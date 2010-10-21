@@ -1,0 +1,13 @@
+target=gov.nasa.jpf.abstraction.Example
+
+classpath=${jpf-abstraction}/build/tests
+
+sourcepath=${jpf-abstraction}/src/tests
+
+abstract.method= gov.nasa.jpf.abstraction.Example.test(sym#sym)
+
+abstract.domain=SIGN
+
+listener = gov.nasa.jpf.abstraction.AbstractListener
+
+vm.storage.class=nil
