@@ -1,39 +1,56 @@
 package gov.nasa.jpf.abstraction.numeric;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Signs extends Abstraction {
 	public static Signs POS = new Signs();
 	public static Signs NEG = new Signs();
 	public static Signs ZERO = new Signs();
-	public static Signs TOP = new Signs();
+	public static Signs TOP = new Signs(true);
+
+
+
+	public Set<Abstraction>   get_tokens() {
+		Set<Abstraction> tokens = new HashSet<Abstraction>();
+		tokens.add(POS);
+		tokens.add(NEG);
+		tokens.add(ZERO);
+		return tokens;
+	}
 
 	public Signs () {
 	}
 
+	public Signs (boolean isTop) {
+		this.isTop = isTop;
+	}
+
 	public Signs abstract_map(int v) {
-		if(v > 0) return Signs.POS;
-		if(v == 0) return Signs.ZERO;
+		if(v > 0) return POS;
+		if(v == 0) return ZERO;
 		// if (v < 0)
-		return Signs.NEG;
+		return NEG;
 	}
 
 	@Override
-	public Signs _plus(int right) {
+	public Abstraction _plus(int right) {
 		return _plus(abstract_map(right));
 	}
 
 	@Override
-	public Signs _plus(Abstraction right) {
+	public Abstraction _plus(Abstraction right) {
 		if(right instanceof Signs) {
 			Signs right_value = (Signs) right;
-			if (this == Signs.POS && right_value == Signs.POS) return Signs.POS;
-			if (this == Signs.POS && right_value == Signs.ZERO) return Signs.POS;
-			if (this == Signs.ZERO && right_value == Signs.POS) return Signs.POS;
-			if (this == Signs.ZERO && right_value == Signs.ZERO) return Signs.ZERO;
-			if (this == Signs.ZERO && right_value == Signs.NEG) return Signs.NEG;
-			if (this == Signs.NEG && right_value == Signs.NEG) return Signs.NEG;
-			if (this == Signs.NEG && right_value == Signs.ZERO) return Signs.NEG;
+			if (this == POS && right_value == POS) return POS;
+			if (this == POS && right_value == ZERO) return POS;
+			if (this == ZERO && right_value == POS) return POS;
+			if (this == ZERO && right_value == ZERO) return ZERO;
+			if (this == ZERO && right_value == NEG) return NEG;
+			if (this == NEG && right_value == NEG) return NEG;
+			if (this == NEG && right_value == ZERO) return NEG;
 			// else
-			return Signs.TOP;
+			return TOP;
 		}
 		else
 			throw new RuntimeException("## Error: unknown abstraction");
@@ -43,15 +60,15 @@ public class Signs extends Abstraction {
 	public Abstraction _minus(Abstraction right) {
 		if(right instanceof Signs) {
 			Signs right_value = (Signs) right;
-			if (this == Signs.POS && right_value == Signs.ZERO) return Signs.POS;
-			if (this == Signs.POS && right_value == Signs.NEG) return Signs.POS;
-			if (this == Signs.ZERO && right_value == Signs.POS) return Signs.NEG;
-			if (this == Signs.ZERO && right_value == Signs.ZERO) return Signs.ZERO;
-			if (this == Signs.ZERO && right_value == Signs.NEG) return Signs.POS;
-			if (this == Signs.NEG && right_value == Signs.POS) return Signs.NEG;
-			if (this == Signs.NEG && right_value == Signs.ZERO) return Signs.NEG;
+			if (this == POS && right_value == ZERO) return POS;
+			if (this == POS && right_value == NEG) return POS;
+			if (this == ZERO && right_value == POS) return NEG;
+			if (this == ZERO && right_value == ZERO) return ZERO;
+			if (this == ZERO && right_value == NEG) return POS;
+			if (this == NEG && right_value == POS) return NEG;
+			if (this == NEG && right_value == ZERO) return NEG;
 			// else
-			return Signs.TOP;
+			return TOP;
 		}
 		else
 			throw new RuntimeException("## Error: unknown abstraction");
@@ -71,13 +88,13 @@ public class Signs extends Abstraction {
 	public AbstractBoolean _ge(Abstraction right) {
 		if(right instanceof Signs) {
 			Signs right_value = (Signs) right;
-			if(this == Signs.POS && right_value == Signs.ZERO) return AbstractBoolean.TRUE;
-			if(this == Signs.POS && right_value == Signs.NEG) return AbstractBoolean.TRUE;
-			if(this == Signs.ZERO && right_value == Signs.ZERO) return AbstractBoolean.TRUE;
-			if(this == Signs.ZERO && right_value == Signs.NEG) return AbstractBoolean.TRUE;
-			if(this == Signs.ZERO && right_value == Signs.POS) return AbstractBoolean.FALSE;
-			if(this == Signs.NEG && right_value == Signs.ZERO) return AbstractBoolean.FALSE;
-			if(this == Signs.NEG && right_value == Signs.POS) return AbstractBoolean.FALSE;
+			if(this == POS && right_value == ZERO) return AbstractBoolean.TRUE;
+			if(this == POS && right_value == NEG) return AbstractBoolean.TRUE;
+			if(this == ZERO && right_value == ZERO) return AbstractBoolean.TRUE;
+			if(this == ZERO && right_value == NEG) return AbstractBoolean.TRUE;
+			if(this == ZERO && right_value == POS) return AbstractBoolean.FALSE;
+			if(this == NEG && right_value == ZERO) return AbstractBoolean.FALSE;
+			if(this == NEG && right_value == POS) return AbstractBoolean.FALSE;
 			// else
 			return AbstractBoolean.TOP;
 		}
@@ -92,13 +109,13 @@ public class Signs extends Abstraction {
 	public AbstractBoolean _gt(Abstraction right) {
 		if(right instanceof Signs) {
 			Signs right_value = (Signs) right;
-			if(this == Signs.POS && right_value == Signs.ZERO) return AbstractBoolean.TRUE;
-			if(this == Signs.POS && right_value == Signs.NEG) return AbstractBoolean.TRUE;
-			if(this == Signs.ZERO && right_value == Signs.ZERO) return AbstractBoolean.FALSE;
-			if(this == Signs.ZERO && right_value == Signs.NEG) return AbstractBoolean.TRUE;
-			if(this == Signs.ZERO && right_value == Signs.POS) return AbstractBoolean.FALSE;
-			if(this == Signs.NEG && right_value == Signs.ZERO) return AbstractBoolean.FALSE;
-			if(this == Signs.NEG && right_value == Signs.POS) return AbstractBoolean.FALSE;
+			if(this == POS && right_value == ZERO) return AbstractBoolean.TRUE;
+			if(this == POS && right_value == NEG) return AbstractBoolean.TRUE;
+			if(this == ZERO && right_value == ZERO) return AbstractBoolean.FALSE;
+			if(this == ZERO && right_value == NEG) return AbstractBoolean.TRUE;
+			if(this == ZERO && right_value == POS) return AbstractBoolean.FALSE;
+			if(this == NEG && right_value == ZERO) return AbstractBoolean.FALSE;
+			if(this == NEG && right_value == POS) return AbstractBoolean.FALSE;
 			// else
 			return AbstractBoolean.TOP;
 		}
@@ -113,13 +130,13 @@ public class Signs extends Abstraction {
 	public AbstractBoolean _le(Abstraction right) {
 		if(right instanceof Signs) {
 			Signs right_value = (Signs) right;
-			if(this == Signs.ZERO && right_value == Signs.POS) return AbstractBoolean.TRUE;
-			if(this == Signs.NEG && right_value == Signs.POS) return AbstractBoolean.TRUE;
-			if(this == Signs.NEG && right_value == Signs.ZERO) return AbstractBoolean.TRUE;
-			if(this == Signs.ZERO && right_value == Signs.ZERO) return AbstractBoolean.TRUE;
-			if(this == Signs.ZERO && right_value == Signs.NEG) return AbstractBoolean.FALSE;
-			if(this == Signs.POS && right_value == Signs.NEG) return AbstractBoolean.FALSE;
-			if(this == Signs.POS && right_value == Signs.ZERO) return AbstractBoolean.FALSE;
+			if(this == ZERO && right_value == POS) return AbstractBoolean.TRUE;
+			if(this == NEG && right_value == POS) return AbstractBoolean.TRUE;
+			if(this == NEG && right_value == ZERO) return AbstractBoolean.TRUE;
+			if(this == ZERO && right_value == ZERO) return AbstractBoolean.TRUE;
+			if(this == ZERO && right_value == NEG) return AbstractBoolean.FALSE;
+			if(this == POS && right_value == NEG) return AbstractBoolean.FALSE;
+			if(this == POS && right_value == ZERO) return AbstractBoolean.FALSE;
 			// else
 			return AbstractBoolean.TOP;
 		}
@@ -134,13 +151,13 @@ public class Signs extends Abstraction {
 	public AbstractBoolean _lt(Abstraction right) {
 		if(right instanceof Signs) {
 			Signs right_value = (Signs) right;
-			if(this == Signs.ZERO && right_value == Signs.POS) return AbstractBoolean.TRUE;
-			if(this == Signs.NEG && right_value == Signs.POS) return AbstractBoolean.TRUE;
-			if(this == Signs.NEG && right_value == Signs.ZERO) return AbstractBoolean.TRUE;
-			if(this == Signs.ZERO && right_value == Signs.ZERO) return AbstractBoolean.FALSE;
-			if(this == Signs.ZERO && right_value == Signs.NEG) return AbstractBoolean.FALSE;
-			if(this == Signs.POS && right_value == Signs.NEG) return AbstractBoolean.FALSE;
-			if(this == Signs.POS && right_value == Signs.ZERO) return AbstractBoolean.FALSE;
+			if(this == ZERO && right_value == POS) return AbstractBoolean.TRUE;
+			if(this == NEG && right_value == POS) return AbstractBoolean.TRUE;
+			if(this == NEG && right_value == ZERO) return AbstractBoolean.TRUE;
+			if(this == ZERO && right_value == ZERO) return AbstractBoolean.FALSE;
+			if(this == ZERO && right_value == NEG) return AbstractBoolean.FALSE;
+			if(this == POS && right_value == NEG) return AbstractBoolean.FALSE;
+			if(this == POS && right_value == ZERO) return AbstractBoolean.FALSE;
 			// else
 			return AbstractBoolean.TOP;
 		}
@@ -154,10 +171,10 @@ public class Signs extends Abstraction {
 
 	public String toString () {
 		if (this instanceof Signs) {
-			if(this == Signs.ZERO) return "ZERO";
-			if(this == Signs.POS) return "POS";
-			if(this == Signs.NEG) return "NEG";
-			if(this == Signs.TOP) return "TOP";
+			if(this == ZERO) return "ZERO";
+			if(this == POS) return "POS";
+			if(this == NEG) return "NEG";
+			if(this == TOP) return "TOP";
 		}
 		else
 			throw new RuntimeException("## Error: unknown abstraction");

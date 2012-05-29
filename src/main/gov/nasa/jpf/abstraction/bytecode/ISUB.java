@@ -46,15 +46,13 @@ public class ISUB extends gov.nasa.jpf.jvm.bytecode.ISUB {
 			int v2 = th.pop();
 			th.push(0, false); // for abstract expressions, the concrete value does not matter for now
 
-			Abstraction result = null;
-			if(abs_v2!=null) {
-				if (abs_v1!=null)
-					result = abs_v2._minus(abs_v1);
-				else // v1 is concrete
-					result = abs_v2._minus(v1);
+			Abstraction result = Abstraction._sub(v1, abs_v1, v2, abs_v2);
+
+			// if result is TOP we need to introduce a non-deterministic choice
+			if(result.isTop()) {
+				System.out.println("non det choice ...");
 			}
-			else if (abs_v1!=null)
-				result = abs_v1._minus_reverse(v2);
+
 			sf.setOperandAttr(result);
 
 			//System.out.println("Execute ISUB: "+result);

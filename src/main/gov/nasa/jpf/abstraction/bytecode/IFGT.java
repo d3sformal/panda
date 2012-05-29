@@ -32,6 +32,11 @@ import gov.nasa.jpf.jvm.bytecode.Instruction;
 
 public class IFGT extends gov.nasa.jpf.jvm.bytecode.IFGT {
 
+	public IFGT(int targetPc) {
+		super(targetPc);
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public Instruction execute (SystemState ss, KernelState ks, ThreadInfo ti) {
 

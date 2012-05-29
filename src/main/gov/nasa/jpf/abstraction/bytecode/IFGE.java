@@ -28,10 +28,12 @@ import gov.nasa.jpf.jvm.SystemState;
 import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 
-
-// we should factor out some of the code and put it in a parent class for all "if statements"
-
 public class IFGE extends gov.nasa.jpf.jvm.bytecode.IFGE {
+
+	public IFGE(int targetPc) {
+		super(targetPc);
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public Instruction execute (SystemState ss, KernelState ks, ThreadInfo ti) {

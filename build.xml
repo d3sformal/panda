@@ -4,7 +4,7 @@
   build.xml - generic JPF extension build script
               using Ant (http://jakarta.apache.org/ant)
   public targets:
-    
+
     compile           compile JPF and its specific (modeled) environment libraries
     test              run all JPF tests
     jar               build JPF jar files
@@ -16,12 +16,12 @@
 
   <!-- ========================== COMMON SECTION ========================== -->
 
-  <!-- 
+  <!--
     local props have to come first, because Ant properties are immutable
     NOTE: this file is local - it is never in the repository!
   -->
   <property file="local.properties"/>
-  
+
   <!-- this is where we get the 'jpf.core' location from -->
   <property file="${user.home}/.jpf/site.properties"/>
 
@@ -101,7 +101,7 @@
 
 
   <!-- ======================= COMPILE SECTION ============================= -->
-    
+
   <!-- public compile -->
   <target name="compile" depends="-init,-compile-annotations,-compile-main,-compile-peers,-compile-classes,-compile-tests,-compile-examples"
           description="compile all JPF core sources" >
@@ -162,9 +162,9 @@
     </javac>
     </target>
 
-  
+
   <!-- ======================= MISC SECTION ================================ -->
-  
+
   <!-- build jars -->
   <target name="build" depends="compile,-jar-jvm,-jar-jpf,-jar-annotations"
         description="generate the ${ant.project.name} jar files" >
@@ -172,22 +172,22 @@
 
   <target name="-jar-jvm" if="have_jvm_code">
     <jar jarfile="build/${ant.project.name}.jar">
-      <fileset dir="build/main" erroronmissingdir="false"/>
-      <fileset dir="build/peers" erroronmissingdir="false"/>
+      <fileset dir="build/main"/>
+      <fileset dir="build/peers"/>
     </jar>
   </target>
 
   <target name="-jar-jpf" if="have_jpf_code">
     <jar jarfile="build/${ant.project.name}-classes.jar">
-      <fileset dir="build/classes" erroronmissingdir="false"/>
-      <fileset dir="build/annotations" erroronmissingdir="false"/>
+      <fileset dir="build/classes"/>
+      <fileset dir="build/annotations"/>
     </jar>
   </target>
 
   <target name="-jar-annotations" if="have_annotations">
     <!-- optional jar that contains annotations to be used in non-JPF dependent apps -->
     <jar jarfile="build/${ant.project.name}-annotations.jar">
-      <fileset dir="build/annotations" erroronmissingdir="false"/>
+      <fileset dir="build/annotations"/>
     </jar>
   </target>
 
@@ -215,7 +215,7 @@
       <fileset dir="." includes="**/error.xml" />
     </delete>
   </target>
-  
+
 
 
   <!-- ======================= TEST SECTION ================================ -->
@@ -246,8 +246,8 @@
       </batchtest>
 
     </junit>
-   
+
   </target>
 
-  
+
 </project>

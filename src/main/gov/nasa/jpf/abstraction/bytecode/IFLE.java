@@ -34,6 +34,11 @@ import gov.nasa.jpf.jvm.StackFrame;
 
 public class IFLE extends gov.nasa.jpf.jvm.bytecode.IFLE {
 
+	public IFLE(int targetPc) {
+		super(targetPc);
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public Instruction execute (SystemState ss, KernelState ks, ThreadInfo ti) {
 

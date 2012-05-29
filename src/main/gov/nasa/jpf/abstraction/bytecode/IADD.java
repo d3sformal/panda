@@ -38,17 +38,15 @@ public class IADD extends gov.nasa.jpf.jvm.bytecode.IADD {
 		else {
 			int v1 = th.pop();
 			int v2 = th.pop();
-			th.push(0, false); // for abstract operations, the concrete value does not matter for now
 
-			Abstraction result = null;
-			if(abs_v1!=null) {
-				if (abs_v2!=null)
-					result = abs_v1._plus(abs_v2);
-				else // v2 is concrete
-					result = abs_v1._plus(v2);
+			Abstraction result = Abstraction._add(v1, abs_v1, v2, abs_v2);
+
+			// if result is TOP we need to introduce a non-deterministic choice to add precision
+			if(result.isTop()) {
+				System.out.println("non det choice ...");
 			}
-			else if (abs_v2!=null)
-				result = abs_v2._plus(v1);
+
+			th.push(0, false); // for abstract operations, the concrete value does not matter for now
 			sf.setOperandAttr(result);
 
 			//System.out.println("Execute IADD: "+result);

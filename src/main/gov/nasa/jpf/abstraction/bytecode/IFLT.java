@@ -32,6 +32,11 @@ import gov.nasa.jpf.jvm.StackFrame;
 
 public class IFLT extends gov.nasa.jpf.jvm.bytecode.IFLT {
 
+	public IFLT(int targetPc) {
+		super(targetPc);
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public Instruction execute (SystemState ss, KernelState ks, ThreadInfo ti) {
 
