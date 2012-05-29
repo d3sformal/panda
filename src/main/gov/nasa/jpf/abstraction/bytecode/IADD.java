@@ -32,7 +32,6 @@ public class IADD extends gov.nasa.jpf.jvm.bytecode.IADD {
 		StackFrame sf = th.getTopFrame();
 		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
 		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
-
 		if(abs_v1==null && abs_v2==null)
 			return super.execute(ss, ks, th); // we'll still do the concrete execution
 		else {
@@ -49,7 +48,7 @@ public class IADD extends gov.nasa.jpf.jvm.bytecode.IADD {
 			th.push(0, false); // for abstract operations, the concrete value does not matter for now
 			sf.setOperandAttr(result);
 
-			//System.out.println("Execute IADD: "+result);
+			System.out.println("Execute IADD: "+result);
 
 			return getNext(th);
 		}

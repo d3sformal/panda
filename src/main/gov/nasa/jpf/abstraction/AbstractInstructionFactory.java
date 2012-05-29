@@ -28,57 +28,69 @@ import gov.nasa.jpf.abstraction.numeric.Signs;
 
 import gov.nasa.jpf.util.InstructionFactoryFilter;
 
+public class AbstractInstructionFactory extends
+		gov.nasa.jpf.jvm.bytecode.InstructionFactory {
 
+	public Instruction iadd() {
+		return (filter.isInstrumentedClass(ci) ? new IADD() : super.iadd());
+	}
 
+	public Instruction isub() {
+		return (filter.isInstrumentedClass(ci) ? new ISUB() : super.isub());
+	}
 
+	public Instruction imul() {
+		return (filter.isInstrumentedClass(ci) ? new IMUL() : super.imul());
+	}
+	
+	public Instruction idiv() {
+		return (filter.isInstrumentedClass(ci) ? new IDIV() : super.idiv());
+	}	
 
-public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.InstructionFactory {
+	public Instruction ineg() {
+		return (filter.isInstrumentedClass(ci) ? new INEG() : super.ineg());
+	}
 
-	 public Instruction iadd() {
-        return (filter.isInstrumentedClass(ci) ? new IADD(): super.iadd());
-      }
+	public Instruction ifle(int targetPc) {
+		return (filter.isInstrumentedClass(ci) ? new IFLE(targetPc) : super
+				.ifle(targetPc));
+	}
 
-	 public Instruction isub() {
-        return (filter.isInstrumentedClass(ci) ? new ISUB() : super.isub());
-      }
+	public Instruction iflt(int targetPc) {
+		return (filter.isInstrumentedClass(ci) ? new IFLT(targetPc) : super
+				.iflt(targetPc));
+	}
 
-	 public Instruction ifle(int targetPc) {
-         return (filter.isInstrumentedClass(ci) ? new IFLE(targetPc) : super.ifle(targetPc));
-       }
+	public Instruction ifge(int targetPc) {
+		return (filter.isInstrumentedClass(ci) ? new IFGE(targetPc) : super
+				.ifge(targetPc));
+	}
 
-	 public Instruction iflt(int targetPc) {
-         return (filter.isInstrumentedClass(ci) ? new IFLT(targetPc) : super.iflt(targetPc));
-       }
-
-	 public Instruction ifge(int targetPc) {
-         return (filter.isInstrumentedClass(ci) ? new IFGE(targetPc): super.ifge(targetPc));
-       }
-
-	 public Instruction ifgt(int targetPc) {
-          return (filter.isInstrumentedClass(ci) ? new IFGT(targetPc): super.ifgt(targetPc));
-       }
-
+	public Instruction ifgt(int targetPc) {
+		return (filter.isInstrumentedClass(ci) ? new IFGT(targetPc) : super
+				.ifgt(targetPc));
+	}
 
 	ClassInfo ci;
 	InstructionFactoryFilter filter;
 
-	 @Override
-	 public void setClassInfoContext(ClassInfo ci){
-		    this.ci = ci;
-	 }
+	@Override
+	public void setClassInfoContext(ClassInfo ci) {
+		this.ci = ci;
+	}
 
+	public static Abstraction abs;
 
-
-	 public static Abstraction abs;
-
-	 public  AbstractInstructionFactory (Config conf){
+	public AbstractInstructionFactory(Config conf) {
 
 		System.out.println("Running Abstract PathFinder ...");
 
-		filter = new InstructionFactoryFilter(null, new String[] {/*"java.*",*/ "javax.*" },null, null);
+		filter = new InstructionFactoryFilter(null,
+				new String[] {/* "java.*", */"javax.*" }, null, null);
 
-		abs = new Signs(); // for now we only have one abstraction but in the future this should be customized based on user config
+		abs = new Signs(); // for now we only have one abstraction but in the
+							// future this should be customized based on user
+							// config
 	}
-
 
 }

@@ -55,7 +55,7 @@ public class ISUB extends gov.nasa.jpf.jvm.bytecode.ISUB {
 
 			sf.setOperandAttr(result);
 
-			//System.out.println("Execute ISUB: "+result);
+			System.out.println("Execute ISUB: "+result);
 
 			return getNext(th);
 		}

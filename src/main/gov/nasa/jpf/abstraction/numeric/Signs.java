@@ -85,6 +85,65 @@ public class Signs extends Abstraction {
 	}
 
 	@Override
+	public Abstraction _mul(int right) {
+		return _mul(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _mul(Abstraction right) {
+		if(right instanceof Signs) {
+			Signs right_value = (Signs) right;
+			if (this == POS && right_value == POS) return POS;
+			if (this == POS && right_value == ZERO) return ZERO;
+			if (this == POS && right_value == NEG) return NEG;
+			if (this == ZERO && right_value == POS) return ZERO;
+			if (this == ZERO && right_value == ZERO) return ZERO;
+			if (this == ZERO && right_value == NEG) return ZERO;
+			if (this == NEG && right_value == POS) return NEG;
+			if (this == NEG && right_value == ZERO) return ZERO;
+			if (this == NEG && right_value == NEG) return POS;			
+			// else (if this or right_value is TOP)
+			return TOP;
+		}
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}	
+
+	@Override
+	public Abstraction _div(int right) {
+		return _div(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _div(Abstraction right) {
+		if(right instanceof Signs) {
+			Signs right_value = (Signs) right;
+			if (this == POS && right_value == POS) return POS;
+			if (this == POS && right_value == NEG) return NEG;
+			if (this == ZERO && right_value == POS) return ZERO;			
+			if (this == ZERO && right_value == NEG) return ZERO;
+			if (this == NEG && right_value == POS) return NEG;
+			if (this == NEG && right_value == NEG) return POS;
+			// TODO: raise a proper exception
+			if (right_value == ZERO)
+				throw new ArithmeticException("Division by zero (in abstract IDIV)");			
+			// else (if this or right_value is TOP)
+			return TOP;
+		}
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}		
+	
+	@Override
+	public Abstraction _neg() {
+		if (this == POS)	return NEG;
+		if (this == NEG)	return POS;
+		if (this == ZERO)	return ZERO;
+		// else (if this is TOP)
+		return TOP;
+	}
+	
+	@Override
 	public AbstractBoolean _ge(Abstraction right) {
 		if(right instanceof Signs) {
 			Signs right_value = (Signs) right;

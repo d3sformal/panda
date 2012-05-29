@@ -25,6 +25,32 @@ public class Abstraction {
 			result = abs_v2._plus(v1);
 		return result;
 	}
+	
+	public static Abstraction _mul(int v1, Abstraction abs_v1, int v2, Abstraction abs_v2) {
+		Abstraction result = null;
+		if(abs_v1!=null) {
+			if (abs_v2!=null)
+				result = abs_v1._mul(abs_v2);
+			else // v2 is concrete
+				result = abs_v1._mul(v2);
+		}
+		else if (abs_v2!=null)
+			result = abs_v2._mul(v1);
+		return result;
+	}	
+	
+	public static Abstraction _div(int v1, Abstraction abs_v1, int v2, Abstraction abs_v2) {
+		Abstraction result = null;
+		if(abs_v1!=null) {
+			if (abs_v2!=null)
+				result = abs_v1._div(abs_v2);
+			else // v2 is concrete
+				result = abs_v1._div(v2);
+		}
+		else if (abs_v2!=null)
+			result = abs_v2._div(v1);
+		return result;
+	}		
 
 	public static Abstraction _sub(int v1, Abstraction abs_v1, int v2, Abstraction abs_v2) {
 		Abstraction result = null;
@@ -38,12 +64,25 @@ public class Abstraction {
 			result = abs_v1._minus_reverse(v2);
 		return result;
 	}
+	
+	public static Abstraction _neg(Abstraction abs_v1) {
+		if (abs_v1 != null)
+			return abs_v1._neg();
+		else
+			return null; // abstraction is not determined
+	}
 
+	public Abstraction _neg() {throw new RuntimeException("negation not implemented");}
+	
 	public Abstraction _plus(Abstraction right) {throw new RuntimeException("plus not implemented");}
 	public Abstraction _plus(int right) {throw new RuntimeException("plus not implemented");}
 	public Abstraction _minus(Abstraction right) {throw new RuntimeException("minus not implemented");}
 	public Abstraction _minus(int right) {throw new RuntimeException("minus not implemented");}
 	public Abstraction _minus_reverse(int right) {throw new RuntimeException("minus_reverse not implemented");}
+	public Abstraction _mul(Abstraction right) {throw new RuntimeException("plus not implemented");}
+	public Abstraction _mul(int right) {throw new RuntimeException("plus not implemented");}
+	public Abstraction _div(Abstraction right) {throw new RuntimeException("plus not implemented");}
+	public Abstraction _div(int right) {throw new RuntimeException("plus not implemented");}	
 
 	public AbstractBoolean _lt(Abstraction right) {throw new RuntimeException("lt not implemented");}
 	public AbstractBoolean _lt(int right) {throw new RuntimeException("lt not implemented");}
