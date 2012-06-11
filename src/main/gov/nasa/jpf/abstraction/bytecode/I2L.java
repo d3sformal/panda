@@ -6,35 +6,24 @@ import gov.nasa.jpf.jvm.StackFrame;
 import gov.nasa.jpf.jvm.SystemState;
 import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
-import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
 
-/**
- * Negate int ..., value => ..., result
- */
-public class INEG extends gov.nasa.jpf.jvm.bytecode.INEG {
+public class I2L extends gov.nasa.jpf.jvm.bytecode.I2L {
 
 	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
-
 		StackFrame sf = th.getTopFrame();
-		Abstraction abs_val = (Abstraction) sf.getOperandAttr(0);
+		Abstraction abs_val = (Abstraction) sf.getOperandAttr(0);		
+		
 		if (abs_val == null)
 			return super.execute(ss, ks, th);
 		else {
 			int val = th.pop(); // just to pop it
+			th.longPush(0);
+			sf.setOperandAttr(abs_val);
 
-			Abstraction result = Abstraction._neg(abs_val);
-
-			if (result.isTop()) {
-				System.out.println("non det choice ...");
-			}
-
-			th.push(0, false);
-			sf.setOperandAttr(result);
-
-			System.out.println("Execute INEG: " + result);
+			System.out.println("Execute I2L: " + abs_val);
 
 			return getNext(th);
-		}
+		}		
 	}
 
 }

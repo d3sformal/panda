@@ -7,37 +7,35 @@ import gov.nasa.jpf.jvm.SystemState;
 import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 
-public class IAND extends gov.nasa.jpf.jvm.bytecode.IAND {
+public class LSHL extends gov.nasa.jpf.jvm.bytecode.LSHL {
 
 	@Override
 	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
-
 		StackFrame sf = th.getTopFrame();
-		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
-		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
+		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(1);
+		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(3);
+
 		if (abs_v1 == null && abs_v2 == null)
 			return super.execute(ss, ks, th); // we'll still do the concrete
 												// execution
 		else {
-			int v1 = th.pop();
-			int v2 = th.pop();
+			long v1 = th.longPop();
+			long v2 = th.longPop();
 
-			Abstraction result = Abstraction._and(v1, abs_v1, v2, abs_v2);
+			th.longPush(0); // for abstract execution the concrete value does
+							// not matter
+			Abstraction result = Abstraction._shl(v1, abs_v1, v2, abs_v2);
 
-			// if result is TOP we need to introduce a non-deterministic choice
-			// to add precision
 			if (result.isTop()) {
-				System.err.println("non det choice ...");
+				System.out.println("non det choice ...");
 			}
 
-			th.push(0, false); // for abstract operations, the concrete value
-								// does not matter for now
-			sf.setOperandAttr(result);
+			sf.setLongOperandAttr(result);
 
-			System.err.println("Execute IAND: " + result);
+			System.out.println("Execute LSHL: " + result);
 
 			return getNext(th);
 		}
-	}
-
+	}		
+	
 }

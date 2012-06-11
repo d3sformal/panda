@@ -9,7 +9,6 @@ import gov.nasa.jpf.jvm.bytecode.Instruction;
 
 public class IMUL extends gov.nasa.jpf.jvm.bytecode.IMUL {
 
-
 	@Override
 	public Instruction execute (SystemState ss, KernelState ks, ThreadInfo th) {
 

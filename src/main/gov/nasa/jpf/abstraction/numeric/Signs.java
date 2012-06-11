@@ -9,7 +9,30 @@ public class Signs extends Abstraction {
 	public static Signs ZERO = new Signs();
 	public static Signs TOP = new Signs(true);
 
-
+//	@Override
+//	public Abstraction _binaryOperation(int right) {
+//		return _binaryOperation(abstract_map(right));
+//	}
+//
+//	@Override
+//	public Abstraction _binaryOperation(Abstraction right) {
+//		if(right instanceof Signs) {
+//			Signs right_value = (Signs) right;
+//			if (this == NEG	&& right_value == NEG) return null;
+//			if (this == NEG	&& right_value == ZERO) return null;			
+//			if (this == NEG	&& right_value == POS) return null;				
+//			if (this == ZERO && right_value == NEG) return null;
+//			if (this == ZERO && right_value == ZERO) return null;			
+//			if (this == ZERO && right_value == POS) return null;				
+//			if (this == POS && right_value == NEG) return null;
+//			if (this == POS && right_value == ZERO) return null;			
+//			if (this == POS && right_value == POS) return null;						
+//			// else (if this or right_value is TOP)
+//			return TOP;
+//		}
+//		else
+//			throw new RuntimeException("## Error: unknown abstraction");
+//	}			
 
 	public Set<Abstraction>   get_tokens() {
 		Set<Abstraction> tokens = new HashSet<Abstraction>();
@@ -32,11 +55,23 @@ public class Signs extends Abstraction {
 		// if (v < 0)
 		return NEG;
 	}
+	
+	public Signs abstract_map(long v) {
+		if(v > 0) return POS;
+		if(v == 0) return ZERO;
+		// if (v < 0)
+		return NEG;
+	}	
 
 	@Override
 	public Abstraction _plus(int right) {
 		return _plus(abstract_map(right));
 	}
+	
+	@Override
+	public Abstraction _plus(long right) {
+		return _plus(abstract_map(right));
+	}	
 
 	@Override
 	public Abstraction _plus(Abstraction right) {
@@ -80,7 +115,17 @@ public class Signs extends Abstraction {
 	}
 
 	@Override
+	public Abstraction _minus(long right) {
+		return _minus(abstract_map(right));
+	}
+
+	@Override
 	public Abstraction _minus_reverse(int right) {
+		return abstract_map(right)._minus(this);
+	}	
+	
+	@Override
+	public Abstraction _minus_reverse(long right) {
 		return abstract_map(right)._minus(this);
 	}
 
@@ -89,6 +134,11 @@ public class Signs extends Abstraction {
 		return _mul(abstract_map(right));
 	}
 
+	@Override
+	public Abstraction _mul(long right) {
+		return _mul(abstract_map(right));
+	}	
+	
 	@Override
 	public Abstraction _mul(Abstraction right) {
 		if(right instanceof Signs) {
@@ -115,6 +165,12 @@ public class Signs extends Abstraction {
 	}
 
 	@Override
+	public Abstraction _div(long right) {
+		return _div(abstract_map(right));
+	}
+	
+	
+	@Override
 	public Abstraction _div(Abstraction right) {
 		if(right instanceof Signs) {
 			Signs right_value = (Signs) right;
@@ -128,6 +184,208 @@ public class Signs extends Abstraction {
 			if (right_value == ZERO)
 				throw new ArithmeticException("Division by zero (in abstract IDIV)");			
 			// else (if this or right_value is TOP)
+			return TOP;
+		}
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}	
+	
+
+	@Override
+	public Abstraction _rem(int right) {
+		return _div(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _rem(long right) {
+		return _div(abstract_map(right));
+	}	
+	
+	@Override
+	public Abstraction _rem(Abstraction right) {
+		if(right instanceof Signs) {
+			Signs right_value = (Signs) right;
+			// if (this == NEG && right_value == NEG) return ZERO_OR_POS;			
+			// if (this == NEG	&& right_value == POS) return ZERO_OR_POS;				
+			if (this == ZERO && right_value == NEG) return ZERO;			
+			if (this == ZERO && right_value == POS) return ZERO;				
+			// if (this == POS && right_value == NEG) return ZERO_OR_POS;			
+			// if (this == POS && right_value == POS) return ZERO_OR_POS;
+			// TODO: raise a proper exception
+			if (right_value == ZERO)
+				throw new ArithmeticException("Division by zero (in abstract IREM)");			
+			// else (if this or right_value is TOP)
+			return TOP;
+		}
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}		
+
+	@Override
+	public Abstraction _bitwise_and(int right) {
+		return _bitwise_and(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _bitwise_and(long right) {
+		return _bitwise_and(abstract_map(right));
+	}	
+	
+	@Override
+	public Abstraction _bitwise_and(Abstraction right) {
+		if(right instanceof Signs) {
+			Signs right_value = (Signs) right;
+			if (this == NEG	&& right_value == NEG) return NEG;
+			if (this == NEG	&& right_value == ZERO) return ZERO;							
+			if (this == ZERO && right_value == NEG) return ZERO;
+			if (this == ZERO && right_value == ZERO) return ZERO;			
+			if (this == ZERO && right_value == POS) return ZERO;				
+			if (this == POS && right_value == ZERO) return ZERO;			
+//			if (this == NEG	&& right_value == POS) return ZERO_OR_POS;			
+//			if (this == POS && right_value == NEG) return ZERO_OR_POS;	
+//			if (this == POS && right_value == POS) return ZERO_OR_POS;				
+			return TOP;
+		}
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}		
+
+	@Override
+	public Abstraction _bitwise_or(int right) {
+		return _bitwise_or(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _bitwise_or(long right) {
+		return _bitwise_or(abstract_map(right));
+	}
+	
+	@Override
+	public Abstraction _bitwise_or(Abstraction right) {
+		if(right instanceof Signs) {
+			Signs right_value = (Signs) right;
+			if (this == NEG	&& right_value == NEG) return NEG;
+			if (this == NEG	&& right_value == ZERO) return NEG;			
+			if (this == NEG	&& right_value == POS) return NEG;			
+			if (this == ZERO && right_value == NEG) return NEG;
+			if (this == ZERO && right_value == ZERO) return ZERO;			
+			if (this == ZERO && right_value == POS) return POS;				
+			if (this == POS && right_value == ZERO) return POS;						
+			if (this == POS && right_value == NEG) return NEG;	
+			if (this == POS && right_value == POS) return POS;				
+			return TOP;
+		}
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}			
+
+	@Override
+	public Abstraction _bitwise_xor(int right) {
+		return _bitwise_xor(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _bitwise_xor(Abstraction right) {
+		if(right instanceof Signs) {
+			Signs right_value = (Signs) right;
+//			if (this == NEG	&& right_value == NEG) return ZERO_OR_POS;
+			if (this == NEG	&& right_value == ZERO) return NEG;			
+			if (this == NEG	&& right_value == POS) return NEG;			
+			if (this == ZERO && right_value == NEG) return NEG;
+			if (this == ZERO && right_value == ZERO) return ZERO;			
+			if (this == ZERO && right_value == POS) return POS;				
+			if (this == POS && right_value == ZERO) return POS;						
+			if (this == POS && right_value == NEG) return NEG;	
+//			if (this == POS && right_value == POS) return ZERO_OR_POS;				
+			return TOP;
+		}
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}				
+	
+	@Override
+	public Abstraction _shift_left(int right) {
+		return _bitwise_or(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _shift_left(long right) {
+		return _bitwise_or(abstract_map(right));
+	}
+	
+	@Override
+	public Abstraction _shift_left(Abstraction right) {
+		if(right instanceof Signs) {
+			Signs right_value = (Signs) right;
+//			if (this == NEG	&& right_value == NEG) return NEG;
+			if (this == NEG	&& right_value == ZERO) return NEG;			
+//			if (this == NEG	&& right_value == POS) return NEG;				
+			if (this == ZERO && right_value == NEG) return ZERO;
+			if (this == ZERO && right_value == ZERO) return ZERO;			
+			if (this == ZERO && right_value == POS) return ZERO;				
+			//if (this == POS && right_value == NEG) return NEG;
+			if (this == POS && right_value == ZERO) return POS;			
+//			if (this == POS && right_value == POS) return POS;						
+			// else (if this or right_value is TOP)
+			return TOP;
+		}
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public Abstraction _shift_right(int right) {
+		return _bitwise_or(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _shift_right(long right) {
+		return _bitwise_or(abstract_map(right));
+	}	
+	
+	@Override
+	public Abstraction _shift_right(Abstraction right) {
+		if(right instanceof Signs) {
+			Signs right_value = (Signs) right;
+			// TODO: sort out when NEG >> * is ZERO
+//			if (this == NEG	&& right_value == NEG) return NEG;
+			if (this == NEG	&& right_value == ZERO) return NEG;			
+//			if (this == NEG	&& right_value == POS) return NEG;				
+			if (this == ZERO && right_value == NEG) return ZERO;
+			if (this == ZERO && right_value == ZERO) return ZERO;			
+			if (this == ZERO && right_value == POS) return ZERO;				
+			//if (this == POS && right_value == NEG) return NEG;
+			if (this == POS && right_value == ZERO) return POS;			
+//			if (this == POS && right_value == POS) return POS;						
+			return TOP;
+		}
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}	
+	
+	@Override
+	public Abstraction _unsigned_shift_right(int right) {
+		return _bitwise_or(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _unsigned_shift_right(long right) {
+		return _bitwise_or(abstract_map(right));
+	}	
+	
+	@Override
+	public Abstraction _unsigned_shift_right(Abstraction right) {
+		if(right instanceof Signs) {
+			Signs right_value = (Signs) right;
+//			if (this == NEG	&& right_value == NEG) return NEG;
+			if (this == NEG	&& right_value == ZERO) return NEG;			
+//			if (this == NEG	&& right_value == POS) return NEG;				
+			if (this == ZERO && right_value == NEG) return ZERO;
+			if (this == ZERO && right_value == ZERO) return ZERO;			
+			if (this == ZERO && right_value == POS) return ZERO;				
+			//if (this == POS && right_value == NEG) return NEG;
+			if (this == POS && right_value == ZERO) return POS;			
+//			if (this == POS && right_value == POS) return POS;						
 			return TOP;
 		}
 		else

@@ -6,35 +6,34 @@ import gov.nasa.jpf.jvm.StackFrame;
 import gov.nasa.jpf.jvm.SystemState;
 import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
-import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
 
-/**
- * Negate int ..., value => ..., result
- */
-public class INEG extends gov.nasa.jpf.jvm.bytecode.INEG {
+public class ISHR extends gov.nasa.jpf.jvm.bytecode.ISHR {
 
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
+	@Override
+	public Instruction execute (SystemState ss, KernelState ks, ThreadInfo th) {
 
 		StackFrame sf = th.getTopFrame();
-		Abstraction abs_val = (Abstraction) sf.getOperandAttr(0);
-		if (abs_val == null)
+		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
+		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
+		if(abs_v1==null && abs_v2==null)
 			return super.execute(ss, ks, th);
 		else {
-			int val = th.pop(); // just to pop it
+			int v1 = th.pop();
+			int v2 = th.pop();
 
-			Abstraction result = Abstraction._neg(abs_val);
+			Abstraction result = Abstraction._shr(v1, abs_v1, v2, abs_v2);
 
-			if (result.isTop()) {
+			if(result.isTop()) {
 				System.out.println("non det choice ...");
 			}
 
 			th.push(0, false);
 			sf.setOperandAttr(result);
 
-			System.out.println("Execute INEG: " + result);
+			System.out.println("Execute ISHR: "+result);
 
 			return getNext(th);
 		}
-	}
-
+	}	
+	
 }

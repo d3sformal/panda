@@ -31,6 +31,34 @@ import gov.nasa.jpf.util.InstructionFactoryFilter;
 public class AbstractInstructionFactory extends
 		gov.nasa.jpf.jvm.bytecode.InstructionFactory {
 
+	public Instruction i2l() {
+		return (filter.isInstrumentedClass(ci) ? new I2L() : super.i2l());
+	}
+
+	public Instruction iand() {
+		return (filter.isInstrumentedClass(ci) ? new IAND() : super.iand());
+	}
+
+	public Instruction ior() {
+		return (filter.isInstrumentedClass(ci) ? new IOR() : super.ior());
+	}
+
+	public Instruction ixor() {
+		return (filter.isInstrumentedClass(ci) ? new IXOR() : super.ixor());
+	}
+
+	public Instruction ishl() {
+		return (filter.isInstrumentedClass(ci) ? new ISHL() : super.ishl());
+	}
+
+	public Instruction ishr() {
+		return (filter.isInstrumentedClass(ci) ? new ISHR() : super.ishr());
+	}
+
+	public Instruction iushr() {
+		return (filter.isInstrumentedClass(ci) ? new IUSHR() : super.iushr());
+	}
+
 	public Instruction iadd() {
 		return (filter.isInstrumentedClass(ci) ? new IADD() : super.iadd());
 	}
@@ -42,13 +70,22 @@ public class AbstractInstructionFactory extends
 	public Instruction imul() {
 		return (filter.isInstrumentedClass(ci) ? new IMUL() : super.imul());
 	}
-	
+
 	public Instruction idiv() {
 		return (filter.isInstrumentedClass(ci) ? new IDIV() : super.idiv());
-	}	
+	}
+
+	public Instruction irem() {
+		return (filter.isInstrumentedClass(ci) ? new IREM() : super.irem());
+	}
 
 	public Instruction ineg() {
 		return (filter.isInstrumentedClass(ci) ? new INEG() : super.ineg());
+	}
+
+	public Instruction iinc(int localVarIndex, int incConstant) {
+		return (filter.isInstrumentedClass(ci) ? new IINC(localVarIndex,
+				incConstant) : super.iinc(localVarIndex, incConstant));
 	}
 
 	public Instruction ifle(int targetPc) {
@@ -69,6 +106,58 @@ public class AbstractInstructionFactory extends
 	public Instruction ifgt(int targetPc) {
 		return (filter.isInstrumentedClass(ci) ? new IFGT(targetPc) : super
 				.ifgt(targetPc));
+	}
+
+	public Instruction l2i() {
+		return (filter.isInstrumentedClass(ci) ? new L2I() : super.l2i());
+	}
+
+	public Instruction ladd() {
+		return (filter.isInstrumentedClass(ci) ? new LADD() : super.ladd());
+	}
+
+	public Instruction land() {
+		return (filter.isInstrumentedClass(ci) ? new LAND() : super.land());
+	}
+
+	public Instruction ldiv() {
+		return (filter.isInstrumentedClass(ci) ? new LDIV() : super.ldiv());
+	}
+
+	public Instruction lmul() {
+		return (filter.isInstrumentedClass(ci) ? new LMUL() : super.lmul());
+	}
+
+	public Instruction lneg() {
+		return (filter.isInstrumentedClass(ci) ? new LNEG() : super.lneg());
+	}
+
+	public Instruction lor() {
+		return (filter.isInstrumentedClass(ci) ? new LOR() : super.lor());
+	}
+
+	public Instruction lrem() {
+		return (filter.isInstrumentedClass(ci) ? new LREM() : super.lrem());
+	}
+
+	public Instruction lshl() {
+		return (filter.isInstrumentedClass(ci) ? new LSHL() : super.lshl());
+	}
+
+	public Instruction lshr() {
+		return (filter.isInstrumentedClass(ci) ? new LSHR() : super.lshr());
+	}
+
+	public Instruction lsub() {
+		return (filter.isInstrumentedClass(ci) ? new LSUB() : super.lsub());
+	}
+
+	public Instruction lushr() {
+		return (filter.isInstrumentedClass(ci) ? new LUSHR() : super.lushr());
+	}
+
+	public Instruction lxor() {
+		return (filter.isInstrumentedClass(ci) ? new LXOR() : super.lxor());
 	}
 
 	ClassInfo ci;
