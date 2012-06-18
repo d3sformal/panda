@@ -44,6 +44,32 @@ public class Abstraction {
 		return result;
 	}	
 
+	public static Abstraction _add(float v1, Abstraction abs_v1, float v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v1 != null) {
+			if (abs_v2 != null)
+				result = abs_v1._plus(abs_v2);
+			else
+				result = abs_v1._plus(v2);
+		} else if (abs_v2 != null)
+			result = abs_v2._plus(v1);
+		return result;
+	}
+
+	public static Abstraction _add(double v1, Abstraction abs_v1, double v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v1 != null) {
+			if (abs_v2 != null)
+				result = abs_v1._plus(abs_v2);
+			else
+				result = abs_v1._plus(v2);
+		} else if (abs_v2 != null)
+			result = abs_v2._plus(v1);
+		return result;
+	}	
+	
 	public static Abstraction _mul(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -70,6 +96,32 @@ public class Abstraction {
 		return result;
 	}	
 
+	public static Abstraction _mul(float v1, Abstraction abs_v1, float v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v1 != null) {
+			if (abs_v2 != null)
+				result = abs_v1._mul(abs_v2);
+			else
+				result = abs_v1._mul(v2);
+		} else if (abs_v2 != null)
+			result = abs_v2._mul(v1);
+		return result;
+	}	
+	
+	public static Abstraction _mul(double v1, Abstraction abs_v1, double v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v1 != null) {
+			if (abs_v2 != null)
+				result = abs_v1._mul(abs_v2);
+			else
+				result = abs_v1._mul(v2);
+		} else if (abs_v2 != null)
+			result = abs_v2._mul(v1);
+		return result;
+	}		
+	
 	public static Abstraction _div(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -96,6 +148,32 @@ public class Abstraction {
 		return result;
 	}	
 	
+	public static Abstraction _div(float v1, Abstraction abs_v1, float v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v1 != null) {
+			if (abs_v2 != null)
+				result = abs_v1._div(abs_v2);
+			else
+				result = abs_v1._div(v2);
+		} else if (abs_v2 != null)
+			result = abs_v2._div(v1);
+		return result;
+	}	
+
+	public static Abstraction _div(double v1, Abstraction abs_v1, double v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v1 != null) {
+			if (abs_v2 != null)
+				result = abs_v1._div(abs_v2);
+			else
+				result = abs_v1._div(v2);
+		} else if (abs_v2 != null)
+			result = abs_v2._div(v1);
+		return result;
+	}		
+	
 	public static Abstraction _rem(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -121,6 +199,32 @@ public class Abstraction {
 			result = abs_v2._rem(v1);
 		return result;
 	}		
+
+	public static Abstraction _rem(float v1, Abstraction abs_v1, float v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v1 != null) {
+			if (abs_v2 != null)
+				result = abs_v1._rem(abs_v2);
+			else
+				result = abs_v1._rem(v2);
+		} else if (abs_v2 != null)
+			result = abs_v2._rem(v1);
+		return result;
+	}		
+	
+	public static Abstraction _rem(double v1, Abstraction abs_v1, double v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v1 != null) {
+			if (abs_v2 != null)
+				result = abs_v1._rem(abs_v2);
+			else
+				result = abs_v1._rem(v2);
+		} else if (abs_v2 != null)
+			result = abs_v2._rem(v1);
+		return result;
+	}			
 	
 	public static Abstraction _sub(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
@@ -147,6 +251,32 @@ public class Abstraction {
 			result = abs_v1._minus_reverse(v2);
 		return result;
 	}	
+	
+	public static Abstraction _sub(float v1, Abstraction abs_v1, float v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v2 != null) {
+			if (abs_v1 != null)
+				result = abs_v2._minus(abs_v1);
+			else
+				result = abs_v2._minus(v1);
+		} else if (abs_v1 != null)
+			result = abs_v1._minus_reverse(v2);
+		return result;
+	}
+	
+	public static Abstraction _sub(double v1, Abstraction abs_v1, double v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v2 != null) {
+			if (abs_v1 != null)
+				result = abs_v2._minus(abs_v1);
+			else
+				result = abs_v2._minus(v1);
+		} else if (abs_v1 != null)
+			result = abs_v1._minus_reverse(v2);
+		return result;
+	}		
 
 	public static Abstraction _neg(Abstraction abs_v1) {
 		if (abs_v1 != null)
@@ -395,6 +525,15 @@ public class Abstraction {
 		throw new RuntimeException("plus not implemented");
 	}	
 
+	public Abstraction _plus(float right) {
+		throw new RuntimeException("plus not implemented");
+	}	
+
+	public Abstraction _plus(double right) {
+		throw new RuntimeException("plus not implemented");
+	}	
+	
+	
 	public Abstraction _minus(Abstraction right) {
 		throw new RuntimeException("minus not implemented");
 	}
@@ -406,12 +545,29 @@ public class Abstraction {
 	public Abstraction _minus(long right) {
 		throw new RuntimeException("minus not implemented");
 	}
+
+	public Abstraction _minus(float right) {
+		throw new RuntimeException("minus not implemented");
+	}
+
+	public Abstraction _minus(double right) {
+		throw new RuntimeException("minus not implemented");
+	}
+	
 	
 	public Abstraction _minus_reverse(int right) {
 		throw new RuntimeException("minus_reverse not implemented");
 	}	
 	
 	public Abstraction _minus_reverse(long right) {
+		throw new RuntimeException("minus_reverse not implemented");
+	}	
+	
+	public Abstraction _minus_reverse(float right) {
+		throw new RuntimeException("minus_reverse not implemented");
+	}	
+	
+	public Abstraction _minus_reverse(double right) {
 		throw new RuntimeException("minus_reverse not implemented");
 	}	
 	
@@ -431,6 +587,14 @@ public class Abstraction {
 		throw new RuntimeException("mul not implemented");
 	}	
 	
+	public Abstraction _mul(float right) {
+		throw new RuntimeException("mul not implemented");
+	}	
+	
+	public Abstraction _mul(double right) {
+		throw new RuntimeException("mul not implemented");
+	}	
+	
 	public Abstraction _div(Abstraction right) {
 		throw new RuntimeException("div not implemented");
 	}
@@ -440,6 +604,14 @@ public class Abstraction {
 	}
 	
 	public Abstraction _div(long right) {
+		throw new RuntimeException("div not implemented");
+	}	
+
+	public Abstraction _div(float right) {
+		throw new RuntimeException("div not implemented");
+	}	
+
+	public Abstraction _div(double right) {
 		throw new RuntimeException("div not implemented");
 	}	
 
@@ -454,7 +626,15 @@ public class Abstraction {
 	public Abstraction _rem(long right) {
 		throw new RuntimeException("rem not implemented");
 	}	
-	
+
+	public Abstraction _rem(float right) {
+		throw new RuntimeException("rem not implemented");
+	}	
+
+	public Abstraction _rem(double right) {
+		throw new RuntimeException("rem not implemented");
+	}	
+
 	public AbstractBoolean _lt(Abstraction right) {
 		throw new RuntimeException("lt not implemented");
 	}

@@ -5,22 +5,23 @@ import gov.nasa.jpf.jvm.KernelState;
 import gov.nasa.jpf.jvm.StackFrame;
 import gov.nasa.jpf.jvm.SystemState;
 import gov.nasa.jpf.jvm.ThreadInfo;
+import gov.nasa.jpf.jvm.Types;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 
-public class L2I extends gov.nasa.jpf.jvm.bytecode.L2I {
-
+public class D2F extends gov.nasa.jpf.jvm.bytecode.D2F {
+	
 	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
 		StackFrame sf = th.getTopFrame();
-		Abstraction abs_val = (Abstraction) sf.getOperandAttr(1);
+		Abstraction abs_val = (Abstraction) sf.getLongOperandAttr();
 
 		if (abs_val == null)
 			return super.execute(ss, ks, th);
 		else {
-			long val = th.longPop(); // just to pop it
+			double val = Types.longToDouble(th.longPop()); // just to pop it
 			th.push(0, false);
 			sf.setOperandAttr(abs_val);
 
-			System.out.println("Execute L2I: " + abs_val);
+			System.out.println("Execute D2F: " + abs_val);
 
 			return getNext(th);
 		}

@@ -1,9 +1,9 @@
 @using=jpf-abstraction
 
-target=gov.nasa.jpf.abstraction.Example
+target=gov.nasa.jpf.abstraction.DoubleBC
 
-classpath=${jpf-abstraction}/build/tests
-sourcepath=${jpf-abstraction}/src/tests
+classpath=build/tests
+sourcepath=src/tests
 
 abstract.domain=SIGN
 

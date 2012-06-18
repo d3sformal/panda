@@ -18,7 +18,7 @@ public class I2L extends gov.nasa.jpf.jvm.bytecode.I2L {
 		else {
 			int val = th.pop(); // just to pop it
 			th.longPush(0);
-			sf.setOperandAttr(abs_val);
+			sf.setLongOperandAttr(abs_val);
 
 			System.out.println("Execute I2L: " + abs_val);
 
