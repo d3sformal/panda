@@ -1,13 +1,20 @@
 package gov.nasa.jpf.abstraction.numeric;
 
+
+
 import java.util.Set;
 
-public class Abstraction {
+public class Abstraction  {
 
 	public Set<Abstraction> get_tokens() {
 		throw new RuntimeException("get_tokens not implemented");
 	}
-
+	
+	// returns number of tokens in abstract domain
+	public int get_num_tokens() {
+		throw new RuntimeException("get_num_tokens not implemented");
+	}
+	
 	boolean isTop = false;
 
 	public boolean isTop() {
@@ -17,7 +24,11 @@ public class Abstraction {
 	public Abstraction abstract_map(int v) {
 		throw new RuntimeException("abstract_map not implemented");
 	}
-
+	
+	public Abstraction abstract_map(double v) {
+		throw new RuntimeException("abstract_map not implemented");
+	}
+	
 	public static Abstraction _add(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;

@@ -26,10 +26,9 @@ public class AbstractChoiceGenerator extends IntIntervalGenerator {
 
 	boolean isReverseOrder;
 
-	// assume we always have 2 choices
-	@SuppressWarnings("deprecation")
+	// assume we always have 2 choices: used only for bools in coditions
 	public AbstractChoiceGenerator() {
-		super(0,1,1);
+		super("abstract",0,1,1);
 		isReverseOrder = false;
 	}
 
@@ -39,9 +38,8 @@ public class AbstractChoiceGenerator extends IntIntervalGenerator {
 	 * the default constructor. If reverseOrder is false
 	 * the usual behavior is used.
 	 */
-	@SuppressWarnings("deprecation")
 	public AbstractChoiceGenerator(boolean reverseOrder) {
-		super(0, 1, reverseOrder ? -1 : 1);
+		super("abstract",0, 1, reverseOrder ? -1 : 1);
 		isReverseOrder = reverseOrder;
 	}
 

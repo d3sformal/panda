@@ -17,11 +17,16 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.jvm.ChoiceGenerator;
 import gov.nasa.jpf.jvm.KernelState;
 import gov.nasa.jpf.jvm.SystemState;
 import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.jvm.StackFrame;
+import gov.nasa.jpf.symbc.numeric.Comparator;
+import gov.nasa.jpf.symbc.numeric.IntegerExpression;
+import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
+import gov.nasa.jpf.symbc.numeric.PathCondition;
 
 
 public class IADD extends gov.nasa.jpf.jvm.bytecode.IADD {
@@ -44,6 +49,12 @@ public class IADD extends gov.nasa.jpf.jvm.bytecode.IADD {
 				System.out.println("non det choice ...");
 			}
 
+			// here we should create a new focus choice generator 
+			// and set the result non-deterministically to each 
+			// token in the abstract domain
+			
+			
+			
 			th.push(0, false);
 			sf.setOperandAttr(result);
 

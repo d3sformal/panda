@@ -16,7 +16,11 @@ public class Signs extends Abstraction {
 		tokens.add(ZERO);
 		return tokens;
 	}
-
+	
+	public int get_num_tokens() {
+		return 3; // don't need top, used in focus choice generator
+	}
+	
 	public Signs() {
 	}
 

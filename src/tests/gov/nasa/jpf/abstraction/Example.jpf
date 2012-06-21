@@ -3,7 +3,9 @@
 target=gov.nasa.jpf.abstraction.Example
 
 classpath=${jpf-abstraction}/build/tests
+
 sourcepath=${jpf-abstraction}/src/tests
+
 
 abstract.domain=SIGN
 

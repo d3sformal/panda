@@ -42,6 +42,7 @@ public class JPF_gov_nasa_jpf_abstraction_Debug {
 
 	public static double makeAbstractReal(MJIEnv env, int objRef, double v){
 		// not implemented yet
+		env.setReturnAttribute(AbstractInstructionFactory.abs.abstract_map(v));
 		return v;
 	}
 
