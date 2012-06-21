@@ -25,6 +25,14 @@ public class Abstraction  {
 		throw new RuntimeException("abstract_map not implemented");
 	}
 	
+	public Abstraction abstract_map(float v) {
+		throw new RuntimeException("abstract_map not implemented");
+	}
+	
+	public Abstraction abstract_map(long v) {
+		throw new RuntimeException("abstract_map not implemented");
+	}	
+	
 	public Abstraction abstract_map(double v) {
 		throw new RuntimeException("abstract_map not implemented");
 	}

@@ -28,6 +28,7 @@ public class Signs extends Abstraction {
 		this.isTop = isTop;
 	}
 
+	@Override
 	public Signs abstract_map(int v) {
 		if (v > 0)
 			return POS;
@@ -37,6 +38,7 @@ public class Signs extends Abstraction {
 		return NEG;
 	}
 
+	@Override
 	public Signs abstract_map(long v) {
 		if (v > 0)
 			return POS;
@@ -46,6 +48,7 @@ public class Signs extends Abstraction {
 		return NEG;
 	}
 
+	@Override
 	public Signs abstract_map(float v) {
 		if (v > 0)
 			return POS;
@@ -57,6 +60,7 @@ public class Signs extends Abstraction {
 		return null;
 	}
 
+	@Override
 	public Signs abstract_map(double v) {
 		if (v > 0)
 			return POS;

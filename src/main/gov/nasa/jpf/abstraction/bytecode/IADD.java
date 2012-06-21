@@ -23,10 +23,10 @@ import gov.nasa.jpf.jvm.SystemState;
 import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.symbc.numeric.Comparator;
-import gov.nasa.jpf.symbc.numeric.IntegerExpression;
-import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
-import gov.nasa.jpf.symbc.numeric.PathCondition;
+//import gov.nasa.jpf.symbc.numeric.Comparator;
+//import gov.nasa.jpf.symbc.numeric.IntegerExpression;
+//import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
+//import gov.nasa.jpf.symbc.numeric.PathCondition;
 
 
 public class IADD extends gov.nasa.jpf.jvm.bytecode.IADD {

@@ -3,9 +3,9 @@ package gov.nasa.jpf.abstraction;
 public class IntBC {
 
 	public static void main(String[] args) {
-		// test_I2F(1);
+		test_I2F(1);
 		test_I2D(1);
-		// test_I2L(1);
+		test_I2L(1);
 		test_IADD(1, 0);
 		test_IAND(1, 0);
 		test_IDIV(1, 1);
@@ -25,19 +25,47 @@ public class IntBC {
 		test_IXOR(1, 0);
 	}
 
+	public static void test_I2F(int x) {
+		System.out.println("\n===== I2F =====");
+		x = Debug.makeAbstractInteger(x);
+		float y = 0.0f;
+		y = Debug.makeAbstractFloat(y);
+
+		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
+				Debug.getAbstractFloat(y));
+		System.out.println("y = x");
+		y = x;
+		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
+				Debug.getAbstractFloat(y));
+	}		
+	
 	public static void test_I2D(int x) {
 		System.out.println("\n===== I2D =====");
 		x = Debug.makeAbstractInteger(x);
 		double y = 0.0;
-		y = Debug.makeAbstractReal(y);
+		y = Debug.makeAbstractDouble(y);
 
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
-				Debug.getAbstractReal(y));
+				Debug.getAbstractDouble(y));
 		System.out.println("y = x");
 		y = x;
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
-				Debug.getAbstractReal(y));
+				Debug.getAbstractDouble(y));
 	}	
+	
+	public static void test_I2L(int x) {
+		System.out.println("\n===== I2L =====");
+		x = Debug.makeAbstractInteger(x);
+		long y = 0;
+		y = Debug.makeAbstractLong(y);
+
+		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
+				Debug.getAbstractLong(y));
+		System.out.println("y = x");
+		y = x;
+		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
+				Debug.getAbstractLong(y));
+	}		
 	
 	public static void test_IADD(int x, int y) {
 		System.out.println("\n===== IADD =====");

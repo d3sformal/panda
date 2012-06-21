@@ -15,7 +15,7 @@ public class JPF_gov_nasa_jpf_abstraction_Debug {
 		return env.newString(abs_arg.toString());
 	}
 
-    public static int getAbstractReal(MJIEnv env, int objRef, double v) {
+    public static int getAbstractDouble(MJIEnv env, int objRef, double v) {
     	Object [] attrs = env.getArgAttributes();
 		Abstraction abs_arg;
 		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
@@ -23,6 +23,24 @@ public class JPF_gov_nasa_jpf_abstraction_Debug {
 
 		return env.newString(abs_arg.toString());
     }
+    
+    public static int getAbstractFloat(MJIEnv env, int objRef, float v) {
+    	Object [] attrs = env.getArgAttributes();
+		Abstraction abs_arg;
+		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
+			return env.newString(Float.toString(v));
+
+		return env.newString(abs_arg.toString());
+    }    
+    
+    public static int getAbstractLong(MJIEnv env, int objRef, long v) {
+    	Object [] attrs = env.getArgAttributes();
+		Abstraction abs_arg;
+		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
+			return env.newString(Long.toString(v));
+
+		return env.newString(abs_arg.toString());
+    }       
 
     public static int getAbstractBoolean(MJIEnv env, int objRef, boolean v) {
     	Object [] attrs = env.getArgAttributes();
@@ -34,16 +52,24 @@ public class JPF_gov_nasa_jpf_abstraction_Debug {
 
     }
 
-
+	public static float makeAbstractFloat(MJIEnv env, int objRef, float v){
+		env.setReturnAttribute(AbstractInstructionFactory.abs.abstract_map(v));
+		return v;
+	}
+	
+	public static double makeAbstractDouble(MJIEnv env, int objRef, double v){
+		env.setReturnAttribute(AbstractInstructionFactory.abs.abstract_map(v));
+		return v;
+	}	
+    
     public static int makeAbstractInteger(MJIEnv env, int objRef, int v){
     	env.setReturnAttribute(AbstractInstructionFactory.abs.abstract_map(v));
     	return v;
     }
-
-	public static double makeAbstractReal(MJIEnv env, int objRef, double v){
-		// not implemented yet
+    
+	public static long makeAbstractLong(MJIEnv env, int objRef, long v){
 		env.setReturnAttribute(AbstractInstructionFactory.abs.abstract_map(v));
 		return v;
-	}
+	}    
 
 }
