@@ -6,6 +6,10 @@ import java.util.Set;
 
 public class Abstraction  {
 
+	int key;
+	public int get_key() { return key;}
+	public void set_key(int key) { this.key=key;}
+	
 	public Set<Abstraction> get_tokens() {
 		throw new RuntimeException("get_tokens not implemented");
 	}

@@ -4,10 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Signs extends Abstraction {
-	public static Signs POS = new Signs();
-	public static Signs NEG = new Signs();
-	public static Signs ZERO = new Signs();
-	public static Signs TOP = new Signs(true);
+	public static Signs POS = new Signs(0);
+	public static Signs NEG = new Signs(1);
+	public static Signs ZERO = new Signs(2);
+	public static Signs TOP = new Signs(true,3);
 
 	public Set<Abstraction> get_tokens() {
 		Set<Abstraction> tokens = new HashSet<Abstraction>();
@@ -21,10 +21,12 @@ public class Signs extends Abstraction {
 		return 3; // don't need top, used in focus choice generator
 	}
 	
-	public Signs() {
+	public Signs(int key) {
+		set_key(key);
 	}
 
-	public Signs(boolean isTop) {
+	public Signs(boolean isTop,int key) {
+		set_key(key);
 		this.isTop = isTop;
 	}
 
