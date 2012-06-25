@@ -68,8 +68,6 @@ public class IADD extends gov.nasa.jpf.jvm.bytecode.IADD {
 				}
 			}
 
-			
-			//sf = th.getTopFrame();
 			th.pop();
 			th.pop();
 			
