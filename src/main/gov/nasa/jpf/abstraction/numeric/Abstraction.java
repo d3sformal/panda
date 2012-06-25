@@ -10,6 +10,11 @@ public class Abstraction  {
 	public int get_key() { return key;}
 	public void set_key(int key) { this.key=key;}
 	
+	// returns the abstract token corresponding to the key
+	public Abstraction get_token(int key) {
+		throw new RuntimeException("get_token not implemented");
+	}
+	
 	public Set<Abstraction> get_tokens() {
 		throw new RuntimeException("get_tokens not implemented");
 	}

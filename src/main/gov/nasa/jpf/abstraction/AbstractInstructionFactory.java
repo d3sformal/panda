@@ -44,7 +44,7 @@ public class AbstractInstructionFactory extends
 		filter = new InstructionFactoryFilter(null,
 				new String[] {/* "java.*", */"javax.*" }, null, null);
 
-		abs = new Signs(); // for now we only have one abstraction but in the
+		abs = new Signs(0); // for now we only have one abstraction but in the
 							// future this should be customized based on user
 							// config
 	}

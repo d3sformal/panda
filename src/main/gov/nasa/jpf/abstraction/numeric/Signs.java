@@ -17,6 +17,18 @@ public class Signs extends Abstraction {
 		return tokens;
 	}
 	
+	
+	// returns the abstract token corresponding to the key
+	public Abstraction get_token(int key) {
+		if(key==0)
+			return POS;
+		if(key==1)
+			return NEG;
+		if(key==2)
+			return ZERO;
+		throw new RuntimeException("Top");
+	}
+	
 	public int get_num_tokens() {
 		return 3; // don't need top, used in focus choice generator
 	}

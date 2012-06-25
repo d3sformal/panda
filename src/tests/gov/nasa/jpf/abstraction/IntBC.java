@@ -3,26 +3,26 @@ package gov.nasa.jpf.abstraction;
 public class IntBC {
 
 	public static void main(String[] args) {
-		test_I2F(1);
-		test_I2D(1);
-		test_I2L(1);
-		test_IADD(1, 0);
-		test_IAND(1, 0);
-		test_IDIV(1, 1);
-		test_IFGE(1, 0);
-		test_IFGT(1, 0);
-		test_IFLE(1, 0);
-		test_IFLT(1, 0);
-		test_IINC(1);
-		test_IMUL(1, 0);
-		test_INEG(1);
-		test_IOR(1, 0);
-		test_IREM(1, 1);
-		test_ISHL(1, 0);
-		test_ISHR(1, 0);
-		test_ISUB(1, 0);
-		test_IUSHR(1, 0);
-		test_IXOR(1, 0);
+//		test_I2F(1);
+//		test_I2D(1);
+//		test_I2L(1);
+		test_IADD(1, -1);
+//		test_IAND(1, 0);
+//		test_IDIV(1, 1);
+//		test_IFGE(1, 0);
+//		test_IFGT(1, 0);
+//		test_IFLE(1, 0);
+//		test_IFLT(1, 0);
+//		test_IINC(1);
+//		test_IMUL(1, 0);
+//		test_INEG(1);
+//		test_IOR(1, 0);
+//		test_IREM(1, 1);
+//		test_ISHL(1, 0);
+//		test_ISHR(1, 0);
+//		test_ISUB(1, 0);
+//		test_IUSHR(1, 0);
+//		test_IXOR(1, 0);
 	}
 
 	public static void test_I2F(int x) {
