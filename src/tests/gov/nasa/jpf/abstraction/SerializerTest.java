@@ -14,15 +14,21 @@ public class SerializerTest
 		int z = Debug.makeAbstractInteger(0);
 
 		int v = Debug.makeAbstractInteger(0);
-		
-		if (Verify.getBoolean())
+	
+		boolean b = Verify.getBoolean();
+
+		if (b)
 		{
 			v = x + z;
 		}
 		else
 		{
+			b = true;
+
 			v = y + z;
 		}
+
+		Verify.breakTransition();
 
 		// default serializer will handle this incorrectly (premature state matching)
 			// local variable "v" has the same concrete value (0) in both branches
