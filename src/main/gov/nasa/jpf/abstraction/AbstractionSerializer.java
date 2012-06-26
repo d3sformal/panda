@@ -23,7 +23,10 @@ import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.jvm.FieldInfo;
 import gov.nasa.jpf.jvm.Fields;
+import gov.nasa.jpf.jvm.ClassInfo;
+import gov.nasa.jpf.jvm.StackFrame;
 import gov.nasa.jpf.jvm.serialize.FilteringSerializer;
+import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.util.FinalBitSet;
 import gov.nasa.jpf.util.JPFLogger;
 
@@ -45,8 +48,15 @@ public class AbstractionSerializer extends FilteringSerializer {
     if (!filtered.get(off)) {
       Abstraction a = fi.getAttr(Abstraction.class);
       if (a != null) {
-        if (fi.is1SlotField()) 
-            buf.add(a.get_key());
+        if (fi.is1SlotField()) {
+          // abstraction cannot exist for references -> we can ignore them here
+
+          // storing abstract representation of the concrete value (as in DynamicAbstractionSerializer) is not correct
+            // the concrete value is always zero if we use the abstraction for the field 
+	
+          // this should work for one-slot fields (int, float) and also for two-slot fields (long, double)
+          buf.add(a.get_key());
+        }
       } else { // no abstraction, fall back to concrete values
         if (fi.is1SlotField()) {
           if (fi.isReference()) {
@@ -65,4 +75,49 @@ public class AbstractionSerializer extends FilteringSerializer {
       }
     }
   }
+
+  protected void processNamedFields(ClassInfo ci, Fields fields) {
+    FinalBitSet filtered = getInstanceFilterMask(ci);
+    int nFields = ci.getNumberOfInstanceFields();
+    int[] slotValues = fields.asFieldSlots(); // for non-attributed fields
+
+    for (int i = 0; i < nFields; i++) {
+      FieldInfo fi = ci.getInstanceField(i);
+      processField(fields, slotValues, fi, filtered);
+    }
+  } 
+ 
+  // we must also store the abstract values that are in attributes for locals and method params (stack frame)
+  protected void serializeFrame(StackFrame frame){
+    buf.add(frame.getMethodInfo().getGlobalId());
+
+    // there can be (rare) cases where a listener sets a null nextPc in
+    // a frame that is still on the stack
+    Instruction pc = frame.getPC();
+    if (pc != null){
+      buf.add(pc.getInstructionIndex());
+    } else {
+      buf.add(-1);
+    }
+
+    int len = frame.getTopPos()+1;
+    buf.add(len);
+
+    int[] slots = frame.getSlots();
+
+    for (int i = 0; i < len; i++) {
+      // store either the abstract value (attribute) or the concrete value 
+      // we should not exceed "len"
+
+      // we must give the offset as method parameter value
+	  // we need attribute for the current slot
+      Abstraction a = frame.getOperandAttr(frame.getTopPos()-i, Abstraction.class);
+
+      if (a != null) buf.add(a.get_key());
+      else buf.add(slots[i]);
+    }
+
+    frame.visitReferenceSlots(this);
+  }
+ 
 }
