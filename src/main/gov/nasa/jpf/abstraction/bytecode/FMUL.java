@@ -1,6 +1,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
+import gov.nasa.jpf.jvm.ChoiceGenerator;
 import gov.nasa.jpf.jvm.KernelState;
 import gov.nasa.jpf.jvm.StackFrame;
 import gov.nasa.jpf.jvm.SystemState;
@@ -17,22 +19,37 @@ public class FMUL extends gov.nasa.jpf.jvm.bytecode.FMUL {
 		if(abs_v1==null && abs_v2==null)
 			return super.execute(ss, ks, th);
 		else {
-			float v1 = Types.intToFloat(th.pop());
-			float v2 = Types.intToFloat(th.pop());
+			float v1 = Types.intToFloat(th.peek(0));
+			float v2 = Types.intToFloat(th.peek(1));
 
 			Abstraction result = Abstraction._mul(v1, abs_v1, v2, abs_v2);
+			System.out.printf("Values: %f (%s), %f (%s)\n", v1, abs_v1, v2, abs_v2);
+			if (result.isTop()) {
+				ChoiceGenerator<?> cg;
+				if (!th.isFirstStepInsn()) { // first time around
+					int size = result.get_num_tokens();
+					cg = new FocusAbstractChoiceGenerator(size);
+					ss.setNextChoiceGenerator(cg);
+					return this;
+				} else { // this is what really returns results
+					cg = ss.getChoiceGenerator();
+					assert (cg instanceof FocusAbstractChoiceGenerator);
+					int key = (Integer) cg.getNextChoice();
+					result = result.get_token(key);
+					System.out.printf("Result: %s\n", result);
+				}
+			} else
+				System.out.printf("Result: %s\n", result);
 
-			if(result.isTop()) {
-				System.out.println("non det choice ...");
-			}
-
+			th.pop();
+			th.pop();
+			
 			th.push(0, false);
+			sf = th.getTopFrame();
 			sf.setOperandAttr(result);
-
-			System.out.println("Execute FMUL: "+result);
 
 			return getNext(th);
 		}		
-	}
+	}	
 	
 }

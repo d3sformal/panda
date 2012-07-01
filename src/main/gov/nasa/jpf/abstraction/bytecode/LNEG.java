@@ -1,6 +1,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
+import gov.nasa.jpf.jvm.ChoiceGenerator;
 import gov.nasa.jpf.jvm.KernelState;
 import gov.nasa.jpf.jvm.StackFrame;
 import gov.nasa.jpf.jvm.SystemState;
@@ -19,15 +21,27 @@ public class LNEG extends gov.nasa.jpf.jvm.bytecode.LNEG {
 			long val = th.longPop(); // just to pop it
 
 			Abstraction result = Abstraction._neg(abs_val);
+			System.out.printf("Values: %d (%s)\n", val, abs_val);
 
 			if (result.isTop()) {
-				System.out.println("non det choice ...");
-			}
+				ChoiceGenerator<?> cg;
+				if (!th.isFirstStepInsn()) { // first time around
+					int size = result.get_num_tokens();
+					cg = new FocusAbstractChoiceGenerator(size);
+					ss.setNextChoiceGenerator(cg);
+					return this;
+				} else { // this is what really returns results
+					cg = ss.getChoiceGenerator();
+					assert (cg instanceof FocusAbstractChoiceGenerator);
+					int key = (Integer) cg.getNextChoice();
+					result = result.get_token(key);
+					System.out.printf("Result: %s\n", result);
+				}
+			} else
+				System.out.printf("Result: %s\n", result);
 
 			th.longPush(0);
 			sf.setLongOperandAttr(result);
-
-			System.out.println("Execute LNEG: " + result);
 
 			return getNext(th);
 		}

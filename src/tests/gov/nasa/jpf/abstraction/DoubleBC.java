@@ -3,16 +3,16 @@ package gov.nasa.jpf.abstraction;
 public class DoubleBC {
 
 	public static void main(String[] args) {
-		test_D2F(1);
-		test_D2I(1);
-		test_D2L(1);
-		test_DADD(1, 0);
-		test_DDIV(1, 1);
-		// test_DCMP(1, 0);
-		test_DMUL(1, 0);
-		test_DNEG(1);
-		test_DREM(1, 1);
-		test_DSUB(1, 0);
+//		test_D2F(1);
+//		test_D2I(1);
+//		test_D2L(1);
+		test_DADD(1, -1);
+//		test_DDIV(1, 1);
+//		test_DCMP(1, 0);
+//		test_DMUL(1, 0);
+//		test_DNEG(1);
+//		test_DREM(1, 1);
+//		test_DSUB(1, 0);
 	}
 
 	public static void test_D2F(double x) {

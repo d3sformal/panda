@@ -1,6 +1,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
+import gov.nasa.jpf.jvm.ChoiceGenerator;
 import gov.nasa.jpf.jvm.KernelState;
 import gov.nasa.jpf.jvm.StackFrame;
 import gov.nasa.jpf.jvm.SystemState;
@@ -20,10 +22,23 @@ public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG {
 			float val = Types.intToFloat(th.pop()); // just to pop it
 
 			Abstraction result = Abstraction._neg(abs_val);
-
+			System.out.printf("Values: %f (%s)\n", val, abs_val);
 			if (result.isTop()) {
-				System.out.println("non det choice ...");
-			}
+				ChoiceGenerator<?> cg;
+				if (!th.isFirstStepInsn()) { // first time around
+					int size = result.get_num_tokens();
+					cg = new FocusAbstractChoiceGenerator(size);
+					ss.setNextChoiceGenerator(cg);
+					return this;
+				} else { // this is what really returns results
+					cg = ss.getChoiceGenerator();
+					assert (cg instanceof FocusAbstractChoiceGenerator);
+					int key = (Integer) cg.getNextChoice();
+					result = result.get_token(key);
+					System.out.printf("Result: %s\n", result);
+				}
+			} else
+				System.out.printf("Result: %s\n", result);
 
 			th.push(0, false);
 			sf.setOperandAttr(result);

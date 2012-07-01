@@ -21,7 +21,8 @@ public class D2L extends gov.nasa.jpf.jvm.bytecode.D2L {
 			th.longPush(0);
 			sf.setLongOperandAttr(abs_val);
 
-			System.out.println("Execute D2L: " + abs_val);
+			System.out.printf("Values: %f (%s)\n", val, abs_val);
+			System.out.println("Result: " + sf.getLongOperandAttr());
 
 			return getNext(th);
 		}

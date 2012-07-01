@@ -3,26 +3,26 @@ package gov.nasa.jpf.abstraction;
 public class LongBC {
 
 	public static void main(String[] args) {
-		test_L2F(1);
-		test_L2D(1);
-		test_L2I(1);
-		test_LADD(1, 0);
-		test_LAND(1, 0);
-		test_LDIV(1, 1);
-		test_LFGE(1, 0);
-		test_LFGT(1, 0);
-		test_LFLE(1, 0);
-		test_LFLT(1, 0);
-		test_LINC(1);
-		test_LMUL(1, 0);
-		test_LNEG(1);
-		test_LOR(1, 0);
-		test_LREM(1, 1);
-		test_LSHL(1, 0);
-		test_LSHR(1, 0);
-		test_LSUB(1, 0);
-		test_LUSHR(1, 0);
-		test_LXOR(1, 0);
+//		test_L2F(1);
+//		test_L2D(1);
+//		test_L2I(1);
+		test_LADD(1, -1);
+//		test_LAND(1, 0);
+//		test_LDIV(1, 1);
+//		test_LFGE(1, 0);
+//		test_LFGT(1, 0);
+//		test_LFLE(1, 0);
+//		test_LFLT(1, 0);
+//		test_LINC(1);
+//		test_LMUL(1, 0);
+//		test_LNEG(1);
+//		test_LOR(1, 0);
+//		test_LREM(1, 1);
+//		test_LSHL(1, 0);
+//		test_LSHR(1, 0);
+//		test_LSUB(1, 0);
+//		test_LUSHR(1, 0);
+//		test_LXOR(1, 0);
 	}
 
 	public static void test_L2F(long x) {

@@ -20,8 +20,9 @@ public class F2D extends gov.nasa.jpf.jvm.bytecode.F2D {
 			float val = Types.intToFloat(th.pop()); // just to pop it
 			th.longPush(0);
 			sf.setLongOperandAttr(abs_val);
-
-			System.out.println("Execute F2D: " + abs_val);
+			
+			System.out.printf("Values: %f (%s)\n", val, abs_val);
+			System.out.println("Result: " + sf.getLongOperandAttr());
 
 			return getNext(th);
 		}

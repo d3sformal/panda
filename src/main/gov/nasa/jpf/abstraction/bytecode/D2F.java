@@ -20,8 +20,9 @@ public class D2F extends gov.nasa.jpf.jvm.bytecode.D2F {
 			double val = Types.longToDouble(th.longPop()); // just to pop it
 			th.push(0, false);
 			sf.setOperandAttr(abs_val);
-
-			System.out.println("Execute D2F: " + abs_val);
+			
+			System.out.printf("Values: %f (%s)\n", val, abs_val);
+			System.out.println("Result: " + sf.getOperandAttr());
 
 			return getNext(th);
 		}

@@ -1,6 +1,9 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
+import sun.security.action.GetLongAction;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
+import gov.nasa.jpf.jvm.ChoiceGenerator;
 import gov.nasa.jpf.jvm.KernelState;
 import gov.nasa.jpf.jvm.StackFrame;
 import gov.nasa.jpf.jvm.SystemState;
@@ -20,7 +23,8 @@ public class L2D extends gov.nasa.jpf.jvm.bytecode.L2D {
 			th.longPush(0);
 			sf.setLongOperandAttr(abs_val);
 
-			System.out.println("Execute L2D: " + abs_val);
+			System.out.printf("Values: %d (%s)\n", val, abs_val);
+			System.out.printf("Result: %s\n", sf.getLongOperandAttr());
 
 			return getNext(th);
 		}
