@@ -49,8 +49,6 @@ public class IADD extends gov.nasa.jpf.jvm.bytecode.IADD {
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
-					int size = result.get_num_tokens();
-					System.out.println(size);
 					cg = new FocusAbstractChoiceGenerator(size);
 					ss.setNextChoiceGenerator(cg);
 					return this;
