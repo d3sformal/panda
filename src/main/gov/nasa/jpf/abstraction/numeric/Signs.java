@@ -193,7 +193,7 @@ public class Signs extends Abstraction {
 			if (this.could_be_NEG() && right_value.could_be_ZERO())
 				n = true;
 			if (this.could_be_NEG() && right_value.could_be_POS())
-				n = z = n = true;
+				n = z = p = true;
 			if (this.could_be_ZERO() && right_value.could_be_NEG())
 				n = true;
 			if (this.could_be_ZERO() && right_value.could_be_ZERO())

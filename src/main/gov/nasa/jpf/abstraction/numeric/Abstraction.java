@@ -694,4 +694,12 @@ public class Abstraction  {
 	public AbstractBoolean _ge(int right) {
 		throw new RuntimeException("ge not implemented");
 	}
+	
+	public boolean equals(Abstraction abs) {
+		if (!getClass().getName().equals(abs.getClass().getName()))
+			throw new RuntimeException("Comparing different abstractions");
+		return (getClass().getName().equals(abs.getClass().getName())) 
+				&& (this.get_key() == abs.get_key());
+	}
+	
 }

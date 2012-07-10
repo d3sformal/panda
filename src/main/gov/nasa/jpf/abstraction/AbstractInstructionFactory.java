@@ -24,6 +24,8 @@ import gov.nasa.jpf.jvm.ClassInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.abstraction.bytecode.*;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.Evenness;
+import gov.nasa.jpf.abstraction.numeric.Interval;
 import gov.nasa.jpf.abstraction.numeric.Signs;
 
 import gov.nasa.jpf.util.InstructionFactoryFilter;
@@ -44,9 +46,34 @@ public class AbstractInstructionFactory extends
 		filter = new InstructionFactoryFilter(null,
 				new String[] {/* "java.*", */"javax.*" }, null, null);
 
-		abs = new Signs(0); // for now we only have one abstraction but in the
-							// future this should be customized based on user
-							// config
+		try {
+			String[] abs_str = conf.getStringArray("abstract.domain");
+			for (String s : abs_str)
+				if (s.toLowerCase().equals("signs")) {
+					System.out.println("### jpf-abstraction: SIGNS turned on");
+					abs = new Signs(0);
+				} else if (s.toLowerCase().equals("evenness")) {
+					System.out.println("### jpf-abstraction: EVENNESS turned on");
+					abs = new Evenness(0);
+				} else if (s.toLowerCase().substring(0,8).equals("interval")) {
+					String[] arr = s.split(" ");
+					try {
+						double min = Double.parseDouble(arr[1]);
+						double max = Double.parseDouble(arr[2]);
+						System.out.printf("### jpf-abstraction: INTERVAL[%f, %f] turned on\n", min, max);
+						abs = Interval.create(min, max);
+					} catch (NumberFormatException nfe) {
+						System.out.println("### jpf-abstraction: please keep format \"Interval MIN MAX\", where MIN and MAX are doubles");
+					} catch (ArrayIndexOutOfBoundsException rce) {
+						System.out.println("### jpf-abstraction: please keep format \"Interval MIN MAX\", where MIN and MAX are doubles");
+					}
+				} else {
+					System.out.println("### jpf-abstraction: unknown abstraction specified");
+					System.out.println("###                 \"" + s + "\"");
+				}
+		}	catch(Exception e){
+			System.out.println("jpf-abstraction: abstraction is not specified");
+		}
 	}
 	
 	@Override

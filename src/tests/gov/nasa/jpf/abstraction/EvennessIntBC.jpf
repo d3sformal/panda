@@ -5,7 +5,7 @@ target=gov.nasa.jpf.abstraction.IntBC
 classpath=build/tests
 sourcepath=src/tests
 
-abstract.domain=SIGNS
+abstract.domain=Evenness
 
 listener = gov.nasa.jpf.abstraction.AbstractListener
 
