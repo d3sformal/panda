@@ -3,41 +3,13 @@ package gov.nasa.jpf.abstraction;
 import gov.nasa.jpf.jvm.Verify;
 
 
-public class SerializerTest 
+public class SerializerTestFields
 {
 	public static void main (String[] args) 
 	{
-		System.out.println("\n=== AbstractionSerializer testing ===\n");
+		System.out.println("\n=== AbstractionSerializer testing : fields ===\n");
 	
-		int x = Debug.makeAbstractInteger(1);
-		int y = Debug.makeAbstractInteger(-1);
-		int z = Debug.makeAbstractInteger(0);
-
-		int v = Debug.makeAbstractInteger(0);
-	
-		boolean b = Verify.getBoolean();
-
-		if (b)
-		{
-			v = x + z;
-		}
-		else
-		{
-			b = true;
-
-			v = y + z;
-		}
-
-		Verify.breakTransition();
-
-		// default serializer will handle this incorrectly (premature state matching)
-			// local variable "v" has the same concrete value (0) in both branches
-
-		// this should be printed twice with the sign abstraction and correct serializer
-		System.out.printf("v = %s\n", Debug.getAbstractInteger(v));
-
-
-		SerializerTest st = new SerializerTest();
+		SerializerTestFields st = new SerializerTestFields();
 		st.compute();
 		st.display();
 	}
@@ -48,7 +20,7 @@ public class SerializerTest
 	private int fz;
 	private int fv;
 	
-	public SerializerTest()
+	public SerializerTestFields()
 	{
 		fx = Debug.makeAbstractInteger(1);
 		fy = Debug.makeAbstractInteger(-1);

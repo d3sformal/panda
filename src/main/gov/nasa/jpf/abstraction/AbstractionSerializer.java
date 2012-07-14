@@ -46,7 +46,7 @@ public class AbstractionSerializer extends FilteringSerializer {
   protected void processField(Fields fields, int[] slotValues, FieldInfo fi, FinalBitSet filtered) {
     int off = fi.getStorageOffset();
     if (!filtered.get(off)) {
-      Abstraction a = fi.getAttr(Abstraction.class);
+      Abstraction a = fields.getFieldAttr(fi.getFieldIndex(), Abstraction.class);
       if (a != null) {
         if (fi.is1SlotField()) {
           // abstraction cannot exist for references -> we can ignore them here
