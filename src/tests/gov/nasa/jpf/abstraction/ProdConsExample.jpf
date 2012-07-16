@@ -1,0 +1,14 @@
+@using=jpf-abstraction
+
+target=gov.nasa.jpf.abstraction.ProdConsExample
+
+classpath=${jpf-abstraction}/build/tests
+
+sourcepath=${jpf-abstraction}/src/tests
+
+abstract.domain=SIGNS
+
+listener = gov.nasa.jpf.abstraction.AbstractListener
+
+vm.serializer.class = gov.nasa.jpf.abstraction.AbstractionSerializer
+
