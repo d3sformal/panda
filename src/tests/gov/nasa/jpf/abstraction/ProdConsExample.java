@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction;
 
 public class ProdConsExample
 {
-	public static final int DAILY_LIMIT = 1000000;
+	public static final int DAILY_LIMIT = Debug.makeAbstractInteger(1000000);
 
 	public static void main(String[] args) 
 	{
@@ -40,7 +40,7 @@ class Producer extends Thread
 			{
 				synchronized (d) 
 				{
-					d.value = 10; // dummy value
+					d.value = Debug.makeAbstractInteger(10); // dummy value
 					d.isNew = true;
 				}
 				remaining--;
