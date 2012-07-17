@@ -21,8 +21,8 @@ public class F2I extends gov.nasa.jpf.jvm.bytecode.F2I {
 			th.push(0, false);
 			sf.setOperandAttr(abs_val);
 
-			System.out.printf("Values: %f (%s)\n", val, abs_val);
-			System.out.println("Result: " + sf.getOperandAttr());
+			System.out.printf("F2I> Values: %f (%s)\n", val, abs_val);
+			System.out.println("F2I> Result: " + sf.getOperandAttr());
 
 			return getNext(th);
 		}

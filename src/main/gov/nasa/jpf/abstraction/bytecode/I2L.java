@@ -34,11 +34,11 @@ public class I2L extends gov.nasa.jpf.jvm.bytecode.I2L {
 			return super.execute(ss, ks, th);
 		else {
 			int val = th.pop(); // just to pop it
-			System.out.printf("Value:  %d (%s)\n", val, abs_val);
+			System.out.printf("I2L> Value:  %d (%s)\n", val, abs_val);
 			th.longPush(0);
 			sf.setLongOperandAttr(abs_val);
 
-			System.out.println("Result: " + sf.getLongOperandAttr());
+			System.out.println("I2L> Result: " + sf.getLongOperandAttr());
 
 			return getNext(th);
 		}		

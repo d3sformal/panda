@@ -24,7 +24,7 @@ public class LADD extends gov.nasa.jpf.jvm.bytecode.LADD {
 			long v2 = th.longPeek(2);
 
 			Abstraction result = Abstraction._add(v1, abs_v1, v2, abs_v2);
-			System.out.printf("Values: %d (%s), %d (%s)\n", v1, abs_v1, v2, abs_v2);
+			System.out.printf("LADD> Values: %d (%s), %d (%s)\n", v1, abs_v1, v2, abs_v2);
 
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
@@ -38,10 +38,10 @@ public class LADD extends gov.nasa.jpf.jvm.bytecode.LADD {
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
 					result = result.get_token(key);
-					System.out.printf("Result: %s\n", result);
+					System.out.printf("LADD> Result: %s\n", result);
 				}
 			} else
-				System.out.printf("Result: %s\n", result);
+				System.out.printf("LADD> Result: %s\n", result);
 
 			th.longPop();
 			th.longPop();

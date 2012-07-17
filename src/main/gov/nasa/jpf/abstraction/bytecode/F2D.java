@@ -21,8 +21,8 @@ public class F2D extends gov.nasa.jpf.jvm.bytecode.F2D {
 			th.longPush(0);
 			sf.setLongOperandAttr(abs_val);
 			
-			System.out.printf("Values: %f (%s)\n", val, abs_val);
-			System.out.println("Result: " + sf.getLongOperandAttr());
+			System.out.printf("F2D> Values: %f (%s)\n", val, abs_val);
+			System.out.println("F2D> Result: " + sf.getLongOperandAttr());
 
 			return getNext(th);
 		}

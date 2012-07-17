@@ -39,7 +39,7 @@ public class INEG extends gov.nasa.jpf.jvm.bytecode.INEG {
 			int val = th.peek(0);
 
 			Abstraction result = Abstraction._neg(abs_val);
-			System.out.printf("Value:  %d (%s)\n", val, abs_val);
+			System.out.printf("INEG> Value:  %d (%s)\n", val, abs_val);
 
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
@@ -53,10 +53,10 @@ public class INEG extends gov.nasa.jpf.jvm.bytecode.INEG {
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
 					result = result.get_token(key);
-					System.out.printf("Result: %s\n", result);
+					System.out.printf("INEG> Result: %s\n", result);
 				}
 			} else
-				System.out.printf("Result: %s\n", result);
+				System.out.printf("INEG> Result: %s\n", result);
 
 			th.pop();
 			

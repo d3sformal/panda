@@ -23,7 +23,7 @@ public class FREM extends gov.nasa.jpf.jvm.bytecode.FREM {
 			float v2 = Types.intToFloat(th.peek(1));
 
 			Abstraction result = Abstraction._rem(v1, abs_v1, v2, abs_v2);
-			System.out.printf("Values: %f (%s), %f (%s)\n", v1, abs_v1, v2, abs_v2);
+			System.out.printf("FREM> Values: %f (%s), %f (%s)\n", v1, abs_v1, v2, abs_v2);
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
@@ -36,10 +36,10 @@ public class FREM extends gov.nasa.jpf.jvm.bytecode.FREM {
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
 					result = result.get_token(key);
-					System.out.printf("Result: %s\n", result);
+					System.out.printf("FREM> Result: %s\n", result);
 				}
 			} else
-				System.out.printf("Result: %s\n", result);
+				System.out.printf("FREM> Result: %s\n", result);
 
 			th.pop();
 			th.pop();

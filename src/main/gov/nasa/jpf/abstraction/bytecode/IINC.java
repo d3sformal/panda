@@ -40,7 +40,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 			th.setLocalVariable(index, th.getLocalVariable(index) + increment, false);
 		else {
 			Abstraction result = abs_v._plus(increment);
-			System.out.printf("Value:  %d (%s)\n", th.getLocalVariable(index), abs_v);
+			System.out.printf("IINC> Value:  %d (%s)\n", th.getLocalVariable(index), abs_v);
 			th.setLocalVariable(index, 0, false);
 
 			if (result.isTop()) {
@@ -55,10 +55,10 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
 					result = result.get_token(key);
-					System.out.printf("Result: %s\n", result);
+					System.out.printf("IINC> Result: %s\n", result);
 				}
 			} else
-				System.out.printf("Result: %s\n", result);
+				System.out.printf("IINC> Result: %s\n", result);
 			
 	    	sf.setLocalAttr(index, result);
 		}

@@ -20,8 +20,8 @@ public class L2I extends gov.nasa.jpf.jvm.bytecode.L2I {
 			th.push(0, false);
 			sf.setOperandAttr(abs_val);
 
-			System.out.printf("Values: %d (%s)\n", val, abs_val);
-			System.out.printf("Result: %s\n", sf.getOperandAttr());
+			System.out.printf("L2I> Values: %d (%s)\n", val, abs_val);
+			System.out.printf("L2I> Result: %s\n", sf.getOperandAttr());
 
 			return getNext(th);
 		}

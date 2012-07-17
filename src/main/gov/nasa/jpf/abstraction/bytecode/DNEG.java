@@ -39,7 +39,7 @@ public class DNEG extends gov.nasa.jpf.jvm.bytecode.DNEG {
 			double val = Types.longToDouble(th.longPeek(0));
 
 			Abstraction result = Abstraction._neg(abs_val);
-			System.out.printf("Values: %f (%s)\n", val, abs_val);
+			System.out.printf("DNEG> Values: %f (%s)\n", val, abs_val);
 			
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
@@ -53,10 +53,10 @@ public class DNEG extends gov.nasa.jpf.jvm.bytecode.DNEG {
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
 					result = result.get_token(key);
-					System.out.printf("Result: %s\n", result);
+					System.out.printf("DNEG> Result: %s\n", result);
 				}
 			} else
-				System.out.printf("Result: %s\n", result);
+				System.out.printf("DNEG> Result: %s\n", result);
 
 			th.longPop();
 			

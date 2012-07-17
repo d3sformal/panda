@@ -22,7 +22,7 @@ public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG {
 			float val = Types.intToFloat(th.pop()); // just to pop it
 
 			Abstraction result = Abstraction._neg(abs_val);
-			System.out.printf("Values: %f (%s)\n", val, abs_val);
+			System.out.printf("FNEG> Values: %f (%s)\n", val, abs_val);
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
@@ -35,10 +35,10 @@ public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG {
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
 					result = result.get_token(key);
-					System.out.printf("Result: %s\n", result);
+					System.out.printf("FNEG> Result: %s\n", result);
 				}
 			} else
-				System.out.printf("Result: %s\n", result);
+				System.out.printf("FNEG> Result: %s\n", result);
 
 			th.push(0, false);
 			sf.setOperandAttr(result);

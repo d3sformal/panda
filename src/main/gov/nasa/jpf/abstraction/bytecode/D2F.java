@@ -21,8 +21,8 @@ public class D2F extends gov.nasa.jpf.jvm.bytecode.D2F {
 			th.push(0, false);
 			sf.setOperandAttr(abs_val);
 			
-			System.out.printf("Values: %f (%s)\n", val, abs_val);
-			System.out.println("Result: " + sf.getOperandAttr());
+			System.out.printf("D2F> Values: %f (%s)\n", val, abs_val);
+			System.out.println("D2F> Result: " + sf.getOperandAttr());
 
 			return getNext(th);
 		}

@@ -21,7 +21,7 @@ public class LNEG extends gov.nasa.jpf.jvm.bytecode.LNEG {
 			long val = th.longPop(); // just to pop it
 
 			Abstraction result = Abstraction._neg(abs_val);
-			System.out.printf("Values: %d (%s)\n", val, abs_val);
+			System.out.printf("LNEG> Values: %d (%s)\n", val, abs_val);
 
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
@@ -35,10 +35,10 @@ public class LNEG extends gov.nasa.jpf.jvm.bytecode.LNEG {
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
 					result = result.get_token(key);
-					System.out.printf("Result: %s\n", result);
+					System.out.printf("LNEG> Result: %s\n", result);
 				}
 			} else
-				System.out.printf("Result: %s\n", result);
+				System.out.printf("LNEG> Result: %s\n", result);
 
 			th.longPush(0);
 			sf.setLongOperandAttr(result);

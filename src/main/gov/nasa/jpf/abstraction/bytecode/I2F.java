@@ -35,11 +35,11 @@ public class I2F extends gov.nasa.jpf.jvm.bytecode.I2F {
 			return super.execute(ss, ks, th);
 		else {
 			int val = th.pop(); // just to pop it
-			System.out.printf("Value:  %d (%s)\n", val, abs_val);	
+			System.out.printf("I2F> Value:  %d (%s)\n", val, abs_val);	
 			th.push(0, false);
 			sf.setOperandAttr(abs_val);
 
-			System.out.println("Result: " + sf.getOperandAttr());
+			System.out.println("I2F> Result: " + sf.getOperandAttr());
 
 			return getNext(th);
 		}

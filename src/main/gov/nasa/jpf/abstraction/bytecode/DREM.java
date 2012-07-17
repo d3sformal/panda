@@ -26,7 +26,7 @@ public class DREM extends gov.nasa.jpf.jvm.bytecode.DREM {
 			double v2 = Types.longToDouble(th.longPeek(2));
 
 			Abstraction result = Abstraction._rem(v1, abs_v1, v2, abs_v2);
-			System.out.printf("Values: %f (%s), %f (%s)\n", v1, abs_v1, v2, abs_v2);
+			System.out.printf("DREM> Values: %f (%s), %f (%s)\n", v1, abs_v1, v2, abs_v2);
 			
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
@@ -40,10 +40,10 @@ public class DREM extends gov.nasa.jpf.jvm.bytecode.DREM {
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
 					result = result.get_token(key);
-					System.out.printf("Result: %s\n", result);
+					System.out.printf("DREM> Result: %s\n", result);
 				}
 			} else
-				System.out.printf("Result: %s\n", result);
+				System.out.printf("DREM> Result: %s\n", result);
 
 			th.longPop();
 			th.longPop();

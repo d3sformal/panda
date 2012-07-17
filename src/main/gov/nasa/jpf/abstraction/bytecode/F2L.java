@@ -21,8 +21,8 @@ public class F2L extends gov.nasa.jpf.jvm.bytecode.F2L {
 			th.longPush(0);
 			sf.setLongOperandAttr(abs_val);
 
-			System.out.printf("Values: %f (%s)\n", val, abs_val);
-			System.out.println("Result: " + sf.getLongOperandAttr());
+			System.out.printf("F2L> Values: %f (%s)\n", val, abs_val);
+			System.out.println("F2L> Result: " + sf.getLongOperandAttr());
 
 			return getNext(th);
 		}

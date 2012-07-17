@@ -23,8 +23,8 @@ public class L2D extends gov.nasa.jpf.jvm.bytecode.L2D {
 			th.longPush(0);
 			sf.setLongOperandAttr(abs_val);
 
-			System.out.printf("Values: %d (%s)\n", val, abs_val);
-			System.out.printf("Result: %s\n", sf.getLongOperandAttr());
+			System.out.printf("L2D> Values: %d (%s)\n", val, abs_val);
+			System.out.printf("L2D> Result: %s\n", sf.getLongOperandAttr());
 
 			return getNext(th);
 		}

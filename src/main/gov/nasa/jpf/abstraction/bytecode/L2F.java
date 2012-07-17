@@ -21,8 +21,8 @@ public class L2F extends gov.nasa.jpf.jvm.bytecode.L2F {
 			th.push(0, false);
 			sf.setOperandAttr(abs_val);
 
-			System.out.printf("Values: %d (%s)\n", val, abs_val);
-			System.out.printf("Result: %s\n", sf.getOperandAttr());
+			System.out.printf("L2F> Values: %d (%s)\n", val, abs_val);
+			System.out.printf("L2F> Result: %s\n", sf.getOperandAttr());
 
 			return getNext(th);
 		}

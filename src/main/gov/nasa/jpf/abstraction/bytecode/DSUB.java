@@ -43,7 +43,7 @@ public class DSUB extends gov.nasa.jpf.jvm.bytecode.DSUB {
 			double v2 = Types.longToDouble(th.longPeek(2));
 
 			Abstraction result = Abstraction._sub(v1, abs_v1, v2, abs_v2);
-			System.out.printf("Values: %f (%s), %f (%s)\n", v1, abs_v1, v2, abs_v2);
+			System.out.printf("DSUB> Values: %f (%s), %f (%s)\n", v1, abs_v1, v2, abs_v2);
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
@@ -56,10 +56,10 @@ public class DSUB extends gov.nasa.jpf.jvm.bytecode.DSUB {
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
 					result = result.get_token(key);
-					System.out.printf("Result: %s\n", result);
+					System.out.printf("DSUB> Result: %s\n", result);
 				}
 			} else
-				System.out.printf("Result: %s\n", result);
+				System.out.printf("DSUB> Result: %s\n", result);
 
 			th.longPop();
 			th.longPop();

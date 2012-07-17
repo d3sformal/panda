@@ -44,7 +44,7 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
 
 			Abstraction result = Abstraction._div(v1, abs_v1, v2, abs_v2);
 
-			System.out.printf("Values: %f (%s), %f (%s)\n", v1, abs_v1, v2, abs_v2);
+			System.out.printf("DDIV> Values: %f (%s), %f (%s)\n", v1, abs_v1, v2, abs_v2);
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
@@ -57,10 +57,10 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
 					result = result.get_token(key);
-					System.out.printf("Result: %s\n", result);
+					System.out.printf("DDIV> Result: %s\n", result);
 				}
 			} else
-				System.out.printf("Result: %s\n", result);
+				System.out.printf("DDIV> Result: %s\n", result);
 
 			th.longPop();
 			th.longPop();

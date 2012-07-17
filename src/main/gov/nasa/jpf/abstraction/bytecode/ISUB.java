@@ -46,7 +46,7 @@ public class ISUB extends gov.nasa.jpf.jvm.bytecode.ISUB {
 			int v2 = th.peek(1);
 
 			Abstraction result = Abstraction._sub(v1, abs_v1, v2, abs_v2);
-			System.out.printf("Values: %d (%s), %d (%s)\n", v1, abs_v1, v2, abs_v2);
+			System.out.printf("ISUB> Values: %d (%s), %d (%s)\n", v1, abs_v1, v2, abs_v2);
 
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
@@ -60,10 +60,10 @@ public class ISUB extends gov.nasa.jpf.jvm.bytecode.ISUB {
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
 					result = result.get_token(key);
-					System.out.printf("Result: %s\n", result);
+					System.out.printf("ISUB> Result: %s\n", result);
 				}
 			} else
-				System.out.printf("Result: %s\n", result);
+				System.out.printf("ISUB> Result: %s\n", result);
 
 			th.pop();
 			th.pop();
