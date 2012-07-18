@@ -305,7 +305,8 @@ public class Abstraction  {
 			result = abs_v1._minus_reverse(v2);
 		return result;
 	}		
-
+	
+	
 	public static Abstraction _neg(Abstraction abs_v1) {
 		if (abs_v1 != null)
 			return abs_v1._neg();
@@ -561,7 +562,10 @@ public class Abstraction  {
 		throw new RuntimeException("plus not implemented");
 	}	
 	
-	
+	public Abstraction _inc(int right) {
+		throw new RuntimeException("inc not implemented");
+	}		
+
 	public Abstraction _minus(Abstraction right) {
 		throw new RuntimeException("minus not implemented");
 	}

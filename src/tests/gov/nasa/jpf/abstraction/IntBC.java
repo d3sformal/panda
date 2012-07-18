@@ -8,7 +8,7 @@ public class IntBC {
 //		test_I2D(1);
 //		test_I2L(1);
 		
-		test_IADD(3, -1);
+//		test_IADD(3, -2);
 //		test_IADD(3, 1);
 //		test_IADD(-1, 0);
 		
@@ -26,9 +26,10 @@ public class IntBC {
 //		test_IFLE(1, 0);
 //		test_IFLT(1, 0);
 		
-//		test_IINC(3);
-//		test_IINC(0);		
-//		test_IINC(-3);		
+//		test_IINC(-2, +1);
+//		test_IINC(0, +1);
+//		test_IINC(0, -1);
+		test_IINC(2, -1);		
 		
 //		test_IMUL(3, -1);
 //		test_IMUL(-3, 1);
@@ -202,12 +203,18 @@ public class IntBC {
 				Debug.getAbstractInteger(y));
 	}
 
-	public static void test_IINC(int x) {
+	public static void test_IINC(int x, int sign) {
 		System.out.println("\n===== IINC =====\n");
 		x = Debug.makeAbstractInteger(x);
 
 		System.out.printf("x is %s\n", Debug.getAbstractInteger(x));
-		++x;
+		if (sign < 0) {
+			System.out.println("--x");
+			--x;
+		} else {
+			System.out.println("++x");
+			++x;			
+		}
 		System.out.printf("x is %s\n", Debug.getAbstractInteger(x));
 	}
 

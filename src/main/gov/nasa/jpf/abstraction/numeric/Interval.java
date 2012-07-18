@@ -165,7 +165,18 @@ public class Interval extends Abstraction {
 
 	@Override
 	public Abstraction _plus(int right) {
-		return _plus(abstract_map(right));
+		if (right == 1) {
+			boolean gr = could_be_INSIDE() || could_be_GREATER();
+			boolean in = (could_be_INSIDE() && MIN != MAX) || could_be_LESS();
+			boolean le = could_be_LESS();
+			return construct_top(le, in, gr);
+		} else if (right == -1) {
+			boolean le = could_be_INSIDE() || could_be_LESS();
+			boolean in = (could_be_INSIDE() && MIN != MAX) || could_be_GREATER();
+			boolean gr = could_be_GREATER();
+			return construct_top(le, in, gr);
+		} else
+			return _plus(abstract_map(right));
 	}
 
 	@Override

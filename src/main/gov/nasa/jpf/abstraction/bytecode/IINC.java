@@ -27,21 +27,22 @@ import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 
 public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
-	
-	public IINC(int localVarIndex, int increment){
+
+	public IINC(int localVarIndex, int increment) {
 		super(localVarIndex, increment);
-	}	
+	}
 
 	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
-		
+
 		StackFrame sf = th.getTopFrame();
 		Abstraction abs_v = (Abstraction) sf.getLocalAttr(index);
-		if(abs_v == null)
-			th.setLocalVariable(index, th.getLocalVariable(index) + increment, false);
+		if (abs_v == null)
+			th.setLocalVariable(index, th.getLocalVariable(index) + increment,
+					false);
 		else {
 			Abstraction result = abs_v._plus(increment);
-			System.out.printf("IINC> Value:  %d (%s)\n", th.getLocalVariable(index), abs_v);
-			th.setLocalVariable(index, 0, false);
+			System.out.printf("IINC> Value:  %d (%s)\n",
+					th.getLocalVariable(index), abs_v);
 
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
@@ -59,10 +60,11 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 				}
 			} else
 				System.out.printf("IINC> Result: %s\n", result);
-			
-	    	sf.setLocalAttr(index, result);
+
+			sf.setLocalAttr(index, result);
+			th.setLocalVariable(index, 0, false);					
 		}
 		return getNext(th);
-	}	
+	}
 
 }

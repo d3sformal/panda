@@ -106,12 +106,18 @@ public class Evenness extends Abstraction {
 
 	@Override
 	public Abstraction _plus(int right) {
-		return _plus(abstract_map(right));
+		if (right == 1 || right == -1)
+			return construct_top(could_be_ODD(), could_be_EVEN());
+		else
+			return _plus(abstract_map(right));
 	}
 
 	@Override
 	public Abstraction _plus(long right) {
-		return _plus(abstract_map(right));
+		if (right == 1 || right == -1)
+			return construct_top(could_be_ODD(), could_be_EVEN());
+		else
+			return _plus(abstract_map(right));
 	}
 	
 	@Override

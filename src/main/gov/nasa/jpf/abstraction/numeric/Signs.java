@@ -165,12 +165,34 @@ public class Signs extends Abstraction {
 
 	@Override
 	public Abstraction _plus(int right) {
-		return _plus(abstract_map(right));
+		if (right == 1) {
+			boolean n = could_be_NEG();
+			boolean z = could_be_NEG();
+			boolean p = could_be_ZERO() || could_be_POS();
+			return construct_top(n, z, p);
+		} else if (right == -1) {
+			boolean n = could_be_NEG() || could_be_ZERO();
+			boolean z = could_be_POS();
+			boolean p = could_be_POS();
+			return construct_top(n, z, p);
+		} else
+			return _plus(abstract_map(right));
 	}
 
 	@Override
 	public Abstraction _plus(long right) {
-		return _plus(abstract_map(right));
+		if (right == 1) {
+			boolean n = could_be_NEG();
+			boolean z = could_be_NEG();
+			boolean p = could_be_ZERO() || could_be_POS();
+			return construct_top(n, z, p);
+		} else if (right == -1) {
+			boolean n = could_be_NEG() || could_be_ZERO();
+			boolean z = could_be_POS();
+			boolean p = could_be_POS();
+			return construct_top(n, z, p);
+		} else
+			return _plus(abstract_map(right));
 	}
 
 	@Override
@@ -780,14 +802,14 @@ public class Signs extends Abstraction {
 
 	public String toString() {
 		if (this instanceof Signs) {
+			if (this.isTop())
+				return "TOP";			
 			if (this == ZERO)
 				return "ZERO";
 			if (this == POS)
 				return "POS";
 			if (this == NEG)
 				return "NEG";
-			if (this.isTop())
-				return "TOP";
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 		return "";
