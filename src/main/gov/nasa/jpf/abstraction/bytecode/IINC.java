@@ -63,8 +63,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 			} else
 				System.out.printf("IINC> Result: %s\n", result);
 			
-			sf = th.getTopFrame();
-			sf.setLocalAttr(index, result);
+			th.setLocalAttr(index, result);
 			th.setLocalVariable(index, 0, false);					
 		}
 		return getNext(th);
