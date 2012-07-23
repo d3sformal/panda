@@ -43,7 +43,7 @@ class Producer extends Thread
 					d.value = Debug.makeAbstractInteger(10); // dummy value
 					d.isNew = true;
 				}
-				remaining--;
+				--remaining;
 			}
 		}
 	}

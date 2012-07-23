@@ -358,11 +358,11 @@ public class Interval extends Abstraction {
 			}
 			double res_left, res_right;
 			if ((left1 <= 0 && 0 <= right1) || (left2 <= 0 && 0 <= right2)) {
-				res_left = _min(left1*left2, left1*right2, right1*left2, right1*right2, 0);
-				res_right = _max(left1*left2, left1*right2, right1*left2, right1*right2, 0);
+				res_left = ___min(left1*left2, left1*right2, right1*left2, right1*right2, 0);
+				res_right = ____max(left1*left2, left1*right2, right1*left2, right1*right2, 0);
 			} else {
-				res_left = _min(left1*left2, left1*right2, right1*left2, right1*right2);
-				res_right = _max(left1*left2, left1*right2, right1*left2, right1*right2);
+				res_left = ___min(left1*left2, left1*right2, right1*left2, right1*right2);
+				res_right = ____max(left1*left2, left1*right2, right1*left2, right1*right2);
 			}
 			return construct_top(res_left < MIN, res_right >= MIN && res_left <= MAX, res_right > MAX);
 		} else
@@ -389,7 +389,7 @@ public class Interval extends Abstraction {
 		return _div(abstract_map(right));
 	}
 
-	private double _min(double... args) {
+	private double ___min(double... args) {
 		double res = args[0];
 		for (int i = 1; i < args.length; ++i)
 			if (args[i] < res)
@@ -397,16 +397,12 @@ public class Interval extends Abstraction {
 		return res;
 	}
 	
-	private double _max(double... args) {
+	private double ____max(double... args) {
 		double res = args[0];
 		for (int i = 1; i < args.length; ++i)
 			if (args[i] > res)
 					res = args[i];
 		return res;
-	}	
-
-	private double _min(double a, double b, double c, double d, double e) {
-		return Math.min(a, Math.min(b, Math.min(c, d)));
 	}	
 	
 	@Override
@@ -440,14 +436,15 @@ public class Interval extends Abstraction {
 				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
 			}
 			if (left2 <= 0 && 0 <= right2)
-				; // TODO: Handle division by zero
+				System.out.println("### WARNING: Division by ZERO may happen"); 
+			// TODO: Handle division by zero
 			double res_left, res_right;
-			if (left1 <= 0 && 0 <= right1) {
-				res_left = _min(left1/left2, left1/right2, right1/left2, right1/right2, 0);
-				res_right = _max(left1/left2, left1/right2, right1/left2, right1/right2, 0);
+			if ((left1 <= 0 && 0 <= right1) || (left2 < 0 && 0 < right2)) {
+				res_left = ___min(left1/left2, left1/right2, right1/left2, right1/right2, 0);
+				res_right = ____max(left1/left2, left1/right2, right1/left2, right1/right2, 0);
 			} else {
-				res_left = _min(left1/left2, left1/right2, right1/left2, right1/right2);
-				res_right = _max(left1/left2, left1/right2, right1/left2, right1/right2);
+				res_left = ___min(left1/left2, left1/right2, right1/left2, right1/right2);
+				res_right = ____max(left1/left2, left1/right2, right1/left2, right1/right2);
 			}
 			return construct_top(res_left < MIN, res_right >= MIN && res_left <= MAX, res_right > MAX);
 		} else
@@ -507,7 +504,7 @@ public class Interval extends Abstraction {
 			if (left2 <= 0 && 0 <= right2)
 				; // TODO: Handle division by zero			
 			double res_left = 0;
-			double res_right = _max(Math.abs(left1), Math.abs(right1), Math.abs(left2), Math.abs(right2));
+			double res_right = ____max(Math.abs(left1), Math.abs(right1), Math.abs(left2), Math.abs(right2));
 
 			return construct_top(res_left < MIN, res_right >= MIN && res_left <= MAX, res_right > MAX);
 		} else

@@ -24,6 +24,7 @@ import gov.nasa.jpf.jvm.ClassInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.abstraction.bytecode.*;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.ConcreteInterval;
 import gov.nasa.jpf.abstraction.numeric.Evenness;
 import gov.nasa.jpf.abstraction.numeric.Interval;
 import gov.nasa.jpf.abstraction.numeric.Signs;
@@ -48,29 +49,40 @@ public class AbstractInstructionFactory extends
 
 		try {
 			String[] abs_str = conf.getStringArray("abstract.domain");
-			for (String s : abs_str)
-				if (s.toLowerCase().equals("signs")) {
-					System.out.println("### jpf-abstraction: SIGNS turned on");
+			for (String s : abs_str) {
+				String[] argv = s.split(" ");
+				String abs_name = argv[0].toLowerCase();
+				if (abs_name.equals("signs"))
 					abs = new Signs(0);
-				} else if (s.toLowerCase().equals("evenness")) {
-					System.out.println("### jpf-abstraction: EVENNESS turned on");
+				else if (abs_name.equals("evenness"))
 					abs = new Evenness(0);
-				} else if (s.toLowerCase().substring(0,8).equals("interval")) {
-					String[] arr = s.split(" ");
+				else if (abs_name.equals("interval")) {
 					try {
-						double min = Double.parseDouble(arr[1]);
-						double max = Double.parseDouble(arr[2]);
-						System.out.printf("### jpf-abstraction: INTERVAL[%f, %f] turned on\n", min, max);
-						abs = Interval.create(min, max);
+					double min = Double.parseDouble(argv[1]);
+					double max = Double.parseDouble(argv[2]);
+					System.out.printf("### jpf-abstraction: INTERVAL[%f, %f] turned on\n", min, max);
+					abs = Interval.create(min, max);
 					} catch (NumberFormatException nfe) {
 						System.out.println("### jpf-abstraction: please keep format \"Interval MIN MAX\", where MIN and MAX are doubles");
 					} catch (ArrayIndexOutOfBoundsException rce) {
 						System.out.println("### jpf-abstraction: please keep format \"Interval MIN MAX\", where MIN and MAX are doubles");
-					}
+					}						
+				} else if (abs_name.equals("concreteinterval")) {
+					try {
+						int min = Integer.parseInt(argv[1]);
+						int max = Integer.parseInt(argv[2]);
+						System.out.printf("### jpf-abstraction: CONCRETEINTERVAL[%d, %d] turned on\n", min, max);
+						abs = ConcreteInterval.create(min, max);
+					} catch (NumberFormatException nfe) {
+						System.out.println("### jpf-abstraction: please keep format \"Interval MIN MAX\", where MIN and MAX are int");
+					} catch (ArrayIndexOutOfBoundsException rce) {
+						System.out.println("### jpf-abstraction: please keep format \"Interval MIN MAX\", where MIN and MAX are int");
+					}										
 				} else {
 					System.out.println("### jpf-abstraction: unknown abstraction specified");
 					System.out.println("###                 \"" + s + "\"");
 				}
+			}
 		}	catch(Exception e){
 			System.out.println("jpf-abstraction: abstraction is not specified");
 		}
