@@ -802,8 +802,16 @@ public class Signs extends Abstraction {
 
 	public String toString() {
 		if (this instanceof Signs) {
-			if (this.isTop())
-				return "TOP";			
+			if (this.isTop()) {
+				String result = "";
+				if (could_be_NEG())
+					result = "NEG,";
+				if (could_be_ZERO())
+					result += (result.isEmpty())? "ZERO," : " ZERO,";
+				if (could_be_POS())
+					result += " POS";				
+				return "{ " + result + " }";	
+			}
 			if (this == ZERO)
 				return "ZERO";
 			if (this == POS)

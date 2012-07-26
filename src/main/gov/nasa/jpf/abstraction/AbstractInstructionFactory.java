@@ -52,11 +52,13 @@ public class AbstractInstructionFactory extends
 			for (String s : abs_str) {
 				String[] argv = s.split(" ");
 				String abs_name = argv[0].toLowerCase();
-				if (abs_name.equals("signs"))
+				if (abs_name.equals("signs")) {
+					System.out.printf("### jpf-abstraction: SIGNS turned on\n");
 					abs = new Signs(0);
-				else if (abs_name.equals("evenness"))
+				} else if (abs_name.equals("evenness")) {
+					System.out.printf("### jpf-abstraction: EVENNESS turned on\n");
 					abs = new Evenness(0);
-				else if (abs_name.equals("interval")) {
+				} else if (abs_name.equals("interval")) {
 					try {
 					double min = Double.parseDouble(argv[1]);
 					double max = Double.parseDouble(argv[2]);
