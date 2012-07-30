@@ -661,7 +661,7 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 
 	@Override
 	public int compareTo(ConcreteInterval o) {
-		return Integer.compare(get_key(), o.get_key());
+		return Integer.valueOf(get_key()).compareTo(o.get_key());
 	}
 	
 }
