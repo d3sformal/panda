@@ -19,12 +19,17 @@
 
 package gov.nasa.jpf.abstraction;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.jvm.ClassInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.abstraction.bytecode.*;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.ConcreteInterval;
+import gov.nasa.jpf.abstraction.numeric.Container;
 import gov.nasa.jpf.abstraction.numeric.Evenness;
 import gov.nasa.jpf.abstraction.numeric.Interval;
 import gov.nasa.jpf.abstraction.numeric.Signs;
@@ -34,10 +39,10 @@ import gov.nasa.jpf.util.InstructionFactoryFilter;
 public class AbstractInstructionFactory extends
 		gov.nasa.jpf.jvm.bytecode.InstructionFactory {
 
-	ClassInfo ci;	
-	
-	InstructionFactoryFilter filter;	
-	
+	ClassInfo ci;
+
+	InstructionFactoryFilter filter;
+
 	public static Abstraction abs;
 
 	public AbstractInstructionFactory(Config conf) {
@@ -47,54 +52,66 @@ public class AbstractInstructionFactory extends
 		filter = new InstructionFactoryFilter(null,
 				new String[] {/* "java.*", */"javax.*" }, null, null);
 
-		try {
-			String[] abs_str = conf.getStringArray("abstract.domain");
-			for (String s : abs_str) {
-				String[] argv = s.split(" ");
-				String abs_name = argv[0].toLowerCase();
-				if (abs_name.equals("signs")) {
-					System.out.printf("### jpf-abstraction: SIGNS turned on\n");
-					abs = new Signs(0);
-				} else if (abs_name.equals("evenness")) {
-					System.out.printf("### jpf-abstraction: EVENNESS turned on\n");
-					abs = new Evenness(0);
-				} else if (abs_name.equals("interval")) {
-					try {
+		List<Abstraction> abs_list = new ArrayList<Abstraction>();
+
+		String[] abs_str = conf.getStringArray("abstract.domain");
+
+		for (String s : abs_str) {
+			String[] argv = s.split(" ");
+			String abs_name = argv[0].toLowerCase();
+			if (abs_name.equals("signs")) {
+				System.out.printf("### jpf-abstraction: SIGNS turned on\n");
+				abs_list.add(new Signs(0));
+			} else if (abs_name.equals("evenness")) {
+				System.out.printf("### jpf-abstraction: EVENNESS turned on\n");
+				abs_list.add(new Evenness(0));
+			} else if (abs_name.equals("interval")) {
+				try {
 					double min = Double.parseDouble(argv[1]);
 					double max = Double.parseDouble(argv[2]);
-					System.out.printf("### jpf-abstraction: INTERVAL[%f, %f] turned on\n", min, max);
-					abs = Interval.create(min, max);
-					} catch (NumberFormatException nfe) {
-						System.out.println("### jpf-abstraction: please keep format \"Interval MIN MAX\", where MIN and MAX are doubles");
-					} catch (ArrayIndexOutOfBoundsException rce) {
-						System.out.println("### jpf-abstraction: please keep format \"Interval MIN MAX\", where MIN and MAX are doubles");
-					}						
-				} else if (abs_name.equals("concreteinterval")) {
-					try {
-						int min = Integer.parseInt(argv[1]);
-						int max = Integer.parseInt(argv[2]);
-						System.out.printf("### jpf-abstraction: CONCRETEINTERVAL[%d, %d] turned on\n", min, max);
-						abs = ConcreteInterval.create(min, max);
-					} catch (NumberFormatException nfe) {
-						System.out.println("### jpf-abstraction: please keep format \"Interval MIN MAX\", where MIN and MAX are int");
-					} catch (ArrayIndexOutOfBoundsException rce) {
-						System.out.println("### jpf-abstraction: please keep format \"Interval MIN MAX\", where MIN and MAX are int");
-					}										
-				} else {
-					System.out.println("### jpf-abstraction: unknown abstraction specified");
-					System.out.println("###                 \"" + s + "\"");
+					System.out.printf("### jpf-abstraction: INTERVAL[%f, %f] turned on\n",
+									min, max);
+					abs_list.add(Interval.create(min, max));
+				} catch (NumberFormatException nfe) {
+					System.out
+							.println("### jpf-abstraction: please keep format "
+									+ "\"Interval MIN MAX\", where MIN and MAX are doubles");
+				} catch (ArrayIndexOutOfBoundsException rce) {
+					System.out.println("### jpf-abstraction: please keep format "
+									+ "\"Interval MIN MAX\", where MIN and MAX are doubles");
 				}
-			}
-		}	catch(Exception e){
-			System.out.println("jpf-abstraction: abstraction is not specified");
+			} else if (abs_name.equals("concreteinterval")) {
+				try {
+					int min = Integer.parseInt(argv[1]);
+					int max = Integer.parseInt(argv[2]);
+					System.out.printf("### jpf-abstraction: CONCRETEINTERVAL[%d, %d] turned on\n",
+									min, max);
+					abs_list.add(ConcreteInterval.create(min, max));
+				} catch (NumberFormatException nfe) {
+					System.out.println("### jpf-abstraction: please keep format "
+									+ "\"Interval MIN MAX\", where MIN and MAX are int");
+				} catch (ArrayIndexOutOfBoundsException rce) {
+					System.out.println("### jpf-abstraction: please keep format "
+									+ "\"Interval MIN MAX\", where MIN and MAX are int");
+				}
+			} else
+				System.out.println("### jpf-abstraction: " + s + " is unknown abstraction");
+		}
+		if (abs_list.size() == 0)
+			abs = null;
+		else if (abs_list.size() == 1)
+			abs = abs_list.get(0);
+		else {
+			abs = new Container(abs_list);
+			System.out.println("### jpf-abstraction: CONTAINER abstraction turned on");
 		}
 	}
-	
+
 	@Override
 	public void setClassInfoContext(ClassInfo ci) {
 		this.ci = ci;
 	}
-	
+
 	// bytecodes
 
 	@Override
@@ -181,17 +198,16 @@ public class AbstractInstructionFactory extends
 	public Instruction fcmpl() {
 		return (filter.isInstrumentedClass(ci) ? new FCMPL() : super.fcmpl());
 	}
-	
+
 	@Override
 	public Instruction fdiv() {
 		return (filter.isInstrumentedClass(ci) ? new FDIV() : super.fdiv());
-	}	
-	
+	}
+
 	@Override
 	public Instruction fmul() {
 		return (filter.isInstrumentedClass(ci) ? new FMUL() : super.fmul());
-	}	
-		
+	}
 
 	@Override
 	public Instruction fneg() {
@@ -254,8 +270,8 @@ public class AbstractInstructionFactory extends
 	public Instruction ifle(int targetPc) {
 		return (filter.isInstrumentedClass(ci) ? new IFLE(targetPc) : super
 				.ifle(targetPc));
-	}	
-	
+	}
+
 	@Override
 	public Instruction iflt(int targetPc) {
 		return (filter.isInstrumentedClass(ci) ? new IFLT(targetPc) : super
@@ -312,7 +328,6 @@ public class AbstractInstructionFactory extends
 	public Instruction ixor() {
 		return (filter.isInstrumentedClass(ci) ? new IXOR() : super.ixor());
 	}
-	
 
 	@Override
 	public Instruction l2d() {
@@ -367,12 +382,13 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction lshl() {
 		return (filter.isInstrumentedClass(ci) ? new LSHL() : super.lshl());
-	}	
+	}
 
 	@Override
 	public Instruction lshr() {
 		return (filter.isInstrumentedClass(ci) ? new LSHR() : super.lshr());
 	}
+
 	@Override
 	public Instruction lsub() {
 		return (filter.isInstrumentedClass(ci) ? new LSUB() : super.lsub());

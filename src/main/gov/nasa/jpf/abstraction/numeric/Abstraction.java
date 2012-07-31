@@ -1,7 +1,5 @@
 package gov.nasa.jpf.abstraction.numeric;
 
-
-
 import java.util.Set;
 
 public class Abstraction  {
@@ -561,10 +559,6 @@ public class Abstraction  {
 	public Abstraction _plus(double right) {
 		throw new RuntimeException("plus not implemented");
 	}	
-	
-	public Abstraction _inc(int right) {
-		throw new RuntimeException("inc not implemented");
-	}		
 
 	public Abstraction _minus(Abstraction right) {
 		throw new RuntimeException("minus not implemented");

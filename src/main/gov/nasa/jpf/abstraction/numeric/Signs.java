@@ -58,20 +58,20 @@ public class Signs extends Abstraction {
 
 	// returns possible tokens from TOP in order {NEG, ZERO, POS}
 	@Override
-	public Abstraction get_token(int key) {
+	public Abstraction get_token(int idx) {
 		int num = get_num_tokens();
-		if (key < 0 || key >= num)
-			throw new RuntimeException("Wrong TOP token");
+		if (idx < 0 || idx >= num)
+			throw new RuntimeException("### Error: out of range");
 		if (could_be_NEG())
-			if (key == 0)
+			if (idx == 0)
 				return NEG;
 			else 
 				if (could_be_ZERO())
-					return (key == 1)? ZERO : POS;
+					return (idx == 1)? ZERO : POS;
 				else 
 					return POS;
 		else if (could_be_ZERO())
-			return (key == 0)? ZERO : POS;
+			return (idx == 0)? ZERO : POS;
 		else
 			return POS;
 	}

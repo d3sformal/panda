@@ -31,12 +31,12 @@ public class IntBC {
 //		test_IINC(0, -1);
 //		test_IINC(2, -1);		
 		
-		test_IMUL(3, -1);
+//		test_IMUL(3, -1);
 //		test_IMUL(-3, 1);
 //		test_IMUL(-3, -2);
 //		test_IMUL(2, -1);	
 		
-		test_INEG(-3);
+//		test_INEG(-3);
 //		test_INEG(0);
 //		test_INEG(3);
 		
