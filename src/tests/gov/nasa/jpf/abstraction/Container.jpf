@@ -1,0 +1,12 @@
+@using=jpf-abstraction
+
+target=gov.nasa.jpf.abstraction.Container
+
+classpath=build/tests
+sourcepath=src/tests
+
+abstract.domain=SIGNS,EVENNESS
+
+listener = gov.nasa.jpf.abstraction.AbstractListener
+
+vm.storage.class=nil
