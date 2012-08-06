@@ -44,6 +44,58 @@ public class Abstraction  {
 		throw new RuntimeException("abstract_map not implemented");
 	}
 	
+	public static Abstraction _cmpg(float v1, Abstraction abs_v1, float v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v1 != null) {
+			if (abs_v2 != null)
+				result = abs_v1._cmpg(abs_v2);
+			else
+				result = abs_v1._cmpg(v2);
+		} else if (abs_v2 != null)
+			result = abs_v2._cmpg(v1);
+		return result;
+	}
+	
+	public static Abstraction _cmpg(double v1, Abstraction abs_v1, double v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v1 != null) {
+			if (abs_v2 != null)
+				result = abs_v1._cmpg(abs_v2);
+			else
+				result = abs_v1._cmpg(v2);
+		} else if (abs_v2 != null)
+			result = abs_v2._cmpg(v1);
+		return result;
+	}		
+	
+	public static Abstraction _cmpl(float v1, Abstraction abs_v1, float v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v1 != null) {
+			if (abs_v2 != null)
+				result = abs_v1._cmpl(abs_v2);
+			else
+				result = abs_v1._cmpl(v2);
+		} else if (abs_v2 != null)
+			result = abs_v2._cmpl(v1);
+		return result;
+	}
+	
+	public static Abstraction _cmpl(double v1, Abstraction abs_v1, double v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v1 != null) {
+			if (abs_v2 != null)
+				result = abs_v1._cmpl(abs_v2);
+			else
+				result = abs_v1._cmpl(v2);
+		} else if (abs_v2 != null)
+			result = abs_v2._cmpl(v1);
+		return result;
+	}	
+	
 	public static Abstraction _add(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -468,6 +520,44 @@ public class Abstraction  {
 		return result;
 	}				
 	
+	public Abstraction _cmpg(Abstraction right) {
+		boolean n = false, z = false, p = false;
+		if (this._gt(right) != AbstractBoolean.FALSE)
+			n = true;
+		if (this._lt(right) != AbstractBoolean.FALSE)
+			p = true;
+		if (this._gt(right) != AbstractBoolean.TRUE && this._lt(right) != AbstractBoolean.TRUE)
+			z = true;
+		return Signs.construct_top(n, z, p);
+	}
+	
+	public Abstraction _cmpg(float right) {
+		return this._cmpg(abstract_map(right));
+	}	
+	
+	public Abstraction _cmpg(double right) {
+		return this._cmpg(abstract_map(right));
+	}
+	
+	public Abstraction _cmpl(Abstraction right) {
+		boolean n = false, z = false, p = false;
+		if (this._gt(right) != AbstractBoolean.FALSE)
+			p = true;
+		if (this._lt(right) != AbstractBoolean.FALSE)
+			n = true;
+		if (this._gt(right) != AbstractBoolean.TRUE && this._lt(right) != AbstractBoolean.TRUE)
+			z = true;
+		return Signs.construct_top(n, z, p);
+	}
+	
+	public Abstraction _cmpl(float right) {
+		return this._cmpl(abstract_map(right));
+	}
+	
+	public Abstraction _cmpl(double right) {
+		return this._cmpl(abstract_map(right));
+	}	
+	
 	public Abstraction _bitwise_and(Abstraction right) {
 		throw new RuntimeException("bitwise and not implemented");
 	}
@@ -660,7 +750,7 @@ public class Abstraction  {
 	public Abstraction _rem(double right) {
 		throw new RuntimeException("rem not implemented");
 	}	
-
+	
 	public AbstractBoolean _lt(Abstraction right) {
 		throw new RuntimeException("lt not implemented");
 	}

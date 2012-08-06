@@ -8,9 +8,20 @@ import java.util.Set;
 
 public class Container extends Abstraction {
 
-	List<Abstraction> list = new ArrayList<Abstraction>();
+	private List<Abstraction> list = new ArrayList<Abstraction>();
 
-	// returns the abstract token corresponding to the key
+	/**
+	 * Gets the list of abstract values, which describe a concrete value with
+	 * abstractions specified by configuration. Abstract values are in the same
+	 * order as specified. A null value inside the list means that some concrete
+	 * value can not be abstracted.
+	 * 
+	 * @return The list of abstract values.
+	 */
+	public List<Abstraction> getAbstractionsList() {
+		return list;
+	}
+
 	@Override
 	public Abstraction get_token(int idx) {
 		int num = get_num_tokens();
@@ -20,7 +31,7 @@ public class Container extends Abstraction {
 		for (int i = 0; i < list.size(); ++i)
 			if (list.get(i) != null) {
 				int cnum = list.get(i).get_num_tokens();
-				int cidx = idx % cnum;				
+				int cidx = idx % cnum;
 				res.add(list.get(i).get_token(cidx));
 				idx /= cnum;
 			} else
@@ -47,7 +58,7 @@ public class Container extends Abstraction {
 	public boolean isTop() {
 		return get_num_tokens() > 1;
 	}
-	
+
 	public Container(List<Abstraction> lst) {
 		list = lst;
 	}
@@ -60,8 +71,9 @@ public class Container extends Abstraction {
 			try {
 				elem = abs.abstract_map(v);
 			} catch (Exception nie) {
-				System.out.println("### jpf-abstraction: abstract function failure for " 
-						+ abs.getClass() + " with " + v);
+				System.out
+						.println("### jpf-abstraction: abstract function failure for "
+								+ abs.getClass() + " with " + v);
 			}
 			arr.add(elem);
 		}
@@ -76,8 +88,9 @@ public class Container extends Abstraction {
 			try {
 				elem = abs.abstract_map(v);
 			} catch (Exception nie) {
-				System.out.println("### jpf-abstraction: abstract function failure for " 
-						+ abs.getClass() + " with " + v);
+				System.out
+						.println("### jpf-abstraction: abstract function failure for "
+								+ abs.getClass() + " with " + v);
 			}
 			arr.add(elem);
 		}
@@ -92,8 +105,9 @@ public class Container extends Abstraction {
 			try {
 				elem = abs.abstract_map(v);
 			} catch (Exception nie) {
-				System.out.println("### jpf-abstraction: abstract function failure for " 
-						+ abs.getClass() + " with " + v);
+				System.out
+						.println("### jpf-abstraction: abstract function failure for "
+								+ abs.getClass() + " with " + v);
 			}
 			arr.add(elem);
 		}
@@ -108,8 +122,9 @@ public class Container extends Abstraction {
 			try {
 				elem = abs.abstract_map(v);
 			} catch (Exception nie) {
-				System.out.println("### jpf-abstraction: abstract function failure for " 
-						+ abs.getClass() + " with " + v);
+				System.out
+						.println("### jpf-abstraction: abstract function failure for "
+								+ abs.getClass() + " with " + v);
 			}
 			arr.add(elem);
 		}
@@ -123,9 +138,20 @@ public class Container extends Abstraction {
 		Abstraction execute(Abstraction left, Abstraction right);
 	}
 
-	// may be changed to support interaction between different abstractions
-	// (e.g. ZERO + ODD)
-	private static List<Pair<Abstraction, Abstraction>> getOperandsCandidates(
+	/**
+	 * Gets all pairs of abstractions from two containers respectfully, which
+	 * can interact which each other. Mainly used for performing a binary
+	 * operation on them and construction of a new container abstraction as a
+	 * result.
+	 * 
+	 * @param op1
+	 *            The first container.
+	 * @param op2
+	 *            The second container.
+	 * @return A list of pairs of abstractions from op1 and op2 containers
+	 *         respectively, which can interact with each other.
+	 */
+	private static List<Pair<Abstraction, Abstraction>> getRelevantAbstractionPairs(
 			Container op1, Container op2) {
 		List<Abstraction> lArr = op1.list;
 		List<Abstraction> rArr = op2.list;
@@ -133,25 +159,38 @@ public class Container extends Abstraction {
 
 		if (lArr.size() != rArr.size())
 			throw new RuntimeException("## Error: wrong container operands");
-
+		// TODO: method must be changed if interactions between different
+		// abstractions are meant to be allowed
 		for (int i = 0; i < lArr.size(); ++i)
 			if (lArr.get(i) == null || rArr.get(i) == null
 					|| lArr.get(i).getClass() == rArr.get(i).getClass())
-				res.add(new Pair<Abstraction, Abstraction>(lArr.get(i), rArr.get(i)));
+				res.add(new Pair<Abstraction, Abstraction>(lArr.get(i), rArr
+						.get(i)));
 			else
-				throw new RuntimeException("## Error: wrong container operands ('" 
-							+ lArr.get(i) + "', '" + rArr.get(i) + "')");
-
+				throw new RuntimeException(
+						"## Error: wrong container operands ('" + lArr.get(i)
+								+ "', '" + rArr.get(i) + "')");
 		return res;
 	}
 
+	/**
+	 * Performs a binary operation on two operands (this and right) specified by
+	 * IBinaryOperation.execute method.
+	 * 
+	 * @param right
+	 *            The second container.
+	 * @param op
+	 *            Implementation of IBinaryOperation interface with a binary
+	 *            operation on abstractions.
+	 * @return The result of an operation.
+	 */
 	private Abstraction binaryOperation(Abstraction right, IBinaryOperation op) {
 		if (right instanceof Container) {
 			Container right_val = (Container) right;
 			List<Abstraction> res = new ArrayList<Abstraction>();
 
-			for (Pair<Abstraction, Abstraction> p : getOperandsCandidates(this,
-					right_val))
+			for (Pair<Abstraction, Abstraction> p : getRelevantAbstractionPairs(
+					this, right_val))
 				if (p._1 == null || p._2 == null)
 					res.add(null);
 				else
@@ -467,12 +506,23 @@ public class Container extends Abstraction {
 		public AbstractBoolean execute(Abstraction op1, Abstraction op2);
 	}
 
+	/**
+	 * Performs a comparison of two operands (this and right) specified by
+	 * IBinaryComparison.execute method.
+	 * 
+	 * @param right
+	 *            The second container.
+	 * @param op
+	 *            Implementation of IBinaryComparison interface which compares
+	 *            two abstract values.
+	 * @return The result of comparison.
+	 */
 	private AbstractBoolean binaryComparison(Abstraction right,
 			IBinaryComparison op) {
 		if (right instanceof Container) {
 			AbstractBoolean res = AbstractBoolean.FALSE;
-			for (Pair<Abstraction, Abstraction> p : getOperandsCandidates(this,
-					(Container) right))
+			for (Pair<Abstraction, Abstraction> p : getRelevantAbstractionPairs(
+					this, (Container) right))
 				if (p._1 != null && p._2 != null)
 					res = res.or(op.execute(p._1, p._2));
 			return res;
@@ -548,12 +598,12 @@ public class Container extends Abstraction {
 			sb.append("[");
 			for (int i = 0; i < list.size(); ++i) {
 				sb.append(" " + list.get(i));
-				if (i+1 < list.size())
+				if (i + 1 < list.size())
 					sb.append(",");
 			}
 			sb.append(" ]");
 			return sb.toString();
 		}
-	}	
-	
+	}
+
 }

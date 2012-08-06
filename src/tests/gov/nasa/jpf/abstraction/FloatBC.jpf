@@ -5,7 +5,7 @@ target=gov.nasa.jpf.abstraction.FloatBC
 classpath=build/tests
 sourcepath=src/tests
 
-abstract.domain=SIGN
+abstract.domain=SIGNS
 
 listener = gov.nasa.jpf.abstraction.AbstractListener
 

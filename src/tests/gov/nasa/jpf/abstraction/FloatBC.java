@@ -3,16 +3,16 @@ package gov.nasa.jpf.abstraction;
 public class FloatBC {
 
 	public static void main(String[] args) {
-		test_F2D(1);
-		test_F2I(1);
-		test_F2L(1);
-		test_FADD(1, 0);
-		test_FDIV(1, 1);
-		// test_FCMP(1, 0);
-		test_FMUL(1, 0);
-		test_FNEG(1);
-		test_FREM(1, 1);
-		test_FSUB(1, 0);
+//		test_F2D(1);
+//		test_F2I(1);
+//		test_F2L(1);
+//		test_FADD(1, 0);
+//		test_FDIV(1, 0);
+		test_FCMP(1, 0);
+//		test_FMUL(1, 0);
+//		test_FNEG(1);
+//		test_FREM(1, 1);
+//		test_FSUB(1, 0);
 	}
 
 	public static void test_F2D(float x) {
@@ -71,30 +71,17 @@ public class FloatBC {
 	}
 
 	public static void test_FCMP(float x, float y) {
-		System.out.println("\n===== FCMPG =====");
+		System.out.println("\n===== FCMPG and FCMPL =====");
 		x = Debug.makeAbstractFloat(x);
 		y = Debug.makeAbstractFloat(y);
 
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractFloat(x),
 				Debug.getAbstractFloat(y));
-		System.out.printf("x > y is %s\n", (x > y) ? "true" : "false");
-		System.out.printf("x >= y is %s\n", (x >= y) ? "true" : "false");
-		System.out.printf("x == y is %s\n", (x == y) ? "true" : "false");
-		System.out.printf("x < y is %s\n", (x < y) ? "true" : "false");
-		System.out.printf("x <= y is %s\n", (x <= y) ? "true" : "false");
-		System.out.printf("x is %s; y is %s\n", Debug.getAbstractFloat(x),
-				Debug.getAbstractFloat(y));
-	}
-
-	public static void test_FCMPL(float x, float y) {
-		System.out.println("\n===== FCMPL =====");
-		x = Debug.makeAbstractFloat(x);
-		y = Debug.makeAbstractFloat(y);
-
-		System.out.printf("x is %s; y is %s\n", Debug.getAbstractFloat(x),
-				Debug.getAbstractFloat(y));
-		System.out.println("y = x + y");
-		y = x + y;
+		System.out.printf("x > y is %s\n", ((x > y)? "true" : "false"));
+		System.out.printf("x >= y is %s\n", ((x >= y)? "true" : "false"));
+		System.out.printf("x == y is %s\n", ((x == y)? "true" : "false"));
+		System.out.printf("x < y is %s\n", ((x < y)? "true" : "false"));
+		System.out.printf("x <= y is %s\n", ((x <= y)? "true" : "false"));
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractFloat(x),
 				Debug.getAbstractFloat(y));
 	}

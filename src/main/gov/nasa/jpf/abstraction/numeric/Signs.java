@@ -96,8 +96,8 @@ public class Signs extends Abstraction {
 		this(key);
 		this.isTop = isTop;
 	}
-
-	private Signs construct_top(boolean isNeg, boolean isZero, boolean isPos) {
+	
+	public static Signs construct_top(boolean isNeg, boolean isZero, boolean isPos) {
 		if (isNeg)
 			if (isZero)
 				if (isPos)
@@ -818,8 +818,7 @@ public class Signs extends Abstraction {
 				return "POS";
 			if (this == NEG)
 				return "NEG";
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
-		return "";
+		}		
+		throw new RuntimeException("## Error: unknown abstraction");
 	}
 }
