@@ -48,6 +48,7 @@ public class IFLT extends gov.nasa.jpf.jvm.bytecode.IFLT {
 		}
 		else { // the condition is abstract
 
+			System.out.printf("IFLT> Values: %d (%s)\n", ti.peek(0), abs_v);
 			AbstractBoolean abs_condition = abs_v._lt(0);
 
 			if(abs_condition == AbstractBoolean.TRUE) {
@@ -69,6 +70,7 @@ public class IFLT extends gov.nasa.jpf.jvm.bytecode.IFLT {
 				}
 			}
 
+			System.out.println("IFLT> Result: " + conditionValue);
 			ti.pop();
 			return (conditionValue ? getTarget() : getNext(ti));
 

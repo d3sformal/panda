@@ -1,11 +1,8 @@
 package gov.nasa.jpf.abstraction.numeric;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class ConcreteInterval extends Abstraction implements Comparable<ConcreteInterval> {
@@ -99,12 +96,90 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 	}		
 	
 	@Override
-	public Abstraction _plus(int right) {
-		return _plus(abstract_map(right));
+	public Abstraction _bitwise_and(Abstraction right) {
+		if (right instanceof ConcreteInterval) {	
+			Set<Integer> values = new HashSet<Integer>();
+			for (int v = MIN-1; v <= MAX+1; ++v)
+				values.add(v);
+			return new ConcreteInterval(values, MIN, MAX);
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
 	}
 	@Override
-	public Abstraction _plus(Abstraction right) {
-		if (right instanceof ConcreteInterval) {
+	public Abstraction _bitwise_and(int right) {
+		return _bitwise_and(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _bitwise_and(long right) {
+		return _bitwise_and(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _bitwise_or(Abstraction right) {
+		if (right instanceof ConcreteInterval) {	
+			Set<Integer> values = new HashSet<Integer>();
+			for (int v = MIN-1; v <= MAX+1; ++v)
+				values.add(v);
+			return new ConcreteInterval(values, MIN, MAX);	
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public Abstraction _bitwise_or(int right) {
+		return _bitwise_or(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _bitwise_or(long right) {
+		return _bitwise_or(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _bitwise_xor(Abstraction right) {
+		if (right instanceof ConcreteInterval) {	
+			Set<Integer> values = new HashSet<Integer>();
+			for (int v = MIN-1; v <= MAX+1; ++v)
+				values.add(v);
+			return new ConcreteInterval(values, MIN, MAX);	
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public Abstraction _bitwise_xor(int right) {
+		return _bitwise_xor(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _bitwise_xor(long right) {
+		return _bitwise_xor(abstract_map(right));
+	}
+
+	@Override
+	protected Abstraction _cmpg_reverse(double right) {
+		return abstract_map(right)._cmpg(this);
+	}
+
+	@Override
+	protected Abstraction _cmpg_reverse(float right) {
+		return abstract_map(right)._cmpg(this);
+	}
+
+	@Override
+	protected Abstraction _cmpl_reverse(double right) {
+		return abstract_map(right)._cmpl(this);
+	}
+	
+	@Override
+	protected Abstraction _cmpl_reverse(float right) {
+		return abstract_map(right)._cmpl(this);
+	}
+
+	@Override
+	public Abstraction _div(Abstraction right) {
+		if (right instanceof ConcreteInterval) {		
 			ConcreteInterval op = (ConcreteInterval)right;
 			Set<Integer> values = new HashSet<Integer>();
 			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
@@ -127,7 +202,17 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 						rv1 = MAX+1;
 						rv2 = Double.POSITIVE_INFINITY;
 					}
-					double _min = lv1+rv1, _max = lv2+rv2;
+					double _min, _max;
+					if (rv1 < 0 && 0 < rv2)
+						System.out.println("### WARNING: Division by ZERO may happen"); 
+					// TODO: Handle division by zero
+					if ((lv1 <= 0 && 0 <= lv2) || (rv1 < 0 && 0 < rv2)) {
+						_min = ___min(lv1/rv1, lv1/rv2, lv2/rv1, lv2/rv2, 0);
+						_max = ___max(lv1/rv1, lv1/rv2, lv2/rv1, lv2/rv2, 0);
+					} else {
+						_min = ___min(lv1/rv1, lv1/rv2, lv2/rv1, lv2/rv2);
+						_max = ___max(lv1/rv1, lv1/rv2, lv2/rv1, lv2/rv2);
+					}
 					int min, max;
 					if (_min < MIN)
 						min = MIN-1;
@@ -140,7 +225,7 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 					else if (_max > MAX)
 						max = MAX+1;
 					else
-						max = (int)_max;
+						max = (int)_max;					
 					for (int v = min; v <= max; ++v)
 						values.add(v);
 				}
@@ -148,6 +233,174 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 			return new ConcreteInterval(values, MIN, MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public Abstraction _div(int right) {
+		return _div(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _div(long right) {
+		return _div(abstract_map(right));
+	}
+
+	@Override
+	protected Abstraction _div_reverse(double right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(float right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(int right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(long right) {
+		return abstract_map(right)._div(this);
+	}
+
+	public AbstractBoolean _eq(Abstraction right) {
+		if (right instanceof ConcreteInterval) {
+			ConcreteInterval op = (ConcreteInterval)right;
+			List<Integer> leftList = Arrays.asList(this.values.toArray(new Integer[this.values.size()]));
+			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);		
+			boolean t = false, f = false;
+			for (int r : rightArr)
+				if (leftList.contains(r))
+					t = true;
+				else
+					f = true;
+			if (f & t)
+				return AbstractBoolean.TOP;
+			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	public AbstractBoolean _eq(int right) {
+		return _eq(abstract_map(right));
+	}
+
+	@Override
+	public AbstractBoolean _ge(Abstraction right) {
+		if (right instanceof ConcreteInterval) {
+			ConcreteInterval op = (ConcreteInterval)right;
+			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
+			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
+			int lMin = leftArr[0];
+			int lMax = leftArr[leftArr.length-1];
+			int rMin = rightArr[0];
+			int rMax = rightArr[rightArr.length-1];			
+			boolean t = lMax >= rMin;
+			boolean f = lMin < rMax || (lMin < MIN && rMax < MIN);
+			if (f & t)
+				return AbstractBoolean.TOP;
+			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+	
+	@Override
+	public AbstractBoolean _ge(int right) {
+		return _ge(abstract_map(right));
+	}
+
+	@Override
+	protected AbstractBoolean _ge_reverse(int right) {
+		return abstract_map(right)._ge(this);
+	}
+
+	@Override
+	public AbstractBoolean _gt(Abstraction right) {
+		if (right instanceof ConcreteInterval) {
+			ConcreteInterval op = (ConcreteInterval)right;
+			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
+			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
+			int lMin = leftArr[0];
+			int lMax = leftArr[leftArr.length-1];
+			int rMin = rightArr[0];
+			int rMax = rightArr[rightArr.length-1];			
+			boolean t = lMax > rMin || (lMax > MAX && rMin > MAX);
+			boolean f = lMin <= rMax;
+			if (f & t)
+				return AbstractBoolean.TOP;
+			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractBoolean _gt(int right) {
+		return _gt(abstract_map(right));
+	}
+
+	@Override
+	protected AbstractBoolean _gt_reverse(int right) {
+		return abstract_map(right)._gt(this);
+	}
+
+	@Override
+	public AbstractBoolean _le(Abstraction right) {
+		if (right instanceof ConcreteInterval) {
+			ConcreteInterval op = (ConcreteInterval)right;
+			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
+			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
+			int lMin = leftArr[0];
+			int lMax = leftArr[leftArr.length-1];
+			int rMin = rightArr[0];
+			int rMax = rightArr[rightArr.length-1];			
+			boolean t = lMin <= rMax;
+			boolean f = lMax > rMin || (lMax > MAX && rMin > MAX);
+			if (f & t)
+				return AbstractBoolean.TOP;
+			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractBoolean _le(int right) {
+		return _le(abstract_map(right));
+	}
+
+	@Override
+	protected AbstractBoolean _le_reverse(int right) {
+		return abstract_map(right)._le(this);
+	}
+
+	@Override
+	public AbstractBoolean _lt(Abstraction right) {
+		if (right instanceof ConcreteInterval) {
+			ConcreteInterval op = (ConcreteInterval)right;
+			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
+			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
+			int lMin = leftArr[0];
+			int lMax = leftArr[leftArr.length-1];
+			int rMin = rightArr[0];
+			int rMax = rightArr[rightArr.length-1];			
+			boolean t = lMin < rMax || (lMin < MIN && rMax < MIN);
+			boolean f = lMax >= rMin;
+			if (f & t)
+				return AbstractBoolean.TOP;
+			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractBoolean _lt(int right) {
+		return _lt(abstract_map(right));
+	}
+
+	@Override
+	protected AbstractBoolean _lt_reverse(int right) {
+		return abstract_map(right)._lt(this);
 	}
 
 	@Override
@@ -219,16 +472,6 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 	}
 
 	@Override
-	public Abstraction _mul(int right) {
-		return _mul(abstract_map(right));
-	}
-
-	@Override
-	public Abstraction _mul(long right) {
-		return _mul(abstract_map(right));
-	}
-
-	@Override
 	public Abstraction _mul(Abstraction right) {
 		if (right instanceof ConcreteInterval) {		
 			ConcreteInterval op = (ConcreteInterval)right;
@@ -284,18 +527,45 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 	}
 
 	@Override
-	public Abstraction _div(int right) {
-		return _div(abstract_map(right));
+	public Abstraction _mul(int right) {
+		return _mul(abstract_map(right));
 	}
 
 	@Override
-	public Abstraction _div(long right) {
-		return _div(abstract_map(right));
+	public Abstraction _mul(long right) {
+		return _mul(abstract_map(right));
+	}
+
+	public AbstractBoolean _ne(Abstraction right) {
+		return _eq(right).not();
 	}
 	
 	@Override
-	public Abstraction _div(Abstraction right) {
-		if (right instanceof ConcreteInterval) {		
+	public AbstractBoolean _ne(int right) {
+		return _ne(abstract_map(right));
+	}	
+	
+	@Override
+	public Abstraction _neg() {
+		Set<Integer> values = new HashSet<Integer>();
+		for (Integer v : this.values) {
+			if (v > MAX)
+				values.add(MIN-1);
+			if (v < MIN)
+				values.add(MAX+1);			
+			if (-v > MAX)
+				values.add(MAX+1);
+			else if (-v < MIN)
+				values.add(MIN-1);
+			else
+				values.add(-v);
+		}
+		return new ConcreteInterval(values, MIN, MAX);
+	}	
+	
+	@Override
+	public Abstraction _plus(Abstraction right) {
+		if (right instanceof ConcreteInterval) {
 			ConcreteInterval op = (ConcreteInterval)right;
 			Set<Integer> values = new HashSet<Integer>();
 			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
@@ -318,17 +588,7 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 						rv1 = MAX+1;
 						rv2 = Double.POSITIVE_INFINITY;
 					}
-					double _min, _max;
-					if (rv1 < 0 && 0 < rv2)
-						System.out.println("### WARNING: Division by ZERO may happen"); 
-					// TODO: Handle division by zero
-					if ((lv1 <= 0 && 0 <= lv2) || (rv1 < 0 && 0 < rv2)) {
-						_min = ___min(lv1/rv1, lv1/rv2, lv2/rv1, lv2/rv2, 0);
-						_max = ___max(lv1/rv1, lv1/rv2, lv2/rv1, lv2/rv2, 0);
-					} else {
-						_min = ___min(lv1/rv1, lv1/rv2, lv2/rv1, lv2/rv2);
-						_max = ___max(lv1/rv1, lv1/rv2, lv2/rv1, lv2/rv2);
-					}
+					double _min = lv1+rv1, _max = lv2+rv2;
 					int min, max;
 					if (_min < MIN)
 						min = MIN-1;
@@ -341,7 +601,7 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 					else if (_max > MAX)
 						max = MAX+1;
 					else
-						max = (int)_max;					
+						max = (int)_max;
 					for (int v = min; v <= max; ++v)
 						values.add(v);
 				}
@@ -352,13 +612,8 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 	}
 
 	@Override
-	public Abstraction _rem(int right) {
-		return _rem(abstract_map(right));
-	}
-
-	@Override
-	public Abstraction _rem(long right) {
-		return _rem(abstract_map(right));
+	public Abstraction _plus(int right) {
+		return _plus(abstract_map(right));
 	}
 
 	@Override
@@ -403,59 +658,38 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 	}
 
 	@Override
-	public Abstraction _bitwise_and(int right) {
-		return _bitwise_and(abstract_map(right));
+	public Abstraction _rem(int right) {
+		return _rem(abstract_map(right));
 	}
 
 	@Override
-	public Abstraction _bitwise_and(long right) {
-		return _bitwise_and(abstract_map(right));
+	public Abstraction _rem(long right) {
+		return _rem(abstract_map(right));
 	}
 
 	@Override
-	public Abstraction _bitwise_and(Abstraction right) {
-		if (right instanceof ConcreteInterval) {	
-			Set<Integer> values = new HashSet<Integer>();
-			for (int v = MIN-1; v <= MAX+1; ++v)
-				values.add(v);
-			return new ConcreteInterval(values, MIN, MAX);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+	protected Abstraction _rem_reverse(double right) {
+		return abstract_map(right)._rem(this);
 	}
 
 	@Override
-	public Abstraction _bitwise_or(int right) {
-		return _bitwise_or(abstract_map(right));
+	protected Abstraction _rem_reverse(float right) {
+		return abstract_map(right)._rem(this);
 	}
 
 	@Override
-	public Abstraction _bitwise_or(long right) {
-		return _bitwise_or(abstract_map(right));
+	protected Abstraction _rem_reverse(int right) {
+		return abstract_map(right)._rem(this);
 	}
 
 	@Override
-	public Abstraction _bitwise_or(Abstraction right) {
-		if (right instanceof ConcreteInterval) {	
-			Set<Integer> values = new HashSet<Integer>();
-			for (int v = MIN-1; v <= MAX+1; ++v)
-				values.add(v);
-			return new ConcreteInterval(values, MIN, MAX);	
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+	protected Abstraction _rem_reverse(long right) {
+		return abstract_map(right)._rem(this);
 	}
 
+	// Note that x << y considers only the least five bits of y
 	@Override
-	public Abstraction _bitwise_xor(int right) {
-		return _bitwise_xor(abstract_map(right));
-	}
-	
-	@Override
-	public Abstraction _bitwise_xor(long right) {
-		return _bitwise_xor(abstract_map(right));
-	}
-
-	@Override
-	public Abstraction _bitwise_xor(Abstraction right) {
+	public Abstraction _shift_left(Abstraction right) {
 		if (right instanceof ConcreteInterval) {	
 			Set<Integer> values = new HashSet<Integer>();
 			for (int v = MIN-1; v <= MAX+1; ++v)
@@ -475,9 +709,19 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 		return _shift_left(abstract_map(right));
 	}
 
-	// Note that x << y considers only the least five bits of y
 	@Override
-	public Abstraction _shift_left(Abstraction right) {
+	protected Abstraction _shift_left_reverse(int right) {
+		return abstract_map(right)._shift_left(this);
+	}
+
+	@Override
+	protected Abstraction _shift_left_reverse(long right) {
+		return abstract_map(right)._shift_left(this);
+	}
+
+	// Note that x >> y considers only the least five bits of y, sign of x is preserved
+	@Override
+	public Abstraction _shift_right(Abstraction right) {
 		if (right instanceof ConcreteInterval) {	
 			Set<Integer> values = new HashSet<Integer>();
 			for (int v = MIN-1; v <= MAX+1; ++v)
@@ -497,26 +741,14 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 		return _shift_right(abstract_map(right));
 	}
 
-	// Note that x >> y considers only the least five bits of y, sign of x is preserved
 	@Override
-	public Abstraction _shift_right(Abstraction right) {
-		if (right instanceof ConcreteInterval) {	
-			Set<Integer> values = new HashSet<Integer>();
-			for (int v = MIN-1; v <= MAX+1; ++v)
-				values.add(v);
-			return new ConcreteInterval(values, MIN, MAX);	
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+	protected Abstraction _shift_right_reverse(int right) {
+		return abstract_map(right)._shift_right(this);
 	}
 
 	@Override
-	public Abstraction _unsigned_shift_right(int right) {
-		return _unsigned_shift_right(abstract_map(right));
-	}
-
-	@Override
-	public Abstraction _unsigned_shift_right(long right) {
-		return _unsigned_shift_right(abstract_map(right));
+	protected Abstraction _shift_right_reverse(long right) {
+		return abstract_map(right)._shift_right(this);
 	}
 
 	// Note that x >>> y considers only the least five bits of y, sign of x is not preserved
@@ -532,117 +764,23 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 	}
 
 	@Override
-	public Abstraction _neg() {
-		Set<Integer> values = new HashSet<Integer>();
-		for (Integer v : this.values) {
-			if (v > MAX)
-				values.add(MIN-1);
-			if (v < MIN)
-				values.add(MAX+1);			
-			if (-v > MAX)
-				values.add(MAX+1);
-			else if (-v < MIN)
-				values.add(MIN-1);
-			else
-				values.add(-v);
-		}
-		return new ConcreteInterval(values, MIN, MAX);
+	public Abstraction _unsigned_shift_right(int right) {
+		return _unsigned_shift_right(abstract_map(right));
 	}
 
 	@Override
-	public AbstractBoolean _ge(Abstraction right) {
-		if (right instanceof ConcreteInterval) {
-			ConcreteInterval op = (ConcreteInterval)right;
-			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
-			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
-			int lMin = leftArr[0];
-			int lMax = leftArr[leftArr.length-1];
-			int rMin = rightArr[0];
-			int rMax = rightArr[rightArr.length-1];			
-			boolean t = lMax >= rMin;
-			boolean f = lMin < rMax || (lMin < MIN && rMax < MIN);
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+	public Abstraction _unsigned_shift_right(long right) {
+		return _unsigned_shift_right(abstract_map(right));
 	}
 
 	@Override
-	public AbstractBoolean _ge(int right) {
-		return _ge(abstract_map(right));
+	protected Abstraction _unsigned_shift_right_reverse(int right) {
+		return abstract_map(right)._unsigned_shift_right(this);
 	}
 
 	@Override
-	public AbstractBoolean _gt(Abstraction right) {
-		if (right instanceof ConcreteInterval) {
-			ConcreteInterval op = (ConcreteInterval)right;
-			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
-			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
-			int lMin = leftArr[0];
-			int lMax = leftArr[leftArr.length-1];
-			int rMin = rightArr[0];
-			int rMax = rightArr[rightArr.length-1];			
-			boolean t = lMax > rMin || (lMax > MAX && rMin > MAX);
-			boolean f = lMin <= rMax;
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
-	}
-
-	@Override
-	public AbstractBoolean _gt(int right) {
-		return _gt(abstract_map(right));
-	}
-
-	@Override
-	public AbstractBoolean _le(Abstraction right) {
-		if (right instanceof ConcreteInterval) {
-			ConcreteInterval op = (ConcreteInterval)right;
-			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
-			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
-			int lMin = leftArr[0];
-			int lMax = leftArr[leftArr.length-1];
-			int rMin = rightArr[0];
-			int rMax = rightArr[rightArr.length-1];			
-			boolean t = lMin <= rMax;
-			boolean f = lMax > rMin || (lMax > MAX && rMin > MAX);
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
-	}
-
-	@Override
-	public AbstractBoolean _le(int right) {
-		return _le(abstract_map(right));
-	}
-
-	@Override
-	public AbstractBoolean _lt(Abstraction right) {
-		if (right instanceof ConcreteInterval) {
-			ConcreteInterval op = (ConcreteInterval)right;
-			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
-			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
-			int lMin = leftArr[0];
-			int lMax = leftArr[leftArr.length-1];
-			int rMin = rightArr[0];
-			int rMax = rightArr[rightArr.length-1];			
-			boolean t = lMin < rMax || (lMin < MIN && rMax < MIN);
-			boolean f = lMax >= rMin;
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
-	}
-
-	@Override
-	public AbstractBoolean _lt(int right) {
-		return _lt(abstract_map(right));
+	protected Abstraction _unsigned_shift_right_reverse(long right) {
+		return abstract_map(right)._unsigned_shift_right(this);
 	}
 
 	public String toString() {

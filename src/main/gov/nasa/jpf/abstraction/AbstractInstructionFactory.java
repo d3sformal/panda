@@ -19,7 +19,6 @@
 
 package gov.nasa.jpf.abstraction;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +68,8 @@ public class AbstractInstructionFactory extends
 				try {
 					double min = Double.parseDouble(argv[1]);
 					double max = Double.parseDouble(argv[2]);
-					System.out.printf("### jpf-abstraction: INTERVAL[%f, %f] turned on\n",
+					System.out
+							.printf("### jpf-abstraction: INTERVAL[%f, %f] turned on\n",
 									min, max);
 					abs_list.add(Interval.create(min, max));
 				} catch (NumberFormatException nfe) {
@@ -77,25 +77,30 @@ public class AbstractInstructionFactory extends
 							.println("### jpf-abstraction: please keep format "
 									+ "\"Interval MIN MAX\", where MIN and MAX are doubles");
 				} catch (ArrayIndexOutOfBoundsException rce) {
-					System.out.println("### jpf-abstraction: please keep format "
+					System.out
+							.println("### jpf-abstraction: please keep format "
 									+ "\"Interval MIN MAX\", where MIN and MAX are doubles");
 				}
 			} else if (abs_name.equals("concreteinterval")) {
 				try {
 					int min = Integer.parseInt(argv[1]);
 					int max = Integer.parseInt(argv[2]);
-					System.out.printf("### jpf-abstraction: CONCRETEINTERVAL[%d, %d] turned on\n",
+					System.out
+							.printf("### jpf-abstraction: CONCRETEINTERVAL[%d, %d] turned on\n",
 									min, max);
 					abs_list.add(ConcreteInterval.create(min, max));
 				} catch (NumberFormatException nfe) {
-					System.out.println("### jpf-abstraction: please keep format "
+					System.out
+							.println("### jpf-abstraction: please keep format "
 									+ "\"Interval MIN MAX\", where MIN and MAX are int");
 				} catch (ArrayIndexOutOfBoundsException rce) {
-					System.out.println("### jpf-abstraction: please keep format "
+					System.out
+							.println("### jpf-abstraction: please keep format "
 									+ "\"Interval MIN MAX\", where MIN and MAX are int");
 				}
 			} else
-				System.out.println("### jpf-abstraction: " + s + " is unknown abstraction");
+				System.out.println("### jpf-abstraction: " + s
+						+ " is unknown abstraction");
 		}
 		if (abs_list.size() == 0)
 			abs = null;
@@ -103,21 +108,17 @@ public class AbstractInstructionFactory extends
 			abs = abs_list.get(0);
 		else {
 			abs = new Container(abs_list);
-			System.out.println("### jpf-abstraction: CONTAINER abstraction turned on");
+			System.out
+					.println("### jpf-abstraction: CONTAINER abstraction turned on");
 		}
 	}
-
-	@Override
-	public void setClassInfoContext(ClassInfo ci) {
-		this.ci = ci;
-	}
-
-	// bytecodes
 
 	@Override
 	public Instruction d2f() {
 		return (filter.isInstrumentedClass(ci) ? new D2F() : super.d2f());
 	}
+
+	// bytecodes
 
 	@Override
 	public Instruction d2i() {
@@ -255,6 +256,48 @@ public class AbstractInstructionFactory extends
 	}
 
 	@Override
+	public Instruction if_icmpeq(int targetPc) {
+		return (filter.isInstrumentedClass(ci) ? new IF_ICMPEQ(targetPc)
+				: super.if_icmpeq(targetPc));
+	}
+
+	@Override
+	public Instruction if_icmpge(int targetPc) {
+		return (filter.isInstrumentedClass(ci) ? new IF_ICMPGE(targetPc)
+				: super.if_icmpge(targetPc));
+	}
+
+	@Override
+	public Instruction if_icmpgt(int targetPc) {
+		return (filter.isInstrumentedClass(ci) ? new IF_ICMPGT(targetPc)
+				: super.if_icmpgt(targetPc));
+	}
+
+	@Override
+	public Instruction if_icmple(int targetPc) {
+		return (filter.isInstrumentedClass(ci) ? new IF_ICMPLE(targetPc)
+				: super.if_icmple(targetPc));
+	}
+
+	@Override
+	public Instruction if_icmplt(int targetPc) {
+		return (filter.isInstrumentedClass(ci) ? new IF_ICMPLT(targetPc)
+				: super.if_icmplt(targetPc));
+	}
+
+	@Override
+	public Instruction if_icmpne(int targetPc) {
+		return (filter.isInstrumentedClass(ci) ? new IF_ICMPNE(targetPc)
+				: super.if_icmpne(targetPc));
+	}
+
+	@Override
+	public Instruction ifeq(int targetPc) {
+		return (filter.isInstrumentedClass(ci) ? new IFEQ(targetPc) : super
+				.ifeq(targetPc));
+	}
+
+	@Override
 	public Instruction ifge(int targetPc) {
 		return (filter.isInstrumentedClass(ci) ? new IFGE(targetPc) : super
 				.ifge(targetPc));
@@ -276,6 +319,12 @@ public class AbstractInstructionFactory extends
 	public Instruction iflt(int targetPc) {
 		return (filter.isInstrumentedClass(ci) ? new IFLT(targetPc) : super
 				.iflt(targetPc));
+	}
+
+	@Override
+	public Instruction ifne(int targetPc) {
+		return (filter.isInstrumentedClass(ci) ? new IFNE(targetPc) : super
+				.ifne(targetPc));
 	}
 
 	@Override
@@ -402,6 +451,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction lxor() {
 		return (filter.isInstrumentedClass(ci) ? new LXOR() : super.lxor());
+	}
+
+	@Override
+	public void setClassInfoContext(ClassInfo ci) {
+		this.ci = ci;
 	}
 
 }

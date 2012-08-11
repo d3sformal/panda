@@ -10,18 +10,18 @@ import java.util.Set;
  *  - greater than MAX;
  */
 public class Interval extends Abstraction {
-	
+
 	public static Interval LESS = new Interval(0);
 	public static Interval INSIDE = new Interval(1);
 	public static Interval GREATER = new Interval(2);
 	public static Interval NOT_LESS = new Interval(true, 3);
 	public static Interval OUTSIDE = new Interval(true, 4);
-	public static Interval NOT_GREATER = new Interval(true, 5);	
-	public static Interval TOP = new Interval(true, 6);	
-	
+	public static Interval NOT_GREATER = new Interval(true, 5);
+	public static Interval TOP = new Interval(true, 6);
+
 	private static double MIN = 0;
 	private static double MAX = 0;
-	
+
 	public boolean could_be_GREATER() {
 		int key = this.get_key();
 		return key == 2 || key == 3 || key == 4 || key == 6;
@@ -58,13 +58,12 @@ public class Interval extends Abstraction {
 		if (could_be_LESS())
 			if (key == 0)
 				return LESS;
-			else 
-				if (could_be_INSIDE())
-					return (key == 1)? INSIDE : GREATER;
-				else 
-					return GREATER;
+			else if (could_be_INSIDE())
+				return (key == 1) ? INSIDE : GREATER;
+			else
+				return GREATER;
 		else if (could_be_INSIDE())
-			return (key == 0)? INSIDE : GREATER;
+			return (key == 0) ? INSIDE : GREATER;
 		else
 			return GREATER;
 	}
@@ -87,7 +86,7 @@ public class Interval extends Abstraction {
 		in.MAX = MAX;
 		return in;
 	}
-	
+
 	// TODO: make public
 	private Interval(int key) {
 		set_key(key);
@@ -99,7 +98,8 @@ public class Interval extends Abstraction {
 		this.isTop = isTop;
 	}
 
-	private Interval construct_top(boolean isLess, boolean isInside, boolean isGreater) {
+	private Interval construct_top(boolean isLess, boolean isInside,
+			boolean isGreater) {
 		if (isLess)
 			if (isInside)
 				if (isGreater)
@@ -136,7 +136,7 @@ public class Interval extends Abstraction {
 			return GREATER;
 		if (v < MIN)
 			return LESS;
-		return INSIDE;		
+		return INSIDE;
 	}
 
 	@Override
@@ -172,7 +172,8 @@ public class Interval extends Abstraction {
 			return construct_top(le, in, gr);
 		} else if (right == -1) {
 			boolean le = could_be_INSIDE() || could_be_LESS();
-			boolean in = (could_be_INSIDE() && MIN != MAX) || could_be_GREATER();
+			boolean in = (could_be_INSIDE() && MIN != MAX)
+					|| could_be_GREATER();
 			boolean gr = could_be_GREATER();
 			return construct_top(le, in, gr);
 		} else
@@ -196,72 +197,74 @@ public class Interval extends Abstraction {
 
 	@Override
 	public Abstraction _plus(Abstraction right) {
-		if (right instanceof Interval) {		
+		if (right instanceof Interval) {
 			Interval right_value = (Interval) right;
 			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
 			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
 			if (this.could_be_LESS()) {
-				left1  = Math.min(left1, Double.NEGATIVE_INFINITY);
+				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
 				right1 = Math.max(right1, MIN);
 			}
 			if (this.could_be_INSIDE()) {
-				left1  = Math.min(left1, MIN);
+				left1 = Math.min(left1, MIN);
 				right1 = Math.max(right1, MAX);
 			}
 			if (this.could_be_GREATER()) {
-				left1  = Math.min(left1, MAX);
+				left1 = Math.min(left1, MAX);
 				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
 			}
 			if (right_value.could_be_LESS()) {
-				left2  = Math.min(left2, Double.NEGATIVE_INFINITY);
+				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
 				right2 = Math.max(right2, MIN);
 			}
 			if (right_value.could_be_INSIDE()) {
-				left2  = Math.min(left2, MIN);
+				left2 = Math.min(left2, MIN);
 				right2 = Math.max(right2, MAX);
 			}
 			if (right_value.could_be_GREATER()) {
-				left2  = Math.min(left2, MAX);
+				left2 = Math.min(left2, MAX);
 				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
 			}
-			double res_left = left1 + left2, res_right = right1 + right2;	
-			return construct_top(res_left < MIN, res_right >= MIN && res_left <= MAX, res_right > MAX);
+			double res_left = left1 + left2, res_right = right1 + right2;
+			return construct_top(res_left < MIN, res_right >= MIN
+					&& res_left <= MAX, res_right > MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 
 	@Override
 	public Abstraction _minus(Abstraction right) {
-		if (right instanceof Interval) {		
+		if (right instanceof Interval) {
 			Interval right_value = (Interval) right;
 			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
 			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
 			if (this.could_be_LESS()) {
-				left1  = Math.min(left1, Double.NEGATIVE_INFINITY);
+				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
 				right1 = Math.max(right1, MIN);
 			}
 			if (this.could_be_INSIDE()) {
-				left1  = Math.min(left1, MIN);
+				left1 = Math.min(left1, MIN);
 				right1 = Math.max(right1, MAX);
 			}
 			if (this.could_be_GREATER()) {
-				left1  = Math.min(left1, MAX);
+				left1 = Math.min(left1, MAX);
 				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
 			}
 			if (right_value.could_be_LESS()) {
-				left2  = Math.min(left2, Double.NEGATIVE_INFINITY);
+				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
 				right2 = Math.max(right2, MIN);
 			}
 			if (right_value.could_be_INSIDE()) {
-				left2  = Math.min(left2, MIN);
+				left2 = Math.min(left2, MIN);
 				right2 = Math.max(right2, MAX);
 			}
 			if (right_value.could_be_GREATER()) {
-				left2  = Math.min(left2, MAX);
+				left2 = Math.min(left2, MAX);
 				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
 			}
-			double res_left = left1 - right2, res_right = right1 - left2;	
-			return construct_top(res_left < MIN, res_right >= MIN && res_left <= MAX, res_right > MAX);
+			double res_left = left1 - right2, res_right = right1 - left2;
+			return construct_top(res_left < MIN, res_right >= MIN
+					&& res_left <= MAX, res_right > MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -287,26 +290,6 @@ public class Interval extends Abstraction {
 	}
 
 	@Override
-	public Abstraction _minus_reverse(int right) {
-		return abstract_map(right)._minus(this);
-	}
-
-	@Override
-	public Abstraction _minus_reverse(long right) {
-		return abstract_map(right)._minus(this);
-	}
-
-	@Override
-	public Abstraction _minus_reverse(float right) {
-		return abstract_map(right)._minus(this);
-	}
-
-	@Override
-	public Abstraction _minus_reverse(double right) {
-		return abstract_map(right)._minus(this);
-	}
-
-	@Override
 	public Abstraction _mul(int right) {
 		return _mul(abstract_map(right));
 	}
@@ -328,43 +311,48 @@ public class Interval extends Abstraction {
 
 	@Override
 	public Abstraction _mul(Abstraction right) {
-		if (right instanceof Interval) {		
+		if (right instanceof Interval) {
 			Interval right_value = (Interval) right;
 			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
 			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
 			if (this.could_be_LESS()) {
-				left1  = Math.min(left1, Double.NEGATIVE_INFINITY);
+				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
 				right1 = Math.max(right1, MIN);
 			}
 			if (this.could_be_INSIDE()) {
-				left1  = Math.min(left1, MIN);
+				left1 = Math.min(left1, MIN);
 				right1 = Math.max(right1, MAX);
 			}
 			if (this.could_be_GREATER()) {
-				left1  = Math.min(left1, MAX);
+				left1 = Math.min(left1, MAX);
 				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
 			}
 			if (right_value.could_be_LESS()) {
-				left2  = Math.min(left2, Double.NEGATIVE_INFINITY);
+				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
 				right2 = Math.max(right2, MIN);
 			}
 			if (right_value.could_be_INSIDE()) {
-				left2  = Math.min(left2, MIN);
+				left2 = Math.min(left2, MIN);
 				right2 = Math.max(right2, MAX);
 			}
 			if (right_value.could_be_GREATER()) {
-				left2  = Math.min(left2, MAX);
+				left2 = Math.min(left2, MAX);
 				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
 			}
 			double res_left, res_right;
 			if ((left1 <= 0 && 0 <= right1) || (left2 <= 0 && 0 <= right2)) {
-				res_left = ___min(left1*left2, left1*right2, right1*left2, right1*right2, 0);
-				res_right = ____max(left1*left2, left1*right2, right1*left2, right1*right2, 0);
+				res_left = ___min(left1 * left2, left1 * right2,
+						right1 * left2, right1 * right2, 0);
+				res_right = ____max(left1 * left2, left1 * right2, right1
+						* left2, right1 * right2, 0);
 			} else {
-				res_left = ___min(left1*left2, left1*right2, right1*left2, right1*right2);
-				res_right = ____max(left1*left2, left1*right2, right1*left2, right1*right2);
+				res_left = ___min(left1 * left2, left1 * right2,
+						right1 * left2, right1 * right2);
+				res_right = ____max(left1 * left2, left1 * right2, right1
+						* left2, right1 * right2);
 			}
-			return construct_top(res_left < MIN, res_right >= MIN && res_left <= MAX, res_right > MAX);
+			return construct_top(res_left < MIN, res_right >= MIN
+					&& res_left <= MAX, res_right > MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -393,60 +381,65 @@ public class Interval extends Abstraction {
 		double res = args[0];
 		for (int i = 1; i < args.length; ++i)
 			if (args[i] < res)
-					res = args[i];
+				res = args[i];
 		return res;
 	}
-	
+
 	private double ____max(double... args) {
 		double res = args[0];
 		for (int i = 1; i < args.length; ++i)
 			if (args[i] > res)
-					res = args[i];
+				res = args[i];
 		return res;
-	}	
-	
+	}
+
 	@Override
 	public Abstraction _div(Abstraction right) {
-		if (right instanceof Interval) {		
+		if (right instanceof Interval) {
 			Interval right_value = (Interval) right;
 			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
 			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
 			if (this.could_be_LESS()) {
-				left1  = Math.min(left1, Double.NEGATIVE_INFINITY);
+				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
 				right1 = Math.max(right1, MIN);
 			}
 			if (this.could_be_INSIDE()) {
-				left1  = Math.min(left1, MIN);
+				left1 = Math.min(left1, MIN);
 				right1 = Math.max(right1, MAX);
 			}
 			if (this.could_be_GREATER()) {
-				left1  = Math.min(left1, MAX);
+				left1 = Math.min(left1, MAX);
 				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
 			}
 			if (right_value.could_be_LESS()) {
-				left2  = Math.min(left2, Double.NEGATIVE_INFINITY);
+				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
 				right2 = Math.max(right2, MIN);
 			}
 			if (right_value.could_be_INSIDE()) {
-				left2  = Math.min(left2, MIN);
+				left2 = Math.min(left2, MIN);
 				right2 = Math.max(right2, MAX);
 			}
 			if (right_value.could_be_GREATER()) {
-				left2  = Math.min(left2, MAX);
+				left2 = Math.min(left2, MAX);
 				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
 			}
 			if (left2 <= 0 && 0 <= right2)
-				System.out.println("### WARNING: Division by ZERO may happen"); 
+				System.out.println("### WARNING: Division by ZERO may happen");
 			// TODO: Handle division by zero
 			double res_left, res_right;
 			if ((left1 <= 0 && 0 <= right1) || (left2 < 0 && 0 < right2)) {
-				res_left = ___min(left1/left2, left1/right2, right1/left2, right1/right2, 0);
-				res_right = ____max(left1/left2, left1/right2, right1/left2, right1/right2, 0);
+				res_left = ___min(left1 / left2, left1 / right2,
+						right1 / left2, right1 / right2, 0);
+				res_right = ____max(left1 / left2, left1 / right2, right1
+						/ left2, right1 / right2, 0);
 			} else {
-				res_left = ___min(left1/left2, left1/right2, right1/left2, right1/right2);
-				res_right = ____max(left1/left2, left1/right2, right1/left2, right1/right2);
+				res_left = ___min(left1 / left2, left1 / right2,
+						right1 / left2, right1 / right2);
+				res_right = ____max(left1 / left2, left1 / right2, right1
+						/ left2, right1 / right2);
 			}
-			return construct_top(res_left < MIN, res_right >= MIN && res_left <= MAX, res_right > MAX);
+			return construct_top(res_left < MIN, res_right >= MIN
+					&& res_left <= MAX, res_right > MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -473,40 +466,42 @@ public class Interval extends Abstraction {
 
 	@Override
 	public Abstraction _rem(Abstraction right) {
-		if (right instanceof Interval) {		
+		if (right instanceof Interval) {
 			Interval right_value = (Interval) right;
 			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
 			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
 			if (this.could_be_LESS()) {
-				left1  = Math.min(left1, Double.NEGATIVE_INFINITY);
+				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
 				right1 = Math.max(right1, MIN);
 			}
 			if (this.could_be_INSIDE()) {
-				left1  = Math.min(left1, MIN);
+				left1 = Math.min(left1, MIN);
 				right1 = Math.max(right1, MAX);
 			}
 			if (this.could_be_GREATER()) {
-				left1  = Math.min(left1, MAX);
+				left1 = Math.min(left1, MAX);
 				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
 			}
 			if (right_value.could_be_LESS()) {
-				left2  = Math.min(left2, Double.NEGATIVE_INFINITY);
+				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
 				right2 = Math.max(right2, MIN);
 			}
 			if (right_value.could_be_INSIDE()) {
-				left2  = Math.min(left2, MIN);
+				left2 = Math.min(left2, MIN);
 				right2 = Math.max(right2, MAX);
 			}
 			if (right_value.could_be_GREATER()) {
-				left2  = Math.min(left2, MAX);
+				left2 = Math.min(left2, MAX);
 				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
 			}
 			if (left2 <= 0 && 0 <= right2)
-				; // TODO: Handle division by zero			
+				; // TODO: Handle division by zero
 			double res_left = 0;
-			double res_right = ____max(Math.abs(left1), Math.abs(right1), Math.abs(left2), Math.abs(right2));
+			double res_right = ____max(Math.abs(left1), Math.abs(right1),
+					Math.abs(left2), Math.abs(right2));
 
-			return construct_top(res_left < MIN, res_right >= MIN && res_left <= MAX, res_right > MAX);
+			return construct_top(res_left < MIN, res_right >= MIN
+					&& res_left <= MAX, res_right > MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -523,8 +518,8 @@ public class Interval extends Abstraction {
 
 	@Override
 	public Abstraction _bitwise_and(Abstraction right) {
-		if (right instanceof Interval) {	
-			return construct_top(true, true, true);			
+		if (right instanceof Interval) {
+			return construct_top(true, true, true);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -541,8 +536,8 @@ public class Interval extends Abstraction {
 
 	@Override
 	public Abstraction _bitwise_or(Abstraction right) {
-		if (right instanceof Interval) {	
-			return construct_top(true, true, true);			
+		if (right instanceof Interval) {
+			return construct_top(true, true, true);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -551,7 +546,7 @@ public class Interval extends Abstraction {
 	public Abstraction _bitwise_xor(int right) {
 		return _bitwise_xor(abstract_map(right));
 	}
-	
+
 	@Override
 	public Abstraction _bitwise_xor(long right) {
 		return _bitwise_xor(abstract_map(right));
@@ -559,8 +554,8 @@ public class Interval extends Abstraction {
 
 	@Override
 	public Abstraction _bitwise_xor(Abstraction right) {
-		if (right instanceof Interval) {	
-			return construct_top(true, true, true);			
+		if (right instanceof Interval) {
+			return construct_top(true, true, true);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -578,8 +573,8 @@ public class Interval extends Abstraction {
 	// Note that x << y considers only the least five bits of y
 	@Override
 	public Abstraction _shift_left(Abstraction right) {
-		if (right instanceof Interval) {	
-			return construct_top(true, true, true);			
+		if (right instanceof Interval) {
+			return construct_top(true, true, true);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -594,11 +589,12 @@ public class Interval extends Abstraction {
 		return _shift_right(abstract_map(right));
 	}
 
-	// Note that x >> y considers only the least five bits of y, sign of x is preserved
+	// Note that x >> y considers only the least five bits of y, sign of x is
+	// preserved
 	@Override
 	public Abstraction _shift_right(Abstraction right) {
-		if (right instanceof Interval) {	
-			return construct_top(true, true, true);			
+		if (right instanceof Interval) {
+			return construct_top(true, true, true);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -613,11 +609,12 @@ public class Interval extends Abstraction {
 		return _unsigned_shift_right(abstract_map(right));
 	}
 
-	// Note that x >>> y considers only the least five bits of y, sign of x is not preserved
+	// Note that x >>> y considers only the least five bits of y, sign of x is
+	// not preserved
 	@Override
 	public Abstraction _unsigned_shift_right(Abstraction right) {
-		if (right instanceof Interval) {	
-			return construct_top(true, true, true);			
+		if (right instanceof Interval) {
+			return construct_top(true, true, true);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -626,20 +623,21 @@ public class Interval extends Abstraction {
 	public Abstraction _neg() {
 		double left = Double.POSITIVE_INFINITY, right = Double.NEGATIVE_INFINITY;
 		if (this.could_be_LESS()) {
-			left  = Math.min(left, Double.NEGATIVE_INFINITY);
+			left = Math.min(left, Double.NEGATIVE_INFINITY);
 			right = Math.max(right, MIN);
 		}
 		if (this.could_be_INSIDE()) {
-			left  = Math.min(left, MIN);
+			left = Math.min(left, MIN);
 			right = Math.max(right, MAX);
 		}
 		if (this.could_be_GREATER()) {
-			left  = Math.min(left, MAX);
+			left = Math.min(left, MAX);
 			right = Math.max(right, Double.POSITIVE_INFINITY);
-		}		
+		}
 		double res_right = -left;
-		double res_left = -right;		
-		return construct_top(res_left < MIN, res_right >= MIN && res_left <= MAX, res_right > MAX);
+		double res_left = -right;
+		return construct_top(res_left < MIN, res_right >= MIN
+				&& res_left <= MAX, res_right > MAX);
 	}
 
 	@Override
@@ -649,34 +647,35 @@ public class Interval extends Abstraction {
 			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
 			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
 			if (this.could_be_LESS()) {
-				left1  = Math.min(left1, Double.NEGATIVE_INFINITY);
+				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
 				right1 = Math.max(right1, MIN);
 			}
 			if (this.could_be_INSIDE()) {
-				left1  = Math.min(left1, MIN);
+				left1 = Math.min(left1, MIN);
 				right1 = Math.max(right1, MAX);
 			}
 			if (this.could_be_GREATER()) {
-				left1  = Math.min(left1, MAX);
+				left1 = Math.min(left1, MAX);
 				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
 			}
 			if (right_value.could_be_LESS()) {
-				left2  = Math.min(left2, Double.NEGATIVE_INFINITY);
+				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
 				right2 = Math.max(right2, MIN);
 			}
 			if (right_value.could_be_INSIDE()) {
-				left2  = Math.min(left2, MIN);
+				left2 = Math.min(left2, MIN);
 				right2 = Math.max(right2, MAX);
 			}
 			if (right_value.could_be_GREATER()) {
-				left2  = Math.min(left2, MAX);
+				left2 = Math.min(left2, MAX);
 				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}			
+			}
 			boolean t = right1 >= left2; // this.MAX >= right.MIN
 			boolean f = left1 < right2;
 			if (f & t)
 				return AbstractBoolean.TOP;
-			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+			else
+				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -693,34 +692,35 @@ public class Interval extends Abstraction {
 			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
 			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
 			if (this.could_be_LESS()) {
-				left1  = Math.min(left1, Double.NEGATIVE_INFINITY);
+				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
 				right1 = Math.max(right1, MIN);
 			}
 			if (this.could_be_INSIDE()) {
-				left1  = Math.min(left1, MIN);
+				left1 = Math.min(left1, MIN);
 				right1 = Math.max(right1, MAX);
 			}
 			if (this.could_be_GREATER()) {
-				left1  = Math.min(left1, MAX);
+				left1 = Math.min(left1, MAX);
 				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
 			}
 			if (right_value.could_be_LESS()) {
-				left2  = Math.min(left2, Double.NEGATIVE_INFINITY);
+				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
 				right2 = Math.max(right2, MIN);
 			}
 			if (right_value.could_be_INSIDE()) {
-				left2  = Math.min(left2, MIN);
+				left2 = Math.min(left2, MIN);
 				right2 = Math.max(right2, MAX);
 			}
 			if (right_value.could_be_GREATER()) {
-				left2  = Math.min(left2, MAX);
+				left2 = Math.min(left2, MAX);
 				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}			
+			}
 			boolean t = right1 > left2; // this.MAX >= right.MIN
 			boolean f = left1 <= right2;
 			if (f & t)
 				return AbstractBoolean.TOP;
-			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+			else
+				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -737,34 +737,35 @@ public class Interval extends Abstraction {
 			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
 			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
 			if (this.could_be_LESS()) {
-				left1  = Math.min(left1, Double.NEGATIVE_INFINITY);
+				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
 				right1 = Math.max(right1, MIN);
 			}
 			if (this.could_be_INSIDE()) {
-				left1  = Math.min(left1, MIN);
+				left1 = Math.min(left1, MIN);
 				right1 = Math.max(right1, MAX);
 			}
 			if (this.could_be_GREATER()) {
-				left1  = Math.min(left1, MAX);
+				left1 = Math.min(left1, MAX);
 				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
 			}
 			if (right_value.could_be_LESS()) {
-				left2  = Math.min(left2, Double.NEGATIVE_INFINITY);
+				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
 				right2 = Math.max(right2, MIN);
 			}
 			if (right_value.could_be_INSIDE()) {
-				left2  = Math.min(left2, MIN);
+				left2 = Math.min(left2, MIN);
 				right2 = Math.max(right2, MAX);
 			}
 			if (right_value.could_be_GREATER()) {
-				left2  = Math.min(left2, MAX);
+				left2 = Math.min(left2, MAX);
 				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}			
+			}
 			boolean t = right2 >= left1; // this.MAX >= right.MIN
 			boolean f = left2 < right1;
 			if (f & t)
 				return AbstractBoolean.TOP;
-			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+			else
+				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -781,34 +782,35 @@ public class Interval extends Abstraction {
 			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
 			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
 			if (this.could_be_LESS()) {
-				left1  = Math.min(left1, Double.NEGATIVE_INFINITY);
+				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
 				right1 = Math.max(right1, MIN);
 			}
 			if (this.could_be_INSIDE()) {
-				left1  = Math.min(left1, MIN);
+				left1 = Math.min(left1, MIN);
 				right1 = Math.max(right1, MAX);
 			}
 			if (this.could_be_GREATER()) {
-				left1  = Math.min(left1, MAX);
+				left1 = Math.min(left1, MAX);
 				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
 			}
 			if (right_value.could_be_LESS()) {
-				left2  = Math.min(left2, Double.NEGATIVE_INFINITY);
+				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
 				right2 = Math.max(right2, MIN);
 			}
 			if (right_value.could_be_INSIDE()) {
-				left2  = Math.min(left2, MIN);
+				left2 = Math.min(left2, MIN);
 				right2 = Math.max(right2, MAX);
 			}
 			if (right_value.could_be_GREATER()) {
-				left2  = Math.min(left2, MAX);
+				left2 = Math.min(left2, MAX);
 				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}			
+			}
 			boolean t = right2 > left1; // this.MAX >= right.MIN
 			boolean f = left2 <= right1;
 			if (f & t)
 				return AbstractBoolean.TOP;
-			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+			else
+				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -818,6 +820,175 @@ public class Interval extends Abstraction {
 		return _lt(abstract_map(right));
 	}
 
+	public AbstractBoolean _eq(Abstraction right) {
+		if (right instanceof Interval) {
+			Interval right_value = (Interval) right;
+			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
+			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
+			if (this.could_be_LESS()) {
+				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
+				right1 = Math.max(right1, MIN);
+			}
+			if (this.could_be_INSIDE()) {
+				left1 = Math.min(left1, MIN);
+				right1 = Math.max(right1, MAX);
+			}
+			if (this.could_be_GREATER()) {
+				left1 = Math.min(left1, MAX);
+				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
+			}
+			if (right_value.could_be_LESS()) {
+				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
+				right2 = Math.max(right2, MIN);
+			}
+			if (right_value.could_be_INSIDE()) {
+				left2 = Math.min(left2, MIN);
+				right2 = Math.max(right2, MAX);
+			}
+			if (right_value.could_be_GREATER()) {
+				left2 = Math.min(left2, MAX);
+				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
+			}
+			// values can be equal, iff equality is possible (bounding segments can intersect)
+			boolean t = (left1 >= left2 && left1 <= right2)
+					|| (right1 >= left2 && right1 <= right2)
+					|| (left2 >= left1 && left2 <= right1)
+					|| (right2 >= left1 && right2 <= right1);
+			// values can be inequal, iff their domains are different
+			boolean f = !(left1 == left2 && right1 == right2);
+			if (f & t)
+				return AbstractBoolean.TOP;
+			else
+				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	public AbstractBoolean _eq(int right) {
+		return _eq(abstract_map(right));
+	}
+
+
+	public AbstractBoolean _ne(Abstraction right) {
+		return _eq(right).not();
+	}
+
+	@Override
+	public AbstractBoolean _ne(int right) {
+		return _ne(abstract_map(right));
+	}
+
+	@Override
+	protected Abstraction _div_reverse(int right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(long right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(float right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(double right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _cmpl_reverse(float right) {
+		return abstract_map(right)._cmpl(this);
+	}
+
+	@Override
+	protected Abstraction _cmpl_reverse(double right) {
+		return abstract_map(right)._cmpl(this);
+	}
+
+	@Override
+	protected Abstraction _cmpg_reverse(float right) {
+		return abstract_map(right)._cmpg(this);
+	}
+
+	@Override
+	protected Abstraction _cmpg_reverse(double right) {
+		return abstract_map(right)._cmpg(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(int right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(long right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(float right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(double right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _shift_left_reverse(int right) {
+		return abstract_map(right)._shift_left(this);
+	}
+
+	@Override
+	protected Abstraction _shift_left_reverse(long right) {
+		return abstract_map(right)._shift_left(this);
+	}
+
+	@Override
+	protected Abstraction _shift_right_reverse(int right) {
+		return abstract_map(right)._shift_right(this);
+	}
+
+	@Override
+	protected Abstraction _shift_right_reverse(long right) {
+		return abstract_map(right)._shift_right(this);
+	}
+
+	@Override
+	protected Abstraction _unsigned_shift_right_reverse(int right) {
+		return abstract_map(right)._unsigned_shift_right(this);
+	}
+
+	@Override
+	protected Abstraction _unsigned_shift_right_reverse(long right) {
+		return abstract_map(right)._unsigned_shift_right(this);
+	}
+
+	@Override
+	protected AbstractBoolean _lt_reverse(int right) {
+		return abstract_map(right)._lt(this);
+	}
+
+	@Override
+	protected AbstractBoolean _le_reverse(int right) {
+		return abstract_map(right)._le(this);
+	}
+
+	@Override
+	protected AbstractBoolean _ge_reverse(int right) {
+		return abstract_map(right)._ge(this);
+	}
+
+	@Override
+	protected AbstractBoolean _gt_reverse(int right) {
+		return abstract_map(right)._gt(this);
+	}
+	
+	
 	public String toString() {
 		if (this instanceof Interval) {
 			if (this == LESS)

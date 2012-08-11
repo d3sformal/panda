@@ -524,7 +524,7 @@ public class Container extends Abstraction {
 			for (Pair<Abstraction, Abstraction> p : getRelevantAbstractionPairs(
 					this, (Container) right))
 				if (p._1 != null && p._2 != null)
-					res = res.or(op.execute(p._1, p._2));
+					res = res.and(op.execute(p._1, p._2));
 			return res;
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
@@ -590,6 +590,138 @@ public class Container extends Abstraction {
 		return _ge(abstract_map(right));
 	}
 
+	public AbstractBoolean _eq(Abstraction right) {
+		return binaryComparison(right, new IBinaryComparison() {
+			@Override
+			public AbstractBoolean execute(Abstraction op1, Abstraction op2) {
+				return op1._eq(op2);
+			}
+		});
+	}	
+	
+	public AbstractBoolean _eq(int right) {
+		return _eq(abstract_map(right));
+	}		
+	
+	public AbstractBoolean _ne(Abstraction right) {
+		return _eq(right).not();
+	}
+
+	@Override
+	public AbstractBoolean _ne(int right) {
+		return _ne(abstract_map(right));
+	}
+
+	@Override
+	protected Abstraction _div_reverse(int right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(long right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(float right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(double right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _cmpl_reverse(float right) {
+		return abstract_map(right)._cmpl(this);
+	}
+
+	@Override
+	protected Abstraction _cmpl_reverse(double right) {
+		return abstract_map(right)._cmpl(this);
+	}
+
+	@Override
+	protected Abstraction _cmpg_reverse(float right) {
+		return abstract_map(right)._cmpg(this);
+	}
+
+	@Override
+	protected Abstraction _cmpg_reverse(double right) {
+		return abstract_map(right)._cmpg(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(int right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(long right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(float right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(double right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _shift_left_reverse(int right) {
+		return abstract_map(right)._shift_left(this);
+	}
+
+	@Override
+	protected Abstraction _shift_left_reverse(long right) {
+		return abstract_map(right)._shift_left(this);
+	}
+
+	@Override
+	protected Abstraction _shift_right_reverse(int right) {
+		return abstract_map(right)._shift_right(this);
+	}
+
+	@Override
+	protected Abstraction _shift_right_reverse(long right) {
+		return abstract_map(right)._shift_right(this);
+	}
+
+	@Override
+	protected Abstraction _unsigned_shift_right_reverse(int right) {
+		return abstract_map(right)._unsigned_shift_right(this);
+	}
+
+	@Override
+	protected Abstraction _unsigned_shift_right_reverse(long right) {
+		return abstract_map(right)._unsigned_shift_right(this);
+	}
+
+	@Override
+	protected AbstractBoolean _lt_reverse(int right) {
+		return abstract_map(right)._lt(this);
+	}
+
+	@Override
+	protected AbstractBoolean _le_reverse(int right) {
+		return abstract_map(right)._le(this);
+	}
+
+	@Override
+	protected AbstractBoolean _ge_reverse(int right) {
+		return abstract_map(right)._ge(this);
+	}
+
+	@Override
+	protected AbstractBoolean _gt_reverse(int right) {
+		return abstract_map(right)._gt(this);
+	}
+	
 	public String toString() {
 		if (get_num_tokens() > 1)
 			return "TOP";

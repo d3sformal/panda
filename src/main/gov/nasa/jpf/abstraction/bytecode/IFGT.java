@@ -48,6 +48,7 @@ public class IFGT extends gov.nasa.jpf.jvm.bytecode.IFGT {
 		}
 		else { // the condition is abstract
 
+			System.out.printf("IFGT> Values: %d (%s)\n", ti.peek(0), abs_v);
 			AbstractBoolean abs_condition = abs_v._gt(0);
 
 			if(abs_condition == AbstractBoolean.TRUE) {

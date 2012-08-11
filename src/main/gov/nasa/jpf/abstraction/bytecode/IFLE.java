@@ -50,6 +50,7 @@ public class IFLE extends gov.nasa.jpf.jvm.bytecode.IFLE {
 		}
 		else { // the condition is abstract
 
+			System.out.printf("IFLE> Values: %d (%s)\n", ti.peek(0), abs_v);
 			AbstractBoolean abs_condition = abs_v._le(0);
 
 			if(abs_condition == AbstractBoolean.TRUE) {
@@ -70,7 +71,8 @@ public class IFLE extends gov.nasa.jpf.jvm.bytecode.IFLE {
 					conditionValue = (Integer)cg.getNextChoice()==0 ? false: true;
 				}
 			}
-
+			
+			System.out.println("IFLE> Result: " + conditionValue);
 			ti.pop();
 			return (conditionValue ? getTarget() : getNext(ti));
 

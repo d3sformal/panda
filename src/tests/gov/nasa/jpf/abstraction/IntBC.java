@@ -20,11 +20,13 @@ public class IntBC {
 //		test_IDIV(-3, 1);
 //		test_IDIV(-3, -1);
 //		test_IDIV(0, -1);		
-		
-//		test_IFGE(1, 0);
-//		test_IFGT(1, 0);
-//		test_IFLE(1, 0);
-//		test_IFLT(1, 0);
+
+//		test_IF_ICMPEQ(3, -1);
+//		test_IF_ICMPNE(3, -1);
+//		test_IF_ICMPLT(3, -1);
+//		test_IF_ICMPLE(1, 0);
+//		test_IF_ICMPGT(1, 0);
+//		test_IF_ICMPGE(1, 0);
 		
 //		test_IINC(-2, +1);
 //		test_IINC(0, +1);
@@ -155,50 +157,76 @@ public class IntBC {
 				Debug.getAbstractInteger(y));
 	}
 
-	public static void test_IFGE(int x, int y) {
-		System.out.println("\n===== IFGE =====");
+	public static void test_IF_ICMPEQ(int x, int y) {
+		System.out.println("\n===== IF_ICMPEQ =====");
 		x = Debug.makeAbstractInteger(x);
 		y = Debug.makeAbstractInteger(y);
 
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
 				Debug.getAbstractInteger(y));
-		System.out.printf("x >= y is %s\n", (x >= y) ? "true" : "false");
+		// boolean condition down here is proper
+		System.out.printf("x == y is %s\n", (x != y) ? "false" : "true");
+		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
+				Debug.getAbstractInteger(y));
+	}
+	
+	public static void test_IF_ICMPNE(int x, int y) {
+		System.out.println("\n===== IF_ICMPNE =====");
+		x = Debug.makeAbstractInteger(x);
+		y = Debug.makeAbstractInteger(y);
+
+		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
+				Debug.getAbstractInteger(y));
+		// boolean condition down here is proper
+		System.out.printf("x != y is %s\n", (x == y) ? "false" : "true");
+		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
+				Debug.getAbstractInteger(y));
+	}		
+	
+	public static void test_IF_ICMPLT(int x, int y) {
+		System.out.println("\n===== IF_ICMPLT =====");
+		x = Debug.makeAbstractInteger(x);
+		y = Debug.makeAbstractInteger(y);
+
+		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
+				Debug.getAbstractInteger(y));
+		System.out.printf("x < y is %s\n", (x >= y) ? "false" : "true");
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
 				Debug.getAbstractInteger(y));
 	}
 
-	public static void test_IFGT(int x, int y) {
-		System.out.println("\n===== IFGT =====");
+	public static void test_IF_ICMPLE(int x, int y) {
+		System.out.println("\n===== IF_ICMPLE =====");
 		x = Debug.makeAbstractInteger(x);
 		y = Debug.makeAbstractInteger(y);
 
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
 				Debug.getAbstractInteger(y));
-		System.out.printf("x > y is %s\n", (x > y) ? "true" : "false");
+		System.out.printf("x <= y is %s\n", (x > y) ? "false" : "true");
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
 				Debug.getAbstractInteger(y));
 	}
 
-	public static void test_IFLE(int x, int y) {
-		System.out.println("\n===== IFLE =====");
+	public static void test_IF_ICMPGT(int x, int y) {
+		System.out.println("\n===== IF_ICMPGT =====");
 		x = Debug.makeAbstractInteger(x);
 		y = Debug.makeAbstractInteger(y);
 
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
 				Debug.getAbstractInteger(y));
-		System.out.printf("x <= y is %s\n", (x <= y) ? "true" : "false");
+		System.out.printf("x > y is %s\n", (x <= y) ? "false" : "true");
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
 				Debug.getAbstractInteger(y));
 	}
 
-	public static void test_IFLT(int x, int y) {
-		System.out.println("\n===== IFLT =====\n");
+	public static void test_IF_ICMPGE(int x, int y) {
+		System.out.println("\n===== IF_ICMPGE =====\n");
 		x = Debug.makeAbstractInteger(x);
 		y = Debug.makeAbstractInteger(y);
 
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
 				Debug.getAbstractInteger(y));
-		System.out.printf("x < y is %s\n", (x < y) ? "true" : "false");
+		System.out.printf("x >= y is %s\n", (x < y) ? "false" : "true");
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractInteger(x),
 				Debug.getAbstractInteger(y));
 	}

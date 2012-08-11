@@ -444,6 +444,147 @@ public class Evenness extends Abstraction {
 		return _lt(abstract_map(right));
 	}
 
+	public AbstractBoolean _eq(Abstraction right) {
+		if (right instanceof Evenness) {
+			Evenness right_value = (Evenness) right;
+			boolean t = (this.could_be_EVEN() && right_value.could_be_EVEN()) ||
+					(this.could_be_ODD() && right_value.could_be_ODD());
+			boolean f = (this.could_be_EVEN() && right_value.could_be_ODD()) ||
+					(this.could_be_ODD() && right_value.could_be_EVEN());
+			assert t || f;
+			if (t & f)
+				return AbstractBoolean.TOP;
+			else if (t)
+				return AbstractBoolean.TRUE;
+			else
+				return AbstractBoolean.TRUE;
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}	
+	
+	public AbstractBoolean _eq(int right) {
+		return _eq(abstract_map(right));
+	}		
+	
+	public AbstractBoolean _ne(Abstraction right) {
+		return _eq(right).not();
+	}
+
+	@Override
+	public AbstractBoolean _ne(int right) {
+		return _ne(abstract_map(right));
+	}
+
+	@Override
+	protected Abstraction _div_reverse(int right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(long right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(float right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(double right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _cmpl_reverse(float right) {
+		return abstract_map(right)._cmpl(this);
+	}
+
+	@Override
+	protected Abstraction _cmpl_reverse(double right) {
+		return abstract_map(right)._cmpl(this);
+	}
+
+	@Override
+	protected Abstraction _cmpg_reverse(float right) {
+		return abstract_map(right)._cmpg(this);
+	}
+
+	@Override
+	protected Abstraction _cmpg_reverse(double right) {
+		return abstract_map(right)._cmpg(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(int right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(long right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(float right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(double right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _shift_left_reverse(int right) {
+		return abstract_map(right)._shift_left(this);
+	}
+
+	@Override
+	protected Abstraction _shift_left_reverse(long right) {
+		return abstract_map(right)._shift_left(this);
+	}
+
+	@Override
+	protected Abstraction _shift_right_reverse(int right) {
+		return abstract_map(right)._shift_right(this);
+	}
+
+	@Override
+	protected Abstraction _shift_right_reverse(long right) {
+		return abstract_map(right)._shift_right(this);
+	}
+
+	@Override
+	protected Abstraction _unsigned_shift_right_reverse(int right) {
+		return abstract_map(right)._unsigned_shift_right(this);
+	}
+
+	@Override
+	protected Abstraction _unsigned_shift_right_reverse(long right) {
+		return abstract_map(right)._unsigned_shift_right(this);
+	}
+
+	@Override
+	protected AbstractBoolean _lt_reverse(int right) {
+		return abstract_map(right)._lt(this);
+	}
+
+	@Override
+	protected AbstractBoolean _le_reverse(int right) {
+		return abstract_map(right)._le(this);
+	}
+
+	@Override
+	protected AbstractBoolean _ge_reverse(int right) {
+		return abstract_map(right)._ge(this);
+	}
+
+	@Override
+	protected AbstractBoolean _gt_reverse(int right) {
+		return abstract_map(right)._gt(this);
+	}
+	
 	public String toString() {
 		if (this instanceof Evenness) {
 			if (this == EVEN)

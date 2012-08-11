@@ -11,7 +11,6 @@ import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.Types;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 
-
 public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL {
 
 	@Override
@@ -20,6 +19,7 @@ public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL {
 
 		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
 		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
+		
 		if(abs_v1==null && abs_v2==null)
 			return super.execute(ss, ks, th);
 		else {

@@ -45,7 +45,8 @@ public class IFGE extends gov.nasa.jpf.jvm.bytecode.IFGE {
 			return super.execute(ss, ks, ti);
 		}
 		else { // the condition is abstract
-
+			
+			System.out.printf("IFGE> Values: %d (%s)\n", ti.peek(0), abs_v);
 			AbstractBoolean abs_condition = abs_v._ge(0);
 
 			if(abs_condition == AbstractBoolean.TRUE) {
@@ -67,6 +68,7 @@ public class IFGE extends gov.nasa.jpf.jvm.bytecode.IFGE {
 				}
 			}
 
+			System.out.println("IFGE> Result: " + conditionValue);
 			ti.pop();
 			return (conditionValue ? getTarget() : getNext(ti));
 

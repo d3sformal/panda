@@ -80,6 +80,7 @@ public class FloatBC {
 		System.out.printf("x > y is %s\n", ((x > y)? "true" : "false"));
 		System.out.printf("x >= y is %s\n", ((x >= y)? "true" : "false"));
 		System.out.printf("x == y is %s\n", ((x == y)? "true" : "false"));
+		System.out.printf("x != y is %s\n", ((x != y)? "true" : "false"));
 		System.out.printf("x < y is %s\n", ((x < y)? "true" : "false"));
 		System.out.printf("x <= y is %s\n", ((x <= y)? "true" : "false"));
 		System.out.printf("x is %s; y is %s\n", Debug.getAbstractFloat(x),

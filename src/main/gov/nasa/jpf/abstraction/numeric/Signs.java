@@ -65,13 +65,12 @@ public class Signs extends Abstraction {
 		if (could_be_NEG())
 			if (idx == 0)
 				return NEG;
-			else 
-				if (could_be_ZERO())
-					return (idx == 1)? ZERO : POS;
-				else 
-					return POS;
+			else if (could_be_ZERO())
+				return (idx == 1) ? ZERO : POS;
+			else
+				return POS;
 		else if (could_be_ZERO())
-			return (idx == 0)? ZERO : POS;
+			return (idx == 0) ? ZERO : POS;
 		else
 			return POS;
 	}
@@ -96,8 +95,9 @@ public class Signs extends Abstraction {
 		this(key);
 		this.isTop = isTop;
 	}
-	
-	public static Signs construct_top(boolean isNeg, boolean isZero, boolean isPos) {
+
+	public static Signs construct_top(boolean isNeg, boolean isZero,
+			boolean isPos) {
 		if (isNeg)
 			if (isZero)
 				if (isPos)
@@ -207,9 +207,9 @@ public class Signs extends Abstraction {
 
 	@Override
 	public Abstraction _plus(Abstraction right) {
-		if (right instanceof Signs) {		
+		if (right instanceof Signs) {
 			Signs right_value = (Signs) right;
-			boolean p = false, n = false, z = false;	
+			boolean p = false, n = false, z = false;
 			if (this.could_be_NEG() && right_value.could_be_NEG())
 				n = true;
 			if (this.could_be_NEG() && right_value.could_be_ZERO())
@@ -227,7 +227,7 @@ public class Signs extends Abstraction {
 			if (this.could_be_POS() && right_value.could_be_ZERO())
 				p = true;
 			if (this.could_be_POS() && right_value.could_be_POS())
-				p = true;			
+				p = true;
 			return construct_top(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
@@ -237,7 +237,7 @@ public class Signs extends Abstraction {
 	public Abstraction _minus(Abstraction right) {
 		if (right instanceof Signs) {
 			Signs right_value = (Signs) right;
-			boolean p = false, n = false, z = false;			
+			boolean p = false, n = false, z = false;
 			if (this.could_be_NEG() && right_value.could_be_NEG())
 				n = z = p = true;
 			if (this.could_be_NEG() && right_value.could_be_ZERO())
@@ -255,8 +255,8 @@ public class Signs extends Abstraction {
 			if (this.could_be_POS() && right_value.could_be_ZERO())
 				p = true;
 			if (this.could_be_POS() && right_value.could_be_POS())
-				n = z = p = true;			
-			return construct_top(n, z, p);			
+				n = z = p = true;
+			return construct_top(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -279,26 +279,6 @@ public class Signs extends Abstraction {
 	@Override
 	public Abstraction _minus(double right) {
 		return _minus(abstract_map(right));
-	}
-
-	@Override
-	public Abstraction _minus_reverse(int right) {
-		return abstract_map(right)._minus(this);
-	}
-
-	@Override
-	public Abstraction _minus_reverse(long right) {
-		return abstract_map(right)._minus(this);
-	}
-
-	@Override
-	public Abstraction _minus_reverse(float right) {
-		return abstract_map(right)._minus(this);
-	}
-
-	@Override
-	public Abstraction _minus_reverse(double right) {
-		return abstract_map(right)._minus(this);
 	}
 
 	@Override
@@ -325,7 +305,7 @@ public class Signs extends Abstraction {
 	public Abstraction _mul(Abstraction right) {
 		if (right instanceof Signs) {
 			Signs right_value = (Signs) right;
-			boolean p = false, n = false, z = false;			
+			boolean p = false, n = false, z = false;
 			if (this.could_be_NEG() && right_value.could_be_NEG())
 				p = true;
 			if (this.could_be_NEG() && right_value.could_be_ZERO())
@@ -343,8 +323,8 @@ public class Signs extends Abstraction {
 			if (this.could_be_POS() && right_value.could_be_ZERO())
 				z = true;
 			if (this.could_be_POS() && right_value.could_be_POS())
-				p = true;			
-			return construct_top(n, z, p);			
+				p = true;
+			return construct_top(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -375,8 +355,8 @@ public class Signs extends Abstraction {
 			Signs right_value = (Signs) right;
 			if (right_value.could_be_ZERO())
 				throw new ArithmeticException(
-						"Division by zero (in abstract IDIV)");			
-			boolean p = false, n = false, z = false;			
+						"Division by zero (in abstract IDIV)");
+			boolean p = false, n = false, z = false;
 			if (this.could_be_NEG() && right_value.could_be_NEG())
 				p = true;
 			if (this.could_be_NEG() && right_value.could_be_POS())
@@ -388,7 +368,7 @@ public class Signs extends Abstraction {
 			if (this.could_be_POS() && right_value.could_be_NEG())
 				n = true;
 			if (this.could_be_POS() && right_value.could_be_POS())
-				p = true;			
+				p = true;
 			return construct_top(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
@@ -416,12 +396,12 @@ public class Signs extends Abstraction {
 
 	@Override
 	public Abstraction _rem(Abstraction right) {
-		if (right instanceof Signs) {			
+		if (right instanceof Signs) {
 			Signs right_value = (Signs) right;
 			if (right_value.could_be_ZERO())
 				throw new ArithmeticException(
-						"Division by zero (in abstract IDIV)");					
-			boolean p = false, n = false, z = false;			
+						"Division by zero (in abstract IDIV)");
+			boolean p = false, n = false, z = false;
 			if (this.could_be_NEG() && right_value.could_be_NEG())
 				z = p = true;
 			if (this.could_be_NEG() && right_value.could_be_POS())
@@ -433,8 +413,8 @@ public class Signs extends Abstraction {
 			if (this.could_be_POS() && right_value.could_be_NEG())
 				z = p = true;
 			if (this.could_be_POS() && right_value.could_be_POS())
-				z = p = true;			
-			return construct_top(n, z, p);				
+				z = p = true;
+			return construct_top(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -453,7 +433,7 @@ public class Signs extends Abstraction {
 	public Abstraction _bitwise_and(Abstraction right) {
 		if (right instanceof Signs) {
 			Signs right_value = (Signs) right;
-			boolean p = false, n = false, z = false;			
+			boolean p = false, n = false, z = false;
 			if (this.could_be_NEG() && right_value.could_be_NEG())
 				n = true;
 			if (this.could_be_NEG() && right_value.could_be_ZERO())
@@ -471,8 +451,8 @@ public class Signs extends Abstraction {
 			if (this.could_be_POS() && right_value.could_be_ZERO())
 				z = true;
 			if (this.could_be_POS() && right_value.could_be_POS())
-				z = p = true;			
-			return construct_top(n, z, p);			
+				z = p = true;
+			return construct_top(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -491,7 +471,7 @@ public class Signs extends Abstraction {
 	public Abstraction _bitwise_or(Abstraction right) {
 		if (right instanceof Signs) {
 			Signs right_value = (Signs) right;
-			boolean p = false, n = false, z = false;			
+			boolean p = false, n = false, z = false;
 			if (this.could_be_NEG() && right_value.could_be_NEG())
 				n = true;
 			if (this.could_be_NEG() && right_value.could_be_ZERO())
@@ -509,8 +489,8 @@ public class Signs extends Abstraction {
 			if (this.could_be_POS() && right_value.could_be_ZERO())
 				p = true;
 			if (this.could_be_POS() && right_value.could_be_POS())
-				p = true;			
-			return construct_top(n, z, p);			
+				p = true;
+			return construct_top(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -519,7 +499,7 @@ public class Signs extends Abstraction {
 	public Abstraction _bitwise_xor(int right) {
 		return _bitwise_xor(abstract_map(right));
 	}
-	
+
 	@Override
 	public Abstraction _bitwise_xor(long right) {
 		return _bitwise_xor(abstract_map(right));
@@ -529,7 +509,7 @@ public class Signs extends Abstraction {
 	public Abstraction _bitwise_xor(Abstraction right) {
 		if (right instanceof Signs) {
 			Signs right_value = (Signs) right;
-			boolean p = false, n = false, z = false;			
+			boolean p = false, n = false, z = false;
 			if (this.could_be_NEG() && right_value.could_be_NEG())
 				z = p = true;
 			if (this.could_be_NEG() && right_value.could_be_ZERO())
@@ -547,8 +527,8 @@ public class Signs extends Abstraction {
 			if (this.could_be_POS() && right_value.could_be_ZERO())
 				p = true;
 			if (this.could_be_POS() && right_value.could_be_POS())
-				z = p = true;			
-			return construct_top(n, z, p);			
+				z = p = true;
+			return construct_top(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -565,9 +545,9 @@ public class Signs extends Abstraction {
 
 	// Note that x << y considers only the least five bits of y
 	// Three disjoint cases:
-	// * x = ZERO, y in { NEG, ZERO, POS}		=>	x << y = ZERO	
-	// * x in { NEG, ZERO, POS}, y = ZERO		=>	x << y = x
-	// * x in { NEG, POS }, y in { NEG, POS }	=>	x << y  = { POS, ZERO, NEG }
+	// * x = ZERO, y in { NEG, ZERO, POS} => x << y = ZERO
+	// * x in { NEG, ZERO, POS}, y = ZERO => x << y = x
+	// * x in { NEG, POS }, y in { NEG, POS } => x << y = { POS, ZERO, NEG }
 	@Override
 	public Abstraction _shift_left(Abstraction right) {
 		if (right instanceof Signs) {
@@ -578,10 +558,11 @@ public class Signs extends Abstraction {
 				z |= this.could_be_ZERO();
 				p |= this.could_be_POS();
 			}
-			if ( (this.could_be_NEG() || this.could_be_POS()) &&
-					(right_value.could_be_NEG() || right_value.could_be_POS()) )
+			if ((this.could_be_NEG() || this.could_be_POS())
+					&& (right_value.could_be_NEG() || right_value
+							.could_be_POS()))
 				n = z = p = true;
-			return construct_top(n, z, p);				
+			return construct_top(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -596,12 +577,13 @@ public class Signs extends Abstraction {
 		return _shift_right(abstract_map(right));
 	}
 
-	// Note that x >> y considers only the least five bits of y, sign of x is preserved
+	// Note that x >> y considers only the least five bits of y, sign of x is
+	// preserved
 	// Four disjoint cases:
-	// * x = ZERO, y in { NEG, ZERO, POS }	=>	x >> y = ZERO	
-	// * x in { NEG, ZERO, POS }, y = ZERO	=>	x >> y = x
-	// * x = POS,  y in { NEG, POS }		=>	x >> y = { ZERO, POS }
-	// * x = NEG,  y in { NEG, POS }		=>	x >> y = NEG
+	// * x = ZERO, y in { NEG, ZERO, POS } => x >> y = ZERO
+	// * x in { NEG, ZERO, POS }, y = ZERO => x >> y = x
+	// * x = POS, y in { NEG, POS } => x >> y = { ZERO, POS }
+	// * x = NEG, y in { NEG, POS } => x >> y = NEG
 	@Override
 	public Abstraction _shift_right(Abstraction right) {
 		if (right instanceof Signs) {
@@ -617,7 +599,7 @@ public class Signs extends Abstraction {
 				z |= this.could_be_POS();
 				p |= this.could_be_POS();
 			}
-			return construct_top(n, z, p);				
+			return construct_top(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -632,11 +614,12 @@ public class Signs extends Abstraction {
 		return _unsigned_shift_right(abstract_map(right));
 	}
 
-	// Note that x >>> y considers only the least five bits of y, sign of x is not preserved
+	// Note that x >>> y considers only the least five bits of y, sign of x is
+	// not preserved
 	// Three disjoint cases:
-	// * x = ZERO, y in { NEG, ZERO, POS }		=>	x >> y = ZERO	
-	// * x in { NEG, ZERO, POS }, y = ZERO		=>	x >> y = x
-	// * x in { NEG, POS },  y in { NEG, POS }	=>	x >> y = { ZERO, POS }
+	// * x = ZERO, y in { NEG, ZERO, POS } => x >> y = ZERO
+	// * x in { NEG, ZERO, POS }, y = ZERO => x >> y = x
+	// * x in { NEG, POS }, y in { NEG, POS } => x >> y = { ZERO, POS }
 	@Override
 	public Abstraction _unsigned_shift_right(Abstraction right) {
 		if (right instanceof Signs) {
@@ -647,10 +630,11 @@ public class Signs extends Abstraction {
 				z |= this.could_be_ZERO();
 				p |= this.could_be_POS();
 			}
-			if ( (this.could_be_NEG() || this.could_be_POS()) &&
-					(right_value.could_be_NEG() || right_value.could_be_POS()) )
+			if ((this.could_be_NEG() || this.could_be_POS())
+					&& (right_value.could_be_NEG() || right_value
+							.could_be_POS()))
 				z = p = true;
-			return construct_top(n, z, p);	
+			return construct_top(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -663,7 +647,7 @@ public class Signs extends Abstraction {
 	@Override
 	public AbstractBoolean _ge(Abstraction right) {
 		if (right instanceof Signs) {
-			Signs right_value = (Signs) right;		
+			Signs right_value = (Signs) right;
 			boolean t = false, f = false;
 			if (this.could_be_NEG() && right_value.could_be_NEG())
 				t = f = true;
@@ -682,10 +666,11 @@ public class Signs extends Abstraction {
 			if (this.could_be_POS() && right_value.could_be_ZERO())
 				t = true;
 			if (this.could_be_POS() && right_value.could_be_POS())
-				t = f = true;			
+				t = f = true;
 			if (f & t)
 				return AbstractBoolean.TOP;
-			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+			else
+				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -717,10 +702,11 @@ public class Signs extends Abstraction {
 			if (this.could_be_POS() && right_value.could_be_ZERO())
 				t = true;
 			if (this.could_be_POS() && right_value.could_be_POS())
-				t = f = true;			
+				t = f = true;
 			if (f & t)
 				return AbstractBoolean.TOP;
-			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+			else
+				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -752,10 +738,11 @@ public class Signs extends Abstraction {
 			if (this.could_be_POS() && right_value.could_be_ZERO())
 				f = true;
 			if (this.could_be_POS() && right_value.could_be_POS())
-				t = f = true;			
+				t = f = true;
 			if (f & t)
 				return AbstractBoolean.TOP;
-			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;			
+			else
+				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -787,10 +774,11 @@ public class Signs extends Abstraction {
 			if (this.could_be_POS() && right_value.could_be_ZERO())
 				f = true;
 			if (this.could_be_POS() && right_value.could_be_POS())
-				t = f = true;			
+				t = f = true;
 			if (f & t)
 				return AbstractBoolean.TOP;
-			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+			else
+				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -800,6 +788,170 @@ public class Signs extends Abstraction {
 		return _lt(abstract_map(right));
 	}
 
+	public AbstractBoolean _eq(Abstraction right) {
+		if (right instanceof Signs) {
+			Signs right_value = (Signs) right;
+			boolean t = (this.could_be_NEG() && right_value.could_be_NEG())
+					|| (this.could_be_ZERO() && right_value.could_be_ZERO())
+					|| (this.could_be_POS() && right_value.could_be_POS());
+			boolean f = (this.could_be_NEG() && right_value.could_be_ZERO())
+					|| (this.could_be_NEG() && right_value.could_be_POS())
+					|| (this.could_be_ZERO() && right_value.could_be_NEG())
+					|| (this.could_be_ZERO() && right_value.could_be_POS())
+					|| (this.could_be_POS() && right_value.could_be_NEG())
+					|| (this.could_be_POS() && right_value.could_be_ZERO());
+			if (f & t)
+				return AbstractBoolean.TOP;
+			else
+				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractBoolean _eq(int right) {
+		return _eq(abstract_map(right));
+	}
+
+	public AbstractBoolean _ne(Abstraction right) {
+		return _eq(right).not();
+	}
+
+	@Override
+	public AbstractBoolean _ne(int right) {
+		return _ne(abstract_map(right));
+	}
+
+	@Override
+	protected Abstraction _minus_reverse(int right) {
+		return abstract_map(right)._minus(this);
+	}
+
+	@Override
+	protected Abstraction _minus_reverse(long right) {
+		return abstract_map(right)._minus(this);
+	}
+
+	@Override
+	protected Abstraction _minus_reverse(float right) {
+		return abstract_map(right)._minus(this);
+	}
+
+	@Override
+	protected Abstraction _minus_reverse(double right) {
+		return abstract_map(right)._minus(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(int right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(long right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(float right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _div_reverse(double right) {
+		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _cmpl_reverse(float right) {
+		return abstract_map(right)._cmpl(this);
+	}
+
+	@Override
+	protected Abstraction _cmpl_reverse(double right) {
+		return abstract_map(right)._cmpl(this);
+	}
+
+	@Override
+	protected Abstraction _cmpg_reverse(float right) {
+		return abstract_map(right)._cmpg(this);
+	}
+
+	@Override
+	protected Abstraction _cmpg_reverse(double right) {
+		return abstract_map(right)._cmpg(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(int right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(long right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(float right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _rem_reverse(double right) {
+		return abstract_map(right)._rem(this);
+	}
+
+	@Override
+	protected Abstraction _shift_left_reverse(int right) {
+		return abstract_map(right)._shift_left(this);
+	}
+
+	@Override
+	protected Abstraction _shift_left_reverse(long right) {
+		return abstract_map(right)._shift_left(this);
+	}
+
+	@Override
+	protected Abstraction _shift_right_reverse(int right) {
+		return abstract_map(right)._shift_right(this);
+	}
+
+	@Override
+	protected Abstraction _shift_right_reverse(long right) {
+		return abstract_map(right)._shift_right(this);
+	}
+
+	@Override
+	protected Abstraction _unsigned_shift_right_reverse(int right) {
+		return abstract_map(right)._unsigned_shift_right(this);
+	}
+
+	@Override
+	protected Abstraction _unsigned_shift_right_reverse(long right) {
+		return abstract_map(right)._unsigned_shift_right(this);
+	}
+
+	@Override
+	protected AbstractBoolean _lt_reverse(int right) {
+		return abstract_map(right)._lt(this);
+	}
+
+	@Override
+	protected AbstractBoolean _le_reverse(int right) {
+		return abstract_map(right)._le(this);
+	}
+
+	@Override
+	protected AbstractBoolean _ge_reverse(int right) {
+		return abstract_map(right)._ge(this);
+	}
+
+	@Override
+	protected AbstractBoolean _gt_reverse(int right) {
+		return abstract_map(right)._gt(this);
+	}
+
 	public String toString() {
 		if (this instanceof Signs) {
 			if (this.isTop()) {
@@ -807,10 +959,10 @@ public class Signs extends Abstraction {
 				if (could_be_NEG())
 					result = "NEG,";
 				if (could_be_ZERO())
-					result += (result.isEmpty())? "ZERO," : " ZERO,";
+					result += (result.isEmpty()) ? "ZERO," : " ZERO,";
 				if (could_be_POS())
-					result += " POS";				
-				return "{ " + result + " }";	
+					result += " POS";
+				return "{ " + result + " }";
 			}
 			if (this == ZERO)
 				return "ZERO";
@@ -818,7 +970,8 @@ public class Signs extends Abstraction {
 				return "POS";
 			if (this == NEG)
 				return "NEG";
-		}		
+		}
 		throw new RuntimeException("## Error: unknown abstraction");
 	}
+
 }
