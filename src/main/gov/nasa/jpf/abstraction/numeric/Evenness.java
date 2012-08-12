@@ -14,7 +14,6 @@
 //A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
 //THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
 //DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
-
 package gov.nasa.jpf.abstraction.numeric;
 
 import java.util.HashSet;
@@ -495,6 +494,11 @@ public class Evenness extends Abstraction {
 		return abstract_map(right)._div(this);
 	}
 
+	@Override
+	protected Abstraction _cmp_reverse(long right) {
+		return abstract_map(right)._cmp(this);
+	}		
+	
 	@Override
 	protected Abstraction _cmpl_reverse(float right) {
 		return abstract_map(right)._cmpl(this);

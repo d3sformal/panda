@@ -50,11 +50,11 @@ public class DCMPG extends gov.nasa.jpf.jvm.bytecode.DCMPG {
 			
 			Signs s_result = (Signs)result;
 			if (s_result == Signs.NEG)
-				th.longPush(-1);
+				th.push(-1, false);
 			else if (s_result == Signs.POS)
-				th.longPush(+1);
+				th.push(+1, false);
 			else
-				th.longPush(0);
+				th.push(0, false);
 
 			return getNext(th);
 		}

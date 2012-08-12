@@ -863,6 +863,11 @@ public class Signs extends Abstraction {
 	}
 
 	@Override
+	protected Abstraction _cmp_reverse(long right) {
+		return abstract_map(right)._cmp(this);
+	}	
+	
+	@Override
 	protected Abstraction _cmpl_reverse(float right) {
 		return abstract_map(right)._cmpl(this);
 	}

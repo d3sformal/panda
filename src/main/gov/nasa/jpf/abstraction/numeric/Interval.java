@@ -1,10 +1,27 @@
+//
+//Copyright (C) 2012 United States Government as represented by the
+// Administrator of the National Aeronautics and Space Administration
+// (NASA).  All Rights Reserved.
+//
+// This software is distributed under the NASA Open Source Agreement
+// (NOSA), version 1.3.  The NOSA has been approved by the Open Source
+// Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
+// directory tree for the complete NOSA document.
+//
+// THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
+// KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
+// LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
+// SPECIFICATIONS, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+// A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
+// THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
+// DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 package gov.nasa.jpf.abstraction.numeric;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /*
- * Inteval abstraction has three values:
+ * Interval abstraction's domain consists of three values:
  *  - less than MIN;
  *  - inside [MIN, MAX] interval;
  *  - greater than MAX;
@@ -849,7 +866,8 @@ public class Interval extends Abstraction {
 				left2 = Math.min(left2, MAX);
 				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
 			}
-			// values can be equal, iff equality is possible (bounding segments can intersect)
+			// values can be equal, iff equality is possible (bounding segments
+			// can intersect)
 			boolean t = (left1 >= left2 && left1 <= right2)
 					|| (right1 >= left2 && right1 <= right2)
 					|| (left2 >= left1 && left2 <= right1)
@@ -867,7 +885,6 @@ public class Interval extends Abstraction {
 	public AbstractBoolean _eq(int right) {
 		return _eq(abstract_map(right));
 	}
-
 
 	public AbstractBoolean _ne(Abstraction right) {
 		return _eq(right).not();
@@ -896,6 +913,11 @@ public class Interval extends Abstraction {
 	@Override
 	protected Abstraction _div_reverse(double right) {
 		return abstract_map(right)._div(this);
+	}
+
+	@Override
+	protected Abstraction _cmp_reverse(long right) {
+		return abstract_map(right)._cmp(this);
 	}
 
 	@Override
@@ -987,8 +1009,7 @@ public class Interval extends Abstraction {
 	protected AbstractBoolean _gt_reverse(int right) {
 		return abstract_map(right)._gt(this);
 	}
-	
-	
+
 	public String toString() {
 		if (this instanceof Interval) {
 			if (this == LESS)

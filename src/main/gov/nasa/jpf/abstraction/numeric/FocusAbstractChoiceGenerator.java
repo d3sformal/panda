@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2007 United States Government as represented by the
+// Copyright (C) 2012 United States Government as represented by the
 // Administrator of the National Aeronautics and Space Administration
 // (NASA).  All Rights Reserved.
 //
@@ -30,28 +30,26 @@ public class FocusAbstractChoiceGenerator extends IntIntervalGenerator {
 
 	// # choices = # elements in the abstract domain
 	public FocusAbstractChoiceGenerator(int num_tokens) {
-		super("focus",0,num_tokens-1,1);
+		super("focus", 0, num_tokens - 1, 1);
 		isReverseOrder = false;
 	}
 
 	/*
-	 * If reverseOrder is true, the ChoiceGenerator
-	 * explores paths in the opposite order used by
-	 * the default constructor. If reverseOrder is false
+	 * If reverseOrder is true, the ChoiceGenerator explores paths in the
+	 * opposite order used by the default constructor. If reverseOrder is false
 	 * the usual behavior is used.
 	 */
 	public FocusAbstractChoiceGenerator(int num_tokens, boolean reverseOrder) {
-		super("focus",0, num_tokens-1, reverseOrder ? -1 : 1);
+		super("focus", 0, num_tokens - 1, reverseOrder ? -1 : 1);
 		isReverseOrder = reverseOrder;
 	}
 
+	// TODO
+	// public IntChoiceGenerator randomize() {
+	// return new FocusAbstractChoiceGenerator(random.nextBoolean());
+	// }
 
-// TODO
-//	public IntChoiceGenerator randomize() {
-//		return new FocusAbstractChoiceGenerator(random.nextBoolean());
-//	}
-
-	public void setNextChoice(int nextChoice){
+	public void setNextChoice(int nextChoice) {
 		super.next = nextChoice;
 	}
 }

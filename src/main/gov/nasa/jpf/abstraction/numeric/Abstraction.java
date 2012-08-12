@@ -1,3 +1,20 @@
+//
+//Copyright (C) 2012 United States Government as represented by the
+// Administrator of the National Aeronautics and Space Administration
+// (NASA).  All Rights Reserved.
+//
+// This software is distributed under the NASA Open Source Agreement
+// (NOSA), version 1.3.  The NOSA has been approved by the Open Source
+// Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
+// directory tree for the complete NOSA document.
+//
+// THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
+// KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
+// LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
+// SPECIFICATIONS, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+// A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
+// THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
+// DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 package gov.nasa.jpf.abstraction.numeric;
 
 import java.util.Set;
@@ -128,6 +145,19 @@ public class Abstraction {
 		return result;
 	}
 
+	public static Abstraction _cmp(long v1, Abstraction abs_v1, long v2,
+			Abstraction abs_v2) {
+		Abstraction result = null;
+		if (abs_v2 != null) {
+			if (abs_v1 != null)
+				result = abs_v2._cmp(abs_v1);
+			else
+				result = abs_v2._cmp(v1);
+		} else if (abs_v1 != null)
+			result = abs_v1._cmp_reverse(v2);
+		return result;
+	}
+	
 	public static Abstraction _cmpg(double v1, Abstraction abs_v1, double v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -603,6 +633,23 @@ public class Abstraction {
 		return result;
 	}
 
+	public Abstraction _cmp(Abstraction right) {
+		// TODO: move to particular abstractions
+		boolean n = false, z = false, p = false;
+		if (this._gt(right) != AbstractBoolean.FALSE)
+			p = true;
+		if (this._lt(right) != AbstractBoolean.FALSE)
+			n = true;
+		if (this._gt(right) != AbstractBoolean.TRUE
+				&& this._lt(right) != AbstractBoolean.TRUE)
+			z = true;
+		return Signs.construct_top(n, z, p);
+	}	
+	
+	public Abstraction _cmp(long right) {
+		return this._cmp(abstract_map(right));
+	}
+	
 	public Abstraction _cmpg(Abstraction right) {
 		// TODO: move to particular abstractions
 		boolean n = false, z = false, p = false;
@@ -681,6 +728,10 @@ public class Abstraction {
 		throw new RuntimeException("bitwise xor not implemented");
 	}
 
+	protected Abstraction _cmp_reverse(long right) {
+		throw new RuntimeException("cmp not implemented");
+	}	
+	
 	protected Abstraction _cmpg_reverse(double right) {
 		throw new RuntimeException("cmpg not implemented");
 	}
