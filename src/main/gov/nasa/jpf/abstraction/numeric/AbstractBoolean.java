@@ -62,4 +62,15 @@ public class AbstractBoolean {
 		throw new RuntimeException("### Error: AbstractBoolean out of range");
 	}
 	
+	@Override
+	public String toString() {
+		if (this == TRUE)
+			return "TRUE";
+		if (this == FALSE)
+			return "FALSE";
+		if (this == TOP)
+			return "TOP";
+		return "OutOfRange";
+	}
+	
 }

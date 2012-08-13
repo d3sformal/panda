@@ -241,6 +241,11 @@ public class AbstractInstructionFactory extends
 	}
 
 	@Override
+	public Instruction i2s() {
+		return (filter.isInstrumentedClass(ci) ? new I2S() : super.i2s());
+	}
+
+	@Override
 	public Instruction iadd() {
 		return (filter.isInstrumentedClass(ci) ? new IADD() : super.iadd());
 	}
@@ -419,6 +424,13 @@ public class AbstractInstructionFactory extends
 	}
 
 	@Override
+	public Instruction lookupswitch(int defaultTargetPc, int nEntries) {
+		return filter.isInstrumentedClass(ci) 
+				? new LOOKUPSWITCH(defaultTargetPc, nEntries) 
+				: super.lookupswitch(defaultTargetPc, nEntries);
+	}
+
+	@Override
 	public Instruction lor() {
 		return (filter.isInstrumentedClass(ci) ? new LOR() : super.lor());
 	}
@@ -451,6 +463,13 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction lxor() {
 		return (filter.isInstrumentedClass(ci) ? new LXOR() : super.lxor());
+	}
+
+	@Override
+	public Instruction tableswitch(int defaultTargetPc, int low, int high) {
+		return filter.isInstrumentedClass(ci) 
+				? new TABLESWITCH(defaultTargetPc, low, high) 
+				: super.tableswitch(defaultTargetPc, low, high);
 	}
 
 	@Override

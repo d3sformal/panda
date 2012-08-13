@@ -2,8 +2,10 @@ package gov.nasa.jpf.abstraction;
 
 public class IntBC {
 
-	public static void main(String[] args) {				
+	public static void main(String[] args) {		
 // Uncomment to test specific bytecode		
+		test_TABLESWITCH();
+//		test_LOOKUPSWITCH();
 //		test_I2F(1);
 //		test_I2D(1);
 //		test_I2L(1);
@@ -76,6 +78,58 @@ public class IntBC {
 //		test_IXOR(-1, 0);
 	}
 
+	public static void test_TABLESWITCH() {
+		System.out.println("\n===== TABLESWITCH =====");
+		int n = 1;
+		System.out.println("Choose " + n + " from {-2, -1, 0, 1, 2}");
+		n = Debug.makeAbstractInteger(n);
+		switch (n) {
+		case -2:
+			System.out.println("-2 is chosen");
+			break;
+		case -1:
+			System.out.println("-1 is chosen");
+			break;
+		case 0:
+			System.out.println("0 is chosen");
+			break;
+		case 1:
+			System.out.println("1 is chosen");
+			break;
+		case 200:
+			System.out.println("2 is chosen");
+			break;			
+		default:
+			System.out.println("default branch is chosen");
+		}			
+	}
+	
+	public static void test_LOOKUPSWITCH() {
+		System.out.println("\n===== LOOKUPSWITCH =====");
+		int n = 1;
+		System.out.println("Choose " + n +" from {-200, -1, 0, 1, 200}");
+		n = Debug.makeAbstractInteger(n);
+		switch (n) {
+		case -200:
+			System.out.println("-200 is chosen");
+			break;
+		case -1:
+			System.out.println("-1 is chosen");
+			break;
+		case 0:
+			System.out.println("0 is chosen");
+			break;
+		case 1:
+			System.out.println("1 is chosen");
+			break;
+		case 200:
+			System.out.println("200 is chosen");
+			break;			
+		default:
+			System.out.println("default branch is chosen");
+		}		
+	}
+	
 	public static void test_I2F(int x) {
 		System.out.println("\n===== I2F =====");
 		x = Debug.makeAbstractInteger(x);
