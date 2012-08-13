@@ -18,10 +18,6 @@
 //
 package gov.nasa.jpf.abstraction;
 
-import Event;
-import FirstTask;
-import SecondTask;
-
 /**
  * This example shows a deadlock that occurs as a result of a missed signal,
  * i.e. a wait() that happens after the corresponding notify().
