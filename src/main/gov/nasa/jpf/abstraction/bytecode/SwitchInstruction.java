@@ -66,7 +66,7 @@ public abstract class SwitchInstruction extends
 				if (result != AbstractBoolean.FALSE) {
 					choices.add(i);
 					if (result == AbstractBoolean.TRUE)
-						break;
+						break; // remove this if not just first match should be processed
 				}
 			}
 			if (choices.size() > 0) {
