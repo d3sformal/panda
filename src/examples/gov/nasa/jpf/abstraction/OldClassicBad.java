@@ -18,6 +18,10 @@
 //
 package gov.nasa.jpf.abstraction;
 
+import Event;
+import FirstTask;
+import SecondTask;
+
 /**
  * This example shows a deadlock that occurs as a result of a missed signal,
  * i.e. a wait() that happens after the corresponding notify().
@@ -58,18 +62,20 @@ class Event {
 	int count = 0;
 
 	public synchronized void signal_event() {
-		
-//		 NOTE: this abstraction is not strictly required - even if the state
-//		 space would be unbound, JPF could still find the error at a
-//		 reasonable search depth, unless it's left-most branch in the search
-//		 tree is unbound. If it is, there are two ways to work around: (1) use
-//		 a different search strategy (e.g. HeuristicSearch with BFSHeuristic),
-//		 or (2) set a random choice enumeration order
-//		 ("+cg.randomize_choices=true"). In this example, (2) works just fine
-//		 count = (count + 1) % 3;
-		 
-		count++;
-		// requires "+cg.randomize_choices=true" for DFSearch policy
+
+		// NOTE: this abstraction is not strictly required - even if the state
+		// space would
+		// be unbound, JPF could still find the error at a reasonable search
+		// depth,
+		// unless it's left-most branch in the search tree is unbound. If it is,
+		// there are two ways to work around: (1) use a different search
+		// strategy
+		// (e.g. HeuristicSearch with BFSHeuristic), or (2) set a random choice
+		// enumeration order ("+cg.randomize_choices=true"). In this example,
+		// (2)
+		// works just fine
+		// count = (count + 1) % 3;
+		count++; // requires "+cg.randomize_choices=true" for DFSearch policy
 
 		notifyAll();
 	}
@@ -86,8 +92,7 @@ class Event {
 class FirstTask extends Thread {
 	Event event1;
 	Event event2;
-	int count = 0; // bad optimization - local cache
-												// of event1 internals
+	int count = 0; // bad optimization - local cache of event1 internals
 
 	public FirstTask(Event e1, Event e2) {
 		this.event1 = e1;
@@ -95,9 +100,7 @@ class FirstTask extends Thread {
 	}
 
 	public void run() {
-		count = event1.count; // <race> violates
-															// event1 monitor
-															// encapsulation
+		count = event1.count; // <race> violates event1 monitor encapsulation
 
 		while (true) {
 			System.out.println("1");
