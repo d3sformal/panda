@@ -42,11 +42,11 @@ package gov.nasa.jpf.abstraction;
 // ------- the test driver
 public class OldClassicBad {
 	public static void main(String[] args) {
-		Event new_event1 = new Event();
-		Event new_event2 = new Event();
+		EventBad new_event1 = new EventBad();
+		EventBad new_event2 = new EventBad();
 
-		FirstTask task1 = new FirstTask(new_event1, new_event2);
-		SecondTask task2 = new SecondTask(new_event1, new_event2);
+		FirstTaskBad task1 = new FirstTaskBad(new_event1, new_event2);
+		SecondTaskBad task2 = new SecondTaskBad(new_event1, new_event2);
 
 		task1.start();
 		task2.start();
@@ -54,7 +54,7 @@ public class OldClassicBad {
 }
 
 // ------- shared objects implemented as monitors
-class Event {
+class EventBad {
 	int count = 0;
 
 	public synchronized void signal_event() {
@@ -85,12 +85,12 @@ class Event {
 }
 
 // ------- the two concurrent threads using the monitors
-class FirstTask extends Thread {
-	Event event1;
-	Event event2;
+class FirstTaskBad extends Thread {
+	EventBad event1;
+	EventBad event2;
 	int count = 0; // bad optimization - local cache of event1 internals
 
-	public FirstTask(Event e1, Event e2) {
+	public FirstTaskBad(EventBad e1, EventBad e2) {
 		this.event1 = e1;
 		this.event2 = e2;
 	}
@@ -111,12 +111,12 @@ class FirstTask extends Thread {
 	}
 }
 
-class SecondTask extends Thread {
-	Event event1;
-	Event event2;
+class SecondTaskBad extends Thread {
+	EventBad event1;
+	EventBad event2;
 	int count = 0; // bad optimization - local cache of event2 internals
 
-	public SecondTask(Event e1, Event e2) {
+	public SecondTaskBad(EventBad e1, EventBad e2) {
 		this.event1 = e1;
 		this.event2 = e2;
 	}

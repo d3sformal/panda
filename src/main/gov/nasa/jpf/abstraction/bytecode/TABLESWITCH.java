@@ -31,7 +31,6 @@ import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
 import gov.nasa.jpf.jvm.choice.IntChoiceFromList;
-import gov.nasa.jpf.jvm.choice.IntIntervalGenerator;
 
 /**
  * Access jump table by index and jump ..., index ...
@@ -59,8 +58,7 @@ public class TABLESWITCH extends SwitchInstruction implements
 
 	protected Instruction executeConditional(SystemState ss, KernelState ks,
 			ThreadInfo ti) {
-		throw new UnsupportedOperationException();
-		// makes no sense with abstractions
+		throw new UnsupportedOperationException(); // makes no sense with abstractions
 	}
 
 	@Override
