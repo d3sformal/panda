@@ -635,7 +635,32 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 
 	@Override
 	public Abstraction _plus(int right) {
-		return _plus(abstract_map(right));
+		if (right == 1) {
+			Set<Integer> result = new HashSet<Integer>();
+			Integer values[] = this.values.toArray(new Integer[this.values.size()]);
+			for (Integer v : values)
+				if (v < MIN) {
+					result.add(v);
+					result.add(MIN);
+				} else if (v >= MAX)
+					result.add(MAX);
+				else
+					result.add(v+1);
+			return new ConcreteInterval(result, MIN, MAX);
+		} else if (right == -1) {
+			Set<Integer> result = new HashSet<Integer>();
+			Integer values[] = this.values.toArray(new Integer[this.values.size()]);
+			for (Integer v : values)
+				if (v > MAX) {
+					result.add(v);
+					result.add(MAX);
+				} else if (v <= MIN)
+					result.add(MIN);
+				else
+					result.add(v-1);
+			return new ConcreteInterval(result, MIN, MAX);
+		} else
+			return _plus(abstract_map(right));
 	}
 
 	@Override

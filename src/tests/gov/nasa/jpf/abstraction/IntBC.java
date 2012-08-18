@@ -33,7 +33,7 @@ public class IntBC {
 //		test_IINC(-2, +1);
 //		test_IINC(0, +1);
 //		test_IINC(0, -1);
-//		test_IINC(2, -1);		
+		test_IINC(2, -1);		
 		
 //		test_IMUL(3, -1);
 //		test_IMUL(-3, 1);
