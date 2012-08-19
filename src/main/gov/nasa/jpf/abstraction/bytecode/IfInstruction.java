@@ -31,9 +31,7 @@ public abstract class IfInstruction extends Instruction {
 	protected int targetPosition; // insn position at jump insnIndex
 	protected Instruction target; // jump target
 
-	protected boolean conditionValue;
-
-	/** value of last evaluation of branch condition */
+	protected boolean conditionValue; // value of last evaluation of branch condition
 
 	protected IfInstruction(int targetPosition) {
 		this.targetPosition = targetPosition;

@@ -1,3 +1,21 @@
+//
+// Copyright (C) 2012 United States Government as represented by the
+// Administrator of the National Aeronautics and Space Administration
+// (NASA).  All Rights Reserved.
+// 
+// This software is distributed under the NASA Open Source Agreement
+// (NOSA), version 1.3.  The NOSA has been approved by the Open Source
+// Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
+// directory tree for the complete NOSA document.
+// 
+// THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
+// KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
+// LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
+// SPECIFICATIONS, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+// A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
+// THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
+// DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
+//
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
@@ -10,6 +28,10 @@ import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.Types;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 
+/**
+ * Remainder double 
+ * ..., value1, value2 => ..., result
+ */
 public class DREM extends gov.nasa.jpf.jvm.bytecode.DREM {
 
 	@Override
@@ -25,9 +47,11 @@ public class DREM extends gov.nasa.jpf.jvm.bytecode.DREM {
 			double v1 = Types.longToDouble(th.longPeek(0));
 			double v2 = Types.longToDouble(th.longPeek(2));
 
+			// abs_v2 % abs_v1
 			Abstraction result = Abstraction._rem(v1, abs_v1, v2, abs_v2);
-			System.out.printf("DREM> Values: %f (%s), %f (%s)\n", v1, abs_v1, v2, abs_v2);
-			
+			System.out.printf("DREM> Values: %f (%s), %f (%s)\n", v2, abs_v2,
+					v1, abs_v1);
+
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
@@ -47,13 +71,13 @@ public class DREM extends gov.nasa.jpf.jvm.bytecode.DREM {
 
 			th.longPop();
 			th.longPop();
-			
+
 			th.longPush(0);
 			sf = th.getTopFrame();
 			sf.setLongOperandAttr(result);
 
 			return getNext(th);
 		}
-	}	
-	
+	}
+
 }

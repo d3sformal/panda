@@ -29,6 +29,10 @@ import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
 
+/**
+ * Branch if int comparison succeeds
+ * ..., value1, value2 => ...
+ */
 public class IF_ICMPNE extends gov.nasa.jpf.jvm.bytecode.IF_ICMPNE {
 
 	public IF_ICMPNE(int targetPc) {
@@ -48,9 +52,10 @@ public class IF_ICMPNE extends gov.nasa.jpf.jvm.bytecode.IF_ICMPNE {
 			int v1 = th.peek(0);
 			int v2 = th.peek(1);
 
+			// abs_v2 != abs_v1
 			AbstractBoolean result = Abstraction._ne(v1, abs_v1, v2, abs_v2);
-			System.out.printf("IF_ICMPNE> Values: %d (%s), %d (%s)\n", v1,
-					abs_v1, v2, abs_v2);
+			System.out.printf("IF_ICMPNE> Values: %d (%s), %d (%s)\n", v2,
+					abs_v2, v1, abs_v1);
 
 			if (result == AbstractBoolean.TRUE) {
 				conditionValue = true;

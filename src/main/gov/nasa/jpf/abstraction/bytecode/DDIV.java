@@ -14,7 +14,6 @@
 //A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
 //THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
 //DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
-
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
@@ -27,6 +26,10 @@ import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.Types;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 
+/**
+ * Divide double
+ * ..., value1, value2 => ..., result
+ */
 public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
 
 	@Override
@@ -41,10 +44,11 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
 		else {
 			double v1 = Types.longToDouble(th.longPeek(0));
 			double v2 = Types.longToDouble(th.longPeek(2));
-
+			
+			// abs_v2 / abs_v1
 			Abstraction result = Abstraction._div(v1, abs_v1, v2, abs_v2);
-
-			System.out.printf("DDIV> Values: %f (%s), %f (%s)\n", v1, abs_v1, v2, abs_v2);
+			
+			System.out.printf("DDIV> Values: %f (%s), %f (%s)\n", v2, abs_v2, v1, abs_v1);
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around

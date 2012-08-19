@@ -14,7 +14,6 @@
 //A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
 //THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
 //DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
-
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
@@ -25,8 +24,11 @@ import gov.nasa.jpf.jvm.StackFrame;
 import gov.nasa.jpf.jvm.SystemState;
 import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
-import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
 
+/**
+ * Negate int
+ * ..., value => ..., result
+ */
 public class INEG extends gov.nasa.jpf.jvm.bytecode.INEG {
 
 	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {

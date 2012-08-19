@@ -14,7 +14,6 @@
 //A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
 //THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
 //DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
-
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
@@ -27,15 +26,14 @@ import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.jvm.ChoiceGenerator;
 import gov.nasa.jpf.jvm.StackFrame;
 
-
-
-// we should factor out some of the code and put it in a parent class for all "if statements"
-
+/**
+ * Branch if int comparison with zero succeeds
+ * ..., value => ...
+ */
 public class IFLE extends gov.nasa.jpf.jvm.bytecode.IFLE {
 
 	public IFLE(int targetPc) {
 		super(targetPc);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

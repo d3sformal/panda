@@ -18,35 +18,50 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import gov.nasa.jpf.jvm.KernelState;
+import gov.nasa.jpf.jvm.SystemState;
+import gov.nasa.jpf.jvm.ThreadInfo;
+import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
 
-
 /**
- * Access jump table by key match and jump
- * ..., key => ...
+ * Access jump table by key match and jump ..., key => ...
  */
-public class LOOKUPSWITCH extends SwitchInstruction implements gov.nasa.jpf.jvm.LookupSwitchInstruction {
+public class LOOKUPSWITCH extends SwitchInstruction implements
+		gov.nasa.jpf.jvm.LookupSwitchInstruction {
 
-	public LOOKUPSWITCH (int defaultTarget, int numberOfTargets) {
-	    super(defaultTarget, numberOfTargets);
-	  }
+	public LOOKUPSWITCH(int defaultTarget, int numberOfTargets) {
+		super(defaultTarget, numberOfTargets);
+	}
 
-	  public void setTarget (int index, int match, int target){
-	    targets[index] = target;
-	    matches[index] = match;
-	  }
+	@Override
+	public void setTarget(int index, int match, int target) {
+		targets[index] = target;
+		matches[index] = match;
+	}
 
+	@Override
+	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
+		/*
+		 * Implementation is in SwitchInstruction, because now LOOKUPSWITCH's
+		 * implementation is used for TABLESWITCH as well
+		 */
+		return super.execute(ss, ks, th);
+	}
 
-	  public int getLength() {
-	    return 10 + 2*(matches.length); // <2do> NOT RIGHT: padding!!
-	  }
+	@Override
+	public int getLength() {
+		return 10 + 2 * (matches.length);
+	}
 
-	  public int getByteCode () {
-	    return 0xAB;
-	  }
+	@Override
+	public int getByteCode() {
+		return 0xAB;
+	}
 
-	  public void accept(InstructionVisitor insVisitor) {
-		  insVisitor.visit(this);
-	  }
+	@Override
+	public void accept(InstructionVisitor insVisitor) {
+		insVisitor.visit(this);
+	}
 
 }

@@ -26,7 +26,6 @@ import gov.nasa.jpf.jvm.KernelState;
 import gov.nasa.jpf.jvm.StackFrame;
 import gov.nasa.jpf.jvm.SystemState;
 import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.Types;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 
 /**
@@ -47,8 +46,9 @@ public class LCMP extends gov.nasa.jpf.jvm.bytecode.LCMP {
 			long v1 = th.longPeek(0);
 			long v2 = th.longPeek(2);
 
+			// abs_v2 compare to abs_v1
 			Abstraction result = Abstraction._cmp(v1, abs_v1, v2, abs_v2);
-			System.out.printf("LCMP> Values: %d (%s), %d (%s)\n", v1, abs_v1, v2, abs_v2);
+			System.out.printf("LCMP> Values: %d (%s), %d (%s)\n", v2, abs_v2, v1, abs_v1);
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around

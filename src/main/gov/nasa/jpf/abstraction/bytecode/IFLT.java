@@ -14,10 +14,12 @@
 //A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
 //THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
 //DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
-
 package gov.nasa.jpf.abstraction.bytecode;
 
-
+/**
+ * Branch if int comparison with zero succeeds
+ * ..., value => ...
+ */
 import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
 import gov.nasa.jpf.abstraction.numeric.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
@@ -33,7 +35,6 @@ public class IFLT extends gov.nasa.jpf.jvm.bytecode.IFLT {
 
 	public IFLT(int targetPc) {
 		super(targetPc);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -43,7 +44,6 @@ public class IFLT extends gov.nasa.jpf.jvm.bytecode.IFLT {
 		Abstraction abs_v = (Abstraction) sf.getOperandAttr();
 
 		if(abs_v == null) { // the condition is concrete
-			//System.out.println("Execute IFLT: The condition is concrete");
 			return super.execute(ss, ks, ti);
 		}
 		else { // the condition is abstract
@@ -51,12 +51,10 @@ public class IFLT extends gov.nasa.jpf.jvm.bytecode.IFLT {
 			System.out.printf("IFLT> Values: %d (%s)\n", ti.peek(0), abs_v);
 			AbstractBoolean abs_condition = abs_v._lt(0);
 
-			if(abs_condition == AbstractBoolean.TRUE) {
+			if(abs_condition == AbstractBoolean.TRUE)
 				conditionValue = true;
-			}
-			else if (abs_condition == AbstractBoolean.FALSE) {
+			else if (abs_condition == AbstractBoolean.FALSE)
 				conditionValue = false;
-			}
 			else { // TOP
 				ChoiceGenerator<?> cg;
 				if (!ti.isFirstStepInsn()) { // first time around
@@ -66,7 +64,9 @@ public class IFLT extends gov.nasa.jpf.jvm.bytecode.IFLT {
 				} else {  // this is what really returns results
 					cg = ss.getChoiceGenerator();
 					assert (cg instanceof AbstractChoiceGenerator) : "expected AbstractChoiceGenerator, got: " + cg;
-					conditionValue = (Integer)cg.getNextChoice()==0 ? false: true;
+					conditionValue = (Integer) cg.getNextChoice() == 0 
+							? false
+							: true;
 				}
 			}
 

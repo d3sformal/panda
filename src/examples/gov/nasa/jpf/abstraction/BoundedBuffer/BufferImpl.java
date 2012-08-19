@@ -17,7 +17,7 @@ public class BufferImpl implements Buffer {
 	protected int size;
 
 	public BufferImpl(int size) {
-		this.size = size;
+		this.size = Debug.makeAbstractInteger(size);
 		// buf = new Object[size];
 	}
 

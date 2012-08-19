@@ -19,9 +19,26 @@ package gov.nasa.jpf.abstraction.numeric;
 
 import java.util.Set;
 
-public class Abstraction {
+/**
+ * Common root class for numeric abstractions.
+ */
+public abstract class Abstraction {
 
-	int key;
+	/**
+	 * This constructor is here to force all abstractions to call set_key. It is
+	 * important, because keys are used to distinguish different abstract values
+	 * during serialization.
+	 * 
+	 * @param key
+	 *            An integer which bijectively defines a particular abstract
+	 *            value
+	 * @see #set_key
+	 */
+	protected Abstraction(int key) {
+		set_key(key);
+	}
+
+	protected int key;
 
 	public int get_key() {
 		return key;
@@ -36,11 +53,18 @@ public class Abstraction {
 		throw new RuntimeException("get_token not implemented");
 	}
 
+	/**
+	 * 
+	 * @return The set of possible abstract values.
+	 */
 	public Set<Abstraction> get_tokens() {
 		throw new RuntimeException("get_tokens not implemented");
 	}
 
-	// returns number of tokens in abstract domain
+	/**
+	 * 
+	 * @return The number of possible abstract values.
+	 */
 	public int get_num_tokens() {
 		throw new RuntimeException("get_num_tokens not implemented");
 	}
@@ -67,6 +91,19 @@ public class Abstraction {
 		throw new RuntimeException("abstract_map not implemented");
 	}
 
+	/**
+	 * Computes abs_v2 + abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of sum.
+	 * @see	#abstract_map(double)
+	 * @see	#_plus(Abstraction)
+	 */
 	public static Abstraction _add(double v1, Abstraction abs_v1, double v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -80,6 +117,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 + abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of sum.
+	 * @see	#abstract_map(float)
+	 * @see	#_plus(Abstraction)
+	 */
 	public static Abstraction _add(float v1, Abstraction abs_v1, float v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -93,6 +143,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 + abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of sum.
+	 * @see	#abstract_map(int)
+	 * @see	#_plus(Abstraction)
+	 */
 	public static Abstraction _add(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -106,6 +169,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 + abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of sum.
+	 * @see	#abstract_map(long)
+	 * @see	#_plus(Abstraction)
+	 */
 	public static Abstraction _add(long v1, Abstraction abs_v1, long v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -119,6 +195,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 & abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of bitwise conjunction.
+	 * @see	#abstract_map(int)
+	 * @see	#_bitwise_and(Abstraction)
+	 */
 	public static Abstraction _and(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -132,6 +221,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 & abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of bitwise conjunction.
+	 * @see	#abstract_map(long)
+	 * @see	#_bitwise_and(Abstraction)
+	 */
 	public static Abstraction _and(long v1, Abstraction abs_v1, long v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -145,6 +247,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Compares two long integers, making calls to abstract_map
+	 * before actual comparison if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of comparison.
+	 * @see	#abstract_map(long)
+	 * @see	#_cmp(Abstraction)
+	 */	
 	public static Abstraction _cmp(long v1, Abstraction abs_v1, long v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -157,7 +272,20 @@ public class Abstraction {
 			result = abs_v1._cmp_reverse(v2);
 		return result;
 	}
-	
+
+	/**
+	 * Compares two doubles, making calls to abstract_map
+	 * before actual comparison if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of comparison.
+	 * @see	#abstract_map(double)
+	 * @see	#_cmp(Abstraction)
+	 */		
 	public static Abstraction _cmpg(double v1, Abstraction abs_v1, double v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -171,6 +299,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Compares two floats, making calls to abstract_map
+	 * before actual comparison if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of comparison.
+	 * @see	#abstract_map(float)
+	 * @see	#_cmp(Abstraction)
+	 */		
 	public static Abstraction _cmpg(float v1, Abstraction abs_v1, float v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -184,6 +325,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Compares two doubles, making calls to abstract_map
+	 * before actual comparison if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of comparison.
+	 * @see	#abstract_map(double)
+	 * @see	#_cmp(Abstraction)
+	 */			
 	public static Abstraction _cmpl(double v1, Abstraction abs_v1, double v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -197,6 +351,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Compares two floats, making calls to abstract_map
+	 * before actual comparison if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of comparison.
+	 * @see	#abstract_map(float)
+	 * @see	#_cmp(Abstraction)
+	 */			
 	public static Abstraction _cmpl(float v1, Abstraction abs_v1, float v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -209,7 +376,20 @@ public class Abstraction {
 			result = abs_v1._cmpl_reverse(v2);
 		return result;
 	}
-
+	
+	/**
+	 * Computes abs_v2 / abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of division.
+	 * @see	#abstract_map(double)
+	 * @see	#_div(Abstraction)
+	 */
 	public static Abstraction _div(double v1, Abstraction abs_v1, double v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -223,6 +403,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 / abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of division.
+	 * @see	#abstract_map(float)
+	 * @see	#_div(Abstraction)
+	 */	
 	public static Abstraction _div(float v1, Abstraction abs_v1, float v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -236,6 +429,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 / abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of division.
+	 * @see	#abstract_map(int)
+	 * @see	#_div(Abstraction)
+	 */		
 	public static Abstraction _div(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -249,6 +455,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 / abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of division.
+	 * @see	#abstract_map(long)
+	 * @see	#_div(Abstraction)
+	 */		
 	public static Abstraction _div(long v1, Abstraction abs_v1, long v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -262,6 +481,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 == abs_v1, making calls to abstract_map
+	 * before actual comparison if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract boolean value of comparison.
+	 * @see	#abstract_map(int)
+	 * @see	#_eq(Abstraction)
+	 */			
 	public static AbstractBoolean _eq(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		AbstractBoolean result = null;
@@ -275,6 +507,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 >= abs_v1, making calls to abstract_map
+	 * before actual comparison if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract boolean value of comparison.
+	 * @see	#abstract_map(int)
+	 * @see	#_ge(Abstraction)
+	 */				
 	public static AbstractBoolean _ge(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		AbstractBoolean result = null;
@@ -288,6 +533,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 > abs_v1, making calls to abstract_map
+	 * before actual comparison if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract boolean value of comparison.
+	 * @see	#abstract_map(int)
+	 * @see	#_gt(Abstraction)
+	 */				
 	public static AbstractBoolean _gt(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		AbstractBoolean result = null;
@@ -301,6 +559,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 <= abs_v1, making calls to abstract_map
+	 * before actual comparison if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract boolean value of comparison.
+	 * @see	#abstract_map(int)
+	 * @see	#_le(Abstraction)
+	 */				
 	public static AbstractBoolean _le(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		AbstractBoolean result = null;
@@ -313,7 +584,20 @@ public class Abstraction {
 			result = abs_v1._le_reverse(v2);
 		return result;
 	}
-
+	
+	/**
+	 * Computes abs_v2 < abs_v1, making calls to abstract_map
+	 * before actual comparison if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract boolean value of comparison.
+	 * @see	#abstract_map(int)
+	 * @see	#_lt(Abstraction)
+	 */			
 	public static AbstractBoolean _lt(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		AbstractBoolean result = null;
@@ -327,6 +611,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 * abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of multiplication.
+	 * @see	#abstract_map(double)
+	 * @see	#_mul(Abstraction)
+	 */				
 	public static Abstraction _mul(double v1, Abstraction abs_v1, double v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -340,6 +637,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 * abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of multiplication.
+	 * @see	#abstract_map(float)
+	 * @see	#_mul(Abstraction)
+	 */			
 	public static Abstraction _mul(float v1, Abstraction abs_v1, float v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -353,6 +663,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 * abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of multiplication.
+	 * @see	#abstract_map(int)
+	 * @see	#_mul(Abstraction)
+	 */			
 	public static Abstraction _mul(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -366,6 +689,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 * abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of multiplication.
+	 * @see	#abstract_map(long)
+	 * @see	#_mul(Abstraction)
+	 */			
 	public static Abstraction _mul(long v1, Abstraction abs_v1, long v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -379,6 +715,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 != abs_v1, making calls to abstract_map
+	 * before actual comparison if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract boolean value of comparison.
+	 * @see	#abstract_map(int)
+	 * @see	#_lt(Abstraction)
+	 */			
 	public static AbstractBoolean _ne(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		AbstractBoolean result = null;
@@ -392,13 +741,32 @@ public class Abstraction {
 		return result;
 	}
 
-	public static Abstraction _neg(Abstraction abs_v1) {
-		if (abs_v1 != null)
-			return abs_v1._neg();
+	/**
+	 * 
+	 * @param abs_v	An abstract value
+	 * @return A negation of abs_v
+	 * @see	#_neg()
+	 */			
+	public static Abstraction _neg(Abstraction abs_v) {
+		if (abs_v != null)
+			return abs_v._neg();
 		else
 			return null;
 	}
 
+	/**
+	 * Computes abs_v2 | abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of bitwise disjunction.
+	 * @see	#abstract_map(int)
+	 * @see	#_bitwise_or(Abstraction)
+	 */			
 	public static Abstraction _or(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -412,6 +780,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 | abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of bitwise disjunction.
+	 * @see	#abstract_map(long)
+	 * @see	#_bitwise_or(Abstraction)
+	 */				
 	public static Abstraction _or(long v1, Abstraction abs_v1, long v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -425,6 +806,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 % abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of remainder.
+	 * @see	#abstract_map(double)
+	 * @see	#_rem(Abstraction)
+	 */				
 	public static Abstraction _rem(double v1, Abstraction abs_v1, double v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -438,6 +832,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 % abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of remainder.
+	 * @see	#abstract_map(float)
+	 * @see	#_rem(Abstraction)
+	 */					
 	public static Abstraction _rem(float v1, Abstraction abs_v1, float v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -451,6 +858,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 % abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of remainder.
+	 * @see	#abstract_map(int)
+	 * @see	#_rem(Abstraction)
+	 */					
 	public static Abstraction _rem(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -464,6 +884,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 % abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of remainder.
+	 * @see	#abstract_map(long)
+	 * @see	#_rem(Abstraction)
+	 */					
 	public static Abstraction _rem(long v1, Abstraction abs_v1, long v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -477,6 +910,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 << abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of shifting.
+	 * @see	#abstract_map(int)
+	 * @see	#_shift_left(Abstraction)
+	 */					
 	public static Abstraction _shl(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -490,6 +936,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 << abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of shifting.
+	 * @see	#abstract_map(long)
+	 * @see	#_shift_left(Abstraction)
+	 */					
 	public static Abstraction _shl(long v1, Abstraction abs_v1, long v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -503,6 +962,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 >> abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of shifting.
+	 * @see	#abstract_map(int)
+	 * @see	#_shift_left(Abstraction)
+	 */					
 	public static Abstraction _shr(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -516,6 +988,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 >> abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of shifting.
+	 * @see	#abstract_map(long)
+	 * @see	#_shift_left(Abstraction)
+	 */					
 	public static Abstraction _shr(long v1, Abstraction abs_v1, long v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -529,6 +1014,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2-abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of subtraction.
+	 * @see	#abstract_map(double)
+	 * @see	#_sub(Abstraction)
+	 */					
 	public static Abstraction _sub(double v1, Abstraction abs_v1, double v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -542,6 +1040,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2-abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of subtraction.
+	 * @see	#abstract_map(float)
+	 * @see	#_sub(Abstraction)
+	 */				
 	public static Abstraction _sub(float v1, Abstraction abs_v1, float v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -555,6 +1066,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2-abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of subtraction.
+	 * @see	#abstract_map(int)
+	 * @see	#_sub(Abstraction)
+	 */				
 	public static Abstraction _sub(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -568,6 +1092,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2-abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of subtraction.
+	 * @see	#abstract_map(long)
+	 * @see	#_sub(Abstraction)
+	 */				
 	public static Abstraction _sub(long v1, Abstraction abs_v1, long v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -581,6 +1118,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 >>> abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of shifting.
+	 * @see	#abstract_map(int)
+	 * @see	#_shift_left(Abstraction)
+	 */					
 	public static Abstraction _ushr(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -594,6 +1144,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 >>> abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of shifting.
+	 * @see	#abstract_map(long)
+	 * @see	#_shift_left(Abstraction)
+	 */					
 	public static Abstraction _ushr(long v1, Abstraction abs_v1, long v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -607,6 +1170,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 ^ abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of bitwise exclusive disjunction.
+	 * @see	#abstract_map(int)
+	 * @see	#_bitwise_xor(Abstraction)
+	 */				
 	public static Abstraction _xor(int v1, Abstraction abs_v1, int v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -620,6 +1196,19 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * Computes abs_v2 ^ abs_v1, making calls to abstract_map
+	 * before actual computation if one of the abstractions is null. Should never
+	 * be called with two nulls.
+	 * 
+	 * @param v1		A concrete value of the first operand
+	 * @param abs_v1	An abstract value of the first operand
+	 * @param v2		A concrete value of the second operand
+	 * @param abs_v2	An abstract value of the second operand
+	 * @return			The abstract value of bitwise exclusive disjunction.
+	 * @see	#abstract_map(long)
+	 * @see	#_bitwise_xor(Abstraction)
+	 */					
 	public static Abstraction _xor(long v1, Abstraction abs_v1, long v2,
 			Abstraction abs_v2) {
 		Abstraction result = null;
@@ -633,6 +1222,12 @@ public class Abstraction {
 		return result;
 	}
 
+	/**
+	 * @return Signs.ZERO if the operand is numerically equal to this
+	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
+	 *         than the operand; and Signs.POS if this Abstraction is
+	 *         numerically greater than the operand.
+	 */
 	public Abstraction _cmp(Abstraction right) {
 		// TODO: move to particular abstractions
 		boolean n = false, z = false, p = false;
@@ -644,12 +1239,18 @@ public class Abstraction {
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
 		return Signs.construct_top(n, z, p);
-	}	
-	
+	}
+
 	public Abstraction _cmp(long right) {
 		return this._cmp(abstract_map(right));
 	}
-	
+
+	/**
+	 * @return Signs.ZERO if the operand is numerically equal to this
+	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
+	 *         than the operand; and Signs.POS if this Abstraction is
+	 *         numerically greater than the operand.
+	 */	
 	public Abstraction _cmpg(Abstraction right) {
 		// TODO: move to particular abstractions
 		boolean n = false, z = false, p = false;
@@ -671,6 +1272,12 @@ public class Abstraction {
 		return this._cmpg(abstract_map(right));
 	}
 
+	/**
+	 * @return Signs.ZERO if the operand is numerically equal to this
+	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
+	 *         than the operand; and Signs.POS if this Abstraction is
+	 *         numerically greater than the operand.
+	 */	
 	public Abstraction _cmpl(Abstraction right) {
 		// TODO: move to particular abstractions
 		boolean n = false, z = false, p = false;
@@ -730,8 +1337,8 @@ public class Abstraction {
 
 	protected Abstraction _cmp_reverse(long right) {
 		throw new RuntimeException("cmp not implemented");
-	}	
-	
+	}
+
 	protected Abstraction _cmpg_reverse(double right) {
 		throw new RuntimeException("cmpg not implemented");
 	}
@@ -920,6 +1527,7 @@ public class Abstraction {
 		throw new RuntimeException("plus not implemented");
 	}
 
+	// IINC
 	public Abstraction _plus(int right) {
 		throw new RuntimeException("plus not implemented");
 	}
@@ -1026,7 +1634,7 @@ public class Abstraction {
 
 	public boolean equals(Abstraction abs) {
 		if (!getClass().getName().equals(abs.getClass().getName()))
-			throw new RuntimeException("Comparing different abstractions");
+			throw new RuntimeException("### Error: Comparing different abstractions");
 		return (getClass().getName().equals(abs.getClass().getName()))
 				&& (this.get_key() == abs.get_key());
 	}

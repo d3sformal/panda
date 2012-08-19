@@ -14,7 +14,6 @@
 //A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
 //THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
 //DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
-
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
@@ -24,6 +23,10 @@ import gov.nasa.jpf.jvm.SystemState;
 import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 
+/**
+ * Convert int to long
+ * ..., value => ..., result
+ */
 public class I2L extends gov.nasa.jpf.jvm.bytecode.I2L {
 
 	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {

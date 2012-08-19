@@ -17,6 +17,10 @@
 // DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 package gov.nasa.jpf.abstraction.numeric;
 
+/**
+ * Abstraction for boolean values.
+ * Used as a return value of comparisons.
+ */
 public class AbstractBoolean {
 	public static AbstractBoolean TRUE = new AbstractBoolean();
 	public static AbstractBoolean FALSE = new AbstractBoolean();
@@ -29,29 +33,48 @@ public class AbstractBoolean {
 		return (v ? AbstractBoolean.TRUE : AbstractBoolean.FALSE);
 	}
 	
+	/**
+	 * @return Negation of this AbstractBoolean
+	 */
 	public AbstractBoolean not() {
 		return create(this != TRUE, this != FALSE);
 	}
-	
+
+	/**
+	 * @return Conjunction of this AbstractBoolean and the operand.
+	 */	
 	public AbstractBoolean and(AbstractBoolean right) {
 		boolean t = (this != FALSE && right != FALSE);
 		boolean f = (this != TRUE || right != TRUE);
 		return create(t, f);
 	}
 	
+	/**
+	 * @return Disjunction of this AbstractBoolean and the operand.
+	 */		
 	public AbstractBoolean or(AbstractBoolean right) {
 		boolean t = (this != FALSE || right != FALSE);
 		boolean f = (this != TRUE && right != TRUE);
 		return create(t, f);
 	}
 	
+	/**
+	 * @return Exclusive disjunction of this AbstractBoolean and the operand.
+	 */		
 	public AbstractBoolean xor(AbstractBoolean right) {
 		boolean t = (this != FALSE && right != TRUE) || (this != TRUE && right != FALSE);
 		boolean f = (this != FALSE && right != FALSE) || (this != TRUE && right != TRUE);
 		return create(t, f);
 	}	
 	
-	private AbstractBoolean create(boolean t, boolean f) {
+	/**
+	 * @param t Indicates whether a new AbstractBoolean can be TRUE
+	 * @param f Indicates whether a new AbstractBoolean can be FALSE
+	 * @return AbstractBoolean.TRUE, if (t && !f); AbstractBoolean.FALSE, if (!t
+	 *         && f); AbstractBoolean.TOP, if (t && f); otherwise throws
+	 *         RuntimeException.
+	 */		
+	public static AbstractBoolean create(boolean t, boolean f) {
 		if (t)
 			if (f)
 				return TOP;

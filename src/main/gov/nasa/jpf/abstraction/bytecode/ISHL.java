@@ -14,7 +14,6 @@
 //A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
 //THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
 //DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
-
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
@@ -26,6 +25,10 @@ import gov.nasa.jpf.jvm.SystemState;
 import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 
+/**
+ * Shift left int
+ * ..., value1, value2 => ..., result
+ */
 public class ISHL extends gov.nasa.jpf.jvm.bytecode.ISHL {
 
 	@Override
@@ -38,11 +41,11 @@ public class ISHL extends gov.nasa.jpf.jvm.bytecode.ISHL {
 		if (abs_v1 == null && abs_v2 == null)
 			return super.execute(ss, ks, th);
 		else {
-			// beware of reversed arguments for shifting
 			int v1 = th.peek(0);
 			int v2 = th.peek(1);
 
-			Abstraction result = Abstraction._shl(v2, abs_v2, v1, abs_v1);
+			// abs_v2 << abs_v1
+			Abstraction result = Abstraction._shl(v1, abs_v1, v2, abs_v2);
 			System.out.printf("ISHL> Values: %d (%s), %d (%s)\n", v2, abs_v2, v1, abs_v1);
 
 			if (result.isTop()) {

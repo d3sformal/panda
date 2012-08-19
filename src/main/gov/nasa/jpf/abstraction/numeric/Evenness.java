@@ -66,11 +66,11 @@ public class Evenness extends Abstraction {
 	}
 
 	public Evenness(int key) {
-		set_key(key);
+		super(key);
 	}
 
 	public Evenness(boolean isTop, int key) {
-		this(key);
+		super(key);
 		this.isTop = isTop;
 	}
 
@@ -473,6 +473,88 @@ public class Evenness extends Abstraction {
 	public AbstractBoolean _ne(int right) {
 		return _ne(abstract_map(right));
 	}
+	
+	/**
+	 * @return Signs.ZERO if the operand is numerically equal to this
+	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
+	 *         than the operand; and Signs.POS if this Abstraction is
+	 *         numerically greater than the operand.
+	 */
+	@Override
+	public Abstraction _cmp(Abstraction right) {
+		boolean n = false, z = false, p = false;
+		if (this._gt(right) != AbstractBoolean.FALSE)
+			p = true;
+		if (this._lt(right) != AbstractBoolean.FALSE)
+			n = true;
+		if (this._gt(right) != AbstractBoolean.TRUE
+				&& this._lt(right) != AbstractBoolean.TRUE)
+			z = true;
+		return Signs.construct_top(n, z, p);
+	}
+
+	@Override
+	public Abstraction _cmp(long right) {
+		return this._cmp(abstract_map(right));
+	}
+
+	/**
+	 * @return Signs.ZERO if the operand is numerically equal to this
+	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
+	 *         than the operand; and Signs.POS if this Abstraction is
+	 *         numerically greater than the operand.
+	 */	
+	@Override
+	public Abstraction _cmpg(Abstraction right) {
+		boolean n = false, z = false, p = false;
+		if (this._gt(right) != AbstractBoolean.FALSE)
+			p = true;
+		if (this._lt(right) != AbstractBoolean.FALSE)
+			n = true;
+		if (this._gt(right) != AbstractBoolean.TRUE
+				&& this._lt(right) != AbstractBoolean.TRUE)
+			z = true;
+		return Signs.construct_top(n, z, p);
+	}
+
+	@Override
+	public Abstraction _cmpg(float right) {
+		return this._cmpg(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _cmpg(double right) {
+		return this._cmpg(abstract_map(right));
+	}
+
+	/**
+	 * @return Signs.ZERO if the operand is numerically equal to this
+	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
+	 *         than the operand; and Signs.POS if this Abstraction is
+	 *         numerically greater than the operand.
+	 */	
+	@Override
+	public Abstraction _cmpl(Abstraction right) {
+		boolean n = false, z = false, p = false;
+		if (this._gt(right) != AbstractBoolean.FALSE)
+			p = true;
+		if (this._lt(right) != AbstractBoolean.FALSE)
+			n = true;
+		if (this._gt(right) != AbstractBoolean.TRUE
+				&& this._lt(right) != AbstractBoolean.TRUE)
+			z = true;
+		return Signs.construct_top(n, z, p);
+	}
+
+	@Override
+	public Abstraction _cmpl(float right) {
+		return this._cmpl(abstract_map(right));
+	}
+
+	@Override
+	public Abstraction _cmpl(double right) {
+		return this._cmpl(abstract_map(right));
+	}	
 
 	@Override
 	protected Abstraction _div_reverse(int right) {

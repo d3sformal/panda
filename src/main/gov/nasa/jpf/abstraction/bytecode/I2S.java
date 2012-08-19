@@ -26,13 +26,12 @@ import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.jvm.StackFrame;
 
 /**
- * Convert int to short
+ * Convert int to short 
  * ..., value => ..., result
  */
 public class I2S extends gov.nasa.jpf.jvm.bytecode.I2S {
- 
 
-  public Instruction execute (SystemState ss, KernelState ks, ThreadInfo th) {
+	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
 		StackFrame sf = th.getTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getOperandAttr();
 
@@ -40,14 +39,14 @@ public class I2S extends gov.nasa.jpf.jvm.bytecode.I2S {
 			return super.execute(ss, ks, th);
 		else {
 			int val = th.pop(); // just to pop it
-			System.out.printf("I2S> Value:  %d (%s)\n", val, abs_val);	
-			th.push((short)0, false);
+			System.out.printf("I2S> Value:  %d (%s)\n", val, abs_val);
+			th.push((short) 0, false);
 			sf.setOperandAttr(abs_val);
 
 			System.out.println("I2S> Result: " + sf.getOperandAttr());
 
 			return getNext(th);
 		}
-  }
+	}
 
 }

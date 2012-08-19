@@ -36,8 +36,8 @@ import gov.nasa.jpf.jvm.choice.IntIntervalGenerator;
 
 /**
  * common root class for LOOKUPSWITCH and TABLESWITCH insns
+ *
  */
-
 public abstract class SwitchInstruction extends
 		gov.nasa.jpf.jvm.bytecode.SwitchInstruction {
 
@@ -65,8 +65,10 @@ public abstract class SwitchInstruction extends
 						result);
 				if (result != AbstractBoolean.FALSE) {
 					choices.add(i);
-					if (result == AbstractBoolean.TRUE)
-						break; // remove this if not just first match should be processed
+// Uncomment to jump after the first exact match like the switch operator
+// does with concrete values 					
+//					if (result == AbstractBoolean.TRUE)
+//						break;
 				}
 			}
 			if (choices.size() > 0) {

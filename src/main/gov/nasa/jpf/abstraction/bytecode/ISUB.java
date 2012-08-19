@@ -14,11 +14,8 @@
 //A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
 //THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
 //DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
-
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
-import gov.nasa.jpf.abstraction.numeric.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.jvm.ChoiceGenerator;
@@ -28,8 +25,10 @@ import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.jvm.StackFrame;
 
-
-
+/**
+ * Subtract int
+ * ..., value1, value2 => ..., result
+ */
 public class ISUB extends gov.nasa.jpf.jvm.bytecode.ISUB {
 
 	@Override
@@ -45,8 +44,9 @@ public class ISUB extends gov.nasa.jpf.jvm.bytecode.ISUB {
 			int v1 = th.peek(0);
 			int v2 = th.peek(1);
 
+			// abs_v2 - abs_v1
 			Abstraction result = Abstraction._sub(v1, abs_v1, v2, abs_v2);
-			System.out.printf("ISUB> Values: %d (%s), %d (%s)\n", v1, abs_v1, v2, abs_v2);
+			System.out.printf("ISUB> Values: %d (%s), %d (%s)\n", v2, abs_v2, v1, abs_v1);
 
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;

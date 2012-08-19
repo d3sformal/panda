@@ -27,6 +27,10 @@ import gov.nasa.jpf.jvm.ThreadInfo;
 import gov.nasa.jpf.jvm.Types;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 
+/**
+ * Add double
+ * ..., value1, value2 => ..., result
+ */
 public class DADD extends gov.nasa.jpf.jvm.bytecode.DADD {
 
 	@Override
@@ -42,8 +46,10 @@ public class DADD extends gov.nasa.jpf.jvm.bytecode.DADD {
 			double v1 = Types.longToDouble(th.longPeek(0));
 			double v2 = Types.longToDouble(th.longPeek(2));
 
+			// abs_v2 + abs_v1
 			Abstraction result = Abstraction._add(v1, abs_v1, v2, abs_v2);
-			System.out.printf("DADD> Values: %f (%s), %f (%s)\n", v1, abs_v1, v2, abs_v2);
+			System.out.printf("DADD> Values: %f (%s), %f (%s)\n", v2, abs_v2,
+					v1, abs_v1);
 			if (result.isTop()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
@@ -63,7 +69,7 @@ public class DADD extends gov.nasa.jpf.jvm.bytecode.DADD {
 
 			th.longPop();
 			th.longPop();
-			
+
 			th.longPush(0);
 			sf = th.getTopFrame();
 			sf.setLongOperandAttr(result);
@@ -71,5 +77,5 @@ public class DADD extends gov.nasa.jpf.jvm.bytecode.DADD {
 			return getNext(th);
 		}
 	}
-	
+
 }
