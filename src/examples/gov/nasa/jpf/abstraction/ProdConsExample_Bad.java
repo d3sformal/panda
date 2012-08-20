@@ -1,24 +1,24 @@
 package gov.nasa.jpf.abstraction;
 
-public class ProdConsExample {
-	public static final int DAILY_LIMIT = Debug.makeAbstractInteger(1000000);
+public class ProdConsExample_Bad {
+	public static final int DAILY_LIMIT = 1000000;
 
 	public static void main(String[] args) {
-		Data d = new Data();
-		new Producer(d).start();
-		new Consumer(d).start();
+		Data_ d = new Data_();
+		new Producer_(d).start();
+		new Consumer_(d).start();
 	}
 }
 
-class Data {
+class Data_ {
 	public int value = 0;
 	public boolean isNew = false;
 }
 
-class Producer extends Thread {
-	private Data d;
+class Producer_ extends Thread {
+	private Data_ d;
 
-	public Producer(Data d_) {
+	public Producer_(Data_ d_) {
 		super("Producer");
 		this.d = d_;
 	}
@@ -26,10 +26,10 @@ class Producer extends Thread {
 	public void run() {
 		while (true) {
 			// one iteration corresponds to one production day
-			int remaining = ProdConsExample.DAILY_LIMIT;
+			int remaining = ProdConsExample_Bad.DAILY_LIMIT;
 			while (remaining > 0) {
 				synchronized (d) {
-					d.value = Debug.makeAbstractInteger(10); // dummy value
+					d.value = 10; // dummy value
 					d.isNew = true;
 				}
 				--remaining;
@@ -38,10 +38,10 @@ class Producer extends Thread {
 	}
 }
 
-class Consumer extends Thread {
-	private Data d;
+class Consumer_ extends Thread {
+	private Data_ d;
 
-	public Consumer(Data d_) {
+	public Consumer_(Data_ d_) {
 		super("Consumer");
 		this.d = d_;
 	}
