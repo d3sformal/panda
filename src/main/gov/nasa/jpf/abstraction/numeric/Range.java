@@ -18,80 +18,118 @@
 package gov.nasa.jpf.abstraction.numeric;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ConcreteInterval extends Abstraction implements Comparable<ConcreteInterval> {
+/**
+ * The abstract domain for given two integer or floating-point values MIN and
+ * MAX is the set of all integers in interval [MIN, MAX], and also LESS and GREATER
+ * to express the fact that a value is less than MIN or greater than MAX,
+ * respectively. This abstraction can be used for integer values only.
+ * 
+ * When the result of an abstract operation cannot be defined unambiguously
+ * (e.g. LESS + LESS can be LESS, GREATER or any value between them), special
+ * "composite tokens" which represent a set of abstract values are returned. They
+ * are not represented by static members since their number increases exponentially
+ * with value of (MAX-MIN).
+ * 
+ * Remember, that this abstraction does not handle such floating-point values as
+ * NaN and INF.
+ */
+public class Range extends Abstraction {
+	
+	// the key for state matching is enumeration of { LESS, MIN, MIN+1, ..., MAX-1, MAX, GREATER }
+	// e.g LESS.get_key() == 0, MIN.get_key() == 1, ..., MAX.get_key() == MAX-MIN+1, ...
+	
+	// since a composite abstract value will never be the result of any bytecode
+	// and thus will never take part in the state matching, all such values
+	// have -1 as their key.
 	
 	private int MIN = 0;
 	private int MAX = 0;
-	
-	// key is enumeration of { LESS, MIN, MIN+1, ..., MAX-1, MAX, GREATER }
-	// e.g LESS.get_key() == 0, MIN.get_key() == 1, ..., MAX.get_key() == MAX-MIN+1, ...
 	
 	Set<Integer> values = new HashSet<Integer>();
 	//Map<Integer, Abstraction> tokens_map = new HashMap<Integer, Abstraction>();
 	
 	@Override
-	public Set<Abstraction> get_tokens() {
+	public Set<Abstraction> getTokens() {
 		Set<Abstraction> tokens = new HashSet<Abstraction>();
 		for (Integer e : values)
-			tokens.add(abstract_map(e));
+			tokens.add(abstractMap(e));
 		return tokens;		
 	}	
 
 	// returns possible tokens from TOP in order {NEG, ZERO, POS}
 	@Override
-	public Abstraction get_token(int key) {
-		int num = get_num_tokens();
+	public Abstraction getToken(int key) {
+		int num = getTokensNumber();
 		if (key < 0 || key >= num)
 			throw new RuntimeException("Wrong TOP token");
-		return abstract_map((Integer)(values.toArray()[key]));
+		return abstractMap((Integer)(values.toArray()[key]));
 	}
 	
 	public int get_value() {
-		return get_key()+MIN-1;
+		return getKey()+MIN-1;
 	}
 	
 	@Override
-	public int get_num_tokens() {
+	public int getTokensNumber() {
 		return values.size();
 	}
 
-	public static ConcreteInterval create(int min, int max) {
-		return new ConcreteInterval(-1, min, max);
+	public static Range create(int min, int max) {
+		return new Range(-1, min, max);
 	}	
 	
-	private ConcreteInterval(int key, int min, int max) {
+	private Range(int key, int min, int max) {
 		this(key);
 		MIN = min;
 		MAX = max;
 	}
 	
-	private ConcreteInterval(int key) {
+	private Range(int key) {
 		super(key);
 	}
 	
-	private ConcreteInterval(Set<Integer> values, int min, int max) {
+	private Range(Set<Integer> values, int min, int max) {
 		this(-1, min, max);
 		if (values.size() == 0)
 			throw new RuntimeException("Invalid value");		
-		isTop = values.size() > 1;
-		if (!isTop)
+		if (values.size() > 1) // isComposite
+			setKey(-1);
+		else
 			for (Integer v : values)
-				set_key(v-MIN+1);
+				setKey(v-MIN+1);
 		for (Integer v : values)
 			this.values.add(v);
 	}		
 
+	/**
+	 * 
+	 * @return The number of abstract values in the domain.
+	 */
+	public int getDomainSize() {
+		return MAX-MIN+3;
+	}		
+	
+	/**
+	 * @return true, if this abstraction is a single value from the domain;
+	 * false, if this abstraction represents a set of values from the domain.
+	 */	
 	@Override
-	public ConcreteInterval abstract_map(int v) {
+	public boolean isComposite() {
+		return values.size() > 1;
+	}	
+	
+	@Override
+	public Range abstractMap(int v) {
 		if (v < MIN)
 			v = MIN-1;
 		else if (v > MAX)
 			v = MAX+1;
-		ConcreteInterval res = new ConcreteInterval(v-MIN+1, MIN, MAX);
+		Range res = new Range(v-MIN+1, MIN, MAX);
 		res.values.add(v);
 		return res;
 	}
@@ -114,98 +152,108 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 	
 	@Override
 	public Abstraction _bitwise_and(Abstraction right) {
-		if (right instanceof ConcreteInterval) {	
+		// result is extremely difficult to predict, so this returns TOP
+		if (right instanceof Range) {	
 			Set<Integer> values = new HashSet<Integer>();
 			for (int v = MIN-1; v <= MAX+1; ++v)
 				values.add(v);
-			return new ConcreteInterval(values, MIN, MAX);
+			return new Range(values, MIN, MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 	@Override
 	public Abstraction _bitwise_and(int right) {
-		return _bitwise_and(abstract_map(right));
+		return _bitwise_and(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _bitwise_and(long right) {
-		return _bitwise_and(abstract_map(right));
+		return _bitwise_and(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _bitwise_or(Abstraction right) {
-		if (right instanceof ConcreteInterval) {	
+		// result is extremely difficult to predict, so this returns TOP	
+		if (right instanceof Range) {	
 			Set<Integer> values = new HashSet<Integer>();
 			for (int v = MIN-1; v <= MAX+1; ++v)
 				values.add(v);
-			return new ConcreteInterval(values, MIN, MAX);	
+			return new Range(values, MIN, MAX);	
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 
 	@Override
 	public Abstraction _bitwise_or(int right) {
-		return _bitwise_or(abstract_map(right));
+		return _bitwise_or(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _bitwise_or(long right) {
-		return _bitwise_or(abstract_map(right));
+		return _bitwise_or(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _bitwise_xor(Abstraction right) {
-		if (right instanceof ConcreteInterval) {	
+		// result is extremely difficult to predict, so this returns TOP
+		if (right instanceof Range) {	
 			Set<Integer> values = new HashSet<Integer>();
 			for (int v = MIN-1; v <= MAX+1; ++v)
 				values.add(v);
-			return new ConcreteInterval(values, MIN, MAX);	
+			return new Range(values, MIN, MAX);	
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 
 	@Override
 	public Abstraction _bitwise_xor(int right) {
-		return _bitwise_xor(abstract_map(right));
+		return _bitwise_xor(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _bitwise_xor(long right) {
-		return _bitwise_xor(abstract_map(right));
+		return _bitwise_xor(abstractMap(right));
 	}
 
 	@Override
 	protected Abstraction _cmp_reverse(long right) {
-		return abstract_map(right)._cmp(this);
+		return abstractMap(right)._cmp(this);
 	}		
 	
 	@Override
 	protected Abstraction _cmpg_reverse(double right) {
-		return abstract_map(right)._cmpg(this);
+		return abstractMap(right)._cmpg(this);
 	}
 
 	@Override
 	protected Abstraction _cmpg_reverse(float right) {
-		return abstract_map(right)._cmpg(this);
+		return abstractMap(right)._cmpg(this);
 	}
 
 	@Override
 	protected Abstraction _cmpl_reverse(double right) {
-		return abstract_map(right)._cmpl(this);
+		return abstractMap(right)._cmpl(this);
 	}
 	
 	@Override
 	protected Abstraction _cmpl_reverse(float right) {
-		return abstract_map(right)._cmpl(this);
+		return abstractMap(right)._cmpl(this);
 	}
 
 	@Override
 	public Abstraction _div(Abstraction right) {
-		if (right instanceof ConcreteInterval) {		
-			ConcreteInterval op = (ConcreteInterval)right;
-			Set<Integer> values = new HashSet<Integer>();
+		if (right instanceof Range) {		
+			Range op = (Range)right;
+			Set<Integer> values = new HashSet<Integer>(); // result
 			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
 			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
+
+			/*
+			 * the idea is to iterate through all possible pairs of operands,
+			 * bound them by intervals [lv1, lv2] and [rv1, rv2] and perform
+			 * the operation on inequality lv1 <= lv <= lv2 and rv1 <= rv <= rv2;
+			 * then we check how the resulting [min, max] intersects [MIN, MAX]
+			 */
 			for (Integer lv : leftArr) {
 				double lv1 = lv, lv2 = lv;
 				if (lv < MIN) {
@@ -226,7 +274,7 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 					}
 					double _min, _max;
 					if (rv1 < 0 && 0 < rv2)
-						System.out.println("### WARNING: Division by ZERO may happen"); 
+						throw new RuntimeException("### ERROR: Division by ZERO may happen"); 
 					// TODO: Handle division by zero
 					if ((lv1 <= 0 && 0 <= lv2) || (rv1 < 0 && 0 < rv2)) {
 						_min = ___min(lv1/rv1, lv1/rv2, lv2/rv1, lv2/rv2, 0);
@@ -252,49 +300,53 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 						values.add(v);
 				}
 			}
-			return new ConcreteInterval(values, MIN, MAX);
+			return new Range(values, MIN, MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 
 	@Override
 	public Abstraction _div(int right) {
-		return _div(abstract_map(right));
+		return _div(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _div(long right) {
-		return _div(abstract_map(right));
+		return _div(abstractMap(right));
 	}
 
 	@Override
 	protected Abstraction _div_reverse(double right) {
-		return abstract_map(right)._div(this);
+		return abstractMap(right)._div(this);
 	}
 
 	@Override
 	protected Abstraction _div_reverse(float right) {
-		return abstract_map(right)._div(this);
+		return abstractMap(right)._div(this);
 	}
 
 	@Override
 	protected Abstraction _div_reverse(int right) {
-		return abstract_map(right)._div(this);
+		return abstractMap(right)._div(this);
 	}
 
 	@Override
 	protected Abstraction _div_reverse(long right) {
-		return abstract_map(right)._div(this);
+		return abstractMap(right)._div(this);
 	}
-
+	
 	public AbstractBoolean _eq(Abstraction right) {
-		if (right instanceof ConcreteInterval) {
-			ConcreteInterval op = (ConcreteInterval)right;
+		if (right instanceof Range) {
+			Range op = (Range)right;
 			List<Integer> leftList = Arrays.asList(this.values.toArray(new Integer[this.values.size()]));
-			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);		
-			boolean t = false, f = false;
+			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
+			
+			// check if two lists contain:
+			// * for true — any pair of equal elements
+			// * for false — any pair of different elements (or their sizes are different)
+			boolean t = false, f = leftList.size() != rightArr.length;
 			for (int r : rightArr)
-				if (leftList.contains(r))
+				if (leftList.contains(r)) // TODO: consider using binary search
 					t = true;
 				else
 					f = true;
@@ -306,19 +358,18 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 	}
 
 	public AbstractBoolean _eq(int right) {
-		return _eq(abstract_map(right));
+		return _eq(abstractMap(right));
 	}
-
+	
 	@Override
 	public AbstractBoolean _ge(Abstraction right) {
-		if (right instanceof ConcreteInterval) {
-			ConcreteInterval op = (ConcreteInterval)right;
-			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
-			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
-			int lMin = leftArr[0];
-			int lMax = leftArr[leftArr.length-1];
-			int rMin = rightArr[0];
-			int rMax = rightArr[rightArr.length-1];			
+		if (right instanceof Range) {
+			Range op = (Range)right;
+			// just check how two segments intersect
+			int lMin = Collections.min(this.values); // get the least and the biggest values 
+			int lMax = Collections.max(this.values);
+			int rMin = Collections.min(op.values); // get the least and the biggest values 
+			int rMax = Collections.max(op.values);	
 			boolean t = lMax >= rMin;
 			boolean f = lMin < rMax || (lMin < MIN && rMax < MIN);
 			if (f & t)
@@ -330,24 +381,23 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 	
 	@Override
 	public AbstractBoolean _ge(int right) {
-		return _ge(abstract_map(right));
+		return _ge(abstractMap(right));
 	}
 
 	@Override
 	protected AbstractBoolean _ge_reverse(int right) {
-		return abstract_map(right)._ge(this);
+		return abstractMap(right)._ge(this);
 	}
 
 	@Override
 	public AbstractBoolean _gt(Abstraction right) {
-		if (right instanceof ConcreteInterval) {
-			ConcreteInterval op = (ConcreteInterval)right;
-			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
-			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
-			int lMin = leftArr[0];
-			int lMax = leftArr[leftArr.length-1];
-			int rMin = rightArr[0];
-			int rMax = rightArr[rightArr.length-1];			
+		if (right instanceof Range) {
+			Range op = (Range)right;
+			// just check how two segments intersect
+			int lMin = Collections.min(this.values); // get the least and the biggest values 
+			int lMax = Collections.max(this.values);
+			int rMin = Collections.min(op.values); // get the least and the biggest values 
+			int rMax = Collections.max(op.values);			
 			boolean t = lMax > rMin || (lMax > MAX && rMin > MAX);
 			boolean f = lMin <= rMax;
 			if (f & t)
@@ -359,24 +409,23 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 
 	@Override
 	public AbstractBoolean _gt(int right) {
-		return _gt(abstract_map(right));
+		return _gt(abstractMap(right));
 	}
 
 	@Override
 	protected AbstractBoolean _gt_reverse(int right) {
-		return abstract_map(right)._gt(this);
+		return abstractMap(right)._gt(this);
 	}
 
 	@Override
 	public AbstractBoolean _le(Abstraction right) {
-		if (right instanceof ConcreteInterval) {
-			ConcreteInterval op = (ConcreteInterval)right;
-			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
-			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
-			int lMin = leftArr[0];
-			int lMax = leftArr[leftArr.length-1];
-			int rMin = rightArr[0];
-			int rMax = rightArr[rightArr.length-1];			
+		if (right instanceof Range) {
+			Range op = (Range)right;
+			// just check how two segments intersect
+			int lMin = Collections.min(this.values); // get the least and the biggest values 
+			int lMax = Collections.max(this.values);
+			int rMin = Collections.min(op.values); // get the least and the biggest values 
+			int rMax = Collections.max(op.values);		
 			boolean t = lMin <= rMax;
 			boolean f = lMax > rMin || (lMax > MAX && rMin > MAX);
 			if (f & t)
@@ -388,24 +437,23 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 
 	@Override
 	public AbstractBoolean _le(int right) {
-		return _le(abstract_map(right));
+		return _le(abstractMap(right));
 	}
 
 	@Override
 	protected AbstractBoolean _le_reverse(int right) {
-		return abstract_map(right)._le(this);
+		return abstractMap(right)._le(this);
 	}
 
 	@Override
 	public AbstractBoolean _lt(Abstraction right) {
-		if (right instanceof ConcreteInterval) {
-			ConcreteInterval op = (ConcreteInterval)right;
-			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
-			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
-			int lMin = leftArr[0];
-			int lMax = leftArr[leftArr.length-1];
-			int rMin = rightArr[0];
-			int rMax = rightArr[rightArr.length-1];			
+		if (right instanceof Range) {
+			Range op = (Range)right;
+			// just check how two segments intersect
+			int lMin = Collections.min(this.values); // get the least and the biggest values 
+			int lMax = Collections.max(this.values);
+			int rMin = Collections.min(op.values); // get the least and the biggest values 
+			int rMax = Collections.max(op.values);	
 			boolean t = lMin < rMax || (lMin < MIN && rMax < MIN);
 			boolean f = lMax >= rMin;
 			if (f & t)
@@ -417,21 +465,27 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 
 	@Override
 	public AbstractBoolean _lt(int right) {
-		return _lt(abstract_map(right));
+		return _lt(abstractMap(right));
 	}
 
 	@Override
 	protected AbstractBoolean _lt_reverse(int right) {
-		return abstract_map(right)._lt(this);
+		return abstractMap(right)._lt(this);
 	}
 
 	@Override
 	public Abstraction _minus(Abstraction right) {
-		if (right instanceof ConcreteInterval) {
-			ConcreteInterval op = (ConcreteInterval)right;
-			Set<Integer> values = new HashSet<Integer>();
+		if (right instanceof Range) {
+			Range op = (Range)right;
+			Set<Integer> values = new HashSet<Integer>(); // result
 			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
 			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
+
+			/*
+			 * the idea is to iterate through all possible pairs of operands,
+			 * bound them by intervals [lv1, lv2] and [rv1, rv2] and perform
+			 * the operation on inequality lv1 <= lv <= lv2 and rv1 <= rv <= rv2;
+			 */			
 			for (Integer lv : leftArr) {
 				double lv1 = lv, lv2 = lv;
 				if (lv < MIN) {
@@ -468,38 +522,44 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 						values.add(v);
 				}
 			}
-			return new ConcreteInterval(values, MIN, MAX);
+			return new Range(values, MIN, MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 
 	@Override
 	public Abstraction _minus(int right) {
-		return _minus(abstract_map(right));
+		return _minus(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _minus(long right) {
-		return _minus(abstract_map(right));
+		return _minus(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _minus_reverse(int right) {
-		return abstract_map(right)._minus(this);
+		return abstractMap(right)._minus(this);
 	}
 
 	@Override
 	public Abstraction _minus_reverse(long right) {
-		return abstract_map(right)._minus(this);
+		return abstractMap(right)._minus(this);
 	}
 
 	@Override
 	public Abstraction _mul(Abstraction right) {
-		if (right instanceof ConcreteInterval) {		
-			ConcreteInterval op = (ConcreteInterval)right;
+		if (right instanceof Range) {		
+			Range op = (Range)right;
 			Set<Integer> values = new HashSet<Integer>();
 			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
 			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
+			
+			/*
+			 * the idea is to iterate through all possible pairs of operands,
+			 * bound them by intervals [lv1, lv2] and [rv1, rv2] and perform
+			 * the operation on inequality lv1 <= lv <= lv2 and rv1 <= rv <= rv2
+			 */			
 			for (Integer lv : leftArr) {
 				double lv1 = lv, lv2 = lv;
 				if (lv < MIN) {
@@ -543,19 +603,19 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 						values.add(v);
 				}
 			}
-			return new ConcreteInterval(values, MIN, MAX);
+			return new Range(values, MIN, MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 
 	@Override
 	public Abstraction _mul(int right) {
-		return _mul(abstract_map(right));
+		return _mul(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _mul(long right) {
-		return _mul(abstract_map(right));
+		return _mul(abstractMap(right));
 	}
 
 	public AbstractBoolean _ne(Abstraction right) {
@@ -564,7 +624,7 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 	
 	@Override
 	public AbstractBoolean _ne(int right) {
-		return _ne(abstract_map(right));
+		return _ne(abstractMap(right));
 	}	
 	
 	@Override
@@ -582,16 +642,22 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 			else
 				values.add(-v);
 		}
-		return new ConcreteInterval(values, MIN, MAX);
+		return new Range(values, MIN, MAX);
 	}	
 	
 	@Override
 	public Abstraction _plus(Abstraction right) {
-		if (right instanceof ConcreteInterval) {
-			ConcreteInterval op = (ConcreteInterval)right;
-			Set<Integer> values = new HashSet<Integer>();
+		if (right instanceof Range) {
+			Range op = (Range)right;
+			Set<Integer> values = new HashSet<Integer>(); //result
 			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
 			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
+			
+			/*
+			 * the idea is to iterate through all possible pairs of operands,
+			 * bound them by intervals [lv1, lv2] and [rv1, rv2] and perform
+			 * the operation on inequality lv1 <= lv <= lv2 and rv1 <= rv <= rv2
+			 */						
 			for (Integer lv : leftArr) {
 				double lv1 = lv, lv2 = lv;
 				if (lv < MIN) {
@@ -628,14 +694,14 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 						values.add(v);
 				}
 			}
-			return new ConcreteInterval(values, MIN, MAX);
+			return new Range(values, MIN, MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 
 	@Override
 	public Abstraction _plus(int right) {
-		if (right == 1) {
+		if (right == 1) { // increment
 			Set<Integer> result = new HashSet<Integer>();
 			Integer values[] = this.values.toArray(new Integer[this.values.size()]);
 			for (Integer v : values)
@@ -646,8 +712,8 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 					result.add(MAX);
 				else
 					result.add(v+1);
-			return new ConcreteInterval(result, MIN, MAX);
-		} else if (right == -1) {
+			return new Range(result, MIN, MAX);
+		} else if (right == -1) { //decrement
 			Set<Integer> result = new HashSet<Integer>();
 			Integer values[] = this.values.toArray(new Integer[this.values.size()]);
 			for (Integer v : values)
@@ -658,18 +724,24 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 					result.add(MIN);
 				else
 					result.add(v-1);
-			return new ConcreteInterval(result, MIN, MAX);
+			return new Range(result, MIN, MAX);
 		} else
-			return _plus(abstract_map(right));
+			return _plus(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _rem(Abstraction right) {
-		if (right instanceof ConcreteInterval) {		
-			ConcreteInterval op = (ConcreteInterval)right;
+		if (right instanceof Range) {		
+			Range op = (Range)right;
 			Set<Integer> values = new HashSet<Integer>();
 			Integer leftArr[] = this.values.toArray(new Integer[this.values.size()]);
 			Integer rightArr[] = op.values.toArray(new Integer[op.values.size()]);
+			
+			/*
+			 * the idea is to iterate through all possible pairs of operands,
+			 * bound them by intervals [lv1, lv2] and [rv1, rv2] and perform
+			 * the operation on inequality lv1 <= lv <= lv2 and rv1 <= rv <= rv2
+			 */						
 			for (Integer lv : leftArr) {
 				for (Integer rv : rightArr) {
 					if (rv == 1) {
@@ -699,135 +771,135 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 						values.add(v);
 				}
 			}
-			return new ConcreteInterval(values, MIN, MAX);
+			return new Range(values, MIN, MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 
 	@Override
 	public Abstraction _rem(int right) {
-		return _rem(abstract_map(right));
+		return _rem(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _rem(long right) {
-		return _rem(abstract_map(right));
+		return _rem(abstractMap(right));
 	}
 
 	@Override
 	protected Abstraction _rem_reverse(double right) {
-		return abstract_map(right)._rem(this);
+		return abstractMap(right)._rem(this);
 	}
 
 	@Override
 	protected Abstraction _rem_reverse(float right) {
-		return abstract_map(right)._rem(this);
+		return abstractMap(right)._rem(this);
 	}
 
 	@Override
 	protected Abstraction _rem_reverse(int right) {
-		return abstract_map(right)._rem(this);
+		return abstractMap(right)._rem(this);
 	}
 
 	@Override
 	protected Abstraction _rem_reverse(long right) {
-		return abstract_map(right)._rem(this);
+		return abstractMap(right)._rem(this);
 	}
 
-	// Note that x << y considers only the least five bits of y
 	@Override
 	public Abstraction _shift_left(Abstraction right) {
-		if (right instanceof ConcreteInterval) {	
+		// result is extremely difficult to predict, so this returns TOP
+		if (right instanceof Range) {	
 			Set<Integer> values = new HashSet<Integer>();
 			for (int v = MIN-1; v <= MAX+1; ++v)
 				values.add(v);
-			return new ConcreteInterval(values, MIN, MAX);	
+			return new Range(values, MIN, MAX);	
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 
 	@Override
 	public Abstraction _shift_left(int right) {
-		return _shift_left(abstract_map(right));
+		return _shift_left(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _shift_left(long right) {
-		return _shift_left(abstract_map(right));
+		return _shift_left(abstractMap(right));
 	}
 
 	@Override
 	protected Abstraction _shift_left_reverse(int right) {
-		return abstract_map(right)._shift_left(this);
+		return abstractMap(right)._shift_left(this);
 	}
 
 	@Override
 	protected Abstraction _shift_left_reverse(long right) {
-		return abstract_map(right)._shift_left(this);
+		return abstractMap(right)._shift_left(this);
 	}
 
-	// Note that x >> y considers only the least five bits of y, sign of x is preserved
 	@Override
 	public Abstraction _shift_right(Abstraction right) {
-		if (right instanceof ConcreteInterval) {	
+		// result is extremely difficult to predict, so this returns TOP
+		if (right instanceof Range) {	
 			Set<Integer> values = new HashSet<Integer>();
 			for (int v = MIN-1; v <= MAX+1; ++v)
 				values.add(v);
-			return new ConcreteInterval(values, MIN, MAX);	
+			return new Range(values, MIN, MAX);	
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 
 	@Override
 	public Abstraction _shift_right(int right) {
-		return _shift_right(abstract_map(right));
+		return _shift_right(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _shift_right(long right) {
-		return _shift_right(abstract_map(right));
+		return _shift_right(abstractMap(right));
 	}
 
 	@Override
 	protected Abstraction _shift_right_reverse(int right) {
-		return abstract_map(right)._shift_right(this);
+		return abstractMap(right)._shift_right(this);
 	}
 
 	@Override
 	protected Abstraction _shift_right_reverse(long right) {
-		return abstract_map(right)._shift_right(this);
+		return abstractMap(right)._shift_right(this);
 	}
 
-	// Note that x >>> y considers only the least five bits of y, sign of x is not preserved
 	@Override
 	public Abstraction _unsigned_shift_right(Abstraction right) {
-		if (right instanceof ConcreteInterval) {	
+		// result is extremely difficult to predict, so this returns TOP
+		if (right instanceof Range) {	
 			Set<Integer> values = new HashSet<Integer>();
 			for (int v = MIN-1; v <= MAX+1; ++v)
 				values.add(v);
-			return new ConcreteInterval(values, MIN, MAX);
+			return new Range(values, MIN, MAX);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 
 	@Override
 	public Abstraction _unsigned_shift_right(int right) {
-		return _unsigned_shift_right(abstract_map(right));
+		return _unsigned_shift_right(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _unsigned_shift_right(long right) {
-		return _unsigned_shift_right(abstract_map(right));
+		return _unsigned_shift_right(abstractMap(right));
 	}
 
 	@Override
 	protected Abstraction _unsigned_shift_right_reverse(int right) {
-		return abstract_map(right)._unsigned_shift_right(this);
+		return abstractMap(right)._unsigned_shift_right(this);
 	}
 
 	@Override
 	protected Abstraction _unsigned_shift_right_reverse(long right) {
-		return abstract_map(right)._unsigned_shift_right(this);
+		return abstractMap(right)._unsigned_shift_right(this);
 	}
 	
 	/**
@@ -846,12 +918,12 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.construct_top(n, z, p);
+		return Signs.create(n, z, p);
 	}
 
 	@Override
 	public Abstraction _cmp(long right) {
-		return this._cmp(abstract_map(right));
+		return this._cmp(abstractMap(right));
 	}
 
 	/**
@@ -870,17 +942,17 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.construct_top(n, z, p);
+		return Signs.create(n, z, p);
 	}
 
 	@Override
 	public Abstraction _cmpg(float right) {
-		return this._cmpg(abstract_map(right));
+		return this._cmpg(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _cmpg(double right) {
-		return this._cmpg(abstract_map(right));
+		return this._cmpg(abstractMap(right));
 	}
 
 	/**
@@ -899,21 +971,21 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.construct_top(n, z, p);
+		return Signs.create(n, z, p);
 	}
 
 	@Override
 	public Abstraction _cmpl(float right) {
-		return this._cmpl(abstract_map(right));
+		return this._cmpl(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _cmpl(double right) {
-		return this._cmpl(abstract_map(right));
+		return this._cmpl(abstractMap(right));
 	}	
 
 	public String toString() {
-		if (isTop()) {
+		if (isComposite()) {
 			String res = "";
 			for (Integer abs : values)
 				res += " or " + abs;
@@ -924,11 +996,6 @@ public class ConcreteInterval extends Abstraction implements Comparable<Concrete
 			return String.format("(%d, +INF)", MAX);
 		else
 			return Integer.toString(get_value());
-	}
-
-	@Override
-	public int compareTo(ConcreteInterval o) {
-		return Integer.valueOf(get_key()).compareTo(o.get_key());
 	}
 	
 }
