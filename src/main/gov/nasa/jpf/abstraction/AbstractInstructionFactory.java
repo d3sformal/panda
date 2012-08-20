@@ -27,7 +27,7 @@ import gov.nasa.jpf.jvm.ClassInfo;
 import gov.nasa.jpf.jvm.bytecode.Instruction;
 import gov.nasa.jpf.abstraction.bytecode.*;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.abstraction.numeric.ConcreteInterval;
+import gov.nasa.jpf.abstraction.numeric.Range;
 import gov.nasa.jpf.abstraction.numeric.Container;
 import gov.nasa.jpf.abstraction.numeric.Evenness;
 import gov.nasa.jpf.abstraction.numeric.Interval;
@@ -88,7 +88,7 @@ public class AbstractInstructionFactory extends
 					System.out
 							.printf("### jpf-abstraction: CONCRETEINTERVAL[%d, %d] turned on\n",
 									min, max);
-					abs_list.add(ConcreteInterval.create(min, max));
+					abs_list.add(Range.create(min, max));
 				} catch (NumberFormatException nfe) {
 					System.out
 							.println("### jpf-abstraction: please keep format "

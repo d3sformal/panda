@@ -47,11 +47,11 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 			System.out.printf("IINC> Value:  %d (%s)\n",
 					th.getLocalVariable(index), abs_v);
 
-			if (result.isTop()) {
+			if (result.isComposite()) {
 				System.out.println("Top");
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
-					int size = result.get_num_tokens();
+					int size = result.getTokensNumber();
 					System.out.println("size "+size);//should be 3
 					cg = new FocusAbstractChoiceGenerator(size);
 					ss.setNextChoiceGenerator(cg);
@@ -60,7 +60,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 					cg = ss.getChoiceGenerator();
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
-					result = result.get_token(key);
+					result = result.getToken(key);
 					System.out.printf("IINC> Result: %s\n", result);
 				}
 			} else

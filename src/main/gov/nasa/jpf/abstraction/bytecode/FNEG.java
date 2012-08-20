@@ -45,10 +45,10 @@ public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG {
 
 			Abstraction result = Abstraction._neg(abs_val);
 			System.out.printf("FNEG> Values: %f (%s)\n", val, abs_val);
-			if (result.isTop()) {
+			if (result.isComposite()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
-					int size = result.get_num_tokens();
+					int size = result.getTokensNumber();
 					cg = new FocusAbstractChoiceGenerator(size);
 					ss.setNextChoiceGenerator(cg);
 					return this;
@@ -56,7 +56,7 @@ public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG {
 					cg = ss.getChoiceGenerator();
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
-					result = result.get_token(key);
+					result = result.getToken(key);
 					System.out.printf("FNEG> Result: %s\n", result);
 				}
 			} else

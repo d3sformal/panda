@@ -55,7 +55,7 @@ public class AbstractionSerializer extends FilteringSerializer {
             // the concrete value is always zero if we use the abstraction for the field 
 	
           // this should work for one-slot fields (int, float) and also for two-slot fields (long, double)
-          buf.add(a.get_key());
+          buf.add(a.getKey());
         }
       } else { // no abstraction, fall back to concrete values
         if (fi.is1SlotField()) {
@@ -113,7 +113,7 @@ public class AbstractionSerializer extends FilteringSerializer {
 	  // we need attribute for the current slot
       Abstraction a = frame.getOperandAttr(frame.getTopPos()-i, Abstraction.class);
 
-      if (a != null) buf.add(a.get_key());
+      if (a != null) buf.add(a.getKey());
       else buf.add(slots[i]);
     }
 

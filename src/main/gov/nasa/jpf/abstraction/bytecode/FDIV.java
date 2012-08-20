@@ -47,10 +47,10 @@ public class FDIV extends gov.nasa.jpf.jvm.bytecode.FDIV {
 			// abs_v2 / abs_v1
 			Abstraction result = Abstraction._div(v1, abs_v1, v2, abs_v2);
 			System.out.printf("FDIV> Values: %f (%s), %f (%s)\n", v2, abs_v2, v1, abs_v1);
-			if (result.isTop()) {
+			if (result.isComposite()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
-					int size = result.get_num_tokens();
+					int size = result.getTokensNumber();
 					cg = new FocusAbstractChoiceGenerator(size);
 					ss.setNextChoiceGenerator(cg);
 					return this;
@@ -58,7 +58,7 @@ public class FDIV extends gov.nasa.jpf.jvm.bytecode.FDIV {
 					cg = ss.getChoiceGenerator();
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
-					result = result.get_token(key);
+					result = result.getToken(key);
 					System.out.printf("FDIV> Result: %s\n", result);
 				}
 			} else

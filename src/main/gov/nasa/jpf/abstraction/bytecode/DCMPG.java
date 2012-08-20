@@ -51,10 +51,10 @@ public class DCMPG extends gov.nasa.jpf.jvm.bytecode.DCMPG {
 			Abstraction result = Abstraction._cmpg(v1, abs_v1, v2, abs_v2);
 			System.out.printf("DCMPG> Values: %f (%s), %f (%s)\n", v1, abs_v1,
 					v2, abs_v2);
-			if (result.isTop()) {
+			if (result.isComposite()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
-					int size = result.get_num_tokens();
+					int size = result.getTokensNumber();
 					cg = new FocusAbstractChoiceGenerator(size);
 					ss.setNextChoiceGenerator(cg);
 					return this;
@@ -62,7 +62,7 @@ public class DCMPG extends gov.nasa.jpf.jvm.bytecode.DCMPG {
 					cg = ss.getChoiceGenerator();
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
-					result = result.get_token(key);
+					result = result.getToken(key);
 					System.out.printf("DCMPG> Result: %s\n", result);
 				}
 			} else

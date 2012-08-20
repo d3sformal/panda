@@ -32,24 +32,24 @@ public abstract class Abstraction {
 	 * @param key
 	 *            An integer which bijectively defines a particular abstract
 	 *            value
-	 * @see #set_key
+	 * @see #setKey
 	 */
 	protected Abstraction(int key) {
-		set_key(key);
+		setKey(key);
 	}
 
 	protected int key;
 
-	public int get_key() {
+	public int getKey() {
 		return key;
 	}
 
-	public void set_key(int key) {
+	public void setKey(int key) {
 		this.key = key;
 	}
 
 	// returns the abstract token corresponding to the key
-	public Abstraction get_token(int key) {
+	public Abstraction getToken(int key) {
 		throw new RuntimeException("get_token not implemented");
 	}
 
@@ -57,7 +57,7 @@ public abstract class Abstraction {
 	 * 
 	 * @return The set of possible abstract values.
 	 */
-	public Set<Abstraction> get_tokens() {
+	public Set<Abstraction> getTokens() {
 		throw new RuntimeException("get_tokens not implemented");
 	}
 
@@ -65,29 +65,39 @@ public abstract class Abstraction {
 	 * 
 	 * @return The number of possible abstract values.
 	 */
-	public int get_num_tokens() {
+	public int getTokensNumber() {
 		throw new RuntimeException("get_num_tokens not implemented");
 	}
 
-	boolean isTop = false;
-
-	public boolean isTop() {
-		return isTop;
+	/**
+	 * 
+	 * @return The number of abstract values in the domain.
+	 */
+	public int getDomainSize() {
+		throw new RuntimeException("get_domain_power not implemented");
 	}
+	
+	/**
+	 * @return true, if this abstraction is a single value from the domain;
+	 * false, if this abstraction represents a set of values from the domain.
+	 */
+	public boolean isComposite() {
+		return getTokensNumber() > 1;
+	}		
 
-	public Abstraction abstract_map(int v) {
+	public Abstraction abstractMap(int v) {
 		throw new RuntimeException("abstract_map not implemented");
 	}
 
-	public Abstraction abstract_map(float v) {
+	public Abstraction abstractMap(float v) {
 		throw new RuntimeException("abstract_map not implemented");
 	}
 
-	public Abstraction abstract_map(long v) {
+	public Abstraction abstractMap(long v) {
 		throw new RuntimeException("abstract_map not implemented");
 	}
 
-	public Abstraction abstract_map(double v) {
+	public Abstraction abstractMap(double v) {
 		throw new RuntimeException("abstract_map not implemented");
 	}
 
@@ -101,7 +111,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of sum.
-	 * @see	#abstract_map(double)
+	 * @see	#abstractMap(double)
 	 * @see	#_plus(Abstraction)
 	 */
 	public static Abstraction _add(double v1, Abstraction abs_v1, double v2,
@@ -127,7 +137,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of sum.
-	 * @see	#abstract_map(float)
+	 * @see	#abstractMap(float)
 	 * @see	#_plus(Abstraction)
 	 */
 	public static Abstraction _add(float v1, Abstraction abs_v1, float v2,
@@ -153,7 +163,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of sum.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_plus(Abstraction)
 	 */
 	public static Abstraction _add(int v1, Abstraction abs_v1, int v2,
@@ -179,7 +189,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of sum.
-	 * @see	#abstract_map(long)
+	 * @see	#abstractMap(long)
 	 * @see	#_plus(Abstraction)
 	 */
 	public static Abstraction _add(long v1, Abstraction abs_v1, long v2,
@@ -205,7 +215,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of bitwise conjunction.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_bitwise_and(Abstraction)
 	 */
 	public static Abstraction _and(int v1, Abstraction abs_v1, int v2,
@@ -231,7 +241,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of bitwise conjunction.
-	 * @see	#abstract_map(long)
+	 * @see	#abstractMap(long)
 	 * @see	#_bitwise_and(Abstraction)
 	 */
 	public static Abstraction _and(long v1, Abstraction abs_v1, long v2,
@@ -257,7 +267,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of comparison.
-	 * @see	#abstract_map(long)
+	 * @see	#abstractMap(long)
 	 * @see	#_cmp(Abstraction)
 	 */	
 	public static Abstraction _cmp(long v1, Abstraction abs_v1, long v2,
@@ -283,7 +293,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of comparison.
-	 * @see	#abstract_map(double)
+	 * @see	#abstractMap(double)
 	 * @see	#_cmp(Abstraction)
 	 */		
 	public static Abstraction _cmpg(double v1, Abstraction abs_v1, double v2,
@@ -309,7 +319,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of comparison.
-	 * @see	#abstract_map(float)
+	 * @see	#abstractMap(float)
 	 * @see	#_cmp(Abstraction)
 	 */		
 	public static Abstraction _cmpg(float v1, Abstraction abs_v1, float v2,
@@ -335,7 +345,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of comparison.
-	 * @see	#abstract_map(double)
+	 * @see	#abstractMap(double)
 	 * @see	#_cmp(Abstraction)
 	 */			
 	public static Abstraction _cmpl(double v1, Abstraction abs_v1, double v2,
@@ -361,7 +371,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of comparison.
-	 * @see	#abstract_map(float)
+	 * @see	#abstractMap(float)
 	 * @see	#_cmp(Abstraction)
 	 */			
 	public static Abstraction _cmpl(float v1, Abstraction abs_v1, float v2,
@@ -387,7 +397,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of division.
-	 * @see	#abstract_map(double)
+	 * @see	#abstractMap(double)
 	 * @see	#_div(Abstraction)
 	 */
 	public static Abstraction _div(double v1, Abstraction abs_v1, double v2,
@@ -413,7 +423,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of division.
-	 * @see	#abstract_map(float)
+	 * @see	#abstractMap(float)
 	 * @see	#_div(Abstraction)
 	 */	
 	public static Abstraction _div(float v1, Abstraction abs_v1, float v2,
@@ -439,7 +449,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of division.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_div(Abstraction)
 	 */		
 	public static Abstraction _div(int v1, Abstraction abs_v1, int v2,
@@ -465,7 +475,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of division.
-	 * @see	#abstract_map(long)
+	 * @see	#abstractMap(long)
 	 * @see	#_div(Abstraction)
 	 */		
 	public static Abstraction _div(long v1, Abstraction abs_v1, long v2,
@@ -491,7 +501,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract boolean value of comparison.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_eq(Abstraction)
 	 */			
 	public static AbstractBoolean _eq(int v1, Abstraction abs_v1, int v2,
@@ -517,7 +527,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract boolean value of comparison.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_ge(Abstraction)
 	 */				
 	public static AbstractBoolean _ge(int v1, Abstraction abs_v1, int v2,
@@ -543,7 +553,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract boolean value of comparison.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_gt(Abstraction)
 	 */				
 	public static AbstractBoolean _gt(int v1, Abstraction abs_v1, int v2,
@@ -569,7 +579,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract boolean value of comparison.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_le(Abstraction)
 	 */				
 	public static AbstractBoolean _le(int v1, Abstraction abs_v1, int v2,
@@ -595,7 +605,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract boolean value of comparison.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_lt(Abstraction)
 	 */			
 	public static AbstractBoolean _lt(int v1, Abstraction abs_v1, int v2,
@@ -621,7 +631,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of multiplication.
-	 * @see	#abstract_map(double)
+	 * @see	#abstractMap(double)
 	 * @see	#_mul(Abstraction)
 	 */				
 	public static Abstraction _mul(double v1, Abstraction abs_v1, double v2,
@@ -647,7 +657,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of multiplication.
-	 * @see	#abstract_map(float)
+	 * @see	#abstractMap(float)
 	 * @see	#_mul(Abstraction)
 	 */			
 	public static Abstraction _mul(float v1, Abstraction abs_v1, float v2,
@@ -673,7 +683,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of multiplication.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_mul(Abstraction)
 	 */			
 	public static Abstraction _mul(int v1, Abstraction abs_v1, int v2,
@@ -699,7 +709,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of multiplication.
-	 * @see	#abstract_map(long)
+	 * @see	#abstractMap(long)
 	 * @see	#_mul(Abstraction)
 	 */			
 	public static Abstraction _mul(long v1, Abstraction abs_v1, long v2,
@@ -725,7 +735,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract boolean value of comparison.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_lt(Abstraction)
 	 */			
 	public static AbstractBoolean _ne(int v1, Abstraction abs_v1, int v2,
@@ -764,7 +774,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of bitwise disjunction.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_bitwise_or(Abstraction)
 	 */			
 	public static Abstraction _or(int v1, Abstraction abs_v1, int v2,
@@ -790,7 +800,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of bitwise disjunction.
-	 * @see	#abstract_map(long)
+	 * @see	#abstractMap(long)
 	 * @see	#_bitwise_or(Abstraction)
 	 */				
 	public static Abstraction _or(long v1, Abstraction abs_v1, long v2,
@@ -816,7 +826,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of remainder.
-	 * @see	#abstract_map(double)
+	 * @see	#abstractMap(double)
 	 * @see	#_rem(Abstraction)
 	 */				
 	public static Abstraction _rem(double v1, Abstraction abs_v1, double v2,
@@ -842,7 +852,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of remainder.
-	 * @see	#abstract_map(float)
+	 * @see	#abstractMap(float)
 	 * @see	#_rem(Abstraction)
 	 */					
 	public static Abstraction _rem(float v1, Abstraction abs_v1, float v2,
@@ -868,7 +878,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of remainder.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_rem(Abstraction)
 	 */					
 	public static Abstraction _rem(int v1, Abstraction abs_v1, int v2,
@@ -894,7 +904,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of remainder.
-	 * @see	#abstract_map(long)
+	 * @see	#abstractMap(long)
 	 * @see	#_rem(Abstraction)
 	 */					
 	public static Abstraction _rem(long v1, Abstraction abs_v1, long v2,
@@ -920,7 +930,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of shifting.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_shift_left(Abstraction)
 	 */					
 	public static Abstraction _shl(int v1, Abstraction abs_v1, int v2,
@@ -946,7 +956,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of shifting.
-	 * @see	#abstract_map(long)
+	 * @see	#abstractMap(long)
 	 * @see	#_shift_left(Abstraction)
 	 */					
 	public static Abstraction _shl(long v1, Abstraction abs_v1, long v2,
@@ -972,7 +982,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of shifting.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_shift_left(Abstraction)
 	 */					
 	public static Abstraction _shr(int v1, Abstraction abs_v1, int v2,
@@ -998,7 +1008,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of shifting.
-	 * @see	#abstract_map(long)
+	 * @see	#abstractMap(long)
 	 * @see	#_shift_left(Abstraction)
 	 */					
 	public static Abstraction _shr(long v1, Abstraction abs_v1, long v2,
@@ -1024,7 +1034,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of subtraction.
-	 * @see	#abstract_map(double)
+	 * @see	#abstractMap(double)
 	 * @see	#_sub(Abstraction)
 	 */					
 	public static Abstraction _sub(double v1, Abstraction abs_v1, double v2,
@@ -1050,7 +1060,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of subtraction.
-	 * @see	#abstract_map(float)
+	 * @see	#abstractMap(float)
 	 * @see	#_sub(Abstraction)
 	 */				
 	public static Abstraction _sub(float v1, Abstraction abs_v1, float v2,
@@ -1076,7 +1086,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of subtraction.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_sub(Abstraction)
 	 */				
 	public static Abstraction _sub(int v1, Abstraction abs_v1, int v2,
@@ -1102,7 +1112,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of subtraction.
-	 * @see	#abstract_map(long)
+	 * @see	#abstractMap(long)
 	 * @see	#_sub(Abstraction)
 	 */				
 	public static Abstraction _sub(long v1, Abstraction abs_v1, long v2,
@@ -1128,7 +1138,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of shifting.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_shift_left(Abstraction)
 	 */					
 	public static Abstraction _ushr(int v1, Abstraction abs_v1, int v2,
@@ -1154,7 +1164,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of shifting.
-	 * @see	#abstract_map(long)
+	 * @see	#abstractMap(long)
 	 * @see	#_shift_left(Abstraction)
 	 */					
 	public static Abstraction _ushr(long v1, Abstraction abs_v1, long v2,
@@ -1180,7 +1190,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of bitwise exclusive disjunction.
-	 * @see	#abstract_map(int)
+	 * @see	#abstractMap(int)
 	 * @see	#_bitwise_xor(Abstraction)
 	 */				
 	public static Abstraction _xor(int v1, Abstraction abs_v1, int v2,
@@ -1206,7 +1216,7 @@ public abstract class Abstraction {
 	 * @param v2		A concrete value of the second operand
 	 * @param abs_v2	An abstract value of the second operand
 	 * @return			The abstract value of bitwise exclusive disjunction.
-	 * @see	#abstract_map(long)
+	 * @see	#abstractMap(long)
 	 * @see	#_bitwise_xor(Abstraction)
 	 */					
 	public static Abstraction _xor(long v1, Abstraction abs_v1, long v2,
@@ -1238,11 +1248,11 @@ public abstract class Abstraction {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.construct_top(n, z, p);
+		return Signs.create(n, z, p);
 	}
 
 	public Abstraction _cmp(long right) {
-		return this._cmp(abstract_map(right));
+		return this._cmp(abstractMap(right));
 	}
 
 	/**
@@ -1261,15 +1271,15 @@ public abstract class Abstraction {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.construct_top(n, z, p);
+		return Signs.create(n, z, p);
 	}
 
 	public Abstraction _cmpg(float right) {
-		return this._cmpg(abstract_map(right));
+		return this._cmpg(abstractMap(right));
 	}
 
 	public Abstraction _cmpg(double right) {
-		return this._cmpg(abstract_map(right));
+		return this._cmpg(abstractMap(right));
 	}
 
 	/**
@@ -1288,15 +1298,15 @@ public abstract class Abstraction {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.construct_top(n, z, p);
+		return Signs.create(n, z, p);
 	}
 
 	public Abstraction _cmpl(float right) {
-		return this._cmpl(abstract_map(right));
+		return this._cmpl(abstractMap(right));
 	}
 
 	public Abstraction _cmpl(double right) {
-		return this._cmpl(abstract_map(right));
+		return this._cmpl(abstractMap(right));
 	}
 
 	public Abstraction _bitwise_and(Abstraction right) {
@@ -1527,7 +1537,13 @@ public abstract class Abstraction {
 		throw new RuntimeException("plus not implemented");
 	}
 
-	// IINC
+	/**
+	 * Computes the sum of this abstraction and abstract_map(right). It is a
+	 * good idea to consider special cases when right is -1 or +1, because this
+	 * can make increments and decrements more precise.
+	 * 
+	 * @return the result of adding operand to this abstraction
+	 */
 	public Abstraction _plus(int right) {
 		throw new RuntimeException("plus not implemented");
 	}
@@ -1636,7 +1652,7 @@ public abstract class Abstraction {
 		if (!getClass().getName().equals(abs.getClass().getName()))
 			throw new RuntimeException("### Error: Comparing different abstractions");
 		return (getClass().getName().equals(abs.getClass().getName()))
-				&& (this.get_key() == abs.get_key());
+				&& (this.getKey() == abs.getKey());
 	}
 
 }

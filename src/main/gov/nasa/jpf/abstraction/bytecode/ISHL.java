@@ -48,10 +48,10 @@ public class ISHL extends gov.nasa.jpf.jvm.bytecode.ISHL {
 			Abstraction result = Abstraction._shl(v1, abs_v1, v2, abs_v2);
 			System.out.printf("ISHL> Values: %d (%s), %d (%s)\n", v2, abs_v2, v1, abs_v1);
 
-			if (result.isTop()) {
+			if (result.isComposite()) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
-					int size = result.get_num_tokens();
+					int size = result.getTokensNumber();
 					cg = new FocusAbstractChoiceGenerator(size);
 					ss.setNextChoiceGenerator(cg);
 					return this;
@@ -59,7 +59,7 @@ public class ISHL extends gov.nasa.jpf.jvm.bytecode.ISHL {
 					cg = ss.getChoiceGenerator();
 					assert (cg instanceof FocusAbstractChoiceGenerator);
 					int key = (Integer) cg.getNextChoice();
-					result = result.get_token(key);
+					result = result.getToken(key);
 					System.out.printf("ISHL> Result: %s\n", result);
 				}
 			} else

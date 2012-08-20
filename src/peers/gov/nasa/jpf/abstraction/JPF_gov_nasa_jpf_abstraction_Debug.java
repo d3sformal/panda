@@ -53,22 +53,22 @@ public class JPF_gov_nasa_jpf_abstraction_Debug {
     }
 
 	public static float makeAbstractFloat(MJIEnv env, int objRef, float v){
-		env.setReturnAttribute(AbstractInstructionFactory.abs.abstract_map(v));
+		env.setReturnAttribute(AbstractInstructionFactory.abs.abstractMap(v));
 		return v;
 	}
 	
 	public static double makeAbstractDouble(MJIEnv env, int objRef, double v){
-		env.setReturnAttribute(AbstractInstructionFactory.abs.abstract_map(v));
+		env.setReturnAttribute(AbstractInstructionFactory.abs.abstractMap(v));
 		return v;
 	}	
     
     public static int makeAbstractInteger(MJIEnv env, int objRef, int v){
-    	env.setReturnAttribute(AbstractInstructionFactory.abs.abstract_map(v));
+    	env.setReturnAttribute(AbstractInstructionFactory.abs.abstractMap(v));
     	return v;
     }
     
 	public static long makeAbstractLong(MJIEnv env, int objRef, long v){
-		env.setReturnAttribute(AbstractInstructionFactory.abs.abstract_map(v));
+		env.setReturnAttribute(AbstractInstructionFactory.abs.abstractMap(v));
 		return v;
 	}    
 

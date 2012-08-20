@@ -17,12 +17,16 @@
 // DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 package gov.nasa.jpf.abstraction.numeric;
 
+import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * This abstraction is designed to combine other numeric abstractions.
+ */
 public class Container extends Abstraction {
 
 	private List<Abstraction> list = new ArrayList<Abstraction>();
@@ -31,25 +35,25 @@ public class Container extends Abstraction {
 	 * Gets the list of abstract values, which describe a concrete value with
 	 * abstractions specified by configuration. Abstract values are in the same
 	 * order as specified. A null value inside the list means that some concrete
-	 * value can not be abstracted.
+	 * value could not have been abstracted.
 	 * 
 	 * @return The list of abstract values.
 	 */
 	public List<Abstraction> getAbstractionsList() {
 		return list;
 	}
-	
+
 	@Override
-	public Abstraction get_token(int idx) {
-		int num = get_num_tokens();
+	public Abstraction getToken(int idx) {
+		int num = getTokensNumber();
 		if (idx < 0 || idx >= num)
 			throw new RuntimeException("### Error: out of range");
 		List<Abstraction> res = new ArrayList<Abstraction>();
 		for (int i = 0; i < list.size(); ++i)
 			if (list.get(i) != null) {
-				int cnum = list.get(i).get_num_tokens();
+				int cnum = list.get(i).getTokensNumber();
 				int cidx = idx % cnum;
-				res.add(list.get(i).get_token(cidx));
+				res.add(list.get(i).getToken(cidx));
 				idx /= cnum;
 			} else
 				res.add(null);
@@ -57,38 +61,73 @@ public class Container extends Abstraction {
 	}
 
 	@Override
-	public Set<Abstraction> get_tokens() {
+	public Set<Abstraction> getTokens() {
 		throw new RuntimeException("get_tokens not implemented");
 	}
 
-	// returns number of tokens in abstract domain
 	@Override
-	public int get_num_tokens() {
+	public int getTokensNumber() {
 		int num = 1;
 		for (Abstraction abs : list)
 			if (abs != null)
-				num *= abs.get_num_tokens();
+				num *= abs.getTokensNumber();
 		return num;
 	}
 
+	/**
+	 * 
+	 * @return The number of abstract values in the domain.
+	 */
+	public int getDomainSize() {
+		int num = 1;
+		for (int i = 0; i < list.size(); ++i)
+			if (list.get(i) != null)
+				num *= list.get(i).getDomainSize();
+			else {
+				// get size of domain from global setup
+				Abstraction abs = ((Container) AbstractInstructionFactory.abs)
+						.getAbstractionsList().get(i);
+				key *= abs.getDomainSize();
+			}
+		return num;
+	}
+
+	/**
+	 * @return true, if this abstraction is a single value from the domain;
+	 *         false, if this abstraction represents a set of values from the
+	 *         domain.
+	 */
 	@Override
-	public boolean isTop() {
-		return get_num_tokens() > 1;
+	public boolean isComposite() {
+		return getTokensNumber() > 1;
 	}
 
 	public Container(List<Abstraction> lst) {
-		// TODO: FIXME: SET KEY
 		super(0);
 		list = lst;
+		// set key
+		int key = 0;
+		for (int i = 0; i < list.size(); ++i)
+			if (list.get(i) != null) {
+				int cpow = list.get(i).getDomainSize();
+				int ckey = list.get(i).getKey();
+				key = key * cpow + ckey;
+			} else {
+				// get size of domain from global setup
+				Abstraction abs = ((Container) AbstractInstructionFactory.abs)
+						.getAbstractionsList().get(i);
+				key *= abs.getDomainSize();
+			}
+		setKey(key);
 	}
 
 	@Override
-	public Abstraction abstract_map(int v) {
+	public Abstraction abstractMap(int v) {
 		ArrayList<Abstraction> arr = new ArrayList<Abstraction>();
 		for (Abstraction abs : list) {
 			Abstraction elem = null;
 			try {
-				elem = abs.abstract_map(v);
+				elem = abs.abstractMap(v);
 			} catch (Exception nie) {
 				System.out
 						.println("### jpf-abstraction: abstract function failure for "
@@ -100,12 +139,12 @@ public class Container extends Abstraction {
 	}
 
 	@Override
-	public Abstraction abstract_map(float v) {
+	public Abstraction abstractMap(float v) {
 		ArrayList<Abstraction> arr = new ArrayList<Abstraction>();
 		for (Abstraction abs : list) {
 			Abstraction elem = null;
 			try {
-				elem = abs.abstract_map(v);
+				elem = abs.abstractMap(v);
 			} catch (Exception nie) {
 				System.out
 						.println("### jpf-abstraction: abstract function failure for "
@@ -117,12 +156,12 @@ public class Container extends Abstraction {
 	}
 
 	@Override
-	public Abstraction abstract_map(long v) {
+	public Abstraction abstractMap(long v) {
 		ArrayList<Abstraction> arr = new ArrayList<Abstraction>();
 		for (Abstraction abs : list) {
 			Abstraction elem = null;
 			try {
-				elem = abs.abstract_map(v);
+				elem = abs.abstractMap(v);
 			} catch (Exception nie) {
 				System.out
 						.println("### jpf-abstraction: abstract function failure for "
@@ -134,12 +173,12 @@ public class Container extends Abstraction {
 	}
 
 	@Override
-	public Abstraction abstract_map(double v) {
+	public Abstraction abstractMap(double v) {
 		ArrayList<Abstraction> arr = new ArrayList<Abstraction>();
 		for (Abstraction abs : list) {
 			Abstraction elem = null;
 			try {
-				elem = abs.abstract_map(v);
+				elem = abs.abstractMap(v);
 			} catch (Exception nie) {
 				System.out
 						.println("### jpf-abstraction: abstract function failure for "
@@ -232,12 +271,12 @@ public class Container extends Abstraction {
 
 	@Override
 	public Abstraction _bitwise_and(int right) {
-		return _bitwise_and(abstract_map(right));
+		return _bitwise_and(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _bitwise_and(long right) {
-		return _bitwise_and(abstract_map(right));
+		return _bitwise_and(abstractMap(right));
 	}
 
 	@Override
@@ -252,12 +291,12 @@ public class Container extends Abstraction {
 
 	@Override
 	public Abstraction _bitwise_or(int right) {
-		return _bitwise_or(abstract_map(right));
+		return _bitwise_or(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _bitwise_or(long right) {
-		return _bitwise_or(abstract_map(right));
+		return _bitwise_or(abstractMap(right));
 	}
 
 	@Override
@@ -272,12 +311,12 @@ public class Container extends Abstraction {
 
 	@Override
 	public Abstraction _bitwise_xor(int right) {
-		return _bitwise_xor(abstract_map(right));
+		return _bitwise_xor(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _bitwise_xor(long right) {
-		return _bitwise_xor(abstract_map(right));
+		return _bitwise_xor(abstractMap(right));
 	}
 
 	@Override
@@ -292,12 +331,12 @@ public class Container extends Abstraction {
 
 	@Override
 	public Abstraction _shift_left(int right) {
-		return _shift_left(abstract_map(right));
+		return _shift_left(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _shift_left(long right) {
-		return _shift_left(abstract_map(right));
+		return _shift_left(abstractMap(right));
 	}
 
 	@Override
@@ -312,12 +351,12 @@ public class Container extends Abstraction {
 
 	@Override
 	public Abstraction _shift_right(int right) {
-		return _shift_right(abstract_map(right));
+		return _shift_right(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _shift_right(long right) {
-		return _shift_right(abstract_map(right));
+		return _shift_right(abstractMap(right));
 	}
 
 	@Override
@@ -332,12 +371,12 @@ public class Container extends Abstraction {
 
 	@Override
 	public Abstraction _unsigned_shift_right(int right) {
-		return _unsigned_shift_right(abstract_map(right));
+		return _unsigned_shift_right(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _unsigned_shift_right(long right) {
-		return _unsigned_shift_right(abstract_map(right));
+		return _unsigned_shift_right(abstractMap(right));
 	}
 
 	@Override
@@ -352,22 +391,22 @@ public class Container extends Abstraction {
 
 	@Override
 	public Abstraction _plus(int right) {
-		return _plus(abstract_map(right));
+		return _plus(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _plus(long right) {
-		return _plus(abstract_map(right));
+		return _plus(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _plus(float right) {
-		return _plus(abstract_map(right));
+		return _plus(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _plus(double right) {
-		return _plus(abstract_map(right));
+		return _plus(abstractMap(right));
 	}
 
 	@Override
@@ -382,42 +421,42 @@ public class Container extends Abstraction {
 
 	@Override
 	public Abstraction _minus(int right) {
-		return _minus(abstract_map(right));
+		return _minus(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _minus(long right) {
-		return _minus(abstract_map(right));
+		return _minus(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _minus(float right) {
-		return _minus(abstract_map(right));
+		return _minus(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _minus(double right) {
-		return _minus(abstract_map(right));
+		return _minus(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _minus_reverse(int right) {
-		return abstract_map(right)._minus(this);
+		return abstractMap(right)._minus(this);
 	}
 
 	@Override
 	public Abstraction _minus_reverse(long right) {
-		return abstract_map(right)._minus(this);
+		return abstractMap(right)._minus(this);
 	}
 
 	@Override
 	public Abstraction _minus_reverse(float right) {
-		return abstract_map(right)._minus(this);
+		return abstractMap(right)._minus(this);
 	}
 
 	@Override
 	public Abstraction _minus_reverse(double right) {
-		return abstract_map(right)._minus(this);
+		return abstractMap(right)._minus(this);
 	}
 
 	@Override
@@ -440,22 +479,22 @@ public class Container extends Abstraction {
 
 	@Override
 	public Abstraction _mul(int right) {
-		return _mul(abstract_map(right));
+		return _mul(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _mul(long right) {
-		return _mul(abstract_map(right));
+		return _mul(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _mul(float right) {
-		return _mul(abstract_map(right));
+		return _mul(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _mul(double right) {
-		return _mul(abstract_map(right));
+		return _mul(abstractMap(right));
 	}
 
 	@Override
@@ -470,22 +509,22 @@ public class Container extends Abstraction {
 
 	@Override
 	public Abstraction _div(int right) {
-		return _div(abstract_map(right));
+		return _div(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _div(long right) {
-		return _div(abstract_map(right));
+		return _div(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _div(float right) {
-		return _div(abstract_map(right));
+		return _div(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _div(double right) {
-		return _div(abstract_map(right));
+		return _div(abstractMap(right));
 	}
 
 	@Override
@@ -500,22 +539,22 @@ public class Container extends Abstraction {
 
 	@Override
 	public Abstraction _rem(int right) {
-		return _rem(abstract_map(right));
+		return _rem(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _rem(long right) {
-		return _rem(abstract_map(right));
+		return _rem(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _rem(float right) {
-		return _rem(abstract_map(right));
+		return _rem(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _rem(double right) {
-		return _rem(abstract_map(right));
+		return _rem(abstractMap(right));
 	}
 
 	// // // // // // // // // // // // // // // // // // // //
@@ -561,7 +600,7 @@ public class Container extends Abstraction {
 
 	@Override
 	public AbstractBoolean _lt(int right) {
-		return _lt(abstract_map(right));
+		return _lt(abstractMap(right));
 	}
 
 	@Override
@@ -576,7 +615,7 @@ public class Container extends Abstraction {
 
 	@Override
 	public AbstractBoolean _le(int right) {
-		return _le(abstract_map(right));
+		return _le(abstractMap(right));
 	}
 
 	@Override
@@ -591,7 +630,7 @@ public class Container extends Abstraction {
 
 	@Override
 	public AbstractBoolean _gt(int right) {
-		return _gt(abstract_map(right));
+		return _gt(abstractMap(right));
 	}
 
 	@Override
@@ -606,7 +645,7 @@ public class Container extends Abstraction {
 
 	@Override
 	public AbstractBoolean _ge(int right) {
-		return _ge(abstract_map(right));
+		return _ge(abstractMap(right));
 	}
 
 	public AbstractBoolean _eq(Abstraction right) {
@@ -616,21 +655,21 @@ public class Container extends Abstraction {
 				return op1._eq(op2);
 			}
 		});
-	}	
-	
+	}
+
 	public AbstractBoolean _eq(int right) {
-		return _eq(abstract_map(right));
-	}		
-	
+		return _eq(abstractMap(right));
+	}
+
 	public AbstractBoolean _ne(Abstraction right) {
 		return _eq(right).not();
 	}
 
 	@Override
 	public AbstractBoolean _ne(int right) {
-		return _ne(abstract_map(right));
+		return _ne(abstractMap(right));
 	}
-	
+
 	/**
 	 * @return Signs.ZERO if the operand is numerically equal to this
 	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
@@ -647,12 +686,12 @@ public class Container extends Abstraction {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.construct_top(n, z, p);
+		return Signs.create(n, z, p);
 	}
 
 	@Override
 	public Abstraction _cmp(long right) {
-		return this._cmp(abstract_map(right));
+		return this._cmp(abstractMap(right));
 	}
 
 	/**
@@ -660,7 +699,7 @@ public class Container extends Abstraction {
 	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
 	 *         than the operand; and Signs.POS if this Abstraction is
 	 *         numerically greater than the operand.
-	 */	
+	 */
 	@Override
 	public Abstraction _cmpg(Abstraction right) {
 		boolean n = false, z = false, p = false;
@@ -671,17 +710,17 @@ public class Container extends Abstraction {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.construct_top(n, z, p);
+		return Signs.create(n, z, p);
 	}
 
 	@Override
 	public Abstraction _cmpg(float right) {
-		return this._cmpg(abstract_map(right));
+		return this._cmpg(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _cmpg(double right) {
-		return this._cmpg(abstract_map(right));
+		return this._cmpg(abstractMap(right));
 	}
 
 	/**
@@ -689,7 +728,7 @@ public class Container extends Abstraction {
 	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
 	 *         than the operand; and Signs.POS if this Abstraction is
 	 *         numerically greater than the operand.
-	 */	
+	 */
 	@Override
 	public Abstraction _cmpl(Abstraction right) {
 		boolean n = false, z = false, p = false;
@@ -700,136 +739,136 @@ public class Container extends Abstraction {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.construct_top(n, z, p);
+		return Signs.create(n, z, p);
 	}
 
 	@Override
 	public Abstraction _cmpl(float right) {
-		return this._cmpl(abstract_map(right));
+		return this._cmpl(abstractMap(right));
 	}
 
 	@Override
 	public Abstraction _cmpl(double right) {
-		return this._cmpl(abstract_map(right));
-	}	
+		return this._cmpl(abstractMap(right));
+	}
 
 	@Override
 	protected Abstraction _div_reverse(int right) {
-		return abstract_map(right)._div(this);
+		return abstractMap(right)._div(this);
 	}
 
 	@Override
 	protected Abstraction _div_reverse(long right) {
-		return abstract_map(right)._div(this);
+		return abstractMap(right)._div(this);
 	}
 
 	@Override
 	protected Abstraction _div_reverse(float right) {
-		return abstract_map(right)._div(this);
+		return abstractMap(right)._div(this);
 	}
 
 	@Override
 	protected Abstraction _div_reverse(double right) {
-		return abstract_map(right)._div(this);
+		return abstractMap(right)._div(this);
 	}
-	
+
 	@Override
 	protected Abstraction _cmp_reverse(long right) {
-		return abstract_map(right)._cmp(this);
-	}		
+		return abstractMap(right)._cmp(this);
+	}
 
 	@Override
 	protected Abstraction _cmpl_reverse(float right) {
-		return abstract_map(right)._cmpl(this);
+		return abstractMap(right)._cmpl(this);
 	}
 
 	@Override
 	protected Abstraction _cmpl_reverse(double right) {
-		return abstract_map(right)._cmpl(this);
+		return abstractMap(right)._cmpl(this);
 	}
 
 	@Override
 	protected Abstraction _cmpg_reverse(float right) {
-		return abstract_map(right)._cmpg(this);
+		return abstractMap(right)._cmpg(this);
 	}
 
 	@Override
 	protected Abstraction _cmpg_reverse(double right) {
-		return abstract_map(right)._cmpg(this);
+		return abstractMap(right)._cmpg(this);
 	}
 
 	@Override
 	protected Abstraction _rem_reverse(int right) {
-		return abstract_map(right)._rem(this);
+		return abstractMap(right)._rem(this);
 	}
 
 	@Override
 	protected Abstraction _rem_reverse(long right) {
-		return abstract_map(right)._rem(this);
+		return abstractMap(right)._rem(this);
 	}
 
 	@Override
 	protected Abstraction _rem_reverse(float right) {
-		return abstract_map(right)._rem(this);
+		return abstractMap(right)._rem(this);
 	}
 
 	@Override
 	protected Abstraction _rem_reverse(double right) {
-		return abstract_map(right)._rem(this);
+		return abstractMap(right)._rem(this);
 	}
 
 	@Override
 	protected Abstraction _shift_left_reverse(int right) {
-		return abstract_map(right)._shift_left(this);
+		return abstractMap(right)._shift_left(this);
 	}
 
 	@Override
 	protected Abstraction _shift_left_reverse(long right) {
-		return abstract_map(right)._shift_left(this);
+		return abstractMap(right)._shift_left(this);
 	}
 
 	@Override
 	protected Abstraction _shift_right_reverse(int right) {
-		return abstract_map(right)._shift_right(this);
+		return abstractMap(right)._shift_right(this);
 	}
 
 	@Override
 	protected Abstraction _shift_right_reverse(long right) {
-		return abstract_map(right)._shift_right(this);
+		return abstractMap(right)._shift_right(this);
 	}
 
 	@Override
 	protected Abstraction _unsigned_shift_right_reverse(int right) {
-		return abstract_map(right)._unsigned_shift_right(this);
+		return abstractMap(right)._unsigned_shift_right(this);
 	}
 
 	@Override
 	protected Abstraction _unsigned_shift_right_reverse(long right) {
-		return abstract_map(right)._unsigned_shift_right(this);
+		return abstractMap(right)._unsigned_shift_right(this);
 	}
 
 	@Override
 	protected AbstractBoolean _lt_reverse(int right) {
-		return abstract_map(right)._lt(this);
+		return abstractMap(right)._lt(this);
 	}
 
 	@Override
 	protected AbstractBoolean _le_reverse(int right) {
-		return abstract_map(right)._le(this);
+		return abstractMap(right)._le(this);
 	}
 
 	@Override
 	protected AbstractBoolean _ge_reverse(int right) {
-		return abstract_map(right)._ge(this);
+		return abstractMap(right)._ge(this);
 	}
 
 	@Override
 	protected AbstractBoolean _gt_reverse(int right) {
-		return abstract_map(right)._gt(this);
+		return abstractMap(right)._gt(this);
 	}
-	
+
 	public String toString() {
-		if (get_num_tokens() > 1)
+		if (getTokensNumber() > 1)
 			return "TOP";
 		else {
 			StringBuilder sb = new StringBuilder();
