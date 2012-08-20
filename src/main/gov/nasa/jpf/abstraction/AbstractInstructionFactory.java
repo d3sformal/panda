@@ -81,12 +81,12 @@ public class AbstractInstructionFactory extends
 							.println("### jpf-abstraction: please keep format "
 									+ "\"Interval MIN MAX\", where MIN and MAX are doubles");
 				}
-			} else if (abs_name.equals("concreteinterval")) {
+			} else if (abs_name.equals("range")) {
 				try {
 					int min = Integer.parseInt(argv[1]);
 					int max = Integer.parseInt(argv[2]);
 					System.out
-							.printf("### jpf-abstraction: CONCRETEINTERVAL[%d, %d] turned on\n",
+							.printf("### jpf-abstraction: RANGE[%d, %d] turned on\n",
 									min, max);
 					abs_list.add(Range.create(min, max));
 				} catch (NumberFormatException nfe) {
