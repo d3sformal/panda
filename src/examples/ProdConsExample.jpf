@@ -3,7 +3,6 @@
 target=gov.nasa.jpf.abstraction.ProdConsExample
 
 classpath=${jpf-abstraction}/build/examples
-
 sourcepath=${jpf-abstraction}/src/examples
 
 abstract.domain=SIGNS

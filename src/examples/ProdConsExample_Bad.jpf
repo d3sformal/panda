@@ -1,14 +1,9 @@
-@using=jpf-abstraction
-
+# Ensure that this is run this with jpf-core project properties
+# e.g., from jpf-core folder
 target=gov.nasa.jpf.abstraction.ProdConsExample_Bad
 
 classpath=${jpf-abstraction}/build/examples
-
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=SIGNS
-
-listener = gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.DebugMonitor
-
-vm.serializer.class = gov.nasa.jpf.abstraction.AbstractionSerializer
+listener = gov.nasa.jpf.abstraction.util.DebugMonitor
 
