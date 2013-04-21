@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.DEOS;
 
-import gov.nasa.jpf.jvm.Verify;
+import gov.nasa.jpf.vm.Verify;
 
 
 /**

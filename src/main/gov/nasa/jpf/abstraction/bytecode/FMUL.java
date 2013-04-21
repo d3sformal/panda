@@ -20,13 +20,13 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.jvm.ChoiceGenerator;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.Types;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Types;
+import gov.nasa.jpf.vm.Instruction;
 
 /**
  * Multiply float
@@ -34,22 +34,26 @@ import gov.nasa.jpf.jvm.bytecode.Instruction;
  */
 public class FMUL extends gov.nasa.jpf.jvm.bytecode.FMUL {
 	
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
-		StackFrame sf = th.getTopFrame();
+	@Override
+	public Instruction execute(ThreadInfo ti) {
+
+		SystemState ss = ti.getVM().getSystemState();
+		StackFrame sf = ti.getTopFrame();
+
 		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
 		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
 		if(abs_v1==null && abs_v2==null)
-			return super.execute(ss, ks, th);
+			return super.execute(ti);
 		else {
-			float v1 = Types.intToFloat(th.peek(0));
-			float v2 = Types.intToFloat(th.peek(1));
+			float v1 = Types.intToFloat(sf.peek(0));
+			float v2 = Types.intToFloat(sf.peek(1));
 
 			// abs_v2 * abs_v1
 			Abstraction result = Abstraction._mul(v1, abs_v1, v2, abs_v2);
 			System.out.printf("FMUL> Values: %f (%s), %f (%s)\n", v2, abs_v2, v1, abs_v1);
 			if (result.isComposite()) {
 				ChoiceGenerator<?> cg;
-				if (!th.isFirstStepInsn()) { // first time around
+				if (!ti.isFirstStepInsn()) { // first time around
 					int size = result.getTokensNumber();
 					cg = new FocusAbstractChoiceGenerator(size);
 					ss.setNextChoiceGenerator(cg);
@@ -64,14 +68,14 @@ public class FMUL extends gov.nasa.jpf.jvm.bytecode.FMUL {
 			} else
 				System.out.printf("FMUL> Result: %s\n", result);
 
-			th.pop();
-			th.pop();
+			sf.pop();
+			sf.pop();
 			
-			th.push(0, false);
-			sf = th.getTopFrame();
+			sf.push(0, false);
+			sf = ti.getTopFrame();
 			sf.setOperandAttr(result);
 
-			return getNext(th);
+			return getNext(ti);
 		}		
 	}	
 	

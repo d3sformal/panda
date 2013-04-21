@@ -21,12 +21,12 @@ package gov.nasa.jpf.abstraction;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.jvm.FieldInfo;
-import gov.nasa.jpf.jvm.Fields;
-import gov.nasa.jpf.jvm.ClassInfo;
-import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.jvm.serialize.FilteringSerializer;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.Fields;
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.serialize.FilteringSerializer;
+import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.util.FinalBitSet;
 import gov.nasa.jpf.util.JPFLogger;
 

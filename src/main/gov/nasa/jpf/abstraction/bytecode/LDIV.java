@@ -20,12 +20,12 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.jvm.ChoiceGenerator;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Instruction;
 
 /**
  * Divide long
@@ -34,23 +34,25 @@ import gov.nasa.jpf.jvm.bytecode.Instruction;
 public class LDIV extends gov.nasa.jpf.jvm.bytecode.LDIV {
 
 	@Override
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
-		StackFrame sf = th.getTopFrame();
+	public Instruction execute(ThreadInfo ti) {
+		
+		SystemState ss = ti.getVM().getSystemState();
+		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(1);
 		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(3);
 
 		if (abs_v1 == null && abs_v2 == null)
-			return super.execute(ss, ks, th);
+			return super.execute(ti);
 		else {
-			long v1 = th.longPeek(0);
-			long v2 = th.longPeek(2);
+			long v1 = sf.peekLong(0);
+			long v2 = sf.peekLong(2);
 
 			Abstraction result = Abstraction._div(v1, abs_v1, v2, abs_v2);
 			System.out.printf("LDIV> Values: %d (%s), %d (%s)\n", v2, abs_v2, v1, abs_v1);
 
 			if (result.isComposite()) {
 				ChoiceGenerator<?> cg;
-				if (!th.isFirstStepInsn()) { // first time around
+				if (!ti.isFirstStepInsn()) { // first time around
 					int size = result.getTokensNumber();
 					cg = new FocusAbstractChoiceGenerator(size);
 					ss.setNextChoiceGenerator(cg);
@@ -65,14 +67,14 @@ public class LDIV extends gov.nasa.jpf.jvm.bytecode.LDIV {
 			} else
 				System.out.printf("LDIV> Result: %s\n", result);
 
-			th.longPop();
-			th.longPop();
+			sf.popLong();
+			sf.popLong();
 			
-			th.longPush(0);
-			sf = th.getTopFrame();
+			sf.pushLong(0);
+			sf = ti.getTopFrame();
 			sf.setLongOperandAttr(result);
 
-			return getNext(th);
+			return getNext(ti);
 		}
 	}
 

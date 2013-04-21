@@ -21,13 +21,13 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.numeric.Signs;
-import gov.nasa.jpf.jvm.ChoiceGenerator;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.Types;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Types;
+import gov.nasa.jpf.vm.Instruction;
 
 /**
  * Compare double 
@@ -36,24 +36,25 @@ import gov.nasa.jpf.jvm.bytecode.Instruction;
 public class DCMPG extends gov.nasa.jpf.jvm.bytecode.DCMPG {
 
 	@Override
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
+	public Instruction execute(ThreadInfo ti) {
 
-		StackFrame sf = th.getTopFrame();
+		SystemState ss = ti.getVM().getSystemState();
+		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(1);
 		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(3);
 
 		if (abs_v1 == null && abs_v2 == null)
-			return super.execute(ss, ks, th);
+			return super.execute(ti);
 		else {
-			double v1 = Types.longToDouble(th.longPeek(0));
-			double v2 = Types.longToDouble(th.longPeek(2));
+			double v1 = Types.longToDouble(sf.peekLong(0));
+			double v2 = Types.longToDouble(sf.peekLong(2));
 
 			Abstraction result = Abstraction._cmpg(v1, abs_v1, v2, abs_v2);
 			System.out.printf("DCMPG> Values: %f (%s), %f (%s)\n", v1, abs_v1,
 					v2, abs_v2);
 			if (result.isComposite()) {
 				ChoiceGenerator<?> cg;
-				if (!th.isFirstStepInsn()) { // first time around
+				if (!ti.isFirstStepInsn()) { // first time around
 					int size = result.getTokensNumber();
 					cg = new FocusAbstractChoiceGenerator(size);
 					ss.setNextChoiceGenerator(cg);
@@ -68,18 +69,18 @@ public class DCMPG extends gov.nasa.jpf.jvm.bytecode.DCMPG {
 			} else
 				System.out.printf("DCMPG> Result: %s\n", result);
 
-			th.longPop();
-			th.longPop();
+			sf.popLong();
+			sf.popLong();
 
 			Signs s_result = (Signs) result;
 			if (s_result == Signs.NEG)
-				th.push(-1, false);
+				sf.push(-1, false);
 			else if (s_result == Signs.POS)
-				th.push(+1, false);
+				sf.push(+1, false);
 			else
-				th.push(0, false);
+				sf.push(0, false);
 
-			return getNext(th);
+			return getNext(ti);
 		}
 	}
 

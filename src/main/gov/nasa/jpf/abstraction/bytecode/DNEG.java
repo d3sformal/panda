@@ -18,13 +18,13 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.jvm.ChoiceGenerator;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.Types;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Types;
+import gov.nasa.jpf.vm.Instruction;
 
 /**
  * Negate double
@@ -32,21 +32,23 @@ import gov.nasa.jpf.jvm.bytecode.Instruction;
  */
 public class DNEG extends gov.nasa.jpf.jvm.bytecode.DNEG {
 
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
+	@Override
+	public Instruction execute(ThreadInfo ti) {
 
-		StackFrame sf = th.getTopFrame();
+		SystemState ss = ti.getVM().getSystemState();
+		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getOperandAttr(1);
 		if (abs_val == null)
-			return super.execute(ss, ks, th);
+			return super.execute(ti);
 		else {
-			double val = Types.longToDouble(th.longPeek(0));
+			double val = Types.longToDouble(sf.peekLong(0));
 
 			Abstraction result = Abstraction._neg(abs_val);
 			System.out.printf("DNEG> Values: %f (%s)\n", val, abs_val);
 			
 			if (result.isComposite()) {
 				ChoiceGenerator<?> cg;
-				if (!th.isFirstStepInsn()) { // first time around
+				if (!ti.isFirstStepInsn()) { // first time around
 					int size = result.getTokensNumber();
 					cg = new FocusAbstractChoiceGenerator(size);
 					ss.setNextChoiceGenerator(cg);
@@ -61,13 +63,13 @@ public class DNEG extends gov.nasa.jpf.jvm.bytecode.DNEG {
 			} else
 				System.out.printf("DNEG> Result: %s\n", result);
 
-			th.longPop();
+			sf.popLong();
 			
-			th.longPush(0);
-			sf = th.getTopFrame();
+			sf.pushLong(0);
+			sf = ti.getTopFrame();
 			sf.setLongOperandAttr(result);
 
-			return getNext(th);
+			return getNext(ti);
 		}
 	}
 		

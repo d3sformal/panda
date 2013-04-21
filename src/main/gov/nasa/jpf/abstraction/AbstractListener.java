@@ -22,15 +22,15 @@ import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.abstraction.numeric.AbstractChoiceGenerator;
-import gov.nasa.jpf.jvm.ChoiceGenerator;
-import gov.nasa.jpf.jvm.JVM;
-import gov.nasa.jpf.jvm.MethodInfo;
-import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.Types;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.jvm.bytecode.IRETURN;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
 import gov.nasa.jpf.jvm.bytecode.ReturnInstruction;
 import gov.nasa.jpf.report.ConsolePublisher;
@@ -65,7 +65,7 @@ public class AbstractListener extends PropertyListenerAdapter implements Publish
 
 	public void propertyViolated (Search search){
 		System.out.println("--------->property violated");
-		JVM vm = search.getVM();
+		VM vm = search.getVM();
 		SystemState ss = vm.getSystemState();
 		ChoiceGenerator cg = vm.getChoiceGenerator();
 		if (!(cg instanceof AbstractChoiceGenerator)){
@@ -79,11 +79,11 @@ public class AbstractListener extends PropertyListenerAdapter implements Publish
 		error = "\"" + error.substring(0,error.indexOf("\n")) + "...\"";
 	}
 
-	public void instructionExecuted(JVM vm) {
+	public void instructionExecuted(VM vm) {
 
-			Instruction insn = vm.getLastInstruction();
+			Instruction insn = vm.getLastStep().getInstruction(); // TODO: VERIFY THIS CONVERSION FROM 6 TO 7 (ORIGINALLY JVM.getLastInstruction())
 			SystemState ss = vm.getSystemState();
-			ThreadInfo ti = vm.getLastThreadInfo();
+			ThreadInfo ti = vm.getLastTransition().getThreadInfo(); // TODO: VERIFY THIS CONVERSION FROM 6 TO 7 (ORIGINALLY JVM.getLastThreadInfo())
 			Config conf = vm.getConfig();
 
 			if (insn instanceof InvokeInstruction && insn.isCompleted(ti)) {

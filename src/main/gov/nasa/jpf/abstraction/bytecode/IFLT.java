@@ -23,12 +23,12 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
 import gov.nasa.jpf.abstraction.numeric.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
-import gov.nasa.jpf.jvm.ChoiceGenerator;
-import gov.nasa.jpf.jvm.StackFrame;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.StackFrame;
 
 
 public class IFLT extends gov.nasa.jpf.jvm.bytecode.IFLT {
@@ -38,17 +38,18 @@ public class IFLT extends gov.nasa.jpf.jvm.bytecode.IFLT {
 	}
 
 	@Override
-	public Instruction execute (SystemState ss, KernelState ks, ThreadInfo ti) {
+	public Instruction execute (ThreadInfo ti) {
 
+		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_v = (Abstraction) sf.getOperandAttr();
 
 		if(abs_v == null) { // the condition is concrete
-			return super.execute(ss, ks, ti);
+			return super.execute(ti);
 		}
 		else { // the condition is abstract
 
-			System.out.printf("IFLT> Values: %d (%s)\n", ti.peek(0), abs_v);
+			System.out.printf("IFLT> Values: %d (%s)\n", sf.peek(0), abs_v);
 			AbstractBoolean abs_condition = abs_v._lt(0);
 
 			if(abs_condition == AbstractBoolean.TRUE)
@@ -71,7 +72,7 @@ public class IFLT extends gov.nasa.jpf.jvm.bytecode.IFLT {
 			}
 
 			System.out.println("IFLT> Result: " + conditionValue);
-			ti.pop();
+			sf.pop();
 			return (conditionValue ? getTarget() : getNext(ti));
 
 		}

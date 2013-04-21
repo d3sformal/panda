@@ -19,10 +19,10 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.JPFException;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
 
 /**
@@ -31,7 +31,7 @@ import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
  * WARNING: it actually duplicates LOOKUPSWITCH behavior
  */
 public class TABLESWITCH extends SwitchInstruction implements
-		gov.nasa.jpf.jvm.TableSwitchInstruction {
+		gov.nasa.jpf.vm.TableSwitchInstruction {
 
 	int min, max;
 
@@ -53,18 +53,17 @@ public class TABLESWITCH extends SwitchInstruction implements
 	}
 
 	@Override
-	protected Instruction executeConditional(SystemState ss, KernelState ks,
-			ThreadInfo ti) {
+	protected Instruction executeConditional(ThreadInfo ti) {
 		throw new UnsupportedOperationException(); // makes no sense with abstractions
 	}
 
 	@Override
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
+	public Instruction execute(ThreadInfo ti) {
 		/* TODO:
-		 * TABLESWITCH is not implemented properly because it looses sense with
+		 * TABLESWITCH is not implemented properly because it loses sense with
 		 * abstractions. Instead LOOKUPSWITCH behavior is used. 
 		 */
-		return super.execute(ss, ks, th);
+		return super.execute(ti);
 	}
 
 	@Override

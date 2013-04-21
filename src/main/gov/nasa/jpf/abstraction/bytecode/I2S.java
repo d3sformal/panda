@@ -19,11 +19,11 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
-import gov.nasa.jpf.jvm.StackFrame;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.StackFrame;
 
 /**
  * Convert int to short 
@@ -31,21 +31,23 @@ import gov.nasa.jpf.jvm.StackFrame;
  */
 public class I2S extends gov.nasa.jpf.jvm.bytecode.I2S {
 
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
-		StackFrame sf = th.getTopFrame();
+	@Override
+	public Instruction execute(ThreadInfo ti) {
+
+		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getOperandAttr();
 
 		if (abs_val == null)
-			return super.execute(ss, ks, th);
+			return super.execute(ti);
 		else {
-			int val = th.pop(); // just to pop it
+			int val = sf.pop(); // just to pop it
 			System.out.printf("I2S> Value:  %d (%s)\n", val, abs_val);
-			th.push((short) 0, false);
+			sf.push((short) 0, false);
 			sf.setOperandAttr(abs_val);
 
 			System.out.println("I2S> Result: " + sf.getOperandAttr());
 
-			return getNext(th);
+			return getNext(ti);
 		}
 	}
 

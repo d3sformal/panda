@@ -21,12 +21,12 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
 import gov.nasa.jpf.abstraction.numeric.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.jvm.ChoiceGenerator;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
 
 /**
@@ -40,17 +40,18 @@ public class IF_ICMPLT extends gov.nasa.jpf.jvm.bytecode.IF_ICMPLT {
 	}
 
 	@Override
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
+	public Instruction execute(ThreadInfo ti) {
 
-		StackFrame sf = th.getTopFrame();
+		SystemState ss = ti.getVM().getSystemState();
+		StackFrame sf = ti.getTopFrame();
 
 		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
 		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
 		if (abs_v1 == null && abs_v2 == null)
-			return super.execute(ss, ks, th);
+			return super.execute(ti);
 		else {
-			int v1 = th.peek(0);
-			int v2 = th.peek(1);
+			int v1 = sf.peek(0);
+			int v2 = sf.peek(1);
 
 			// abs_v2 < abs_v1
 			AbstractBoolean result = Abstraction._lt(v1, abs_v1, v2, abs_v2);
@@ -63,7 +64,7 @@ public class IF_ICMPLT extends gov.nasa.jpf.jvm.bytecode.IF_ICMPLT {
 				conditionValue = false;
 			} else { // TOP
 				ChoiceGenerator<?> cg;
-				if (!th.isFirstStepInsn()) { // first time around
+				if (!ti.isFirstStepInsn()) { // first time around
 					cg = new AbstractChoiceGenerator();
 					ss.setNextChoiceGenerator(cg);
 					return this;
@@ -76,11 +77,11 @@ public class IF_ICMPLT extends gov.nasa.jpf.jvm.bytecode.IF_ICMPLT {
 				}
 			}
 
-			th.pop();
-			th.pop();
+			sf.pop();
+			sf.pop();
 
 			System.out.println("IF_ICMPLT> Result: " + conditionValue);
-			return (conditionValue ? getTarget() : getNext(th));
+			return (conditionValue ? getTarget() : getNext(ti));
 		}
 
 	}

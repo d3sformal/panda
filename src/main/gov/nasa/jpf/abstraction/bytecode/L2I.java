@@ -19,11 +19,11 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Instruction;
 
 /**
  * Convert long to int
@@ -31,21 +31,22 @@ import gov.nasa.jpf.jvm.bytecode.Instruction;
  */
 public class L2I extends gov.nasa.jpf.jvm.bytecode.L2I {
 
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
-		StackFrame sf = th.getTopFrame();
+	public Instruction execute(ThreadInfo ti) {
+
+		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getOperandAttr(1);
 
 		if (abs_val == null)
-			return super.execute(ss, ks, th);
+			return super.execute(ti);
 		else {
-			long val = th.longPop(); // just to pop it
-			th.push(0, false);
+			long val = sf.popLong(); // just to pop it
+			sf.push(0, false);
 			sf.setOperandAttr(abs_val);
 
 			System.out.printf("L2I> Values: %d (%s)\n", val, abs_val);
 			System.out.printf("L2I> Result: %s\n", sf.getOperandAttr());
 
-			return getNext(th);
+			return getNext(ti);
 		}
 	}
 

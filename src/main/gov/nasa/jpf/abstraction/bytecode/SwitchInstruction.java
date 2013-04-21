@@ -24,15 +24,15 @@ import java.util.ArrayList;
 import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.jvm.ChoiceGenerator;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.Verify;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
-import gov.nasa.jpf.jvm.choice.IntChoiceFromList;
-import gov.nasa.jpf.jvm.choice.IntIntervalGenerator;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Verify;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.choice.IntChoiceFromList;
+import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
 
 /**
  * common root class for LOOKUPSWITCH and TABLESWITCH insns
@@ -46,15 +46,17 @@ public abstract class SwitchInstruction extends
 	}
 
 	@Override
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
-		StackFrame sf = th.getTopFrame();
+	public Instruction execute(ThreadInfo ti) {
+		
+		SystemState ss = ti.getVM().getSystemState();
+		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_v = (Abstraction) sf.getOperandAttr(0);
 
 		if (abs_v == null)
-			return super.execute(ss, ks, th);
-		else if (!th.isFirstStepInsn()) {
+			return super.execute(ti);
+		else if (!ti.isFirstStepInsn()) {
 			lastIdx = DEFAULT;
-			int value = th.peek(0);
+			int value = sf.peek(0);
 			System.out.printf("Switch> Value: %d (%s)\n", value, abs_v);
 
 			ArrayList<Integer> choices = new ArrayList<Integer>();
@@ -79,7 +81,7 @@ public abstract class SwitchInstruction extends
 				ss.setNextChoiceGenerator(cg);
 				return this;
 			} else {
-				th.pop();
+				sf.pop();
 				System.out.printf("Switch> Result: default\n");
 				return mi.getInstructionAt(target);
 			}
@@ -87,7 +89,7 @@ public abstract class SwitchInstruction extends
 			ChoiceGenerator<?> cg = ss.getCurrentChoiceGenerator("abstractSwitchAll",
 					IntChoiceFromList.class);
 			int idx = ((IntChoiceFromList) cg).getNextChoice();
-			th.pop();
+			sf.pop();
 
 			System.out.printf("Switch> Result: choice #%d\n", idx);
 			if (idx == -1)

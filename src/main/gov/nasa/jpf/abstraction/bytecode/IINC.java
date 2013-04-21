@@ -18,12 +18,12 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.jvm.ChoiceGenerator;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Instruction;
 
 /**
  * Increment local variable by constant
@@ -35,22 +35,23 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 		super(localVarIndex, increment);
 	}
 
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
+	public Instruction execute(ThreadInfo ti) {
 
-		StackFrame sf = th.getTopFrame();
+		SystemState ss = ti.getVM().getSystemState();
+		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_v = (Abstraction) sf.getLocalAttr(index);
 		if (abs_v == null)
-			th.setLocalVariable(index, th.getLocalVariable(index) + increment,
+			sf.setLocalVariable(index, sf.getLocalVariable(index) + increment,
 					false);
 		else {
 			Abstraction result = abs_v._plus(increment);
 			System.out.printf("IINC> Value:  %d (%s)\n",
-					th.getLocalVariable(index), abs_v);
+					sf.getLocalVariable(index), abs_v);
 
 			if (result.isComposite()) {
 				System.out.println("Top");
 				ChoiceGenerator<?> cg;
-				if (!th.isFirstStepInsn()) { // first time around
+				if (!ti.isFirstStepInsn()) { // first time around
 					int size = result.getTokensNumber();
 					System.out.println("size "+size);//should be 3
 					cg = new FocusAbstractChoiceGenerator(size);
@@ -66,10 +67,10 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 			} else
 				System.out.printf("IINC> Result: %s\n", result);
 			
-			th.setLocalAttr(index, result);
-			th.setLocalVariable(index, 0, false);					
+			sf.setLocalAttr(index, result);
+			sf.setLocalVariable(index, 0, false);					
 		}
-		return getNext(th);
+		return getNext(ti);
 	}
 
 }
