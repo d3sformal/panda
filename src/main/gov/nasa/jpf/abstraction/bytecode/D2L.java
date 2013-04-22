@@ -27,27 +27,27 @@ import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert double to long
- * ..., value => ..., result
+ * Convert double to long ..., value => ..., result
  */
 public class D2L extends gov.nasa.jpf.jvm.bytecode.D2L {
 
 	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo ti) {
+
 		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getLongOperandAttr();
 
-		if (abs_val == null)
+		if (abs_val == null) {
 			return super.execute(ti);
-		else {
-			double val = Types.longToDouble(sf.popLong()); // just to pop it
-			sf.pushLong(0);
-			sf.setLongOperandAttr(abs_val);
-
-			System.out.printf("D2L> Values: %f (%s)\n", val, abs_val);
-			System.out.println("D2L> Result: " + sf.getLongOperandAttr());
-
-			return getNext(ti);
 		}
+
+		double val = Types.longToDouble(sf.popLong()); // just to pop it
+		sf.pushLong(0);
+		sf.setLongOperandAttr(abs_val);
+
+		System.out.printf("D2L> Values: %f (%s)\n", val, abs_val);
+		System.out.println("D2L> Result: " + sf.getLongOperandAttr());
+
+		return getNext(ti);
 	}
 
 }

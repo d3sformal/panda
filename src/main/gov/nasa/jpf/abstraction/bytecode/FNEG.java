@@ -21,7 +21,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -29,8 +28,7 @@ import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Negate float
- * ..., value => ..., result
+ * Negate float ..., value => ..., result
  */
 public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG {
 
@@ -39,38 +37,44 @@ public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG {
 
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getTopFrame();
+
 		Abstraction abs_val = (Abstraction) sf.getOperandAttr(0);
-		if (abs_val == null)
+
+		if (abs_val == null) {
 			return super.execute(ti);
-		else {
-			float val = Types.intToFloat(sf.pop()); // just to pop it
-
-			Abstraction result = Abstraction._neg(abs_val);
-			System.out.printf("FNEG> Values: %f (%s)\n", val, abs_val);
-			if (result.isComposite()) {
-				ChoiceGenerator<?> cg;
-				if (!ti.isFirstStepInsn()) { // first time around
-					int size = result.getTokensNumber();
-					cg = new FocusAbstractChoiceGenerator(size);
-					ss.setNextChoiceGenerator(cg);
-					return this;
-				} else { // this is what really returns results
-					cg = ss.getChoiceGenerator();
-					assert (cg instanceof FocusAbstractChoiceGenerator);
-					int key = (Integer) cg.getNextChoice();
-					result = result.getToken(key);
-					System.out.printf("FNEG> Result: %s\n", result);
-				}
-			} else
-				System.out.printf("FNEG> Result: %s\n", result);
-
-			sf.push(0, false);
-			sf.setOperandAttr(result);
-
-			System.out.println("Execute FNEG: " + result);
-
-			return getNext(ti);
 		}
-	}	
-	
+
+		float val = Types.intToFloat(sf.pop()); // just to pop it
+
+		Abstraction result = Abstraction._neg(abs_val);
+
+		System.out.printf("FNEG> Values: %f (%s)\n", val, abs_val);
+
+		if (result.isComposite()) {
+			if (!ti.isFirstStepInsn()) { // first time around
+				int size = result.getTokensNumber();
+				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
+				ss.setNextChoiceGenerator(cg);
+
+				return this;
+			} else { // this is what really returns results
+				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+
+				assert (cg instanceof FocusAbstractChoiceGenerator);
+
+				int key = (Integer) cg.getNextChoice();
+				result = result.getToken(key);
+			}
+		}
+		
+		System.out.printf("FNEG> Result: %s\n", result);
+
+		sf.push(0, false);
+		sf.setOperandAttr(result);
+
+		System.out.println("Execute FNEG: " + result);
+
+		return getNext(ti);
+	}
+
 }

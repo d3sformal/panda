@@ -19,9 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
@@ -36,18 +34,20 @@ public class L2D extends gov.nasa.jpf.jvm.bytecode.L2D {
 		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getLongOperandAttr();
 
-		if (abs_val == null)
+		if (abs_val == null) {
 			return super.execute(ti);
-		else {
-			long val = sf.popLong(); // just to pop it
-			sf.pushLong(0);
-			sf.setLongOperandAttr(abs_val);
-
-			System.out.printf("L2D> Values: %d (%s)\n", val, abs_val);
-			System.out.printf("L2D> Result: %s\n", sf.getLongOperandAttr());
-
-			return getNext(ti);
 		}
-	}		
-	
+
+		long val = sf.popLong(); // just to pop it
+
+		sf.pushLong(0);
+		sf.setLongOperandAttr(abs_val);
+
+		System.out.printf("L2D> Values: %d (%s)\n", val, abs_val);
+		System.out.printf("L2D> Result: %s\n", sf.getLongOperandAttr());
+
+		return getNext(ti);
+
+	}
+
 }

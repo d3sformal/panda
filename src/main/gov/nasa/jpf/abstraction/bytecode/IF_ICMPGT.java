@@ -46,50 +46,45 @@ public class IF_ICMPGT extends gov.nasa.jpf.jvm.bytecode.IF_ICMPGT {
 
 		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
 		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
-		if (abs_v1 == null && abs_v2 == null)
+
+		if (abs_v1 == null && abs_v2 == null) {
 			return super.execute(ti);
-		else {
-			int v1 = sf.peek(0);
-			int v2 = sf.peek(1);
-
-			// abs_v2 > abs_v1
-			AbstractBoolean result = Abstraction._gt(v1, abs_v1, v2, abs_v2);
-			System.out.printf("IF_ICMPGT> Values: %d (%s), %d (%s)\n", v2,
-					abs_v2, v1, abs_v1);
-
-			if (result == AbstractBoolean.TRUE) {
-				conditionValue = true;
-			} else if (result == AbstractBoolean.FALSE) {
-				conditionValue = false;
-			} else { // TOP
-				ChoiceGenerator<?> cg;
-				if (!ti.isFirstStepInsn()) { // first time around
-					cg = new AbstractChoiceGenerator();
-					ss.setNextChoiceGenerator(cg);
-					return this;
-				} else { // this is what really returns results
-					cg = ss.getChoiceGenerator();
-					assert (cg instanceof AbstractChoiceGenerator) : "expected AbstractChoiceGenerator, got: "
-							+ cg;
-					conditionValue = (Integer) cg.getNextChoice() == 0 ? false
-							: true;
-				}
-			}
-
-			sf.pop();
-			sf.pop();
-
-			System.out.println("IF_ICMPGT> Result: " + conditionValue);
-			return (conditionValue ? getTarget() : getNext(ti));
 		}
 
+		int v1 = sf.peek(0);
+		int v2 = sf.peek(1);
+
+		// abs_v2 > abs_v1
+		AbstractBoolean result = Abstraction._gt(v1, abs_v1, v2, abs_v2);
+		System.out.printf("IF_ICMPGT> Values: %d (%s), %d (%s)\n", v2, abs_v2, v1, abs_v1);
+
+		if (result == AbstractBoolean.TRUE) {
+			conditionValue = true;
+		} else if (result == AbstractBoolean.FALSE) {
+			conditionValue = false;
+		} else { // TOP
+			if (!ti.isFirstStepInsn()) { // first time around
+				ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
+				ss.setNextChoiceGenerator(cg);
+
+				return this;
+			} else { // this is what really returns results
+				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+					
+				assert (cg instanceof AbstractChoiceGenerator) : "expected AbstractChoiceGenerator, got: " + cg;
+					
+				conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
+			}
+		}
+
+		sf.pop();
+		sf.pop();
+
+		System.out.println("IF_ICMPGT> Result: " + conditionValue);
+
+		return (conditionValue ? getTarget() : getNext(ti));
 	}
-	
-//	@Override
-//	public boolean popConditionValue(ThreadInfo ti) {
-//		throw new UnsupportedOperationException();
-//	}
-	
+
 	@Override
 	protected Instruction executeBothBranches (SystemState ss, KernelState ks, ThreadInfo ti){
 		throw new UnsupportedOperationException();

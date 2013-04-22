@@ -19,7 +19,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -40,36 +39,41 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_v = (Abstraction) sf.getLocalAttr(index);
-		if (abs_v == null)
-			sf.setLocalVariable(index, sf.getLocalVariable(index) + increment,
-					false);
-		else {
+		
+		if (abs_v == null) {
+			sf.setLocalVariable(index, sf.getLocalVariable(index) + increment, false);
+		} else {
 			Abstraction result = abs_v._plus(increment);
-			System.out.printf("IINC> Value:  %d (%s)\n",
-					sf.getLocalVariable(index), abs_v);
+			System.out.printf("IINC> Value:  %d (%s)\n", sf.getLocalVariable(index), abs_v);
 
 			if (result.isComposite()) {
 				System.out.println("Top");
-				ChoiceGenerator<?> cg;
+
 				if (!ti.isFirstStepInsn()) { // first time around
 					int size = result.getTokensNumber();
+					
 					System.out.println("size "+size);//should be 3
-					cg = new FocusAbstractChoiceGenerator(size);
+					
+					ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
 					ss.setNextChoiceGenerator(cg);
+					
 					return this;
 				} else { // this is what really returns results
-					cg = ss.getChoiceGenerator();
+					ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+					
 					assert (cg instanceof FocusAbstractChoiceGenerator);
+					
 					int key = (Integer) cg.getNextChoice();
 					result = result.getToken(key);
-					System.out.printf("IINC> Result: %s\n", result);
 				}
-			} else
-				System.out.printf("IINC> Result: %s\n", result);
+			}
+			
+			System.out.printf("IINC> Result: %s\n", result);
 			
 			sf.setLocalAttr(index, result);
 			sf.setLocalVariable(index, 0, false);					
 		}
+
 		return getNext(ti);
 	}
 

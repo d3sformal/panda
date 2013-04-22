@@ -19,8 +19,6 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.vm.KernelState;
-import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -37,18 +35,20 @@ public class I2S extends gov.nasa.jpf.jvm.bytecode.I2S {
 		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getOperandAttr();
 
-		if (abs_val == null)
+		if (abs_val == null) {
 			return super.execute(ti);
-		else {
-			int val = sf.pop(); // just to pop it
-			System.out.printf("I2S> Value:  %d (%s)\n", val, abs_val);
-			sf.push((short) 0, false);
-			sf.setOperandAttr(abs_val);
-
-			System.out.println("I2S> Result: " + sf.getOperandAttr());
-
-			return getNext(ti);
 		}
+
+		int val = sf.pop(); // just to pop it
+
+		System.out.printf("I2S> Value:  %d (%s)\n", val, abs_val);
+		
+		sf.push((short) 0, false);
+		sf.setOperandAttr(abs_val);
+
+		System.out.println("I2S> Result: " + sf.getOperandAttr());
+
+		return getNext(ti);
 	}
 
 }

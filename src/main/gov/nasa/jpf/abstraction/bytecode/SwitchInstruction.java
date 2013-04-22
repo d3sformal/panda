@@ -23,16 +23,12 @@ import java.util.ArrayList;
 
 import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Verify;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
-import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
 
 /**
  * common root class for LOOKUPSWITCH and TABLESWITCH insns
@@ -52,9 +48,9 @@ public abstract class SwitchInstruction extends
 		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_v = (Abstraction) sf.getOperandAttr(0);
 
-		if (abs_v == null)
+		if (abs_v == null) {
 			return super.execute(ti);
-		else if (!ti.isFirstStepInsn()) {
+		} else if (!ti.isFirstStepInsn()) {
 			lastIdx = DEFAULT;
 			int value = sf.peek(0);
 			System.out.printf("Switch> Value: %d (%s)\n", value, abs_v);
@@ -73,6 +69,7 @@ public abstract class SwitchInstruction extends
 //						break;
 				}
 			}
+			
 			if (choices.size() > 0) {
 				int[] param = new int[choices.size()];
 				for (int i = 0; i < choices.size(); ++i)
@@ -92,13 +89,13 @@ public abstract class SwitchInstruction extends
 			sf.pop();
 
 			System.out.printf("Switch> Result: choice #%d\n", idx);
-			if (idx == -1)
+			if (idx == -1) {
 				return mi.getInstructionAt(target);
-			else {
-				lastIdx = idx;
-				return mi.getInstructionAt(targets[idx]);
 			}
 
+			lastIdx = idx;
+			
+			return mi.getInstructionAt(targets[idx]);
 		}
 	}
 

@@ -19,8 +19,6 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.JPFException;
-import gov.nasa.jpf.vm.KernelState;
-import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;

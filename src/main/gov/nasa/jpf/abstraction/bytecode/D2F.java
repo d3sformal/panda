@@ -27,27 +27,27 @@ import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert double to float
- * ..., value => ..., result
+ * Convert double to float ..., value => ..., result
  */
 public class D2F extends gov.nasa.jpf.jvm.bytecode.D2F {
-	
+
 	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo ti) {
+
 		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getLongOperandAttr();
 
-		if (abs_val == null)
+		if (abs_val == null) {
 			return super.execute(ti);
-		else {
-			double val = Types.longToDouble(sf.popLong()); // just to pop it
-			sf.push(0, false);
-			sf.setOperandAttr(abs_val);
-			
-			System.out.printf("D2F> Values: %f (%s)\n", val, abs_val);
-			System.out.println("D2F> Result: " + sf.getOperandAttr());
-
-			return getNext(ti);
 		}
+
+		double val = Types.longToDouble(sf.popLong()); // just to pop it
+		sf.push(0, false);
+		sf.setOperandAttr(abs_val);
+
+		System.out.printf("D2F> Values: %f (%s)\n", val, abs_val);
+		System.out.println("D2F> Result: " + sf.getOperandAttr());
+
+		return getNext(ti);
 	}
 
 }

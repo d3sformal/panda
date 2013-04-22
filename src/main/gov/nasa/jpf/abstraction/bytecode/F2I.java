@@ -19,16 +19,13 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert float to int
- * ..., value => ..., result
+ * Convert float to int ..., value => ..., result
  */
 public class F2I extends gov.nasa.jpf.jvm.bytecode.F2I {
 
@@ -38,18 +35,18 @@ public class F2I extends gov.nasa.jpf.jvm.bytecode.F2I {
 		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getOperandAttr();
 
-		if (abs_val == null)
+		if (abs_val == null) {
 			return super.execute(ti);
-		else {
-			float val = Types.intToFloat(sf.pop()); // just to pop it
-			sf.push(0, false);
-			sf.setOperandAttr(abs_val);
-
-			System.out.printf("F2I> Values: %f (%s)\n", val, abs_val);
-			System.out.println("F2I> Result: " + sf.getOperandAttr());
-
-			return getNext(ti);
 		}
-	}		
-	
+
+		float val = Types.intToFloat(sf.pop()); // just to pop it
+		sf.push(0, false);
+		sf.setOperandAttr(abs_val);
+
+		System.out.printf("F2I> Values: %f (%s)\n", val, abs_val);
+		System.out.println("F2I> Result: " + sf.getOperandAttr());
+
+		return getNext(ti);
+	}
+
 }

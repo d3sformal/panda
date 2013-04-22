@@ -20,7 +20,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -28,8 +27,7 @@ import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Add double
- * ..., value1, value2 => ..., result
+ * Add double ..., value1, value2 => ..., result
  */
 public class DADD extends gov.nasa.jpf.jvm.bytecode.DADD {
 
@@ -38,45 +36,50 @@ public class DADD extends gov.nasa.jpf.jvm.bytecode.DADD {
 
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getTopFrame();
+
 		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(1);
 		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(3);
 
-		if (abs_v1 == null && abs_v2 == null)
+		if (abs_v1 == null && abs_v2 == null) {
 			return super.execute(ti);
-		else {
-			double v1 = Types.longToDouble(sf.peekLong(0));
-			double v2 = Types.longToDouble(sf.peekLong(2));
-
-			// abs_v2 + abs_v1
-			Abstraction result = Abstraction._add(v1, abs_v1, v2, abs_v2);
-			System.out.printf("DADD> Values: %f (%s), %f (%s)\n", v2, abs_v2,
-					v1, abs_v1);
-			if (result.isComposite()) {
-				ChoiceGenerator<?> cg;
-				if (!ti.isFirstStepInsn()) { // first time around
-					int size = result.getTokensNumber();
-					cg = new FocusAbstractChoiceGenerator(size);
-					ss.setNextChoiceGenerator(cg);
-					return this;
-				} else { // this is what really returns results
-					cg = ss.getChoiceGenerator();
-					assert (cg instanceof FocusAbstractChoiceGenerator);
-					int key = (Integer) cg.getNextChoice();
-					result = result.getToken(key);
-					System.out.printf("DADD> Result: %s\n", result);
-				}
-			} else
-				System.out.printf("DADD> Result: %s\n", result);
-
-			sf.popLong();
-			sf.popLong();
-
-			sf.pushLong(0);
-			/* ??? sf = ti.getTopFrame(); ??? */
-			sf.setLongOperandAttr(result);
-
-			return getNext(ti);
 		}
+
+		double v1 = Types.longToDouble(sf.peekLong(0));
+		double v2 = Types.longToDouble(sf.peekLong(2));
+
+		// abs_v2 + abs_v1
+		Abstraction result = Abstraction._add(v1, abs_v1, v2, abs_v2);
+
+		System.out.printf("DADD> Values: %f (%s), %f (%s)\n", v2, abs_v2, v1,
+				abs_v1);
+
+		if (result.isComposite()) {
+			if (!ti.isFirstStepInsn()) { // first time around
+				int size = result.getTokensNumber();
+				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
+				ss.setNextChoiceGenerator(cg);
+
+				return this;
+			} else { // this is what really returns results
+				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+
+				assert (cg instanceof FocusAbstractChoiceGenerator);
+
+				int key = (Integer) cg.getNextChoice();
+				result = result.getToken(key);
+			}
+		}
+
+		System.out.printf("DADD> Result: %s\n", result);
+
+		sf.popLong();
+		sf.popLong();
+
+		sf.pushLong(0);
+
+		sf.setLongOperandAttr(result);
+
+		return getNext(ti);
 	}
 
 }

@@ -28,6 +28,7 @@ import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
  * abstraction for all comparison instructions
  */
 public abstract class IfInstruction extends Instruction {
+
 	protected int targetPosition; // insn position at jump insnIndex
 	protected Instruction target; // jump target
 

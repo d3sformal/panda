@@ -22,7 +22,6 @@ import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.numeric.Signs;
 import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -42,50 +41,56 @@ public class LCMP extends gov.nasa.jpf.jvm.bytecode.LCMP {
 		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(1);
 		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(3);
 		
-		if(abs_v1==null && abs_v2==null)
+		if(abs_v1==null && abs_v2==null) {
 			return super.execute(ti);
-		else {
-			long v1 = sf.peekLong(0);
-			long v2 = sf.peekLong(2);
+		}
 
-			// abs_v2 compare to abs_v1
-			Abstraction result = Abstraction._cmp(v1, abs_v1, v2, abs_v2);
-			System.out.printf("LCMP> Values: %d (%s), %d (%s)\n", v2, abs_v2, v1, abs_v1);
-			if (result.isComposite()) {
-				ChoiceGenerator<?> cg;
-				if (!ti.isFirstStepInsn()) { // first time around
-					int size = result.getTokensNumber();
-					cg = new FocusAbstractChoiceGenerator(size);
-					ss.setNextChoiceGenerator(cg);
-					return this;
-				} else { // this is what really returns results
-					cg = ss.getChoiceGenerator();
-					assert (cg instanceof FocusAbstractChoiceGenerator);
-					int key = (Integer) cg.getNextChoice();
-					result = result.getToken(key);
-					System.out.printf("LCMP> Result: %s\n", result);
-				}
-			} else
-				System.out.printf("LFCMP> Result: %s\n", result);
+		long v1 = sf.peekLong(0);
+		long v2 = sf.peekLong(2);
 
-			sf.popLong();
-			sf.popLong();
+		// abs_v2 compare to abs_v1
+		Abstraction result = Abstraction._cmp(v1, abs_v1, v2, abs_v2);
+
+		System.out.printf("LCMP> Values: %d (%s), %d (%s)\n", v2, abs_v2, v1, abs_v1);
+		
+		if (result.isComposite()) {
+			if (!ti.isFirstStepInsn()) { // first time around
+				int size = result.getTokensNumber();
+				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
+				ss.setNextChoiceGenerator(cg);
+				
+				return this;
+			} else { // this is what really returns results
+				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+					
+				assert (cg instanceof FocusAbstractChoiceGenerator);
+				
+				int key = (Integer) cg.getNextChoice();
+				result = result.getToken(key);
+			}
+		}
+		
+		System.out.printf("LFCMP> Result: %s\n", result);
+
+		sf.popLong();
+		sf.popLong();
 			
-			Signs s_result = (Signs)result;
-			if (s_result == Signs.NEG)
-				sf.push(-1, false);
-			else if (s_result == Signs.POS)
-				sf.push(+1, false);
-			else
-				sf.push(0, false);
-			
-			sf = ti.getTopFrame();
-			sf.setOperandAttr(result); // redundant
+		Signs s_result = (Signs)result;
 
-			return getNext(ti);
-		}	
+		if (s_result == Signs.NEG) {
+			sf.push(-1, false);
+		} else if (s_result == Signs.POS) {
+			sf.push(+1, false);
+		} else {
+			sf.push(0, false);
+		}
+
+		sf.setOperandAttr(result); // redundant
+
+		return getNext(ti);
 	}
 
+	@Override
 	protected int conditionValue(long v1, long v2) {
 		if (v1 == v2) {
 			return 0;

@@ -21,7 +21,6 @@ import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
 import gov.nasa.jpf.abstraction.numeric.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -47,34 +46,36 @@ public class IFGT extends gov.nasa.jpf.jvm.bytecode.IFGT {
 		if(abs_v == null) { // the condition is concrete
 			return super.execute(ti);
 		}
-		else { // the condition is abstract
+		
+		// the condition is abstract
 
-			System.out.printf("IFGT> Values: %d (%s)\n", sf.peek(0), abs_v);
-			AbstractBoolean abs_condition = abs_v._gt(0);
+		System.out.printf("IFGT> Values: %d (%s)\n", sf.peek(0), abs_v);
+		
+		AbstractBoolean abs_condition = abs_v._gt(0);
 
-			if(abs_condition == AbstractBoolean.TRUE)
-				conditionValue = true;
-			else if (abs_condition == AbstractBoolean.FALSE)
-				conditionValue = false;
-			else { // TOP
-				ChoiceGenerator<?> cg;
-				if (!ti.isFirstStepInsn()) { // first time around
-					cg = new AbstractChoiceGenerator();
-					ss.setNextChoiceGenerator(cg);
-					return this;
-				} else {  // this is what really returns results
-					cg = ss.getChoiceGenerator();
-					assert (cg instanceof AbstractChoiceGenerator) : "expected AbstractChoiceGenerator, got: " + cg;
-					conditionValue = (Integer) cg.getNextChoice() == 0 
-							? false
-							: true;
-				}
+		if(abs_condition == AbstractBoolean.TRUE) {
+			conditionValue = true;
+		} else if (abs_condition == AbstractBoolean.FALSE) {
+			conditionValue = false;
+		} else { // TOP
+			if (!ti.isFirstStepInsn()) { // first time around
+				ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
+				ss.setNextChoiceGenerator(cg);
+
+				return this;
+			} else {  // this is what really returns results
+				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+					
+				assert (cg instanceof AbstractChoiceGenerator) : "expected AbstractChoiceGenerator, got: " + cg;
+				
+				conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
 			}
-
-			sf.pop();
-			return (conditionValue ? getTarget() : getNext(ti));
-
 		}
+		
+		System.out.println("IFGT> Result: " + conditionValue);
 
+		sf.pop();
+
+		return (conditionValue ? getTarget() : getNext(ti));
 	}
 }
