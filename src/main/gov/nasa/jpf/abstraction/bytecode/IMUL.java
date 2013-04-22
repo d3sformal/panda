@@ -14,71 +14,54 @@
 //A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
 //THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
 //DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
+
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.SystemState;
-import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
- * Multiply int
- * ..., value => ..., result
+ * Multiply integer ..., value1, value2 => ..., result
  */
-public class IMUL extends gov.nasa.jpf.jvm.bytecode.IMUL {
+public class IMUL extends gov.nasa.jpf.jvm.bytecode.IMUL implements AbstractBinaryOperator<Integer> {
 
+	IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
+	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
+		
+		/**
+		 * Delegates the call to a shared object that does all the heavy lifting
+		 */
+		return executor.execute(this, ti);
+	}
 
-		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getTopFrame();
+	@Override
+	public Abstraction getResult(Integer v1, Abstraction abs_v1, Integer v2, Abstraction abs_v2) {
+		
+		/**
+		 * Performs the adequate operation over abstractions
+		 */
+		return Abstraction._mul(v1, abs_v1, v2, abs_v2);
+	}
 
-		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
-		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
+	@Override
+	public Instruction executeConcrete(ThreadInfo ti) {
+		
+		/**
+		 * Ensures execution of the original instruction
+		 */
+		return super.execute(ti);
+	}
 
-		if (abs_v1 == null && abs_v2 == null) {
-			return super.execute(ti);
-		}
-
-		int v1 = sf.peek(0);
-		int v2 = sf.peek(1);
-
-		// abs_v2 * abs_v1
-		Abstraction result = Abstraction._mul(v1, abs_v1, v2, abs_v2);
-
-		System.out.printf("IMUL> Values: %d (%s), %d (%s)\n", v2, abs_v2, v1, abs_v1);
-
-		if (result.isComposite()) {
-			if (!ti.isFirstStepInsn()) { // first time around
-				int size = result.getTokensNumber();
-				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
-				ss.setNextChoiceGenerator(cg);
-
-				return this;
-			} else { // this is what really returns results
-				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-					
-				assert (cg instanceof FocusAbstractChoiceGenerator);
-				
-				int key = (Integer) cg.getNextChoice();
-				result = result.getToken(key);
-				
-				System.out.printf("IMUL> Result: %s\n", result);
-			}
-		} else {
-			System.out.printf("IMUL> Result: %s\n", result);
-		}
-
-		sf.pop();
-		sf.pop();
-
-		sf.push(0, false);
-		sf.setOperandAttr(result);
-
-		return getNext(ti);
+	@Override
+	public Instruction getSelf() {
+		
+		/**
+		 * Ensures translation into an ordinary instruction
+		 */
+		return this;
 	}
 
 }

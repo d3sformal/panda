@@ -1,85 +1,67 @@
-//
-// Copyright (C) 2012 United States Government as represented by the
-// Administrator of the National Aeronautics and Space Administration
-// (NASA).  All Rights Reserved.
-// 
-// This software is distributed under the NASA Open Source Agreement
-// (NOSA), version 1.3.  The NOSA has been approved by the Open Source
-// Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
-// directory tree for the complete NOSA document.
-// 
-// THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
-// KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
-// LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
-// SPECIFICATIONS, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
-// A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
-// THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
-// DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
-//
+//Copyright (C) 2012 United States Government as represented by the
+//Administrator of the National Aeronautics and Space Administration
+//(NASA).  All Rights Reserved.
+
+//This software is distributed under the NASA Open Source Agreement
+//(NOSA), version 1.3.  The NOSA has been approved by the Open Source
+//Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
+//directory tree for the complete NOSA document.
+
+//THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
+//KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
+//LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
+//SPECIFICATIONS, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
+//THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
+//DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
+
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.SystemState;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
  * Divide float ..., value1, value2 => ..., result
  */
-public class FDIV extends gov.nasa.jpf.jvm.bytecode.FDIV {
+public class FDIV extends gov.nasa.jpf.jvm.bytecode.FDIV implements AbstractBinaryOperator<Float> {
 
+	FloatBinaryOperatorExecutor executor = FloatBinaryOperatorExecutor.getInstance();
+	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-
-		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getTopFrame();
-
-		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
-		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
-
-		if (abs_v1 == null && abs_v2 == null) {
-			return super.execute(ti);
-		}
-
-		float v1 = Types.intToFloat(sf.peek(0));
-		float v2 = Types.intToFloat(sf.peek(1));
-
-		// abs_v2 / abs_v1
-		Abstraction result = Abstraction._div(v1, abs_v1, v2, abs_v2);
-
-		System.out.printf("FDIV> Values: %f (%s), %f (%s)\n", v2, abs_v2, v1,
-				abs_v1);
-
-		if (result.isComposite()) {
-			if (!ti.isFirstStepInsn()) { // first time around
-				int size = result.getTokensNumber();
-				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
-				ss.setNextChoiceGenerator(cg);
-
-				return this;
-			} else { // this is what really returns results
-				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-
-				assert (cg instanceof FocusAbstractChoiceGenerator);
-
-				int key = (Integer) cg.getNextChoice();
-				result = result.getToken(key);
-			}
-		}
 		
-		System.out.printf("FDIV> Result: %s\n", result);
+		/**
+		 * Delegates the call to a shared object that does all the heavy lifting
+		 */
+		return executor.execute(this, ti);
+	}
 
-		sf.pop();
-		sf.pop();
+	@Override
+	public Abstraction getResult(Float v1, Abstraction abs_v1, Float v2, Abstraction abs_v2) {
+		
+		/**
+		 * Performs the adequate operation over abstractions
+		 */
+		return Abstraction._div(v1, abs_v1, v2, abs_v2);
+	}
 
-		sf.push(0, false);
-		sf.setOperandAttr(result);
+	@Override
+	public Instruction executeConcrete(ThreadInfo ti) {
+		
+		/**
+		 * Ensures execution of the original instruction
+		 */
+		return super.execute(ti);
+	}
 
-		return getNext(ti);
+	@Override
+	public Instruction getSelf() {
+		
+		/**
+		 * Ensures translation into an ordinary instruction
+		 */
+		return this;
 	}
 
 }

@@ -18,68 +18,50 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.SystemState;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
  * Add double ..., value1, value2 => ..., result
  */
-public class DADD extends gov.nasa.jpf.jvm.bytecode.DADD {
+public class DADD extends gov.nasa.jpf.jvm.bytecode.DADD implements AbstractBinaryOperator<Double> {
 
+	DoubleBinaryOperatorExecutor executor = DoubleBinaryOperatorExecutor.getInstance();
+	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
+		
+		/**
+		 * Delegates the call to a shared object that does all the heavy lifting
+		 */
+		return executor.execute(this, ti);
+	}
 
-		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getTopFrame();
+	@Override
+	public Abstraction getResult(Double v1, Abstraction abs_v1, Double v2, Abstraction abs_v2) {
+		
+		/**
+		 * Performs the adequate operation over abstractions
+		 */
+		return Abstraction._add(v1, abs_v1, v2, abs_v2);
+	}
 
-		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(1);
-		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(3);
+	@Override
+	public Instruction executeConcrete(ThreadInfo ti) {
+		
+		/**
+		 * Ensures execution of the original instruction
+		 */
+		return super.execute(ti);
+	}
 
-		if (abs_v1 == null && abs_v2 == null) {
-			return super.execute(ti);
-		}
-
-		double v1 = Types.longToDouble(sf.peekLong(0));
-		double v2 = Types.longToDouble(sf.peekLong(2));
-
-		// abs_v2 + abs_v1
-		Abstraction result = Abstraction._add(v1, abs_v1, v2, abs_v2);
-
-		System.out.printf("DADD> Values: %f (%s), %f (%s)\n", v2, abs_v2, v1,
-				abs_v1);
-
-		if (result.isComposite()) {
-			if (!ti.isFirstStepInsn()) { // first time around
-				int size = result.getTokensNumber();
-				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
-				ss.setNextChoiceGenerator(cg);
-
-				return this;
-			} else { // this is what really returns results
-				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-
-				assert (cg instanceof FocusAbstractChoiceGenerator);
-
-				int key = (Integer) cg.getNextChoice();
-				result = result.getToken(key);
-			}
-		}
-
-		System.out.printf("DADD> Result: %s\n", result);
-
-		sf.popLong();
-		sf.popLong();
-
-		sf.pushLong(0);
-
-		sf.setLongOperandAttr(result);
-
-		return getNext(ti);
+	@Override
+	public Instruction getSelf() {
+		
+		/**
+		 * Ensures translation into an ordinary instruction
+		 */
+		return this;
 	}
 
 }
