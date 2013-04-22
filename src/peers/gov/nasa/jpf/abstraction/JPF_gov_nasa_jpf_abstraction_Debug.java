@@ -2,9 +2,10 @@ package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.MJIEnv;
+import gov.nasa.jpf.vm.NativePeer;
 
 
-public class JPF_gov_nasa_jpf_abstraction_Debug {
+public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
 
 	public static int getAbstractInteger(MJIEnv env, int objRef, int v) {
 		Object [] attrs = env.getArgAttributes();
