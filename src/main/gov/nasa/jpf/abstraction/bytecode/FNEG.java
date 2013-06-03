@@ -24,7 +24,6 @@ import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
@@ -45,7 +44,7 @@ public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG {
 			return super.execute(ti);
 		}
 
-		float val = Types.intToFloat(sf.pop()); // just to pop it
+		float val = sf.popFloat(); // just to pop it
 
 		Abstraction result = Abstraction._neg(abs_val);
 

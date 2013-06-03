@@ -21,7 +21,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
@@ -40,7 +39,7 @@ public class F2D extends gov.nasa.jpf.jvm.bytecode.F2D {
 			return super.execute(ti);
 		}
 
-		float val = Types.intToFloat(sf.pop()); // just to pop it
+		float val = sf.popFloat(); // just to pop it
 		sf.pushLong(0);
 		sf.setLongOperandAttr(abs_val);
 			

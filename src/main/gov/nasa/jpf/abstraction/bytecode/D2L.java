@@ -23,7 +23,6 @@ import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
@@ -41,7 +40,7 @@ public class D2L extends gov.nasa.jpf.jvm.bytecode.D2L {
 			return super.execute(ti);
 		}
 
-		double val = Types.longToDouble(sf.popLong()); // just to pop it
+		double val = sf.popDouble(); // just to pop it
 		sf.pushLong(0);
 		sf.setLongOperandAttr(abs_val);
 

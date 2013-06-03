@@ -40,7 +40,7 @@ public class F2L extends gov.nasa.jpf.jvm.bytecode.F2L {
 			return super.execute(ti);
 		}
 
-		float val = Types.intToFloat(sf.pop()); // just to pop it
+		float val = sf.popFloat(); // just to pop it
 		sf.pushLong(0);
 		sf.setLongOperandAttr(abs_val);
 
