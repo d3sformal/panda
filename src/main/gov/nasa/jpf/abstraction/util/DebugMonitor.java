@@ -20,11 +20,8 @@ package gov.nasa.jpf.abstraction.util;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.ListenerAdapter;
-import gov.nasa.jpf.jvm.JVM;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.ChoiceGenerator;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.search.Search;
 
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
@@ -50,9 +47,9 @@ public class DebugMonitor extends ListenerAdapter
 		System.out.println("[MONITOR] backtrack");
 	}
 
-	public void choiceGeneratorRegistered(JVM vm) 
+	public void choiceGeneratorRegistered(VM vm) 
 	{
-		ChoiceGenerator cg = vm.getLastChoiceGenerator();
+		ChoiceGenerator<?> cg = vm.getChoiceGenerator(); // TODO: VERIFY THIS CONVERSION FROM 6 TO 7 (ORIGINALLY getLastChoiceGenerator())
 
 		if (cg instanceof FocusAbstractChoiceGenerator) 
 		{
@@ -60,9 +57,9 @@ public class DebugMonitor extends ListenerAdapter
 		}
 	}
 
-	public void choiceGeneratorAdvanced(JVM vm) 
+	public void choiceGeneratorAdvanced(VM vm) 
 	{
-		ChoiceGenerator cg = vm.getLastChoiceGenerator();
+		ChoiceGenerator<?> cg = vm.getChoiceGenerator(); // TODO: VERIFY THIS CONVERSION FROM 6 TO 7 (ORIGINALLY getLastChoiceGenerator())
 	
 		if (cg instanceof FocusAbstractChoiceGenerator) 
 		{

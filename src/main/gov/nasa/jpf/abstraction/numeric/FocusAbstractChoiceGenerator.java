@@ -18,8 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.numeric;
 
-//import gov.nasa.jpf.jvm.IntChoiceGenerator;
-import gov.nasa.jpf.jvm.choice.IntIntervalGenerator;
+// import gov.nasa.jpf.vm.IntChoiceGenerator;
+import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
 
 // helps "focus" the analysis from Top to individual abstract tokens
 // meant to be more precise

@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.ReplicatedWorkers;
 
 import gov.nasa.jpf.abstraction.Debug;
-import gov.nasa.jpf.jvm.Verify;
+import gov.nasa.jpf.vm.Verify;
 
 class GenericCollection implements Collection {
 	int count; // abstract with signs; zero_pos

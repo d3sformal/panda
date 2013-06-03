@@ -1,20 +1,20 @@
 //
-//Copyright (C) 2012 United States Government as represented by the
-//Administrator of the National Aeronautics and Space Administration
-//(NASA).  All Rights Reserved.
+// Copyright (C) 2012 United States Government as represented by the
+// Administrator of the National Aeronautics and Space Administration
+// (NASA).  All Rights Reserved.
 //
-//This software is distributed under the NASA Open Source Agreement
-//(NOSA), version 1.3.  The NOSA has been approved by the Open Source
-//Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
-//directory tree for the complete NOSA document.
+// This software is distributed under the NASA Open Source Agreement
+// (NOSA), version 1.3.  The NOSA has been approved by the Open Source
+// Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
+// directory tree for the complete NOSA document.
 //
-//THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
-//KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
-//LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
-//SPECIFICATIONS, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
-//A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
-//THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
-//DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
+// THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
+// KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
+// LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
+// SPECIFICATIONS, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+// A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
+// THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
+// DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 //
 
 package gov.nasa.jpf.abstraction.bytecode;
@@ -23,16 +23,12 @@ import java.util.ArrayList;
 
 import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.jvm.ChoiceGenerator;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.Verify;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
-import gov.nasa.jpf.jvm.choice.IntChoiceFromList;
-import gov.nasa.jpf.jvm.choice.IntIntervalGenerator;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 
 /**
  * common root class for LOOKUPSWITCH and TABLESWITCH insns
@@ -46,15 +42,17 @@ public abstract class SwitchInstruction extends
 	}
 
 	@Override
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
-		StackFrame sf = th.getTopFrame();
+	public Instruction execute(ThreadInfo ti) {
+		
+		SystemState ss = ti.getVM().getSystemState();
+		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_v = (Abstraction) sf.getOperandAttr(0);
 
-		if (abs_v == null)
-			return super.execute(ss, ks, th);
-		else if (!th.isFirstStepInsn()) {
+		if (abs_v == null) {
+			return super.execute(ti);
+		} else if (!ti.isFirstStepInsn()) {
 			lastIdx = DEFAULT;
-			int value = th.peek(0);
+			int value = sf.peek(0);
 			System.out.printf("Switch> Value: %d (%s)\n", value, abs_v);
 
 			ArrayList<Integer> choices = new ArrayList<Integer>();
@@ -71,6 +69,7 @@ public abstract class SwitchInstruction extends
 //						break;
 				}
 			}
+			
 			if (choices.size() > 0) {
 				int[] param = new int[choices.size()];
 				for (int i = 0; i < choices.size(); ++i)
@@ -79,7 +78,7 @@ public abstract class SwitchInstruction extends
 				ss.setNextChoiceGenerator(cg);
 				return this;
 			} else {
-				th.pop();
+				sf.pop();
 				System.out.printf("Switch> Result: default\n");
 				return mi.getInstructionAt(target);
 			}
@@ -87,16 +86,16 @@ public abstract class SwitchInstruction extends
 			ChoiceGenerator<?> cg = ss.getCurrentChoiceGenerator("abstractSwitchAll",
 					IntChoiceFromList.class);
 			int idx = ((IntChoiceFromList) cg).getNextChoice();
-			th.pop();
+			sf.pop();
 
 			System.out.printf("Switch> Result: choice #%d\n", idx);
-			if (idx == -1)
+			if (idx == -1) {
 				return mi.getInstructionAt(target);
-			else {
-				lastIdx = idx;
-				return mi.getInstructionAt(targets[idx]);
 			}
 
+			lastIdx = idx;
+			
+			return mi.getInstructionAt(targets[idx]);
 		}
 	}
 

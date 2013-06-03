@@ -19,35 +19,36 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.StackFrame;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.Types;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Types;
+import gov.nasa.jpf.vm.Instruction;
 
 /**
  * Convert double to float
  * ..., value => ..., result
  */
 public class D2F extends gov.nasa.jpf.jvm.bytecode.D2F {
-	
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
-		StackFrame sf = th.getTopFrame();
+
+	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo ti) {
+
+		StackFrame sf = ti.getTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getLongOperandAttr();
 
-		if (abs_val == null)
-			return super.execute(ss, ks, th);
-		else {
-			double val = Types.longToDouble(th.longPop()); // just to pop it
-			th.push(0, false);
-			sf.setOperandAttr(abs_val);
-			
-			System.out.printf("D2F> Values: %f (%s)\n", val, abs_val);
-			System.out.println("D2F> Result: " + sf.getOperandAttr());
-
-			return getNext(th);
+		if (abs_val == null) {
+			return super.execute(ti);
 		}
+
+		double val = Types.longToDouble(sf.popLong()); // just to pop it
+		sf.push(0, false);
+		sf.setOperandAttr(abs_val);
+
+		System.out.printf("D2F> Values: %f (%s)\n", val, abs_val);
+		System.out.println("D2F> Result: " + sf.getOperandAttr());
+
+		return getNext(ti);
 	}
 
 }

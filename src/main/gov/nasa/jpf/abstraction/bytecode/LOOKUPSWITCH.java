@@ -18,17 +18,16 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.jvm.KernelState;
-import gov.nasa.jpf.jvm.SystemState;
-import gov.nasa.jpf.jvm.ThreadInfo;
-import gov.nasa.jpf.jvm.bytecode.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
 
 /**
- * Access jump table by key match and jump ..., key => ...
+ * Access jump table by key match and jump
+ * ..., key => ...
  */
 public class LOOKUPSWITCH extends SwitchInstruction implements
-		gov.nasa.jpf.jvm.LookupSwitchInstruction {
+		gov.nasa.jpf.vm.LookupSwitchInstruction {
 
 	public LOOKUPSWITCH(int defaultTarget, int numberOfTargets) {
 		super(defaultTarget, numberOfTargets);
@@ -41,12 +40,12 @@ public class LOOKUPSWITCH extends SwitchInstruction implements
 	}
 
 	@Override
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo th) {
+	public Instruction execute(ThreadInfo ti) {
 		/*
 		 * Implementation is in SwitchInstruction, because now LOOKUPSWITCH's
 		 * implementation is used for TABLESWITCH as well
 		 */
-		return super.execute(ss, ks, th);
+		return super.execute(ti);
 	}
 
 	@Override
