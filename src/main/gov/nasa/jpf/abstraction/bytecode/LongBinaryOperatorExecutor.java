@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
+import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.StackFrame;
 
 public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
@@ -12,6 +13,16 @@ public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
 		}
 		
 		return instance;
+	}
+	
+	@Override
+	protected Abstraction getLeftAbstraction(StackFrame sf) {
+		return (Abstraction)sf.getOperandAttr(1);
+	}
+
+	@Override
+	protected Abstraction getRightAbstraction(StackFrame sf) {
+		return (Abstraction)sf.getOperandAttr(3);
 	}
 
 	@Override

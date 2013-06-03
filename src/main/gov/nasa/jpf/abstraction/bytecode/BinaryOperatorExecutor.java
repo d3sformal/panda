@@ -17,8 +17,8 @@ public abstract class BinaryOperatorExecutor<T> {
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
 
-		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
-		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
+		Abstraction abs_v1 = getLeftAbstraction(sf);
+		Abstraction abs_v2 = getRightAbstraction(sf);
 
 		if (abs_v1 == null && abs_v2 == null) {
 			return op.executeConcrete(ti);
@@ -57,6 +57,8 @@ public abstract class BinaryOperatorExecutor<T> {
 		return op.getNext(ti);
 	}
 	
+	abstract protected Abstraction getLeftAbstraction(StackFrame sf);
+	abstract protected Abstraction getRightAbstraction(StackFrame sf);
 	abstract protected T getLeft(StackFrame sf);
 	abstract protected T getRight(StackFrame sf);
 	abstract protected void cleanUp(StackFrame sf);
