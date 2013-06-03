@@ -20,6 +20,8 @@ package gov.nasa.jpf.abstraction.util;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.ListenerAdapter;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.search.Search;
@@ -47,20 +49,18 @@ public class DebugMonitor extends ListenerAdapter
 		System.out.println("[MONITOR] backtrack");
 	}
 
-	public void choiceGeneratorRegistered(VM vm) 
+	@Override
+	public void choiceGeneratorRegistered(VM vm, ChoiceGenerator<?> nextCG, ThreadInfo currentThread, Instruction executedInstruction) 
 	{
-		ChoiceGenerator<?> cg = vm.getChoiceGenerator(); // TODO: VERIFY THIS CONVERSION FROM 6 TO 7 (ORIGINALLY getLastChoiceGenerator())
-
-		if (cg instanceof FocusAbstractChoiceGenerator) 
+		if (nextCG instanceof FocusAbstractChoiceGenerator) 
 		{
 			System.out.println("[MONITOR] new focus cg");
 		}
 	}
 
-	public void choiceGeneratorAdvanced(VM vm) 
-	{
-		ChoiceGenerator<?> cg = vm.getChoiceGenerator(); // TODO: VERIFY THIS CONVERSION FROM 6 TO 7 (ORIGINALLY getLastChoiceGenerator())
-	
+	@Override
+	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> cg) 
+	{	
 		if (cg instanceof FocusAbstractChoiceGenerator) 
 		{
 			System.out.println("[MONITOR] focus cg : more choices = " + cg.hasMoreChoices() + ", current value = " + cg.getNextChoice());
