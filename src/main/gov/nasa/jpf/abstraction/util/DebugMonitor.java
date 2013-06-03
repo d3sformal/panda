@@ -36,6 +36,7 @@ public class DebugMonitor extends ListenerAdapter
 	}
 
 
+	@Override
 	public void stateAdvanced(Search search)
 	{
 		System.out.print("[MONITOR] state : ");
@@ -44,6 +45,7 @@ public class DebugMonitor extends ListenerAdapter
 		System.out.println(" , id = " + search.getStateId());
 	}
 	
+	@Override
 	public void stateBacktracked(Search search)
 	{
 		System.out.println("[MONITOR] backtrack");
