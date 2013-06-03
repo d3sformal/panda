@@ -5,16 +5,11 @@ import gov.nasa.jpf.vm.Types;
 
 public class FloatBinaryOperatorExecutor extends BinaryOperatorExecutor<Float> {
 
-	private static Object lock = new Object();
 	private static FloatBinaryOperatorExecutor instance;
 
 	public static FloatBinaryOperatorExecutor getInstance() {
 		if (instance == null) {
-			synchronized (lock) {
-				if (instance == null) {
-					instance = new FloatBinaryOperatorExecutor();
-				}
-			}
+			instance = new FloatBinaryOperatorExecutor();
 		}
 		
 		return instance;

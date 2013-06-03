@@ -4,16 +4,11 @@ import gov.nasa.jpf.vm.StackFrame;
 
 public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
 
-	private static Object lock = new Object();
 	private static LongBinaryOperatorExecutor instance;
 
 	public static LongBinaryOperatorExecutor getInstance() {
 		if (instance == null) {
-			synchronized (lock) {
-				if (instance == null) {
-					instance = new LongBinaryOperatorExecutor();
-				}
-			}
+			instance = new LongBinaryOperatorExecutor();
 		}
 		
 		return instance;

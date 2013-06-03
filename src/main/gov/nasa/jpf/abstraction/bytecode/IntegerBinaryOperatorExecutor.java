@@ -4,16 +4,11 @@ import gov.nasa.jpf.vm.StackFrame;
 
 public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Integer> {
 
-	private static Object lock = new Object();
 	private static IntegerBinaryOperatorExecutor instance;
 
 	public static IntegerBinaryOperatorExecutor getInstance() {
 		if (instance == null) {
-			synchronized (lock) {
-				if (instance == null) {
-					instance = new IntegerBinaryOperatorExecutor();
-				}
-			}
+			instance = new IntegerBinaryOperatorExecutor();
 		}
 		
 		return instance;

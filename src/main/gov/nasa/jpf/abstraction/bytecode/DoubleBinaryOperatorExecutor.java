@@ -5,16 +5,11 @@ import gov.nasa.jpf.vm.Types;
 
 public class DoubleBinaryOperatorExecutor extends BinaryOperatorExecutor<Double> {
 
-	private static Object lock = new Object();
 	private static DoubleBinaryOperatorExecutor instance;
 
 	public static DoubleBinaryOperatorExecutor getInstance() {
 		if (instance == null) {
-			synchronized (lock) {
-				if (instance == null) {
-					instance = new DoubleBinaryOperatorExecutor();
-				}
-			}
+			instance = new DoubleBinaryOperatorExecutor();
 		}
 		
 		return instance;
