@@ -62,7 +62,6 @@ public class AbstractionSerializer extends FilteringSerializer {
 					if (fi.isReference()) {
 						int ref = slotValues[off];
 
-						buf.add(ref);
 						processReference(ref);
 					} else {
 						buf.add(slotValues[off]);

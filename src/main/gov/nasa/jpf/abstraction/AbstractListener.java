@@ -26,23 +26,11 @@ import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.report.ConsolePublisher;
-import gov.nasa.jpf.report.Publisher;
-import gov.nasa.jpf.report.PublisherExtension;
 import gov.nasa.jpf.search.Search;
 
-import java.io.PrintWriter;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-public class AbstractListener extends PropertyListenerAdapter implements PublisherExtension {
-
-
-	Set<String> test_sequences = new HashSet<String>();; // here we print the test sequences
+public class AbstractListener extends PropertyListenerAdapter {
 
 	public AbstractListener(Config conf, JPF jpf) {
-		jpf.addPublisherExtension(ConsolePublisher.class, this);
 	}
 
 	@Override
@@ -61,11 +49,6 @@ public class AbstractListener extends PropertyListenerAdapter implements Publish
 
 			cg = prev_cg;
 		}
-
-		String error = search.getLastError().getDetails();
-		error = "\"" + error.substring(0,error.indexOf("\n")) + "...\"";
-		
-		System.out.println(error);
 	}
 
 	@Override
@@ -75,19 +58,5 @@ public class AbstractListener extends PropertyListenerAdapter implements Publish
 	@Override
 	public void stateBacktracked(Search search) {
 		// here do something similar to what you do when propertyViolated
-	}
-
-	//	-------- the publisher interface
-	@Override
-	public void publishFinished (Publisher publisher) {
-		PrintWriter pw = publisher.getOut();
-		// here just print the method sequences
-		publisher.publishTopicStart("Method Sequences");
-
-		Iterator<String> it = test_sequences.iterator();
-
-		while (it.hasNext()) {
-			pw.println(it.next());
-		}
 	}
 }

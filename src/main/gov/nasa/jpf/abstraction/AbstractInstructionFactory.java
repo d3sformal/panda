@@ -25,8 +25,6 @@ import java.util.List;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.MethodInfo;
-import gov.nasa.jpf.vm.NativeMethodInfo;
 import gov.nasa.jpf.abstraction.bytecode.*;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.Range;
@@ -36,7 +34,6 @@ import gov.nasa.jpf.abstraction.numeric.Interval;
 import gov.nasa.jpf.abstraction.numeric.Signs;
 
 import gov.nasa.jpf.util.InstructionFactoryFilter;
-import gov.nasa.jpf.util.Invocation;
 
 public class AbstractInstructionFactory extends
 		gov.nasa.jpf.jvm.bytecode.InstructionFactory {
@@ -474,11 +471,4 @@ public class AbstractInstructionFactory extends
 				? new TABLESWITCH(defaultTargetPc, low, high) 
 				: super.tableswitch(defaultTargetPc, low, high);
 	}
-
-	/*
-	@Override
-	public void setClassInfoContext(ClassInfo ci) {
-		this.ci = ci;
-	}
-	*/
 }
