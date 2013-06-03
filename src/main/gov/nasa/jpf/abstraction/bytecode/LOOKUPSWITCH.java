@@ -23,7 +23,8 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
 
 /**
- * Access jump table by key match and jump ..., key => ...
+ * Access jump table by key match and jump
+ * ..., key => ...
  */
 public class LOOKUPSWITCH extends SwitchInstruction implements
 		gov.nasa.jpf.vm.LookupSwitchInstruction {

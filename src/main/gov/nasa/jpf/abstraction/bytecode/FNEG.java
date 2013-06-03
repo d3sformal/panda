@@ -28,7 +28,8 @@ import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Negate float ..., value => ..., result
+ * Negate float
+ * ..., value => ..., result
  */
 public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG {
 

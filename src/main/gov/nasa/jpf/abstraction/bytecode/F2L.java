@@ -25,7 +25,8 @@ import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert float to long ..., value => ..., result
+ * Convert float to long
+ * ..., value => ..., result
  */
 public class F2L extends gov.nasa.jpf.jvm.bytecode.F2L {
 

@@ -27,7 +27,8 @@ import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert double to int ..., value => ..., result
+ * Convert double to int
+ * ..., value => ..., result
  */
 public class D2I extends gov.nasa.jpf.jvm.bytecode.D2I {
 

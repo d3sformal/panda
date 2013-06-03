@@ -29,7 +29,8 @@ import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Compare double ..., value1, value2 => ..., result
+ * Compare double
+ * ..., value1, value2 => ..., result
  */
 public class DCMPL extends gov.nasa.jpf.jvm.bytecode.DCMPL {
 

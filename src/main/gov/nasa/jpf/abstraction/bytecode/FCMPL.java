@@ -29,7 +29,8 @@ import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Compare floats ..., value1, value2 => ..., result
+ * Compare floats
+ * ..., value1, value2 => ..., result
  */
 public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL {
 

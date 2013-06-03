@@ -25,7 +25,8 @@ import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert float to int ..., value => ..., result
+ * Convert float to int
+ * ..., value => ..., result
  */
 public class F2I extends gov.nasa.jpf.jvm.bytecode.F2I {
 

@@ -27,7 +27,8 @@ import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert double to long ..., value => ..., result
+ * Convert double to long
+ * ..., value => ..., result
  */
 public class D2L extends gov.nasa.jpf.jvm.bytecode.D2L {
 

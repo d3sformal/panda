@@ -28,7 +28,8 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Compare long ..., value1, value2 => ..., result
+ * Compare long
+ * ..., value1, value2 => ..., result
  */
 public class LCMP extends gov.nasa.jpf.jvm.bytecode.LCMP {
 
