@@ -25,7 +25,7 @@ import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
 
 /**
  * Access jump table by index and jump
- *   ..., index  => ...
+ * ..., index  => ...
  * WARNING: it actually duplicates LOOKUPSWITCH behavior
  */
 public class TABLESWITCH extends SwitchInstruction implements
