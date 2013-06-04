@@ -42,7 +42,7 @@ public class IFGT extends gov.nasa.jpf.jvm.bytecode.IFGT {
 	public Instruction execute (ThreadInfo ti) {
 
 		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getTopFrame();
+		StackFrame sf = ti.getModifiableTopFrame();
 		Abstraction abs_v = (Abstraction) sf.getOperandAttr();
 
 		if(abs_v == null) { // the condition is concrete

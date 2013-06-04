@@ -36,7 +36,7 @@ public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG {
 	public Instruction execute(ThreadInfo ti) {
 
 		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getTopFrame();
+		StackFrame sf = ti.getModifiableTopFrame();
 
 		Abstraction abs_val = (Abstraction) sf.getOperandAttr(0);
 

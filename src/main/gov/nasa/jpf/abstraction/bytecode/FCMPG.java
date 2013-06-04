@@ -37,7 +37,7 @@ public class FCMPG extends gov.nasa.jpf.jvm.bytecode.FCMPG {
 	public Instruction execute(ThreadInfo ti) {
 
 		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getTopFrame();
+		StackFrame sf = ti.getModifiableTopFrame();
 
 		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
 		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
