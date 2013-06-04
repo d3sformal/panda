@@ -37,10 +37,10 @@ public class FloatBinaryOperatorExecutor extends BinaryOperatorExecutor<Float> {
 
 	@Override
 	final protected void cleanUp(StackFrame sf) {
-		sf.pop();
-		sf.pop();
+		sf.popFloat();
+		sf.popFloat();
 		
-		sf.push(0, false);
+		sf.pushFloat(0);
 	}
 
 }

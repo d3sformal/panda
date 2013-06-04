@@ -79,11 +79,11 @@ public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL {
 
 		Signs s_result = (Signs) result;
 		if (s_result == Signs.NEG) {
-			sf.push(-1, false);
+			sf.push(-1);
 		} else if (s_result == Signs.POS) {
-			sf.push(+1, false);
+			sf.push(+1);
 		} else {
-			sf.push(0, false);
+			sf.push(0);
 		}
 
 		sf.setOperandAttr(result);

@@ -41,7 +41,7 @@ public class D2F extends gov.nasa.jpf.jvm.bytecode.D2F {
 		}
 
 		double val = sf.popDouble(); // just to pop it
-		sf.push(0, false);
+		sf.pushFloat(0);
 		sf.setOperandAttr(abs_val);
 
 		System.out.printf("D2F> Values: %f (%s)\n", val, abs_val);

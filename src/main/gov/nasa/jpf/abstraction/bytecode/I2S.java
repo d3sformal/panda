@@ -43,7 +43,7 @@ public class I2S extends gov.nasa.jpf.jvm.bytecode.I2S {
 
 		System.out.printf("I2S> Value:  %d (%s)\n", val, abs_val);
 		
-		sf.push((short) 0, false);
+		sf.push((short) 0);
 		sf.setOperandAttr(abs_val);
 
 		System.out.println("I2S> Result: " + sf.getOperandAttr());

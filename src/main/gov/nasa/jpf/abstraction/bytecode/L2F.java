@@ -40,7 +40,7 @@ public class L2F extends gov.nasa.jpf.jvm.bytecode.L2F {
 
 		long val = sf.popLong(); // just to pop it
 
-		sf.push(0, false);
+		sf.pushFloat(0);
 		sf.setOperandAttr(abs_val);
 
 		System.out.printf("L2F> Values: %d (%s)\n", val, abs_val);

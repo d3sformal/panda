@@ -41,7 +41,7 @@ public class D2I extends gov.nasa.jpf.jvm.bytecode.D2I {
 		}
 
 		double val = sf.popDouble(); // just to pop it
-		sf.push(0, false);
+		sf.push(0);
 		sf.setOperandAttr(abs_val);
 
 		System.out.printf("D2I> Values: %f (%s)\n", val, abs_val);

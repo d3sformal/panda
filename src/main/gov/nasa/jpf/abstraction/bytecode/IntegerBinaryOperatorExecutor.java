@@ -40,7 +40,7 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
 		sf.pop();
 		sf.pop();
 		
-		sf.push(0, false);
+		sf.push(0);
 	}
 
 }

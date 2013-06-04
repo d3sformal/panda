@@ -40,7 +40,7 @@ public class L2I extends gov.nasa.jpf.jvm.bytecode.L2I {
 
 		long val = sf.popLong(); // just to pop it
 		
-		sf.push(0, false);
+		sf.push(0);
 		sf.setOperandAttr(abs_val);
 
 		System.out.printf("L2I> Values: %d (%s)\n", val, abs_val);

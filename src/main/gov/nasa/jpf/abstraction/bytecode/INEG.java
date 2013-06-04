@@ -67,7 +67,7 @@ public class INEG extends gov.nasa.jpf.jvm.bytecode.INEG {
 
 		sf.pop();
 			
-		sf.push(0, false);
+		sf.push(0);
 		sf.setOperandAttr(result);
 
 		return getNext(ti);

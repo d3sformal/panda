@@ -41,7 +41,7 @@ public class I2F extends gov.nasa.jpf.jvm.bytecode.I2F {
 		
 		System.out.printf("I2F> Value:  %d (%s)\n", val, abs_val);	
 		
-		sf.push(0, false);
+		sf.pushFloat(0);
 		sf.setOperandAttr(abs_val);
 
 		System.out.println("I2F> Result: " + sf.getOperandAttr());

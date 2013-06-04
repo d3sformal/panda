@@ -40,7 +40,7 @@ public class F2I extends gov.nasa.jpf.jvm.bytecode.F2I {
 		}
 
 		float val = sf.popFloat(); // just to pop it
-		sf.push(0, false);
+		sf.push(0);
 		sf.setOperandAttr(abs_val);
 
 		System.out.printf("F2I> Values: %f (%s)\n", val, abs_val);

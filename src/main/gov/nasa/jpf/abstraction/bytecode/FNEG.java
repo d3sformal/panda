@@ -69,7 +69,7 @@ public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG {
 		
 		System.out.printf("FNEG> Result: %s\n", result);
 
-		sf.push(0, false);
+		sf.pushFloat(0);
 		sf.setOperandAttr(result);
 
 		System.out.println("Execute FNEG: " + result);
