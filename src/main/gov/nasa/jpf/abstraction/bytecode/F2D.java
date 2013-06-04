@@ -40,7 +40,7 @@ public class F2D extends gov.nasa.jpf.jvm.bytecode.F2D {
 		}
 
 		float val = sf.popFloat(); // just to pop it
-		sf.pushLong(0);
+		sf.pushDouble(0);
 		sf.setLongOperandAttr(abs_val);
 			
 		System.out.printf("F2D> Values: %f (%s)\n", val, abs_val);

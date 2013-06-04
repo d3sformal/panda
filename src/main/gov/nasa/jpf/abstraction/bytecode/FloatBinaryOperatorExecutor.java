@@ -2,7 +2,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.Types;
 
 public class FloatBinaryOperatorExecutor extends BinaryOperatorExecutor<Float> {
 
@@ -28,12 +27,12 @@ public class FloatBinaryOperatorExecutor extends BinaryOperatorExecutor<Float> {
 	
 	@Override
 	final protected Float getLeft(StackFrame sf) {
-		return Types.intToFloat(sf.peek(0));
+		return sf.peekFloat(0);
 	}
 
 	@Override
 	final protected Float getRight(StackFrame sf) {
-		return Types.intToFloat(sf.peek(1));
+		return sf.peekFloat(1);
 	}
 
 	@Override

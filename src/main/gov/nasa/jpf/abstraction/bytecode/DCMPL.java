@@ -25,7 +25,6 @@ import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
@@ -47,8 +46,8 @@ public class DCMPL extends gov.nasa.jpf.jvm.bytecode.DCMPL {
 			return super.execute(ti);
 		}
 
-		double v1 = Types.longToDouble(sf.peekLong(0));
-		double v2 = Types.longToDouble(sf.peekLong(2));
+		double v1 = sf.peekDouble(0);
+		double v2 = sf.peekDouble(2);
 
 		Abstraction result = Abstraction._cmpg(v1, abs_v1, v2, abs_v2);
 
@@ -74,8 +73,8 @@ public class DCMPL extends gov.nasa.jpf.jvm.bytecode.DCMPL {
 
 		System.out.printf("DCMPL> Result: %s\n", result);
 
-		sf.popLong();
-		sf.popLong();
+		sf.popDouble();
+		sf.popDouble();
 
 		Signs s_result = (Signs) result;
 

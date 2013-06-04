@@ -2,7 +2,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.Types;
 
 public class DoubleBinaryOperatorExecutor extends BinaryOperatorExecutor<Double> {
 
@@ -28,20 +27,20 @@ public class DoubleBinaryOperatorExecutor extends BinaryOperatorExecutor<Double>
 
 	@Override
 	final protected Double getLeft(StackFrame sf) {
-		return Types.longToDouble(sf.peekLong(0));
+		return sf.peekDouble(0);
 	}
 
 	@Override
 	final protected Double getRight(StackFrame sf) {
-		return Types.longToDouble(sf.peekLong(2));
+		return sf.peekDouble(2);
 	}
 
 	@Override
 	final protected void cleanUp(StackFrame sf) {
-		sf.popLong();
-		sf.popLong();
+		sf.popDouble();
+		sf.popDouble();
 		
-		sf.pushLong(0);
+		sf.pushDouble(0);
 	}
 
 }

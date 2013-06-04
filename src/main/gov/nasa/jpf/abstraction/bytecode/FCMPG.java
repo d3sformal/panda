@@ -25,7 +25,6 @@ import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
@@ -47,8 +46,8 @@ public class FCMPG extends gov.nasa.jpf.jvm.bytecode.FCMPG {
 			return super.execute(ti);
 		}
 
-		float v1 = Types.intToFloat(sf.peek(0));
-		float v2 = Types.intToFloat(sf.peek(1));
+		float v1 = sf.peekFloat(0);
+		float v2 = sf.peekFloat(1);
 
 		// abs_v2 compare to abs_v1
 		Abstraction result = Abstraction._cmpg(v1, abs_v1, v2, abs_v2);

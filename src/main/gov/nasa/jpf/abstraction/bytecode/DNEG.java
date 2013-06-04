@@ -22,7 +22,6 @@ import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
@@ -43,7 +42,7 @@ public class DNEG extends gov.nasa.jpf.jvm.bytecode.DNEG {
 			return super.execute(ti);
 		}
 
-		double val = Types.longToDouble(sf.peekLong(0));
+		double val = sf.peekDouble(0);
 
 		Abstraction result = Abstraction._neg(abs_val);
 
