@@ -2,12 +2,12 @@
 // Copyright (C) 2012 United States Government as represented by the
 // Administrator of the National Aeronautics and Space Administration
 // (NASA).  All Rights Reserved.
-// 
+//
 // This software is distributed under the NASA Open Source Agreement
 // (NOSA), version 1.3.  The NOSA has been approved by the Open Source
 // Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
 // directory tree for the complete NOSA document.
-// 
+//
 // THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
 // KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
 // LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
@@ -19,51 +19,55 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.abstraction.numeric.Signs;
+import gov.nasa.jpf.vm.StackFrame;
 
-/**
- * Compare double
- * ..., value1, value2 => ..., result
- */
-public class DCMPG extends gov.nasa.jpf.jvm.bytecode.DCMPG implements AbstractBinaryOperator<Double> {
+public class FloatComparatorExecutor extends BinaryOperatorExecutor<Float> {
 
-	DoubleComparatorExecutor executor = DoubleComparatorExecutor.getInstance();
-	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
+	private static FloatComparatorExecutor instance;
+
+	public static FloatComparatorExecutor getInstance() {
+		if (instance == null) {
+			instance = new FloatComparatorExecutor();
+		}
 		
-		/**
-		 * Delegates the call to a shared object that does all the heavy lifting
-		 */
-		return executor.execute(this, ti);
+		return instance;
 	}
 
 	@Override
-	public Abstraction getResult(Double v1, Abstraction abs_v1, Double v2, Abstraction abs_v2) {
-		
-		/**
-		 * Performs the adequate operation over abstractions
-		 */
-		return Abstraction._cmpg(v1, abs_v1, v2, abs_v2);
+	protected Abstraction getLeftAbstraction(StackFrame sf) {
+		return (Abstraction)sf.getOperandAttr(0);
 	}
 
 	@Override
-	public Instruction executeConcrete(ThreadInfo ti) {
-		
-		/**
-		 * Ensures execution of the original instruction
-		 */
-		return super.execute(ti);
+	protected Abstraction getRightAbstraction(StackFrame sf) {
+		return (Abstraction)sf.getOperandAttr(1);
 	}
 
 	@Override
-	public Instruction getSelf() {
+	final protected Float getLeft(StackFrame sf) {
+		return sf.peekFloat(0);
+	}
+
+	@Override
+	final protected Float getRight(StackFrame sf) {
+		return sf.peekFloat(1);
+	}
+
+	@Override
+	final protected void cleanUp(Abstraction result, StackFrame sf) {
+		sf.popFloat();
+		sf.popFloat();
 		
-		/**
-		 * Ensures translation into an ordinary instruction
-		 */
-		return this;
+		Signs s_result = (Signs) result;
+
+		if (s_result == Signs.NEG) {
+			sf.push(-1);
+		} else if (s_result == Signs.POS) {
+			sf.push(+1);
+		} else {
+			sf.push(0);
+		}
 	}
 
 }

@@ -68,7 +68,7 @@ public abstract class BinaryOperatorExecutor<T> {
 		
 		System.out.printf("%s> Result: %s\n", name, result);
 
-		cleanUp(sf);
+		cleanUp(result, sf);
 		
 		sf.setOperandAttr(result);
 
@@ -79,5 +79,5 @@ public abstract class BinaryOperatorExecutor<T> {
 	abstract protected Abstraction getRightAbstraction(StackFrame sf);
 	abstract protected T getLeft(StackFrame sf);
 	abstract protected T getRight(StackFrame sf);
-	abstract protected void cleanUp(StackFrame sf);
+	abstract protected void cleanUp(Abstraction result, StackFrame sf);
 }

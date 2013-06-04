@@ -54,7 +54,7 @@ public class DoubleBinaryOperatorExecutor extends BinaryOperatorExecutor<Double>
 	}
 
 	@Override
-	final protected void cleanUp(StackFrame sf) {
+	final protected void cleanUp(Abstraction result, StackFrame sf) {
 		sf.popDouble();
 		sf.popDouble();
 		

@@ -19,11 +19,6 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.abstraction.numeric.Signs;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
@@ -31,65 +26,44 @@ import gov.nasa.jpf.vm.Instruction;
  * Compare floats
  * ..., value1, value2 => ..., result
  */
-public class FCMPG extends gov.nasa.jpf.jvm.bytecode.FCMPG {
+public class FCMPG extends gov.nasa.jpf.jvm.bytecode.FCMPG implements AbstractBinaryOperator<Float> {
 
+	FloatComparatorExecutor executor = FloatComparatorExecutor.getInstance();
+	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-
-		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getModifiableTopFrame();
-
-		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
-		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
-
-		if (abs_v1 == null && abs_v2 == null) {
-			return super.execute(ti);
-		}
-
-		float v1 = sf.peekFloat(0);
-		float v2 = sf.peekFloat(1);
-
-		// abs_v2 compare to abs_v1
-		Abstraction result = Abstraction._cmpg(v1, abs_v1, v2, abs_v2);
-
-		System.out.printf("FCMPG> Values: %f (%s), %f (%s)\n", v2, abs_v2, v1,
-				abs_v1);
-
-		if (result.isComposite()) {
-			if (!ti.isFirstStepInsn()) { // first time around
-				int size = result.getTokensNumber();
-				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
-				ss.setNextChoiceGenerator(cg);
-
-				return this;
-			} else { // this is what really returns results
-				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-
-				assert (cg instanceof FocusAbstractChoiceGenerator);
-
-				int key = (Integer) cg.getNextChoice();
-				result = result.getToken(key);
-			}
-		}
 		
-		System.out.printf("FCMPG> Result: %s\n", result);
+		/**
+		 * Delegates the call to a shared object that does all the heavy lifting
+		 */
+		return executor.execute(this, ti);
+	}
 
-		sf.pop();
-		sf.pop();
+	@Override
+	public Abstraction getResult(Float v1, Abstraction abs_v1, Float v2, Abstraction abs_v2) {
+		
+		/**
+		 * Performs the adequate operation over abstractions
+		 */
+		return Abstraction._cmpg(v1, abs_v1, v2, abs_v2);
+	}
 
-		Signs s_result = (Signs) result;
+	@Override
+	public Instruction executeConcrete(ThreadInfo ti) {
+		
+		/**
+		 * Ensures execution of the original instruction
+		 */
+		return super.execute(ti);
+	}
 
-		if (s_result == Signs.NEG) {
-			sf.push(-1);
-		} else if (s_result == Signs.POS) {
-			sf.push(+1);
-		} else {
-			sf.push(0);
-		}
-
-		sf.setOperandAttr(result);
-
-		return getNext(ti);
+	@Override
+	public Instruction getSelf() {
+		
+		/**
+		 * Ensures translation into an ordinary instruction
+		 */
+		return this;
 	}
 
 }

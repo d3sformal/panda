@@ -54,7 +54,7 @@ public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
 	}
 
 	@Override
-	protected void cleanUp(StackFrame sf) {
+	protected void cleanUp(Abstraction result, StackFrame sf) {
 		sf.popLong();
 		sf.popLong();
 		
