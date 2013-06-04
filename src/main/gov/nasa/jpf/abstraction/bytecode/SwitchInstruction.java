@@ -16,7 +16,6 @@
 // THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
 // DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 //
-
 package gov.nasa.jpf.abstraction.bytecode;
 
 import java.util.ArrayList;
