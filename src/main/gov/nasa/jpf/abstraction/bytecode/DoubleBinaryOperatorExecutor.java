@@ -44,12 +44,12 @@ public class DoubleBinaryOperatorExecutor extends BinaryOperatorExecutor<Double>
 	}
 
 	@Override
-	final protected Double getLeft(StackFrame sf) {
+	final protected Double getLeftOperand(StackFrame sf) {
 		return sf.peekDouble(0);
 	}
 
 	@Override
-	final protected Double getRight(StackFrame sf) {
+	final protected Double getRightOperand(StackFrame sf) {
 		return sf.peekDouble(2);
 	}
 
@@ -59,6 +59,7 @@ public class DoubleBinaryOperatorExecutor extends BinaryOperatorExecutor<Double>
 		sf.popDouble();
 		
 		sf.pushDouble(0);
+		sf.setLongOperandAttr(result);
 	}
 
 }

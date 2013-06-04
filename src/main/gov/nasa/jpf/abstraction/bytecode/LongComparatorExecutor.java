@@ -19,51 +19,55 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.abstraction.numeric.Signs;
+import gov.nasa.jpf.vm.StackFrame;
 
-/**
- * Negate double
- * ..., value => ..., result
- */
-public class DNEG extends gov.nasa.jpf.jvm.bytecode.DNEG implements AbstractUnaryOperator<Double> {
+public class LongComparatorExecutor extends BinaryOperatorExecutor<Long> {
 
-	DoubleUnaryOperatorExecutor executor = DoubleUnaryOperatorExecutor.getInstance();
-	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
+	private static LongComparatorExecutor instance;
+
+	public static LongComparatorExecutor getInstance() {
+		if (instance == null) {
+			instance = new LongComparatorExecutor();
+		}
 		
-		/**
-		 * Delegates the call to a shared object that does all the heavy lifting
-		 */
-		return executor.execute(this, ti);
+		return instance;
 	}
 
 	@Override
-	public Abstraction getResult(Double v, Abstraction abs_v) {
-		
-		/**
-		 * Performs the adequate operation over abstractions
-		 */
-		return Abstraction._neg(abs_v);
+	protected Abstraction getLeftAbstraction(StackFrame sf) {
+		return (Abstraction)sf.getOperandAttr(1);
 	}
 
 	@Override
-	public Instruction executeConcrete(ThreadInfo ti) {
-		
-		/**
-		 * Ensures execution of the original instruction
-		 */
-		return super.execute(ti);
+	protected Abstraction getRightAbstraction(StackFrame sf) {
+		return (Abstraction)sf.getOperandAttr(3);
 	}
 
 	@Override
-	public Instruction getSelf() {
+	final protected Long getLeftOperand(StackFrame sf) {
+		return sf.peekLong(0);
+	}
+
+	@Override
+	final protected Long getRightOperand(StackFrame sf) {
+		return sf.peekLong(2);
+	}
+
+	@Override
+	final protected void cleanUp(Abstraction result, StackFrame sf) {
+		sf.popLong();
+		sf.popLong();
 		
-		/**
-		 * Ensures translation into an ordinary instruction
-		 */
-		return this;
+		Signs s_result = (Signs) result;
+
+		if (s_result == Signs.NEG) {
+			sf.push(-1);
+		} else if (s_result == Signs.POS) {
+			sf.push(+1);
+		} else {
+			sf.push(0);
+		}
 	}
 
 }

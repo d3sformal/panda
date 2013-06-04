@@ -22,48 +22,11 @@ import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-/**
- * Negate double
- * ..., value => ..., result
- */
-public class DNEG extends gov.nasa.jpf.jvm.bytecode.DNEG implements AbstractUnaryOperator<Double> {
-
-	DoubleUnaryOperatorExecutor executor = DoubleUnaryOperatorExecutor.getInstance();
+public interface AbstractUnaryOperator<T> {
+	public Instruction executeConcrete(ThreadInfo ti);
 	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		
-		/**
-		 * Delegates the call to a shared object that does all the heavy lifting
-		 */
-		return executor.execute(this, ti);
-	}
+	public Abstraction getResult(T v, Abstraction abs_v);
 
-	@Override
-	public Abstraction getResult(Double v, Abstraction abs_v) {
-		
-		/**
-		 * Performs the adequate operation over abstractions
-		 */
-		return Abstraction._neg(abs_v);
-	}
-
-	@Override
-	public Instruction executeConcrete(ThreadInfo ti) {
-		
-		/**
-		 * Ensures execution of the original instruction
-		 */
-		return super.execute(ti);
-	}
-
-	@Override
-	public Instruction getSelf() {
-		
-		/**
-		 * Ensures translation into an ordinary instruction
-		 */
-		return this;
-	}
-
+	public Instruction getSelf();
+	public Instruction getNext(ThreadInfo ti);
 }

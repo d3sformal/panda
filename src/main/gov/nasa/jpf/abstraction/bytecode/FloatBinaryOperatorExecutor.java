@@ -44,12 +44,12 @@ public class FloatBinaryOperatorExecutor extends BinaryOperatorExecutor<Float> {
 	}
 	
 	@Override
-	final protected Float getLeft(StackFrame sf) {
+	final protected Float getLeftOperand(StackFrame sf) {
 		return sf.peekFloat(0);
 	}
 
 	@Override
-	final protected Float getRight(StackFrame sf) {
+	final protected Float getRightOperand(StackFrame sf) {
 		return sf.peekFloat(1);
 	}
 
@@ -59,6 +59,7 @@ public class FloatBinaryOperatorExecutor extends BinaryOperatorExecutor<Float> {
 		sf.popFloat();
 		
 		sf.pushFloat(0);
+		sf.setOperandAttr(result);
 	}
 
 }

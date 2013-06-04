@@ -44,12 +44,12 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
 	}
 
 	@Override
-	protected Integer getLeft(StackFrame sf) {
+	protected Integer getLeftOperand(StackFrame sf) {
 		return sf.peek(0);
 	}
 
 	@Override
-	protected Integer getRight(StackFrame sf) {
+	protected Integer getRightOperand(StackFrame sf) {
 		return sf.peek(1);
 	}
 
@@ -59,6 +59,7 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
 		sf.pop();
 		
 		sf.push(0);
+		sf.setOperandAttr(result);
 	}
 
 }

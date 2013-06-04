@@ -19,51 +19,37 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.StackFrame;
 
-/**
- * Negate double
- * ..., value => ..., result
- */
-public class DNEG extends gov.nasa.jpf.jvm.bytecode.DNEG implements AbstractUnaryOperator<Double> {
+public class DoubleUnaryOperatorExecutor extends UnaryOperatorExecutor<Double> {
 
-	DoubleUnaryOperatorExecutor executor = DoubleUnaryOperatorExecutor.getInstance();
-	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
+	private static DoubleUnaryOperatorExecutor instance;
+
+	public static DoubleUnaryOperatorExecutor getInstance() {
+		if (instance == null) {
+			instance = new DoubleUnaryOperatorExecutor();
+		}
 		
-		/**
-		 * Delegates the call to a shared object that does all the heavy lifting
-		 */
-		return executor.execute(this, ti);
+		return instance;
 	}
 
 	@Override
-	public Abstraction getResult(Double v, Abstraction abs_v) {
-		
-		/**
-		 * Performs the adequate operation over abstractions
-		 */
-		return Abstraction._neg(abs_v);
+	protected Abstraction getAbstraction(StackFrame sf) {
+		return (Abstraction)sf.getOperandAttr(1);
+	}
+
+
+	@Override
+	final protected Double getOperand(StackFrame sf) {
+		return sf.peekDouble(0);
 	}
 
 	@Override
-	public Instruction executeConcrete(ThreadInfo ti) {
+	final protected void cleanUp(Abstraction result, StackFrame sf) {
+		sf.popDouble();
 		
-		/**
-		 * Ensures execution of the original instruction
-		 */
-		return super.execute(ti);
-	}
-
-	@Override
-	public Instruction getSelf() {
-		
-		/**
-		 * Ensures translation into an ordinary instruction
-		 */
-		return this;
+		sf.pushDouble(0);
+		sf.setLongOperandAttr(result);
 	}
 
 }

@@ -45,12 +45,12 @@ public class DoubleComparatorExecutor extends BinaryOperatorExecutor<Double> {
 	}
 
 	@Override
-	final protected Double getLeft(StackFrame sf) {
+	final protected Double getLeftOperand(StackFrame sf) {
 		return sf.peekDouble(0);
 	}
 
 	@Override
-	final protected Double getRight(StackFrame sf) {
+	final protected Double getRightOperand(StackFrame sf) {
 		return sf.peekDouble(2);
 	}
 

@@ -19,60 +19,51 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.SystemState;
-import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
- * Negate int
+ * Negate integer
  * ..., value => ..., result
  */
-public class INEG extends gov.nasa.jpf.jvm.bytecode.INEG {
+public class INEG extends gov.nasa.jpf.jvm.bytecode.INEG implements AbstractUnaryOperator<Integer> {
 
+	IntegerUnaryOperatorExecutor executor = IntegerUnaryOperatorExecutor.getInstance();
+	
+	@Override
 	public Instruction execute(ThreadInfo ti) {
-
-		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getModifiableTopFrame();
-		Abstraction abs_val = (Abstraction) sf.getOperandAttr(0);
-
-		if (abs_val == null) {
-			return super.execute(ti);
-		}
-
-		int val = sf.peek(0);
-
-		Abstraction result = Abstraction._neg(abs_val);
-
-		System.out.printf("INEG> Value:  %d (%s)\n", val, abs_val);
-
-		if (result.isComposite()) {
-			if (!ti.isFirstStepInsn()) { // first time around
-				int size = result.getTokensNumber();
-				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
-				ss.setNextChoiceGenerator(cg);
-
-				return this;
-			} else { // this is what really returns results
-				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-					
-				assert (cg instanceof FocusAbstractChoiceGenerator);
-				
-				int key = (Integer) cg.getNextChoice();
-				result = result.getToken(key);
-			}
-		}
 		
-		System.out.printf("INEG> Result: %s\n", result);
+		/**
+		 * Delegates the call to a shared object that does all the heavy lifting
+		 */
+		return executor.execute(this, ti);
+	}
 
-		sf.pop();
-			
-		sf.push(0);
-		sf.setOperandAttr(result);
+	@Override
+	public Abstraction getResult(Integer v, Abstraction abs_v) {
+		
+		/**
+		 * Performs the adequate operation over abstractions
+		 */
+		return Abstraction._neg(abs_v);
+	}
 
-		return getNext(ti);
+	@Override
+	public Instruction executeConcrete(ThreadInfo ti) {
+		
+		/**
+		 * Ensures execution of the original instruction
+		 */
+		return super.execute(ti);
+	}
+
+	@Override
+	public Instruction getSelf() {
+		
+		/**
+		 * Ensures translation into an ordinary instruction
+		 */
+		return this;
 	}
 
 }

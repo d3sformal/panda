@@ -44,12 +44,12 @@ public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
 	}
 
 	@Override
-	protected Long getLeft(StackFrame sf) {
+	protected Long getLeftOperand(StackFrame sf) {
 		return sf.peekLong(0);
 	}
 
 	@Override
-	protected Long getRight(StackFrame sf) {
+	protected Long getRightOperand(StackFrame sf) {
 		return sf.peekLong(2);
 	}
 
@@ -59,6 +59,7 @@ public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
 		sf.popLong();
 		
 		sf.pushLong(0);
+		sf.setLongOperandAttr(result);
 	}
 
 }

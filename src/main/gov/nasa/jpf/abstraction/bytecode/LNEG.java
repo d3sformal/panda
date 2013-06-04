@@ -2,12 +2,12 @@
 // Copyright (C) 2012 United States Government as represented by the
 // Administrator of the National Aeronautics and Space Administration
 // (NASA).  All Rights Reserved.
-// 
+//
 // This software is distributed under the NASA Open Source Agreement
 // (NOSA), version 1.3.  The NOSA has been approved by the Open Source
 // Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
 // directory tree for the complete NOSA document.
-// 
+//
 // THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
 // KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
 // LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
@@ -19,59 +19,51 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.SystemState;
-import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
  * Negate long
  * ..., value => ..., result
  */
-public class LNEG extends gov.nasa.jpf.jvm.bytecode.LNEG {
+public class LNEG extends gov.nasa.jpf.jvm.bytecode.LNEG implements AbstractUnaryOperator<Long> {
 
+	LongUnaryOperatorExecutor executor = LongUnaryOperatorExecutor.getInstance();
+	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
 		
-		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getModifiableTopFrame();
-		Abstraction abs_val = (Abstraction) sf.getOperandAttr(1);
+		/**
+		 * Delegates the call to a shared object that does all the heavy lifting
+		 */
+		return executor.execute(this, ti);
+	}
 
-		if (abs_val == null) {
-			return super.execute(ti);
-		}
-
-		long val = sf.popLong(); // just to pop it
-
-		Abstraction result = Abstraction._neg(abs_val);
-
-		System.out.printf("LNEG> Values: %d (%s)\n", val, abs_val);
-
-		if (result.isComposite()) {
-			if (!ti.isFirstStepInsn()) { // first time around
-				int size = result.getTokensNumber();
-				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
-				ss.setNextChoiceGenerator(cg);
-			
-				return this;
-			} else { // this is what really returns results
-				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-				
-				assert (cg instanceof FocusAbstractChoiceGenerator);
-			
-				int key = (Integer) cg.getNextChoice();
-				result = result.getToken(key);
-			}
-		}
+	@Override
+	public Abstraction getResult(Long v, Abstraction abs_v) {
 		
-		System.out.printf("LNEG> Result: %s\n", result);
+		/**
+		 * Performs the adequate operation over abstractions
+		 */
+		return Abstraction._neg(abs_v);
+	}
 
-		sf.pushLong(0);
-		sf.setLongOperandAttr(result);
+	@Override
+	public Instruction executeConcrete(ThreadInfo ti) {
+		
+		/**
+		 * Ensures execution of the original instruction
+		 */
+		return super.execute(ti);
+	}
 
-		return getNext(ti);
+	@Override
+	public Instruction getSelf() {
+		
+		/**
+		 * Ensures translation into an ordinary instruction
+		 */
+		return this;
 	}
 
 }

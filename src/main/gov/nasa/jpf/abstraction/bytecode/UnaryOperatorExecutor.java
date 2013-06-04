@@ -26,28 +26,26 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public abstract class BinaryOperatorExecutor<T> {
+public abstract class UnaryOperatorExecutor<T> {
 
-	final public Instruction execute(AbstractBinaryOperator<T> op, ThreadInfo ti) {
-		
+	final public Instruction execute(AbstractUnaryOperator<T> op, ThreadInfo ti) {
+
 		String name = op.getClass().getName();
 		
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
 
-		Abstraction abs_v1 = getLeftAbstraction(sf);
-		Abstraction abs_v2 = getRightAbstraction(sf);
+		Abstraction abs_v = getAbstraction(sf);
 
-		if (abs_v1 == null && abs_v2 == null) {
+		if (abs_v == null) {
 			return op.executeConcrete(ti);
 		}
 
-		T v1 = getLeftOperand(sf);
-		T v2 = getRightOperand(sf);
+		T v = getOperand(sf);
 
-		Abstraction result = op.getResult(v1, abs_v1, v2, abs_v2);
+		Abstraction result = op.getResult(v, abs_v);
 
-		System.out.printf("%s> Values: %f (%s), %f (%s)\n", name, v2, abs_v2, v1, abs_v1);
+		System.out.printf("%s> Values: %f (%s)\n", name, v, abs_v);
 
 		if (result.isComposite()) {
 			if (!ti.isFirstStepInsn()) { // first time around
@@ -73,9 +71,7 @@ public abstract class BinaryOperatorExecutor<T> {
 		return op.getNext(ti);
 	}
 	
-	abstract protected Abstraction getLeftAbstraction(StackFrame sf);
-	abstract protected Abstraction getRightAbstraction(StackFrame sf);
-	abstract protected T getLeftOperand(StackFrame sf);
-	abstract protected T getRightOperand(StackFrame sf);
+	abstract protected Abstraction getAbstraction(StackFrame sf);
+	abstract protected T getOperand(StackFrame sf);
 	abstract protected void cleanUp(Abstraction result, StackFrame sf);
 }
