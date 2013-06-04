@@ -32,7 +32,7 @@ public class I2D extends gov.nasa.jpf.jvm.bytecode.I2D {
 	@Override
 	public Instruction execute(ThreadInfo ti) {
 
-		StackFrame sf = ti.getTopFrame();
+		StackFrame sf = ti.getModifiableTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getOperandAttr();
 
 		if (abs_val == null) {

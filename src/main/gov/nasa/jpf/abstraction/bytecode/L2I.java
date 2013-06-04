@@ -31,7 +31,7 @@ public class L2I extends gov.nasa.jpf.jvm.bytecode.L2I {
 
 	public Instruction execute(ThreadInfo ti) {
 
-		StackFrame sf = ti.getTopFrame();
+		StackFrame sf = ti.getModifiableTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getOperandAttr(1);
 
 		if (abs_val == null) {

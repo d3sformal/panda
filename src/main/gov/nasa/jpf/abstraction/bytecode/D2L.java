@@ -33,7 +33,7 @@ public class D2L extends gov.nasa.jpf.jvm.bytecode.D2L {
 
 	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo ti) {
 
-		StackFrame sf = ti.getTopFrame();
+		StackFrame sf = ti.getModifiableTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getLongOperandAttr();
 
 		if (abs_val == null) {

@@ -31,7 +31,7 @@ public class L2D extends gov.nasa.jpf.jvm.bytecode.L2D {
 
 	public Instruction execute(ThreadInfo ti) {
 
-		StackFrame sf = ti.getTopFrame();
+		StackFrame sf = ti.getModifiableTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getLongOperandAttr();
 
 		if (abs_val == null) {

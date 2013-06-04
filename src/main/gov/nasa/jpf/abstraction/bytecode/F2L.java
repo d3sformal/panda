@@ -32,7 +32,7 @@ public class F2L extends gov.nasa.jpf.jvm.bytecode.F2L {
 	@Override
 	public Instruction execute(ThreadInfo ti) {
 
-		StackFrame sf = ti.getTopFrame();
+		StackFrame sf = ti.getModifiableTopFrame();
 		Abstraction abs_val = (Abstraction) sf.getOperandAttr();
 
 		if (abs_val == null) {
