@@ -1,13 +1,14 @@
 package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.annotation.MJI;
 import gov.nasa.jpf.vm.MJIEnv;
 import gov.nasa.jpf.vm.NativePeer;
 
-
 public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
 
-	public static int getAbstractInteger(MJIEnv env, int objRef, int v) {
+	@MJI
+	public static int getAbstractInteger__I__Ljava_lang_String_2(MJIEnv env, int objRef, int v) {
 		Object [] attrs = env.getArgAttributes();
 		Abstraction abs_arg;
 		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
@@ -16,7 +17,8 @@ public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
 		return env.newString(abs_arg.toString());
 	}
 
-    public static int getAbstractDouble(MJIEnv env, int objRef, double v) {
+    @MJI
+    public static int getAbstractDouble__D__Ljava_lang_String_2(MJIEnv env, int objRef, double v) {
     	Object [] attrs = env.getArgAttributes();
 		Abstraction abs_arg;
 		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
@@ -25,7 +27,8 @@ public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
 		return env.newString(abs_arg.toString());
     }
     
-    public static int getAbstractFloat(MJIEnv env, int objRef, float v) {
+    @MJI
+    public static int getAbstractFloat__F__Ljava_lang_String_2(MJIEnv env, int objRef, float v) {
     	Object [] attrs = env.getArgAttributes();
 		Abstraction abs_arg;
 		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
@@ -34,7 +37,8 @@ public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
 		return env.newString(abs_arg.toString());
     }    
     
-    public static int getAbstractLong(MJIEnv env, int objRef, long v) {
+    @MJI
+    public static int getAbstractLong__J__Ljava_lang_String_2(MJIEnv env, int objRef, long v) {
     	Object [] attrs = env.getArgAttributes();
 		Abstraction abs_arg;
 		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
@@ -43,7 +47,8 @@ public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
 		return env.newString(abs_arg.toString());
     }       
 
-    public static int getAbstractBoolean(MJIEnv env, int objRef, boolean v) {
+    @MJI
+    public static int getAbstractBoolean__Z__Ljava_lang_String_2(MJIEnv env, int objRef, boolean v) {
     	Object [] attrs = env.getArgAttributes();
 		Abstraction abs_arg;
 		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
@@ -53,22 +58,26 @@ public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
 
     }
 
-	public static float makeAbstractFloat(MJIEnv env, int objRef, float v){
+    @MJI
+	public static float makeAbstractFloat__F__F(MJIEnv env, int objRef, float v){
 		env.setReturnAttribute(AbstractInstructionFactory.abs.abstractMap(v));
 		return v;
 	}
 	
-	public static double makeAbstractDouble(MJIEnv env, int objRef, double v){
+    @MJI
+	public static double makeAbstractDouble__D__D(MJIEnv env, int objRef, double v){
 		env.setReturnAttribute(AbstractInstructionFactory.abs.abstractMap(v));
 		return v;
 	}	
     
-    public static int makeAbstractInteger(MJIEnv env, int objRef, int v){
+    @MJI
+    public static int makeAbstractInteger__I__I(MJIEnv env, int objRef, int v){
     	env.setReturnAttribute(AbstractInstructionFactory.abs.abstractMap(v));
     	return v;
     }
     
-	public static long makeAbstractLong(MJIEnv env, int objRef, long v){
+    @MJI
+	public static long makeAbstractLong__J__J(MJIEnv env, int objRef, long v){
 		env.setReturnAttribute(AbstractInstructionFactory.abs.abstractMap(v));
 		return v;
 	}    
