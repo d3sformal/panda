@@ -45,7 +45,7 @@ public abstract class UnaryOperatorExecutor<T> {
 
 		Abstraction result = op.getResult(v, abs_v);
 
-		System.out.printf("%s> Values: %f (%s)\n", name, v, abs_v);
+		System.out.printf("%s> Values: %s (%s)\n", name, v.toString(), abs_v);
 
 		if (result.isComposite()) {
 			if (!ti.isFirstStepInsn()) { // first time around

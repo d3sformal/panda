@@ -47,7 +47,7 @@ public abstract class BinaryOperatorExecutor<T> {
 
 		Abstraction result = op.getResult(v1, abs_v1, v2, abs_v2);
 
-		System.out.printf("%s> Values: %f (%s), %f (%s)\n", name, v2, abs_v2, v1, abs_v1);
+		System.out.printf("%s> Values: %s (%s), %s (%s)\n", name, v2.toString(), abs_v2, v1.toString(), abs_v1);
 
 		if (result.isComposite()) {
 			if (!ti.isFirstStepInsn()) { // first time around
