@@ -1,14 +1,20 @@
 package gov.nasa.jpf.abstraction;
 
+import java.util.Arrays;
+
 public class IntBC {
 
 	public static void main(String[] args) {		
 // Uncomment to test specific bytecode		
 		test_TABLESWITCH();
 		test_LOOKUPSWITCH();
-		test_I2F(1);
-		test_I2D(1);
-		test_I2L(1);
+
+        if (!Arrays.asList(args).contains("noconversions"))
+        {
+		    test_I2F(1);
+		    test_I2D(1);
+		    test_I2L(1);
+        }
 		
 		test_IADD(3, -2);
 		test_IADD(3, 1);
