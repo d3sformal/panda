@@ -33,6 +33,8 @@ public class Evenness extends Abstraction {
 	public static Evenness ODD  = new Evenness(1);
 	public static Evenness TOP = new Evenness(2);
 
+    private static final int DOMAIN_SIZE = 2;
+
 	public boolean can_be_ODD() {
 		return getKey() != 0;
 	}
@@ -71,6 +73,15 @@ public class Evenness extends Abstraction {
 		if (can_be_ODD())
 			++result;
 		return result;
+	}
+
+    /**
+	 * 
+	 * @return The number of abstract values in the domain.
+	 */
+    @Override
+	public int getDomainSize() {
+		return DOMAIN_SIZE;
 	}
 
 	public Evenness(int key) {

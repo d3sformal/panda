@@ -193,6 +193,7 @@ public class Signs extends Abstraction {
 	 * 
 	 * @return The number of abstract values in the domain.
 	 */
+    @Override
 	public int getDomainSize() {
 		return DOMAIN_SIZE;
 	}	

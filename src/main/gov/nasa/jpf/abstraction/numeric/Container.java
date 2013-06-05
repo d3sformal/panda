@@ -78,6 +78,7 @@ public class Container extends Abstraction {
 	 * 
 	 * @return The number of abstract values in the domain.
 	 */
+    @Override
 	public int getDomainSize() {
 		int num = 1;
 		for (int i = 0; i < list.size(); ++i)
