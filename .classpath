@@ -7,7 +7,14 @@
 	<classpathentry kind="src" output="build/peers" path="src/peers"/>
 	<classpathentry kind="src" output="build/tests" path="src/tests"/>
 	<classpathentry kind="src" output="build/classes" path="src/classes"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jpf-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jpf-core">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="jpf-core"/>
+		</attributes>
+		<accessrules>
+			<accessrule kind="accessible" pattern="**"/>
+		</accessrules>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/opt4j-2.2.jar"/>
 	<classpathentry kind="lib" path="lib/commons-math-1.2.jar"/>
 	<classpathentry kind="lib" path="/jpf-core/lib/junit-4.10.jar"/>

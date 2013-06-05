@@ -33,7 +33,7 @@
 
 
   <!-- compiler settings -->
-  <property name="src_level"     value="6"/>
+  <property name="src_level"     value="1.7"/>
   <property name="debug"         value="on"/>
   <property name="deprecation"   value="on"/>
 
