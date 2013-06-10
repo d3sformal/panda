@@ -66,12 +66,12 @@ public abstract class UnaryOperatorExecutor<T> {
 		
 		System.out.printf("%s> Result: %s\n", name, result);
 
-		cleanUp(result, sf);
+		storeResult(result, sf);
 
 		return op.getNext(ti);
 	}
 	
 	abstract protected Abstraction getAbstraction(StackFrame sf);
 	abstract protected T getOperand(StackFrame sf);
-	abstract protected void cleanUp(Abstraction result, StackFrame sf);
+	abstract protected void storeResult(Abstraction result, StackFrame sf);
 }

@@ -55,7 +55,7 @@ public class FloatComparatorExecutor extends BinaryOperatorExecutor<Float> {
 	}
 
 	@Override
-	final protected void cleanUp(Abstraction result, StackFrame sf) {
+	final protected void storeResult(Abstraction result, StackFrame sf) {
 		sf.popFloat();
 		sf.popFloat();
 		

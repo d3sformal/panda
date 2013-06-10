@@ -45,7 +45,7 @@ public class FloatUnaryOperatorExecutor extends UnaryOperatorExecutor<Float> {
 	}
 
 	@Override
-	final protected void cleanUp(Abstraction result, StackFrame sf) {
+	final protected void storeResult(Abstraction result, StackFrame sf) {
 		sf.popFloat();
 		
 		sf.pushFloat(0);

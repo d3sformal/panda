@@ -54,7 +54,7 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
 	}
 
 	@Override
-	protected void cleanUp(Abstraction result, StackFrame sf) {
+	protected void storeResult(Abstraction result, StackFrame sf) {
 		sf.pop();
 		sf.pop();
 		

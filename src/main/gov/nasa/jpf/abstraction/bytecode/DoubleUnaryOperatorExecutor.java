@@ -45,7 +45,7 @@ public class DoubleUnaryOperatorExecutor extends UnaryOperatorExecutor<Double> {
 	}
 
 	@Override
-	final protected void cleanUp(Abstraction result, StackFrame sf) {
+	final protected void storeResult(Abstraction result, StackFrame sf) {
 		sf.popDouble();
 		
 		sf.pushDouble(0);

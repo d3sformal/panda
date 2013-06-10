@@ -45,7 +45,7 @@ public class IntegerUnaryOperatorExecutor extends UnaryOperatorExecutor<Integer>
 	}
 
 	@Override
-	final protected void cleanUp(Abstraction result, StackFrame sf) {
+	final protected void storeResult(Abstraction result, StackFrame sf) {
 		sf.pop();
 		
 		sf.push(0);

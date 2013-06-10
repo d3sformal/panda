@@ -55,7 +55,7 @@ public class DoubleComparatorExecutor extends BinaryOperatorExecutor<Double> {
 	}
 
 	@Override
-	final protected void cleanUp(Abstraction result, StackFrame sf) {
+	final protected void storeResult(Abstraction result, StackFrame sf) {
 		sf.popDouble();
 		sf.popDouble();
 		

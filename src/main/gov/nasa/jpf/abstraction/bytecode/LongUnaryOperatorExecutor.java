@@ -44,7 +44,7 @@ public class LongUnaryOperatorExecutor extends UnaryOperatorExecutor<Long> {
 	}
 
 	@Override
-	protected void cleanUp(Abstraction result, StackFrame sf) {
+	protected void storeResult(Abstraction result, StackFrame sf) {
 		sf.popLong();
 		
 		sf.pushLong(0);
