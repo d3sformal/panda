@@ -20,7 +20,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
 import gov.nasa.jpf.abstraction.numeric.AbstractChoiceGenerator;
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.AbstractValue;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
@@ -44,8 +44,8 @@ public class IF_ICMPLE extends gov.nasa.jpf.jvm.bytecode.IF_ICMPLE {
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
 
-		Abstraction abs_v1 = (Abstraction) sf.getOperandAttr(0);
-		Abstraction abs_v2 = (Abstraction) sf.getOperandAttr(1);
+		AbstractValue abs_v1 = (AbstractValue) sf.getOperandAttr(0);
+		AbstractValue abs_v2 = (AbstractValue) sf.getOperandAttr(1);
 
 		if (abs_v1 == null && abs_v2 == null) {
 			return super.execute(ti);
@@ -55,7 +55,7 @@ public class IF_ICMPLE extends gov.nasa.jpf.jvm.bytecode.IF_ICMPLE {
 		int v2 = sf.peek(1);
 
 		// abs_v2 <= abs_v1
-		AbstractBoolean result = Abstraction._le(v1, abs_v1, v2, abs_v2);
+		AbstractBoolean result = AbstractValue._le(v1, abs_v1, v2, abs_v2);
 
 		System.out.printf("IF_ICMPLE> Values: %d (%s), %d (%s)\n", v2, abs_v2, v1, abs_v1);
 

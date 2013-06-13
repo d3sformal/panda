@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.AbstractValue;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -33,7 +33,7 @@ public class I2L extends gov.nasa.jpf.jvm.bytecode.I2L {
 	public Instruction execute(ThreadInfo ti) {
 
 		StackFrame sf = ti.getModifiableTopFrame();
-		Abstraction abs_val = (Abstraction) sf.getOperandAttr(0);		
+		AbstractValue abs_val = (AbstractValue) sf.getOperandAttr(0);		
 		
 		if (abs_val == null) {
 			return super.execute(ti);

@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.AbstractValue;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -32,7 +32,7 @@ public class L2D extends gov.nasa.jpf.jvm.bytecode.L2D {
 	public Instruction execute(ThreadInfo ti) {
 
 		StackFrame sf = ti.getModifiableTopFrame();
-		Abstraction abs_val = (Abstraction) sf.getLongOperandAttr();
+		AbstractValue abs_val = (AbstractValue) sf.getLongOperandAttr();
 
 		if (abs_val == null) {
 			return super.execute(ti);

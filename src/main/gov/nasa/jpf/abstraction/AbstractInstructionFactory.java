@@ -60,10 +60,10 @@ public class AbstractInstructionFactory extends
 			String abs_name = argv[0].toLowerCase();
 			if (abs_name.equals("signs")) {
 				System.out.printf("### jpf-abstraction: SIGNS turned on\n");
-				abs_list.add(new Signs(0));
+				abs_list.add(Signs.getInstance());
 			} else if (abs_name.equals("evenness")) {
 				System.out.printf("### jpf-abstraction: EVENNESS turned on\n");
-				abs_list.add(new Evenness(0));
+				abs_list.add(Evenness.getInstance());
 			} else if (abs_name.equals("interval")) {
 				try {
 					double min = Double.parseDouble(argv[1]);
@@ -71,7 +71,7 @@ public class AbstractInstructionFactory extends
 					System.out
 							.printf("### jpf-abstraction: INTERVAL[%f, %f] turned on\n",
 									min, max);
-					abs_list.add(Interval.create(min, max));
+					abs_list.add(new Interval(min, max));
 				} catch (NumberFormatException nfe) {
 					System.out
 							.println("### jpf-abstraction: please keep format "
@@ -88,7 +88,7 @@ public class AbstractInstructionFactory extends
 					System.out
 							.printf("### jpf-abstraction: RANGE[%d, %d] turned on\n",
 									min, max);
-					abs_list.add(Range.create(min, max));
+					abs_list.add(new Range(min, max));
 				} catch (NumberFormatException nfe) {
 					System.out
 							.println("### jpf-abstraction: please keep format "

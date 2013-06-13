@@ -18,7 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.AbstractValue;
+import gov.nasa.jpf.abstraction.numeric.AbstractValue;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
@@ -35,8 +36,8 @@ public abstract class BinaryOperatorExecutor<T> {
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
 
-		Abstraction abs_v1 = getLeftAbstraction(sf);
-		Abstraction abs_v2 = getRightAbstraction(sf);
+		AbstractValue abs_v1 = getLeftAbstractValue(sf);
+		AbstractValue abs_v2 = getRightAbstractValue(sf);
 
 		if (abs_v1 == null && abs_v2 == null) {
 			return op.executeConcrete(ti);
@@ -45,7 +46,7 @@ public abstract class BinaryOperatorExecutor<T> {
 		T v1 = getLeftOperand(sf);
 		T v2 = getRightOperand(sf);
 
-		Abstraction result = op.getResult(v1, abs_v1, v2, abs_v2);
+		AbstractValue result = op.getResult(v1, abs_v1, v2, abs_v2);
 
 		System.out.printf("%s> Values: %s (%s), %s (%s)\n", name, v2.toString(), abs_v2, v1.toString(), abs_v1);
 
@@ -73,9 +74,9 @@ public abstract class BinaryOperatorExecutor<T> {
 		return op.getNext(ti);
 	}
 	
-	abstract protected Abstraction getLeftAbstraction(StackFrame sf);
-	abstract protected Abstraction getRightAbstraction(StackFrame sf);
+	abstract protected AbstractValue getLeftAbstractValue(StackFrame sf);
+	abstract protected AbstractValue getRightAbstractValue(StackFrame sf);
 	abstract protected T getLeftOperand(StackFrame sf);
 	abstract protected T getRightOperand(StackFrame sf);
-	abstract protected void storeResult(Abstraction result, StackFrame sf);
+	abstract protected void storeResult(AbstractValue result, StackFrame sf);
 }

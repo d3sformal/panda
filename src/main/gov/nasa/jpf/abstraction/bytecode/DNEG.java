@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.AbstractValue;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -40,12 +40,12 @@ public class DNEG extends gov.nasa.jpf.jvm.bytecode.DNEG implements AbstractUnar
 	}
 
 	@Override
-	public Abstraction getResult(Double v, Abstraction abs_v) {
+	public AbstractValue getResult(Double v, AbstractValue abs_v) {
 		
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return Abstraction._neg(abs_v);
+		return AbstractValue._neg(abs_v);
 	}
 
 	@Override

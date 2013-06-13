@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction;
 
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.AbstractValue;
 import gov.nasa.jpf.annotation.MJI;
 import gov.nasa.jpf.vm.MJIEnv;
 import gov.nasa.jpf.vm.NativePeer;
@@ -10,8 +10,8 @@ public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
 	@MJI
 	public static int getAbstractInteger__I__Ljava_lang_String_2(MJIEnv env, int objRef, int v) {
 		Object [] attrs = env.getArgAttributes();
-		Abstraction abs_arg;
-		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
+		AbstractValue abs_arg;
+		if(attrs == null || (abs_arg=(AbstractValue)attrs[0])==null)
 			return env.newString(Integer.toString(v));
 
 		return env.newString(abs_arg.toString());
@@ -20,8 +20,8 @@ public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
     @MJI
     public static int getAbstractDouble__D__Ljava_lang_String_2(MJIEnv env, int objRef, double v) {
     	Object [] attrs = env.getArgAttributes();
-		Abstraction abs_arg;
-		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
+		AbstractValue abs_arg;
+		if(attrs == null || (abs_arg=(AbstractValue)attrs[0])==null)
 			return env.newString(Double.toString(v));
 
 		return env.newString(abs_arg.toString());
@@ -30,8 +30,8 @@ public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
     @MJI
     public static int getAbstractFloat__F__Ljava_lang_String_2(MJIEnv env, int objRef, float v) {
     	Object [] attrs = env.getArgAttributes();
-		Abstraction abs_arg;
-		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
+		AbstractValue abs_arg;
+		if(attrs == null || (abs_arg=(AbstractValue)attrs[0])==null)
 			return env.newString(Float.toString(v));
 
 		return env.newString(abs_arg.toString());
@@ -40,8 +40,8 @@ public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
     @MJI
     public static int getAbstractLong__J__Ljava_lang_String_2(MJIEnv env, int objRef, long v) {
     	Object [] attrs = env.getArgAttributes();
-		Abstraction abs_arg;
-		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
+		AbstractValue abs_arg;
+		if(attrs == null || (abs_arg=(AbstractValue)attrs[0])==null)
 			return env.newString(Long.toString(v));
 
 		return env.newString(abs_arg.toString());
@@ -50,8 +50,8 @@ public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
     @MJI
     public static int getAbstractBoolean__Z__Ljava_lang_String_2(MJIEnv env, int objRef, boolean v) {
     	Object [] attrs = env.getArgAttributes();
-		Abstraction abs_arg;
-		if(attrs == null || (abs_arg=(Abstraction)attrs[0])==null)
+		AbstractValue abs_arg;
+		if(attrs == null || (abs_arg=(AbstractValue)attrs[0])==null)
 			return env.newString(Boolean.toString(v));
 
 		return env.newString(abs_arg.toString());

@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.AbstractValue;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -40,12 +40,12 @@ public class DSUB extends gov.nasa.jpf.jvm.bytecode.DREM implements AbstractBina
 	}
 
 	@Override
-	public Abstraction getResult(Double v1, Abstraction abs_v1, Double v2, Abstraction abs_v2) {
+	public AbstractValue getResult(Double v1, AbstractValue abs_v1, Double v2, AbstractValue abs_v2) {
 		
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return Abstraction._sub(v1, abs_v1, v2, abs_v2);
+		return AbstractValue._sub(v1, abs_v1, v2, abs_v2);
 	}
 
 	@Override

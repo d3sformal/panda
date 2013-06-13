@@ -21,7 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import java.util.ArrayList;
 
 import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.AbstractValue;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
@@ -45,7 +45,7 @@ public abstract class SwitchInstruction extends
 		
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
-		Abstraction abs_v = (Abstraction) sf.getOperandAttr(0);
+		AbstractValue abs_v = (AbstractValue) sf.getOperandAttr(0);
 
 		if (abs_v == null) {
 			return super.execute(ti);
@@ -56,7 +56,7 @@ public abstract class SwitchInstruction extends
 
 			ArrayList<Integer> choices = new ArrayList<Integer>();
 			for (int i = 0, l = matches.length; i < l; i++) {
-				AbstractBoolean result = Abstraction._eq(value, abs_v,
+				AbstractBoolean result = AbstractValue._eq(value, abs_v,
 						matches[i], null);
 				System.out.printf("Switch> Check %d -- %s\n", matches[i],
 						result);

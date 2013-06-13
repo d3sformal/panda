@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.AbstractValue;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
@@ -35,7 +35,7 @@ public abstract class UnaryOperatorExecutor<T> {
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
 
-		Abstraction abs_v = getAbstraction(sf);
+		AbstractValue abs_v = getAbstractValue(sf);
 
 		if (abs_v == null) {
 			return op.executeConcrete(ti);
@@ -43,7 +43,7 @@ public abstract class UnaryOperatorExecutor<T> {
 
 		T v = getOperand(sf);
 
-		Abstraction result = op.getResult(v, abs_v);
+		AbstractValue result = op.getResult(v, abs_v);
 
 		System.out.printf("%s> Values: %s (%s)\n", name, v.toString(), abs_v);
 
@@ -71,7 +71,7 @@ public abstract class UnaryOperatorExecutor<T> {
 		return op.getNext(ti);
 	}
 	
-	abstract protected Abstraction getAbstraction(StackFrame sf);
+	abstract protected AbstractValue getAbstractValue(StackFrame sf);
 	abstract protected T getOperand(StackFrame sf);
-	abstract protected void storeResult(Abstraction result, StackFrame sf);
+	abstract protected void storeResult(AbstractValue result, StackFrame sf);
 }

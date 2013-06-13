@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.numeric.AbstractValue;
 import gov.nasa.jpf.vm.StackFrame;
 
 public class LongUnaryOperatorExecutor extends UnaryOperatorExecutor<Long> {
@@ -34,8 +34,8 @@ public class LongUnaryOperatorExecutor extends UnaryOperatorExecutor<Long> {
 	}
 	
 	@Override
-	protected Abstraction getAbstraction(StackFrame sf) {
-		return (Abstraction)sf.getOperandAttr(1);
+	protected AbstractValue getAbstractValue(StackFrame sf) {
+		return (AbstractValue)sf.getOperandAttr(1);
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class LongUnaryOperatorExecutor extends UnaryOperatorExecutor<Long> {
 	}
 
 	@Override
-	protected void storeResult(Abstraction result, StackFrame sf) {
+	protected void storeResult(AbstractValue result, StackFrame sf) {
 		sf.popLong();
 		
 		sf.pushLong(0);

@@ -20,6 +20,7 @@ package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
+import gov.nasa.jpf.abstraction.numeric.AbstractValue;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Fields;
@@ -45,7 +46,7 @@ public class AbstractionSerializer extends FilteringSerializer {
 		int off = fi.getStorageOffset();
 
 		if (!filtered.get(off)) {
-			Abstraction a = fields.getFieldAttr(fi.getFieldIndex(), Abstraction.class);
+			AbstractValue a = fields.getFieldAttr(fi.getFieldIndex(), AbstractValue.class);
 
 			if (a != null) {
 				if (fi.is1SlotField()) {
@@ -111,7 +112,7 @@ public class AbstractionSerializer extends FilteringSerializer {
 
 			// we must give the offset as method parameter value
 			// we need attribute for the current slot
-			Abstraction a = frame.getOperandAttr(frame.getTopPos()-i, Abstraction.class);
+			AbstractValue a = frame.getOperandAttr(frame.getTopPos()-i, AbstractValue.class);
 
 			if (a != null) {
 				buf.add(a.getKey());
