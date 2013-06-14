@@ -1,0 +1,93 @@
+\documentclass{article}
+
+\usepackage{graphics}
+\usepackage{listings}
+\usepackage[cm]{fullpage}
+
+\lstset{language=Java}
+
+\begin{document}
+
+\begin{itemize}
+
+\item Predicates defined per program
+\item Abstract value $\sim$ evaluation of individual predicates 
+\item Attributes need to also hold identification information about the source of the concrete data. (Field, Element of an array, \ldots)
+\item Predicate pseudo example
+
+$$
+  a.x.z.field < b.z.field + 1
+$$
+
+The root element is always an identifier of an instance (local, param, static). Field names and array indices follow.
+
+\item Evaluation to {\tt undefined, 0, 1, unknown (*) $\sim$ TOP}
+
+\begin{figure}[!h]
+\includegraphics{figure0}
+\end{figure}
+
+{\tt undefined}: In some parts of the inspected program some of the predicates may not be well defined due to referencing non-existing variables.
+
+\item Addressing data in a predicate
+\begin{figure}[!h]
+\includegraphics{figure1}
+\end{figure}
+
+\begin{lstlisting}
+ClassX a = new ClassX();
+ClassY b = a.y;
+\end{lstlisting}
+
+{\bf Challenge}: Traverse {\tt ElementInfo} objects to store all possible identifying paths ({\tt {\bf a}.y.z.{\it field}}, {\tt {\bf b}.z.{\it field}}) to resolve references in individual abstract values.
+
+Taking into account:
+\begin{itemize}
+\item Local variables (and parameters)
+\item Fields
+\item Static fields
+\end{itemize}
+
+{\it Note}: Cannot resort to fixed {\tt objRef}'s due to change of scope ({\tt JMP, CALL, RET}). There are also different identification paths in different scope levels.
+
+\item How to identify work with arrays? What does "support for arrays" mean? (Quantifications are troublesome)
+\item Abstract value in predicate abstraction may (should) use a singleton container where all (?) the predicates are updated upon manipulation of any other abstract value.
+There is no need to keep different truth values for various attributes of concrete values.
+
+Benefits
+\begin{itemize}
+\item Avoids redundancy (No need to have two truth value estimates for a single predicate stored in two different abstract values)
+\item Implies consistency (No differences)
+\item Provides accessibility to the most extensive information for all the abstract values
+\end{itemize}
+
+\begin{lstlisting}
+a = b + c
+b = 3
+\end{lstlisting}
+
+Update the same underlaying abstract value with truth values for all the predicates.
+
+\item Allow multiple predicates or make use of the {\tt Container} implemented in {\tt jpf-abstract}?
+\item SMT
+
+\begin{itemize}
+\item at update of the abstract value
+\item at branch choice
+\end{itemize}
+
+Choices:
+\begin{itemize}
+\item yices
+\item mathsat
+\item \ldots (Any OpenSource? Java bindings?)
+\end{itemize}
+
+\item At an evaluation of truth value of the predicates: Do we have access to all the objects at any time?
+In other words: Is it expected that all specification of a variable (field, \ldots) is always replaced with a concrete value at a given time.
+
+\item Instructions that need to update data identification: {\tt GETFIELD, LOAD \ldots}
+
+\end{itemize}
+
+\end{document}

@@ -9,3 +9,8 @@ activity*.png
 *.class
 *~
 *.DS_Store
+*.log
+*.mpx
+*.mps
+*.aux
+*.pdf
