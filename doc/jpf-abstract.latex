@@ -29,6 +29,8 @@ Defined in a textual file whose name (path) is passed as an argument to the sele
     \item array elements
   \end{itemize}
 
+  Ensured by allowing proper terms in formulas.
+
 \end{itemize}
 
 \section*{Predicate language}
@@ -57,9 +59,9 @@ Defined in a textual file whose name (path) is passed as an argument to the sele
 
 \subsection*{Identifiers}
 
-The root element is always an identifier of an instance (local or static).
+The root element of a path is always an identifier of an instance (local or static).
 Field names and array indices follow.
-Every identifier ends in a primitive-typed field / element (or its wrapper: Integer, Double, Float \ldots) otherwise the whole expression does not make sense.
+Every path ends in a primitive-typed field / element (or its wrapper: Integer, Double, Float \ldots ?) otherwise the whole expression does not make sense.
 
 \subsection*{SMT-LIB Lisp-like syntax}
 
@@ -68,39 +70,41 @@ Not very effective from manual-maintenance point of view.
 \section*{Extension to JPF Abstraction}
 
 \begin{itemize}
-\item Abstract value $\sim$ valuation of individual predicates
-\item There is a single valuation of all input predicates shared between all the abstract values (attributes to all the concrete values)
+\item {\bf Abstract value} $\sim$ valuation of individual predicates
+\item {\bf Global abstraction} - There is a single valuation of all input predicates shared between all the abstract values (attributes to all the concrete values)
 
-Benefits
-\begin{itemize}
-\item Avoids redundancy (No need to have two truth value estimates for a single predicate stored in two different abstract values)
-\item Implies consistency (No differences)
-\item Provides accessibility to the most extensive information for all the abstract values
-\end{itemize}
-
-Requirements
-\begin{itemize}
-\item Maintenance (backtracking, \ldots)
-\item Serialisation (state matching)
-\end{itemize}
-
-Update
-\begin{itemize}
-\item Invoked by instruction execution
   \begin{itemize}
-  \item Always
-  \item Abstract value determines what dependencies it has.
-  May save a considerable number of SMT invocations.
+  \item {\bf Benefits}
+    \begin{itemize}
+    \item Avoids redundancy (No need to have two truth value estimates for a single predicate stored in two different abstract values)
+    \item Implies consistency (No differences)
+    \item Provides accessibility to the most extensive information for all the abstract values
+    \end{itemize}
 
-  \begin{figure}[!h]
-  \centering
-  \includegraphics{figure1}
-  \end{figure}
+  \item {\bf Requirements}
+    \begin{itemize}
+    \item Maintenance (backtracking, instruction execution \ldots)
+    \item Serialisation (state matching)
+    \end{itemize}
 
-  \FloatBarrier
+  \item {\bf Update}
+    \begin{itemize}
+    \item Invoked by instruction execution
+      \begin{itemize}
+      \item Always
+      \item Abstract value determines what dependencies it has.
+      May save a considerable number of SMT invocations.
+
+      \begin{figure}[!h]
+      \centering
+      \includegraphics{figure1}
+      \end{figure}
+
+      \FloatBarrier
+      \end{itemize}
+  \item Resolve all paths: defined $\Rightarrow$ add clause $\text{\tt path} = value$; undefined $\Rightarrow$ predicate undefined
+  \item \ldots
   \end{itemize}
-\item Resolve all paths: defined $\Rightarrow$ add clause $\text{\tt path} = value$; undefined $\Rightarrow$ predicate undefined
-\item \ldots
 \end{itemize}
 
 \item Predicates evaluate to $\left\{ \begin{array}{lcl}\text{\tt undefined} &\sim& \text{\it referring to out-of-scope variables} \\ \text{\tt 0} &\sim& \text{\tt false} \\ \text{\tt 1} &\sim& \text{\tt true} \\ \text{\tt unknown (*)} &\sim& \text{\tt TOP} \end{array} \right. $
@@ -112,18 +116,20 @@ Update
 
 \FloatBarrier
 
-\item Mapping variables / class names to concrete ElementInfo / ClassInfo objects.
+\item Mapping variables / class names to concrete ElementInfo / ClassInfo objects in concrete scope.
+
+Needed to be able to provide SMT with fixed values of different variables (symbols).
 
   Choose one of:
   \begin{itemize}
   \item provide a dictionary of our own
 
-    Pros:
+    {\bf Pros:}
     \begin{itemize}
     \item Fast (Hash tables) or other dictionary-like structures instead of arrays
     \end{itemize}
 
-    Cons:
+    {\bf Cons:}
     \begin{itemize}
     \item Need to handle backtracking and scoping in general
     \end{itemize}
@@ -145,8 +151,8 @@ Use:
 
 Choices:
 \begin{itemize}
-\item {\bf mathsat} - accepts SMT-LIB format and DIMACS format
-\item yices
+\item {\bf MathSAT 5} - accepts SMT-LIB format and DIMACS format
+\item Yices
 \item \ldots
 \end{itemize}
 
