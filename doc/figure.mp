@@ -73,5 +73,51 @@ beginfig(1)
 
   link(dashedLink)(c.attributeStack.pict[0].s--Anonymous.n);
 endfig;
+
+beginfig(2)
+  Activity.instr("Instruction Executed");
+  Activity.attr("Load attributes", "Especially paths to", "the operands");
+  Activity.pred("Select predicates", "utilising the paths");
+  Activity.val("Evaluate used paths", "to concrete numerical values");
+  Activity.smt("Run SMT on selected", "predicates extended by", "path = value clauses");
+  Activity.upd("Update abstract value and paths");
+
+  topToBottom(30)(instr, attr, pred, val, smt, upd);
+
+  Note.nInstr("FADD(f1, f2)");
+  Note.nAttr("a.y.z.field (f1)", "b.z.field", "", "a.y.z.field", "b.z.field (f2)");
+  Note.nPred("P1 ~ a.y.z.field = c");
+  Note.nVal("a.y.z.field = 3", "c = 1");
+  Note.nSmt("SAT a.y.z.field = c and a.y.z.field = 3 and c = 1 ?");
+  Note.nUpd("not P1");
+
+  nInstr.midy = instr.midy;
+  nAttr.midy = attr.midy;
+  nPred.midy = pred.midy;
+  nVal.midy = val.midy;
+  nSmt.midy = smt.midy;
+  nUpd.midy = upd.midy;
+
+  same.left(nInstr, nAttr, nPred, nVal, nSmt, nUpd);
+
+  nInstr.left = 150;
+
+  drawObjects(instr, attr, pred, val, smt, upd, nInstr, nAttr, nPred, nVal, nSmt, nUpd);
+
+  link(associationUni)(instr.s--attr.n);
+  link(associationUni)(attr.s--pred.n);
+  link(associationUni)(pred.s--val.n);
+  link(associationUni)(val.s--smt.n);
+  link(associationUni)(smt.s--upd.n);
+  link(associationUni)(rpathManhattanX(instr.w, upd.w));
+
+  clink(dashedLink)(instr, nInstr);
+  clink(dashedLink)(attr, nAttr);
+  clink(dashedLink)(pred, nPred);
+  clink(dashedLink)(val, nVal);
+  clink(dashedLink)(smt, nSmt);
+  clink(dashedLink)(upd, nUpd);
+endfig;
+
 end
 .
