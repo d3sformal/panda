@@ -3,56 +3,73 @@
 \usepackage{graphics}
 \usepackage{listings}
 \usepackage[cm]{fullpage}
+\usepackage{syntax}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{placeins}
 
 \lstset{language=Java}
 
 \begin{document}
 
+\section*{JPF Predicate Abstraction}
+
 \begin{itemize}
 
 \item Predicates defined per program
-\item Abstract value $\sim$ evaluation of individual predicates 
-\item Attributes need to also hold identification information about the source of the concrete data. (Field, Element of an array, \ldots)
-\item Predicate pseudo example
 
-$$
-  a.x.z.field < b.z.field + 1
-$$
+Defined in a textual file whose name (path) is passed as an argument to the selected predicate abstraction in a .jpf file.
 
-The root element is always an identifier of an instance (local, param, static). Field names and array indices follow.
+\item Focus solely on numerical data types (byte, char, short, int, long, float, double)
+\item Predicate language rich enough to support objects, classes, arrays
+  \begin{itemize}
+    \item local variables (including method parameters)
+    \item static fields
+    \item object fields
+    \item array elements
+  \end{itemize}
 
-\item Evaluation to {\tt undefined, 0, 1, unknown (*) $\sim$ TOP}
-
-\begin{figure}[!h]
-\includegraphics{figure0}
-\end{figure}
-
-{\tt undefined}: In some parts of the inspected program some of the predicates may not be well defined due to referencing non-existing variables.
-
-\item Addressing data in a predicate
-\begin{figure}[!h]
-\includegraphics{figure1}
-\end{figure}
-
-\begin{lstlisting}
-ClassX a = new ClassX();
-ClassY b = a.y;
-\end{lstlisting}
-
-{\bf Challenge}: Traverse {\tt ElementInfo} objects to store all possible identifying paths ({\tt {\bf a}.y.z.{\it field}}, {\tt {\bf b}.z.{\it field}}) to resolve references in individual abstract values.
-
-Taking into account:
-\begin{itemize}
-\item Local variables (and parameters)
-\item Fields
-\item Static fields
 \end{itemize}
 
-{\it Note}: Cannot resort to fixed {\tt objRef}'s due to change of scope ({\tt JMP, CALL, RET}). There are also different identification paths in different scope levels.
+\section*{Predicate language}
 
-\item How to identify work with arrays? What does "support for arrays" mean? (Quantifications are troublesome)
-\item Abstract value in predicate abstraction may (should) use a singleton container where all (?) the predicates are updated upon manipulation of any other abstract value.
-There is no need to keep different truth values for various attributes of concrete values.
+\begin{grammar}
+<predicate> ::= `not' `(' <predicate> `)'
+    \alt `(' <predicate> `and' <predicate> `)'
+    \alt `(' <predicate> `or'  <predicate> `)'
+    \alt `true'
+    \alt `false'
+    \alt <term> `=' <term>
+    \alt <term> `\textless' <term>
+
+<term> ::= "constant"
+    \alt <path>
+    \alt <altpath>
+
+<path> ::= <path> `.' "identifier"
+    \alt <path> `[' "index" `]'
+    \alt "identifier"
+
+<altpath> ::= `field' `(' <altpath> `,' "identifier" `)'
+    \alt `array' `(' <altpath> `,' "index" `)'
+    \alt "identifier"
+\end{grammar}
+
+\subsection*{Identifiers}
+
+The root element is always an identifier of an instance (local or static).
+Field names and array indices follow.
+Every identifier ends in a primitive-typed field / element (or its wrapper: Integer, Double, Float \ldots) otherwise the whole expression does not make sense.
+
+\subsection*{SMT-LIB Lisp-like syntax}
+
+Not very effective from manual-maintenance point of view.
+
+\section*{Extension to JPF Abstraction}
+
+\begin{itemize}
+\item Abstract value $\sim$ valuation of individual predicates
+\item There is a single valuation of all input predicates shared between all the abstract values (attributes to all the concrete values)
 
 Benefits
 \begin{itemize}
@@ -61,16 +78,66 @@ Benefits
 \item Provides accessibility to the most extensive information for all the abstract values
 \end{itemize}
 
-\begin{lstlisting}
-a = b + c
-b = 3
-\end{lstlisting}
+Requirements
+\begin{itemize}
+\item Maintenance (backtracking, \ldots)
+\item Serialisation (state matching)
+\end{itemize}
 
-Update the same underlaying abstract value with truth values for all the predicates.
+Update
+\begin{itemize}
+\item Invoked by instruction execution
+  \begin{itemize}
+  \item Always
+  \item Abstract value determines what dependencies it has.
+  May save a considerable number of SMT invocations.
 
-\item Allow multiple predicates or make use of the {\tt Container} implemented in {\tt jpf-abstract}?
-\item SMT
+  \begin{figure}[!h]
+  \centering
+  \includegraphics{figure1}
+  \end{figure}
 
+  \FloatBarrier
+  \end{itemize}
+\item Resolve all paths: defined $\Rightarrow$ add clause $\text{\tt path} = value$; undefined $\Rightarrow$ predicate undefined
+\item \ldots
+\end{itemize}
+
+\item Predicates evaluate to $\left\{ \begin{array}{lcl}\text{\tt undefined} &\sim& \text{\it referring to out-of-scope variables} \\ \text{\tt 0} &\sim& \text{\tt false} \\ \text{\tt 1} &\sim& \text{\tt true} \\ \text{\tt unknown (*)} &\sim& \text{\tt TOP} \end{array} \right. $
+
+\begin{figure}[!h]
+\centering
+\includegraphics{figure0}
+\end{figure}
+
+\FloatBarrier
+
+\item Mapping variables / class names to concrete ElementInfo / ClassInfo objects.
+
+  Choose one of:
+  \begin{itemize}
+  \item provide a dictionary of our own
+
+    Pros:
+    \begin{itemize}
+    \item Fast (Hash tables) or other dictionary-like structures instead of arrays
+    \end{itemize}
+
+    Cons:
+    \begin{itemize}
+    \item Need to handle backtracking and scoping in general
+    \end{itemize}
+  \item extract needed information from ThreadInfo, StackFrame and VM
+    \begin{itemize}
+    \item {\bf Fields:} ThreadInfo.getElementInfo, StackFrame.getThis, ElementInfo.getClassInfo, ClassInfo.getInstanceField
+    \item {\bf Locals:} StackFrame.getLocalVars
+    \item {\bf Static:} VM.getClassLoaderList, ClassLoaderInfo.loadedClasses, ClassInfo.getStatics \ldots
+    \end{itemize}
+  \end{itemize}
+
+\item SMT - invoked as a separate process
+
+Use:
 \begin{itemize}
 \item at update of the abstract value
 \item at branch choice
@@ -78,15 +145,10 @@ Update the same underlaying abstract value with truth values for all the predica
 
 Choices:
 \begin{itemize}
+\item {\bf mathsat} - accepts SMT-LIB format and DIMACS format
 \item yices
-\item mathsat
-\item \ldots (Any OpenSource? Java bindings?)
+\item \ldots
 \end{itemize}
-
-\item At an evaluation of truth value of the predicates: Do we have access to all the objects at any time?
-In other words: Is it expected that all specification of a variable (field, \ldots) is always replaced with a concrete value at a given time.
-
-\item Instructions that need to update data identification: {\tt GETFIELD, LOAD \ldots}
 
 \end{itemize}
 

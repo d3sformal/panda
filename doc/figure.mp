@@ -41,8 +41,10 @@ beginfig(1)
   b.info.iAttributeStack.bottom := 0;
 
   Instance.c("")("field = 42");
+  c.info.iName.top := 0;
+  c.info.iName.bottom := 0;
 
-  Note.Anonymous(btex An anonymous instance. etex, btex Identifiable as {\tt {\bf a}.y.z} or {\tt {\bf b}.z}. etex);
+  Note.Anonymous("Accessible as a.y.z.field or b.z.field", "", "Therefore it may prove necessary that these paths are reported upon manipulation of the value", "to ensure the ability to recognize what predicates are affected and should be updated.");
 
   leftToRight(60)(ClassX, ClassY, ClassZ);
   topToBottom(60)(ClassX, a);
@@ -69,7 +71,7 @@ beginfig(1)
   item(iAssoc)("y")(obj.sw = a.ne);
   item(iAssoc)("z")(obj.sw = b.ne);
 
-  clink(dashedLink)(c, Anonymous);
+  link(dashedLink)(c.attributeStack.pict[0].s--Anonymous.n);
 endfig;
 end
 .
