@@ -48,16 +48,18 @@ Defined in a textual file whose name (path) is passed as an argument to the sele
     \alt <path>
     \alt <altpath>
 
-<path> ::= <path> `.' "identifier"
+<path> ::= <path> `.' "fieldname"
     \alt <path> `[' "index" `]'
-    \alt "identifier"
+    \alt "classname" `.' "staticfieldname"
+    \alt "varname"
 
-<altpath> ::= `field' `(' <altpath> `,' "identifier" `)'
+<altpath> ::= `field' `(' <altpath> `,' "fieldname" `)'
     \alt `array' `(' <altpath> `,' "index" `)'
-    \alt "identifier"
+    \alt "classname" `.' "staticfieldname"
+    \alt "varname"
 \end{grammar}
 
-\subsection*{Identifiers}
+\subsection*{Identifiers - Variable/Field/Class names}
 
 The root element of a path is always an identifier of an instance (local or static).
 Field names and array indices follow.
@@ -104,6 +106,14 @@ Not very effective from manual-maintenance point of view.
       \end{itemize}
   \item Resolve all paths: defined $\Rightarrow$ add clause $\text{\tt path} = value$; undefined $\Rightarrow$ predicate undefined
   \item \ldots
+
+    \begin{figure}[!h]
+    \centering
+    \includegraphics{figure2}
+    \end{figure}
+
+    \FloatBarrier
+
   \end{itemize}
 \end{itemize}
 
