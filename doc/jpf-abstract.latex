@@ -114,6 +114,9 @@ Not very effective from manual-maintenance point of view.
 
     \FloatBarrier
 
+    If a concrete value {\tt {\bf a}.y.z.{\it field}} from the examples above is not used as {\tt {\bf b}.z.{\it field}} then the second path is not present in its abstract value and cannot cause predicates to be updated.
+    It seems correct, however.
+
   \end{itemize}
 \end{itemize}
 
