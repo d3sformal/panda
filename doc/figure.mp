@@ -84,12 +84,12 @@ beginfig(2)
 
   topToBottom(30)(instr, attr, pred, val, smt, upd);
 
-  Note.nInstr("FADD(f1, f2)");
-  Note.nAttr("a.y.z.field (f1)", "b.z.field", "", "a.y.z.field", "b.z.field (f2)");
-  Note.nPred("P1 ~ a.y.z.field = c");
+  Note.nInstr("Example:", "", "FADD(f1, f2)");
+  Note.nAttr("Let f1 be obtained from a.y.z.field and f2 from b.z.field.", "The two paths refer the same piece of data in memory.", "Therefore both the attributes need to yield the two paths.", "The attributes are however different.", "", "Therefore refer to ElementInfo instead of a concrete set of paths.");
+  Note.nPred("Affected predicate P1", "", "a.y.z.field = c");
   Note.nVal("a.y.z.field = 3", "c = 1");
   Note.nSmt("SAT a.y.z.field = c and a.y.z.field = 3 and c = 1 ?");
-  Note.nUpd("not P1");
+  Note.nUpd("not P1", "", "The result value corresponds to no path,", "it is an intermediate result.");
 
   nInstr.midy = instr.midy;
   nAttr.midy = attr.midy;

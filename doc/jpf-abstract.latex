@@ -7,8 +7,26 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{placeins}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{ulem}
 
 \lstset{language=Java}
+
+% Variable
+\def\var#1{{\tt \bf #1}}
+
+% Access path
+\def\ap#1#2#3{%
+{\tt \var{#1}.%
+\edef\p{#2}%
+\edef\e{}%
+\ifx\p\e%
+\else%
+#2.%
+\fi%
+{\it #3}}%
+}
 
 \begin{document}
 
@@ -41,12 +59,21 @@ Defined in a textual file whose name (path) is passed as an argument to the sele
     \alt `(' <predicate> `or'  <predicate> `)'
     \alt `true'
     \alt `false'
-    \alt <term> `=' <term>
-    \alt <term> `\textless' <term>
+    \alt <expression> `=' <expression>
+    \alt <expression> `\textless' <expression>
 
-<term> ::= "constant"
+<expression> ::= <term>
+    \alt <term> `+' <term>
+    \alt <term> `-' <term>
+
+<term> ::= <factor>
+    \alt <factor> `*' <factor>
+    \alt <factor> `/' <factor>
+
+<factor> ::= "constant"
     \alt <path>
     \alt <altpath>
+    \alt `(' <expression> `)'
 
 <path> ::= <path> `.' "fieldname"
     \alt <path> `[' "index" `]'
@@ -59,11 +86,17 @@ Defined in a textual file whose name (path) is passed as an argument to the sele
     \alt "varname"
 \end{grammar}
 
+The dot-notation (\ap{a}{b}{f}) is a syntactic sugar for the notation based on function calls. All expressions with dots will be translated into the function-notation internally.
+
 \subsection*{Identifiers - Variable/Field/Class names}
 
-The root element of a path is always an identifier of an instance (local or static).
+The root element of an access path is always an identifier of an instance (local or static). 
+If some element of the access path is a variable of a reference type, then its value uniquely identifies the object (by its heap address (objRef)).
 Field names and array indices follow.
 Every path ends in a primitive-typed field / element (or its wrapper: Integer, Double, Float \ldots ?) otherwise the whole expression does not make sense.
+
+We will also consider the scope of variables. If some predicate contains an expression \ap{a}{}{f}, where \var{a} is a local variable of some method {\it m}, then the predicate is defined only in the scope of the method {\it m}.
+
 
 \subsection*{SMT-LIB Lisp-like syntax}
 
@@ -73,6 +106,17 @@ Not very effective from manual-maintenance point of view.
 
 \begin{itemize}
 \item {\bf Abstract value} $\sim$ valuation of individual predicates
+\item Predicates evaluate to $\left\{ \begin{array}{lcl}\text{\tt undefined} &\sim& \text{\it referring to out-of-scope variables} \\ \text{\tt 0} &\sim& \text{\tt false} \\ \text{\tt 1} &\sim& \text{\tt true} \\ \text{\tt unknown (*)} &\sim& \text{\tt TOP} \end{array} \right. $
+
+\begin{figure}[!h]
+\centering
+\includegraphics{figure0}
+\end{figure}
+
+\FloatBarrier
+
+\item Concrete value kept unmodified for SMT purposes
+
 \item {\bf Global abstraction} - There is a single valuation of all input predicates shared between all the abstract values (attributes to all the concrete values)
 
   \begin{itemize}
@@ -91,21 +135,32 @@ Not very effective from manual-maintenance point of view.
 
   \item {\bf Update}
     \begin{itemize}
+    \item Invoked by change of scope
     \item Invoked by instruction execution
-      \begin{itemize}
-      \item Always
-      \item Abstract value determines what dependencies it has.
-      May save a considerable number of SMT invocations.
 
-      \begin{figure}[!h]
-      \centering
-      \includegraphics{figure1}
-      \end{figure}
+    Predicate determines what access paths it depends on.
+    Only predicates depending on paths affected by a given instruction are updated.
+    Unaffected predicates keep their value.
+    This may save a considerable number of SMT invocations.
 
-      \FloatBarrier
-      \end{itemize}
-  \item Resolve all paths: defined $\Rightarrow$ add clause $\text{\tt path} = value$; undefined $\Rightarrow$ predicate undefined
-  \item \ldots
+    \newpage
+    The following example demonstrates challenges that severely affect the design of our solution.
+
+    \begin{lstlisting}
+    public void m(ClassX a) {
+      ClassY b = a.y;
+      ...
+      ... a.y.z.field + b.z.field ...
+      ...
+    }
+    \end{lstlisting}
+
+    \begin{figure}[!h]
+    \centering
+    \includegraphics{figure1}
+    \end{figure}
+
+    \FloatBarrier
 
     \begin{figure}[!h]
     \centering
@@ -114,24 +169,61 @@ Not very effective from manual-maintenance point of view.
 
     \FloatBarrier
 
-    If a concrete value {\tt {\bf a}.y.z.{\it field}} from the examples above is not used as {\tt {\bf b}.z.{\it field}} then the second path is not present in its abstract value and cannot cause predicates to be updated.
-    It seems correct, however.
+    Resolve all paths used in a concrete predicate:
+    \begin{itemize}
+    \item defined $\Rightarrow$ add clause $\text{\tt path} = value$
+    \item undefined $\Rightarrow$ predicate undefined
+    \end{itemize}
+
+    \begin{algorithm}
+    \begin{algorithmic}
+    \Procedure{updatePredicates}{$Predicates, Valuation, AffectedPaths$}
+    \ForAll{$p \in Predicates$}
+      \If{$AffectedPaths \cap usedPaths(p) \neq \emptyset$}
+        \State $Valuation \gets Valuation \oplus p \mapsto evalPredicate(p)$
+      \EndIf
+    \EndFor
+    \EndProcedure
+    \end{algorithmic}
+    \end{algorithm}
+
+    \begin{algorithm}
+    \begin{algorithmic}
+    \Function{evalPredicate}{$P$}
+    \State $Q \gets P$
+    \ForAll{$p \in usedPaths(P)$}
+      \State $e \gets pathToElementInfo(p)$
+      \State $v \gets getValue(e)$
+      \State $Q \gets Q \wedge p = v$
+    \EndFor
+    \Return $SMT(Q)$
+    \EndFunction
+    \end{algorithmic}
+    \end{algorithm}
+
+    \FloatBarrier
+
 
   \end{itemize}
 \end{itemize}
 
-\item Predicates evaluate to $\left\{ \begin{array}{lcl}\text{\tt undefined} &\sim& \text{\it referring to out-of-scope variables} \\ \text{\tt 0} &\sim& \text{\tt false} \\ \text{\tt 1} &\sim& \text{\tt true} \\ \text{\tt unknown (*)} &\sim& \text{\tt TOP} \end{array} \right. $
+\item Implementation mechanisms
 
-\begin{figure}[!h]
-\centering
-\includegraphics{figure0}
-\end{figure}
-
-\FloatBarrier
+  \begin{itemize}
+  \item Bytecode instructions
+  \item Serialisation
+  \item Attribute system
+  \item \ldots
+  \item AbstractValue (if not proven to have unsuitable interface)
+  \item AbstractInstructionFactory (co-existence with other abstractions)
+  \item Scope-aware Map: $path \mapsto \text{primitive \tt ElementInfo e}$
+  \item Scope-aware Map: $\text{primitive \tt ElementInfo e} \mapsto \left\{p\:\middle\vert\:p\:\text{access path to \tt e}\right\}$
+  \end{itemize}
 
 \item Mapping variables / class names to concrete ElementInfo / ClassInfo objects in concrete scope.
 
-Needed to be able to provide SMT with fixed values of different variables (symbols).
+Needed to be able to provide SMT with fixed values of referred variables.
+The mapping needs to allow looking up corresponding ElementInfo's for a given access path (To allow use of concrete values in predicates to capture current state) but also for a given ElementInfo all possible currently valid access paths (To allow filtering out affected predicates for re-evaluation).
 
   Choose one of:
   \begin{itemize}
@@ -139,7 +231,7 @@ Needed to be able to provide SMT with fixed values of different variables (symbo
 
     {\bf Pros:}
     \begin{itemize}
-    \item Fast (Hash tables) or other dictionary-like structures instead of arrays
+    \item Fast (Hash tables or other dictionary-like structures instead of arrays)
     \end{itemize}
 
     {\bf Cons:}
@@ -152,6 +244,19 @@ Needed to be able to provide SMT with fixed values of different variables (symbo
     \item {\bf Locals:} StackFrame.getLocalVars
     \item {\bf Static:} VM.getClassLoaderList, ClassLoaderInfo.loadedClasses, ClassInfo.getStatics \ldots
     \end{itemize}
+
+    {\bf Pros:}
+    \begin{itemize}
+    \item Existing code
+    \item State maintained over backtracking / \ldots
+    \end{itemize}
+
+    {\bf Cons:}
+    \begin{itemize}
+    \item One-way (Path to ElementInfo)
+    \item {\it Need of debugging symbols}
+    \end{itemize}
+    
   \end{itemize}
 
 \item SMT - invoked as a separate process
