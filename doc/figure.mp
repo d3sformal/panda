@@ -44,7 +44,7 @@ beginfig(1)
   c.info.iName.top := 0;
   c.info.iName.bottom := 0;
 
-  Note.Anonymous("Accessible as a.y.z.field or b.z.field", "", "Therefore it may prove necessary that these paths are reported upon manipulation of the value", "to ensure the ability to recognize what predicates are affected and should be updated.");
+  Note.Anonymous("Accessible as a.y.z.field or b.z.field", "", "Therefore it is necessary that these paths are reported upon manipulation of the value", "to ensure the ability to recognize what predicates are affected and should be updated.");
 
   leftToRight(60)(ClassX, ClassY, ClassZ);
   topToBottom(60)(ClassX, a);
@@ -89,7 +89,7 @@ beginfig(2)
   Note.nPred("Affected predicate P1", "", "a.y.z.field = c");
   Note.nVal("a.y.z.field = 3", "c = 1");
   Note.nSmt("SAT a.y.z.field = c and a.y.z.field = 3 and c = 1 ?");
-  Note.nUpd("not P1", "", "The result value corresponds to no path,", "it is an intermediate result.");
+  Note.nUpd("not P1", "", "The result value corresponds to no path, it", "is an intermediate result. (It's ElementInfo", "will be resolved to no paths.)");
 
   nInstr.midy = instr.midy;
   nAttr.midy = attr.midy;

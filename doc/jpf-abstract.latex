@@ -216,7 +216,7 @@ Not very effective from manual-maintenance point of view.
   \item \ldots
   \item AbstractValue (if not proven to have unsuitable interface)
   \item AbstractInstructionFactory (co-existence with other abstractions)
-  \item Scope-aware Map: $path \mapsto \text{primitive \tt ElementInfo e}$
+  \item Scope-aware Map: access path $p$ to {\tt e} $\mapsto$ primitive {\tt ElementInfo e}
   \item Scope-aware Map: $\text{primitive \tt ElementInfo e} \mapsto \left\{p\:\middle\vert\:p\:\text{access path to \tt e}\right\}$
   \end{itemize}
 
