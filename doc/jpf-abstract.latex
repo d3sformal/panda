@@ -81,7 +81,7 @@ Defined in a textual file whose name (path) is passed as an argument to the sele
     \alt "varname"
 
 <altpath> ::= `field' `(' <altpath> `,' "fieldname" `)'
-    \alt `array' `(' <altpath> `,' "index" `)'
+    \alt `element' `(' <altpath> `,' "index" `)'
     \alt `field' `(' "classname" `,' "staticfieldname" `)'
     \alt "varname"
 \end{grammar}

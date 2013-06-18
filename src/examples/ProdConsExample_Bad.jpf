@@ -5,5 +5,7 @@ target=gov.nasa.jpf.abstraction.ProdConsExample_Bad
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
+abstract.domain=SIGNS
+
 listener = gov.nasa.jpf.abstraction.util.DebugMonitor
 

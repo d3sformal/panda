@@ -6,7 +6,7 @@ classpath=${jpf-abstraction}/build/examples
 
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=SIGNS
+abstract.domain=RANGE -128 128
 
 listener = gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.DebugMonitor
 
