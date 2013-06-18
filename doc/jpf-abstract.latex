@@ -108,16 +108,21 @@ Not very effective from manual-maintenance point of view.
 \item {\bf Abstract value} $\sim$ valuation of individual predicates
 \item Predicates evaluate to $\left\{ \begin{array}{lcl}\text{\tt undefined} &\sim& \text{\it referring to out-of-scope variables} \\ \text{\tt 0} &\sim& \text{\tt false} \\ \text{\tt 1} &\sim& \text{\tt true} \\ \text{\tt unknown (*)} &\sim& \text{\tt TOP} \end{array} \right. $
 
-\begin{figure}[!h]
-\centering
-\includegraphics{figure0}
-\end{figure}
+  \begin{figure}[!h]
+  \centering
+  \includegraphics{figure0}
+  \end{figure}
 
-\FloatBarrier
+  \FloatBarrier
 
 \item Concrete value kept unmodified for SMT purposes
-
 \item {\bf Global abstraction} - There is a single valuation of all input predicates shared between all the abstract values (attributes to all the concrete values)
+  \begin{figure}[!h]
+  \centering
+  \includegraphics{figure3}
+  \end{figure}
+
+  \FloatBarrier
 
   \begin{itemize}
   \item {\bf Benefits}
@@ -141,17 +146,14 @@ Not very effective from manual-maintenance point of view.
     Predicate determines what access paths it depends on.
     Only predicates depending on paths affected by a given instruction are updated.
     Unaffected predicates keep their value.
-    This may save a considerable number of SMT invocations.
+    This may save a considerable number of SMT invocations. \\
 
-    \newpage
     The following example demonstrates challenges that severely affect the design of our solution.
 
     \begin{lstlisting}
     public void m(ClassX a) {
       ClassY b = a.y;
-      ...
       ... a.y.z.field + b.z.field ...
-      ...
     }
     \end{lstlisting}
 
@@ -169,6 +171,7 @@ Not very effective from manual-maintenance point of view.
 
     \FloatBarrier
 
+    \newpage
     Resolve all paths used in a concrete predicate:
     \begin{itemize}
     \item defined $\Rightarrow$ add clause $\text{\tt path} = value$
@@ -254,7 +257,7 @@ The mapping needs to allow looking up corresponding ElementInfo's for a given ac
     {\bf Cons:}
     \begin{itemize}
     \item One-way (Path to ElementInfo)
-    \item {\it Need of debugging symbols}
+    \item {\it Need of debugging symbols ???}
     \end{itemize}
     
   \end{itemize}
@@ -265,6 +268,39 @@ Use:
 \begin{itemize}
 \item at update of the abstract value
 \item at branch choice
+\item state matching over predicates
+
+  $s_1, s_2$ states, $s_1$ already visited, $s_2$ current. Determine whether $s_1 \sim s_2$ (Subsumption). \\
+
+  Test whether $s_2$ is already visited based on truth values of the predicates. 
+  One option is to create formulas and use SMT to decide.
+
+  Assume $PC(s_1) = PC(s_2)$ otherwise $s_1 \not \sim s_2$.
+
+  We will check related work, especially abstract state matching with subsumption for symbolic execution.
+
+%  Example: \\
+%
+%  $s_1$:
+%  \begin{itemize}
+%  \item $P_1$
+%  \item $\neg P_2$
+%  \item $P_3$
+%  \item $P_4$ unknown
+%  \end{itemize}
+%
+%  $s_2$:
+%  \begin{itemize}
+%  \item $P_1$
+%  \item $\neg P_2$
+%  \item $P_3$ undefined
+%  \item $P_4$
+%  \end{itemize}
+
+%  SMT: $s_1 \Rightarrow sdd_2$ ?\\
+
+%  If $s_2$ is a consequence of $s_1$ which we have already visited then it is impossible to infer anything new (branching etc.).
+%  The new state is therefore effectively equivalent.
 \end{itemize}
 
 Choices:

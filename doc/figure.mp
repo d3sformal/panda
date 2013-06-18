@@ -47,11 +47,11 @@ beginfig(1)
   Note.Anonymous("Accessible as a.y.z.field or b.z.field", "", "Therefore it is necessary that these paths are reported upon manipulation of the value", "to ensure the ability to recognize what predicates are affected and should be updated.");
 
   leftToRight(60)(ClassX, ClassY, ClassZ);
-  topToBottom(60)(ClassX, a);
-  topToBottom(60)(ClassY, b);
+  topToBottom(40)(ClassX, a);
+  topToBottom(40)(ClassY, b);
   same.midx(ClassZ, c);
   same.midy(b, c);
-  topToBottom(60)(c, Anonymous);
+  topToBottom(30)(c, Anonymous);
 
   drawObjects(a, b, c, ClassX, ClassY, ClassZ, Anonymous);
 
@@ -117,6 +117,52 @@ beginfig(2)
   clink(dashedLink)(val, nVal);
   clink(dashedLink)(smt, nSmt);
   clink(dashedLink)(upd, nUpd);
+endfig;
+
+beginfig(3)
+  Class.StackItem("StackItem")("concreteValue", "attribute : Attribute")();
+  StackItem.info.iMethodStack.top := 0;
+  StackItem.info.iMethodStack.bottom := 0;
+
+  Class.Attribute("Attribute")()();
+  Attribute.info.iAttributeStack.top := 0;
+  Attribute.info.iAttributeStack.bottom := 0;
+  Attribute.info.iMethodStack.top := 0;
+  Attribute.info.iMethodStack.bottom := 0;
+
+  Class.AbstractValue("AbstractValue")()();
+  AbstractValue.info.iAttributeStack.top := 0;
+  AbstractValue.info.iAttributeStack.bottom := 0;
+  AbstractValue.info.iMethodStack.top := 0;
+  AbstractValue.info.iMethodStack.bottom := 0;
+
+  Class.Meta("Meta")("access path(s)")();
+  Meta.info.iMethodStack.top := 0;
+  Meta.info.iMethodStack.bottom := 0;
+
+  Class.Global("GlobalAbstractValue")("valuation : Map<Predicate, TruthValue>")();
+  Global.info.iMethodStack.top := 0;
+  Global.info.iMethodStack.bottom := 0;
+  classStereotypes.Global("<<multiton>>");
+
+  Note.Multiton("Instance of GlobalAbstractValue", "per Abstraction instance");
+
+  leftToRight(30)(StackItem.attributeStack.pict[1], Attribute);
+  topToBottom(30)(AbstractValue, Meta);
+
+  Group.g(AbstractValue, Meta);
+
+  leftToRight(30)(Attribute, g);
+  leftToRight(30)(AbstractValue, Global);
+  topToBottom(30)(Global, Multiton);
+
+  drawObjects(StackItem, Attribute, g, Global, Multiton);
+
+  link(aggregation)(AbstractValue.w -- Attribute.ne);
+  link(aggregation)(Meta.w -- Attribute.se);
+  link(dashedLink)(StackItem.attributeStack.pict[1].e -- Attribute.w);
+  link(dashedLink)(AbstractValue.e -- Global.w);
+  clink(dashedLink)(Global, Multiton);
 endfig;
 
 end
