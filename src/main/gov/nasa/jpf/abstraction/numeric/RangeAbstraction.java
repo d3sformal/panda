@@ -120,15 +120,6 @@ public class RangeAbstraction extends Abstraction {
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
-	@Override
-	public AbstractValue _bitwise_and(AbstractValue left, int right) {
-		return _bitwise_and(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _bitwise_and(AbstractValue left, long right) {
-		return _bitwise_and(left, left.abs.abstractMap(right));
-	}
 
 	@Override
 	public AbstractValue _bitwise_or(AbstractValue left, AbstractValue right) {
@@ -143,16 +134,6 @@ public class RangeAbstraction extends Abstraction {
 	}
 
 	@Override
-	public AbstractValue _bitwise_or(AbstractValue left, int right) {
-		return _bitwise_or(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _bitwise_or(AbstractValue left, long right) {
-		return _bitwise_or(left, left.abs.abstractMap(right));
-	}
-
-	@Override
 	public AbstractValue _bitwise_xor(AbstractValue left, AbstractValue right) {
 		// result is extremely difficult to predict, so this returns TOP
 		if (right instanceof RangeValue) {	
@@ -162,41 +143,6 @@ public class RangeAbstraction extends Abstraction {
 			return ((RangeAbstraction)left.abs).create(values);	
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
-	}
-
-	@Override
-	public AbstractValue _bitwise_xor(AbstractValue left, int right) {
-		return _bitwise_xor(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _bitwise_xor(AbstractValue left, long right) {
-		return _bitwise_xor(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	protected AbstractValue _cmp_reverse(AbstractValue left, long right) {
-		return _cmp(left.abs.abstractMap(right), left);
-	}		
-	
-	@Override
-	protected AbstractValue _cmpg_reverse(AbstractValue left, double right) {
-		return _cmpg(left.abs.abstractMap(right), left);
-	}
-
-	@Override
-	protected AbstractValue _cmpg_reverse(AbstractValue left, float right) {
-		return _cmpg(left.abs.abstractMap(right), left);
-	}
-
-	@Override
-	protected AbstractValue _cmpl_reverse(AbstractValue left, double right) {
-		return _cmpl(left.abs.abstractMap(right), left);
-	}
-	
-	@Override
-	protected AbstractValue _cmpl_reverse(AbstractValue left, float right) {
-		return _cmpl(left.abs.abstractMap(right), left);
 	}
 
 	@Override
@@ -266,36 +212,6 @@ public class RangeAbstraction extends Abstraction {
 	}
 
 	@Override
-	public AbstractValue _div(AbstractValue left, int right) {
-		return _div(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _div(AbstractValue left, long right) {
-		return _div(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	protected AbstractValue _div_reverse(AbstractValue left, double right) {
-		return _div(left.abs.abstractMap(right), left);
-	}
-
-	@Override
-	protected AbstractValue _div_reverse(AbstractValue left, float right) {
-		return _div(left.abs.abstractMap(right), left);
-	}
-
-	@Override
-	protected AbstractValue _div_reverse(AbstractValue left, int right) {
-		return _div(left.abs.abstractMap(right), left);
-	}
-
-	@Override
-	protected AbstractValue _div_reverse(AbstractValue left, long right) {
-		return _div(left.abs.abstractMap(right), left);
-	}
-	
-	@Override
 	public AbstractBoolean _eq(AbstractValue left, AbstractValue right) {
 		if (right instanceof RangeValue) {
 			RangeValue left_value = (RangeValue)left;
@@ -318,11 +234,6 @@ public class RangeAbstraction extends Abstraction {
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
-
-	@Override
-	public AbstractBoolean _eq(AbstractValue left, int right) {
-		return _eq(left, left.abs.abstractMap(right));
-	}
 	
 	@Override
 	public AbstractBoolean _ge(AbstractValue left, AbstractValue right) {
@@ -341,16 +252,6 @@ public class RangeAbstraction extends Abstraction {
 			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
-	}
-	
-	@Override
-	public AbstractBoolean _ge(AbstractValue left, int right) {
-		return _ge(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	protected AbstractBoolean _ge_reverse(AbstractValue left, int right) {
-		return _ge(left.abs.abstractMap(right), left);
 	}
 
 	@Override
@@ -373,16 +274,6 @@ public class RangeAbstraction extends Abstraction {
 	}
 
 	@Override
-	public AbstractBoolean _gt(AbstractValue left, int right) {
-		return _gt(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	protected AbstractBoolean _gt_reverse(AbstractValue left, int right) {
-		return _gt(left.abs.abstractMap(right), left);
-	}
-
-	@Override
 	public AbstractBoolean _le(AbstractValue left, AbstractValue right) {
 		if (right instanceof RangeValue) {
 			RangeValue left_value = (RangeValue)left;
@@ -402,16 +293,6 @@ public class RangeAbstraction extends Abstraction {
 	}
 
 	@Override
-	public AbstractBoolean _le(AbstractValue left, int right) {
-		return _le(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	protected AbstractBoolean _le_reverse(AbstractValue left, int right) {
-		return _le(left.abs.abstractMap(right), left);
-	}
-
-	@Override
 	public AbstractBoolean _lt(AbstractValue left, AbstractValue right) {
 		if (right instanceof RangeValue) {
 			RangeValue left_value = (RangeValue)left;
@@ -428,16 +309,6 @@ public class RangeAbstraction extends Abstraction {
 			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
-	}
-
-	@Override
-	public AbstractBoolean _lt(AbstractValue left, int right) {
-		return _lt(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	protected AbstractBoolean _lt_reverse(AbstractValue left, int right) {
-		return _lt(left.abs.abstractMap(right), left);
 	}
 
 	@Override
@@ -493,26 +364,6 @@ public class RangeAbstraction extends Abstraction {
 			return ((RangeAbstraction)left.abs).create(values);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
-	}
-
-	@Override
-	public AbstractValue _minus(AbstractValue left, int right) {
-		return _minus(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _minus(AbstractValue left, long right) {
-		return _minus(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _minus_reverse(AbstractValue left, int right) {
-		return _minus(left.abs.abstractMap(right), left);
-	}
-
-	@Override
-	public AbstractValue _minus_reverse(AbstractValue left, long right) {
-		return _minus(left.abs.abstractMap(right), left);
 	}
 
 	@Override
@@ -576,26 +427,6 @@ public class RangeAbstraction extends Abstraction {
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
-
-	@Override
-	public AbstractValue _mul(AbstractValue left, int right) {
-		return _mul(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _mul(AbstractValue left, long right) {
-		return _mul(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractBoolean _ne(AbstractValue left, AbstractValue right) {
-		return _eq(left, right).not();
-	}
-	
-	@Override
-	public AbstractBoolean _ne(AbstractValue left, int right) {
-		return _ne(left, left.abs.abstractMap(right));
-	}	
 	
 	@Override
 	public AbstractValue _neg_impl(AbstractValue abs) {
@@ -752,36 +583,6 @@ public class RangeAbstraction extends Abstraction {
 	}
 
 	@Override
-	public AbstractValue _rem(AbstractValue left, int right) {
-		return _rem(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _rem(AbstractValue left, long right) {
-		return _rem(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	protected AbstractValue _rem_reverse(AbstractValue left, double right) {
-		return _rem(left.abs.abstractMap(right), left);
-	}
-
-	@Override
-	protected AbstractValue _rem_reverse(AbstractValue left, float right) {
-		return _rem(left.abs.abstractMap(right), left);
-	}
-
-	@Override
-	protected AbstractValue _rem_reverse(AbstractValue left, int right) {
-		return _rem(left.abs.abstractMap(right), left);
-	}
-
-	@Override
-	protected AbstractValue _rem_reverse(AbstractValue left, long right) {
-		return _rem(left.abs.abstractMap(right), left);
-	}
-
-	@Override
 	public AbstractValue _shift_left(AbstractValue left, AbstractValue right) {
 		// result is extremely difficult to predict, so this returns TOP
 		if (right instanceof RangeValue) {	
@@ -791,26 +592,6 @@ public class RangeAbstraction extends Abstraction {
 			return ((RangeAbstraction)left.abs).create(values);	
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
-	}
-
-	@Override
-	public AbstractValue _shift_left(AbstractValue left, int right) {
-		return _shift_left(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _shift_left(AbstractValue left, long right) {
-		return _shift_left(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	protected AbstractValue _shift_left_reverse(AbstractValue left, int right) {
-		return _shift_left(left.abs.abstractMap(right), left);
-	}
-
-	@Override
-	protected AbstractValue _shift_left_reverse(AbstractValue left, long right) {
-		return _shift_left(left.abs.abstractMap(right), left);
 	}
 
 	@Override
@@ -826,26 +607,6 @@ public class RangeAbstraction extends Abstraction {
 	}
 
 	@Override
-	public AbstractValue _shift_right(AbstractValue left, int right) {
-		return _shift_right(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _shift_right(AbstractValue left, long right) {
-		return _shift_right(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	protected AbstractValue _shift_right_reverse(AbstractValue left, int right) {
-		return _shift_right(left.abs.abstractMap(right), left);
-	}
-
-	@Override
-	protected AbstractValue _shift_right_reverse(AbstractValue left, long right) {
-		return _shift_right(left.abs.abstractMap(right), left);
-	}
-
-	@Override
 	public AbstractValue _unsigned_shift_right(AbstractValue left, AbstractValue right) {
 		// result is extremely difficult to predict, so this returns TOP
 		if (right instanceof RangeValue) {	
@@ -855,26 +616,6 @@ public class RangeAbstraction extends Abstraction {
 			return ((RangeAbstraction)left.abs).create(values);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
-	}
-
-	@Override
-	public AbstractValue _unsigned_shift_right(AbstractValue left, int right) {
-		return _unsigned_shift_right(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _unsigned_shift_right(AbstractValue left, long right) {
-		return _unsigned_shift_right(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	protected AbstractValue _unsigned_shift_right_reverse(AbstractValue left, int right) {
-		return _unsigned_shift_right(left.abs.abstractMap(right), left);
-	}
-
-	@Override
-	protected AbstractValue _unsigned_shift_right_reverse(AbstractValue left, long right) {
-		return _unsigned_shift_right(left.abs.abstractMap(right), left);
 	}
 	
 	/**
@@ -896,11 +637,6 @@ public class RangeAbstraction extends Abstraction {
 		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
-	@Override
-	public AbstractValue _cmp(AbstractValue left, long right) {
-		return _cmp(left, left.abs.abstractMap(right));
-	}
-
 	/**
 	 * @return Signs.ZERO if the operand is numerically equal to this
 	 *         AbstractValue; Signs.NEG if this AbstractValue is numerically less
@@ -920,16 +656,6 @@ public class RangeAbstraction extends Abstraction {
 		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
-	@Override
-	public AbstractValue _cmpg(AbstractValue left, float right) {
-		return _cmpg(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _cmpg(AbstractValue left, double right) {
-		return _cmpg(left, left.abs.abstractMap(right));
-	}
-
 	/**
 	 * @return Signs.ZERO if the operand is numerically equal to this
 	 *         AbstractValue; Signs.NEG if this AbstractValue is numerically less
@@ -947,16 +673,6 @@ public class RangeAbstraction extends Abstraction {
 				&& _lt(left, right) != AbstractBoolean.TRUE)
 			z = true;
 		return SignsAbstraction.getInstance().create(n, z, p);
-	}
-
-	@Override
-	public AbstractValue _cmpl(AbstractValue left, float right) {
-		return _cmpl(left, left.abs.abstractMap(right));
-	}
-
-	@Override
-	public AbstractValue _cmpl(AbstractValue left, double right) {
-		return _cmpl(left, left.abs.abstractMap(right));
 	}
 	
 }

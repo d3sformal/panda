@@ -17,8 +17,6 @@
 // DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 package gov.nasa.jpf.abstraction.numeric;
 
-import java.util.Set;
-
 /**
  * Common root class for numeric abstractions.
  */
@@ -1261,11 +1259,11 @@ public abstract class Abstraction {
 	}
 
 	public AbstractValue _bitwise_and(AbstractValue left, int right) {
-		throw new RuntimeException("bitwise and not implemented");
+		return _bitwise_and(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _bitwise_and(AbstractValue left, long right) {
-		throw new RuntimeException("bitwise and not implemented");
+		return _bitwise_and(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _bitwise_or(AbstractValue left, AbstractValue right) {
@@ -1273,11 +1271,11 @@ public abstract class Abstraction {
 	}
 
 	public AbstractValue _bitwise_or(AbstractValue left, int right) {
-		throw new RuntimeException("bitwise or not implemented");
+		return _bitwise_or(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _bitwise_or(AbstractValue left, long right) {
-		throw new RuntimeException("bitwise or not implemented");
+		return _bitwise_or(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _bitwise_xor(AbstractValue left, AbstractValue right) {
@@ -1285,31 +1283,31 @@ public abstract class Abstraction {
 	}
 
 	public AbstractValue _bitwise_xor(AbstractValue left, int right) {
-		throw new RuntimeException("bitwise xor not implemented");
+		return _bitwise_xor(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _bitwise_xor(AbstractValue left, long right) {
-		throw new RuntimeException("bitwise xor not implemented");
+		return _bitwise_xor(left, left.abs.abstractMap(right));
 	}
 
-	protected AbstractValue _cmp_reverse(AbstractValue left, long right) {
-		throw new RuntimeException("cmp not implemented");
+	protected final AbstractValue _cmp_reverse(AbstractValue left, long right) {
+		return _cmp(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _cmpg_reverse(AbstractValue left, double right) {
-		throw new RuntimeException("cmpg not implemented");
+	protected final AbstractValue _cmpg_reverse(AbstractValue left, double right) {
+		return _cmpg(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _cmpg_reverse(AbstractValue left, float right) {
-		throw new RuntimeException("cmpg not implemented");
+	protected final AbstractValue _cmpg_reverse(AbstractValue left, float right) {
+		return _cmpg(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _cmpl_reverse(AbstractValue left, double right) {
-		throw new RuntimeException("cmpl not implemented");
+	protected final AbstractValue _cmpl_reverse(AbstractValue left, double right) {
+		return _cmpl(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _cmpl_reverse(AbstractValue left, float right) {
-		throw new RuntimeException("cmpl not implemented");
+	protected final AbstractValue _cmpl_reverse(AbstractValue left, float right) {
+		return _cmpl(left.abs.abstractMap(right), left);
 	}
 
 	public AbstractValue _div(AbstractValue left, AbstractValue right) {
@@ -1317,35 +1315,35 @@ public abstract class Abstraction {
 	}
 
 	public AbstractValue _div(AbstractValue left, double right) {
-		throw new RuntimeException("div not implemented");
+		return _div(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _div(AbstractValue left, float right) {
-		throw new RuntimeException("div not implemented");
+		return _div(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _div(AbstractValue left, int right) {
-		throw new RuntimeException("div not implemented");
+		return _div(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _div(AbstractValue left, long right) {
-		throw new RuntimeException("div not implemented");
+		return _div(left, left.abs.abstractMap(right));
 	}
 
-	protected AbstractValue _div_reverse(AbstractValue left, double right) {
-		throw new RuntimeException("div not implemented");
+	protected final AbstractValue _div_reverse(AbstractValue left, double right) {
+		return _div(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _div_reverse(AbstractValue left, float right) {
-		throw new RuntimeException("div not implemented");
+	protected final AbstractValue _div_reverse(AbstractValue left, float right) {
+		return _div(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _div_reverse(AbstractValue left, int right) {
-		throw new RuntimeException("div not implemented");
+	protected final AbstractValue _div_reverse(AbstractValue left, int right) {
+		return _div(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _div_reverse(AbstractValue left, long right) {
-		throw new RuntimeException("div not implemented");
+	protected final AbstractValue _div_reverse(AbstractValue left, long right) {
+		return _div(left.abs.abstractMap(right), left);
 	}
 
 	public AbstractBoolean _eq(AbstractValue left, AbstractValue right) {
@@ -1353,7 +1351,7 @@ public abstract class Abstraction {
 	}
 
 	public AbstractBoolean _eq(AbstractValue left, int right) {
-		throw new RuntimeException("ge not implemented");
+		return _eq(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractBoolean _ge(AbstractValue left, AbstractValue right) {
@@ -1361,11 +1359,11 @@ public abstract class Abstraction {
 	}
 
 	public AbstractBoolean _ge(AbstractValue left, int right) {
-		throw new RuntimeException("ge not implemented");
+		return _ge(left, left.abs.abstractMap(right));
 	}
 
-	protected AbstractBoolean _ge_reverse(AbstractValue left, int right) {
-		throw new RuntimeException("ge not implemented");
+	protected final AbstractBoolean _ge_reverse(AbstractValue left, int right) {
+		return _ge(left.abs.abstractMap(right), left);
 	}
 
 	public AbstractBoolean _gt(AbstractValue left, AbstractValue right) {
@@ -1373,11 +1371,11 @@ public abstract class Abstraction {
 	}
 
 	public AbstractBoolean _gt(AbstractValue left, int right) {
-		throw new RuntimeException("gt not implemented");
+		return _gt(left, left.abs.abstractMap(right));
 	}
 
-	protected AbstractBoolean _gt_reverse(AbstractValue left, int right) {
-		throw new RuntimeException("gt not implemented");
+	protected final AbstractBoolean _gt_reverse(AbstractValue left, int right) {
+		return _gt(left.abs.abstractMap(right), left);
 	}
 
 	public AbstractBoolean _le(AbstractValue left, AbstractValue right) {
@@ -1385,11 +1383,11 @@ public abstract class Abstraction {
 	}
 
 	public AbstractBoolean _le(AbstractValue left, int right) {
-		throw new RuntimeException("le not implemented");
+		return _le(left, left.abs.abstractMap(right));
 	}
 
-	protected AbstractBoolean _le_reverse(AbstractValue left, int right) {
-		throw new RuntimeException("le not implemented");
+	protected final AbstractBoolean _le_reverse(AbstractValue left, int right) {
+		return _le(left.abs.abstractMap(right), left);
 	}
 
 	public AbstractBoolean _lt(AbstractValue left, AbstractValue right) {
@@ -1397,11 +1395,11 @@ public abstract class Abstraction {
 	}
 
 	public AbstractBoolean _lt(AbstractValue left, int right) {
-		throw new RuntimeException("lt not implemented");
+		return _lt(left, left.abs.abstractMap(right));
 	}
 
-	protected AbstractBoolean _lt_reverse(AbstractValue left, int right) {
-		throw new RuntimeException("lt not implemented");
+	protected final AbstractBoolean _lt_reverse(AbstractValue left, int right) {
+		return _lt(left.abs.abstractMap(right), left);
 	}
 
 	public AbstractValue _minus(AbstractValue left, AbstractValue right) {
@@ -1409,35 +1407,35 @@ public abstract class Abstraction {
 	}
 
 	public AbstractValue _minus(AbstractValue left, double right) {
-		throw new RuntimeException("minus not implemented");
+		return _minus(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _minus(AbstractValue left, float right) {
-		throw new RuntimeException("minus not implemented");
+		return _minus(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _minus(AbstractValue left, int right) {
-		throw new RuntimeException("minus not implemented");
+		return _minus(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _minus(AbstractValue left, long right) {
-		throw new RuntimeException("minus not implemented");
+		return _minus(left, left.abs.abstractMap(right));
 	}
 
-	protected AbstractValue _minus_reverse(AbstractValue left, double right) {
-		throw new RuntimeException("minus not implemented");
+	protected final AbstractValue _minus_reverse(AbstractValue left, double right) {
+		return _minus(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _minus_reverse(AbstractValue left, float right) {
-		throw new RuntimeException("minus not implemented");
+	protected final AbstractValue _minus_reverse(AbstractValue left, float right) {
+		return _minus(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _minus_reverse(AbstractValue left, int right) {
-		throw new RuntimeException("minus not implemented");
+	protected final AbstractValue _minus_reverse(AbstractValue left, int right) {
+		return _minus(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _minus_reverse(AbstractValue left, long right) {
-		throw new RuntimeException("minus not implemented");
+	protected final AbstractValue _minus_reverse(AbstractValue left, long right) {
+		return _minus(left.abs.abstractMap(right), left);
 	}
 
 	public AbstractValue _mul(AbstractValue left, AbstractValue right) {
@@ -1445,27 +1443,27 @@ public abstract class Abstraction {
 	}
 
 	public AbstractValue _mul(AbstractValue left, double right) {
-		throw new RuntimeException("mul not implemented");
+		return _mul(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _mul(AbstractValue left, float right) {
-		throw new RuntimeException("mul not implemented");
+		return _mul(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _mul(AbstractValue left, int right) {
-		throw new RuntimeException("mul not implemented");
+		return _mul(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _mul(AbstractValue left, long right) {
-		throw new RuntimeException("mul not implemented");
+		return _mul(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractBoolean _ne(AbstractValue left, AbstractValue right) {
-		throw new RuntimeException("ge not implemented");
+		return _eq(left, right).not();
 	}
 
 	public AbstractBoolean _ne(AbstractValue left, int right) {
-		throw new RuntimeException("ge not implemented");
+		return _ne(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _neg_impl(AbstractValue abs) {
@@ -1477,11 +1475,11 @@ public abstract class Abstraction {
 	}
 
 	public AbstractValue _plus(AbstractValue left, double right) {
-		throw new RuntimeException("plus not implemented");
+		return _plus(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _plus(AbstractValue left, float right) {
-		throw new RuntimeException("plus not implemented");
+		return _plus(left, left.abs.abstractMap(right));
 	}
 
 	/**
@@ -1492,11 +1490,11 @@ public abstract class Abstraction {
 	 * @return the result of adding operand to this AbstractValue
 	 */
 	public AbstractValue _plus(AbstractValue left, int right) {
-		throw new RuntimeException("plus not implemented");
+		return _plus(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _plus(AbstractValue left, long right) {
-		throw new RuntimeException("plus not implemented");
+		return _plus(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _rem(AbstractValue left, AbstractValue right) {
@@ -1504,35 +1502,35 @@ public abstract class Abstraction {
 	}
 
 	public AbstractValue _rem(AbstractValue left, double right) {
-		throw new RuntimeException("rem not implemented");
+		return _rem(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _rem(AbstractValue left, float right) {
-		throw new RuntimeException("rem not implemented");
+		return _rem(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _rem(AbstractValue left, int right) {
-		throw new RuntimeException("rem not implemented");
+		return _rem(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _rem(AbstractValue left, long right) {
-		throw new RuntimeException("rem not implemented");
+		return _rem(left, left.abs.abstractMap(right));
 	}
 
-	protected AbstractValue _rem_reverse(AbstractValue left, double right) {
-		throw new RuntimeException("rem not implemented");
+	protected final AbstractValue _rem_reverse(AbstractValue left, double right) {
+		return _rem(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _rem_reverse(AbstractValue left, float right) {
-		throw new RuntimeException("rem not implemented");
+	protected final AbstractValue _rem_reverse(AbstractValue left, float right) {
+		return _rem(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _rem_reverse(AbstractValue left, int right) {
-		throw new RuntimeException("rem not implemented");
+	protected final AbstractValue _rem_reverse(AbstractValue left, int right) {
+		return _rem(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _rem_reverse(AbstractValue left, long right) {
-		throw new RuntimeException("rem not implemented");
+	protected final AbstractValue _rem_reverse(AbstractValue left, long right) {
+		return _rem(left.abs.abstractMap(right), left);
 	}
 
 	public AbstractValue _shift_left(AbstractValue left, AbstractValue right) {
@@ -1540,19 +1538,19 @@ public abstract class Abstraction {
 	}
 
 	public AbstractValue _shift_left(AbstractValue left, int right) {
-		throw new RuntimeException("shift left not implemented");
+		return _shift_left(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _shift_left(AbstractValue left, long right) {
-		throw new RuntimeException("shift left not implemented");
+		return _shift_left(left, left.abs.abstractMap(right));
 	}
 
-	protected AbstractValue _shift_left_reverse(AbstractValue left, int right) {
-		throw new RuntimeException("shift left not implemented");
+	protected final AbstractValue _shift_left_reverse(AbstractValue left, int right) {
+		return _shift_left(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _shift_left_reverse(AbstractValue left, long right) {
-		throw new RuntimeException("shift left not implemented");
+	protected final AbstractValue _shift_left_reverse(AbstractValue left, long right) {
+		return _shift_left(left.abs.abstractMap(right), left);
 	}
 
 	public AbstractValue _shift_right(AbstractValue left, AbstractValue right) {
@@ -1560,19 +1558,19 @@ public abstract class Abstraction {
 	}
 
 	public AbstractValue _shift_right(AbstractValue left, int right) {
-		throw new RuntimeException("shift right not implemented");
+		return _shift_right(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _shift_right(AbstractValue left, long right) {
-		throw new RuntimeException("shift right not implemented");
+		return _shift_right(left, left.abs.abstractMap(right));
 	}
 
-	protected AbstractValue _shift_right_reverse(AbstractValue left, int right) {
-		throw new RuntimeException("shift right not implemented");
+	protected final AbstractValue _shift_right_reverse(AbstractValue left, int right) {
+		return _shift_right(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _shift_right_reverse(AbstractValue left, long right) {
-		throw new RuntimeException("shift right not implemented");
+	protected final AbstractValue _shift_right_reverse(AbstractValue left, long right) {
+		return _shift_right(left.abs.abstractMap(right), left);
 	}
 
 	public AbstractValue _unsigned_shift_right(AbstractValue left, AbstractValue right) {
@@ -1580,19 +1578,19 @@ public abstract class Abstraction {
 	}
 
 	public AbstractValue _unsigned_shift_right(AbstractValue left, int right) {
-		throw new RuntimeException("shift right not implemented");
+		return _unsigned_shift_right(left, left.abs.abstractMap(right));
 	}
 
 	public AbstractValue _unsigned_shift_right(AbstractValue left, long right) {
-		throw new RuntimeException("shift right not implemented");
+		return _unsigned_shift_right(left, left.abs.abstractMap(right));
 	}
 
-	protected AbstractValue _unsigned_shift_right_reverse(AbstractValue left, int right) {
-		throw new RuntimeException("unsigned shift right not implemented");
+	protected final AbstractValue _unsigned_shift_right_reverse(AbstractValue left, int right) {
+		return _unsigned_shift_right(left.abs.abstractMap(right), left);
 	}
 
-	protected AbstractValue _unsigned_shift_right_reverse(AbstractValue left, long right) {
-		throw new RuntimeException("shift right not implemented");
+	protected final AbstractValue _unsigned_shift_right_reverse(AbstractValue left, long right) {
+		return _unsigned_shift_right(left.abs.abstractMap(right), left);
 	}
 
 	public boolean equals(AbstractValue left, AbstractValue right) {
