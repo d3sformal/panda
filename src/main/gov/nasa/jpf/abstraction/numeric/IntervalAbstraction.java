@@ -198,127 +198,118 @@ public class IntervalAbstraction extends Abstraction {
 
 	@Override
 	public AbstractValue _plus(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			IntervalValue left_value = (IntervalValue) left;
-			IntervalValue right_value = (IntervalValue) right;
-			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
-			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
-			if (left_value.can_be_LESS()) {
-				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (left_value.can_be_INSIDE()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (left_value.can_be_GREATER()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
-				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
-			}
-			if (right_value.can_be_LESS()) {
-				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (right_value.can_be_INSIDE()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (right_value.can_be_GREATER()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
-				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}
-			double res_left = left1 + left2, res_right = right1 + right2;
-			return ((IntervalAbstraction)left.abs).create(res_left < ((IntervalAbstraction)left.abs).MIN, res_right >= ((IntervalAbstraction)left.abs).MIN
-					&& res_left <= ((IntervalAbstraction)left.abs).MAX, res_right > ((IntervalAbstraction)left.abs).MAX);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		IntervalValue left_value = (IntervalValue) left;
+		IntervalValue right_value = (IntervalValue) right;
+		double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
+		double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
+		if (left_value.can_be_LESS()) {
+			left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (left_value.can_be_INSIDE()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (left_value.can_be_GREATER()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
+			right1 = Math.max(right1, Double.POSITIVE_INFINITY);
+		}
+		if (right_value.can_be_LESS()) {
+			left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (right_value.can_be_INSIDE()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (right_value.can_be_GREATER()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
+			right2 = Math.max(right2, Double.POSITIVE_INFINITY);
+		}
+		double res_left = left1 + left2, res_right = right1 + right2;
+		return ((IntervalAbstraction)left.abs).create(res_left < ((IntervalAbstraction)left.abs).MIN, res_right >= ((IntervalAbstraction)left.abs).MIN
+			&& res_left <= ((IntervalAbstraction)left.abs).MAX, res_right > ((IntervalAbstraction)left.abs).MAX);
 	}
 
 	@Override
 	public AbstractValue _minus(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			IntervalValue left_value = (IntervalValue) left;
-			IntervalValue right_value = (IntervalValue) right;
-			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
-			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
-			if (left_value.can_be_LESS()) {
-				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (left_value.can_be_INSIDE()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (left_value.can_be_GREATER()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
-				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
-			}
-			if (right_value.can_be_LESS()) {
-				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (right_value.can_be_INSIDE()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (right_value.can_be_GREATER()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
-				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}
-			double res_left = left1 - right2, res_right = right1 - left2;
-			return ((IntervalAbstraction)left.abs).create(res_left < ((IntervalAbstraction)left.abs).MIN, res_right >= ((IntervalAbstraction)left.abs).MIN
-					&& res_left <= ((IntervalAbstraction)left.abs).MAX, res_right > ((IntervalAbstraction)left.abs).MAX);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		IntervalValue left_value = (IntervalValue) left;
+		IntervalValue right_value = (IntervalValue) right;
+		double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
+		double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
+		if (left_value.can_be_LESS()) {
+			left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (left_value.can_be_INSIDE()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (left_value.can_be_GREATER()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
+			right1 = Math.max(right1, Double.POSITIVE_INFINITY);
+		}
+		if (right_value.can_be_LESS()) {
+			left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (right_value.can_be_INSIDE()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (right_value.can_be_GREATER()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
+			right2 = Math.max(right2, Double.POSITIVE_INFINITY);
+		}
+		double res_left = left1 - right2, res_right = right1 - left2;
+		return ((IntervalAbstraction)left.abs).create(res_left < ((IntervalAbstraction)left.abs).MIN, res_right >= ((IntervalAbstraction)left.abs).MIN
+				&& res_left <= ((IntervalAbstraction)left.abs).MAX, res_right > ((IntervalAbstraction)left.abs).MAX);
 	}
 
 	@Override
 	public AbstractValue _mul(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			IntervalValue left_value = (IntervalValue) left;
-			IntervalValue right_value = (IntervalValue) right;
-			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
-			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
-			if (left_value.can_be_LESS()) {
-				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (left_value.can_be_INSIDE()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (left_value.can_be_GREATER()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
-				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
-			}
-			if (right_value.can_be_LESS()) {
-				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (right_value.can_be_INSIDE()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (right_value.can_be_GREATER()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
-				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}
-			double res_left, res_right;
-			if ((left1 <= 0 && 0 <= right1) || (left2 <= 0 && 0 <= right2)) {
-				res_left = ___min(left1 * left2, left1 * right2,
-						right1 * left2, right1 * right2, 0);
-				res_right = ____max(left1 * left2, left1 * right2, right1
-						* left2, right1 * right2, 0);
-			} else {
-				res_left = ___min(left1 * left2, left1 * right2,
-						right1 * left2, right1 * right2);
-				res_right = ____max(left1 * left2, left1 * right2, right1
-						* left2, right1 * right2);
-			}
-			return ((IntervalAbstraction)left.abs).create(res_left < ((IntervalAbstraction)left.abs).MIN, res_right >= ((IntervalAbstraction)left.abs).MIN
-					&& res_left <= ((IntervalAbstraction)left.abs).MAX, res_right > ((IntervalAbstraction)left.abs).MAX);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		IntervalValue left_value = (IntervalValue) left;
+		IntervalValue right_value = (IntervalValue) right;
+		double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
+		double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
+		if (left_value.can_be_LESS()) {
+			left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (left_value.can_be_INSIDE()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (left_value.can_be_GREATER()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
+			right1 = Math.max(right1, Double.POSITIVE_INFINITY);
+		}
+		if (right_value.can_be_LESS()) {
+			left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (right_value.can_be_INSIDE()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (right_value.can_be_GREATER()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
+			right2 = Math.max(right2, Double.POSITIVE_INFINITY);
+		}
+		double res_left, res_right;
+		if ((left1 <= 0 && 0 <= right1) || (left2 <= 0 && 0 <= right2)) {
+			res_left = ___min(left1 * left2, left1 * right2,
+					right1 * left2, right1 * right2, 0);
+			res_right = ____max(left1 * left2, left1 * right2, right1
+					* left2, right1 * right2, 0);
+		} else {
+			res_left = ___min(left1 * left2, left1 * right2,
+					right1 * left2, right1 * right2);
+			res_right = ____max(left1 * left2, left1 * right2, right1
+					* left2, right1 * right2);
+		}
+		return ((IntervalAbstraction)left.abs).create(res_left < ((IntervalAbstraction)left.abs).MIN, res_right >= ((IntervalAbstraction)left.abs).MIN
+				&& res_left <= ((IntervalAbstraction)left.abs).MAX, res_right > ((IntervalAbstraction)left.abs).MAX);
 	}
 
 	private double ___min(double... args) {
@@ -339,150 +330,126 @@ public class IntervalAbstraction extends Abstraction {
 
 	@Override
 	public AbstractValue _div(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			IntervalValue left_value = (IntervalValue) left;
-			IntervalValue right_value = (IntervalValue) right;
-			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
-			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
-			if (left_value.can_be_LESS()) {
-				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (left_value.can_be_INSIDE()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (left_value.can_be_GREATER()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
-				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
-			}
-			if (right_value.can_be_LESS()) {
-				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (right_value.can_be_INSIDE()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (right_value.can_be_GREATER()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
-				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}
-			if (left2 <= 0 && 0 <= right2)
-				System.out.println("### WARNING: Division by ZERO may happen");
-			// TODO: Handle division by zero
-			double res_left, res_right;
-			if ((left1 <= 0 && 0 <= right1) || (left2 < 0 && 0 < right2)) {
-				res_left = ___min(left1 / left2, left1 / right2,
-						right1 / left2, right1 / right2, 0);
-				res_right = ____max(left1 / left2, left1 / right2, right1
-						/ left2, right1 / right2, 0);
-			} else {
-				res_left = ___min(left1 / left2, left1 / right2,
-						right1 / left2, right1 / right2);
-				res_right = ____max(left1 / left2, left1 / right2, right1
-						/ left2, right1 / right2);
-			}
-			return ((IntervalAbstraction)left.abs).create(res_left < ((IntervalAbstraction)left.abs).MIN, res_right >= ((IntervalAbstraction)left.abs).MIN
-					&& res_left <= ((IntervalAbstraction)left.abs).MAX, res_right > ((IntervalAbstraction)left.abs).MAX);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		IntervalValue left_value = (IntervalValue) left;
+		IntervalValue right_value = (IntervalValue) right;
+		double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
+		double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
+		if (left_value.can_be_LESS()) {
+			left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (left_value.can_be_INSIDE()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (left_value.can_be_GREATER()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
+			right1 = Math.max(right1, Double.POSITIVE_INFINITY);
+		}
+		if (right_value.can_be_LESS()) {
+			left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (right_value.can_be_INSIDE()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (right_value.can_be_GREATER()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
+			right2 = Math.max(right2, Double.POSITIVE_INFINITY);
+		}
+		if (left2 <= 0 && 0 <= right2)
+			System.out.println("### WARNING: Division by ZERO may happen");
+		// TODO: Handle division by zero
+		double res_left, res_right;
+		if ((left1 <= 0 && 0 <= right1) || (left2 < 0 && 0 < right2)) {
+			res_left = ___min(left1 / left2, left1 / right2,
+					right1 / left2, right1 / right2, 0);
+			res_right = ____max(left1 / left2, left1 / right2, right1
+					/ left2, right1 / right2, 0);
+		} else {
+			res_left = ___min(left1 / left2, left1 / right2,
+					right1 / left2, right1 / right2);
+			res_right = ____max(left1 / left2, left1 / right2, right1
+					/ left2, right1 / right2);
+		}
+		return ((IntervalAbstraction)left.abs).create(res_left < ((IntervalAbstraction)left.abs).MIN, res_right >= ((IntervalAbstraction)left.abs).MIN
+				&& res_left <= ((IntervalAbstraction)left.abs).MAX, res_right > ((IntervalAbstraction)left.abs).MAX);
 	}
 
 	@Override
 	public AbstractValue _rem(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			IntervalValue left_value = (IntervalValue) left;
-			IntervalValue right_value = (IntervalValue) right;
-			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
-			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
-			if (left_value.can_be_LESS()) {
-				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (left_value.can_be_INSIDE()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (left_value.can_be_GREATER()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
-				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
-			}
-			if (right_value.can_be_LESS()) {
-				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (right_value.can_be_INSIDE()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (right_value.can_be_GREATER()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
-				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}
-			if (left2 <= 0 && 0 <= right2)
-				; // TODO: Handle division by zero
-			double res_left = 0;
-			double res_right = ____max(Math.abs(left1), Math.abs(right1),
-					Math.abs(left2), Math.abs(right2));
+		IntervalValue left_value = (IntervalValue) left;
+		IntervalValue right_value = (IntervalValue) right;
+		double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
+		double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
+		if (left_value.can_be_LESS()) {
+			left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (left_value.can_be_INSIDE()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (left_value.can_be_GREATER()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
+			right1 = Math.max(right1, Double.POSITIVE_INFINITY);
+		}
+		if (right_value.can_be_LESS()) {
+			left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (right_value.can_be_INSIDE()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (right_value.can_be_GREATER()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
+			right2 = Math.max(right2, Double.POSITIVE_INFINITY);
+		}
+		if (left2 <= 0 && 0 <= right2)
+			; // TODO: Handle division by zero
+		double res_left = 0;
+		double res_right = ____max(Math.abs(left1), Math.abs(right1),
+				Math.abs(left2), Math.abs(right2));
 
-			return ((IntervalAbstraction)left.abs).create(res_left < ((IntervalAbstraction)left.abs).MIN, res_right >= ((IntervalAbstraction)left.abs).MIN
-					&& res_left <= ((IntervalAbstraction)left.abs).MAX, res_right > ((IntervalAbstraction)left.abs).MAX);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		return ((IntervalAbstraction)left.abs).create(res_left < ((IntervalAbstraction)left.abs).MIN, res_right >= ((IntervalAbstraction)left.abs).MIN
+				&& res_left <= ((IntervalAbstraction)left.abs).MAX, res_right > ((IntervalAbstraction)left.abs).MAX);
 	}
 
 	@Override
 	public AbstractValue _bitwise_and(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			return ((IntervalAbstraction)left.abs).create(true, true, true);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		return ((IntervalAbstraction)left.abs).create(true, true, true);
 	}
 
 	@Override
 	public AbstractValue _bitwise_or(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			return ((IntervalAbstraction)left.abs).create(true, true, true);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		return ((IntervalAbstraction)left.abs).create(true, true, true);
 	}
 
 	@Override
 	public AbstractValue _bitwise_xor(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			return ((IntervalAbstraction)left.abs).create(true, true, true);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		return ((IntervalAbstraction)left.abs).create(true, true, true);
 	}
 
 	// Note that x << y considers only the least five bits of y
 	@Override
 	public AbstractValue _shift_left(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			return ((IntervalAbstraction)left.abs).create(true, true, true);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		return ((IntervalAbstraction)left.abs).create(true, true, true);
 	}
 
 	// Note that x >> y considers only the least five bits of y, sign of x is
 	// preserved
 	@Override
 	public AbstractValue _shift_right(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			return ((IntervalAbstraction)left.abs).create(true, true, true);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		return ((IntervalAbstraction)left.abs).create(true, true, true);
 	}
 
 	// Note that x >>> y considers only the least five bits of y, sign of x is
 	// not preserved
 	@Override
 	public AbstractValue _unsigned_shift_right(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			return ((IntervalAbstraction)left.abs).create(true, true, true);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		return ((IntervalAbstraction)left.abs).create(true, true, true);
 	}
 
 	@Override
@@ -510,213 +477,198 @@ public class IntervalAbstraction extends Abstraction {
 
 	@Override
 	public AbstractBoolean _ge(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			IntervalValue left_value = (IntervalValue) left;
-			IntervalValue right_value = (IntervalValue) right;
-			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
-			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
-			if (left_value.can_be_LESS()) {
-				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (left_value.can_be_INSIDE()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (left_value.can_be_GREATER()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
-				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
-			}
-			if (right_value.can_be_LESS()) {
-				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (right_value.can_be_INSIDE()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (right_value.can_be_GREATER()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
-				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}
-			boolean t = right1 >= left2; // this.MAX >= right.MIN
-			boolean f = left1 < right2;
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else
-				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		IntervalValue left_value = (IntervalValue) left;
+		IntervalValue right_value = (IntervalValue) right;
+		double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
+		double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
+		if (left_value.can_be_LESS()) {
+			left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (left_value.can_be_INSIDE()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (left_value.can_be_GREATER()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
+			right1 = Math.max(right1, Double.POSITIVE_INFINITY);
+		}
+		if (right_value.can_be_LESS()) {
+			left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (right_value.can_be_INSIDE()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (right_value.can_be_GREATER()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
+			right2 = Math.max(right2, Double.POSITIVE_INFINITY);
+		}
+		boolean t = right1 >= left2; // this.MAX >= right.MIN
+		boolean f = left1 < right2;
+		if (f & t)
+			return AbstractBoolean.TOP;
+		else
+			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 	}
 
 	@Override
 	public AbstractBoolean _gt(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			IntervalValue left_value = (IntervalValue) left;
-			IntervalValue right_value = (IntervalValue) right;
-			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
-			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
-			if (left_value.can_be_LESS()) {
-				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (left_value.can_be_INSIDE()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (left_value.can_be_GREATER()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
-				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
-			}
-			if (right_value.can_be_LESS()) {
-				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (right_value.can_be_INSIDE()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (right_value.can_be_GREATER()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
-				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}
-			boolean t = right1 > left2; // this.MAX >= right.MIN
-			boolean f = left1 <= right2;
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else
-				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		IntervalValue left_value = (IntervalValue) left;
+		IntervalValue right_value = (IntervalValue) right;
+		double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
+		double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
+		if (left_value.can_be_LESS()) {
+			left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (left_value.can_be_INSIDE()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (left_value.can_be_GREATER()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
+			right1 = Math.max(right1, Double.POSITIVE_INFINITY);
+		}
+		if (right_value.can_be_LESS()) {
+			left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (right_value.can_be_INSIDE()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (right_value.can_be_GREATER()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
+			right2 = Math.max(right2, Double.POSITIVE_INFINITY);
+		}
+		boolean t = right1 > left2; // this.MAX >= right.MIN
+		boolean f = left1 <= right2;
+		if (f & t)
+			return AbstractBoolean.TOP;
+		else
+			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 	}
 
 	@Override
 	public AbstractBoolean _le(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			IntervalValue left_value = (IntervalValue) left;
-			IntervalValue right_value = (IntervalValue) right;
-			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
-			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
-			if (left_value.can_be_LESS()) {
-				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (left_value.can_be_INSIDE()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (left_value.can_be_GREATER()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
-				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
-			}
-			if (right_value.can_be_LESS()) {
-				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (right_value.can_be_INSIDE()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (right_value.can_be_GREATER()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
-				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}
-			boolean t = right2 >= left1; // this.MAX >= right.MIN
-			boolean f = left2 < right1;
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else
-				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		IntervalValue left_value = (IntervalValue) left;
+		IntervalValue right_value = (IntervalValue) right;
+		double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
+		double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
+		if (left_value.can_be_LESS()) {
+			left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (left_value.can_be_INSIDE()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (left_value.can_be_GREATER()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
+			right1 = Math.max(right1, Double.POSITIVE_INFINITY);
+		}
+		if (right_value.can_be_LESS()) {
+			left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (right_value.can_be_INSIDE()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (right_value.can_be_GREATER()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
+			right2 = Math.max(right2, Double.POSITIVE_INFINITY);
+		}
+		boolean t = right2 >= left1; // this.MAX >= right.MIN
+		boolean f = left2 < right1;
+		if (f & t)
+			return AbstractBoolean.TOP;
+		else
+			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 	}
 
 	@Override
 	public AbstractBoolean _lt(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			IntervalValue left_value = (IntervalValue) left;
-			IntervalValue right_value = (IntervalValue) right;
-			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
-			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
-			if (left_value.can_be_LESS()) {
-				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (left_value.can_be_INSIDE()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (left_value.can_be_GREATER()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
-				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
-			}
-			if (right_value.can_be_LESS()) {
-				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (right_value.can_be_INSIDE()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (right_value.can_be_GREATER()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
-				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}
-			boolean t = right2 > left1; // this.MAX >= right.MIN
-			boolean f = left2 <= right1;
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else
-				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		IntervalValue left_value = (IntervalValue) left;
+		IntervalValue right_value = (IntervalValue) right;
+		double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
+		double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
+		if (left_value.can_be_LESS()) {
+			left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (left_value.can_be_INSIDE()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (left_value.can_be_GREATER()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
+			right1 = Math.max(right1, Double.POSITIVE_INFINITY);
+		}
+		if (right_value.can_be_LESS()) {
+			left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (right_value.can_be_INSIDE()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (right_value.can_be_GREATER()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
+			right2 = Math.max(right2, Double.POSITIVE_INFINITY);
+		}
+		boolean t = right2 > left1; // this.MAX >= right.MIN
+		boolean f = left2 <= right1;
+		if (f & t)
+			return AbstractBoolean.TOP;
+		else
+			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 	}
 
 	@Override
 	public AbstractBoolean _eq(AbstractValue left, AbstractValue right) {
-		if (right instanceof IntervalValue) {
-			IntervalValue left_value = (IntervalValue) left;
-			IntervalValue right_value = (IntervalValue) right;
-			double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
-			double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
-			if (left_value.can_be_LESS()) {
-				left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (left_value.can_be_INSIDE()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
-				right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (left_value.can_be_GREATER()) {
-				left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
-				right1 = Math.max(right1, Double.POSITIVE_INFINITY);
-			}
-			if (right_value.can_be_LESS()) {
-				left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
-			}
-			if (right_value.can_be_INSIDE()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
-				right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
-			}
-			if (right_value.can_be_GREATER()) {
-				left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
-				right2 = Math.max(right2, Double.POSITIVE_INFINITY);
-			}
-			// values can be equal, iff equality is possible (bounding segments
-			// can intersect)
-			boolean t = (left1 >= left2 && left1 <= right2)
-					|| (right1 >= left2 && right1 <= right2)
-					|| (left2 >= left1 && left2 <= right1)
-					|| (right2 >= left1 && right2 <= right1);
-			// values can be inequal, iff their domains are different
-			boolean f = !(left1 == left2 && right1 == right2);
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else
-				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		IntervalValue left_value = (IntervalValue) left;
+		IntervalValue right_value = (IntervalValue) right;
+		double left1 = Double.POSITIVE_INFINITY, right1 = Double.NEGATIVE_INFINITY;
+		double left2 = Double.POSITIVE_INFINITY, right2 = Double.NEGATIVE_INFINITY;
+		if (left_value.can_be_LESS()) {
+			left1 = Math.min(left1, Double.NEGATIVE_INFINITY);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (left_value.can_be_INSIDE()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MIN);
+			right1 = Math.max(right1, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (left_value.can_be_GREATER()) {
+			left1 = Math.min(left1, ((IntervalAbstraction)left.abs).MAX);
+			right1 = Math.max(right1, Double.POSITIVE_INFINITY);
+		}
+		if (right_value.can_be_LESS()) {
+			left2 = Math.min(left2, Double.NEGATIVE_INFINITY);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MIN);
+		}
+		if (right_value.can_be_INSIDE()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MIN);
+			right2 = Math.max(right2, ((IntervalAbstraction)left.abs).MAX);
+		}
+		if (right_value.can_be_GREATER()) {
+			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
+			right2 = Math.max(right2, Double.POSITIVE_INFINITY);
+		}
+		// values can be equal, iff equality is possible (bounding segments
+		// can intersect)
+		boolean t = (left1 >= left2 && left1 <= right2)
+				|| (right1 >= left2 && right1 <= right2)
+				|| (left2 >= left1 && left2 <= right1)
+				|| (right2 >= left1 && right2 <= right1);
+		// values can be inequal, iff their domains are different
+		boolean f = !(left1 == left2 && right1 == right2);
+		if (f & t)
+			return AbstractBoolean.TOP;
+		else
+			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 	}
 
 	/**

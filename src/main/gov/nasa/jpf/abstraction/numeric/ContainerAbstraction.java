@@ -196,19 +196,16 @@ public class ContainerAbstraction extends Abstraction {
 	 * @return The result of an operation.
 	 */
 	private AbstractValue binaryOperation(AbstractValue left, AbstractValue right, IBinaryOperation op) {
-		if (right instanceof ContainerValue) {
-			ContainerValue left_val = (ContainerValue) left;
-			ContainerValue right_val = (ContainerValue) right;
-			List<AbstractValue> res = new ArrayList<AbstractValue>();
-				for (Pair<AbstractValue, AbstractValue> p : getRelevantAbstractValuePairs(
-					left_val, right_val))
-				if (p._1 == null || p._2 == null)
-					res.add(null);
-				else
-					res.add(op.execute(p._1, p._2));
-				return ((ContainerAbstraction)left.abs).create(res);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		ContainerValue left_val = (ContainerValue) left;
+		ContainerValue right_val = (ContainerValue) right;
+		List<AbstractValue> res = new ArrayList<AbstractValue>();
+			for (Pair<AbstractValue, AbstractValue> p : getRelevantAbstractValuePairs(
+				left_val, right_val))
+			if (p._1 == null || p._2 == null)
+				res.add(null);
+			else
+				res.add(op.execute(p._1, p._2));
+			return ((ContainerAbstraction)left.abs).create(res);
 	}
 	
 	@Override
@@ -350,15 +347,12 @@ public class ContainerAbstraction extends Abstraction {
 	 */
 	private AbstractBoolean binaryComparison(AbstractValue left, AbstractValue right,
 			IBinaryComparison op) {
-		if (right instanceof ContainerValue) {
-			AbstractBoolean res = AbstractBoolean.FALSE;
-			for (Pair<AbstractValue, AbstractValue> p : getRelevantAbstractValuePairs(
-					(ContainerValue) left, (ContainerValue) right))
-				if (p._1 != null && p._2 != null)
-					res = res.and(op.execute(p._1, p._2));
-			return res;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		AbstractBoolean res = AbstractBoolean.FALSE;
+		for (Pair<AbstractValue, AbstractValue> p : getRelevantAbstractValuePairs(
+				(ContainerValue) left, (ContainerValue) right))
+			if (p._1 != null && p._2 != null)
+				res = res.and(op.execute(p._1, p._2));
+		return res;
 	}
 
 	@Override

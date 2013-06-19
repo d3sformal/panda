@@ -177,228 +177,204 @@ public class SignsAbstraction extends Abstraction {
 
 	@Override
 	public AbstractValue _plus(AbstractValue left, AbstractValue right) {		
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean p = false, n = false, z = false;
-			if (left_value.can_be_NEG() && right_value.can_be_NEG())
-				n = true;
-			if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-				n = true;
-			if (left_value.can_be_NEG() && right_value.can_be_POS())
-				n = z = p = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				n = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-				z = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_POS())
-				p = true;
-			if (left_value.can_be_POS() && right_value.can_be_NEG())
-				n = z = p = true;
-			if (left_value.can_be_POS() && right_value.can_be_ZERO())
-				p = true;
-			if (left_value.can_be_POS() && right_value.can_be_POS())
-				p = true;
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean p = false, n = false, z = false;
+		if (left_value.can_be_NEG() && right_value.can_be_NEG())
+			n = true;
+		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+			n = true;
+		if (left_value.can_be_NEG() && right_value.can_be_POS())
+			n = z = p = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+			n = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+			z = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_POS())
+			p = true;
+		if (left_value.can_be_POS() && right_value.can_be_NEG())
+			n = z = p = true;
+		if (left_value.can_be_POS() && right_value.can_be_ZERO())
+			p = true;
+		if (left_value.can_be_POS() && right_value.can_be_POS())
+			p = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
 	public AbstractValue _minus(AbstractValue left, AbstractValue right) {
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean p = false, n = false, z = false;
-			if (left_value.can_be_NEG() && right_value.can_be_NEG())
-				n = z = p = true;
-			if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-				n = true;
-			if (left_value.can_be_NEG() && right_value.can_be_POS())
-				n = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				p = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-				z = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_POS())
-				n = true;
-			if (left_value.can_be_POS() && right_value.can_be_NEG())
-				p = true;
-			if (left_value.can_be_POS() && right_value.can_be_ZERO())
-				p = true;
-			if (left_value.can_be_POS() && right_value.can_be_POS())
-				n = z = p = true;
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean p = false, n = false, z = false;
+		if (left_value.can_be_NEG() && right_value.can_be_NEG())
+			n = z = p = true;
+		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+			n = true;
+		if (left_value.can_be_NEG() && right_value.can_be_POS())
+			n = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+			p = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+			z = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_POS())
+			n = true;
+		if (left_value.can_be_POS() && right_value.can_be_NEG())
+			p = true;
+		if (left_value.can_be_POS() && right_value.can_be_ZERO())
+			p = true;
+		if (left_value.can_be_POS() && right_value.can_be_POS())
+			n = z = p = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
 	public AbstractValue _mul(AbstractValue left, AbstractValue right) {
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean p = false, n = false, z = false;
-			if (left_value.can_be_NEG() && right_value.can_be_NEG())
-				p = true;
-			if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-				z = true;
-			if (left_value.can_be_NEG() && right_value.can_be_POS())
-				n = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				z = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-				z = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_POS())
-				z = true;
-			if (left_value.can_be_POS() && right_value.can_be_NEG())
-				n = true;
-			if (left_value.can_be_POS() && right_value.can_be_ZERO())
-				z = true;
-			if (left_value.can_be_POS() && right_value.can_be_POS())
-				p = true;
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean p = false, n = false, z = false;
+		if (left_value.can_be_NEG() && right_value.can_be_NEG())
+			p = true;
+		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+			z = true;
+		if (left_value.can_be_NEG() && right_value.can_be_POS())
+			n = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+			z = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+			z = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_POS())
+			z = true;
+		if (left_value.can_be_POS() && right_value.can_be_NEG())
+			n = true;
+		if (left_value.can_be_POS() && right_value.can_be_ZERO())
+			z = true;
+		if (left_value.can_be_POS() && right_value.can_be_POS())
+			p = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
 	public AbstractValue _div(AbstractValue left, AbstractValue right) {
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			if (right_value.can_be_ZERO())
-				throw new ArithmeticException(
-						"Division by zero (in abstract IDIV)");
-			boolean p = false, n = false, z = false;
-			if (left_value.can_be_NEG() && right_value.can_be_NEG())
-				p = true;
-			if (left_value.can_be_NEG() && right_value.can_be_POS())
-				n = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				z = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_POS())
-				z = true;
-			if (left_value.can_be_POS() && right_value.can_be_NEG())
-				n = true;
-			if (left_value.can_be_POS() && right_value.can_be_POS())
-				p = true;
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		if (right_value.can_be_ZERO())
+			throw new ArithmeticException(
+					"Division by zero (in abstract IDIV)");
+		boolean p = false, n = false, z = false;
+		if (left_value.can_be_NEG() && right_value.can_be_NEG())
+			p = true;
+		if (left_value.can_be_NEG() && right_value.can_be_POS())
+			n = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+			z = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_POS())
+			z = true;
+		if (left_value.can_be_POS() && right_value.can_be_NEG())
+			n = true;
+		if (left_value.can_be_POS() && right_value.can_be_POS())
+			p = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
 	public AbstractValue _rem(AbstractValue left, AbstractValue right) {
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			if (right_value.can_be_ZERO())
-				throw new ArithmeticException(
-						"Division by zero (in abstract IDIV)");
-			boolean p = false, n = false, z = false;
-			if (left_value.can_be_NEG() && right_value.can_be_NEG())
-				z = p = true;
-			if (left_value.can_be_NEG() && right_value.can_be_POS())
-				z = p = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				z = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_POS())
-				z = true;
-			if (left_value.can_be_POS() && right_value.can_be_NEG())
-				z = p = true;
-			if (left_value.can_be_POS() && right_value.can_be_POS())
-				z = p = true;
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		if (right_value.can_be_ZERO())
+			throw new ArithmeticException(
+					"Division by zero (in abstract IDIV)");
+		boolean p = false, n = false, z = false;
+		if (left_value.can_be_NEG() && right_value.can_be_NEG())
+			z = p = true;
+		if (left_value.can_be_NEG() && right_value.can_be_POS())
+			z = p = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+			z = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_POS())
+			z = true;
+		if (left_value.can_be_POS() && right_value.can_be_NEG())
+			z = p = true;
+		if (left_value.can_be_POS() && right_value.can_be_POS())
+			z = p = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
 	public AbstractValue _bitwise_and(AbstractValue left, AbstractValue right) {
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean p = false, n = false, z = false;
-			if (left_value.can_be_NEG() && right_value.can_be_NEG())
-				n = true;
-			if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-				z = true;
-			if (left_value.can_be_NEG() && right_value.can_be_POS())
-				z = p = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				z = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-				z = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_POS())
-				z = true;
-			if (left_value.can_be_POS() && right_value.can_be_NEG())
-				z = p = true;
-			if (left_value.can_be_POS() && right_value.can_be_ZERO())
-				z = true;
-			if (left_value.can_be_POS() && right_value.can_be_POS())
-				z = p = true;
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean p = false, n = false, z = false;
+		if (left_value.can_be_NEG() && right_value.can_be_NEG())
+			n = true;
+		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+			z = true;
+		if (left_value.can_be_NEG() && right_value.can_be_POS())
+			z = p = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+			z = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+			z = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_POS())
+			z = true;
+		if (left_value.can_be_POS() && right_value.can_be_NEG())
+			z = p = true;
+		if (left_value.can_be_POS() && right_value.can_be_ZERO())
+			z = true;
+		if (left_value.can_be_POS() && right_value.can_be_POS())
+			z = p = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
 	public AbstractValue _bitwise_or(AbstractValue left, AbstractValue right) {
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean p = false, n = false, z = false;
-			if (left_value.can_be_NEG() && right_value.can_be_NEG())
-				n = true;
-			if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-				n = true;
-			if (left_value.can_be_NEG() && right_value.can_be_POS())
-				n = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				n = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-				z = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_POS())
-				p = true;
-			if (left_value.can_be_POS() && right_value.can_be_NEG())
-				n = true;
-			if (left_value.can_be_POS() && right_value.can_be_ZERO())
-				p = true;
-			if (left_value.can_be_POS() && right_value.can_be_POS())
-				p = true;
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean p = false, n = false, z = false;
+		if (left_value.can_be_NEG() && right_value.can_be_NEG())
+			n = true;
+		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+			n = true;
+		if (left_value.can_be_NEG() && right_value.can_be_POS())
+			n = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+			n = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+			z = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_POS())
+			p = true;
+		if (left_value.can_be_POS() && right_value.can_be_NEG())
+			n = true;
+		if (left_value.can_be_POS() && right_value.can_be_ZERO())
+			p = true;
+		if (left_value.can_be_POS() && right_value.can_be_POS())
+			p = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
 	public AbstractValue _bitwise_xor(AbstractValue left, AbstractValue right) {
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean p = false, n = false, z = false;
-			if (left_value.can_be_NEG() && right_value.can_be_NEG())
-				z = p = true;
-			if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-				n = true;
-			if (left_value.can_be_NEG() && right_value.can_be_POS())
-				n = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				n = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-				z = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_POS())
-				p = true;
-			if (left_value.can_be_POS() && right_value.can_be_NEG())
-				n = true;
-			if (left_value.can_be_POS() && right_value.can_be_ZERO())
-				p = true;
-			if (left_value.can_be_POS() && right_value.can_be_POS())
-				z = p = true;
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean p = false, n = false, z = false;
+		if (left_value.can_be_NEG() && right_value.can_be_NEG())
+			z = p = true;
+		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+			n = true;
+		if (left_value.can_be_NEG() && right_value.can_be_POS())
+			n = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+			n = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+			z = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_POS())
+			p = true;
+		if (left_value.can_be_POS() && right_value.can_be_NEG())
+			n = true;
+		if (left_value.can_be_POS() && right_value.can_be_ZERO())
+			p = true;
+		if (left_value.can_be_POS() && right_value.can_be_POS())
+			z = p = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -408,22 +384,19 @@ public class SignsAbstraction extends Abstraction {
 		// * x = ZERO, y in { NEG, ZERO, POS} => x << y = ZERO
 		// * x in { NEG, ZERO, POS}, y = ZERO => x << y = x
 		// * x in { NEG, POS }, y in { NEG, POS } => x << y = { POS, ZERO, NEG }		
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean p = false, n = false, z = left_value.can_be_ZERO();
-			if (right_value.can_be_ZERO()) {
-				n |= left_value.can_be_NEG();
-				z |= left_value.can_be_ZERO();
-				p |= left_value.can_be_POS();
-			}
-			if ((left_value.can_be_NEG() || left_value.can_be_POS())
-					&& (right_value.can_be_NEG() || right_value
-							.can_be_POS()))
-				n = z = p = true;
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean p = false, n = false, z = left_value.can_be_ZERO();
+		if (right_value.can_be_ZERO()) {
+			n |= left_value.can_be_NEG();
+			z |= left_value.can_be_ZERO();
+			p |= left_value.can_be_POS();
+		}
+		if ((left_value.can_be_NEG() || left_value.can_be_POS())
+				&& (right_value.can_be_NEG() || right_value
+						.can_be_POS()))
+			n = z = p = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -435,23 +408,20 @@ public class SignsAbstraction extends Abstraction {
 		// * x in { NEG, ZERO, POS }, y = ZERO => x >> y = x
 		// * x = POS, y in { NEG, POS } => x >> y = { ZERO, POS }
 		// * x = NEG, y in { NEG, POS } => x >> y = NEG		
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean p = false, n = false, z = left_value.can_be_ZERO();
-			if (right_value.can_be_ZERO()) {
-				n |= left_value.can_be_NEG();
-				z |= left_value.can_be_ZERO();
-				p |= left_value.can_be_POS();
-			}
-			if (right_value.can_be_NEG() || right_value.can_be_POS()) {
-				n |= left_value.can_be_NEG();
-				z |= left_value.can_be_POS();
-				p |= left_value.can_be_POS();
-			}
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean p = false, n = false, z = left_value.can_be_ZERO();
+		if (right_value.can_be_ZERO()) {
+			n |= left_value.can_be_NEG();
+			z |= left_value.can_be_ZERO();
+			p |= left_value.can_be_POS();
+		}
+		if (right_value.can_be_NEG() || right_value.can_be_POS()) {
+			n |= left_value.can_be_NEG();
+			z |= left_value.can_be_POS();
+			p |= left_value.can_be_POS();
+		}
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -462,22 +432,19 @@ public class SignsAbstraction extends Abstraction {
 		// * x = ZERO, y in { NEG, ZERO, POS } => x >> y = ZERO
 		// * x in { NEG, ZERO, POS }, y = ZERO => x >> y = x
 		// * x in { NEG, POS }, y in { NEG, POS } => x >> y = { ZERO, POS }		
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean p = false, n = false, z = left_value.can_be_ZERO();
-			if (right_value.can_be_ZERO()) {
-				n |= left_value.can_be_NEG();
-				z |= left_value.can_be_ZERO();
-				p |= left_value.can_be_POS();
-			}
-			if ((left_value.can_be_NEG() || left_value.can_be_POS())
-					&& (right_value.can_be_NEG() || right_value
-							.can_be_POS()))
-				z = p = true;
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean p = false, n = false, z = left_value.can_be_ZERO();
+		if (right_value.can_be_ZERO()) {
+			n |= left_value.can_be_NEG();
+			z |= left_value.can_be_ZERO();
+			p |= left_value.can_be_POS();
+		}
+		if ((left_value.can_be_NEG() || left_value.can_be_POS())
+				&& (right_value.can_be_NEG() || right_value
+						.can_be_POS()))
+			z = p = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -489,151 +456,136 @@ public class SignsAbstraction extends Abstraction {
 
 	@Override
 	public AbstractBoolean _ge(AbstractValue left, AbstractValue right) {
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean t = false, f = false;
-			if (left_value.can_be_NEG() && right_value.can_be_NEG())
-				t = f = true;
-			if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-				f = true;
-			if (left_value.can_be_NEG() && right_value.can_be_POS())
-				f = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				t = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-				t = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_POS())
-				f = true;
-			if (left_value.can_be_POS() && right_value.can_be_NEG())
-				t = true;
-			if (left_value.can_be_POS() && right_value.can_be_ZERO())
-				t = true;
-			if (left_value.can_be_POS() && right_value.can_be_POS())
-				t = f = true;
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else
-				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean t = false, f = false;
+		if (left_value.can_be_NEG() && right_value.can_be_NEG())
+			t = f = true;
+		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+			f = true;
+		if (left_value.can_be_NEG() && right_value.can_be_POS())
+			f = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+			t = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+			t = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_POS())
+			f = true;
+		if (left_value.can_be_POS() && right_value.can_be_NEG())
+			t = true;
+		if (left_value.can_be_POS() && right_value.can_be_ZERO())
+			t = true;
+		if (left_value.can_be_POS() && right_value.can_be_POS())
+			t = f = true;
+		if (f & t)
+			return AbstractBoolean.TOP;
+		else
+			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 	}
 
 	@Override
 	public AbstractBoolean _gt(AbstractValue left, AbstractValue right) {
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean t = false, f = false;
-			if (left_value.can_be_NEG() && right_value.can_be_NEG())
-				t = f = true;
-			if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-				f = true;
-			if (left_value.can_be_NEG() && right_value.can_be_POS())
-				f = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				t = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-				f = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_POS())
-				f = true;
-			if (left_value.can_be_POS() && right_value.can_be_NEG())
-				t = true;
-			if (left_value.can_be_POS() && right_value.can_be_ZERO())
-				t = true;
-			if (left_value.can_be_POS() && right_value.can_be_POS())
-				t = f = true;
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else
-				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean t = false, f = false;
+		if (left_value.can_be_NEG() && right_value.can_be_NEG())
+			t = f = true;
+		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+			f = true;
+		if (left_value.can_be_NEG() && right_value.can_be_POS())
+			f = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+			t = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+			f = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_POS())
+			f = true;
+		if (left_value.can_be_POS() && right_value.can_be_NEG())
+			t = true;
+		if (left_value.can_be_POS() && right_value.can_be_ZERO())
+			t = true;
+		if (left_value.can_be_POS() && right_value.can_be_POS())
+			t = f = true;
+		if (f & t)
+			return AbstractBoolean.TOP;
+		else
+			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 	}
 
 	@Override
 	public AbstractBoolean _le(AbstractValue left, AbstractValue right) {
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean t = false, f = false;
-			if (left_value.can_be_NEG() && right_value.can_be_NEG())
-				t = f = true;
-			if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-				t = true;
-			if (left_value.can_be_NEG() && right_value.can_be_POS())
-				t = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				f = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-				t = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_POS())
-				t = true;
-			if (left_value.can_be_POS() && right_value.can_be_NEG())
-				f = true;
-			if (left_value.can_be_POS() && right_value.can_be_ZERO())
-				f = true;
-			if (left_value.can_be_POS() && right_value.can_be_POS())
-				t = f = true;
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else
-				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean t = false, f = false;
+		if (left_value.can_be_NEG() && right_value.can_be_NEG())
+			t = f = true;
+		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+			t = true;
+		if (left_value.can_be_NEG() && right_value.can_be_POS())
+			t = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+			f = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+			t = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_POS())
+			t = true;
+		if (left_value.can_be_POS() && right_value.can_be_NEG())
+			f = true;
+		if (left_value.can_be_POS() && right_value.can_be_ZERO())
+			f = true;
+		if (left_value.can_be_POS() && right_value.can_be_POS())
+			t = f = true;
+		if (f & t)
+			return AbstractBoolean.TOP;
+		else
+			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 	}
 
 	@Override
 	public AbstractBoolean _lt(AbstractValue left, AbstractValue right) {
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean t = false, f = false;
-			if (left_value.can_be_NEG() && right_value.can_be_NEG())
-				t = f = true;
-			if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-				t = true;
-			if (left_value.can_be_NEG() && right_value.can_be_POS())
-				t = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				f = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-				f = true;
-			if (left_value.can_be_ZERO() && right_value.can_be_POS())
-				t = true;
-			if (left_value.can_be_POS() && right_value.can_be_NEG())
-				f = true;
-			if (left_value.can_be_POS() && right_value.can_be_ZERO())
-				f = true;
-			if (left_value.can_be_POS() && right_value.can_be_POS())
-				t = f = true;
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else
-				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean t = false, f = false;
+		if (left_value.can_be_NEG() && right_value.can_be_NEG())
+			t = f = true;
+		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+			t = true;
+		if (left_value.can_be_NEG() && right_value.can_be_POS())
+			t = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+			f = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+			f = true;
+		if (left_value.can_be_ZERO() && right_value.can_be_POS())
+			t = true;
+		if (left_value.can_be_POS() && right_value.can_be_NEG())
+			f = true;
+		if (left_value.can_be_POS() && right_value.can_be_ZERO())
+			f = true;
+		if (left_value.can_be_POS() && right_value.can_be_POS())
+			t = f = true;
+		if (f & t)
+			return AbstractBoolean.TOP;
+		else
+			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 	}
 
 	public AbstractBoolean _eq(AbstractValue left, AbstractValue right) {
-		if (right instanceof SignsValue) {
-			SignsValue left_value = (SignsValue) left;
-			SignsValue right_value = (SignsValue) right;
-			boolean t = (left_value.can_be_NEG() && right_value.can_be_NEG())
-					|| (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-					|| (left_value.can_be_POS() && right_value.can_be_POS());
-			boolean f = (left_value.can_be_NEG() && right_value.can_be_ZERO())
-					|| (left_value.can_be_NEG() && right_value.can_be_POS())
-					|| (left_value.can_be_ZERO() && right_value.can_be_NEG())
-					|| (left_value.can_be_ZERO() && right_value.can_be_POS())
-					|| (left_value.can_be_POS() && right_value.can_be_NEG())
-					|| (left_value.can_be_POS() && right_value.can_be_ZERO());
-			if (f & t)
-				return AbstractBoolean.TOP;
-			else
-				return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		SignsValue left_value = (SignsValue) left;
+		SignsValue right_value = (SignsValue) right;
+		boolean t = (left_value.can_be_NEG() && right_value.can_be_NEG())
+				|| (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+				|| (left_value.can_be_POS() && right_value.can_be_POS());
+		boolean f = (left_value.can_be_NEG() && right_value.can_be_ZERO())
+				|| (left_value.can_be_NEG() && right_value.can_be_POS())
+				|| (left_value.can_be_ZERO() && right_value.can_be_NEG())
+				|| (left_value.can_be_ZERO() && right_value.can_be_POS())
+				|| (left_value.can_be_POS() && right_value.can_be_NEG())
+				|| (left_value.can_be_POS() && right_value.can_be_ZERO());
+		if (f & t)
+			return AbstractBoolean.TOP;
+		else
+			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
 	}
 
 	/**

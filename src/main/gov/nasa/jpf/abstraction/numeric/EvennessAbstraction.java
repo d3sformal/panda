@@ -106,59 +106,50 @@ public class EvennessAbstraction extends Abstraction {
 	
 	@Override
 	public AbstractValue _plus(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue) {
-			EvennessValue left_value = (EvennessValue) left;
-			EvennessValue right_value = (EvennessValue) right;	
-			boolean o = false, e = false;			
-			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
-				e = true;
-			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
-				o = true;		
-			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
-				o = true;
-			if (left_value.can_be_ODD() && right_value.can_be_ODD())
-				e = true;			
-			return EvennessAbstraction.getInstance().create(e, o);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		EvennessValue left_value = (EvennessValue) left;
+		EvennessValue right_value = (EvennessValue) right;	
+		boolean o = false, e = false;			
+		if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+			e = true;
+		if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+			o = true;		
+		if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+			o = true;
+		if (left_value.can_be_ODD() && right_value.can_be_ODD())
+			e = true;			
+		return EvennessAbstraction.getInstance().create(e, o);
 	}
 
 	@Override
 	public AbstractValue _minus(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue) {
-			EvennessValue left_value = (EvennessValue) left;
-			EvennessValue right_value = (EvennessValue) right;	
-			boolean o = false, e = false;			
-			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
-				e = true;
-			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
-				o = true;		
-			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
-				o = true;
-			if (left_value.can_be_ODD() && right_value.can_be_ODD())
-				e = true;			
-			return EvennessAbstraction.getInstance().create(e, o);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		EvennessValue left_value = (EvennessValue) left;
+		EvennessValue right_value = (EvennessValue) right;	
+		boolean o = false, e = false;			
+		if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+			e = true;
+		if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+			o = true;		
+		if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+			o = true;
+		if (left_value.can_be_ODD() && right_value.can_be_ODD())
+			e = true;			
+		return EvennessAbstraction.getInstance().create(e, o);
 	}
 	
 	@Override
 	public AbstractValue _mul(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue) {
-			EvennessValue left_value = (EvennessValue) left;
-			EvennessValue right_value = (EvennessValue) right;	
-			boolean o = false, e = false;			
-			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
-				e = true;
-			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
-				e = true;		
-			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
-				e = true;
-			if (left_value.can_be_ODD() && right_value.can_be_ODD())
-				o = true;			
-			return EvennessAbstraction.getInstance().create(e, o);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		EvennessValue left_value = (EvennessValue) left;
+		EvennessValue right_value = (EvennessValue) right;	
+		boolean o = false, e = false;			
+		if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+			e = true;
+		if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+			e = true;		
+		if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+			e = true;
+		if (left_value.can_be_ODD() && right_value.can_be_ODD())
+			o = true;			
+		return EvennessAbstraction.getInstance().create(e, o);
 	}
 
 	@Override
@@ -171,96 +162,78 @@ public class EvennessAbstraction extends Abstraction {
 
 	@Override
 	public AbstractValue _rem(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue) {
-			EvennessValue left_value = (EvennessValue) left;
-			EvennessValue right_value = (EvennessValue) right;	
-			boolean o = false, e = false;			
-			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
-				e = true;
-			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
-				e = o = true;		
-			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
-				o = true;
-			if (left_value.can_be_ODD() && right_value.can_be_ODD())
-				e = o = true;			
-			return EvennessAbstraction.getInstance().create(e, o);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		EvennessValue left_value = (EvennessValue) left;
+		EvennessValue right_value = (EvennessValue) right;	
+		boolean o = false, e = false;			
+		if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+			e = true;
+		if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+			e = o = true;		
+		if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+			o = true;
+		if (left_value.can_be_ODD() && right_value.can_be_ODD())
+			e = o = true;			
+		return EvennessAbstraction.getInstance().create(e, o);
 	}
 
 	@Override
 	public AbstractValue _bitwise_and(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue) {
-			EvennessValue left_value = (EvennessValue) left;
-			EvennessValue right_value = (EvennessValue) right;	
-			boolean o = false, e = false;			
-			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
-				e = true;
-			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
-				e = true;		
-			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
-				e = true;
-			if (left_value.can_be_ODD() && right_value.can_be_ODD())
-				o = true;			
-			return EvennessAbstraction.getInstance().create(e, o);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		EvennessValue left_value = (EvennessValue) left;
+		EvennessValue right_value = (EvennessValue) right;	
+		boolean o = false, e = false;			
+		if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+			e = true;
+		if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+			e = true;		
+		if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+			e = true;
+		if (left_value.can_be_ODD() && right_value.can_be_ODD())
+			o = true;			
+		return EvennessAbstraction.getInstance().create(e, o);
 	}
 
 	@Override
 	public AbstractValue _bitwise_or(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue) {
-			EvennessValue left_value = (EvennessValue) left;
-			EvennessValue right_value = (EvennessValue) right;	
-			boolean o = false, e = false;			
-			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
-				e = true;
-			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
-				o = true;		
-			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
-				o = true;
-			if (left_value.can_be_ODD() && right_value.can_be_ODD())
-				o = true;			
-			return EvennessAbstraction.getInstance().create(e, o);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");	
+		EvennessValue left_value = (EvennessValue) left;
+		EvennessValue right_value = (EvennessValue) right;	
+		boolean o = false, e = false;			
+		if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+			e = true;
+		if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+			o = true;		
+		if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+			o = true;
+		if (left_value.can_be_ODD() && right_value.can_be_ODD())
+			o = true;			
+		return EvennessAbstraction.getInstance().create(e, o);
 	}
 
 	@Override
 	public AbstractValue _bitwise_xor(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue) {
-			EvennessValue left_value = (EvennessValue) left;
-			EvennessValue right_value = (EvennessValue) right;	
-			boolean o = false, e = false;			
-			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
-				e = true;
-			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
-				o = true;		
-			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
-				o = true;
-			if (left_value.can_be_ODD() && right_value.can_be_ODD())
-				e = true;			
-			return EvennessAbstraction.getInstance().create(e, o);
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		EvennessValue left_value = (EvennessValue) left;
+		EvennessValue right_value = (EvennessValue) right;	
+		boolean o = false, e = false;			
+		if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+			e = true;
+		if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+			o = true;		
+		if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+			o = true;
+		if (left_value.can_be_ODD() && right_value.can_be_ODD())
+			e = true;			
+		return EvennessAbstraction.getInstance().create(e, o);
 	}
 
 	@Override
 	public AbstractValue _shift_left(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue) {
-			EvennessValue left_value = (EvennessValue) left;
-			EvennessValue right_value = (EvennessValue) right;	
-			return EvennessAbstraction.getInstance().create(true, left_value.can_be_ODD() && right_value.can_be_ODD());
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		EvennessValue left_value = (EvennessValue) left;
+		EvennessValue right_value = (EvennessValue) right;	
+		return EvennessAbstraction.getInstance().create(true, left_value.can_be_ODD() && right_value.can_be_ODD());
 	}
  
 	@Override
 	public AbstractValue _shift_right(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue)			
-			return EvennessAbstraction.TOP;
-		else
-			throw new RuntimeException("## Error: unknown abstraction");
+		return EvennessAbstraction.TOP;
 	}
 
 	@Override
@@ -276,54 +249,39 @@ public class EvennessAbstraction extends Abstraction {
 
 	@Override
 	public AbstractBoolean _ge(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue)
-			return AbstractBoolean.TOP;
-		else
-			throw new RuntimeException("## Error: unknown abstraction");
+		return AbstractBoolean.TOP;
 	}
 
 	@Override
 	public AbstractBoolean _gt(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue)
-			return AbstractBoolean.TOP;
-		else
-			throw new RuntimeException("## Error: unknown abstraction");
+		return AbstractBoolean.TOP;
 	}
 
 	@Override
 	public AbstractBoolean _le(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue)
-			return AbstractBoolean.TOP;
-		else
-			throw new RuntimeException("## Error: unknown abstraction");
+		return AbstractBoolean.TOP;
 	}
 
 	@Override
 	public AbstractBoolean _lt(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue)
-			return AbstractBoolean.TOP;
-		else
-			throw new RuntimeException("## Error: unknown abstraction");
+		return AbstractBoolean.TOP;
 	}
 
 	@Override
 	public AbstractBoolean _eq(AbstractValue left, AbstractValue right) {
-		if (right instanceof EvennessValue) {
-			EvennessValue left_value = (EvennessValue) left;
-			EvennessValue right_value = (EvennessValue) right;
-			boolean t = (left_value.can_be_EVEN() && right_value.can_be_EVEN()) ||
-					(left_value.can_be_ODD() && right_value.can_be_ODD());
-			boolean f = (left_value.can_be_EVEN() && right_value.can_be_ODD()) ||
-					(left_value.can_be_ODD() && right_value.can_be_EVEN());
-			assert t || f;
-			if (t & f)
-				return AbstractBoolean.TOP;
-			else if (t)
-				return AbstractBoolean.TRUE;
-			else
-				return AbstractBoolean.TRUE;
-		} else
-			throw new RuntimeException("## Error: unknown abstraction");
+		EvennessValue left_value = (EvennessValue) left;
+		EvennessValue right_value = (EvennessValue) right;
+		boolean t = (left_value.can_be_EVEN() && right_value.can_be_EVEN()) ||
+				(left_value.can_be_ODD() && right_value.can_be_ODD());
+		boolean f = (left_value.can_be_EVEN() && right_value.can_be_ODD()) ||
+				(left_value.can_be_ODD() && right_value.can_be_EVEN());
+		assert t || f;
+		if (t & f)
+			return AbstractBoolean.TOP;
+		else if (t)
+			return AbstractBoolean.TRUE;
+		else
+			return AbstractBoolean.TRUE;
 	}
 	
 	/**
