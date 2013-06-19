@@ -25,7 +25,7 @@
 \else%
 #2.%
 \fi%
-{\it #3}}%
+#3}%
 }
 
 
@@ -90,9 +90,9 @@ We must also consider the scope of local variables.
 If some predicate contains an expression \ap{a}{}{f}, where \var{a} is a local variable of some method {\it m}, then the predicate is defined only in the scope of the method {\it m}.
 
 One predicate can refer to fields of different objects. 
-Example: \texttt{this}.o1.f \textless \ p1.g, where p1 is a method parameter (an object different from \texttt{this}.o1).
+Example: \ap{this}{o1}{f} \textless \ \ap{p1}{}{g}, where \var{p1} is a method parameter (an object different from \ap{this}{}{o1}).
 
-If a given predicate refers only to object fields (not local variables of some method), such as \texttt{this}.f1 \textless \ \texttt{this}.f2, then it will be defined only during method calls on the given object.
+If a given predicate refers only to object fields (not local variables of some method), such as \ap{this}{}{f1} \textless \ \ap{this}{}{f2}, then it will be defined during method calls on the given object.
 
 \section*{Abstract State}
 
@@ -113,7 +113,7 @@ We will use a {\bf single global container} for current values of all predicates
 The container is a map from predicates to their values.
 This approach has several benefits:
 \begin{itemize}
-	\item avoiding redundancy (no need to store values at two different locations if the given predicates refers to two local variables or instance fields),
+	\item avoiding redundancy (no need to store values at two different locations if the given predicate refers to two local variables or instance fields),
 	\item consistency (when the predicate value is stored at one place), and
 	\item easy access to current values for all predicates (over all objects)
 \end{itemize}
@@ -123,7 +123,7 @@ This approach has several benefits:
 For each value on the current stack frame (context, scope) that represents an object reference, we must know the access path through which we acquired the value, so that we can find the corresponding predicates.
 The access path can be a local variable name, or a local variable name followed by a sequence of field names.
 We will keep the access path for a given value on the stack in its attribute.
-If we have the value $v$ on the top of the stack frame and its access path \texttt{this}.f in the attribute for $v$, and JPF executes a getfield instruction on $v$ and the field $g$, the new value on the top of the stack frame will be $w$ and its access path will be \texttt{this}.f.g --- then we know that a predicate referring to \texttt{this}.f.g applies to $w$.
+If we have the value $v$ on the top of the stack frame and its access path \ap{this}{}{f} in the attribute for $v$, and JPF executes a getfield instruction on $v$ and the field \texttt{g}, the new value on the top of the stack frame will be $w$ and its access path will be \ap{this}{f}{g} --- then we know that a predicate referring to \ap{this}{f}{g} applies to $w$.
 
 \subsection*{Updating}
 
@@ -134,16 +134,16 @@ This may save a considerable number of calls to the SMT solver.
 
 However, there are still difficult challenges.
 The following example demonstrates the case when we have two different access paths lead to the same object.
-The field $f$ of a given object of the class \texttt{ClassZ} is accessible through a.y.z.f and b.z.f.
-If JPF executes an instruction that uses a.y.z.f, then we must update truth value of predicates over a.y.z.f and also predicates over b.z.f.
+The field \texttt{f} of a given object of the class \texttt{ClassZ} is accessible through \ap{a}{y.z}{f} and \ap{b}{z}{f}.
+If JPF executes an instruction that uses \ap{a}{y.z}{f}, then we must update truth value of predicates over \ap{a}{y.z}{f} and also predicates over \ap{b}{z}{f}.
 
 \begin{lstlisting}
   public void m(ClassX a) {
     ClassY b = a.y;
     ... 
-    a.y.z.field = 5;
+    a.y.z.f = 5;
     ...
-    b.z.field = x + 1;
+    b.z.f = x + 1;
     ...
   }
 \end{lstlisting}
