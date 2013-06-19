@@ -6,7 +6,7 @@ import java.util.Set;
 public class SignsValue extends AbstractValue {
 	public SignsValue(int key) {
 		super(key);
-		abs = Signs.getInstance();
+		abs = SignsAbstraction.getInstance();
 	}
 	
 	/**
@@ -37,11 +37,11 @@ public class SignsValue extends AbstractValue {
 	public Set<AbstractValue> getTokens() {
 		Set<AbstractValue> tokens = new HashSet<AbstractValue>();
 		if (can_be_NEG())
-			tokens.add(Signs.NEG);
+			tokens.add(SignsAbstraction.NEG);
 		if (can_be_ZERO())
-			tokens.add(Signs.ZERO);
+			tokens.add(SignsAbstraction.ZERO);
 		if (can_be_POS())
-			tokens.add(Signs.POS);
+			tokens.add(SignsAbstraction.POS);
 		return tokens;
 	}
 
@@ -53,15 +53,15 @@ public class SignsValue extends AbstractValue {
 			throw new RuntimeException("### Error: out of range");
 		if (can_be_NEG())
 			if (idx == 0)
-				return Signs.NEG;
+				return SignsAbstraction.NEG;
 			else if (can_be_ZERO())
-				return (idx == 1) ? Signs.ZERO : Signs.POS;
+				return (idx == 1) ? SignsAbstraction.ZERO : SignsAbstraction.POS;
 			else
-				return Signs.POS;
+				return SignsAbstraction.POS;
 		else if (can_be_ZERO())
-			return (idx == 0) ? Signs.ZERO : Signs.POS;
+			return (idx == 0) ? SignsAbstraction.ZERO : SignsAbstraction.POS;
 		else
-			return Signs.POS;
+			return SignsAbstraction.POS;
 	}
 
 	@Override
@@ -91,12 +91,12 @@ public class SignsValue extends AbstractValue {
 			boolean n = can_be_NEG();
 			boolean z = can_be_NEG();
 			boolean p = can_be_ZERO() || can_be_POS();
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else if (right == -1) {
 			boolean n = can_be_NEG() || can_be_ZERO();
 			boolean z = can_be_POS();
 			boolean p = can_be_POS();
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			return _plus(abs.abstractMap(right));
 	}
@@ -107,12 +107,12 @@ public class SignsValue extends AbstractValue {
 			boolean n = can_be_NEG();
 			boolean z = can_be_NEG();
 			boolean p = can_be_ZERO() || can_be_POS();
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else if (right == -1) {
 			boolean n = can_be_NEG() || can_be_ZERO();
 			boolean z = can_be_POS();
 			boolean p = can_be_POS();
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			return _plus(abs.abstractMap(right));
 	}
@@ -150,7 +150,7 @@ public class SignsValue extends AbstractValue {
 				p = true;
 			if (this.can_be_POS() && right_value.can_be_POS())
 				p = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -178,7 +178,7 @@ public class SignsValue extends AbstractValue {
 				p = true;
 			if (this.can_be_POS() && right_value.can_be_POS())
 				n = z = p = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -246,7 +246,7 @@ public class SignsValue extends AbstractValue {
 				z = true;
 			if (this.can_be_POS() && right_value.can_be_POS())
 				p = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -291,7 +291,7 @@ public class SignsValue extends AbstractValue {
 				n = true;
 			if (this.can_be_POS() && right_value.can_be_POS())
 				p = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -336,7 +336,7 @@ public class SignsValue extends AbstractValue {
 				z = p = true;
 			if (this.can_be_POS() && right_value.can_be_POS())
 				z = p = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -374,7 +374,7 @@ public class SignsValue extends AbstractValue {
 				z = true;
 			if (this.can_be_POS() && right_value.can_be_POS())
 				z = p = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -412,7 +412,7 @@ public class SignsValue extends AbstractValue {
 				p = true;
 			if (this.can_be_POS() && right_value.can_be_POS())
 				p = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -450,7 +450,7 @@ public class SignsValue extends AbstractValue {
 				p = true;
 			if (this.can_be_POS() && right_value.can_be_POS())
 				z = p = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -484,7 +484,7 @@ public class SignsValue extends AbstractValue {
 					&& (right_value.can_be_NEG() || right_value
 							.can_be_POS()))
 				n = z = p = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -521,7 +521,7 @@ public class SignsValue extends AbstractValue {
 				z |= this.can_be_POS();
 				p |= this.can_be_POS();
 			}
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -556,14 +556,14 @@ public class SignsValue extends AbstractValue {
 					&& (right_value.can_be_NEG() || right_value
 							.can_be_POS()))
 				z = p = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
 
 	@Override
 	public AbstractValue _neg() {
-		return Signs.getInstance().create(can_be_POS(), can_be_ZERO(), can_be_NEG());
+		return SignsAbstraction.getInstance().create(can_be_POS(), can_be_ZERO(), can_be_NEG());
 	}
 
 	@Override
@@ -895,7 +895,7 @@ public class SignsValue extends AbstractValue {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.getInstance().create(n, z, p);
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -919,7 +919,7 @@ public class SignsValue extends AbstractValue {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.getInstance().create(n, z, p);
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -948,7 +948,7 @@ public class SignsValue extends AbstractValue {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.getInstance().create(n, z, p);
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -973,11 +973,11 @@ public class SignsValue extends AbstractValue {
 					result += " POS";
 				return "{ " + result + " }";
 			}
-			if (this == Signs.ZERO)
+			if (this == SignsAbstraction.ZERO)
 				return "ZERO";
-			if (this == Signs.POS)
+			if (this == SignsAbstraction.POS)
 				return "POS";
-			if (this == Signs.NEG)
+			if (this == SignsAbstraction.NEG)
 				return "NEG";
 		}
 		throw new RuntimeException("## Error: unknown abstraction");

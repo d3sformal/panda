@@ -23,11 +23,11 @@ import java.util.List;
 /**
  * This abstraction is designed to combine other numeric abstractions.
  */
-public class Container extends Abstraction {
+public class ContainerAbstraction extends Abstraction {
 
 	private List<Abstraction> list = new ArrayList<Abstraction>();
 
-	public Container(List<Abstraction> lst) {
+	public ContainerAbstraction(List<Abstraction> lst) {
 		list = lst;
 	}
 	

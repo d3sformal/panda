@@ -32,8 +32,8 @@ package gov.nasa.jpf.abstraction.numeric;
  * Remember, that this abstraction does not handle such floating-point values as
  * NaN and INF.
  */
-public class Interval extends Abstraction {
-	public static Interval defaultAbstraction = new Interval(Double.NaN, Double.NaN);
+public class IntervalAbstraction extends Abstraction {
+	public static IntervalAbstraction defaultAbstraction = new IntervalAbstraction(Double.NaN, Double.NaN);
 
 	public static enum AbstractIntervalValueType {
 		LESS(0),
@@ -56,7 +56,7 @@ public class Interval extends Abstraction {
 	
 	private static final int DOMAIN_SIZE = 3;
 	
-	public Interval(double min, double max) {
+	public IntervalAbstraction(double min, double max) {
 		MIN = min;
 		MAX = max;
 	}

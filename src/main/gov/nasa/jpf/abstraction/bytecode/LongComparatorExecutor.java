@@ -19,7 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.AbstractValue;
-import gov.nasa.jpf.abstraction.numeric.Signs;
+import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.vm.StackFrame;
 
@@ -62,9 +62,9 @@ public class LongComparatorExecutor extends BinaryOperatorExecutor<Long> {
 		
 		SignsValue s_result = (SignsValue) result;
 
-		if (s_result == Signs.NEG) {
+		if (s_result == SignsAbstraction.NEG) {
 			sf.push(-1);
-		} else if (s_result == Signs.POS) {
+		} else if (s_result == SignsAbstraction.POS) {
 			sf.push(+1);
 		} else {
 			sf.push(0);

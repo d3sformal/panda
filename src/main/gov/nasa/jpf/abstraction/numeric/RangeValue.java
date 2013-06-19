@@ -32,7 +32,7 @@ public class RangeValue extends AbstractValue {
 	}
 	
 	public int get_value() {
-		return getKey()+((Range)abs).MIN-1;
+		return getKey()+((RangeAbstraction)abs).MIN-1;
 	}
 	
 	@Override
@@ -70,9 +70,9 @@ public class RangeValue extends AbstractValue {
 		// result is extremely difficult to predict, so this returns TOP
 		if (right instanceof RangeValue) {	
 			Set<Integer> values = new HashSet<Integer>();
-			for (int v = ((Range)abs).MIN-1; v <= ((Range)abs).MAX+1; ++v)
+			for (int v = ((RangeAbstraction)abs).MIN-1; v <= ((RangeAbstraction)abs).MAX+1; ++v)
 				values.add(v);
-			return ((Range)abs).create(values);
+			return ((RangeAbstraction)abs).create(values);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -91,9 +91,9 @@ public class RangeValue extends AbstractValue {
 		// result is extremely difficult to predict, so this returns TOP	
 		if (right instanceof RangeValue) {	
 			Set<Integer> values = new HashSet<Integer>();
-			for (int v = ((Range)abs).MIN-1; v <= ((Range)abs).MAX+1; ++v)
+			for (int v = ((RangeAbstraction)abs).MIN-1; v <= ((RangeAbstraction)abs).MAX+1; ++v)
 				values.add(v);
-			return ((Range)abs).create(values);	
+			return ((RangeAbstraction)abs).create(values);	
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -113,9 +113,9 @@ public class RangeValue extends AbstractValue {
 		// result is extremely difficult to predict, so this returns TOP
 		if (right instanceof RangeValue) {	
 			Set<Integer> values = new HashSet<Integer>();
-			for (int v = ((Range)abs).MIN-1; v <= ((Range)abs).MAX+1; ++v)
+			for (int v = ((RangeAbstraction)abs).MIN-1; v <= ((RangeAbstraction)abs).MAX+1; ++v)
 				values.add(v);
-			return ((Range)abs).create(values);	
+			return ((RangeAbstraction)abs).create(values);	
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -171,20 +171,20 @@ public class RangeValue extends AbstractValue {
 			 */
 			for (Integer lv : leftArr) {
 				double lv1 = lv, lv2 = lv;
-				if (lv < ((Range)abs).MIN) {
+				if (lv < ((RangeAbstraction)abs).MIN) {
 					lv1 = Double.NEGATIVE_INFINITY;
-					lv2 = ((Range)abs).MIN-1;
-				} else if (lv > ((Range)abs).MAX) {
-					lv1 = ((Range)abs).MAX+1;
+					lv2 = ((RangeAbstraction)abs).MIN-1;
+				} else if (lv > ((RangeAbstraction)abs).MAX) {
+					lv1 = ((RangeAbstraction)abs).MAX+1;
 					lv2 = Double.POSITIVE_INFINITY;
 				}
 				for (Integer rv : rightArr) {
 					double rv1 = rv, rv2 = rv;
-					if (rv < ((Range)abs).MIN) {
+					if (rv < ((RangeAbstraction)abs).MIN) {
 						rv1 = Double.NEGATIVE_INFINITY;
-						rv2 = ((Range)abs).MIN-1;
-					} else if (lv > ((Range)abs).MAX) {
-						rv1 = ((Range)abs).MAX+1;
+						rv2 = ((RangeAbstraction)abs).MIN-1;
+					} else if (lv > ((RangeAbstraction)abs).MAX) {
+						rv1 = ((RangeAbstraction)abs).MAX+1;
 						rv2 = Double.POSITIVE_INFINITY;
 					}
 					double _min, _max;
@@ -199,23 +199,23 @@ public class RangeValue extends AbstractValue {
 						_max = ___max(lv1/rv1, lv1/rv2, lv2/rv1, lv2/rv2);
 					}
 					int min, max;
-					if (_min < ((Range)abs).MIN)
-						min = ((Range)abs).MIN-1;
-					else if (_min > ((Range)abs).MAX)
-						min = ((Range)abs).MAX+1;
+					if (_min < ((RangeAbstraction)abs).MIN)
+						min = ((RangeAbstraction)abs).MIN-1;
+					else if (_min > ((RangeAbstraction)abs).MAX)
+						min = ((RangeAbstraction)abs).MAX+1;
 					else
 						min = (int)_min;
-					if (_max < ((Range)abs).MIN)
-						max = ((Range)abs).MIN-1;
-					else if (_max > ((Range)abs).MAX)
-						max = ((Range)abs).MAX+1;
+					if (_max < ((RangeAbstraction)abs).MIN)
+						max = ((RangeAbstraction)abs).MIN-1;
+					else if (_max > ((RangeAbstraction)abs).MAX)
+						max = ((RangeAbstraction)abs).MAX+1;
 					else
 						max = (int)_max;					
 					for (int v = min; v <= max; ++v)
 						values.add(v);
 				}
 			}
-			return ((Range)abs).create(values);
+			return ((RangeAbstraction)abs).create(values);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -286,7 +286,7 @@ public class RangeValue extends AbstractValue {
 			int rMin = Collections.min(op.values); // get the least and the biggest values 
 			int rMax = Collections.max(op.values);	
 			boolean t = lMax >= rMin;
-			boolean f = lMin < rMax || (lMin < ((Range)abs).MIN && rMax < ((Range)abs).MIN);
+			boolean f = lMin < rMax || (lMin < ((RangeAbstraction)abs).MIN && rMax < ((RangeAbstraction)abs).MIN);
 			if (f & t)
 				return AbstractBoolean.TOP;
 			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
@@ -313,7 +313,7 @@ public class RangeValue extends AbstractValue {
 			int lMax = Collections.max(this.values);
 			int rMin = Collections.min(op.values); // get the least and the biggest values 
 			int rMax = Collections.max(op.values);			
-			boolean t = lMax > rMin || (lMax > ((Range)abs).MAX && rMin > ((Range)abs).MAX);
+			boolean t = lMax > rMin || (lMax > ((RangeAbstraction)abs).MAX && rMin > ((RangeAbstraction)abs).MAX);
 			boolean f = lMin <= rMax;
 			if (f & t)
 				return AbstractBoolean.TOP;
@@ -342,7 +342,7 @@ public class RangeValue extends AbstractValue {
 			int rMin = Collections.min(op.values); // get the least and the biggest values 
 			int rMax = Collections.max(op.values);		
 			boolean t = lMin <= rMax;
-			boolean f = lMax > rMin || (lMax > ((Range)abs).MAX && rMin > ((Range)abs).MAX);
+			boolean f = lMax > rMin || (lMax > ((RangeAbstraction)abs).MAX && rMin > ((RangeAbstraction)abs).MAX);
 			if (f & t)
 				return AbstractBoolean.TOP;
 			else return (f)? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
@@ -369,7 +369,7 @@ public class RangeValue extends AbstractValue {
 			int lMax = Collections.max(this.values);
 			int rMin = Collections.min(op.values); // get the least and the biggest values 
 			int rMax = Collections.max(op.values);	
-			boolean t = lMin < rMax || (lMin < ((Range)abs).MIN && rMax < ((Range)abs).MIN);
+			boolean t = lMin < rMax || (lMin < ((RangeAbstraction)abs).MIN && rMax < ((RangeAbstraction)abs).MIN);
 			boolean f = lMax >= rMin;
 			if (f & t)
 				return AbstractBoolean.TOP;
@@ -403,41 +403,41 @@ public class RangeValue extends AbstractValue {
 			 */			
 			for (Integer lv : leftArr) {
 				double lv1 = lv, lv2 = lv;
-				if (lv < ((Range)abs).MIN) {
+				if (lv < ((RangeAbstraction)abs).MIN) {
 					lv1 = Double.NEGATIVE_INFINITY;
-					lv2 = ((Range)abs).MIN-1;
-				} else if (lv > ((Range)abs).MAX) {
-					lv1 = ((Range)abs).MAX+1;
+					lv2 = ((RangeAbstraction)abs).MIN-1;
+				} else if (lv > ((RangeAbstraction)abs).MAX) {
+					lv1 = ((RangeAbstraction)abs).MAX+1;
 					lv2 = Double.POSITIVE_INFINITY;
 				}
 				for (Integer rv : rightArr) {
 					double rv1 = rv, rv2 = rv;
-					if (rv < ((Range)abs).MIN) {
+					if (rv < ((RangeAbstraction)abs).MIN) {
 						rv1 = Double.NEGATIVE_INFINITY;
-						rv2 = ((Range)abs).MIN-1;
-					} else if (lv > ((Range)abs).MAX) {
-						rv1 = ((Range)abs).MAX+1;
+						rv2 = ((RangeAbstraction)abs).MIN-1;
+					} else if (lv > ((RangeAbstraction)abs).MAX) {
+						rv1 = ((RangeAbstraction)abs).MAX+1;
 						rv2 = Double.POSITIVE_INFINITY;
 					}
 					double _min = lv1+rv1, _max = lv2+rv2;
 					int min, max;
-					if (_min < ((Range)abs).MIN)
-						min = ((Range)abs).MIN-1;
-					else if (_min > ((Range)abs).MAX)
-						min = ((Range)abs).MAX+1;
+					if (_min < ((RangeAbstraction)abs).MIN)
+						min = ((RangeAbstraction)abs).MIN-1;
+					else if (_min > ((RangeAbstraction)abs).MAX)
+						min = ((RangeAbstraction)abs).MAX+1;
 					else
 						min = (int)_min;
-					if (_max < ((Range)abs).MIN)
-						max = ((Range)abs).MIN-1;
-					else if (_max > ((Range)abs).MAX)
-						max = ((Range)abs).MAX+1;
+					if (_max < ((RangeAbstraction)abs).MIN)
+						max = ((RangeAbstraction)abs).MIN-1;
+					else if (_max > ((RangeAbstraction)abs).MAX)
+						max = ((RangeAbstraction)abs).MAX+1;
 					else
 						max = (int)_max;
 					for (int v = min; v <= max; ++v)
 						values.add(v);
 				}
 			}
-			return ((Range)abs).create(values);
+			return ((RangeAbstraction)abs).create(values);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -477,20 +477,20 @@ public class RangeValue extends AbstractValue {
 			 */			
 			for (Integer lv : leftArr) {
 				double lv1 = lv, lv2 = lv;
-				if (lv < ((Range)abs).MIN) {
+				if (lv < ((RangeAbstraction)abs).MIN) {
 					lv1 = Double.NEGATIVE_INFINITY;
-					lv2 = ((Range)abs).MIN-1;
-				} else if (lv > ((Range)abs).MAX) {
-					lv1 = ((Range)abs).MAX+1;
+					lv2 = ((RangeAbstraction)abs).MIN-1;
+				} else if (lv > ((RangeAbstraction)abs).MAX) {
+					lv1 = ((RangeAbstraction)abs).MAX+1;
 					lv2 = Double.POSITIVE_INFINITY;
 				}
 				for (Integer rv : rightArr) {
 					double rv1 = rv, rv2 = rv;
-					if (rv < ((Range)abs).MIN) {
+					if (rv < ((RangeAbstraction)abs).MIN) {
 						rv1 = Double.NEGATIVE_INFINITY;
-						rv2 = ((Range)abs).MIN-1;
-					} else if (lv > ((Range)abs).MAX) {
-						rv1 = ((Range)abs).MAX+1;
+						rv2 = ((RangeAbstraction)abs).MIN-1;
+					} else if (lv > ((RangeAbstraction)abs).MAX) {
+						rv1 = ((RangeAbstraction)abs).MAX+1;
 						rv2 = Double.POSITIVE_INFINITY;
 					}
 					double _min, _max;
@@ -502,23 +502,23 @@ public class RangeValue extends AbstractValue {
 						_max = ___max(lv1*rv1, lv1*rv2, lv2*rv1, lv2*rv2);
 					}
 					int min, max;
-					if (_min < ((Range)abs).MIN)
-						min = ((Range)abs).MIN-1;
-					else if (_min > ((Range)abs).MAX)
-						min = ((Range)abs).MAX+1;
+					if (_min < ((RangeAbstraction)abs).MIN)
+						min = ((RangeAbstraction)abs).MIN-1;
+					else if (_min > ((RangeAbstraction)abs).MAX)
+						min = ((RangeAbstraction)abs).MAX+1;
 					else
 						min = (int)_min;
-					if (_max < ((Range)abs).MIN)
-						max = ((Range)abs).MIN-1;
-					else if (_max > ((Range)abs).MAX)
-						max = ((Range)abs).MAX+1;
+					if (_max < ((RangeAbstraction)abs).MIN)
+						max = ((RangeAbstraction)abs).MIN-1;
+					else if (_max > ((RangeAbstraction)abs).MAX)
+						max = ((RangeAbstraction)abs).MAX+1;
 					else
 						max = (int)_max;					
 					for (int v = min; v <= max; ++v)
 						values.add(v);
 				}
 			}
-			return ((Range)abs).create(values);
+			return ((RangeAbstraction)abs).create(values);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -546,18 +546,18 @@ public class RangeValue extends AbstractValue {
 	public AbstractValue _neg() {
 		Set<Integer> values = new HashSet<Integer>();
 		for (Integer v : this.values) {
-			if (v > ((Range)abs).MAX)
-				values.add(((Range)abs).MIN-1);
-			if (v < ((Range)abs).MIN)
-				values.add(((Range)abs).MAX+1);			
-			if (-v > ((Range)abs).MAX)
-				values.add(((Range)abs).MAX+1);
-			else if (-v < ((Range)abs).MIN)
-				values.add(((Range)abs).MIN-1);
+			if (v > ((RangeAbstraction)abs).MAX)
+				values.add(((RangeAbstraction)abs).MIN-1);
+			if (v < ((RangeAbstraction)abs).MIN)
+				values.add(((RangeAbstraction)abs).MAX+1);			
+			if (-v > ((RangeAbstraction)abs).MAX)
+				values.add(((RangeAbstraction)abs).MAX+1);
+			else if (-v < ((RangeAbstraction)abs).MIN)
+				values.add(((RangeAbstraction)abs).MIN-1);
 			else
 				values.add(-v);
 		}
-		return ((Range)abs).create(values);
+		return ((RangeAbstraction)abs).create(values);
 	}	
 	
 	@Override
@@ -575,41 +575,41 @@ public class RangeValue extends AbstractValue {
 			 */						
 			for (Integer lv : leftArr) {
 				double lv1 = lv, lv2 = lv;
-				if (lv < ((Range)abs).MIN) {
+				if (lv < ((RangeAbstraction)abs).MIN) {
 					lv1 = Double.NEGATIVE_INFINITY;
-					lv2 = ((Range)abs).MIN-1;
-				} else if (lv > ((Range)abs).MAX) {
-					lv1 = ((Range)abs).MAX+1;
+					lv2 = ((RangeAbstraction)abs).MIN-1;
+				} else if (lv > ((RangeAbstraction)abs).MAX) {
+					lv1 = ((RangeAbstraction)abs).MAX+1;
 					lv2 = Double.POSITIVE_INFINITY;
 				}
 				for (Integer rv : rightArr) {
 					double rv1 = rv, rv2 = rv;
-					if (rv < ((Range)abs).MIN) {
+					if (rv < ((RangeAbstraction)abs).MIN) {
 						rv1 = Double.NEGATIVE_INFINITY;
-						rv2 = ((Range)abs).MIN-1;
-					} else if (lv > ((Range)abs).MAX) {
-						rv1 = ((Range)abs).MAX+1;
+						rv2 = ((RangeAbstraction)abs).MIN-1;
+					} else if (lv > ((RangeAbstraction)abs).MAX) {
+						rv1 = ((RangeAbstraction)abs).MAX+1;
 						rv2 = Double.POSITIVE_INFINITY;
 					}
 					double _min = lv1+rv1, _max = lv2+rv2;
 					int min, max;
-					if (_min < ((Range)abs).MIN)
-						min = ((Range)abs).MIN-1;
-					else if (_min > ((Range)abs).MAX)
-						min = ((Range)abs).MAX+1;
+					if (_min < ((RangeAbstraction)abs).MIN)
+						min = ((RangeAbstraction)abs).MIN-1;
+					else if (_min > ((RangeAbstraction)abs).MAX)
+						min = ((RangeAbstraction)abs).MAX+1;
 					else
 						min = (int)_min;
-					if (_max < ((Range)abs).MIN)
-						max = ((Range)abs).MIN-1;
-					else if (_max > ((Range)abs).MAX)
-						max = ((Range)abs).MAX+1;
+					if (_max < ((RangeAbstraction)abs).MIN)
+						max = ((RangeAbstraction)abs).MIN-1;
+					else if (_max > ((RangeAbstraction)abs).MAX)
+						max = ((RangeAbstraction)abs).MAX+1;
 					else
 						max = (int)_max;
 					for (int v = min; v <= max; ++v)
 						values.add(v);
 				}
 			}
-			return ((Range)abs).create(values);
+			return ((RangeAbstraction)abs).create(values);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -620,26 +620,26 @@ public class RangeValue extends AbstractValue {
 			Set<Integer> result = new HashSet<Integer>();
 			Integer values[] = this.values.toArray(new Integer[this.values.size()]);
 			for (Integer v : values)
-				if (v < ((Range)abs).MIN) {
+				if (v < ((RangeAbstraction)abs).MIN) {
 					result.add(v);
-					result.add(((Range)abs).MIN);
-				} else if (v >= ((Range)abs).MAX)
-					result.add(((Range)abs).MAX);
+					result.add(((RangeAbstraction)abs).MIN);
+				} else if (v >= ((RangeAbstraction)abs).MAX)
+					result.add(((RangeAbstraction)abs).MAX);
 				else
 					result.add(v+1);
-			return ((Range)abs).create(result);
+			return ((RangeAbstraction)abs).create(result);
 		} else if (right == -1) { //decrement
 			Set<Integer> result = new HashSet<Integer>();
 			Integer values[] = this.values.toArray(new Integer[this.values.size()]);
 			for (Integer v : values)
-				if (v > ((Range)abs).MAX) {
+				if (v > ((RangeAbstraction)abs).MAX) {
 					result.add(v);
-					result.add(((Range)abs).MAX);
-				} else if (v <= ((Range)abs).MIN)
-					result.add(((Range)abs).MIN);
+					result.add(((RangeAbstraction)abs).MAX);
+				} else if (v <= ((RangeAbstraction)abs).MIN)
+					result.add(((RangeAbstraction)abs).MIN);
 				else
 					result.add(v-1);
-			return ((Range)abs).create(result);
+			return ((RangeAbstraction)abs).create(result);
 		} else
 			return _plus(abs.abstractMap(right));
 	}
@@ -664,29 +664,29 @@ public class RangeValue extends AbstractValue {
 						continue;
 					}
 					int min = 0, max = lv;
-					if (lv < ((Range)abs).MIN || lv > ((Range)abs).MAX)
-						if (rv < ((Range)abs).MIN || rv > ((Range)abs).MAX)
-							max = ((Range)abs).MAX+1;
+					if (lv < ((RangeAbstraction)abs).MIN || lv > ((RangeAbstraction)abs).MAX)
+						if (rv < ((RangeAbstraction)abs).MIN || rv > ((RangeAbstraction)abs).MAX)
+							max = ((RangeAbstraction)abs).MAX+1;
 						else
-							max = Math.min(((Range)abs).MAX+1, Math.abs(rv)-1);
+							max = Math.min(((RangeAbstraction)abs).MAX+1, Math.abs(rv)-1);
 					else
-						if (rv < ((Range)abs).MIN || rv > ((Range)abs).MAX)
+						if (rv < ((RangeAbstraction)abs).MIN || rv > ((RangeAbstraction)abs).MAX)
 							min = Math.abs(rv);
 						else
 							min = max = lv % rv;
-					if (min < ((Range)abs).MIN)
-						min = ((Range)abs).MIN-1;
-					else if (min > ((Range)abs).MAX)
-						min = ((Range)abs).MAX+1;
-					if (max < ((Range)abs).MIN)
-						max = ((Range)abs).MIN-1;
-					else if (max > ((Range)abs).MAX)
-						max = ((Range)abs).MAX+1;					
+					if (min < ((RangeAbstraction)abs).MIN)
+						min = ((RangeAbstraction)abs).MIN-1;
+					else if (min > ((RangeAbstraction)abs).MAX)
+						min = ((RangeAbstraction)abs).MAX+1;
+					if (max < ((RangeAbstraction)abs).MIN)
+						max = ((RangeAbstraction)abs).MIN-1;
+					else if (max > ((RangeAbstraction)abs).MAX)
+						max = ((RangeAbstraction)abs).MAX+1;					
 					for (int v = min; v <= max; ++v)
 						values.add(v);
 				}
 			}
-			return ((Range)abs).create(values);
+			return ((RangeAbstraction)abs).create(values);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -726,9 +726,9 @@ public class RangeValue extends AbstractValue {
 		// result is extremely difficult to predict, so this returns TOP
 		if (right instanceof RangeValue) {	
 			Set<Integer> values = new HashSet<Integer>();
-			for (int v = ((Range)abs).MIN-1; v <= ((Range)abs).MAX+1; ++v)
+			for (int v = ((RangeAbstraction)abs).MIN-1; v <= ((RangeAbstraction)abs).MAX+1; ++v)
 				values.add(v);
-			return ((Range)abs).create(values);	
+			return ((RangeAbstraction)abs).create(values);	
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -758,9 +758,9 @@ public class RangeValue extends AbstractValue {
 		// result is extremely difficult to predict, so this returns TOP
 		if (right instanceof RangeValue) {	
 			Set<Integer> values = new HashSet<Integer>();
-			for (int v = ((Range)abs).MIN-1; v <= ((Range)abs).MAX+1; ++v)
+			for (int v = ((RangeAbstraction)abs).MIN-1; v <= ((RangeAbstraction)abs).MAX+1; ++v)
 				values.add(v);
-			return ((Range)abs).create(values);	
+			return ((RangeAbstraction)abs).create(values);	
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -790,9 +790,9 @@ public class RangeValue extends AbstractValue {
 		// result is extremely difficult to predict, so this returns TOP
 		if (right instanceof RangeValue) {	
 			Set<Integer> values = new HashSet<Integer>();
-			for (int v = ((Range)abs).MIN-1; v <= ((Range)abs).MAX+1; ++v)
+			for (int v = ((RangeAbstraction)abs).MIN-1; v <= ((RangeAbstraction)abs).MAX+1; ++v)
 				values.add(v);
-			return ((Range)abs).create(values);
+			return ((RangeAbstraction)abs).create(values);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -833,7 +833,7 @@ public class RangeValue extends AbstractValue {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.getInstance().create(n, z, p);
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -857,7 +857,7 @@ public class RangeValue extends AbstractValue {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.getInstance().create(n, z, p);
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -886,7 +886,7 @@ public class RangeValue extends AbstractValue {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.getInstance().create(n, z, p);
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -905,10 +905,10 @@ public class RangeValue extends AbstractValue {
 			for (Integer abs : values)
 				res += " or " + abs;
 			return res;
-		} else if (get_value() < ((Range)abs).MIN)
-			return String.format("(-INF, %d)", ((Range)abs).MIN);
-		else if (get_value() > ((Range)abs).MAX)
-			return String.format("(%d, +INF)", ((Range)abs).MAX);
+		} else if (get_value() < ((RangeAbstraction)abs).MIN)
+			return String.format("(-INF, %d)", ((RangeAbstraction)abs).MIN);
+		else if (get_value() > ((RangeAbstraction)abs).MAX)
+			return String.format("(%d, +INF)", ((RangeAbstraction)abs).MAX);
 		else
 			return Integer.toString(get_value());
 	}

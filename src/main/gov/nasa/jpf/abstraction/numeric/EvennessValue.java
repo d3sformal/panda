@@ -7,7 +7,7 @@ public class EvennessValue extends AbstractValue {
 	
 	public EvennessValue(int key) {
 		super(key);
-		abs = Evenness.getInstance();
+		abs = EvennessAbstraction.getInstance();
 	}
 	
 	public boolean can_be_ODD() {
@@ -22,9 +22,9 @@ public class EvennessValue extends AbstractValue {
 	public Set<AbstractValue> getTokens() {
 		Set<AbstractValue> tokens = new HashSet<AbstractValue>();
 		if (can_be_EVEN())
-			tokens.add(Evenness.EVEN);
+			tokens.add(EvennessAbstraction.EVEN);
 		if (can_be_ODD())
-			tokens.add(Evenness.ODD);
+			tokens.add(EvennessAbstraction.ODD);
 		return tokens;
 	}
 
@@ -35,9 +35,9 @@ public class EvennessValue extends AbstractValue {
 		if (key < 0 || key >= num)
 			throw new RuntimeException("Wrong TOP token");
 		if (can_be_EVEN())
-			return (key == 0)? Evenness.EVEN : Evenness.ODD;
+			return (key == 0)? EvennessAbstraction.EVEN : EvennessAbstraction.ODD;
 		else
-			return Evenness.ODD;
+			return EvennessAbstraction.ODD;
 	}
 
 	@Override
@@ -52,13 +52,13 @@ public class EvennessValue extends AbstractValue {
 	
 	@Override
 	public boolean isComposite() {
-		return this == Evenness.TOP;
+		return this == EvennessAbstraction.TOP;
 	}
 	
 	@Override
 	public AbstractValue _plus(int right) {
 		if (right == 1 || right == -1)
-			return Evenness.getInstance().create(can_be_ODD(), can_be_EVEN());
+			return EvennessAbstraction.getInstance().create(can_be_ODD(), can_be_EVEN());
 		else
 			return _plus(abs.abstractMap(right));
 	}
@@ -66,7 +66,7 @@ public class EvennessValue extends AbstractValue {
 	@Override
 	public AbstractValue _plus(long right) {
 		if (right == 1 || right == -1)
-			return Evenness.getInstance().create(can_be_ODD(), can_be_EVEN());
+			return EvennessAbstraction.getInstance().create(can_be_ODD(), can_be_EVEN());
 		else
 			return _plus(abs.abstractMap(right));
 	}
@@ -84,7 +84,7 @@ public class EvennessValue extends AbstractValue {
 				o = true;
 			if (this.can_be_ODD() && right_value.can_be_ODD())
 				e = true;			
-			return Evenness.getInstance().create(e, o);
+			return EvennessAbstraction.getInstance().create(e, o);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -102,7 +102,7 @@ public class EvennessValue extends AbstractValue {
 				o = true;
 			if (this.can_be_ODD() && right_value.can_be_ODD())
 				e = true;			
-			return Evenness.getInstance().create(e, o);
+			return EvennessAbstraction.getInstance().create(e, o);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -150,7 +150,7 @@ public class EvennessValue extends AbstractValue {
 				e = true;
 			if (this.can_be_ODD() && right_value.can_be_ODD())
 				o = true;			
-			return Evenness.getInstance().create(e, o);
+			return EvennessAbstraction.getInstance().create(e, o);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -168,7 +168,7 @@ public class EvennessValue extends AbstractValue {
 	@Override
 	public AbstractValue _div(AbstractValue right) {
 		if (right instanceof EvennessValue)	
-			return Evenness.TOP;
+			return EvennessAbstraction.TOP;
 		else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -196,7 +196,7 @@ public class EvennessValue extends AbstractValue {
 				o = true;
 			if (this.can_be_ODD() && right_value.can_be_ODD())
 				e = o = true;			
-			return Evenness.getInstance().create(e, o);
+			return EvennessAbstraction.getInstance().create(e, o);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -224,7 +224,7 @@ public class EvennessValue extends AbstractValue {
 				e = true;
 			if (this.can_be_ODD() && right_value.can_be_ODD())
 				o = true;			
-			return Evenness.getInstance().create(e, o);
+			return EvennessAbstraction.getInstance().create(e, o);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -252,7 +252,7 @@ public class EvennessValue extends AbstractValue {
 				o = true;
 			if (this.can_be_ODD() && right_value.can_be_ODD())
 				o = true;			
-			return Evenness.getInstance().create(e, o);
+			return EvennessAbstraction.getInstance().create(e, o);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");	
 	}
@@ -280,7 +280,7 @@ public class EvennessValue extends AbstractValue {
 				o = true;
 			if (this.can_be_ODD() && right_value.can_be_ODD())
 				e = true;			
-			return Evenness.getInstance().create(e, o);
+			return EvennessAbstraction.getInstance().create(e, o);
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -299,7 +299,7 @@ public class EvennessValue extends AbstractValue {
 	public AbstractValue _shift_left(AbstractValue right) {
 		if (right instanceof EvennessValue) {			
 			EvennessValue right_value = (EvennessValue) right;	
-			return Evenness.getInstance().create(true, this.can_be_ODD() && right_value.can_be_ODD());
+			return EvennessAbstraction.getInstance().create(true, this.can_be_ODD() && right_value.can_be_ODD());
 		} else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -317,7 +317,7 @@ public class EvennessValue extends AbstractValue {
 	@Override
 	public AbstractValue _shift_right(AbstractValue right) {
 		if (right instanceof EvennessValue)			
-			return Evenness.TOP;
+			return EvennessAbstraction.TOP;
 		else
 			throw new RuntimeException("## Error: unknown abstraction");
 	}
@@ -442,7 +442,7 @@ public class EvennessValue extends AbstractValue {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.getInstance().create(n, z, p);
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -466,7 +466,7 @@ public class EvennessValue extends AbstractValue {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.getInstance().create(n, z, p);
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -495,7 +495,7 @@ public class EvennessValue extends AbstractValue {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.getInstance().create(n, z, p);
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	@Override
@@ -624,9 +624,9 @@ public class EvennessValue extends AbstractValue {
 	}
 	
 	public String toString() {
-		if (this == Evenness.EVEN)
+		if (this == EvennessAbstraction.EVEN)
 			return "EVEN";
-		if (this == Evenness.ODD)
+		if (this == EvennessAbstraction.ODD)
 			return "ODD";
 		if (this.isComposite())
 			return "TOP";

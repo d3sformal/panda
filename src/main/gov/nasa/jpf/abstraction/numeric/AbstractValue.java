@@ -1221,7 +1221,7 @@ public abstract class AbstractValue {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.getInstance().create(n, z, p);
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	public AbstractValue _cmp(long right) {
@@ -1244,7 +1244,7 @@ public abstract class AbstractValue {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.getInstance().create(n, z, p);
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	public AbstractValue _cmpg(float right) {
@@ -1271,7 +1271,7 @@ public abstract class AbstractValue {
 		if (this._gt(right) != AbstractBoolean.TRUE
 				&& this._lt(right) != AbstractBoolean.TRUE)
 			z = true;
-		return Signs.getInstance().create(n, z, p);
+		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
 	public AbstractValue _cmpl(float right) {

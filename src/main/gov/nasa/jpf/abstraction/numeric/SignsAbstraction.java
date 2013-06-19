@@ -29,20 +29,20 @@ package gov.nasa.jpf.abstraction.numeric;
  * Remember, that this abstraction does not handle such floating-point values as
  * NaN and INF.
  */
-public class Signs extends Abstraction {
+public class SignsAbstraction extends Abstraction {
 	
-	private static Signs instance;
+	private static SignsAbstraction instance;
 	
-	public static Signs getInstance() {
+	public static SignsAbstraction getInstance() {
 		if (instance == null)
 		{
-			instance = new Signs();
+			instance = new SignsAbstraction();
 		}
 		
 		return instance;
 	}
 
-	private Signs() {
+	private SignsAbstraction() {
 	}
 	
 	// basic tokens: NEG, ZERO, POS

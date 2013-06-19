@@ -27,11 +27,11 @@ import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.abstraction.bytecode.*;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.abstraction.numeric.Range;
-import gov.nasa.jpf.abstraction.numeric.Container;
-import gov.nasa.jpf.abstraction.numeric.Evenness;
-import gov.nasa.jpf.abstraction.numeric.Interval;
-import gov.nasa.jpf.abstraction.numeric.Signs;
+import gov.nasa.jpf.abstraction.numeric.RangeAbstraction;
+import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
+import gov.nasa.jpf.abstraction.numeric.EvennessAbstraction;
+import gov.nasa.jpf.abstraction.numeric.IntervalAbstraction;
+import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 
 import gov.nasa.jpf.util.InstructionFactoryFilter;
 
@@ -60,10 +60,10 @@ public class AbstractInstructionFactory extends
 			String abs_name = argv[0].toLowerCase();
 			if (abs_name.equals("signs")) {
 				System.out.printf("### jpf-abstraction: SIGNS turned on\n");
-				abs_list.add(Signs.getInstance());
+				abs_list.add(SignsAbstraction.getInstance());
 			} else if (abs_name.equals("evenness")) {
 				System.out.printf("### jpf-abstraction: EVENNESS turned on\n");
-				abs_list.add(Evenness.getInstance());
+				abs_list.add(EvennessAbstraction.getInstance());
 			} else if (abs_name.equals("interval")) {
 				try {
 					double min = Double.parseDouble(argv[1]);
@@ -71,7 +71,7 @@ public class AbstractInstructionFactory extends
 					System.out
 							.printf("### jpf-abstraction: INTERVAL[%f, %f] turned on\n",
 									min, max);
-					abs_list.add(new Interval(min, max));
+					abs_list.add(new IntervalAbstraction(min, max));
 				} catch (NumberFormatException nfe) {
 					System.out
 							.println("### jpf-abstraction: please keep format "
@@ -88,7 +88,7 @@ public class AbstractInstructionFactory extends
 					System.out
 							.printf("### jpf-abstraction: RANGE[%d, %d] turned on\n",
 									min, max);
-					abs_list.add(new Range(min, max));
+					abs_list.add(new RangeAbstraction(min, max));
 				} catch (NumberFormatException nfe) {
 					System.out
 							.println("### jpf-abstraction: please keep format "
@@ -107,7 +107,7 @@ public class AbstractInstructionFactory extends
 		else if (abs_list.size() == 1)
 			abs = abs_list.get(0);
 		else {
-			abs = new Container(abs_list);
+			abs = new ContainerAbstraction(abs_list);
 			System.out
 					.println("### jpf-abstraction: CONTAINER abstraction turned on");
 		}

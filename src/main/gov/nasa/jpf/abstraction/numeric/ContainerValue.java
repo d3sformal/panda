@@ -38,7 +38,7 @@ public class ContainerValue extends AbstractValue {
 				idx /= cnum;
 			} else
 				res.add(null);
-		return ((Container)abs).create(res);
+		return ((ContainerAbstraction)abs).create(res);
 	}
 
 	@Override
@@ -130,7 +130,7 @@ public class ContainerValue extends AbstractValue {
 					else
 						res.add(op.execute(p._1, p._2));
 
-				return ((Container)abs).create(res);
+				return ((ContainerAbstraction)abs).create(res);
 			} else
 				throw new RuntimeException("## Error: unknown abstraction");
 		}
@@ -340,7 +340,7 @@ public class ContainerValue extends AbstractValue {
 			List<AbstractValue> res = new ArrayList<AbstractValue>();
 			for (AbstractValue abs : list)
 				res.add((abs == null) ? null : abs._neg());
-			return ((Container)abs).create(res);
+			return ((ContainerAbstraction)abs).create(res);
 		}
 
 		@Override
@@ -562,7 +562,7 @@ public class ContainerValue extends AbstractValue {
 			if (this._gt(right) != AbstractBoolean.TRUE
 					&& this._lt(right) != AbstractBoolean.TRUE)
 				z = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		}
 
 		@Override
@@ -586,7 +586,7 @@ public class ContainerValue extends AbstractValue {
 			if (this._gt(right) != AbstractBoolean.TRUE
 					&& this._lt(right) != AbstractBoolean.TRUE)
 				z = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		}
 
 		@Override
@@ -615,7 +615,7 @@ public class ContainerValue extends AbstractValue {
 			if (this._gt(right) != AbstractBoolean.TRUE
 					&& this._lt(right) != AbstractBoolean.TRUE)
 				z = true;
-			return Signs.getInstance().create(n, z, p);
+			return SignsAbstraction.getInstance().create(n, z, p);
 		}
 
 		@Override

@@ -38,7 +38,7 @@ import java.util.Set;
  * Remember, that this abstraction does not handle such floating-point values as
  * NaN and INF.
  */
-public class Range extends Abstraction {
+public class RangeAbstraction extends Abstraction {
 	
 	// the key for state matching is enumeration of { LESS, MIN, MIN+1, ..., MAX-1, MAX, GREATER }
 	// e.g LESS.get_key() == 0, MIN.get_key() == 1, ..., MAX.get_key() == MAX-MIN+1, ...
@@ -50,7 +50,7 @@ public class Range extends Abstraction {
 	public int MIN = 0;
 	public int MAX = 0;
 	
-	public Range(int min, int max) {
+	public RangeAbstraction(int min, int max) {
 		MIN = min;
 		MAX = max;
 	}

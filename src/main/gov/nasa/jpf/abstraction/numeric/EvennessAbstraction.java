@@ -24,20 +24,20 @@ package gov.nasa.jpf.abstraction.numeric;
  * (e.g. ODD % ODD can be both ODD and EVEN), the special "composite token" TOP
  * returned.
  */
-public class Evenness extends Abstraction {
+public class EvennessAbstraction extends Abstraction {
 	
-	private static Evenness instance;
+	private static EvennessAbstraction instance;
 	
-	public static Evenness getInstance() {
+	public static EvennessAbstraction getInstance() {
 		if (instance == null)
 		{
-			instance = new Evenness();
+			instance = new EvennessAbstraction();
 		}
 		
 		return instance;
 	}
 	
-	private Evenness() {
+	private EvennessAbstraction() {
 	}
 
 	public static EvennessValue EVEN = new EvennessValue(0);
