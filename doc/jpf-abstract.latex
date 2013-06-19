@@ -28,35 +28,23 @@
 {\it #3}}%
 }
 
+
 \begin{document}
 
-\section*{JPF Predicate Abstraction}
+\title{Predicate Abstraction in JPF}
 
-\begin{itemize}
+\maketitle
 
-\item Predicates defined per program
-
-Defined in a textual file whose name (path) is passed as an argument to the selected predicate abstraction in a .jpf file.
-
-\item Focus solely on numerical data types (byte, char, short, int, long, float, double)
-\item Predicate language rich enough to support objects, classes, arrays
-  \begin{itemize}
-    \item local variables (including method parameters)
-    \item static fields
-    \item object fields
-    \item array elements
-  \end{itemize}
-
-  Ensured by allowing proper terms in formulas.
-
-\end{itemize}
+The main goal is to support important features of Java (objects, classes, fields, arrays, local variables) and predicates over variables that have numerical data types.
+We consider primitive types (byte, short, char, int, long, float, double) and also wrapper classes (Integer, Double, etc).
 
 \section*{Predicate language}
 
+The predicate language must be rich enough to support the following: classes, objects, static fields, instance fields, local variables (including method parameters), arrays, and array elements.
+Syntax of the predicates is captured by this grammar:
+
 \begin{grammar}
 <predicate> ::= `not' `(' <predicate> `)'
-    \alt `(' <predicate> `and' <predicate> `)'
-    \alt `(' <predicate> `or'  <predicate> `)'
     \alt `true'
     \alt `false'
     \alt <expression> `=' <expression>
@@ -71,38 +59,55 @@ Defined in a textual file whose name (path) is passed as an argument to the sele
     \alt <factor> `/' <factor>
 
 <factor> ::= "constant"
-    \alt <path>
-    \alt <altpath>
+    \alt <dotpath>
+    \alt <funpath>
     \alt `(' <expression> `)'
 
-<path> ::= <path> `.' "fieldname"
-    \alt <path> `[' "index" `]'
-    \alt "classname" `.' "staticfieldname"
+<dotpath> ::= <dotpath> `.' "fieldname"
+    \alt <dotpath> `[' <expression> `]'
+    \alt "classname" `.' "fieldname"
     \alt "varname"
 
-<altpath> ::= `field' `(' <altpath> `,' "fieldname" `)'
-    \alt `element' `(' <altpath> `,' "index" `)'
-    \alt `field' `(' "classname" `,' "staticfieldname" `)'
+<funpath> ::= `fread' `(' "fieldname" `,' <funpath> `)'
+    \alt `aread' `(' `arr', `,' <funpath> `,' <expression> `)'
+    \alt `fread' `(' "fieldname" `,' "classname" `)'
     \alt "varname"
 \end{grammar}
 
-The dot-notation (\ap{a}{b}{f}) is a syntactic sugar for the notation based on function calls. All expressions with dots will be translated into the function-notation internally.
+The dot-notation (\ap{a}{b}{f}) is a syntactic sugar for the internal notation based on functions (fread, aread).
+All expressions with dots will be translated into the functions-based notation internally.
 
-\subsection*{Identifiers - Variable/Field/Class names}
-
-The root element of an access path is always an identifier of an instance (local or static). 
-If some element of the access path is a variable of a reference type, then its value uniquely identifies the object (by its heap address (objRef)).
-Field names and array indices follow.
-Every path ends in a primitive-typed field / element (or its wrapper: Integer, Double, Float \ldots ?) otherwise the whole expression does not make sense.
-
-We will also consider the scope of variables. If some predicate contains an expression \ap{a}{}{f}, where \var{a} is a local variable of some method {\it m}, then the predicate is defined only in the scope of the method {\it m}.
+The grammar does not include logic operators (and, or) and quantifiers, because we do not care much about properties here.
+Formulas that represent properties over arrays typically involve quantifiers.
 
 
-\subsection*{SMT-LIB Lisp-like syntax}
+\subsection*{Identifiers}
 
-Not very effective from manual-maintenance point of view.
+The first element (root) of an access path is a local variable name (including \texttt{this}) or a class name.
+If some element of an access path is a variable or field of a reference type, then its value uniquely identifies the respective object by its heap address (objRef).
+The last element of an access path must be an expression (local variable, field, array element) of a numeric type (primitive, wrapper class), otherwise the whole expression does not make sense for us.
 
-\section*{Extension to JPF Abstraction}
+We must also consider the scope of local variables. 
+If some predicate contains an expression \ap{a}{}{f}, where \var{a} is a local variable of some method {\it m}, then the predicate is defined only in the scope of the method {\it m}.
+
+One predicate can refer to fields of different objects. 
+Example: \texttt{this}.o1.f \textless \ p1.g, where p1 is a method parameter (an object different from \texttt{this}.o1).
+
+
+
+
+
+
+
+
+% TODO
+
+\section*{Usage / Running}
+
+Input: a set of predicates defined in a textual file whose name (path) is passed as an argument to the selected predicate abstraction in a .jpf file.
+
+
+\section*{Abstract State}
 
 \begin{itemize}
 \item {\bf Abstract value} $\sim$ valuation of individual predicates
@@ -209,6 +214,8 @@ Not very effective from manual-maintenance point of view.
 
   \end{itemize}
 \end{itemize}
+
+\section*{Implementation: Extension to JPF Abstraction}
 
 \item Implementation mechanisms
 
