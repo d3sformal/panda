@@ -28,7 +28,7 @@ beginfig(1)
   ClassY.info.iAttributeStack.bottom := 0;
   ClassY.info.iMethodStack.top := 0;
   ClassY.info.iMethodStack.bottom := 0;
-  Class.ClassZ("ClassZ")("+field : int")();
+  Class.ClassZ("ClassZ")("+f : int")();
   ClassZ.info.iMethodStack.top := 0;
   ClassZ.info.iMethodStack.bottom := 0;
 
@@ -40,20 +40,17 @@ beginfig(1)
   b.info.iAttributeStack.top := 0;
   b.info.iAttributeStack.bottom := 0;
 
-  Instance.c("")("field = 42");
+  Instance.c("")("f = 42");
   c.info.iName.top := 0;
   c.info.iName.bottom := 0;
-
-  Note.Anonymous("Accessible as a.y.z.field or b.z.field", "", "Therefore it is necessary that these paths are reported upon manipulation of the value", "to ensure the ability to recognize what predicates are affected and should be updated.");
 
   leftToRight(60)(ClassX, ClassY, ClassZ);
   topToBottom(40)(ClassX, a);
   topToBottom(40)(ClassY, b);
   same.midx(ClassZ, c);
   same.midy(b, c);
-  topToBottom(30)(c, Anonymous);
 
-  drawObjects(a, b, c, ClassX, ClassY, ClassZ, Anonymous);
+  drawObjects(a, b, c, ClassX, ClassY, ClassZ);
 
   link(aggregation)(ClassY.w--ClassX.e);
   link(aggregation)(ClassZ.w--ClassY.e);
@@ -70,8 +67,6 @@ beginfig(1)
   item(iAssoc)("z")(obj.sw = ClassY.ne);
   item(iAssoc)("y")(obj.sw = a.ne);
   item(iAssoc)("z")(obj.sw = b.ne);
-
-  link(dashedLink)(c.attributeStack.pict[0].s--Anonymous.n);
 endfig;
 
 beginfig(2)

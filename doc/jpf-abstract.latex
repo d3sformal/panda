@@ -80,7 +80,6 @@ All expressions with dots will be translated into the functions-based notation i
 The grammar does not include logic operators (and, or) and quantifiers, because we do not care much about properties here.
 Formulas that represent properties over arrays typically involve quantifiers.
 
-
 \subsection*{Identifiers}
 
 The first element (root) of an access path is a local variable name (including \texttt{this}) or a class name.
@@ -93,8 +92,68 @@ If some predicate contains an expression \ap{a}{}{f}, where \var{a} is a local v
 One predicate can refer to fields of different objects. 
 Example: \texttt{this}.o1.f \textless \ p1.g, where p1 is a method parameter (an object different from \texttt{this}.o1).
 
+If a given predicate refers only to object fields (not local variables of some method), such as \texttt{this}.f1 \textless \ \texttt{this}.f2, then it will be defined only during method calls on the given object.
 
+\section*{Abstract State}
 
+An \textit{abstract state} is the valuation (truth value) of all individual predicates defined in the current context (scope).
+
+\vspace{\baselineskip}
+
+Each predicate evaluates to $\left\{ \begin{array}{lcl}\text{\tt undefined} &\sim& \text{\it referring to out-of-scope variables} \\ \text{\tt 0} &\sim& \text{\tt false} \\ \text{\tt 1} &\sim& \text{\tt true} \\ \text{\tt unknown (*)} &\sim& \text{\tt TOP} \end{array} \right.$
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics{figure0}
+\end{figure}
+
+In each state, we will store valuations of all predicates defined in the current scope. We will preserve the concrete values too (i.e., not setting them to 0 like in the original Abstract Pathfinder), because they may be useful in deciding values of certain predicates (see below) with the SMT solver.
+
+We will use a {\bf single global container} for current values of all predicates. Values will not be stored in attributes for objects, fields, and local variables (stack frame slots).
+The container is a map from predicates to their values.
+This approach has several benefits:
+\begin{itemize}
+	\item avoiding redundancy (no need to store values at two different locations if the given predicates refers to two local variables or instance fields),
+	\item consistency (when the predicate value is stored at one place), and
+	\item easy access to current values for all predicates (over all objects)
+\end{itemize}
+
+\vspace{\baselineskip}
+ 
+For each value on the current stack frame (context, scope) that represents an object reference, we must know the access path through which we acquired the value, so that we can find the corresponding predicates.
+The access path can be a local variable name, or a local variable name followed by a sequence of field names.
+We will keep the access path for a given value on the stack in its attribute.
+If we have the value $v$ on the top of the stack frame and its access path \texttt{this}.f in the attribute for $v$, and JPF executes a getfield instruction on $v$ and the field $g$, the new value on the top of the stack frame will be $w$ and its access path will be \texttt{this}.f.g --- then we know that a predicate referring to \texttt{this}.f.g applies to $w$.
+
+\subsection*{Updating}
+
+Truth values of some predicates are updated either when the current scope changes (call, return) or when JPF executes some data-manipulation instruction (getfield, iadd, etc).
+For each instruction we must update (process) only the predicates affected by the instruction. We identify relevant predicates using the access paths for the instruction operands.
+Original value is preserved for other (unaffected) predicates.
+This may save a considerable number of calls to the SMT solver.
+
+However, there are still difficult challenges.
+The following example demonstrates the case when we have two different access paths lead to the same object.
+The field $f$ of a given object of the class \texttt{ClassZ} is accessible through a.y.z.f and b.z.f.
+If JPF executes an instruction that uses a.y.z.f, then we must update truth value of predicates over a.y.z.f and also predicates over b.z.f.
+
+\begin{lstlisting}
+  public void m(ClassX a) {
+    ClassY b = a.y;
+    ... 
+    a.y.z.field = 5;
+    ...
+    b.z.field = x + 1;
+    ...
+  }
+\end{lstlisting}
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics{figure1}
+\end{figure}
+
+We also need a map from object references (ElementInfo) to all access paths that refer to a given object. Using this map we can find aliased access paths and then predicates which must be updated.
 
 
 
@@ -102,70 +161,52 @@ Example: \texttt{this}.o1.f \textless \ p1.g, where p1 is a method parameter (an
 
 % TODO
 
+\noindent\textbf{TODO}
+
+		- jmena lokalnich promennych mozna zjistime pres StackFrame (kdyz bude prislusny class file obsahovat debugovaci symboly)
+
+		- behem state space traversal bude JPF obsah toho containeru vhodne updatovat (backtracking) a take serializovat (na state matching)
+		- it will be properly managed (backtracking)
+
+		- truth value of predicates that refer only to object fields should be preserved between different method calls on the object
+
+	- pouzite mechanismy: bytecode instructions, serialization, apod
+	
+	- state matching over predicates -> nejspis pouzit SMT solver (jako symbolic execution) nebo jinak checkovat subsumption
+		- pro stavy s1 a s2, kde s1 je "already visited before" a s2 je current state, vyrobit logicke formule na zaklade truth value predikatu a zavolat solver, aby otestoval platnost implikace "s1 => s2"
+		- musime upravit serializer tak, aby pro danou variable ignoroval konkretni hodnoty, pokud existuje nejaky predikat 
+		- najit existujici clanky (related work) -> hlavne abstract state matching with subsumption for symbolic execution
+
+	- method call: truth values of predicates over "this" and formal method parameters must be set according to truth values of predicates over actual parameters
+
+	- we can probably allow mixing predicate abstraction with numeric abstractions (signs, etc) -> use the same instruction factory
+	- how to use the SMT solver: prepare input (string), execute system process, and parse output ("sat", "unsat")
+	- kdyz najdeme v dynamic program state aktualni hodnotu nejake promenne, tak ji muzeme pouzit v logicke formuli (input for SMT) jako dalsi constraint
+		- example: predikat "a[i] > x" a constraint "a[i] = 5" vyrobena na zaklade dynamic state
+	- rozmyslet dobre jestli navrzene pouziti globalniho containeru pro ukladani abstract values nezpusobi problemy
+
+
+
 \section*{Usage / Running}
 
 Input: a set of predicates defined in a textual file whose name (path) is passed as an argument to the selected predicate abstraction in a .jpf file.
+	define predicates over local variables of each method separately, and for each class (predicates over static fields and instance fields)
+
+	Each predicate must be associated with some class (for predicates that refer only to fields) or with some method (for predicates that refer also to local variables).
 
 
-\section*{Abstract State}
 
 \begin{itemize}
-\item {\bf Abstract value} $\sim$ valuation of individual predicates
-\item Predicates evaluate to $\left\{ \begin{array}{lcl}\text{\tt undefined} &\sim& \text{\it referring to out-of-scope variables} \\ \text{\tt 0} &\sim& \text{\tt false} \\ \text{\tt 1} &\sim& \text{\tt true} \\ \text{\tt unknown (*)} &\sim& \text{\tt TOP} \end{array} \right. $
 
-  \begin{figure}[!h]
-  \centering
-  \includegraphics{figure0}
-  \end{figure}
-
-  \FloatBarrier
-
-\item Concrete value kept unmodified for SMT purposes
-\item {\bf Global abstraction} - There is a single valuation of all input predicates shared between all the abstract values (attributes to all the concrete values)
-  \begin{figure}[!h]
-  \centering
-  \includegraphics{figure3}
-  \end{figure}
-
-  \FloatBarrier
+	\item 
 
   \begin{itemize}
-  \item {\bf Benefits}
-    \begin{itemize}
-    \item Avoids redundancy (No need to have two truth value estimates for a single predicate stored in two different abstract values)
-    \item Implies consistency (No differences)
-    \item Provides accessibility to the most extensive information for all the abstract values
-    \end{itemize}
-
   \item {\bf Requirements}
     \begin{itemize}
     \item Maintenance (backtracking, instruction execution \ldots)
     \item Serialisation (state matching)
     \end{itemize}
 
-  \item {\bf Update}
-    \begin{itemize}
-    \item Invoked by change of scope
-    \item Invoked by instruction execution
-
-    Predicate determines what access paths it depends on.
-    Only predicates depending on paths affected by a given instruction are updated.
-    Unaffected predicates keep their value.
-    This may save a considerable number of SMT invocations. \\
-
-    The following example demonstrates challenges that severely affect the design of our solution.
-
-    \begin{lstlisting}
-    public void m(ClassX a) {
-      ClassY b = a.y;
-      ... a.y.z.field + b.z.field ...
-    }
-    \end{lstlisting}
-
-    \begin{figure}[!h]
-    \centering
-    \includegraphics{figure1}
-    \end{figure}
 
     \FloatBarrier
 
@@ -212,7 +253,6 @@ Input: a set of predicates defined in a textual file whose name (path) is passed
     \FloatBarrier
 
 
-  \end{itemize}
 \end{itemize}
 
 \section*{Implementation: Extension to JPF Abstraction}
