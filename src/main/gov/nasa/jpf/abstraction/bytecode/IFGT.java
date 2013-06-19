@@ -22,6 +22,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
 import gov.nasa.jpf.abstraction.numeric.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.numeric.AbstractValue;
+import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
@@ -53,7 +54,7 @@ public class IFGT extends gov.nasa.jpf.jvm.bytecode.IFGT {
 
 		System.out.printf("IFGT> Values: %d (%s)\n", sf.peek(0), abs_v);
 		
-		AbstractBoolean abs_condition = abs_v._gt(0);
+		AbstractBoolean abs_condition = Abstraction._gt(0, abs_v, 0, null);
 
 		if(abs_condition == AbstractBoolean.TRUE) {
 			conditionValue = true;

@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
 import gov.nasa.jpf.abstraction.numeric.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.numeric.AbstractValue;
+import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
@@ -51,7 +52,7 @@ public class IFEQ extends gov.nasa.jpf.jvm.bytecode.IFEQ {
 		// the condition is abstract
 		System.out.printf("IFEQ> Values: %d (%s)\n", sf.peek(0), abs_v);
 
-		AbstractBoolean abs_condition = abs_v._eq(0);
+		AbstractBoolean abs_condition = Abstraction._eq(0, abs_v, 0, null);
 
 		if (abs_condition == AbstractBoolean.TRUE) {
 			conditionValue = true;

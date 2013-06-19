@@ -83,5 +83,589 @@ public class EvennessAbstraction extends Abstraction {
 		else
 			return ODD;
 	}
+	
+	@Override
+	public AbstractValue _plus(AbstractValue left, int right) {
+		EvennessValue left_val = (EvennessValue) left;
+
+		if (right == 1 || right == -1)
+			return EvennessAbstraction.getInstance().create(left_val.can_be_ODD(), left_val.can_be_EVEN());
+		else
+			return _plus(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _plus(AbstractValue left, long right) {
+		EvennessValue left_val = (EvennessValue) left;
+
+		if (right == 1 || right == -1)
+			return EvennessAbstraction.getInstance().create(left_val.can_be_ODD(), left_val.can_be_EVEN());
+		else
+			return _plus(left, left.abs.abstractMap(right));
+	}
+	
+	@Override
+	public AbstractValue _plus(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue) {
+			EvennessValue left_value = (EvennessValue) left;
+			EvennessValue right_value = (EvennessValue) right;	
+			boolean o = false, e = false;			
+			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+				e = true;
+			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+				o = true;		
+			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+				o = true;
+			if (left_value.can_be_ODD() && right_value.can_be_ODD())
+				e = true;			
+			return EvennessAbstraction.getInstance().create(e, o);
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractValue _minus(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue) {
+			EvennessValue left_value = (EvennessValue) left;
+			EvennessValue right_value = (EvennessValue) right;	
+			boolean o = false, e = false;			
+			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+				e = true;
+			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+				o = true;		
+			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+				o = true;
+			if (left_value.can_be_ODD() && right_value.can_be_ODD())
+				e = true;			
+			return EvennessAbstraction.getInstance().create(e, o);
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractValue _minus(AbstractValue left, int right) {
+		return _minus(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _minus(AbstractValue left, long right) {
+		return _minus(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _minus_reverse(AbstractValue left, int right) {
+		return _minus(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	public AbstractValue _minus_reverse(AbstractValue left, long right) {
+		return _minus(left.abs.abstractMap(right), left);
+	}
+	
+	@Override
+	public AbstractValue _mul(AbstractValue left, int right) {
+		return _mul(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	public AbstractValue _mul(AbstractValue left, long right) {
+		return _mul(left.abs.abstractMap(right), left);
+	}
+	
+	@Override
+	public AbstractValue _mul(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue) {
+			EvennessValue left_value = (EvennessValue) left;
+			EvennessValue right_value = (EvennessValue) right;	
+			boolean o = false, e = false;			
+			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+				e = true;
+			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+				e = true;		
+			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+				e = true;
+			if (left_value.can_be_ODD() && right_value.can_be_ODD())
+				o = true;			
+			return EvennessAbstraction.getInstance().create(e, o);
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractValue _div(AbstractValue left, int right) {
+		return _div(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _div(AbstractValue left, long right) {
+		return _div(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _div(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue)	
+			return EvennessAbstraction.TOP;
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractValue _rem(AbstractValue left, int right) {
+		return _rem(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _rem(AbstractValue left, long right) {
+		return _rem(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _rem(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue) {
+			EvennessValue left_value = (EvennessValue) left;
+			EvennessValue right_value = (EvennessValue) right;	
+			boolean o = false, e = false;			
+			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+				e = true;
+			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+				e = o = true;		
+			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+				o = true;
+			if (left_value.can_be_ODD() && right_value.can_be_ODD())
+				e = o = true;			
+			return EvennessAbstraction.getInstance().create(e, o);
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractValue _bitwise_and(AbstractValue left, int right) {
+		return _bitwise_and(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _bitwise_and(AbstractValue left, long right) {
+		return _bitwise_and(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _bitwise_and(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue) {
+			EvennessValue left_value = (EvennessValue) left;
+			EvennessValue right_value = (EvennessValue) right;	
+			boolean o = false, e = false;			
+			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+				e = true;
+			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+				e = true;		
+			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+				e = true;
+			if (left_value.can_be_ODD() && right_value.can_be_ODD())
+				o = true;			
+			return EvennessAbstraction.getInstance().create(e, o);
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractValue _bitwise_or(AbstractValue left, int right) {
+		return _bitwise_or(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _bitwise_or(AbstractValue left, long right) {
+		return _bitwise_or(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _bitwise_or(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue) {
+			EvennessValue left_value = (EvennessValue) left;
+			EvennessValue right_value = (EvennessValue) right;	
+			boolean o = false, e = false;			
+			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+				e = true;
+			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+				o = true;		
+			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+				o = true;
+			if (left_value.can_be_ODD() && right_value.can_be_ODD())
+				o = true;			
+			return EvennessAbstraction.getInstance().create(e, o);
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");	
+	}
+
+	@Override
+	public AbstractValue _bitwise_xor(AbstractValue left, int right) {
+		return _bitwise_xor(left, left.abs.abstractMap(right));
+	}
+	
+	@Override
+	public AbstractValue _bitwise_xor(AbstractValue left, long right) {
+		return _bitwise_xor(left, left.abs.abstractMap(right));
+	}	
+
+	@Override
+	public AbstractValue _bitwise_xor(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue) {
+			EvennessValue left_value = (EvennessValue) left;
+			EvennessValue right_value = (EvennessValue) right;	
+			boolean o = false, e = false;			
+			if (left_value.can_be_EVEN() && right_value.can_be_EVEN())
+				e = true;
+			if (left_value.can_be_EVEN() && right_value.can_be_ODD())
+				o = true;		
+			if (left_value.can_be_ODD() && right_value.can_be_EVEN())
+				o = true;
+			if (left_value.can_be_ODD() && right_value.can_be_ODD())
+				e = true;			
+			return EvennessAbstraction.getInstance().create(e, o);
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractValue _shift_left(AbstractValue left, int right) {
+		return _shift_left(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _shift_left(AbstractValue left, long right) {
+		return _shift_left(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _shift_left(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue) {
+			EvennessValue left_value = (EvennessValue) left;
+			EvennessValue right_value = (EvennessValue) right;	
+			return EvennessAbstraction.getInstance().create(true, left_value.can_be_ODD() && right_value.can_be_ODD());
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractValue _shift_right(AbstractValue left, int right) {
+		return _shift_right(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _shift_right(AbstractValue left, long right) {
+		return _shift_right(left, left.abs.abstractMap(right));
+	}
+ 
+	@Override
+	public AbstractValue _shift_right(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue)			
+			return EvennessAbstraction.TOP;
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractValue _unsigned_shift_right(AbstractValue left, int right) {
+		return _unsigned_shift_right(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _unsigned_shift_right(AbstractValue left, long right) {
+		return _unsigned_shift_right(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _unsigned_shift_right(AbstractValue left, AbstractValue right) {
+		// sign does not matter
+		return _shift_right(left, right);
+	}
+
+	@Override
+	public AbstractValue _neg_impl(AbstractValue left) {
+		return left;
+	}
+
+	@Override
+	public AbstractBoolean _ge(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue)
+			return AbstractBoolean.TOP;
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractBoolean _ge(AbstractValue left, int right) {
+		return _ge(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractBoolean _gt(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue)
+			return AbstractBoolean.TOP;
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractBoolean _gt(AbstractValue left, int right) {
+		return _gt(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractBoolean _le(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue)
+			return AbstractBoolean.TOP;
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractBoolean _le(AbstractValue left, int right) {
+		return _le(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractBoolean _lt(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue)
+			return AbstractBoolean.TOP;
+		else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}
+
+	@Override
+	public AbstractBoolean _lt(AbstractValue left, int right) {
+		return _lt(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractBoolean _eq(AbstractValue left, AbstractValue right) {
+		if (right instanceof EvennessValue) {
+			EvennessValue left_value = (EvennessValue) left;
+			EvennessValue right_value = (EvennessValue) right;
+			boolean t = (left_value.can_be_EVEN() && right_value.can_be_EVEN()) ||
+					(left_value.can_be_ODD() && right_value.can_be_ODD());
+			boolean f = (left_value.can_be_EVEN() && right_value.can_be_ODD()) ||
+					(left_value.can_be_ODD() && right_value.can_be_EVEN());
+			assert t || f;
+			if (t & f)
+				return AbstractBoolean.TOP;
+			else if (t)
+				return AbstractBoolean.TRUE;
+			else
+				return AbstractBoolean.TRUE;
+		} else
+			throw new RuntimeException("## Error: unknown abstraction");
+	}	
+	
+	@Override
+	public AbstractBoolean _eq(AbstractValue left, int right) {
+		return _eq(left, left.abs.abstractMap(right));
+	}		
+	
+	@Override
+	public AbstractBoolean _ne(AbstractValue left, AbstractValue right) {
+		return _eq(left, right).not();
+	}
+
+	@Override
+	public AbstractBoolean _ne(AbstractValue left, int right) {
+		return _ne(left, left.abs.abstractMap(right));
+	}
+	
+	/**
+	 * @return Signs.ZERO if the operand is numerically equal to this
+	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
+	 *         than the operand; and Signs.POS if this Abstraction is
+	 *         numerically greater than the operand.
+	 */
+	@Override
+	public AbstractValue _cmp(AbstractValue left, AbstractValue right) {
+		boolean n = false, z = false, p = false;
+		if (_gt(left, right) != AbstractBoolean.FALSE)
+			p = true;
+		if (_lt(left, right) != AbstractBoolean.FALSE)
+			n = true;
+		if (_gt(left, right) != AbstractBoolean.TRUE
+				&& _lt(left, right) != AbstractBoolean.TRUE)
+			z = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
+	}
+
+	@Override
+	public AbstractValue _cmp(AbstractValue left, long right) {
+		return _cmp(left, left.abs.abstractMap(right));
+	}
+
+	/**
+	 * @return Signs.ZERO if the operand is numerically equal to this
+	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
+	 *         than the operand; and Signs.POS if this Abstraction is
+	 *         numerically greater than the operand.
+	 */	
+	@Override
+	public AbstractValue _cmpg(AbstractValue left, AbstractValue right) {
+		boolean n = false, z = false, p = false;
+		if (_gt(left, right) != AbstractBoolean.FALSE)
+			p = true;
+		if (_lt(left, right) != AbstractBoolean.FALSE)
+			n = true;
+		if (_gt(left, right) != AbstractBoolean.TRUE
+				&& _lt(left, right) != AbstractBoolean.TRUE)
+			z = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
+	}
+
+	@Override
+	public AbstractValue _cmpg(AbstractValue left, float right) {
+		return _cmpg(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _cmpg(AbstractValue left, double right) {
+		return _cmpg(left, left.abs.abstractMap(right));
+	}
+
+	/**
+	 * @return Signs.ZERO if the operand is numerically equal to this
+	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
+	 *         than the operand; and Signs.POS if this Abstraction is
+	 *         numerically greater than the operand.
+	 */	
+	@Override
+	public AbstractValue _cmpl(AbstractValue left, AbstractValue right) {
+		boolean n = false, z = false, p = false;
+		if (_gt(left, right) != AbstractBoolean.FALSE)
+			p = true;
+		if (_lt(left, right) != AbstractBoolean.FALSE)
+			n = true;
+		if (_gt(left, right) != AbstractBoolean.TRUE
+				&& _lt(left, right) != AbstractBoolean.TRUE)
+			z = true;
+		return SignsAbstraction.getInstance().create(n, z, p);
+	}
+
+	@Override
+	public AbstractValue _cmpl(AbstractValue left, float right) {
+		return this._cmpl(left, left.abs.abstractMap(right));
+	}
+
+	@Override
+	public AbstractValue _cmpl(AbstractValue left, double right) {
+		return this._cmpl(left, left.abs.abstractMap(right));
+	}	
+
+	@Override
+	protected AbstractValue _div_reverse(AbstractValue left, int right) {
+		return _div(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _div_reverse(AbstractValue left, long right) {
+		return _div(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _div_reverse(AbstractValue left, float right) {
+		return _div(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _div_reverse(AbstractValue left, double right) {
+		return _div(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _cmp_reverse(AbstractValue left, long right) {
+		return _cmp(left.abs.abstractMap(right), left);
+	}		
+	
+	@Override
+	protected AbstractValue _cmpl_reverse(AbstractValue left, float right) {
+		return _cmpl(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _cmpl_reverse(AbstractValue left, double right) {
+		return _cmpl(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _cmpg_reverse(AbstractValue left, float right) {
+		return _cmpg(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _cmpg_reverse(AbstractValue left, double right) {
+		return _cmpg(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _rem_reverse(AbstractValue left, int right) {
+		return _rem(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _rem_reverse(AbstractValue left, long right) {
+		return _rem(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _rem_reverse(AbstractValue left, float right) {
+		return _rem(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _rem_reverse(AbstractValue left, double right) {
+		return _rem(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _shift_left_reverse(AbstractValue left, int right) {
+		return _shift_left(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _shift_left_reverse(AbstractValue left, long right) {
+		return _shift_left(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _shift_right_reverse(AbstractValue left, int right) {
+		return _shift_right(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _shift_right_reverse(AbstractValue left, long right) {
+		return _shift_right(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _unsigned_shift_right_reverse(AbstractValue left, int right) {
+		return _unsigned_shift_right(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractValue _unsigned_shift_right_reverse(AbstractValue left, long right) {
+		return _unsigned_shift_right(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractBoolean _lt_reverse(AbstractValue left, int right) {
+		return _lt(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractBoolean _le_reverse(AbstractValue left, int right) {
+		return _le(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractBoolean _ge_reverse(AbstractValue left, int right) {
+		return _ge(left.abs.abstractMap(right), left);
+	}
+
+	@Override
+	protected AbstractBoolean _gt_reverse(AbstractValue left, int right) {
+		return _gt(left.abs.abstractMap(right), left);
+	}
 		
 }

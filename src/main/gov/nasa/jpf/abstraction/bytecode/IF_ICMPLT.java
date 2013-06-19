@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
 import gov.nasa.jpf.abstraction.numeric.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.numeric.AbstractValue;
+import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
@@ -55,7 +56,7 @@ public class IF_ICMPLT extends gov.nasa.jpf.jvm.bytecode.IF_ICMPLT {
 		int v2 = sf.peek(1);
 
 		// abs_v2 < abs_v1
-		AbstractBoolean result = AbstractValue._lt(v1, abs_v1, v2, abs_v2);
+		AbstractBoolean result = Abstraction._lt(v1, abs_v1, v2, abs_v2);
 
 		System.out.printf("IF_ICMPLT> Values: %d (%s), %d (%s)\n", v2, abs_v2, v1, abs_v1);
 

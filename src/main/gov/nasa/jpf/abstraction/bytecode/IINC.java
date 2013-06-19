@@ -19,6 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.AbstractValue;
+import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.StackFrame;
@@ -45,7 +46,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 		if (abs_v == null) {
 			sf.setLocalVariable(index, sf.getLocalVariable(index) + increment, false);
 		} else {
-			AbstractValue result = abs_v._plus(increment);
+			AbstractValue result = Abstraction._add(0, abs_v, increment, null);
 			System.out.printf("IINC> Value:  %d (%s)\n", sf.getLocalVariable(index), abs_v);
 
 			if (result.isComposite()) {

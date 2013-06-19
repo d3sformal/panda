@@ -19,6 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.numeric.AbstractValue;
+import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -45,7 +46,7 @@ public class LUSHR extends gov.nasa.jpf.jvm.bytecode.LUSHR implements AbstractBi
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return AbstractValue._ushr(v1, abs_v1, v2, abs_v2);
+		return Abstraction._ushr(v1, abs_v1, v2, abs_v2);
 	}
 
 	@Override
