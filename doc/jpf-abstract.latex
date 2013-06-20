@@ -28,6 +28,11 @@
 #3}%
 }
 
+% code (inline)
+\def\code#1{
+{\tt #1}
+} 
+
 
 \begin{document}
 
@@ -82,7 +87,7 @@ Formulas that represent properties over arrays typically involve quantifiers.
 
 \subsection*{Identifiers}
 
-The first element (root) of an access path is a local variable name (including \texttt{this}) or a class name.
+The first element (root) of an access path is a local variable name (including \code{this}) or a class name.
 If some element of an access path is a variable or field of a reference type, then its value uniquely identifies the respective object by its heap address (objRef).
 The last element of an access path must be an expression (local variable, field, array element) of a numeric type (primitive, wrapper class), otherwise the whole expression does not make sense for us.
 
@@ -96,7 +101,8 @@ If a given predicate refers only to object fields (not local variables of some m
 
 \section*{Abstract State}
 
-An \textit{abstract state} is the valuation (truth value) of all individual predicates defined in the current context (scope).
+An \textit{abstract state} is the valuation (truth values) of all individual predicates defined in the current context (scope).
+Each predicate must be associated with some class (for predicates that refer only to fields and numeric constants) or with some method (for predicates that refer also to local variables).
 
 \vspace{\baselineskip}
 
@@ -107,7 +113,9 @@ Each predicate evaluates to $\left\{ \begin{array}{lcl}\text{\tt undefined} &\si
   \includegraphics{figure0}
 \end{figure}
 
-In each state, we will store valuations of all predicates defined in the current scope. We will preserve the concrete values too (i.e., not setting them to 0 like in the original Abstract Pathfinder), because they may be useful in deciding values of certain predicates (see below) with the SMT solver.
+In each state, we will store valuations of all predicates defined in the current scope. 
+We may preserve the concrete values of some variables too (i.e., not setting them to 0 like in the original Abstract Pathfinder), because they may be useful in deciding values of certain predicates with the SMT solver (see below).
+However, this will negatively impact the benefits of abstraction (reduced state space). We can let the user decide (make this configurable).
 
 We will use a {\bf single global container} for current values of all predicates. Values will not be stored in attributes for objects, fields, and local variables (stack frame slots).
 The container is a map from predicates to their values.
@@ -115,15 +123,18 @@ This approach has several benefits:
 \begin{itemize}
 	\item avoiding redundancy (no need to store values at two different locations if the given predicate refers to two local variables or instance fields),
 	\item consistency (when the predicate value is stored at one place), and
-	\item easy access to current values for all predicates (over all objects)
+	\item easy access to current values for all predicates (over all objects).
 \end{itemize}
+
+This container must be properly managed during the state space traversal --- restored to a previous value when JPF backtracks, and so on.
 
 \vspace{\baselineskip}
  
-For each value on the current stack frame (context, scope) that represents an object reference, we must know the access path through which we acquired the value, so that we can find the corresponding predicates.
+For each value on the current stack frame (context, scope) that represents an object reference, we must know the access path through which the value was acquired, so that we can find the corresponding predicates.
 The access path can be a local variable name, or a local variable name followed by a sequence of field names.
 We will keep the access path for a given value on the stack in its attribute.
-If we have the value $v$ on the top of the stack frame and its access path \ap{this}{}{f} in the attribute for $v$, and JPF executes a getfield instruction on $v$ and the field \texttt{g}, the new value on the top of the stack frame will be $w$ and its access path will be \ap{this}{f}{g} --- then we know that a predicate referring to \ap{this}{f}{g} applies to $w$.
+If we have the value $v$ on the top of the stack frame and its access path \ap{this}{}{f} in the attribute for $v$, and JPF executes a getfield instruction on $v$ and the field \code{g}, the new value on the top of the stack frame will be $w$ and its access path will be \ap{this}{f}{g} --- then we know that a predicate referring to \ap{this}{f}{g} applies to $w$.
+For local variables, we can find their names via methods of the \code{StackFrame} class if the debugging symbols are available (loaded from the class file).
 
 \subsection*{Updating}
 
@@ -132,9 +143,11 @@ For each instruction we must update (process) only the predicates affected by th
 Original value is preserved for other (unaffected) predicates.
 This may save a considerable number of calls to the SMT solver.
 
+Note that two methods can have a local variable with the same name. When processing a predicate that refers to this variable name, we must use the association of the predicate with a particular method to find the right scope for the predicate, i.e. to determine whether it is a relevat predicate for the current instruction (method).
+
 However, there are still difficult challenges.
 The following example demonstrates the case when we have two different access paths lead to the same object.
-The field \texttt{f} of a given object of the class \texttt{ClassZ} is accessible through \ap{a}{y.z}{f} and \ap{b}{z}{f}.
+The field \code{f} of a given object of the class \code{ClassZ} is accessible through \ap{a}{y.z}{f} and \ap{b}{z}{f}.
 If JPF executes an instruction that uses \ap{a}{y.z}{f}, then we must update truth value of predicates over \ap{a}{y.z}{f} and also predicates over \ap{b}{z}{f}.
 
 \begin{lstlisting}
@@ -153,210 +166,82 @@ If JPF executes an instruction that uses \ap{a}{y.z}{f}, then we must update tru
   \includegraphics{figure1}
 \end{figure}
 
-We also need a map from object references (ElementInfo) to all access paths that refer to a given object. Using this map we can find aliased access paths and then predicates which must be updated.
+We also need a map from object references (ElementInfo) to all access paths that refer to a given object in the given scope (call context). 
+Using this map we can find aliased access paths and then predicates which must be updated when executing a particular instruction.
+
+A special case are call and return instructions. 
+When executing a call to the method $m$, truth values of predicates over \code{this} and formal parameters of $m$ must be set according to truth values of predicates over the actual parameters for the call. 
+The same must be done when executing a return instruction --- with parameters of reference types and with the returned value.
+Truth value of predicates that refer only to fields of some object must be preserved between different method calls on the object, i.e. the value at the entry to some call on the object must be the same as the value at the exit from a previous call on the object (assuming that variables and fields referred to by the predicate were not explicitly modified between the calls).
+
+New values of predicates will be computed with the help of an SMT solver. We could use the standard approach based on weakest preconditions or something else.
+
+The following algorithm summarizes the procedure for computing new values of relevant predicates at some instruction.
+The set $\text{AffectedPaths}$ contains all access paths affected by the given instruction, and the function expression $paths(p)$ returns all access paths referred to by the predicate $p$.
+The procedure $\text{evalPredicate}$ calls the SMT solver.
+
+\begin{algorithm}
+\begin{algorithmic}
+  \Procedure{updatePredicates}{$\text{Predicates}, \text{Valuation}, \text{AffectedPaths}$}
+    \ForAll{$p \in Predicates$}
+      \If{$AffectedPaths \cap paths(p) \neq \emptyset$}
+        \State $Valuation \gets Valuation \oplus (p \mapsto evalPredicate(p, \text{Valuation}))$
+      \EndIf
+    \EndFor
+  \EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+We could also use information from the dynamic state. 
+If the given predicate refers to an access path $ap$, then we could find a concrete value of the path $ap$ in the dynamic program state and use the concrete value in the logic formula (input for SMT) as another constraint (clause) of the form $ap = \text{value}$.
+For example, given the predicate \code{a[i]} \textgreater \code{x} and the concrete value for \code{a[i]} being 5, we can add the constraint $\text{aread}(\text{arr},a,i) = 5$.
+
+This figure illustrates all the steps that must be performed for each instruction.
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics{figure2}
+\end{figure}
 
 
+\section*{Implementation}
 
+We will use the following mechanisms of JPF:
+\begin{itemize}
+  \item Custom bytecode interpreter
+  \item Serialization
+  \item Attribute system
+\end{itemize}
 
+We also plan to use some code from the original Abstract Pathfinder. 
+For example, the classes \code{AbstractValue} (if it has a suitable interface) and \code{AbstractInstructionFactory}.
+We should allow mixing (co-existence) of predicate abstraction with numeric abstractions (signs, etc).
 
-% TODO
+The following API methods can provide necessary information about variables:
+\begin{itemize}
+  \item {\bf fields:} ThreadInfo.getElementInfo, StackFrame.getThis, ElementInfo.getClassInfo, ClassInfo.getInstanceField
+  \item {\bf locals:} StackFrame.getLocalVars
+  \item {\bf static:} VM.getClassLoaderList, ClassLoaderInfo.loadedClasses, ClassInfo.getStatics
+\end{itemize}
 
-\noindent\textbf{TODO}
+We will probably run the SMT solver in a separate process (not via a Java binding).
+How to use it: prepare input (command-line, string), execute the system process, and parse output ("sat", "unsat").
+Options: {\bf MathSAT 5} (the preferred one), Yices, CVC4, \ldots.
 
-		- jmena lokalnich promennych mozna zjistime pres StackFrame (kdyz bude prislusny class file obsahovat debugovaci symboly)
+\subsection*{State Matching over Predicates}
 
-		- behem state space traversal bude JPF obsah toho containeru vhodne updatovat (backtracking) a take serializovat (na state matching)
-		- it will be properly managed (backtracking)
+For two states $s_1$ and $s_2$, where $s_1$ has been already visited before and $s_2$ is the currently processed state, we must determine whether $s_2$ is already covered by $s_1$ ($s_1 \sim s_2$, subsumption), i.e. we must decide whether to consider $s_2$ as already visited too.
+One option is to create formulas based on truth values of predicates and ask the SMT solver.
+We assume that $PC(s_1) = PC(s_2)$ because otherwise $s_1 \not \sim s_2$.
 
-		- truth value of predicates that refer only to object fields should be preserved between different method calls on the object
+Our plan is to check related work, especially abstract state matching with subsumption for symbolic execution.
 
-	- pouzite mechanismy: bytecode instructions, serialization, apod
-	
-	- state matching over predicates -> nejspis pouzit SMT solver (jako symbolic execution) nebo jinak checkovat subsumption
-		- pro stavy s1 a s2, kde s1 je "already visited before" a s2 je current state, vyrobit logicke formule na zaklade truth value predikatu a zavolat solver, aby otestoval platnost implikace "s1 => s2"
-		- musime upravit serializer tak, aby pro danou variable ignoroval konkretni hodnoty, pokud existuje nejaky predikat 
-		- najit existujici clanky (related work) -> hlavne abstract state matching with subsumption for symbolic execution
-
-	- method call: truth values of predicates over "this" and formal method parameters must be set according to truth values of predicates over actual parameters
-
-	- we can probably allow mixing predicate abstraction with numeric abstractions (signs, etc) -> use the same instruction factory
-	- how to use the SMT solver: prepare input (string), execute system process, and parse output ("sat", "unsat")
-	- kdyz najdeme v dynamic program state aktualni hodnotu nejake promenne, tak ji muzeme pouzit v logicke formuli (input for SMT) jako dalsi constraint
-		- example: predikat "a[i] > x" a constraint "a[i] = 5" vyrobena na zaklade dynamic state
-	- rozmyslet dobre jestli navrzene pouziti globalniho containeru pro ukladani abstract values nezpusobi problemy
-
-
+We must also modify the serializer. It will preserve the concrete values (for selected variables) or save 0 (otherwise), but we have to decide what to do with predicates during serialization.
 
 \section*{Usage / Running}
 
-Input: a set of predicates defined in a textual file whose name (path) is passed as an argument to the selected predicate abstraction in a .jpf file.
-	define predicates over local variables of each method separately, and for each class (predicates over static fields and instance fields)
-
-	Each predicate must be associated with some class (for predicates that refer only to fields) or with some method (for predicates that refer also to local variables).
-
-
-
-\begin{itemize}
-
-	\item 
-
-  \begin{itemize}
-  \item {\bf Requirements}
-    \begin{itemize}
-    \item Maintenance (backtracking, instruction execution \ldots)
-    \item Serialisation (state matching)
-    \end{itemize}
-
-
-    \FloatBarrier
-
-    \begin{figure}[!h]
-    \centering
-    \includegraphics{figure2}
-    \end{figure}
-
-    \FloatBarrier
-
-    \newpage
-    Resolve all paths used in a concrete predicate:
-    \begin{itemize}
-    \item defined $\Rightarrow$ add clause $\text{\tt path} = value$
-    \item undefined $\Rightarrow$ predicate undefined
-    \end{itemize}
-
-    \begin{algorithm}
-    \begin{algorithmic}
-    \Procedure{updatePredicates}{$Predicates, Valuation, AffectedPaths$}
-    \ForAll{$p \in Predicates$}
-      \If{$AffectedPaths \cap usedPaths(p) \neq \emptyset$}
-        \State $Valuation \gets Valuation \oplus p \mapsto evalPredicate(p)$
-      \EndIf
-    \EndFor
-    \EndProcedure
-    \end{algorithmic}
-    \end{algorithm}
-
-    \begin{algorithm}
-    \begin{algorithmic}
-    \Function{evalPredicate}{$P$}
-    \State $Q \gets P$
-    \ForAll{$p \in usedPaths(P)$}
-      \State $e \gets pathToElementInfo(p)$
-      \State $v \gets getValue(e)$
-      \State $Q \gets Q \wedge p = v$
-    \EndFor
-    \Return $SMT(Q)$
-    \EndFunction
-    \end{algorithmic}
-    \end{algorithm}
-
-    \FloatBarrier
-
-
-\end{itemize}
-
-\section*{Implementation: Extension to JPF Abstraction}
-
-\item Implementation mechanisms
-
-  \begin{itemize}
-  \item Bytecode instructions
-  \item Serialisation
-  \item Attribute system
-  \item \ldots
-  \item AbstractValue (if not proven to have unsuitable interface)
-  \item AbstractInstructionFactory (co-existence with other abstractions)
-  \item Scope-aware Map: access path $p$ to {\tt e} $\mapsto$ primitive {\tt ElementInfo e}
-  \item Scope-aware Map: $\text{primitive \tt ElementInfo e} \mapsto \left\{p\:\middle\vert\:p\:\text{access path to \tt e}\right\}$
-  \end{itemize}
-
-\item Mapping variables / class names to concrete ElementInfo / ClassInfo objects in concrete scope.
-
-Needed to be able to provide SMT with fixed values of referred variables.
-The mapping needs to allow looking up corresponding ElementInfo's for a given access path (To allow use of concrete values in predicates to capture current state) but also for a given ElementInfo all possible currently valid access paths (To allow filtering out affected predicates for re-evaluation).
-
-  Choose one of:
-  \begin{itemize}
-  \item provide a dictionary of our own
-
-    {\bf Pros:}
-    \begin{itemize}
-    \item Fast (Hash tables or other dictionary-like structures instead of arrays)
-    \end{itemize}
-
-    {\bf Cons:}
-    \begin{itemize}
-    \item Need to handle backtracking and scoping in general
-    \end{itemize}
-  \item extract needed information from ThreadInfo, StackFrame and VM
-    \begin{itemize}
-    \item {\bf Fields:} ThreadInfo.getElementInfo, StackFrame.getThis, ElementInfo.getClassInfo, ClassInfo.getInstanceField
-    \item {\bf Locals:} StackFrame.getLocalVars
-    \item {\bf Static:} VM.getClassLoaderList, ClassLoaderInfo.loadedClasses, ClassInfo.getStatics \ldots
-    \end{itemize}
-
-    {\bf Pros:}
-    \begin{itemize}
-    \item Existing code
-    \item State maintained over backtracking / \ldots
-    \end{itemize}
-
-    {\bf Cons:}
-    \begin{itemize}
-    \item One-way (Path to ElementInfo)
-    \item {\it Need of debugging symbols ???}
-    \end{itemize}
-    
-  \end{itemize}
-
-\item SMT - invoked as a separate process
-
-Use:
-\begin{itemize}
-\item at update of the abstract value
-\item at branch choice
-\item state matching over predicates
-
-  $s_1, s_2$ states, $s_1$ already visited, $s_2$ current. Determine whether $s_1 \sim s_2$ (Subsumption). \\
-
-  Test whether $s_2$ is already visited based on truth values of the predicates. 
-  One option is to create formulas and use SMT to decide.
-
-  Assume $PC(s_1) = PC(s_2)$ otherwise $s_1 \not \sim s_2$.
-
-  We will check related work, especially abstract state matching with subsumption for symbolic execution.
-
-%  Example: \\
-%
-%  $s_1$:
-%  \begin{itemize}
-%  \item $P_1$
-%  \item $\neg P_2$
-%  \item $P_3$
-%  \item $P_4$ unknown
-%  \end{itemize}
-%
-%  $s_2$:
-%  \begin{itemize}
-%  \item $P_1$
-%  \item $\neg P_2$
-%  \item $P_3$ undefined
-%  \item $P_4$
-%  \end{itemize}
-
-%  SMT: $s_1 \Rightarrow sdd_2$ ?\\
-
-%  If $s_2$ is a consequence of $s_1$ which we have already visited then it is impossible to infer anything new (branching etc.).
-%  The new state is therefore effectively equivalent.
-\end{itemize}
-
-Choices:
-\begin{itemize}
-\item {\bf MathSAT 5} - accepts SMT-LIB format and DIMACS format
-\item Yices
-\item \ldots
-\end{itemize}
-
-\end{itemize}
+Input: a set of predicates defined in a textual file. The name of the file (path) will be passed to the abstraction module through a {\tt .jpf} file.
+The user must define predicates over local variables of each method separately, and predicates over static fields and instance fields of each class.
 
 \end{document}
+

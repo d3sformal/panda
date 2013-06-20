@@ -71,20 +71,20 @@ endfig;
 
 beginfig(2)
   Activity.instr("Instruction Executed");
-  Activity.attr("Load attributes", "Especially paths to", "the operands");
-  Activity.pred("Select predicates", "utilising the paths");
-  Activity.val("Evaluate used paths", "to concrete numerical values");
-  Activity.smt("Run SMT on selected", "predicates extended by", "path = value clauses");
-  Activity.upd("Update abstract value and paths");
+  Activity.attr("Load attributes", "Especially access paths to", "the operands");
+  Activity.pred("Select predicates", "using the access paths");
+  Activity.val("Resolve all paths in the predicate", "to concrete numerical values", "(if not replaced with 0)");
+  Activity.smt("Run SMT solver on the", "selected predicates");
+  Activity.upd("Update abstract values and access paths");
 
   topToBottom(30)(instr, attr, pred, val, smt, upd);
 
   Note.nInstr("Example:", "", "FADD(f1, f2)");
-  Note.nAttr("Let f1 be obtained from a.y.z.field and f2 from b.z.field.", "The two paths refer the same piece of data in memory.", "Therefore both the attributes need to yield the two paths.", "The attributes are however different.", "", "Therefore refer to ElementInfo instead of a concrete set of paths.");
-  Note.nPred("Affected predicate P1", "", "a.y.z.field = c");
-  Note.nVal("a.y.z.field = 3", "c = 1");
-  Note.nSmt("SAT a.y.z.field = c and a.y.z.field = 3 and c = 1 ?");
-  Note.nUpd("not P1", "", "The result value corresponds to no path, it", "is an intermediate result. (It's ElementInfo", "will be resolved to no paths.)");
+  Note.nAttr("Let f1 be obtained from a.y.z.f and f2 from b.z.f.", "The two paths refer the same piece of data in memory.", "Therefore both attributes need to yield the two access paths.", "However, the attributes are different.");
+  Note.nPred("Affected predicate P1", "", "a.y.z.f = c");
+  Note.nVal("a.y.z.f = 3", "c = 1");
+  Note.nSmt("SAT a.y.z.f = c and a.y.z.f = 3 and c = 1 ?");
+  Note.nUpd("not P1", "", "The result value does not correspond to any path,", "it is an intermediate result.");
 
   nInstr.midy = instr.midy;
   nAttr.midy = attr.midy;
@@ -95,7 +95,7 @@ beginfig(2)
 
   same.left(nInstr, nAttr, nPred, nVal, nSmt, nUpd);
 
-  nInstr.left = 150;
+  nInstr.left = 200;
 
   drawObjects(instr, attr, pred, val, smt, upd, nInstr, nAttr, nPred, nVal, nSmt, nUpd);
 
