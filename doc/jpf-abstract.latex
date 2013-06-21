@@ -146,7 +146,7 @@ This may save a considerable number of calls to the SMT solver.
 Note that two methods can have a local variable with the same name. When processing a predicate that refers to this variable name, we must use the association of the predicate with a particular method to find the right scope for the predicate, i.e. to determine whether it is a relevat predicate for the current instruction (method).
 
 However, there are still difficult challenges.
-The following example demonstrates the case when we have two different access paths lead to the same object.
+The following example demonstrates the case when we have two different access paths leading to the same object.
 The field \code{f} of a given object of the class \code{ClassZ} is accessible through \ap{a}{y.z}{f} and \ap{b}{z}{f}.
 If JPF executes an instruction that uses \ap{a}{y.z}{f}, then we must update truth value of predicates over \ap{a}{y.z}{f} and also predicates over \ap{b}{z}{f}.
 
@@ -172,21 +172,25 @@ Using this map we can find aliased access paths and then predicates which must b
 A special case are call and return instructions. 
 When executing a call to the method $m$, truth values of predicates over \code{this} and formal parameters of $m$ must be set according to truth values of predicates over the actual parameters for the call. 
 The same must be done when executing a return instruction --- with parameters of reference types and with the returned value.
-Truth value of predicates that refer only to fields of some object must be preserved between different method calls on the object, i.e. the value at the entry to some call on the object must be the same as the value at the exit from a previous call on the object (assuming that variables and fields referred to by the predicate were not explicitly modified between the calls).
+Truth value of predicates that refer only to fields of some object (via \code{this}) must be preserved between different method calls on the object, i.e. the value at the entry to some call on the object must be the same as the value at the exit from a previous call on the object (assuming that variables and fields referred to by the predicate were not explicitly modified between the calls).
 
 New values of predicates will be computed with the help of an SMT solver. We could use the standard approach based on weakest preconditions or something else.
 
 The following algorithm summarizes the procedure for computing new values of relevant predicates at some instruction.
 The set $\text{AffectedPaths}$ contains all access paths affected by the given instruction, and the function expression $paths(p)$ returns all access paths referred to by the predicate $p$.
-The procedure $\text{evalPredicate}$ calls the SMT solver.
+The procedure $\text{evalPredicates}$ calls the SMT solver.
 
 \begin{algorithm}
 \begin{algorithmic}
-  \Procedure{updatePredicates}{$\text{Predicates}, \text{Valuation}, \text{AffectedPaths}$}
+  \Procedure{updatePredicates}{$\text{Instruction}, \text{Predicates}, \text{Valuation}, \text{AffectedPaths}$}
+    \State $RelevantPredicates \gets \emptyset$
     \ForAll{$p \in Predicates$}
       \If{$AffectedPaths \cap paths(p) \neq \emptyset$}
-        \State $Valuation \gets Valuation \oplus (p \mapsto evalPredicate(p, \text{Valuation}))$
+        \State $RelevantPredicates \gets RelevantPredicates \cup p$
       \EndIf
+    \EndFor
+    \ForAll{$p \in RelevantPredicates$}
+      \State $Valuation \gets evalPredicates(\text{Instruction}, \text{RelevantPredicates}, \text{Valuation})$
     \EndFor
   \EndProcedure
 \end{algorithmic}
