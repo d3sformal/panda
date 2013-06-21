@@ -1,0 +1,7 @@
+[method race.CyclingRace.main]
+results[0].time < results[1].time
+results[1].time < results[2].time
+not(diff < 0)
+not(cyclists[0].bonus < 0)
+not(cyclists[1].bonus < 0)
+not(cyclists[2].bonus < 0)

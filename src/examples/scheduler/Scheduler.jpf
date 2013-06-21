@@ -1,0 +1,13 @@
+@using=jpf-abstraction
+
+target=scheduler.Scheduler
+
+classpath=${jpf-abstraction}/build/examples
+sourcepath=${jpf-abstraction}/src/examples
+
+abstract.domain=PREDICATES Scheduler.pred
+
+listener = gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.DebugMonitor
+
+vm.serializer.class = gov.nasa.jpf.abstraction.AbstractionSerializer
+

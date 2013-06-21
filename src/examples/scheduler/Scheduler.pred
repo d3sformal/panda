@@ -1,0 +1,3 @@
+[method scheduler.Scheduler.main]
+id2thread[schedule[0]].priority < id2thread[schedule[1]].priority
+id2thread[schedule[1]].priority < id2thread[schedule[2]].priority

@@ -1,0 +1,17 @@
+[object image.Image]
+this.pixels.length = gov.nasa.jpf.abstraction.Image.SIZE
+this.pixels[0].length = gov.nasa.jpf.abstraction.Image.SIZE
+
+[object image.Rectangle]
+this.top < this.bottom
+this.left < this.right
+
+[method image.Image.load]
+this.rectangles[0].top > this.rectangles[1].top
+this.rectangles[0].bottom < this.rectangles[1].bottom
+this.rectangles[0].left > this.rectangles[1].left
+this.rectangles[0].right < this.rectangles[1].right
+
+[method image.Image.render]
+this.rectangles.length = 2
+this.pixels[i][j] = 2
