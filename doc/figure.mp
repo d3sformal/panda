@@ -79,8 +79,8 @@ beginfig(2)
 
   topToBottom(30)(instr, attr, pred, val, smt, upd);
 
-  Note.nInstr("Example:", "", "FADD(f1, f2)");
-  Note.nAttr("Let f1 be obtained from a.y.z.f and f2 from b.z.f.", "The two paths refer the same piece of data in memory.", "Therefore both attributes need to yield the two access paths.", "However, the attributes are different.");
+  Note.nInstr("Example:", "", "IADD(i1, i2)");
+  Note.nAttr("Let i1 be obtained from a.y.z.f and i2 from b.z.f.", "The two paths refer the same piece of data in memory.", "Therefore both attributes need to yield the two access paths.", "However, the attributes are different.");
   Note.nPred("Affected predicate P1", "", "a.y.z.f = c");
   Note.nVal("a.y.z.f = 3", "c = 1");
   Note.nSmt("SAT a.y.z.f = c and a.y.z.f = 3 and c = 1 ?");

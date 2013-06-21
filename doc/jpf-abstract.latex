@@ -42,6 +42,7 @@
 
 The main goal is to support important features of Java (objects, classes, fields, arrays, local variables) and predicates over variables that have numerical data types.
 We consider primitive types (byte, short, char, int, long, float, double) and also wrapper classes (Integer, Double, etc).
+The level of support for floating-point numbers depends on the abilities of SMT solvers.
 
 \section*{Predicate language}
 
@@ -166,6 +167,8 @@ If JPF executes an instruction that uses \ap{a}{y.z}{f}, then we must update tru
   \includegraphics{figure1}
 \end{figure}
 
+\FloatBarrier
+
 We also need a map from object references (ElementInfo) to all access paths that refer to a given object in the given scope (call context). 
 Using this map we can find aliased access paths and then predicates which must be updated when executing a particular instruction.
 
@@ -196,6 +199,8 @@ The procedure $\text{evalPredicates}$ calls the SMT solver.
 \end{algorithmic}
 \end{algorithm}
 
+\FloatBarrier
+
 We could also use information from the dynamic state. 
 If the given predicate refers to an access path $ap$, then we could find a concrete value of the path $ap$ in the dynamic program state and use the concrete value in the logic formula (input for SMT) as another constraint (clause) of the form $ap = \text{value}$.
 For example, given the predicate \code{a[i]} \textgreater \code{x} and the concrete value for \code{a[i]} being 5, we can add the constraint $\text{aread}(\text{arr},a,i) = 5$.
@@ -207,6 +212,7 @@ This figure illustrates all the steps that must be performed for each instructio
   \includegraphics{figure2}
 \end{figure}
 
+\FloatBarrier
 
 \section*{Implementation}
 
@@ -225,7 +231,7 @@ The following API methods can provide necessary information about variables:
 \begin{itemize}
   \item {\bf fields:} ThreadInfo.getElementInfo, StackFrame.getThis, ElementInfo.getClassInfo, ClassInfo.getInstanceField
   \item {\bf locals:} StackFrame.getLocalVars
-  \item {\bf static:} VM.getClassLoaderList, ClassLoaderInfo.loadedClasses, ClassInfo.getStatics
+  \item {\bf static:} VM.getClassLoaderList, ClassLoaderInfo.getStatics
 \end{itemize}
 
 We will probably run the SMT solver in a separate process (not via a Java binding).
