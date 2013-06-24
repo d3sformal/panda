@@ -1,13 +1,11 @@
 package gov.nasa.jpf.abstraction.numeric;
 
-import java.util.List;
-
 import gov.nasa.jpf.abstraction.AbstractionFactory;
 
 public class IntervalAbstractionFactory extends AbstractionFactory {
 
 	@Override
-	public void tryAppendNew(List<Abstraction> abs_list, String[] args) {
+	public Abstraction create(String[] args) {
 		try {
 			double min = Double.parseDouble(args[1]);
 			double max = Double.parseDouble(args[2]);
@@ -15,7 +13,7 @@ public class IntervalAbstractionFactory extends AbstractionFactory {
 			System.out.printf("### jpf-abstraction: INTERVAL[%f, %f] turned on\n",
 					min, max);
 			
-			abs_list.add(new IntervalAbstraction(min, max));
+			return new IntervalAbstraction(min, max);
 		} catch (NumberFormatException nfe) {
 			System.out
 					.println("### jpf-abstraction: please keep format "
@@ -25,6 +23,8 @@ public class IntervalAbstractionFactory extends AbstractionFactory {
 					.println("### jpf-abstraction: please keep format "
 							+ "\"Interval MIN MAX\", where MIN and MAX are doubles");
 		}
+		
+		return null;
 	}
 
 }
