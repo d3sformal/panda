@@ -74,7 +74,11 @@ public class AbstractInstructionFactory extends
 				System.out.println("### jpf-abstraction: " + s
 						+ " is unknown abstraction");
 			} else {
-				factory.tryAppendNew(abs_list, args);
+				Abstraction abs = factory.create(args);
+				
+				if (abs != null) {
+					abs_list.add(abs);
+				}
 			}
 		}
 
