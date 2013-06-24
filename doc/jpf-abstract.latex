@@ -116,7 +116,7 @@ Each predicate evaluates to $\left\{ \begin{array}{lcl}\text{\tt undefined} &\si
 
 In each state, we will store valuations of all predicates defined in the current scope. 
 We may preserve the concrete values of some variables too (i.e., not setting them to 0 like in the original Abstract Pathfinder), because they may be useful in deciding values of certain predicates with the SMT solver (see below).
-However, this will negatively impact the benefits of abstraction (reduced state space). We can let the user decide (make this configurable).
+However, this would negatively impact the benefits of abstraction (reduced state space). We can let the user decide (make this configurable).
 
 We will use a {\bf single global container} for current values of all predicates. Values will not be stored in attributes for objects, fields, and local variables (stack frame slots).
 The container is a map from predicates to their values.
@@ -143,6 +143,9 @@ Truth values of some predicates are updated either when the current scope change
 For each instruction we must update (process) only the predicates affected by the instruction. We identify relevant predicates using the access paths for the instruction operands.
 Original value is preserved for other (unaffected) predicates.
 This may save a considerable number of calls to the SMT solver.
+
+In the case of bytecode instructions that read or modify some array element, the set of relevant predicates contains all predicates that refer to the respective array variable and to variables aliased with it. 
+This means especially predicates over the given array that do not use constant indexes.
 
 Note that two methods can have a local variable with the same name. When processing a predicate that refers to this variable name, we must use the association of the predicate with a particular method to find the right scope for the predicate, i.e. to determine whether it is a relevat predicate for the current instruction (method).
 

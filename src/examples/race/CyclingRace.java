@@ -31,17 +31,19 @@ public class CyclingRace
 		
 		Cyclist[] results = new Cyclist[3];
 		
-		int diff = 0;
-		
 		// compute results of the competition
         for (int i = 0; i < cyclists.length; ++i) {
-			diff = cyclists[i].time - cyclists[i].bonus;
+			int res = cyclists[i].time - cyclists[i].bonus;
 
-            for (int j = cyclists.length - 1; j >= diff; --j) {
-                results[j + 1] = results[j];
+			int pos = 0;
+
+            for (int j = results.length - 1; j >= 0; --j) 
+			{
+				if (res < results[j].time - results[j].bonus) results[j + 1] = results[j];
+				else pos = j + 1;
             }
 
-			results[diff] = cyclists[i];
+			results[pos] = cyclists[i];
 		}
 
         int[] diffs = new int[3];
@@ -51,7 +53,7 @@ public class CyclingRace
         diffs[0] = bestTime;
 		for (int i = 1; i < results.length; ++i) {
 			cl = results[i];
-			diff = cl.time - cl.bonus - bestTime;
+			int diff = cl.time - cl.bonus - bestTime;
             diffs[i] = diff;
 		}
 	}

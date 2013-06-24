@@ -15,6 +15,7 @@ public class DataFlowAnalysis
 		cfg[4] = new NodeInfo();
 
 		int i, j;
+
         // Each node can be placed in the queue as a successor of any other node -> at most n^2 elements
         int[] queue = new int[cfg.length * cfg.length + 1];
 

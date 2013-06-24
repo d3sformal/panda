@@ -5,3 +5,6 @@ not(diff < 0)
 not(cyclists[0].bonus < 0)
 not(cyclists[1].bonus < 0)
 not(cyclists[2].bonus < 0)
+i = 0
+j = 0
+i < j

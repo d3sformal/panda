@@ -1,5 +1,6 @@
 [method dataflow.DataFlowAnalysis.main]
 not(newFacts.length < oldFacts.length)
+i = 0
 not(i < 0)
 not(j < 0)
 i < queue.length
@@ -11,3 +12,6 @@ queue[i] = 1
 queue[i] = 2
 queue[i] = 3
 queue[i] = 4
+i = 1
+i = 2
+j = i + 1

@@ -44,6 +44,7 @@ public class Image
 
 		// loop over all rectangles and draw them
 		for (int k = 0; k < rectangles.length; ++k) {
+			rec = rectangles[k];
 		
 	    	// change relevant pixels to rectangle color
 			for (i = rec.left; i <= rec.right; i++) {

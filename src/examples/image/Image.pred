@@ -15,3 +15,6 @@ this.rectangles[0].right < this.rectangles[1].right
 [method image.Image.render]
 this.rectangles.length = 2
 this.pixels[i][j] = 2
+i = 0
+i < rec.right
+rec.color = 2

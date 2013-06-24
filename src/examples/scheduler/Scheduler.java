@@ -22,23 +22,31 @@ public class Scheduler
 		int[] schedule = new int[SCHEDULE_SIZE];
 
 		// set of active threads is iterated when to make scheduling decisions
-		for (int k = 1; k < id2thread.length; ++k) {
+		for (int k = 0; k < id2thread.length; ++k) {
 			ThreadInfo actTh = id2thread[k];
 
 			if (!actTh.active) continue;
 
-			// the info object is retrieved for each active thread
-			for (int i = 0; i < schedule_size; ++i) {
-				ThreadInfo schTh = id2thread[schedule[i]];
+			if (schedule_size == 0)
+			{
+				schedule[0] = k;
+				++schedule_size;
+			}
+			else
+			{
+				// the info object is retrieved for each active thread
+				for (int i = 0; i < schedule_size; ++i) {
+					ThreadInfo schTh = id2thread[schedule[i]];
 
-				if (actTh.priority > schTh.priority) {
-                    // insert into the scheduling queue
-                    for (int j = schedule_size - 1; j >= i; --j) {
-                        schedule[j + 1] = schedule[j];
-                    }
-   					schedule[i] = k;
-                    ++schedule_size;
-					break;
+					if (actTh.priority > schTh.priority) {
+            	        // insert into the scheduling queue
+                	    for (int j = schedule_size - 1; j >= i; --j) {
+                    	    schedule[j + 1] = schedule[j];
+	                    }
+   						schedule[i] = k;
+        	            ++schedule_size;
+						break;
+					}
 				}
 			}
 		}
