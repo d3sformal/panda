@@ -113,7 +113,15 @@
            debug="${debug}" source="${src_level}" deprecation="${deprecation}" classpath="" includeantruntime="false"/>
   </target>
 
-  <target name="-compile-main" if="have_main">
+  <target name="grammar">
+    <java jar="lib/antlr-4.0-complete.jar" fork="true">
+      <arg value="src/main/gov/nasa/jpf/abstraction/predicate/parser/PredicateGrammar.g4" />
+      <arg value="-package" />
+      <arg value="gov.nasa.jpf.abstraction.predicate.parser" />
+    </java>
+  </target>
+
+  <target name="-compile-main" if="have_main" depends="grammar">
     <mkdir dir="build/main"/>
     <javac srcdir="src/main" destdir="build/main"
            debug="${debug}" source="${src_level}" deprecation="${deprecation}"

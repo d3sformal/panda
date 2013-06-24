@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="lib/opt4j-2.2.jar"/>
 	<classpathentry kind="lib" path="lib/commons-math-1.2.jar"/>
 	<classpathentry kind="lib" path="/jpf-core/lib/junit-4.10.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-4.0-complete.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

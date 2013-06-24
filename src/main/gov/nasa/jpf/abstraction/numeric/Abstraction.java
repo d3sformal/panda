@@ -1184,7 +1184,6 @@ public abstract class Abstraction {
 	 *         numerically greater than the operand.
 	 */
 	public AbstractValue _cmp(AbstractValue left, AbstractValue right) {
-		// TODO: move to particular AbstractValues
 		boolean n = false, z = false, p = false;
 		if (_gt(left, right) != AbstractBoolean.FALSE)
 			p = true;
@@ -1207,7 +1206,6 @@ public abstract class Abstraction {
 	 *         numerically greater than the operand.
 	 */	
 	public AbstractValue _cmpg(AbstractValue left, AbstractValue right) {
-		// TODO: move to particular AbstractValues
 		boolean n = false, z = false, p = false;
 		if (_gt(left, right) != AbstractBoolean.FALSE)
 			p = true;
@@ -1234,7 +1232,6 @@ public abstract class Abstraction {
 	 *         numerically greater than the operand.
 	 */	
 	public AbstractValue _cmpl(AbstractValue left, AbstractValue right) {
-		// TODO: move to particular AbstractValues
 		boolean n = false, z = false, p = false;
 		if (_gt(left, right) != AbstractBoolean.FALSE)
 			p = true;
