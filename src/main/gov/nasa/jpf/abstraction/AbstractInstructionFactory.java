@@ -20,18 +20,20 @@
 package gov.nasa.jpf.abstraction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.abstraction.bytecode.*;
 import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.abstraction.numeric.RangeAbstraction;
+import gov.nasa.jpf.abstraction.numeric.EvennessAbstractionFactory;
+import gov.nasa.jpf.abstraction.numeric.IntervalAbstractionFactory;
+import gov.nasa.jpf.abstraction.numeric.RangeAbstractionFactory;
+import gov.nasa.jpf.abstraction.numeric.SignsAbstractionFactory;
 import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
-import gov.nasa.jpf.abstraction.numeric.EvennessAbstraction;
-import gov.nasa.jpf.abstraction.numeric.IntervalAbstraction;
-import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 
 import gov.nasa.jpf.util.InstructionFactoryFilter;
 
@@ -51,62 +53,36 @@ public class AbstractInstructionFactory extends
 		filter = new InstructionFactoryFilter(null,
 				new String[] {/* "java.*", */"javax.*" }, null, null);
 
+		Map<String, AbstractionFactory> abs_factory = new HashMap<String, AbstractionFactory>();
+		
+		abs_factory.put("signs", 	new SignsAbstractionFactory());
+		abs_factory.put("evenness",	new EvennessAbstractionFactory());
+		abs_factory.put("interval",	new IntervalAbstractionFactory());
+		abs_factory.put("range",	new RangeAbstractionFactory());
+		
 		List<Abstraction> abs_list = new ArrayList<Abstraction>();
 
 		String[] abs_str = conf.getStringArray("abstract.domain");
 
 		for (String s : abs_str) {
-			String[] argv = s.split(" ");
-			String abs_name = argv[0].toLowerCase();
-			if (abs_name.equals("signs")) {
-				System.out.printf("### jpf-abstraction: SIGNS turned on\n");
-				abs_list.add(SignsAbstraction.getInstance());
-			} else if (abs_name.equals("evenness")) {
-				System.out.printf("### jpf-abstraction: EVENNESS turned on\n");
-				abs_list.add(EvennessAbstraction.getInstance());
-			} else if (abs_name.equals("interval")) {
-				try {
-					double min = Double.parseDouble(argv[1]);
-					double max = Double.parseDouble(argv[2]);
-					System.out
-							.printf("### jpf-abstraction: INTERVAL[%f, %f] turned on\n",
-									min, max);
-					abs_list.add(new IntervalAbstraction(min, max));
-				} catch (NumberFormatException nfe) {
-					System.out
-							.println("### jpf-abstraction: please keep format "
-									+ "\"Interval MIN MAX\", where MIN and MAX are doubles");
-				} catch (ArrayIndexOutOfBoundsException rce) {
-					System.out
-							.println("### jpf-abstraction: please keep format "
-									+ "\"Interval MIN MAX\", where MIN and MAX are doubles");
-				}
-			} else if (abs_name.equals("range")) {
-				try {
-					int min = Integer.parseInt(argv[1]);
-					int max = Integer.parseInt(argv[2]);
-					System.out
-							.printf("### jpf-abstraction: RANGE[%d, %d] turned on\n",
-									min, max);
-					abs_list.add(new RangeAbstraction(min, max));
-				} catch (NumberFormatException nfe) {
-					System.out
-							.println("### jpf-abstraction: please keep format "
-									+ "\"Interval MIN MAX\", where MIN and MAX are int");
-				} catch (ArrayIndexOutOfBoundsException rce) {
-					System.out
-							.println("### jpf-abstraction: please keep format "
-									+ "\"Interval MIN MAX\", where MIN and MAX are int");
-				}
-			} else
+			String[] args = s.split(" ");
+			String abs_name = args[0].toLowerCase();
+			
+			AbstractionFactory factory = abs_factory.get(abs_name);
+			
+			if (factory == null) {
 				System.out.println("### jpf-abstraction: " + s
 						+ " is unknown abstraction");
+			} else {
+				factory.tryAppendNew(abs_list, args);
+			}
 		}
-		if (abs_list.size() == 0)
+
+		if (abs_list.size() == 0) {
 			abs = null;
-		else if (abs_list.size() == 1)
+		} else if (abs_list.size() == 1) {
 			abs = abs_list.get(0);
-		else {
+		} else {
 			abs = new ContainerAbstraction(abs_list);
 			System.out
 					.println("### jpf-abstraction: CONTAINER abstraction turned on");
