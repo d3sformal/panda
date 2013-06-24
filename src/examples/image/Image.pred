@@ -1,6 +1,6 @@
 [object image.Image]
-this.pixels.length = gov.nasa.jpf.abstraction.Image.SIZE
-this.pixels[0].length = gov.nasa.jpf.abstraction.Image.SIZE
+this.pixels.length = image.Image.SIZE
+this.pixels[0].length = image.Image.SIZE
 
 [object image.Rectangle]
 this.top < this.bottom
