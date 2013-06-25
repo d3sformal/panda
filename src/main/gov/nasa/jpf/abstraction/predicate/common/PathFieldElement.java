@@ -3,8 +3,8 @@ package gov.nasa.jpf.abstraction.predicate.common;
 public class PathFieldElement extends PathMiddleElement {
 	public String name;
 	
-	public PathFieldElement(PathElement previous, String name) {
-		super(previous);
+	public PathFieldElement(String name) {
+		super(null);
 
 		this.name = name;
 	}

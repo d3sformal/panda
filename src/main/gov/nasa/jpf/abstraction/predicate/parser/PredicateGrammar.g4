@@ -50,48 +50,47 @@ factor returns [Expression val]
 	: CONSTANT {
 		$ctx.val = new Constant(Integer.parseInt($CONSTANT.text));
 	}
-	| path=dotpath {
-		$ctx.val = $path.val;
+	| p=path {
+		$ctx.val = $p.val;
 	}
-/*
-	| path=funpath {
-		$ctx.val = $path.val;
-	}
-*/
 	| '(' e=expression ')' {
 		$ctx.val = $e.val;
 	}
 	;
 
-dotpath returns [AccessPath val]
-	: ID {
-		$ctx.val = new AccessPath($ID.text);
+path returns [AccessPath val]
+	: f=ID {
+		$ctx.val = new AccessPath($f.text);
 	}
-	| subpath=dotpath '.' field=ID {
-		$ctx.val = $subpath.val;
-		$ctx.val.appendField($field.text);
+	| p=path d=dotpath {
+		$ctx.val = $p.val;
+		$ctx.val.append($d.val);
 	}
-	| subpath=dotpath '[' e=expression ']' {
-		$ctx.val = $subpath.val;
-		$ctx.val.appendIndex($e.val);
+	| p=funpath {
+		$ctx.val = $p.val;
 	}
 	;
 
-/*	
-funpath returns [AccessPath val]
-	: ID {
-		$ctx.val = new AccessPath($ID.text);
+dotpath returns [PathElement val]
+	: '.' f=ID {
+		$ctx.val = new PathFieldElement($f.text);
 	}
-	| 'fread' '(' field=ID ',' subpath=funpath ')' {
-		$ctx.val = $subpath.val;
-		$ctx.val.appendField($field.text);
-	}
-	| 'aread' '(' 'arr' ',' subpath=dotpath ',' e=expression ')' {
-		$ctx.val = $subpath.val;
-		$ctx.val.appendIndex($e.val);
+	| '[' e=expression ']' {
+		$ctx.val = new PathIndexElement($e.val);
 	}
 	;
-*/
+
+funpath returns [AccessPath val]
+	: 'fread' '(' f=ID ',' p=path ')' {
+		$ctx.val = $p.val;
+		$ctx.val.append(new PathFieldElement($f.text));
+	}
+	| 'aread' '(' 'arr' ',' p=path ',' e=expression ')' {
+		$ctx.val = $p.val;
+		$ctx.val.append(new PathIndexField($e.val));
+	}
+	;
+
 CONSTANT
 	: [-+]?'0'('.' [0-9]*)?
 	| [-+]?[1-9][0-9]*('.' [0-9]*)?

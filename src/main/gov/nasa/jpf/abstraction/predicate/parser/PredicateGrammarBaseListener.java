@@ -13,11 +13,17 @@ public class PredicateGrammarBaseListener implements PredicateGrammarListener {
 	@Override public void enterExpression(PredicateGrammarParser.ExpressionContext ctx) { }
 	@Override public void exitExpression(PredicateGrammarParser.ExpressionContext ctx) { }
 
+	@Override public void enterFunpath(PredicateGrammarParser.FunpathContext ctx) { }
+	@Override public void exitFunpath(PredicateGrammarParser.FunpathContext ctx) { }
+
 	@Override public void enterTerm(PredicateGrammarParser.TermContext ctx) { }
 	@Override public void exitTerm(PredicateGrammarParser.TermContext ctx) { }
 
 	@Override public void enterPredicate(PredicateGrammarParser.PredicateContext ctx) { }
 	@Override public void exitPredicate(PredicateGrammarParser.PredicateContext ctx) { }
+
+	@Override public void enterPath(PredicateGrammarParser.PathContext ctx) { }
+	@Override public void exitPath(PredicateGrammarParser.PathContext ctx) { }
 
 	@Override public void enterDotpath(PredicateGrammarParser.DotpathContext ctx) { }
 	@Override public void exitDotpath(PredicateGrammarParser.DotpathContext ctx) { }

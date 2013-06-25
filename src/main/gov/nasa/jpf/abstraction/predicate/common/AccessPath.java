@@ -9,13 +9,9 @@ class AccessPath extends Expression {
 		tail = root;
 	}
 	
-	public void appendField(String name) {
-		tail.next = new PathFieldElement(tail, name);
-		tail = tail.next;
-	}
-	
-	public void appendIndex(Expression expression) {
-		tail.next = new PathIndexElement(tail, expression);
+	public void append(PathElement element) {
+		tail.next = element;
+		element.previous = tail;
 		tail = tail.next;
 	}
 	

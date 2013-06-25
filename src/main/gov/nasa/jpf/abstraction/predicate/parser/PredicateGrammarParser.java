@@ -18,17 +18,19 @@ public class PredicateGrammarParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__13=1, T__12=2, T__11=3, T__10=4, T__9=5, T__8=6, T__7=7, T__6=8, T__5=9, 
-		T__4=10, T__3=11, T__2=12, T__1=13, T__0=14, CONSTANT=15, ID=16, WS=17;
+		T__17=1, T__16=2, T__15=3, T__14=4, T__13=5, T__12=6, T__11=7, T__10=8, 
+		T__9=9, T__8=10, T__7=11, T__6=12, T__5=13, T__4=14, T__3=15, T__2=16, 
+		T__1=17, T__0=18, CONSTANT=19, ID=20, WS=21;
 	public static final String[] tokenNames = {
-		"<INVALID>", "']'", "'.'", "')'", "'+'", "'*'", "'-'", "'['", "'('", "'not'", 
-		"'<'", "'='", "'false'", "'/'", "'true'", "CONSTANT", "ID", "WS"
+		"<INVALID>", "']'", "'.'", "')'", "','", "'+'", "'['", "'*'", "'-'", "'('", 
+		"'not'", "'<'", "'='", "'false'", "'/'", "'aread'", "'true'", "'fread'", 
+		"'arr'", "CONSTANT", "ID", "WS"
 	};
 	public static final int
 		RULE_predicate = 0, RULE_expression = 1, RULE_term = 2, RULE_factor = 3, 
-		RULE_dotpath = 4;
+		RULE_path = 4, RULE_dotpath = 5, RULE_funpath = 6;
 	public static final String[] ruleNames = {
-		"predicate", "expression", "term", "factor", "dotpath"
+		"predicate", "expression", "term", "factor", "path", "dotpath", "funpath"
 	};
 
 	@Override
@@ -79,12 +81,12 @@ public class PredicateGrammarParser extends Parser {
 		PredicateContext _localctx = new PredicateContext(_ctx, getState());
 		enterRule(_localctx, 0, RULE_predicate);
 		try {
-			setState(30);
+			setState(34);
 			switch ( getInterpreter().adaptivePredict(_input,0,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(10); match(14);
+				setState(14); match(16);
 
 						((PredicateContext)_localctx).val =  new Equals(new Constant(1), new Constant(1));
 					
@@ -94,7 +96,7 @@ public class PredicateGrammarParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(12); match(12);
+				setState(16); match(13);
 
 						((PredicateContext)_localctx).val =  new Equals(new Constant(0), new Constant(1));
 					
@@ -104,10 +106,10 @@ public class PredicateGrammarParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(14); match(9);
-				setState(15); match(8);
-				setState(16); ((PredicateContext)_localctx).p = predicate();
-				setState(17); match(3);
+				setState(18); match(10);
+				setState(19); match(9);
+				setState(20); ((PredicateContext)_localctx).p = predicate();
+				setState(21); match(3);
 
 						((PredicateContext)_localctx).val =  new Negation(((PredicateContext)_localctx).p.val);
 					
@@ -117,9 +119,9 @@ public class PredicateGrammarParser extends Parser {
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(20); ((PredicateContext)_localctx).a = expression();
-				setState(21); match(11);
-				setState(22); ((PredicateContext)_localctx).b = expression();
+				setState(24); ((PredicateContext)_localctx).a = expression();
+				setState(25); match(12);
+				setState(26); ((PredicateContext)_localctx).b = expression();
 
 						((PredicateContext)_localctx).val =  new Equals(((PredicateContext)_localctx).a.val, ((PredicateContext)_localctx).b.val);
 					
@@ -129,9 +131,9 @@ public class PredicateGrammarParser extends Parser {
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(25); ((PredicateContext)_localctx).a = expression();
-				setState(26); match(10);
-				setState(27); ((PredicateContext)_localctx).b = expression();
+				setState(29); ((PredicateContext)_localctx).a = expression();
+				setState(30); match(11);
+				setState(31); ((PredicateContext)_localctx).b = expression();
 
 						((PredicateContext)_localctx).val =  new LessThan(((PredicateContext)_localctx).a.val, ((PredicateContext)_localctx).b.val);
 					
@@ -179,12 +181,12 @@ public class PredicateGrammarParser extends Parser {
 		ExpressionContext _localctx = new ExpressionContext(_ctx, getState());
 		enterRule(_localctx, 2, RULE_expression);
 		try {
-			setState(45);
+			setState(49);
 			switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(32); ((ExpressionContext)_localctx).t = term();
+				setState(36); ((ExpressionContext)_localctx).t = term();
 
 						((ExpressionContext)_localctx).val =  ((ExpressionContext)_localctx).t.val;
 					
@@ -194,9 +196,9 @@ public class PredicateGrammarParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(35); ((ExpressionContext)_localctx).a = term();
-				setState(36); match(4);
-				setState(37); ((ExpressionContext)_localctx).b = term();
+				setState(39); ((ExpressionContext)_localctx).a = term();
+				setState(40); match(5);
+				setState(41); ((ExpressionContext)_localctx).b = term();
 
 						((ExpressionContext)_localctx).val =  new Add(((ExpressionContext)_localctx).a.val, ((ExpressionContext)_localctx).b.val);
 					
@@ -206,9 +208,9 @@ public class PredicateGrammarParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(40); ((ExpressionContext)_localctx).a = term();
-				setState(41); match(6);
-				setState(42); ((ExpressionContext)_localctx).b = term();
+				setState(44); ((ExpressionContext)_localctx).a = term();
+				setState(45); match(8);
+				setState(46); ((ExpressionContext)_localctx).b = term();
 
 						((ExpressionContext)_localctx).val =  new Subtract(((ExpressionContext)_localctx).a.val, ((ExpressionContext)_localctx).b.val);
 					
@@ -256,12 +258,12 @@ public class PredicateGrammarParser extends Parser {
 		TermContext _localctx = new TermContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_term);
 		try {
-			setState(60);
+			setState(64);
 			switch ( getInterpreter().adaptivePredict(_input,2,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(47); ((TermContext)_localctx).f = factor();
+				setState(51); ((TermContext)_localctx).f = factor();
 
 						((TermContext)_localctx).val =  ((TermContext)_localctx).f.val;
 					
@@ -271,9 +273,9 @@ public class PredicateGrammarParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(50); ((TermContext)_localctx).a = factor();
-				setState(51); match(5);
-				setState(52); ((TermContext)_localctx).b = factor();
+				setState(54); ((TermContext)_localctx).a = factor();
+				setState(55); match(7);
+				setState(56); ((TermContext)_localctx).b = factor();
 
 						((TermContext)_localctx).val =  new Multiply(_localctx.a.val, _localctx.b.val);
 					
@@ -283,9 +285,9 @@ public class PredicateGrammarParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(55); ((TermContext)_localctx).a = factor();
-				setState(56); match(13);
-				setState(57); ((TermContext)_localctx).b = factor();
+				setState(59); ((TermContext)_localctx).a = factor();
+				setState(60); match(14);
+				setState(61); ((TermContext)_localctx).b = factor();
 
 						((TermContext)_localctx).val =  new Divide(_localctx.a.val, _localctx.b.val);
 					
@@ -307,14 +309,14 @@ public class PredicateGrammarParser extends Parser {
 	public static class FactorContext extends ParserRuleContext {
 		public Expression val;
 		public Token CONSTANT;
-		public DotpathContext path;
+		public PathContext p;
 		public ExpressionContext e;
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public TerminalNode CONSTANT() { return getToken(PredicateGrammarParser.CONSTANT, 0); }
-		public DotpathContext dotpath() {
-			return getRuleContext(DotpathContext.class,0);
+		public PathContext path() {
+			return getRuleContext(PathContext.class,0);
 		}
 		public FactorContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -334,32 +336,34 @@ public class PredicateGrammarParser extends Parser {
 		FactorContext _localctx = new FactorContext(_ctx, getState());
 		enterRule(_localctx, 6, RULE_factor);
 		try {
-			setState(72);
+			setState(76);
 			switch (_input.LA(1)) {
 			case CONSTANT:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(62); ((FactorContext)_localctx).CONSTANT = match(CONSTANT);
+				setState(66); ((FactorContext)_localctx).CONSTANT = match(CONSTANT);
 
 						((FactorContext)_localctx).val =  new Constant(Integer.parseInt((((FactorContext)_localctx).CONSTANT!=null?((FactorContext)_localctx).CONSTANT.getText():null)));
 					
 				}
 				break;
+			case 15:
+			case 17:
 			case ID:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(64); ((FactorContext)_localctx).path = dotpath(0);
+				setState(68); ((FactorContext)_localctx).p = path(0);
 
-						((FactorContext)_localctx).val =  ((FactorContext)_localctx).path.val;
+						((FactorContext)_localctx).val =  ((FactorContext)_localctx).p.val;
 					
 				}
 				break;
-			case 8:
+			case 9:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(67); match(8);
-				setState(68); ((FactorContext)_localctx).e = expression();
-				setState(69); match(3);
+				setState(71); match(9);
+				setState(72); ((FactorContext)_localctx).e = expression();
+				setState(73); match(3);
 
 						((FactorContext)_localctx).val =  ((FactorContext)_localctx).e.val;
 					
@@ -380,55 +384,73 @@ public class PredicateGrammarParser extends Parser {
 		return _localctx;
 	}
 
-	public static class DotpathContext extends ParserRuleContext {
+	public static class PathContext extends ParserRuleContext {
 		public int _p;
 		public AccessPath val;
-		public DotpathContext subpath;
-		public Token ID;
-		public Token field;
-		public ExpressionContext e;
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
+		public PathContext p;
+		public Token f;
+		public DotpathContext d;
+		public FunpathContext funpath() {
+			return getRuleContext(FunpathContext.class,0);
+		}
+		public PathContext path() {
+			return getRuleContext(PathContext.class,0);
 		}
 		public TerminalNode ID() { return getToken(PredicateGrammarParser.ID, 0); }
 		public DotpathContext dotpath() {
 			return getRuleContext(DotpathContext.class,0);
 		}
-		public DotpathContext(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }
-		public DotpathContext(ParserRuleContext parent, int invokingState, int _p) {
+		public PathContext(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }
+		public PathContext(ParserRuleContext parent, int invokingState, int _p) {
 			super(parent, invokingState);
 			this._p = _p;
 		}
-		@Override public int getRuleIndex() { return RULE_dotpath; }
+		@Override public int getRuleIndex() { return RULE_path; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PredicateGrammarListener ) ((PredicateGrammarListener)listener).enterDotpath(this);
+			if ( listener instanceof PredicateGrammarListener ) ((PredicateGrammarListener)listener).enterPath(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PredicateGrammarListener ) ((PredicateGrammarListener)listener).exitDotpath(this);
+			if ( listener instanceof PredicateGrammarListener ) ((PredicateGrammarListener)listener).exitPath(this);
 		}
 	}
 
-	public final DotpathContext dotpath(int _p) throws RecognitionException {
+	public final PathContext path(int _p) throws RecognitionException {
 		ParserRuleContext _parentctx = _ctx;
 		int _parentState = getState();
-		DotpathContext _localctx = new DotpathContext(_ctx, _parentState, _p);
-		DotpathContext _prevctx = _localctx;
+		PathContext _localctx = new PathContext(_ctx, _parentState, _p);
+		PathContext _prevctx = _localctx;
 		int _startState = 8;
-		enterRecursionRule(_localctx, RULE_dotpath);
+		enterRecursionRule(_localctx, RULE_path);
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			{
-			setState(75); ((DotpathContext)_localctx).ID = match(ID);
+			setState(84);
+			switch (_input.LA(1)) {
+			case ID:
+				{
+				setState(79); ((PathContext)_localctx).f = match(ID);
 
-					((DotpathContext)_localctx).val =  new AccessPath((((DotpathContext)_localctx).ID!=null?((DotpathContext)_localctx).ID.getText():null));
-				
+						((PathContext)_localctx).val =  new AccessPath((((PathContext)_localctx).f!=null?((PathContext)_localctx).f.getText():null));
+					
+				}
+				break;
+			case 15:
+			case 17:
+				{
+				setState(81); ((PathContext)_localctx).p = funpath();
+
+						((PathContext)_localctx).val =  ((PathContext)_localctx).p.val;
+					
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(90);
+			setState(92);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,5,_ctx);
 			while ( _alt!=2 && _alt!=-1 ) {
@@ -436,44 +458,21 @@ public class PredicateGrammarParser extends Parser {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(88);
-					switch ( getInterpreter().adaptivePredict(_input,4,_ctx) ) {
-					case 1:
-						{
-						_localctx = new DotpathContext(_parentctx, _parentState, _p);
-						_localctx.subpath = _prevctx;
-						pushNewRecursionContext(_localctx, _startState, RULE_dotpath);
-						setState(78);
-						if (!(2 >= _localctx._p)) throw new FailedPredicateException(this, "2 >= $_p");
-						setState(79); match(2);
-						setState(80); ((DotpathContext)_localctx).field = match(ID);
+					{
+					_localctx = new PathContext(_parentctx, _parentState, _p);
+					_localctx.p = _prevctx;
+					pushNewRecursionContext(_localctx, _startState, RULE_path);
+					setState(86);
+					if (!(2 >= _localctx._p)) throw new FailedPredicateException(this, "2 >= $_p");
+					setState(87); ((PathContext)_localctx).d = dotpath();
 
-						          		((DotpathContext)_localctx).val =  ((DotpathContext)_localctx).subpath.val;
-						          		_localctx.val.appendField((((DotpathContext)_localctx).field!=null?((DotpathContext)_localctx).field.getText():null));
-						          	
-						}
-						break;
-
-					case 2:
-						{
-						_localctx = new DotpathContext(_parentctx, _parentState, _p);
-						_localctx.subpath = _prevctx;
-						pushNewRecursionContext(_localctx, _startState, RULE_dotpath);
-						setState(82);
-						if (!(1 >= _localctx._p)) throw new FailedPredicateException(this, "1 >= $_p");
-						setState(83); match(7);
-						setState(84); ((DotpathContext)_localctx).e = expression();
-						setState(85); match(1);
-
-						          		((DotpathContext)_localctx).val =  ((DotpathContext)_localctx).subpath.val;
-						          		_localctx.val.appendIndex(((DotpathContext)_localctx).e.val);
-						          	
-						}
-						break;
+					          		((PathContext)_localctx).val =  ((PathContext)_localctx).p.val;
+					          		_localctx.val.append(((PathContext)_localctx).d.val);
+					          	
 					}
 					} 
 				}
-				setState(92);
+				setState(94);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,5,_ctx);
 			}
@@ -490,45 +489,193 @@ public class PredicateGrammarParser extends Parser {
 		return _localctx;
 	}
 
+	public static class DotpathContext extends ParserRuleContext {
+		public PathElement val;
+		public Token f;
+		public ExpressionContext e;
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public TerminalNode ID() { return getToken(PredicateGrammarParser.ID, 0); }
+		public DotpathContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_dotpath; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof PredicateGrammarListener ) ((PredicateGrammarListener)listener).enterDotpath(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof PredicateGrammarListener ) ((PredicateGrammarListener)listener).exitDotpath(this);
+		}
+	}
+
+	public final DotpathContext dotpath() throws RecognitionException {
+		DotpathContext _localctx = new DotpathContext(_ctx, getState());
+		enterRule(_localctx, 10, RULE_dotpath);
+		try {
+			setState(103);
+			switch (_input.LA(1)) {
+			case 2:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(95); match(2);
+				setState(96); ((DotpathContext)_localctx).f = match(ID);
+
+						((DotpathContext)_localctx).val =  new PathFieldElement((((DotpathContext)_localctx).f!=null?((DotpathContext)_localctx).f.getText():null));
+					
+				}
+				break;
+			case 6:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(98); match(6);
+				setState(99); ((DotpathContext)_localctx).e = expression();
+				setState(100); match(1);
+
+						((DotpathContext)_localctx).val =  new PathIndexElement(((DotpathContext)_localctx).e.val);
+					
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class FunpathContext extends ParserRuleContext {
+		public AccessPath val;
+		public Token f;
+		public PathContext p;
+		public ExpressionContext e;
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public PathContext path() {
+			return getRuleContext(PathContext.class,0);
+		}
+		public TerminalNode ID() { return getToken(PredicateGrammarParser.ID, 0); }
+		public FunpathContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_funpath; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof PredicateGrammarListener ) ((PredicateGrammarListener)listener).enterFunpath(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof PredicateGrammarListener ) ((PredicateGrammarListener)listener).exitFunpath(this);
+		}
+	}
+
+	public final FunpathContext funpath() throws RecognitionException {
+		FunpathContext _localctx = new FunpathContext(_ctx, getState());
+		enterRule(_localctx, 12, RULE_funpath);
+		try {
+			setState(123);
+			switch (_input.LA(1)) {
+			case 17:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(105); match(17);
+				setState(106); match(9);
+				setState(107); ((FunpathContext)_localctx).f = match(ID);
+				setState(108); match(4);
+				setState(109); ((FunpathContext)_localctx).p = path(0);
+				setState(110); match(3);
+
+						((FunpathContext)_localctx).val =  ((FunpathContext)_localctx).p.val;
+						_localctx.val.append(new PathFieldElement((((FunpathContext)_localctx).f!=null?((FunpathContext)_localctx).f.getText():null)));
+					
+				}
+				break;
+			case 15:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(113); match(15);
+				setState(114); match(9);
+				setState(115); match(18);
+				setState(116); match(4);
+				setState(117); ((FunpathContext)_localctx).p = path(0);
+				setState(118); match(4);
+				setState(119); ((FunpathContext)_localctx).e = expression();
+				setState(120); match(3);
+
+						((FunpathContext)_localctx).val =  ((FunpathContext)_localctx).p.val;
+						_localctx.val.append(new PathIndexField(((FunpathContext)_localctx).e.val));
+					
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
-		case 4: return dotpath_sempred((DotpathContext)_localctx, predIndex);
+		case 4: return path_sempred((PathContext)_localctx, predIndex);
 		}
 		return true;
 	}
-	private boolean dotpath_sempred(DotpathContext _localctx, int predIndex) {
+	private boolean path_sempred(PathContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0: return 2 >= _localctx._p;
-
-		case 1: return 1 >= _localctx._p;
 		}
 		return true;
 	}
 
 	public static final String _serializedATN =
-		"\2\3\23`\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\3\2\3\2\3\2\3\2\3\2\3"+
-		"\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\5\2!\n\2\3"+
-		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3\60\n\3\3\4\3\4"+
-		"\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4?\n\4\3\5\3\5\3\5\3\5"+
-		"\3\5\3\5\3\5\3\5\3\5\3\5\5\5K\n\5\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6"+
-		"\3\6\3\6\3\6\3\6\3\6\7\6[\n\6\f\6\16\6^\13\6\3\6\2\7\2\4\6\b\n\2\2f\2"+
-		" \3\2\2\2\4/\3\2\2\2\6>\3\2\2\2\bJ\3\2\2\2\nL\3\2\2\2\f\r\7\20\2\2\r!"+
-		"\b\2\1\2\16\17\7\16\2\2\17!\b\2\1\2\20\21\7\13\2\2\21\22\7\n\2\2\22\23"+
-		"\5\2\2\2\23\24\7\5\2\2\24\25\b\2\1\2\25!\3\2\2\2\26\27\5\4\3\2\27\30\7"+
-		"\r\2\2\30\31\5\4\3\2\31\32\b\2\1\2\32!\3\2\2\2\33\34\5\4\3\2\34\35\7\f"+
-		"\2\2\35\36\5\4\3\2\36\37\b\2\1\2\37!\3\2\2\2 \f\3\2\2\2 \16\3\2\2\2 \20"+
-		"\3\2\2\2 \26\3\2\2\2 \33\3\2\2\2!\3\3\2\2\2\"#\5\6\4\2#$\b\3\1\2$\60\3"+
-		"\2\2\2%&\5\6\4\2&\'\7\6\2\2\'(\5\6\4\2()\b\3\1\2)\60\3\2\2\2*+\5\6\4\2"+
-		"+,\7\b\2\2,-\5\6\4\2-.\b\3\1\2.\60\3\2\2\2/\"\3\2\2\2/%\3\2\2\2/*\3\2"+
-		"\2\2\60\5\3\2\2\2\61\62\5\b\5\2\62\63\b\4\1\2\63?\3\2\2\2\64\65\5\b\5"+
-		"\2\65\66\7\7\2\2\66\67\5\b\5\2\678\b\4\1\28?\3\2\2\29:\5\b\5\2:;\7\17"+
-		"\2\2;<\5\b\5\2<=\b\4\1\2=?\3\2\2\2>\61\3\2\2\2>\64\3\2\2\2>9\3\2\2\2?"+
-		"\7\3\2\2\2@A\7\21\2\2AK\b\5\1\2BC\5\n\6\2CD\b\5\1\2DK\3\2\2\2EF\7\n\2"+
-		"\2FG\5\4\3\2GH\7\5\2\2HI\b\5\1\2IK\3\2\2\2J@\3\2\2\2JB\3\2\2\2JE\3\2\2"+
-		"\2K\t\3\2\2\2LM\b\6\1\2MN\7\22\2\2NO\b\6\1\2O\\\3\2\2\2PQ\6\6\2\3QR\7"+
-		"\4\2\2RS\7\22\2\2S[\b\6\1\2TU\6\6\3\3UV\7\t\2\2VW\5\4\3\2WX\7\3\2\2XY"+
-		"\b\6\1\2Y[\3\2\2\2ZP\3\2\2\2ZT\3\2\2\2[^\3\2\2\2\\Z\3\2\2\2\\]\3\2\2\2"+
-		"]\13\3\2\2\2^\\\3\2\2\2\b />JZ\\";
+		"\2\3\27\u0080\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b"+
+		"\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3"+
+		"\2\3\2\3\2\5\2%\n\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
+		"\3\5\3\64\n\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4"+
+		"C\n\4\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\5\5O\n\5\3\6\3\6\3\6\3\6"+
+		"\3\6\3\6\5\6W\n\6\3\6\3\6\3\6\3\6\7\6]\n\6\f\6\16\6`\13\6\3\7\3\7\3\7"+
+		"\3\7\3\7\3\7\3\7\3\7\5\7j\n\7\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b"+
+		"\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\5\b~\n\b\3\b\2\t\2\4\6\b\n\f\16\2\2\u0086"+
+		"\2$\3\2\2\2\4\63\3\2\2\2\6B\3\2\2\2\bN\3\2\2\2\nV\3\2\2\2\fi\3\2\2\2\16"+
+		"}\3\2\2\2\20\21\7\22\2\2\21%\b\2\1\2\22\23\7\17\2\2\23%\b\2\1\2\24\25"+
+		"\7\f\2\2\25\26\7\13\2\2\26\27\5\2\2\2\27\30\7\5\2\2\30\31\b\2\1\2\31%"+
+		"\3\2\2\2\32\33\5\4\3\2\33\34\7\16\2\2\34\35\5\4\3\2\35\36\b\2\1\2\36%"+
+		"\3\2\2\2\37 \5\4\3\2 !\7\r\2\2!\"\5\4\3\2\"#\b\2\1\2#%\3\2\2\2$\20\3\2"+
+		"\2\2$\22\3\2\2\2$\24\3\2\2\2$\32\3\2\2\2$\37\3\2\2\2%\3\3\2\2\2&\'\5\6"+
+		"\4\2\'(\b\3\1\2(\64\3\2\2\2)*\5\6\4\2*+\7\7\2\2+,\5\6\4\2,-\b\3\1\2-\64"+
+		"\3\2\2\2./\5\6\4\2/\60\7\n\2\2\60\61\5\6\4\2\61\62\b\3\1\2\62\64\3\2\2"+
+		"\2\63&\3\2\2\2\63)\3\2\2\2\63.\3\2\2\2\64\5\3\2\2\2\65\66\5\b\5\2\66\67"+
+		"\b\4\1\2\67C\3\2\2\289\5\b\5\29:\7\t\2\2:;\5\b\5\2;<\b\4\1\2<C\3\2\2\2"+
+		"=>\5\b\5\2>?\7\20\2\2?@\5\b\5\2@A\b\4\1\2AC\3\2\2\2B\65\3\2\2\2B8\3\2"+
+		"\2\2B=\3\2\2\2C\7\3\2\2\2DE\7\25\2\2EO\b\5\1\2FG\5\n\6\2GH\b\5\1\2HO\3"+
+		"\2\2\2IJ\7\13\2\2JK\5\4\3\2KL\7\5\2\2LM\b\5\1\2MO\3\2\2\2ND\3\2\2\2NF"+
+		"\3\2\2\2NI\3\2\2\2O\t\3\2\2\2PQ\b\6\1\2QR\7\26\2\2RW\b\6\1\2ST\5\16\b"+
+		"\2TU\b\6\1\2UW\3\2\2\2VP\3\2\2\2VS\3\2\2\2W^\3\2\2\2XY\6\6\2\3YZ\5\f\7"+
+		"\2Z[\b\6\1\2[]\3\2\2\2\\X\3\2\2\2]`\3\2\2\2^\\\3\2\2\2^_\3\2\2\2_\13\3"+
+		"\2\2\2`^\3\2\2\2ab\7\4\2\2bc\7\26\2\2cj\b\7\1\2de\7\b\2\2ef\5\4\3\2fg"+
+		"\7\3\2\2gh\b\7\1\2hj\3\2\2\2ia\3\2\2\2id\3\2\2\2j\r\3\2\2\2kl\7\23\2\2"+
+		"lm\7\13\2\2mn\7\26\2\2no\7\6\2\2op\5\n\6\2pq\7\5\2\2qr\b\b\1\2r~\3\2\2"+
+		"\2st\7\21\2\2tu\7\13\2\2uv\7\24\2\2vw\7\6\2\2wx\5\n\6\2xy\7\6\2\2yz\5"+
+		"\4\3\2z{\7\5\2\2{|\b\b\1\2|~\3\2\2\2}k\3\2\2\2}s\3\2\2\2~\17\3\2\2\2\n"+
+		"$\63BNV^i}";
 	public static final ATN _ATN =
 		ATNSimulator.deserialize(_serializedATN.toCharArray());
 	static {

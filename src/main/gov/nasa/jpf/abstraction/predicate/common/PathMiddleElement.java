@@ -5,5 +5,7 @@ public class PathMiddleElement extends PathElement {
 	
 	public PathMiddleElement(PathElement previous) {
 		super(null);
+
+		this.previous = previous;
 	}
 }

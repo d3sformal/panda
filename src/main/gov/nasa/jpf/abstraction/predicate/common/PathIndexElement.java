@@ -3,8 +3,8 @@ package gov.nasa.jpf.abstraction.predicate.common;
 public class PathIndexElement extends PathMiddleElement {
 	public Expression index;
 	
-	public PathIndexElement(PathElement previous, Expression index) {
-		super(previous);
+	public PathIndexElement(Expression index) {
+		super(null);
 		
 		this.index = index;
 	}

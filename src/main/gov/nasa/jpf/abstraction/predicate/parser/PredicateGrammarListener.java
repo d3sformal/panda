@@ -10,11 +10,17 @@ public interface PredicateGrammarListener extends ParseTreeListener {
 	void enterExpression(PredicateGrammarParser.ExpressionContext ctx);
 	void exitExpression(PredicateGrammarParser.ExpressionContext ctx);
 
+	void enterFunpath(PredicateGrammarParser.FunpathContext ctx);
+	void exitFunpath(PredicateGrammarParser.FunpathContext ctx);
+
 	void enterTerm(PredicateGrammarParser.TermContext ctx);
 	void exitTerm(PredicateGrammarParser.TermContext ctx);
 
 	void enterPredicate(PredicateGrammarParser.PredicateContext ctx);
 	void exitPredicate(PredicateGrammarParser.PredicateContext ctx);
+
+	void enterPath(PredicateGrammarParser.PathContext ctx);
+	void exitPath(PredicateGrammarParser.PathContext ctx);
 
 	void enterDotpath(PredicateGrammarParser.DotpathContext ctx);
 	void exitDotpath(PredicateGrammarParser.DotpathContext ctx);
