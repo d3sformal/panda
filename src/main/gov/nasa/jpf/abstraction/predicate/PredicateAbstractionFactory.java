@@ -14,7 +14,7 @@ public class PredicateAbstractionFactory extends AbstractionFactory {
 
 	@Override
 	public Abstraction create(String[] args) {
-		String input = "not(x.y.z.a.b.c[f[x.y]] = (2 * d + (1 - 16 / c)))";
+		String input = "not(x.y.z.a.b.c[f[x.y]] = (2 * d + (1 - 16 / c))) + aread(arr, fread(A, B)[0], x.y.z).c";
 		CharStream chars = new ANTLRInputStream(input);
 		PredicateGrammarLexer lexer = new PredicateGrammarLexer(chars);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
