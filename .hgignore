@@ -15,3 +15,4 @@ activity*.png
 *.aux
 *.pdf
 .*.swp
+src/main/gov/nasa/jpf/abstraction/predicate/parser/*.java
