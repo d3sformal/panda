@@ -15,13 +15,13 @@
 // A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
 // THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
 // DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
-package gov.nasa.jpf.abstraction.numeric;
+package gov.nasa.jpf.abstraction;
 
 import java.util.Set;
 
 public abstract class AbstractValue {
 	protected int key;
-	protected Abstraction abs;
+	public Abstraction abs;
 
 	/**
 	 * This constructor is here to force all AbstractValues to call set_key. It is
