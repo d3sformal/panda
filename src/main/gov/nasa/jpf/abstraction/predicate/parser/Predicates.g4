@@ -1,8 +1,43 @@
-grammar PredicateGrammar;
+grammar Predicates;
 
 @header {
 	import gov.nasa.jpf.abstraction.predicate.common.*;
 }
+
+predicates returns [Predicates val]
+	: cs=contextlist {
+		$ctx.val = new Predicates($cs.val);
+	}
+	;
+
+contextlist returns [List<Context> val]
+	: /* EMPTY */ {
+		$ctx.val = new ArrayList<Context>();
+	}
+	| cs=contextlist c=context {
+		$ctx.val = $cs.val;
+		$ctx.val.add($c.val);
+	}
+	;
+	
+context returns [Context val]
+	: '[' 'object' c=contextpath ']' ps=predicatelist {
+		$ctx.val = new ObjectContext($c.val, $ps.val);
+	}
+	| '[' 'method' c=contextpath ']' ps=predicatelist {
+		$ctx.val = new MethodContext($c.val, $ps.val);
+	}
+	;
+
+predicatelist returns [List<Predicate> val]
+	: /* EMPTY */ {
+		$ctx.val = new ArrayList<Predicate>();
+	}
+	| ps=predicatelist p=predicate {
+		$ctx.val = $ps.val;
+		$ctx.val.add($p.val);
+	}
+	; 
 
 predicate returns [Predicate val]
 	: 'true' {
@@ -57,6 +92,16 @@ factor returns [Expression val]
 		$ctx.val = $e.val;
 	}
 	;
+	
+contextpath returns [AccessPath val]
+	: f=ID {
+		$ctx.val = new AccessPath($f.text);
+	}
+	| p=contextpath '.' f=ID {
+		$ctx.val = $p.val;
+		$ctx.val.append(new PathSubElement($f.text));
+	}
+	;
 
 path returns [AccessPath val]
 	: f=ID {
@@ -68,7 +113,7 @@ path returns [AccessPath val]
 	}
 	| 'fread' '(' f=ID ',' p=path ')' {
 		$ctx.val = $p.val;
-		$ctx.val.append(new PathFieldElement($f.text));
+		$ctx.val.append(new PathSubElement($f.text));
 	}
 	| 'aread' '(' 'arr' ',' p=path ',' e=expression ')' {
 		$ctx.val = $p.val;
@@ -78,7 +123,7 @@ path returns [AccessPath val]
 
 dotpath returns [PathMiddleElement val]
 	: '.' f=ID {
-		$ctx.val = new PathFieldElement($f.text);
+		$ctx.val = new PathSubElement($f.text);
 	}
 	| '[' e=expression ']' {
 		$ctx.val = new PathIndexElement($e.val);
@@ -95,5 +140,5 @@ ID
 	;
 
 WS
-	: (' ')+ { skip(); }
+	: ([ \t\n])+ { skip(); }
 	;

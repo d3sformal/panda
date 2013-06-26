@@ -26,4 +26,16 @@ public class AccessPath extends Expression {
 	public String toString() {
 		return root.toString();
 	}
+	
+	public String toString(NotationPolicy policy) {
+		NotationPolicy original = AccessPath.policy;
+		
+		AccessPath.policy = policy;
+		
+		String ret = toString();
+		
+		AccessPath.policy = original;
+		
+		return ret;
+	}
 }

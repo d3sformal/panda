@@ -1,57 +1,39 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.AbstractionFactory;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
-import gov.nasa.jpf.abstraction.predicate.parser.PredicateGrammarLexer;
-import gov.nasa.jpf.abstraction.predicate.parser.PredicateGrammarParser;
+import gov.nasa.jpf.abstraction.predicate.common.Predicates;
+import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
+import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
 
 public class PredicateAbstractionFactory extends AbstractionFactory {
 
 	@Override
 	public Abstraction create(String[] args) {
-		String file = args[1];
-		String def;
+		String filename = args[1];
 		
-		List<Predicate> predicates = new ArrayList<Predicate>();
-
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+			ANTLRInputStream chars = new ANTLRInputStream(new FileInputStream(filename));
+			PredicatesLexer lexer = new PredicatesLexer(chars);
+			CommonTokenStream tokens = new CommonTokenStream(lexer);
+			PredicatesParser parser = new PredicatesParser(tokens);
+		
+			Predicates predicates = parser.predicates().val;
 			
-			while ((def = reader.readLine()) != null) {
-				predicates.add(load(def));
-			}
-			
-			reader.close();
+			System.err.println(predicates.toString());
+
+			return new PredicateAbstraction(predicates);
 		} catch (IOException e) {
-			System.err.println("Could not read predicate file '" + file + "'");
+			System.err.println("Could not read input file '" + filename + "'");
 		}
-
-		return new PredicateAbstraction(predicates);
-	}
-	
-	private Predicate load(String def) {	
-		ANTLRInputStream chars = new ANTLRInputStream(def);
-		PredicateGrammarLexer lexer = new PredicateGrammarLexer(chars);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		PredicateGrammarParser parser = new PredicateGrammarParser(tokens);
 		
-		Predicate predicate = parser.predicate().val;
-		
-		//System.err.println(predicate.toString());
-
-		return predicate;
+		return null;
 	}
 
 }

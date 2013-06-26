@@ -5,5 +5,5 @@ target=image.Image
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES Image.pred
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/image/Image.pred
 

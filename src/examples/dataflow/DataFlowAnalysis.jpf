@@ -5,5 +5,5 @@ target=dataflow.DataFlowAnalysis
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES DataFlowAnalysis.pred
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/dataflow/DataFlowAnalysis.pred
 

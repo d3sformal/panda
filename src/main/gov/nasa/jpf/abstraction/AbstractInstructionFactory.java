@@ -59,12 +59,12 @@ public class AbstractInstructionFactory extends
 		abs_factory.put("evenness", new EvennessAbstractionFactory());
 		abs_factory.put("interval", new IntervalAbstractionFactory());
 		abs_factory.put("range", new RangeAbstractionFactory());
-		abs_factory.put("predicate", new PredicateAbstractionFactory());		
+		abs_factory.put("predicates", new PredicateAbstractionFactory());
 		
 		List<Abstraction> abs_list = new ArrayList<Abstraction>();
 
 		String[] abs_str = conf.getStringArray("abstract.domain");
-
+		
 		for (String s : abs_str) {
 			String[] args = s.split(" ");
 			String abs_name = args[0].toLowerCase();

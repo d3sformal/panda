@@ -5,5 +5,5 @@ target=scheduler.Scheduler
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES Scheduler.pred
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/scheduler/Scheduler.pred
 

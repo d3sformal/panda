@@ -7,9 +7,9 @@ this.top < this.bottom
 this.left < this.right
 
 [method image.Image.load]
-this.rectangles[0].top > this.rectangles[1].top
+this.rectangles[1].top < this.rectangles[0].top
 this.rectangles[0].bottom < this.rectangles[1].bottom
-this.rectangles[0].left > this.rectangles[1].left
+this.rectangles[1].left < this.rectangles[0].left
 this.rectangles[0].right < this.rectangles[1].right
 
 [method image.Image.render]
