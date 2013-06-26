@@ -1,6 +1,5 @@
 package gov.nasa.jpf.abstraction;
 
-import gov.nasa.jpf.abstraction.numeric.AbstractValue;
 import gov.nasa.jpf.annotation.MJI;
 import gov.nasa.jpf.vm.MJIEnv;
 import gov.nasa.jpf.vm.NativePeer;

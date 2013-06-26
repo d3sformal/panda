@@ -22,10 +22,10 @@ package gov.nasa.jpf.abstraction.bytecode;
  * Branch if int comparison with zero succeeds
  * ..., value => ...
  */
-import gov.nasa.jpf.abstraction.numeric.AbstractBoolean;
-import gov.nasa.jpf.abstraction.numeric.AbstractChoiceGenerator;
-import gov.nasa.jpf.abstraction.numeric.AbstractValue;
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.AbstractBoolean;
+import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.AbstractValue;
+import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;

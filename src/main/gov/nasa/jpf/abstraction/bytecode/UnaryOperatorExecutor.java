@@ -18,9 +18,9 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.numeric.AbstractValue;
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
-import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.AbstractValue;
+import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;

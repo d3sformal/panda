@@ -17,6 +17,10 @@
 // DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 package gov.nasa.jpf.abstraction.numeric;
 
+import gov.nasa.jpf.abstraction.AbstractBoolean;
+import gov.nasa.jpf.abstraction.AbstractValue;
+import gov.nasa.jpf.abstraction.Abstraction;
+
 /**
  * The abstract domain for given two integer or floating-point values MIN and
  * MAX is the set { LESS, INSIDE, GREATER }, whose elements express the fact

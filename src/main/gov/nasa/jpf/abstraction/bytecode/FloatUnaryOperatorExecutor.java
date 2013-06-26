@@ -18,8 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.numeric.AbstractValue;
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
+import gov.nasa.jpf.abstraction.AbstractValue;
+import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.vm.StackFrame;
 
 public class FloatUnaryOperatorExecutor extends UnaryOperatorExecutor<Float> {

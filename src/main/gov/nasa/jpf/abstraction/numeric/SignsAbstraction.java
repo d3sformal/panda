@@ -17,6 +17,10 @@
 
 package gov.nasa.jpf.abstraction.numeric;
 
+import gov.nasa.jpf.abstraction.AbstractBoolean;
+import gov.nasa.jpf.abstraction.AbstractValue;
+import gov.nasa.jpf.abstraction.Abstraction;
+
 /**
  * The domain of this abstraction consists of three values: NEG, ZERO, and POS.
  * Numeric values are mapped to one of them depending on their signs.

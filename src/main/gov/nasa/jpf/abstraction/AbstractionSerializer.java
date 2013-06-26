@@ -20,8 +20,6 @@ package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
-import gov.nasa.jpf.abstraction.numeric.AbstractValue;
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Fields;
 import gov.nasa.jpf.vm.ClassInfo;

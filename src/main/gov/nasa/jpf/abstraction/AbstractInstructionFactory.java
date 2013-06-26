@@ -28,12 +28,12 @@ import gov.nasa.jpf.Config;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.abstraction.bytecode.*;
-import gov.nasa.jpf.abstraction.numeric.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.EvennessAbstractionFactory;
 import gov.nasa.jpf.abstraction.numeric.IntervalAbstractionFactory;
 import gov.nasa.jpf.abstraction.numeric.RangeAbstractionFactory;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstractionFactory;
 import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstractionFactory;
 
 import gov.nasa.jpf.util.InstructionFactoryFilter;
 
@@ -55,10 +55,11 @@ public class AbstractInstructionFactory extends
 
 		Map<String, AbstractionFactory> abs_factory = new HashMap<String, AbstractionFactory>();
 		
-		abs_factory.put("signs", 	new SignsAbstractionFactory());
-		abs_factory.put("evenness",	new EvennessAbstractionFactory());
-		abs_factory.put("interval",	new IntervalAbstractionFactory());
-		abs_factory.put("range",	new RangeAbstractionFactory());
+		abs_factory.put("signs", new SignsAbstractionFactory());
+		abs_factory.put("evenness", new EvennessAbstractionFactory());
+		abs_factory.put("interval", new IntervalAbstractionFactory());
+		abs_factory.put("range", new RangeAbstractionFactory());
+		abs_factory.put("predicate", new PredicateAbstractionFactory());		
 		
 		List<Abstraction> abs_list = new ArrayList<Abstraction>();
 

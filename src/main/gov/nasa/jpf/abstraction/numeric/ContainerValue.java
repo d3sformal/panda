@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.numeric;
 
+import gov.nasa.jpf.abstraction.AbstractValue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

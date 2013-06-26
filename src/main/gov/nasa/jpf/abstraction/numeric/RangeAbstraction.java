@@ -17,6 +17,10 @@
 // DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 package gov.nasa.jpf.abstraction.numeric;
 
+import gov.nasa.jpf.abstraction.AbstractBoolean;
+import gov.nasa.jpf.abstraction.AbstractValue;
+import gov.nasa.jpf.abstraction.Abstraction;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;

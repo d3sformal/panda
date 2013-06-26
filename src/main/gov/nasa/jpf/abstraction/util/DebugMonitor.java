@@ -26,7 +26,7 @@ import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.search.Search;
 
-import gov.nasa.jpf.abstraction.numeric.FocusAbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
 
 
 public class DebugMonitor extends ListenerAdapter 

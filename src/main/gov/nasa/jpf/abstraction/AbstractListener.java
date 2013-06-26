@@ -21,7 +21,6 @@ package gov.nasa.jpf.abstraction;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
-import gov.nasa.jpf.abstraction.numeric.AbstractChoiceGenerator;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.ThreadInfo;
