@@ -11,12 +11,25 @@ public class PathRootElement extends PathElement {
 	
 	@Override
 	public String toString() {
-		String ret = name;
+		switch (AccessPath.policy) {
+		case DOT_NOTATION:
+			String ret = name;
 		
-		if (next != null) {
-			ret += next.toString();
+			if (next != null) {
+				ret += next.toString();
+			}
+		
+			return ret;
+		case FUNCTION_NOTATION:
+			String format = "%s";
+			
+			if (next != null) {
+				format = String.format(format, next.toString());
+			}
+
+			return String.format(format, name);
+		default:
+			return null;
 		}
-		
-		return ret;
 	}
 }

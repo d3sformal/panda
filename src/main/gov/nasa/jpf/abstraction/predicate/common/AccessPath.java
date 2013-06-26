@@ -1,6 +1,13 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-class AccessPath extends Expression {
+public class AccessPath extends Expression {
+	public static enum NotationPolicy {
+		DOT_NOTATION,
+		FUNCTION_NOTATION
+	}
+	
+	public static NotationPolicy policy = NotationPolicy.FUNCTION_NOTATION;
+	
 	public PathRootElement root;
 	public PathElement tail;
 	
@@ -9,7 +16,7 @@ class AccessPath extends Expression {
 		tail = root;
 	}
 	
-	public void append(PathElement element) {
+	public void append(PathMiddleElement element) {
 		tail.next = element;
 		element.previous = tail;
 		tail = tail.next;

@@ -66,28 +66,22 @@ path returns [AccessPath val]
 		$ctx.val = $p.val;
 		$ctx.val.append($d.val);
 	}
-	| p=funpath {
-		$ctx.val = $p.val;
-	}
-	;
-
-dotpath returns [PathElement val]
-	: '.' f=ID {
-		$ctx.val = new PathFieldElement($f.text);
-	}
-	| '[' e=expression ']' {
-		$ctx.val = new PathIndexElement($e.val);
-	}
-	;
-
-funpath returns [AccessPath val]
-	: 'fread' '(' f=ID ',' p=path ')' {
+	| 'fread' '(' f=ID ',' p=path ')' {
 		$ctx.val = $p.val;
 		$ctx.val.append(new PathFieldElement($f.text));
 	}
 	| 'aread' '(' 'arr' ',' p=path ',' e=expression ')' {
 		$ctx.val = $p.val;
-		$ctx.val.append(new PathIndexField($e.val));
+		$ctx.val.append(new PathIndexElement($e.val));
+	}
+	;
+
+dotpath returns [PathMiddleElement val]
+	: '.' f=ID {
+		$ctx.val = new PathFieldElement($f.text);
+	}
+	| '[' e=expression ']' {
+		$ctx.val = new PathIndexElement($e.val);
 	}
 	;
 

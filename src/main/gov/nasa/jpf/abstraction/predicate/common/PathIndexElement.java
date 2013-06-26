@@ -11,12 +11,25 @@ public class PathIndexElement extends PathMiddleElement {
 	
 	@Override
 	public String toString() {
-		String ret = "[" + index.toString() + "]";
-		
-		if (next != null) {
-			ret += next.toString();
+		switch (AccessPath.policy) {
+		case DOT_NOTATION:
+			String ret = "[" + index.toString() + "]";
+			
+			if (next != null) {
+				ret += next.toString();
+			}
+			
+			return ret;
+		case FUNCTION_NOTATION:
+			String format = "%s";
+			
+			if (next != null) {
+				format = String.format(format, next.toString());
+			}
+
+			return String.format(format, "aread(arr, %s, " + index.toString() + ")");
+		default:
+			return null;
 		}
-		
-		return ret;
 	}
 }
