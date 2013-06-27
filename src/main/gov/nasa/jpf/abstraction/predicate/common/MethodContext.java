@@ -12,9 +12,7 @@ public class MethodContext extends Context {
 	public String toString() {
 		String ret = "[method " + path.toString(AccessPath.NotationPolicy.DOT_NOTATION) + "]\n";
 		
-		for (Predicate c : predicates) {
-			ret += c.toString() + "\n";
-		}
+		ret = super.toString();
 		
 		return ret;
 	}

@@ -10,4 +10,15 @@ public class Context {
 		this.path = path;
 		this.predicates = predicates;
 	}
+	
+	@Override
+	public String toString() {
+		String ret = "";
+
+		for (Predicate p : predicates) {
+			ret += p.toString() + "\n";
+		}
+		
+		return ret;
+	}
 }

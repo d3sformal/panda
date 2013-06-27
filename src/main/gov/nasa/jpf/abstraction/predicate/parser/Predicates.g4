@@ -107,9 +107,13 @@ path returns [AccessPath val]
 	: f=ID {
 		$ctx.val = new AccessPath($f.text);
 	}
-	| p=path d=dotpath {
+	| p=path '.' f=ID {
 		$ctx.val = $p.val;
-		$ctx.val.append($d.val);
+		$ctx.val.append(new PathSubElement($f.text));
+	}
+	| p=path '[' e=expression ']' {
+		$ctx.val = $p.val;
+		$ctx.val.append(new PathIndexElement($e.val));
 	}
 	| 'fread' '(' f=ID ',' p=path ')' {
 		$ctx.val = $p.val;
@@ -118,15 +122,6 @@ path returns [AccessPath val]
 	| 'aread' '(' 'arr' ',' p=path ',' e=expression ')' {
 		$ctx.val = $p.val;
 		$ctx.val.append(new PathIndexElement($e.val));
-	}
-	;
-
-dotpath returns [PathMiddleElement val]
-	: '.' f=ID {
-		$ctx.val = new PathSubElement($f.text);
-	}
-	| '[' e=expression ']' {
-		$ctx.val = new PathIndexElement($e.val);
 	}
 	;
 

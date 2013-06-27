@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
+import java.util.List;
+
 public abstract class Operation extends Expression {
 	public Expression a;
 	public Expression b;
@@ -7,5 +9,13 @@ public abstract class Operation extends Expression {
 	public Operation(Expression a, Expression b) {
 		this.a = a;
 		this.b = b;
+		
+		this.paths.addAll(a.getPaths());
+		this.paths.addAll(b.getPaths());
+	}
+	
+	@Override
+	public List<AccessPath> getPaths() {
+		return paths;
 	}
 }

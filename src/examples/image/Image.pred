@@ -18,3 +18,4 @@ this.pixels[i][j] = 2
 i = 0
 i < rec.right
 rec.color = 2
+f.g.h[c.d + e.f] = 1
