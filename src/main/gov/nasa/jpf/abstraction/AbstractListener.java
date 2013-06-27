@@ -53,9 +53,14 @@ public class AbstractListener extends PropertyListenerAdapter {
 	@Override
 	public void instructionExecuted(VM vm, ThreadInfo ti, Instruction insn, Instruction exec) {
 	}
+	
+	@Override
+	public void stateAdvanced(Search search) {
+		AbstractInstructionFactory.abs.advance();
+	}
 
 	@Override
 	public void stateBacktracked(Search search) {
-		// here do something similar to what you do when propertyViolated
+		AbstractInstructionFactory.abs.backtrack();
 	}
 }

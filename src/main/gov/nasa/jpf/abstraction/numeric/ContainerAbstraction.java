@@ -145,6 +145,20 @@ public class ContainerAbstraction extends Abstraction {
 		return create(arr);
 	}
 	
+	@Override
+	public void advance() {
+		for (Abstraction abs : list) {
+			abs.advance();
+		}
+	}
+	
+	@Override
+	public void backtrack() {
+		for (Abstraction abs : list) {
+			abs.backtrack();
+		}
+	}
+	
 	// // // // // // // // // // // // // // // // // // // //
 	// numeric operations
 

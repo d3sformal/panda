@@ -47,6 +47,12 @@ public abstract class Abstraction {
 	public AbstractValue abstractMap(double v) {
 		throw new RuntimeException("abstract_map not implemented");
 	}
+	
+	public void advance() {
+	}
+	
+	public void backtrack() {
+	}
 
 	/**
 	 * Computes abs_v2 + abs_v1, making calls to abstract_map

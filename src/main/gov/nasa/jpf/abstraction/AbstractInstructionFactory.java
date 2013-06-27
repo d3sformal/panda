@@ -93,13 +93,18 @@ public class AbstractInstructionFactory extends
 					.println("### jpf-abstraction: CONTAINER abstraction turned on");
 		}
 	}
+	
+	// bytecodes
+	
+	@Override
+	public Instruction aload(int index) {
+		return (filter.isInstrumentedClass(ci) ? new ALOAD(index) : super.aload(index));
+	}
 
 	@Override
 	public Instruction d2f() {
 		return (filter.isInstrumentedClass(ci) ? new D2F() : super.d2f());
 	}
-
-	// bytecodes
 
 	@Override
 	public Instruction d2i() {
