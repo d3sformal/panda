@@ -11,25 +11,25 @@ public class AccessPath extends Expression {
 	
 	public static NotationPolicy policy = NotationPolicy.FUNCTION_NOTATION;
 	
-	public PathRootElement root;
-	public PathElement tail;
+	public AccessPathRootElement root;
+	public AccessPathElement tail;
 	
 	public AccessPath(String name) {
-		root = new PathRootElement(name);
+		root = new AccessPathRootElement(name);
 		tail = root;
 	}
 	
-	private void appendElement(PathMiddleElement element) {
+	private void appendElement(AccessPathMiddleElement element) {
 		tail.next = element;
 		element.previous = tail;
 		tail = tail.next;
 	}
 	
-	public void append(PathSubElement element) {
+	public void append(AccessPathSubElement element) {
 		appendElement(element);
 	}
 	
-	public void append(PathIndexElement element) {
+	public void append(AccessPathIndexElement element) {
 		appendElement(element);
 		
 		paths.addAll(element.index.paths);

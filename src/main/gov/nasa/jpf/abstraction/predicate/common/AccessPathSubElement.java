@@ -1,19 +1,19 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-public class PathIndexElement extends PathMiddleElement {
-	public Expression index;
+public class AccessPathSubElement extends AccessPathMiddleElement {
+	public String name;
 	
-	public PathIndexElement(Expression index) {
+	public AccessPathSubElement(String name) {
 		super(null);
-		
-		this.index = index;
+
+		this.name = name;
 	}
 	
 	@Override
 	public String toString() {
 		switch (AccessPath.policy) {
 		case DOT_NOTATION:
-			String ret = "[" + index.toString() + "]";
+			String ret = "." + name.toString();
 			
 			if (next != null) {
 				ret += next.toString();
@@ -27,7 +27,7 @@ public class PathIndexElement extends PathMiddleElement {
 				format = String.format(format, next.toString());
 			}
 
-			return String.format(format, "aread(arr, %s, " + index.toString() + ")");
+			return String.format(format, "fread(" + name + ", %s)");
 		default:
 			return null;
 		}
