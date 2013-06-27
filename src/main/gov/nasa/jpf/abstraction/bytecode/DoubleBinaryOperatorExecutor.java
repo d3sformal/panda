@@ -60,7 +60,7 @@ public class DoubleBinaryOperatorExecutor extends BinaryOperatorExecutor<Double>
 		sf.popDouble();
 		
 		sf.pushDouble(0);
-		sf.setLongOperandAttr(new Attribute(result, null, null, null));
+		sf.setLongOperandAttr(new Attribute(result, null));
 	}
 
 }

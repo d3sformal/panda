@@ -56,9 +56,26 @@ public class FlatSymbolTable implements SymbolTable, Cloneable {
 	@Override
 	public String toString() {
 		String ret = "--------------------- (" + path2num.size() + ")\n";
+		
+		int padding = 0;
 
 		for (AccessPath p : path2num.keySet()) {
-			ret += p.toString(AccessPath.NotationPolicy.DOT_NOTATION) + "\n";
+			String path = p.toString(AccessPath.NotationPolicy.DOT_NOTATION);
+			
+			padding = padding < path.length() ? path.length() : padding;
+		}
+		
+		padding += 4;
+		
+		for (AccessPath p : path2num.keySet()) {
+			String path = p.toString(AccessPath.NotationPolicy.DOT_NOTATION);
+			String pad = "";
+			
+			for (int i = 0; i < padding - path.length(); ++i) {
+				pad += " ";
+			}
+			
+			ret += path + pad + path2num.get(p).getClass().getSimpleName() + "\n";
 		}
 		
 		ret += "---------------------\n";

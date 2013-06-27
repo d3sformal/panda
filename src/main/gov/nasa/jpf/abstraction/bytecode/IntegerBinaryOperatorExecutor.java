@@ -60,7 +60,7 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
 		sf.pop();
 		
 		sf.push(0);
-		sf.setOperandAttr(new Attribute(result, null, null, null));
+		sf.setOperandAttr(new Attribute(result, null));
 	}
 
 }

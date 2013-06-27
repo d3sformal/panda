@@ -19,9 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathSubElement;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathType;
+import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.common.Number;
 import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
@@ -38,20 +36,20 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 	public Instruction execute(ThreadInfo ti) {		
 		StackFrame sf = ti.getModifiableTopFrame();
 		
-		AccessPath path = new AccessPath(getClassName());		
+		ConcretePath path = new ConcretePath(getClassName(), getClassInfo(), ConcretePath.Type.STATIC);		
 		Instruction ret = super.execute(ti);
 		
 		if (path != null) {
-			path.append(new AccessPathSubElement(getFieldName()));
+			path.appendSubElement(getFieldName());
 			
-			Number number = path.resolve(getClassInfo(), AccessPathType.STATIC);
+			Number number = path.resolve();
 			
 			if (number != null) {
 				ScopedSymbolTable.getInstance().register(path, number);
 			}
 		}
 		
-		sf.setOperandAttr(new Attribute(null, path, null, AccessPathType.STATIC));
+		sf.setOperandAttr(new Attribute(null, path));
 		
 		return ret;
 	}

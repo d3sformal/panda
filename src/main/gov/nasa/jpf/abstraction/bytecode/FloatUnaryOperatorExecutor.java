@@ -50,7 +50,7 @@ public class FloatUnaryOperatorExecutor extends UnaryOperatorExecutor<Float> {
 		sf.popFloat();
 		
 		sf.pushFloat(0);
-		sf.setOperandAttr(new Attribute(result, null, null, null));
+		sf.setOperandAttr(new Attribute(result, null));
 	}
 
 }

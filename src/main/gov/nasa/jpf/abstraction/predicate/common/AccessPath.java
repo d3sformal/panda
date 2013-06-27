@@ -1,7 +1,5 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.vm.ClassInfo;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,73 +11,43 @@ public class AccessPath extends Expression {
 	
 	public static NotationPolicy policy = NotationPolicy.FUNCTION_NOTATION;
 	
-	public AccessPathRootElement root;
-	public AccessPathElement tail;
+	protected AccessPathRootElement root;
+	protected AccessPathElement tail;
+	
+	protected AccessPathRootElement createRootElement(String name) {
+		return new DefaultAccessPathRootElement(name);
+	}
+	
+	protected AccessPath() {
+	}
 	
 	public AccessPath(String name) {
-		root = new AccessPathRootElement(name);
+		root = createRootElement(name);
 		tail = root;
 	}
 	
 	private void appendElement(AccessPathMiddleElement element) {
-		tail.next = element;
-		element.previous = tail;
-		tail = tail.next;
+		tail.setNext(element);
+		element.setPrevious(tail);
+		tail = element;
 	}
 	
-	public void append(AccessPathSubElement element) {
-		appendElement(element);
+	protected AccessPathMiddleElement createSubElement(String name) {
+		return new DefaultAccessPathSubElement(name);
 	}
 	
-	public void append(AccessPathIndexElement element) {
-		appendElement(element);
-		
-		paths.addAll(element.index.paths);
+	protected AccessPathMiddleElement createIndexElement(Expression index) {
+		return new DefaultConcretePathIndexElement(index);
 	}
 	
-	public Number resolve(ClassInfo info, AccessPathType type) {
-		AccessPathElement e = root;
-		AccessPathType originalType = type;
-		
-		while (e.next != null && !info.isPrimitive()) {
-			if (e.next instanceof AccessPathIndexElement) {
-				if (info.isArray()) {
-					info = info.getComponentClassInfo(); //TODO: verify
-				} else {
-					return null;
-				}
-			} else if (e.next instanceof AccessPathSubElement) {
-				AccessPathSubElement field = (AccessPathSubElement) e.next;
+	public void appendSubElement(String name) {
+		appendElement(createSubElement(name));
+	}
+	
+	public void appendIndexElement(Expression index) {
+		appendElement(createIndexElement(index));
 
-				switch (type) {
-				case STATIC:
-					info = info.getStaticField(field.name).getClassInfo();
-					type = AccessPathType.HEAP;
-					break;
-				case LOCAL:
-				case HEAP:
-					info = info.getInstanceField(field.name).getClassInfo();
-					break;
-				default:
-					//TODO
-				}
-			}
-			
-			e = e.next;
-		}
-		
-		if (info.isPrimitive()) {
-			switch (originalType) {
-			case STATIC:
-				return new StaticNumber();
-			case LOCAL:
-				return new LocalNumber();
-			case HEAP:
-				return new HeapNumber();
-			}
-		}
-		
-		return null;
+		paths.addAll(index.paths);
 	}
 	
 	@Override

@@ -19,8 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathType;
+import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -41,11 +40,12 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 		Instruction ret = super.execute(ti);
 		
 		if (var != null) {
-			AccessPath path = new AccessPath(var.getName());
 			ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
 			
 			if (ei != null) {
-				Attribute attribute = new Attribute(null, path, ei.getClassInfo(), AccessPathType.LOCAL);
+				ConcretePath path = new ConcretePath(var.getName(), ei.getClassInfo(), ConcretePath.Type.INSTANCE);
+				Attribute attribute = new Attribute(null, path);
+
 				sf.setOperandAttr(attribute);
 			}
 		}

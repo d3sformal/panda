@@ -50,7 +50,7 @@ public class LongUnaryOperatorExecutor extends UnaryOperatorExecutor<Long> {
 		sf.popLong();
 		
 		sf.pushLong(0);
-		sf.setLongOperandAttr(new Attribute(result, null, null, null));
+		sf.setLongOperandAttr(new Attribute(result, null));
 	}
 
 }

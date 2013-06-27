@@ -99,7 +99,7 @@ contextpath returns [AccessPath val]
 	}
 	| p=contextpath '.' f=ID {
 		$ctx.val = $p.val;
-		$ctx.val.append(new AccessPathSubElement($f.text));
+		$ctx.val.appendSubElement($f.text);
 	}
 	;
 
@@ -109,19 +109,19 @@ path returns [AccessPath val]
 	}
 	| p=path '.' f=ID {
 		$ctx.val = $p.val;
-		$ctx.val.append(new AccessPathSubElement($f.text));
+		$ctx.val.appendSubElement($f.text);
 	}
 	| p=path '[' e=expression ']' {
 		$ctx.val = $p.val;
-		$ctx.val.append(new AccessPathIndexElement($e.val));
+		$ctx.val.appendIndexElement($e.val);
 	}
 	| 'fread' '(' f=ID ',' p=path ')' {
 		$ctx.val = $p.val;
-		$ctx.val.append(new AccessPathSubElement($f.text));
+		$ctx.val.appendSubElement($f.text);
 	}
 	| 'aread' '(' 'arr' ',' p=path ',' e=expression ')' {
 		$ctx.val = $p.val;
-		$ctx.val.append(new AccessPathIndexElement($e.val));
+		$ctx.val.appendIndexElement($e.val);
 	}
 	;
 

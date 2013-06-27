@@ -50,7 +50,7 @@ public class IntegerUnaryOperatorExecutor extends UnaryOperatorExecutor<Integer>
 		sf.pop();
 		
 		sf.push(0);
-		sf.setOperandAttr(new Attribute(result, null, null, null));
+		sf.setOperandAttr(new Attribute(result, null));
 	}
 
 }

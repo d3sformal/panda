@@ -19,8 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathSubElement;
+import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.common.Number;
 import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
@@ -38,21 +37,21 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 		StackFrame sf = ti.getModifiableTopFrame();
 		
 		Attribute attribute = (Attribute) sf.getOperandAttr();
-		AccessPath path = attribute.accessPath;
+		ConcretePath path = attribute.accessPath;
 		
 		Instruction ret = super.execute(ti);
 		
 		if (path != null) {
-			path.append(new AccessPathSubElement(getFieldName()));
+			path.appendSubElement(getFieldName());
 			
-			Number number = path.resolve(attribute.rootClass, attribute.pathType);
+			Number number = path.resolve();
 			
 			if (number != null) {
 				ScopedSymbolTable.getInstance().register(path, number);
 			}
 		}
 		
-		sf.setOperandAttr(new Attribute(null, path, null, attribute.pathType));
+		sf.setOperandAttr(new Attribute(null, path));
 		
 		return ret;
 	}

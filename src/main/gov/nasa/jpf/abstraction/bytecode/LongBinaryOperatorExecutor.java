@@ -61,7 +61,7 @@ public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
 		sf.popLong();
 		
 		sf.pushLong(0);
-		sf.setLongOperandAttr(new Attribute(result, null, null, null));
+		sf.setLongOperandAttr(new Attribute(result, null));
 	}
 
 }
