@@ -32,4 +32,5 @@ public class AccessPathSubElement extends AccessPathMiddleElement {
 			return null;
 		}
 	}
+
 }

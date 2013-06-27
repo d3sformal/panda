@@ -19,7 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
-import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
@@ -70,6 +70,16 @@ public abstract class UnaryOperatorExecutor<T> {
 		storeResult(result, sf);
 
 		return op.getNext(ti);
+	}
+	
+	protected AbstractValue getAbstractValue(StackFrame sf, int index) {
+		Attribute attr = (Attribute)sf.getOperandAttr(index);
+		
+		if (attr != null) {
+			return attr.abstractValue;
+		}
+		
+		return null;
 	}
 	
 	abstract protected AbstractValue getAbstractValue(StackFrame sf);

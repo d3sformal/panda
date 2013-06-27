@@ -28,4 +28,8 @@ public class Trace {
 			states.pop();
 		}
 	}
+	
+	public void push(State state) {
+		states.push(state);
+	}
 }

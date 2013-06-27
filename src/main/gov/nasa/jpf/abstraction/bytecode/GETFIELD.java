@@ -20,36 +20,40 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathType;
-import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPathSubElement;
+import gov.nasa.jpf.abstraction.predicate.common.Number;
+import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
-
-	public ALOAD(int index) {
-		super(index);
-	}
+public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 	
+	public GETFIELD(String fieldName, String classType, String fieldDescriptor) {
+		super(fieldName, classType, fieldDescriptor);
+	}
+
 	@Override
-	public Instruction execute(ThreadInfo ti) {
+	public Instruction execute(ThreadInfo ti) {		
 		StackFrame sf = ti.getModifiableTopFrame();
-		LocalVarInfo var = sf.getLocalVarInfo(index);
+		
+		Attribute attribute = (Attribute) sf.getOperandAttr();
+		AccessPath path = attribute.accessPath;
 		
 		Instruction ret = super.execute(ti);
 		
-		if (var != null) {
-			AccessPath path = new AccessPath(var.getName());
-			ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
+		if (path != null) {
+			path.append(new AccessPathSubElement(getFieldName()));
 			
-			if (ei != null) {
-				Attribute attribute = new Attribute(null, path, ei.getClassInfo(), AccessPathType.LOCAL);
-				sf.setOperandAttr(attribute);
+			Number number = path.resolve(attribute.rootClass, attribute.pathType);
+			
+			if (number != null) {
+				ScopedSymbolTable.getInstance().register(path, number);
 			}
 		}
-
+		
+		sf.setOperandAttr(new Attribute(null, path, null, attribute.pathType));
+		
 		return ret;
 	}
 }

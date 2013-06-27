@@ -1,5 +1,5 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-public abstract class Number {
+public class HeapNumber extends Number {
 
 }

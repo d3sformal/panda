@@ -19,7 +19,6 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
-import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.vm.StackFrame;
@@ -38,12 +37,12 @@ public class DoubleComparatorExecutor extends BinaryOperatorExecutor<Double> {
 
 	@Override
 	protected AbstractValue getLeftAbstractValue(StackFrame sf) {
-		return (AbstractValue)sf.getOperandAttr(1);
+		return getAbstractValue(sf, 1);
 	}
 
 	@Override
 	protected AbstractValue getRightAbstractValue(StackFrame sf) {
-		return (AbstractValue)sf.getOperandAttr(3);
+		return getAbstractValue(sf, 3);
 	}
 
 	@Override

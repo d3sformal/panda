@@ -20,6 +20,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.vm.StackFrame;
@@ -38,12 +39,12 @@ public class LongComparatorExecutor extends BinaryOperatorExecutor<Long> {
 
 	@Override
 	protected AbstractValue getLeftAbstractValue(StackFrame sf) {
-		return (AbstractValue)sf.getOperandAttr(1);
+		return (AbstractValue)((Attribute)sf.getOperandAttr(1)).abstractValue;
 	}
 
 	@Override
 	protected AbstractValue getRightAbstractValue(StackFrame sf) {
-		return (AbstractValue)sf.getOperandAttr(3);
+		return (AbstractValue)((Attribute)sf.getOperandAttr(3)).abstractValue;
 	}
 
 	@Override

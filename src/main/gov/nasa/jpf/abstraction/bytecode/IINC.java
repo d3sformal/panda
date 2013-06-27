@@ -20,6 +20,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.StackFrame;
@@ -41,7 +42,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
-		AbstractValue abs_v = (AbstractValue) sf.getLocalAttr(index);
+		AbstractValue abs_v = getAbstractValue(sf, index);
 		
 		if (abs_v == null) {
 			sf.setLocalVariable(index, sf.getLocalVariable(index) + increment, false);
@@ -78,6 +79,16 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 		}
 
 		return getNext(ti);
+	}
+	
+	private AbstractValue getAbstractValue(StackFrame sf, int index) {
+		Attribute attr = (Attribute) sf.getLocalAttr(index);
+		
+		if (attr != null) { 
+			return attr.abstractValue;
+		}
+		
+		return null;
 	}
 
 }

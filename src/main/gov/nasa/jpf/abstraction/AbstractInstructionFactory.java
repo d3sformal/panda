@@ -210,6 +210,16 @@ public class AbstractInstructionFactory extends
 	public Instruction fsub() {
 		return (filter.isInstrumentedClass(ci) ? new FSUB() : super.fsub());
 	}
+	
+	@Override
+	public Instruction getfield(String fieldName, String clsName, String fieldDescriptor) {
+		return (filter.isInstrumentedClass(ci) ? new GETFIELD(fieldName, clsName, fieldDescriptor) : super.getfield(fieldName, clsName, fieldDescriptor));
+	}
+	
+	@Override
+	public Instruction getstatic(String fieldName, String clsName, String fieldDescriptor) {
+		return (filter.isInstrumentedClass(ci) ? new GETSTATIC(fieldName, clsName, fieldDescriptor) : super.getstatic(fieldName, clsName, fieldDescriptor));
+	}
 
 	@Override
 	public Instruction i2d() {

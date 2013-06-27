@@ -1,9 +1,9 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
 public class AccessPathElement {
-	public AccessPathElement next;
+	public AccessPathMiddleElement next;
 
-	public AccessPathElement(AccessPathElement next) {
+	public AccessPathElement(AccessPathMiddleElement next) {
 		this.next = next;
 	}
 }

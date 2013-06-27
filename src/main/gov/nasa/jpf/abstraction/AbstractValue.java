@@ -17,10 +17,13 @@
 // DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 package gov.nasa.jpf.abstraction;
 
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+
 import java.util.Set;
 
 public abstract class AbstractValue {
 	protected int key;
+	protected AccessPath path;
 	public Abstraction abs;
 
 	/**

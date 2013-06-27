@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
+import gov.nasa.jpf.vm.ClassInfo;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +37,51 @@ public class AccessPath extends Expression {
 		paths.addAll(element.index.paths);
 	}
 	
+	public Number resolve(ClassInfo info, AccessPathType type) {
+		AccessPathElement e = root;
+		AccessPathType originalType = type;
+		
+		while (e.next != null && !info.isPrimitive()) {
+			if (e.next instanceof AccessPathIndexElement) {
+				if (info.isArray()) {
+					info = info.getComponentClassInfo(); //TODO: verify
+				} else {
+					return null;
+				}
+			} else if (e.next instanceof AccessPathSubElement) {
+				AccessPathSubElement field = (AccessPathSubElement) e.next;
+
+				switch (type) {
+				case STATIC:
+					info = info.getStaticField(field.name).getClassInfo();
+					type = AccessPathType.HEAP;
+					break;
+				case LOCAL:
+				case HEAP:
+					info = info.getInstanceField(field.name).getClassInfo();
+					break;
+				default:
+					//TODO
+				}
+			}
+			
+			e = e.next;
+		}
+		
+		if (info.isPrimitive()) {
+			switch (originalType) {
+			case STATIC:
+				return new StaticNumber();
+			case LOCAL:
+				return new LocalNumber();
+			case HEAP:
+				return new HeapNumber();
+			}
+		}
+		
+		return null;
+	}
+	
 	@Override
 	public List<AccessPath> getPaths() {
 		List<AccessPath> ret = new ArrayList<AccessPath>();
@@ -60,6 +107,16 @@ public class AccessPath extends Expression {
 		AccessPath.policy = original;
 		
 		return ret;
+	}
+	
+	@Override
+	public int hashCode() {
+		return toString(NotationPolicy.DOT_NOTATION).hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object path) {
+		return toString().equals(path.toString());
 	}
 
 }

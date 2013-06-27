@@ -8,7 +8,7 @@ public class AccessPathRootElement extends AccessPathElement {
 
 		this.name = name;
 	}
-	
+
 	@Override
 	public String toString() {
 		switch (AccessPath.policy) {
