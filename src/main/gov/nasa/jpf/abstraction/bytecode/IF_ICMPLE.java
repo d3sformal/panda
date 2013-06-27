@@ -2,12 +2,12 @@
 // Copyright (C) 2012 United States Government as represented by the
 // Administrator of the National Aeronautics and Space Administration
 // (NASA).  All Rights Reserved.
-// 
+//
 // This software is distributed under the NASA Open Source Agreement
 // (NOSA), version 1.3.  The NOSA has been approved by the Open Source
 // Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
 // directory tree for the complete NOSA document.
-// 
+//
 // THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
 // KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
 // LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
@@ -19,13 +19,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractBoolean;
-import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.KernelState;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
@@ -33,7 +28,9 @@ import gov.nasa.jpf.vm.Instruction;
  * Branch if int comparison succeeds
  * ..., value1, value2 => ...
  */
-public class IF_ICMPLE extends gov.nasa.jpf.jvm.bytecode.IF_ICMPLE {
+public class IF_ICMPLE extends gov.nasa.jpf.jvm.bytecode.IF_ICMPLE implements AbstractBranching {
+	
+	BinaryIfInstructionExecutor executor = new BinaryIfInstructionExecutor();
 
 	public IF_ICMPLE(int targetPc) {
 		super(targetPc);
@@ -41,55 +38,22 @@ public class IF_ICMPLE extends gov.nasa.jpf.jvm.bytecode.IF_ICMPLE {
 
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-
-		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getModifiableTopFrame();
-
-		AbstractValue abs_v1 = (AbstractValue) sf.getOperandAttr(0);
-		AbstractValue abs_v2 = (AbstractValue) sf.getOperandAttr(1);
-
-		if (abs_v1 == null && abs_v2 == null) {
-			return super.execute(ti);
-		}
-
-		int v1 = sf.peek(0);
-		int v2 = sf.peek(1);
-
-		// abs_v2 <= abs_v1
-		AbstractBoolean result = Abstraction._le(v1, abs_v1, v2, abs_v2);
-
-		System.out.printf("IF_ICMPLE> Values: %d (%s), %d (%s)\n", v2, abs_v2, v1, abs_v1);
-
-		if (result == AbstractBoolean.TRUE) {
-			conditionValue = true;
-		} else if (result == AbstractBoolean.FALSE) {
-			conditionValue = false;
-		} else { // TOP
-			if (!ti.isFirstStepInsn()) { // first time around
-				ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
-				ss.setNextChoiceGenerator(cg);
-
-				return this;
-			} else { // this is what really returns results
-				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-
-				assert (cg instanceof AbstractChoiceGenerator) : "expected AbstractChoiceGenerator, got: " + cg;
-				
-				conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
-			}
-		}
-
-		sf.pop();
-		sf.pop();
-
-		System.out.println("IF_ICMPLE> Result: " + conditionValue);
-		
-		return (conditionValue ? getTarget() : getNext(ti));
+		return executor.execute(this, ti);
 	}
 
 	@Override
-	protected Instruction executeBothBranches (SystemState ss, KernelState ks, ThreadInfo ti){
-		throw new UnsupportedOperationException();
+	public Instruction executeConcrete(ThreadInfo ti) {
+		return super.execute(ti);
+	}
+
+	@Override
+	public Instruction getSelf() {
+		return this;
+	}
+
+	@Override
+	public AbstractBoolean getCondition(AbstractValue abs_v1, AbstractValue abs_v2) {
+		return Abstraction._le(0, abs_v1, 0, abs_v2);
 	}
 
 }

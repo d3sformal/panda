@@ -19,67 +19,41 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractBoolean;
-import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.StackFrame;
 
 /**
  * Branch if int comparison with zero succeeds
  * ..., value => ...
  */
-public class IFLE extends gov.nasa.jpf.jvm.bytecode.IFLE {
+public class IFLE extends gov.nasa.jpf.jvm.bytecode.IFLE implements AbstractBranching {
+	
+	UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor();
 
 	public IFLE(int targetPc) {
 		super(targetPc);
 	}
 
 	@Override
-	public Instruction execute (ThreadInfo ti) {
+	public Instruction execute(ThreadInfo ti) {
+		return executor.execute(this, ti);
+	}
 
-		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getModifiableTopFrame();
-		AbstractValue abs_v = (AbstractValue) sf.getOperandAttr();
+	@Override
+	public Instruction executeConcrete(ThreadInfo ti) {
+		return super.execute(ti);
+	}
 
-		if(abs_v == null) { // the condition is concrete
-			//System.out.println("Execute IFLE: The condition is concrete");
-			return super.execute(ti);
-		}
-		
-		// the condition is abstract
+	@Override
+	public Instruction getSelf() {
+		return this;
+	}
 
-		System.out.printf("IFLE> Values: %d (%s)\n", sf.peek(0), abs_v);
-		
-		AbstractBoolean abs_condition = Abstraction._le(0, abs_v, 0, null);
-
-		if(abs_condition == AbstractBoolean.TRUE) {
-			conditionValue = true;
-		} else if (abs_condition == AbstractBoolean.FALSE) {
-			conditionValue = false;
-		} else { // TOP
-			if (!ti.isFirstStepInsn()) { // first time around
-				ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
-				ss.setNextChoiceGenerator(cg);
-
-				return this;
-			} else {  // this is what really returns results
-				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-					
-				assert (cg instanceof AbstractChoiceGenerator) : "expected AbstractChoiceGenerator, got: " + cg;
-				
-				conditionValue = (Integer)cg.getNextChoice()==0 ? false: true;
-			}
-		}
-			
-		System.out.println("IFLE> Result: " + conditionValue);
-		
-		sf.pop();
-		
-		return (conditionValue ? getTarget() : getNext(ti));
+	@Override
+	public AbstractBoolean getCondition(AbstractValue abs_v1, AbstractValue abs_v2) {
+		return Abstraction._le(0, abs_v1, 0, null);
 	}
 
 }
