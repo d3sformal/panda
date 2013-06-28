@@ -2,7 +2,6 @@ package gov.nasa.jpf.abstraction.predicate.common;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class FlatSymbolTable implements SymbolTable, Cloneable {
@@ -11,15 +10,26 @@ public class FlatSymbolTable implements SymbolTable, Cloneable {
 	private HashMap<VariableID, Set<AccessPath>> num2paths = new HashMap<VariableID, Set<AccessPath>>();
 
 	@Override
-	public List<AccessPath> lookupEquivalentAccessPaths(VariableID number) {
-		// TODO Auto-generated method stub
-		return null;
+	public Set<AccessPath> lookupAccessPaths(AccessPath prefix) {
+		Set<AccessPath> ret = new HashSet<AccessPath>();
+		
+		for (AccessPath path : path2num.keySet()) {
+			if (prefix.isPrefix(path)) {
+				ret.add(path);
+			}
+		}
+		
+		return ret;
+	}
+
+	@Override
+	public Set<AccessPath> lookupEquivalentAccessPaths(VariableID number) {
+		return num2paths.get(number);
 	}
 
 	@Override
 	public VariableID resolvePath(AccessPath path) {
-		// TODO Auto-generated method stub
-		return null;
+		return path2num.get(path);
 	}
 	
 	@SuppressWarnings("unchecked")

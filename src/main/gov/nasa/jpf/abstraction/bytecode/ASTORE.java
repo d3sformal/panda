@@ -55,10 +55,9 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 			Attribute attribute = (Attribute) sf.getOperandAttr();
 		
 			if (attribute != null) {
-				ConcretePath path = attribute.accessPath;
+				ConcretePath prefix = attribute.accessPath;
 				
-				// FIND ALL PREFIXES IN SYMBOL TABLE
-				for (AccessPath prefix : new AccessPath[0]) {
+				for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
 					VariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
 
 					ConcretePath clone = (ConcretePath) path.clone();
@@ -70,7 +69,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 			}
 		}
 		
-		System.err.println("WARNING: this needs to be implemented!");
+		System.err.println("WARNING: this needs to be implemented properly!");
 		return super.execute(ti);
 	}
 }

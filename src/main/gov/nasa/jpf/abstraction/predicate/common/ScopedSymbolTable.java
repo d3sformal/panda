@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 public class ScopedSymbolTable implements SymbolTable {
@@ -20,32 +20,30 @@ public class ScopedSymbolTable implements SymbolTable {
 		
 		return instance;
 	}
+	
 
-	// TODO: Number should wrap stack / heap / static data
-	public List<AccessPath> lookupEquivalentAccessPaths(VariableID number) {
+	@Override
+	public Set<AccessPath> lookupAccessPaths(AccessPath prefix) {
+		return scopes.lastElement().lookupAccessPaths(prefix);
+	}
+
+	@Override
+	public Set<AccessPath> lookupEquivalentAccessPaths(VariableID number) {
 		return scopes.lastElement().lookupEquivalentAccessPaths(number);
 	}
 
+	@Override
 	public VariableID resolvePath(AccessPath path) {
 		return scopes.lastElement().resolvePath(path);
 	}
 	
+	@Override
+	public void register(AccessPath path, VariableID number) {
+		scopes.lastElement().register(path, number);
+	}
+	
 	public void methodCall() {
 		scopes.push(new FlatSymbolTable());
-
-		//TODO:
-		//method call removes local variables (all paths rooted in local var)
-		//and all reverse mappings whose root was local var
-		//
-		// static int A a;
-		//
-		// Some scope:
-		// {
-		//		... // access path `a' refers static field
-		//		m(int a):
-		//			... // access path `a' needs to be rewritten
-		//		...
-		// }
 	}
 	
 	public void methodReturn() {
@@ -61,11 +59,6 @@ public class ScopedSymbolTable implements SymbolTable {
 	
 	public FlatSymbolTable memorise() {
 		return scopes.lastElement().clone();
-	}
-
-	@Override
-	public void register(AccessPath path, VariableID number) {
-		scopes.lastElement().register(path, number);
 	}
 	
 }

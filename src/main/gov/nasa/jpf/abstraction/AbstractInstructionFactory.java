@@ -105,6 +105,11 @@ public class AbstractInstructionFactory extends
 	public Instruction areturn() {
 		return (filter.isInstrumentedClass(ci) ? new ARETURN() : super.areturn());
 	}
+	
+	@Override
+	public Instruction astore(int index) {
+		return (filter.isInstrumentedClass(ci) ? new ASTORE(index) : super.astore(index));
+	}
 
 	@Override
 	public Instruction d2f() {

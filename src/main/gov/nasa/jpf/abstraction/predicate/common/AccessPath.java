@@ -71,6 +71,20 @@ public class AccessPath extends Expression implements Cloneable {
 		}
 	}
 	
+	public boolean isPrefix(AccessPath path) {
+		//TODO IMPLEMENT EQUALS PROPERLY!
+		
+		AccessPathElement rootPrefix = root;
+		AccessPathElement rootPath = path.root;
+		
+		while (rootPrefix.equals(rootPath)) {
+			rootPrefix = rootPrefix.getNext();
+			rootPath = rootPath.getNext();
+		}
+		
+		return rootPrefix != null || rootPath == null;
+	}
+	
 	@Override
 	public List<AccessPath> getPaths() {
 		List<AccessPath> ret = new ArrayList<AccessPath>();
