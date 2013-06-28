@@ -333,6 +333,11 @@ public class AbstractInstructionFactory extends
 		return (filter.isInstrumentedClass(ci) ? new IINC(localVarIndex,
 				incConstant) : super.iinc(localVarIndex, incConstant));
 	}
+	
+	@Override
+	public Instruction iload(int index) {
+		return (filter.isInstrumentedClass(ci) ? new ILOAD(index) : super.iload(index));
+	}
 
 	@Override
 	public Instruction imul() {

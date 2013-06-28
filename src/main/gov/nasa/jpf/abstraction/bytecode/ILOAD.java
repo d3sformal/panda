@@ -20,15 +20,16 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
-import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.abstraction.predicate.common.Number;
+import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
+public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 
-	public ALOAD(int index) {
+	public ILOAD(int index) {
 		super(index);
 	}
 	
@@ -40,14 +41,16 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 		Instruction ret = super.execute(ti);
 		
 		if (var != null) {
-			ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
-			
-			if (ei != null) {
-				ConcretePath path = new ConcretePath(var.getName(), ei.getClassInfo(), ConcretePath.Type.LOCAL);
-				Attribute attribute = new Attribute(null, path);
-
-				sf.setOperandAttr(attribute);
+			ConcretePath path = new ConcretePath(var.getName(), null, ConcretePath.Type.LOCAL);
+			Attribute attribute = new Attribute(null, path);
+				
+			Number number = path.resolve();
+				
+			if (number != null) {
+				ScopedSymbolTable.getInstance().register(path, number);
 			}
+
+			sf.setOperandAttr(attribute);
 		}
 
 		return ret;
