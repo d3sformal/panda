@@ -2,12 +2,16 @@ package ambiguity;
 
 class A
 {
-  B x;
+    B x;
+
+    public A() {
+        x = new B();
+    }
 }
 
 class B
 {
-  int y;
+    int y;
 }
 
 public class Ambiguity
