@@ -7,17 +7,17 @@ import java.util.Set;
 
 public class FlatSymbolTable implements SymbolTable, Cloneable {
 	
-	private HashMap<AccessPath, Number> path2num = new HashMap<AccessPath, Number>();
-	private HashMap<Number, Set<AccessPath>> num2paths = new HashMap<Number, Set<AccessPath>>();
+	private HashMap<AccessPath, VariableID> path2num = new HashMap<AccessPath, VariableID>();
+	private HashMap<VariableID, Set<AccessPath>> num2paths = new HashMap<VariableID, Set<AccessPath>>();
 
 	@Override
-	public List<AccessPath> lookupEquivalentAccessPaths(Number number) {
+	public List<AccessPath> lookupEquivalentAccessPaths(VariableID number) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Number resolvePath(AccessPath path) {
+	public VariableID resolvePath(AccessPath path) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -27,14 +27,14 @@ public class FlatSymbolTable implements SymbolTable, Cloneable {
 	public FlatSymbolTable clone() {
 		FlatSymbolTable clone = new FlatSymbolTable();
 		
-		clone.path2num = (HashMap<AccessPath, Number>)path2num.clone();
-		clone.num2paths = (HashMap<Number, Set<AccessPath>>)num2paths.clone();
+		clone.path2num = (HashMap<AccessPath, VariableID>)path2num.clone();
+		clone.num2paths = (HashMap<VariableID, Set<AccessPath>>)num2paths.clone();
 		
 		return clone;
 	}
 
 	@Override
-	public void register(AccessPath path, Number number) {
+	public void register(AccessPath path, VariableID number) {
 		if (!num2paths.containsKey(number)) {
 			num2paths.put(number, new HashSet<AccessPath>());
 		}
@@ -44,7 +44,7 @@ public class FlatSymbolTable implements SymbolTable, Cloneable {
 		// Update: path -> number2
 		// Therefore: number1 -> {...}
 		if (path2num.containsKey(path) && !path2num.get(path).equals(number)) {
-			Number old = path2num.get(path);
+			VariableID old = path2num.get(path);
 			num2paths.get(old).remove(path);
 		}
 		
@@ -75,7 +75,7 @@ public class FlatSymbolTable implements SymbolTable, Cloneable {
 				pad += " ";
 			}
 			
-			ret += path + pad + path2num.get(p).getClass().getSimpleName() + "\n";
+			ret += path + pad + path2num.get(p) + "\n";
 		}
 		
 		ret += "---------------------\n";

@@ -41,9 +41,9 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 		
 		if (var != null) {
 			ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
+			ConcretePath path = new ConcretePath(var.getName(), ti, ei, ConcretePath.Type.HEAP);
 			
 			if (ei != null) {
-				ConcretePath path = new ConcretePath(var.getName(), ei.getClassInfo(), ConcretePath.Type.LOCAL);
 				Attribute attribute = new Attribute(null, path);
 
 				sf.setOperandAttr(attribute);

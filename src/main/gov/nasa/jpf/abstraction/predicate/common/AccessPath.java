@@ -26,26 +26,18 @@ public class AccessPath extends Expression {
 		tail = root;
 	}
 	
-	private void appendElement(AccessPathMiddleElement element) {
+	protected void appendElement(AccessPathMiddleElement element) {
 		tail.setNext(element);
 		element.setPrevious(tail);
 		tail = element;
 	}
 	
-	protected AccessPathMiddleElement createSubElement(String name) {
-		return new DefaultAccessPathSubElement(name);
-	}
-	
-	protected AccessPathMiddleElement createIndexElement(Expression index) {
-		return new DefaultConcretePathIndexElement(index);
-	}
-	
 	public void appendSubElement(String name) {
-		appendElement(createSubElement(name));
+		appendElement(new DefaultAccessPathSubElement(name));
 	}
 	
 	public void appendIndexElement(Expression index) {
-		appendElement(createIndexElement(index));
+		appendElement(new DefaultAccessPathIndexElement(index));
 
 		paths.addAll(index.paths);
 	}

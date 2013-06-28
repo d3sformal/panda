@@ -20,7 +20,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
-import gov.nasa.jpf.abstraction.predicate.common.Number;
+import gov.nasa.jpf.abstraction.predicate.common.VariableID;
 import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -44,7 +44,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 		if (path != null) {
 			path.appendSubElement(getFieldName());
 			
-			Number number = path.resolve();
+			VariableID number = path.resolve();
 			
 			if (number != null) {
 				ScopedSymbolTable.getInstance().register(path, number);

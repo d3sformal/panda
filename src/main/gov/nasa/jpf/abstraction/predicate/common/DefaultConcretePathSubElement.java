@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.vm.ClassInfo;
-import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement implements ConcretePathSubElement {
 	
@@ -15,30 +15,33 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 	}
 
 	@Override
-	public ClassInfo getClassInfo() {
+	public Object getObject(ThreadInfo ti) {
 		ConcretePathElement previous = getPrevious();
-		ClassInfo classInfo = previous.getClassInfo();
-		FieldInfo fieldInfo;
+		Object object = previous.getObject(ti);
+		
+		if (object == null) return null;
+		if (!(object instanceof ElementInfo)) return null;
+
+		ElementInfo ei = (ElementInfo) object;
+		
+		object = ei.getFieldValueObject(getName());
 		
 		if (previous instanceof ConcretePathRootElement) {
 			ConcretePathRootElement root = (ConcretePathRootElement) previous;
 			
-			if (root.getType() == ConcretePath.Type.STATIC) {
-				fieldInfo = classInfo.getStaticField(getName());
-				
-				if (fieldInfo == null) return null;
-				
-				return fieldInfo.getTypeClassInfo();
+			switch (root.getType()) {
+			case STATIC:
+				if (!(object instanceof ElementInfo)) {
+					return new StaticFieldID(ei.getClassInfo().getName(), getName());
+				}
 			}
 		}
-
-		if (classInfo == null) return null;
 		
-		fieldInfo = classInfo.getInstanceField(getName());
+		if (!(object instanceof ElementInfo)) {
+			return new ObjectFieldID(ei.getObjectRef(), getName());
+		}
 		
-		if (fieldInfo == null) return null;
-		
-		return fieldInfo.getTypeClassInfo();
+		return object;
 	}
 
 }

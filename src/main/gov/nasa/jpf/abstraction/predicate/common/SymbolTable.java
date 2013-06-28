@@ -4,9 +4,9 @@ import java.util.List;
 
 public interface SymbolTable {
 	
-	public List<AccessPath> lookupEquivalentAccessPaths(Number number);
-	public Number resolvePath(AccessPath path);
+	public List<AccessPath> lookupEquivalentAccessPaths(VariableID number);
+	public VariableID resolvePath(AccessPath path);
 	
-	public void register(AccessPath path, Number number);
+	public void register(AccessPath path, VariableID number);
 	
 }

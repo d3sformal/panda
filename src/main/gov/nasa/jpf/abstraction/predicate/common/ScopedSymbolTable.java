@@ -22,16 +22,16 @@ public class ScopedSymbolTable implements SymbolTable {
 	}
 
 	// TODO: Number should wrap stack / heap / static data
-	public List<AccessPath> lookupEquivalentAccessPaths(Number number) {
+	public List<AccessPath> lookupEquivalentAccessPaths(VariableID number) {
 		return scopes.lastElement().lookupEquivalentAccessPaths(number);
 	}
 
-	public Number resolvePath(AccessPath path) {
+	public VariableID resolvePath(AccessPath path) {
 		return scopes.lastElement().resolvePath(path);
 	}
 	
 	public void methodCall() {
-		scopes.push(scopes.lastElement().clone());
+		scopes.push(new FlatSymbolTable());
 
 		//TODO:
 		//method call removes local variables (all paths rooted in local var)
@@ -64,7 +64,7 @@ public class ScopedSymbolTable implements SymbolTable {
 	}
 
 	@Override
-	public void register(AccessPath path, Number number) {
+	public void register(AccessPath path, VariableID number) {
 		scopes.lastElement().register(path, number);
 	}
 	

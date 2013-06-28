@@ -20,7 +20,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
-import gov.nasa.jpf.abstraction.predicate.common.Number;
+import gov.nasa.jpf.abstraction.predicate.common.VariableID;
 import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -41,10 +41,10 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 		Instruction ret = super.execute(ti);
 		
 		if (var != null) {
-			ConcretePath path = new ConcretePath(var.getName(), null, ConcretePath.Type.LOCAL);
+			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);
 			Attribute attribute = new Attribute(null, path);
 				
-			Number number = path.resolve();
+			VariableID number = path.resolve();
 				
 			if (number != null) {
 				ScopedSymbolTable.getInstance().register(path, number);

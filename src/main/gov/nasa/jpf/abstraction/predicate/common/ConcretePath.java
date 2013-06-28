@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 public class ConcretePath extends AccessPath {
 	
@@ -11,11 +11,13 @@ public class ConcretePath extends AccessPath {
 	}
 	
 	public Type type;
-	public ClassInfo rootClass;
+	public Object rootObject;
+	public ThreadInfo ti;
 
-	public ConcretePath(String name, ClassInfo rootClass, Type type) {
-		this.rootClass = rootClass;
+	public ConcretePath(String name, ThreadInfo ti, Object rootObject, Type type) {
+		this.rootObject = rootObject;
 		this.type = type;
+		this.ti = ti;
 		
 		root = createRootElement(name);
 		tail = root;
@@ -23,49 +25,32 @@ public class ConcretePath extends AccessPath {
 	
 	@Override
 	protected AccessPathRootElement createRootElement(String name) {
-		return new DefaultConcretePathRootElement(name, rootClass, type);
+		return new DefaultConcretePathRootElement(name, rootObject, type);
 	}
 	
 	@Override
-	protected AccessPathMiddleElement createSubElement(String name) {
-		return new DefaultConcretePathSubElement(name);
+	public void appendSubElement(String name) {
+		appendElement(new DefaultConcretePathSubElement(name));
 	}
 	
 	@Override
-	protected AccessPathMiddleElement createIndexElement(Expression index) {
-		return new DefaultConcretePathIndexElement(index);
+	public void appendIndexElement(Expression index) {
+		throw new RuntimeException("Concrete path cannot cope with expressions.");
 	}
 	
-	public Number resolve() {
-		/**
-		 * If the path is of a primitive form (one element)
-		 * it necessarily refers to a primitive local variable.
-		 */
-		if (root == tail && type == Type.LOCAL) {
-			return new LocalNumber(); //local var index
-		}
-		
+	public void appendIndexElement(int index) {
+		appendElement(new DefaultConcretePathIndexElement(index));
+	}
+	
+	public VariableID resolve() {
 		ConcretePathElement element = (ConcretePathElement) tail;
-		ClassInfo classInfo = element.getClassInfo();
+		Object object = element.getObject(ti);
 		
-		if (classInfo == null) return null;
-		if (!classInfo.isPrimitive()) return null;
-		
-		/**
-		 * If the path is composed of two elements with
-		 * root being a class and tail being of a primitive type
-		 * then it is a primitive static field.
-		 */
-		if (root.getNext() == tail && type == Type.STATIC) {
-			return new StaticNumber(); //class + static field index
+		if (object instanceof VariableID) {
+			return (VariableID) object;
 		}
 		
-		
-		/**
-		 * Otherwise the closest enclosing object is somewhere
-		 * on the heap, regardless of the root type (LOCAL, STATIC).
-		 */
-		return new HeapNumber(); //tail.previous.objref + field index
+		return null;
 	}
 
 }
