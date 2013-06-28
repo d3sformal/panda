@@ -1,3 +1,6 @@
+[global]
+not(image.Image.SIZE < 0)
+
 [object image.Image]
 this.pixels.length = image.Image.SIZE
 this.pixels[0].length = image.Image.SIZE

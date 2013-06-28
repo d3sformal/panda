@@ -3,14 +3,18 @@ package gov.nasa.jpf.abstraction.predicate.common;
 import java.util.List;
 
 public class MethodContext extends Context {
+	
+	private AccessPath method;
 
 	public MethodContext(AccessPath path, List<Predicate> predicates) {
-		super(path, predicates);
+		super(predicates);
+		
+		method = path;
 	}
 
 	@Override
 	public String toString() {
-		String ret = "[method " + path.toString(AccessPath.NotationPolicy.DOT_NOTATION) + "]\n";
+		String ret = "[method " + method.toString(AccessPath.NotationPolicy.DOT_NOTATION) + "]\n";
 		
 		ret = super.toString();
 		
