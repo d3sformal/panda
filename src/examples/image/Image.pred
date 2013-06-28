@@ -1,4 +1,4 @@
-[global]
+[static]
 not(image.Image.SIZE < 0)
 
 [object image.Image]

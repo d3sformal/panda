@@ -21,8 +21,8 @@ contextlist returns [List<Context> val]
 	;
 	
 context returns [Context val]
-	: '[' 'global' ']' ps=predicatelist {
-		$ctx.val = new GlobalContext($ps.val);
+	: '[' 'static' ']' ps=predicatelist {
+		$ctx.val = new StaticContext($ps.val);
 	}
 	| '[' 'object' c=contextpath ']' ps=predicatelist {
 		$ctx.val = new ObjectContext($c.val, $ps.val);
