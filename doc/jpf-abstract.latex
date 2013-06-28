@@ -100,6 +100,20 @@ Example: \ap{this}{o1}{f} \textless \ \ap{p1}{}{g}, where \var{p1} is a method p
 
 If a given predicate refers only to object fields (not local variables of some method), such as \ap{this}{}{f1} \textless \ \ap{this}{}{f2}, then it will be defined during method calls on the given object.
 
+\subsection*{Multiple Instances}
+
+We support predicates over multiple instances (dynamically created) of a given class.
+For example, the predicate \ap{this}{}{a} \textless \ \ap{this}{}{b} defined for a specific class is evaluated during each method call on every object of the given class. 
+In some sense, it is a predicate over fields of all existing instances (dynamically created) of the given class.
+
+Regarding allocation of many objects in a loop, e.g. as in the following code,
+\begin{lstlisting}
+  for (int i = 0; i < size; i++) {
+    a[i] = new Data();
+  }
+\end{lstlisting}
+we support predicates like \ap{a[i]}{}{f} \textless \ \ap{a[i-1]}{}{f}, which also cover multiple instances in a certain sense.
+
 \section*{Abstract State}
 
 An \textit{abstract state} is the valuation (truth values) of all individual predicates defined in the current context (scope).
@@ -251,10 +265,12 @@ Our plan is to check related work, especially abstract state matching with subsu
 
 We must also modify the serializer. It will preserve the concrete values (for selected variables) or save 0 (otherwise), but we have to decide what to do with predicates during serialization.
 
+Variables captured in the predicates cannot be serialized normally. One option might be to save the boolean vector containing truth values of all relevant predicates.
+
 \section*{Usage / Running}
 
 Input: a set of predicates defined in a textual file. The name of the file (path) will be passed to the abstraction module through a {\tt .jpf} file.
-The user must define predicates over local variables of each method separately, and predicates over static fields and instance fields of each class.
+The user must define predicates over local variables of each method separately, predicates over instance fields of each class, and predicates over static fields (of all classes together).
 
 \end{document}
 
