@@ -1,0 +1,10 @@
+@using=jpf-abstraction
+
+target=ambiguity.Ambiguity
+
+classpath=${jpf-abstraction}/build/examples
+sourcepath=${jpf-abstraction}/src/examples
+
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/ambiguity/Ambiguity.pred
+
+listener=gov.nasa.jpf.abstraction.AbstractListener
