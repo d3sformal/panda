@@ -37,5 +37,16 @@ public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexEleme
 		
 		return null;
 	}
+	
+	@Override
+	public Object clone() {
+		DefaultConcretePathIndexElement clone = new DefaultConcretePathIndexElement(index);
+		
+		if (getNext() != null) {
+			clone.setNext((AccessPathMiddleElement) getNext().clone());
+		}
+		
+		return clone;
+	}
 
 }

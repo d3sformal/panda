@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-public class DefaultAccessPathMiddleElement extends DefaultAccessPathElement implements AccessPathMiddleElement,
+public abstract class DefaultAccessPathMiddleElement extends DefaultAccessPathElement implements AccessPathMiddleElement,
 		AccessPathElement {
 
 	private AccessPathElement previous;
@@ -14,5 +14,8 @@ public class DefaultAccessPathMiddleElement extends DefaultAccessPathElement imp
 	public void setPrevious(AccessPathElement previous) {
 		this.previous = previous;
 	}
+	
+	@Override
+	public abstract Object clone();
 
 }

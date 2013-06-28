@@ -43,5 +43,16 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 		
 		return object;
 	}
+	
+	@Override
+	public Object clone() {
+		DefaultConcretePathSubElement clone = new DefaultConcretePathSubElement(getName());
+		
+		if (getNext() != null) {
+			clone.setNext((AccessPathMiddleElement) getNext().clone());
+		}
+		
+		return clone;
+	}
 
 }

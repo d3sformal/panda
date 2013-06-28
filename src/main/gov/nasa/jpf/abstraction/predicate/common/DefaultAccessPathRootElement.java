@@ -35,4 +35,16 @@ public class DefaultAccessPathRootElement extends DefaultAccessPathElement imple
 			return null;
 		}
 	}
+	
+	@Override
+	public Object clone() {
+		DefaultAccessPathRootElement clone = new DefaultAccessPathRootElement(name);
+		
+		if (getNext() != null) {
+			clone.setNext((AccessPathMiddleElement) getNext().clone());
+		}
+		
+		return clone;
+	}
+
 }

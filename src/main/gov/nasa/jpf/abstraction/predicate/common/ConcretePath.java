@@ -13,6 +13,9 @@ public class ConcretePath extends AccessPath {
 	public Type type;
 	public Object rootObject;
 	public ThreadInfo ti;
+	
+	protected ConcretePath() {
+	}
 
 	public ConcretePath(String name, ThreadInfo ti, Object rootObject, Type type) {
 		this.rootObject = rootObject;
@@ -42,6 +45,15 @@ public class ConcretePath extends AccessPath {
 		appendElement(new DefaultConcretePathIndexElement(index));
 	}
 	
+	public static void reRoot(ConcretePath path, AccessPath prefix, String name, ThreadInfo ti, Object rootObject, Type type) {
+		path.type = type;
+		
+		AccessPath.reRoot(path, prefix, name);
+		
+		path.rootObject = rootObject;
+		path.ti = ti;
+	}
+	
 	public VariableID resolve() {
 		ConcretePathElement element = (ConcretePathElement) tail;
 		Object object = element.getObject(ti);
@@ -51,6 +63,27 @@ public class ConcretePath extends AccessPath {
 		}
 		
 		return null;
+	}
+	
+	@Override
+	public Object clone() {
+		ConcretePath path = new ConcretePath();
+		
+		path.rootObject = rootObject;
+		path.type = type;
+		path.ti = ti;
+		
+		path.root = (AccessPathRootElement) root.clone();
+		path.tail = path.root;
+		
+		AccessPathElement next = path.root;
+		
+		while (next.getNext() != null) {
+			path.tail = next;
+			next = next.getNext();
+		}
+		
+		return path;
 	}
 
 }

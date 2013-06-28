@@ -35,5 +35,16 @@ public class DefaultAccessPathSubElement extends DefaultAccessPathMiddleElement 
 			return null;
 		}
 	}
+	
+	@Override
+	public Object clone() {
+		DefaultAccessPathSubElement clone = new DefaultAccessPathSubElement(name);
+		
+		if (getNext() != null) {
+			clone.setNext((AccessPathMiddleElement) getNext().clone());
+		}
+		
+		return clone;
+	}
 
 }
