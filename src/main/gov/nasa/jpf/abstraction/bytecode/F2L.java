@@ -19,7 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
-import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -34,7 +34,12 @@ public class F2L extends gov.nasa.jpf.jvm.bytecode.F2L {
 	public Instruction execute(ThreadInfo ti) {
 
 		StackFrame sf = ti.getModifiableTopFrame();
-		AbstractValue abs_val = (AbstractValue) sf.getOperandAttr();
+		Attribute attr = (Attribute) sf.getOperandAttr();
+		AbstractValue abs_val = null;
+		
+		if (attr != null) {
+			abs_val = (AbstractValue) attr.abstractValue;
+		}
 
 		if (abs_val == null) {
 			return super.execute(ti);

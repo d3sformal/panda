@@ -19,7 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
-import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
@@ -35,7 +35,12 @@ public class D2L extends gov.nasa.jpf.jvm.bytecode.D2L {
 	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo ti) {
 
 		StackFrame sf = ti.getModifiableTopFrame();
-		AbstractValue abs_val = (AbstractValue) sf.getLongOperandAttr();
+		Attribute attr = (Attribute) sf.getLongOperandAttr();
+		AbstractValue abs_val = null;
+		
+		if (attr != null) {
+			abs_val = (AbstractValue) attr.abstractValue;
+		}
 
 		if (abs_val == null) {
 			return super.execute(ti);
