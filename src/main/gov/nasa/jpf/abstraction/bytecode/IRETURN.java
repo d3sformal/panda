@@ -18,43 +18,17 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
-import gov.nasa.jpf.abstraction.predicate.common.VariableID;
 import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
+public class IRETURN extends gov.nasa.jpf.jvm.bytecode.IRETURN {
 	
-	public GETFIELD(String fieldName, String classType, String fieldDescriptor) {
-		super(fieldName, classType, fieldDescriptor);
-	}
-
 	@Override
-	public Instruction execute(ThreadInfo ti) {		
-		StackFrame sf = ti.getModifiableTopFrame();
-		
-		Attribute attribute = (Attribute) sf.getOperandAttr();
-		
+	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		if (attribute != null) {
-			ConcretePath path = attribute.accessPath;
-		
-			if (path != null) {
-				path.appendSubElement(getFieldName());
-			
-				VariableID number = path.resolve();
-			
-				if (number != null) {
-					ScopedSymbolTable.getInstance().register(path, number);
-				}
-			}
-		
-			sf.setOperandAttr(new Attribute(null, path));
-		}
+		ScopedSymbolTable.getInstance().methodReturn();
 		
 		return ret;
 	}

@@ -102,6 +102,11 @@ public class AbstractInstructionFactory extends
 	}
 
 	@Override
+	public Instruction areturn() {
+		return (filter.isInstrumentedClass(ci) ? new ARETURN() : super.areturn());
+	}
+
+	@Override
 	public Instruction d2f() {
 		return (filter.isInstrumentedClass(ci) ? new D2F() : super.d2f());
 	}
@@ -149,6 +154,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction drem() {
 		return (filter.isInstrumentedClass(ci) ? new DREM() : super.drem());
+	}
+	
+	@Override
+	public Instruction dreturn() {
+		return (filter.isInstrumentedClass(ci) ? new DRETURN() : super.dreturn());
 	}
 
 	@Override
@@ -204,6 +214,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction frem() {
 		return (filter.isInstrumentedClass(ci) ? new FREM() : super.frem());
+	}
+	
+	@Override
+	public Instruction freturn() {
+		return (filter.isInstrumentedClass(ci) ? new FRETURN() : super.freturn());
 	}
 
 	@Override
@@ -348,6 +363,26 @@ public class AbstractInstructionFactory extends
 	public Instruction ineg() {
 		return (filter.isInstrumentedClass(ci) ? new INEG() : super.ineg());
 	}
+	
+	@Override
+	public Instruction invokeinterface(String clsName, String methodName, String methodSignature) {
+		return (filter.isInstrumentedClass(ci) ? new INVOKEINTERFACE(clsName, methodName, methodSignature) : super.invokeinterface(clsName, methodName, methodSignature));
+	}
+
+	@Override
+	public Instruction invokespecial(String clsName, String methodName, String methodSignature) {
+		return (filter.isInstrumentedClass(ci) ? new INVOKESPECIAL(clsName, methodName, methodSignature) : super.invokespecial(clsName, methodName, methodSignature));
+	}
+	
+	@Override
+	public Instruction invokestatic(String clsName, String methodName, String methodSignature) {
+		return (filter.isInstrumentedClass(ci) ? new INVOKESTATIC(clsName, methodName, methodSignature) : super.invokestatic(clsName, methodName, methodSignature));
+	}
+	
+	@Override
+	public Instruction invokevirtual(String clsName, String methodName, String methodSignature) {
+		return (filter.isInstrumentedClass(ci) ? new INVOKEVIRTUAL(clsName, methodName, methodSignature) : super.invokevirtual(clsName, methodName, methodSignature));
+	}
 
 	@Override
 	public Instruction ior() {
@@ -357,6 +392,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction irem() {
 		return (filter.isInstrumentedClass(ci) ? new IREM() : super.irem());
+	}
+	
+	@Override
+	public Instruction ireturn() {
+		return (filter.isInstrumentedClass(ci) ? new IRETURN() : super.ireturn());
 	}
 
 	@Override
@@ -439,6 +479,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction lrem() {
 		return (filter.isInstrumentedClass(ci) ? new LREM() : super.lrem());
+	}
+	
+	@Override
+	public Instruction lreturn() {
+		return (filter.isInstrumentedClass(ci) ? new LRETURN() : super.lreturn());
 	}
 
 	@Override

@@ -37,7 +37,7 @@ public class CyclingRace
 
 			int pos = 0;
 
-            for (int j = results.length - 1; j >= 0; --j) 
+            for (int j = i - 1; j >= 0; --j) 
 			{
 				if (res < results[j].time - results[j].bonus) results[j + 1] = results[j];
 				else pos = j + 1;
