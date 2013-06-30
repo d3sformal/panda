@@ -35,6 +35,17 @@ public class DefaultAccessPathRootElement extends DefaultAccessPathElement imple
 			return null;
 		}
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof DefaultAccessPathRootElement) {
+            DefaultAccessPathRootElement root = (DefaultAccessPathRootElement) o;
+
+            return name.equals(root.name);
+        }
+
+        return false;
+    }
 	
 	@Override
 	public Object clone() {

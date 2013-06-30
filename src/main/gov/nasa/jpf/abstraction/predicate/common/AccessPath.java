@@ -45,15 +45,15 @@ public class AccessPath extends Expression implements Cloneable {
 	public static void reRoot(AccessPath path, AccessPath prefix, String name) {
 		AccessPathRootElement newRoot = path.createRootElement(name);
 		
-		AccessPathElement rootPrefix = prefix.root;
-		AccessPathElement rootThis = path.root;
+		AccessPathElement prefixElement = prefix.root;
+		AccessPathElement pathElement = path.root;
 		
-		while (rootPrefix.equals(rootThis)) {
-			rootPrefix = rootPrefix.getNext();
-			rootThis = rootThis.getNext();
+		while (prefixElement != null && pathElement != null && prefixElement.equals(pathElement)) {
+			prefixElement = prefixElement.getNext();
+			pathElement = pathElement.getNext();
 		}
-		
-		AccessPathMiddleElement next = (AccessPathMiddleElement) rootThis;
+
+		AccessPathMiddleElement next = (AccessPathMiddleElement) pathElement;
 		
 		path.root = newRoot;
 		path.tail = newRoot;
@@ -72,17 +72,19 @@ public class AccessPath extends Expression implements Cloneable {
 	}
 	
 	public boolean isPrefix(AccessPath path) {
-		//TODO IMPLEMENT EQUALS PROPERLY!
+		AccessPathElement prefixElement = root;
+		AccessPathElement pathElement = path.root;
 		
-		AccessPathElement rootPrefix = root;
-		AccessPathElement rootPath = path.root;
-		
-		while (rootPrefix.equals(rootPath)) {
-			rootPrefix = rootPrefix.getNext();
-			rootPath = rootPath.getNext();
+		while (prefixElement != null && pathElement != null) {
+            if (!prefixElement.equals(pathElement)) {
+                return false;
+            }
+
+			prefixElement = prefixElement.getNext();
+			pathElement = pathElement.getNext();
 		}
 		
-		return rootPrefix != null || rootPath == null;
+		return prefixElement == null || pathElement != null;
 	}
 	
 	@Override

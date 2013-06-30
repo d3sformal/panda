@@ -48,8 +48,10 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		 */
 		StackFrame sf = ti.getModifiableTopFrame();
 		LocalVarInfo var = sf.getLocalVarInfo(index);
-		
+
 		if (var != null) {
+            System.err.println("WRITE TO " + var.getName());
+		
 			ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
 
 			Attribute attribute = (Attribute) sf.getOperandAttr();
@@ -69,7 +71,6 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 			}
 		}
 		
-		System.err.println("WARNING: this needs to be implemented properly!");
 		return super.execute(ti);
 	}
 }

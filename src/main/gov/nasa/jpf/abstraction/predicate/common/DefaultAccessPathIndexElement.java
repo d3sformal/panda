@@ -35,6 +35,19 @@ public class DefaultAccessPathIndexElement extends DefaultAccessPathMiddleElemen
 			return null;
 		}
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof DefaultAccessPathIndexElement) {
+            DefaultAccessPathIndexElement i = (DefaultAccessPathIndexElement) o;
+
+            return index.equals(i.index);
+        }
+
+        return false;
+    }
+	
+
 	
 	@Override
 	public Object clone() {

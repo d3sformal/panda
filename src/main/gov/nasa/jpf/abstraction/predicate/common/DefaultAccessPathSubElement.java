@@ -35,6 +35,19 @@ public class DefaultAccessPathSubElement extends DefaultAccessPathMiddleElement 
 			return null;
 		}
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof DefaultAccessPathSubElement) {
+            DefaultAccessPathSubElement sub = (DefaultAccessPathSubElement) o;
+
+            return name.equals(sub.name);
+        }
+
+        return false;
+    }
+	
+
 	
 	@Override
 	public Object clone() {
