@@ -42,32 +42,23 @@ public class AccessPath extends Expression implements Cloneable {
 		paths.addAll(index.paths);
 	}
 	
-	public static void reRoot(AccessPath path, AccessPath prefix, String name) {
-		AccessPathRootElement newRoot = path.createRootElement(name);
-		
-		AccessPathElement prefixElement = prefix.root;
+	public static void reRoot(AccessPath path, AccessPath oldPrefix, AccessPath newPrefix) {
+		AccessPathElement oldPrefixElement = oldPrefix.root;
 		AccessPathElement pathElement = path.root;
 		
-		while (prefixElement != null && pathElement != null && prefixElement.equals(pathElement)) {
-			prefixElement = prefixElement.getNext();
+		while (oldPrefixElement != null && pathElement != null && oldPrefixElement.equals(pathElement)) {
+			oldPrefixElement = oldPrefixElement.getNext();
 			pathElement = pathElement.getNext();
 		}
 
 		AccessPathMiddleElement next = (AccessPathMiddleElement) pathElement;
+
+		path.root = newPrefix.root;
 		
-		path.root = newRoot;
-		path.tail = newRoot;
-		
-		newRoot.setNext(next);
+		newPrefix.tail.setNext(next);
 		
 		if (next != null) {
-			next.setPrevious(newRoot);
-			
-			while (next.getNext() != null) {
-				next = next.getNext();
-			}
-			
-			path.tail = next;
+			next.setPrevious(newPrefix.tail);
 		}
 	}
 	

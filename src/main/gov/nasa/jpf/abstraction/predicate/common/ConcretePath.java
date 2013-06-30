@@ -45,15 +45,6 @@ public class ConcretePath extends AccessPath {
 		appendElement(new DefaultConcretePathIndexElement(index));
 	}
 	
-	public static void reRoot(ConcretePath path, AccessPath prefix, String name, ThreadInfo ti, Object rootObject, Type type) {
-		path.type = type;
-		
-		AccessPath.reRoot(path, prefix, name);
-		
-		path.rootObject = rootObject;
-		path.ti = ti;
-	}
-	
 	public VariableID resolve() {
 		ConcretePathElement element = (ConcretePathElement) tail;
 		Object object = element.getObject(ti);

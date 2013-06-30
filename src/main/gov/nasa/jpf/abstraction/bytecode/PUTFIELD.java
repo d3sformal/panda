@@ -39,6 +39,8 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		Attribute attribute = (Attribute) sf.getOperandAttr(1);
 		
 		Instruction ret = super.execute(ti);
+
+        //TODO: REROOT ALL PATHS PREFIXED BY ASSIGNED VALUE (IF ANY ... OBJREF) TO HAVE NEW PREFIX DEFINED BY THE ENCLOSING OBJECT OF THE FIELD
 		
 		if (attribute != null) {
 			ConcretePath path = attribute.accessPath;
