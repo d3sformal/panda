@@ -517,6 +517,11 @@ public class AbstractInstructionFactory extends
 	}
 
 	@Override
+	public Instruction putfield(String fieldName, String clsName, String fieldDescriptor) {
+		return (filter.isInstrumentedClass(ci) ? new PUTFIELD(fieldName, clsName, fieldDescriptor) : super.putfield(fieldName, clsName, fieldDescriptor));
+	}
+	
+	@Override
 	public Instruction tableswitch(int defaultTargetPc, int low, int high) {
 		return filter.isInstrumentedClass(ci) 
 				? new TABLESWITCH(defaultTargetPc, low, high) 

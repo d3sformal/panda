@@ -47,27 +47,27 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		 * new paths need to be registered in Symbol table
 		 */
 		StackFrame sf = ti.getModifiableTopFrame();
-		LocalVarInfo var = sf.getLocalVarInfo(index);
+		LocalVarInfo var = getMethodInfo().getLocalVars()[index];
 
-		if (var != null) {
-            System.err.println("WRITE TO " + var.getName());
-		
-			ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
+		ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
 
-			Attribute attribute = (Attribute) sf.getOperandAttr();
+		Attribute attribute = (Attribute) sf.getOperandAttr();
 		
-			if (attribute != null) {
-				ConcretePath prefix = attribute.accessPath;
+		if (attribute != null) {
+			ConcretePath prefix = attribute.accessPath;
+
+            //System.err.println("ASTORE " + var.getName() + " := " + prefix);
 				
-				for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
-					VariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
+			for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
+				VariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
 
-					ConcretePath clone = (ConcretePath) path.clone();
+                //System.err.println("\t" + path);
+
+				ConcretePath clone = (ConcretePath) path.clone();
 			
-					ConcretePath.reRoot(clone, prefix, var.getName(), ti, ei, ConcretePath.Type.HEAP);
+				ConcretePath.reRoot(clone, prefix, var.getName(), ti, ei, ConcretePath.Type.HEAP);
 
-					ScopedSymbolTable.getInstance().register(clone, variableID);
-				}
+				ScopedSymbolTable.getInstance().register(clone, variableID);
 			}
 		}
 		
