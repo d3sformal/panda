@@ -3,6 +3,8 @@ package gov.nasa.jpf.abstraction.predicate.common;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.Comparator;
 
 public class FlatSymbolTable implements SymbolTable, Cloneable {
 	
@@ -76,8 +78,17 @@ public class FlatSymbolTable implements SymbolTable, Cloneable {
 		}
 		
 		padding += 4;
+
+        TreeSet<AccessPath> paths = new TreeSet<AccessPath>(new Comparator<AccessPath>() {
+            @Override
+            public int compare(AccessPath p1, AccessPath p2) {
+                return p1.toString(AccessPath.NotationPolicy.DOT_NOTATION).compareTo(p2.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+            }
+        });
+
+        paths.addAll(path2num.keySet());
 		
-		for (AccessPath p : path2num.keySet()) {
+		for (AccessPath p : paths) {
 			String path = p.toString(AccessPath.NotationPolicy.DOT_NOTATION);
 			String pad = "";
 			
