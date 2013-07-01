@@ -11,18 +11,29 @@ class A
 
 class B
 {
-    int y;
+    C y;
+
+    public B() {
+        y = new C();
+    }
+}
+
+class C
+{
+    int z;
 }
 
 public class Ambiguity
 {
     public static void main(String[] args) {
         A a = new A();
+        B b;
+        C c = new C();
 
-        a.x.y = 0;
+        a.x.y.z = 0;
+        c.z = 3;
 
-        B b = a.x;
-
-        b.y = 3;
+        b = a.x;
+        a.x.y = c;
     }
 }

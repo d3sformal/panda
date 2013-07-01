@@ -56,12 +56,8 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		if (attribute != null) {
 			ConcretePath prefix = attribute.accessPath;
 
-            //System.err.println("ASTORE " + var.getName() + " := " + prefix);
-				
 			for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
 				VariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
-
-                //System.err.println("\t" + path);
 
 				ConcretePath clone = (ConcretePath) path.clone();
 			

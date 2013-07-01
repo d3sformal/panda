@@ -69,7 +69,7 @@ public class ConcretePath extends AccessPath {
 		
 		AccessPathElement next = path.root;
 		
-		while (next.getNext() != null) {
+		while (next != null) {
 			path.tail = next;
 			next = next.getNext();
 		}

@@ -54,9 +54,9 @@ public class AccessPath extends Expression implements Cloneable {
 		AccessPathMiddleElement next = (AccessPathMiddleElement) pathElement;
 
 		path.root = newPrefix.root;
-		
+
 		newPrefix.tail.setNext(next);
-		
+
 		if (next != null) {
 			next.setPrevious(newPrefix.tail);
 		}
@@ -124,7 +124,7 @@ public class AccessPath extends Expression implements Cloneable {
 		
 		AccessPathElement next = path.root;
 		
-		while (next.getNext() != null) {
+		while (next != null) {
 			path.tail = next;
 			next = next.getNext();
 		}

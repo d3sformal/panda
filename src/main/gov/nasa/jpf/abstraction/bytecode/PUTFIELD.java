@@ -19,6 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.common.VariableID;
 import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
@@ -36,27 +37,42 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 	public Instruction execute(ThreadInfo ti) {		
 		StackFrame sf = ti.getModifiableTopFrame();
 		
-		Attribute attribute = (Attribute) sf.getOperandAttr(1);
-		
+        Attribute source = (Attribute) sf.getOperandAttr(0);
+		Attribute destination = (Attribute) sf.getOperandAttr(1);
+
 		Instruction ret = super.execute(ti);
 
-        //TODO: REROOT ALL PATHS PREFIXED BY ASSIGNED VALUE (IF ANY ... OBJREF) TO HAVE NEW PREFIX DEFINED BY THE ENCLOSING OBJECT OF THE FIELD
+		if (destination != null) {
+			ConcretePath pathRoot = (ConcretePath) destination.accessPath;
 		
-		if (attribute != null) {
-			ConcretePath path = attribute.accessPath;
-		
-			if (path != null) {
-                //System.err.println(path);
-				path.appendSubElement(getFieldName());
+			if (pathRoot != null) {
+				pathRoot.appendSubElement(getFieldName());
 			
-				VariableID number = path.resolve();
+                if (source == null) {
+    				VariableID number = pathRoot.resolve();
 			
-				if (number != null) {
-					ScopedSymbolTable.getInstance().register(path, number);
-				}
+	    			if (number != null) {
+		    			ScopedSymbolTable.getInstance().register(pathRoot, number);
+			    	}
+                } else {
+                    ConcretePath prefix = source.accessPath;
+
+                    if (prefix != null) {
+                        for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
+            				VariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
+
+		    		        ConcretePath newPath = (ConcretePath) path.clone();
+                            ConcretePath newPathRoot = (ConcretePath) pathRoot.clone();
+
+        	    			AccessPath.reRoot(newPath, prefix, newPathRoot);
+
+		            		ScopedSymbolTable.getInstance().register(newPath, variableID);
+			            }
+                    }
+                }
 			}
 		
-			sf.setOperandAttr(new Attribute(null, path));
+			sf.setOperandAttr(new Attribute(null, pathRoot));
 		}
 		
 		return ret;
