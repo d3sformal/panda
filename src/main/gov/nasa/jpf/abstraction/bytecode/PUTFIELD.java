@@ -43,7 +43,7 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		Instruction ret = super.execute(ti);
 
 		if (destination != null) {
-			ConcretePath pathRoot = (ConcretePath) destination.accessPath;
+			ConcretePath pathRoot = destination.accessPath;
 		
 			if (pathRoot != null) {
 				pathRoot.appendSubElement(getFieldName());

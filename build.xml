@@ -110,7 +110,9 @@
   <target name="-compile-annotations" if="have_annotations">
     <mkdir dir="build/annotations"/>
     <javac srcdir="src/annotations" destdir="build/annotations"
-           debug="${debug}" source="${src_level}" deprecation="${deprecation}" classpath="" includeantruntime="false"/>
+           debug="${debug}" source="${src_level}" deprecation="${deprecation}" classpath="" includeantruntime="false">
+      <compilerarg value="-Xlint:all" />
+    </javac>
   </target>
 
   <target name="grammar">
@@ -125,14 +127,18 @@
     <mkdir dir="build/main"/>
     <javac srcdir="src/main" destdir="build/main"
            debug="${debug}" source="${src_level}" deprecation="${deprecation}"
-           classpathref="lib.path" includeantruntime="false"/>
+           classpathref="lib.path" includeantruntime="false">
+      <compilerarg value="-Xlint:all" />
+    </javac>
   </target>
 
   <target name="-compile-peers" if="have_peers" depends="-compile-main" >
     <mkdir dir="build/peers"/>
     <javac srcdir="src/peers" destdir="build/peers"
            debug="${debug}" source="${src_level}" deprecation="${deprecation}"
-           classpathref="lib.path" includeantruntime="false"/>
+           classpathref="lib.path" includeantruntime="false">
+      <compilerarg value="-Xlint:all" />
+    </javac>
   </target>
 
   <target name="-compile-classes" if="have_classes" depends="-compile-annotations,-compile-main" >
@@ -143,6 +149,7 @@
         <path refid="lib.path"/>
         <pathelement location="build/annotations"/>
       </classpath>
+      <compilerarg value="-Xlint:all" />
     </javac>
   </target>
 
@@ -155,6 +162,7 @@
         <pathelement location="build/classes"/>
         <pathelement location="build/annotations"/>
       </classpath>
+      <compilerarg value="-Xlint:all" />
     </javac>
   </target>
 
@@ -162,11 +170,12 @@
     <mkdir dir="build/examples" />
     <javac srcdir="src/examples" destdir="build/examples"
            debug="${debug}" source="${src_level}" deprecation="${deprecation}" includeantruntime="false">
-    <classpath>
+      <classpath>
         <path refid="lib.path"/>
         <pathelement location="build/classes"/>
-      <pathelement location="build/annotations"/>
-     </classpath>
+        <pathelement location="build/annotations"/>
+      </classpath>
+      <compilerarg value="-Xlint:all" />
     </javac>
     </target>
 

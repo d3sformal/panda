@@ -411,8 +411,9 @@ public class IntervalAbstraction extends Abstraction {
 			left2 = Math.min(left2, ((IntervalAbstraction)left.abs).MAX);
 			right2 = Math.max(right2, Double.POSITIVE_INFINITY);
 		}
-		if (left2 <= 0 && 0 <= right2)
-			; // TODO: Handle division by zero
+		if (left2 <= 0 && 0 <= right2) {
+		    // TODO: Handle division by zero
+        }
 		double res_left = 0;
 		double res_right = ____max(Math.abs(left1), Math.abs(right1),
 				Math.abs(left2), Math.abs(right2));

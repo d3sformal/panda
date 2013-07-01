@@ -25,10 +25,14 @@ public class DefaultConcretePathRootElement extends DefaultAccessPathRootElement
 		switch (type) {
 		case LOCAL:
 			throw new RuntimeException("Cannot access structure of a primitive type.");
+
 		case STATIC:
 			if (element instanceof AccessPathIndexElement) {
 				throw new RuntimeException("Cannot access a class as an array.");
 			}
+			super.setNext(element);
+            break;
+
 		default:
 			super.setNext(element);
 		}

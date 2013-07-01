@@ -37,12 +37,12 @@ public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
 	
 	@Override
 	protected AbstractValue getLeftAbstractValue(StackFrame sf) {
-		return (AbstractValue)((Attribute)sf.getOperandAttr(1)).abstractValue;
+		return ((Attribute)sf.getOperandAttr(1)).abstractValue;
 	}
 
 	@Override
 	protected AbstractValue getRightAbstractValue(StackFrame sf) {
-		return (AbstractValue)((Attribute)sf.getOperandAttr(3)).abstractValue;
+		return ((Attribute)sf.getOperandAttr(3)).abstractValue;
 	}
 
 	@Override
