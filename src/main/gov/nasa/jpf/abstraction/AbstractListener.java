@@ -21,7 +21,6 @@ package gov.nasa.jpf.abstraction;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
-import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -33,30 +32,12 @@ public class AbstractListener extends PropertyListenerAdapter {
 	}
 
 	@Override
-	public void propertyViolated (Search search){
-		System.out.println("--------->property violated");
-
-		VM vm = search.getVM();
-		ChoiceGenerator<?> cg = vm.getChoiceGenerator();
-
-		if (!(cg instanceof AbstractChoiceGenerator)){
-			ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
-
-			while (!((prev_cg == null) || (prev_cg instanceof AbstractChoiceGenerator))) {
-				prev_cg = prev_cg.getPreviousChoiceGenerator();
-			}
-
-			cg = prev_cg;
-		}
-	}
-
-	@Override
 	public void instructionExecuted(VM vm, ThreadInfo ti, Instruction insn, Instruction exec) {
 	}
 	
 	@Override
 	public void stateAdvanced(Search search) {
-		AbstractInstructionFactory.abs.advance();
+		AbstractInstructionFactory.abs.forward();
 	}
 
 	@Override
