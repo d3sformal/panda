@@ -18,6 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import java.util.Collection;
+
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
@@ -44,10 +46,10 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 		Instruction ret = super.execute(ti);
 
         if (source == null) {
-    		CompleteVariableID number = pathRoot.resolve();
+        	Collection<CompleteVariableID> numbers = pathRoot.resolve().values();
 			
-	    	if (number != null) {
-		    	ScopedSymbolTable.getInstance().registerPathToVariable(pathRoot, number);
+			if (!numbers.isEmpty()) {
+				ScopedSymbolTable.getInstance().registerPathToVariable(pathRoot, numbers.iterator().next());
 			}
         } else {
             ConcretePath prefix = source.accessPath;

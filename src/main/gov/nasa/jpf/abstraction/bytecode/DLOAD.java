@@ -18,6 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import java.util.Collection;
+
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
@@ -44,10 +46,10 @@ public class DLOAD extends gov.nasa.jpf.jvm.bytecode.DLOAD {
 			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);
 			Attribute attribute = new Attribute(null, path);
 				
-			CompleteVariableID number = path.resolve();
+			Collection<CompleteVariableID> numbers = path.resolve().values();
 				
-			if (number != null) {
-				ScopedSymbolTable.getInstance().registerPathToVariable(path, number);
+			if (!numbers.isEmpty()) {
+				ScopedSymbolTable.getInstance().registerPathToVariable(path, numbers.iterator().next());
 			}
 
 			sf.setLongOperandAttr(attribute);

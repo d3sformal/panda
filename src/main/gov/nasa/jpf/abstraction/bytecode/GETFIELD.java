@@ -18,6 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import java.util.Collection;
+
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
@@ -46,10 +48,10 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 			if (path != null) {
 				path.appendSubElement(getFieldName());
 			
-				CompleteVariableID number = path.resolve();
-			
-				if (number != null) {
-					ScopedSymbolTable.getInstance().registerPathToVariable(path, number);
+				Collection<CompleteVariableID> numbers = path.resolve().values();
+				
+				if (!numbers.isEmpty()) {
+					ScopedSymbolTable.getInstance().registerPathToVariable(path, numbers.iterator().next());
 				}
 			}
 		

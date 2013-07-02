@@ -1,10 +1,14 @@
 package gov.nasa.jpf.abstraction.predicate.concrete.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathRootElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.LocalVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.VariableID;
+import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathMiddleElement;
 import gov.nasa.jpf.abstraction.predicate.grammar.impl.DefaultAccessPathRootElement;
@@ -48,23 +52,25 @@ public class DefaultConcretePathRootElement extends DefaultAccessPathRootElement
 	}
 
 	@Override
-	public VariableID getVariableID(ThreadInfo ti) {
+	public Map<AccessPath, VariableID> getVariableID(ThreadInfo ti) {
 		/**
 		 * If the path is of a primitive form (one element)
 		 * it necessarily refers to a primitive local variable.
-		 */		
-		switch (type) {
-		case LOCAL:
+		 */
+		Map<AccessPath, VariableID> ret = new HashMap<AccessPath, VariableID>();
+
+		if (type == ConcretePath.Type.LOCAL) {
 			LocalVarInfo info = (LocalVarInfo) rootObject;
 
-			return new LocalVariableID(info.getName(), info.getSlotIndex());
-		}
-		
-		if (rootObject instanceof ElementInfo) {
-			return new PartialVariableID((ElementInfo)rootObject);
+			// LOCAL VARIABLE
+			ret.put(new AccessPath(getName()), new LocalVariableID(info.getName(), info.getSlotIndex()));
+		} else if (rootObject instanceof ElementInfo) {
+			
+			// INCOMPLETE PATH
+			ret.put(new AccessPath(getName()), new PartialVariableID((ElementInfo)rootObject));
 		}
 
-		return null;
+		return ret;
 	}
 	
 	@Override

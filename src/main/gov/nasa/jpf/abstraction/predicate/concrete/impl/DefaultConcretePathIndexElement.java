@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.concrete.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.predicate.concrete.ArrayElementID;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
@@ -7,17 +10,17 @@ import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.VariableID;
+import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathMiddleElement;
 import gov.nasa.jpf.abstraction.predicate.grammar.Constant;
-import gov.nasa.jpf.abstraction.predicate.grammar.Expression;
 import gov.nasa.jpf.abstraction.predicate.grammar.impl.DefaultAccessPathIndexElement;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexElement implements ConcretePathIndexElement {
 	
-	public DefaultConcretePathIndexElement(Expression index) {
-		super(index);
+	public DefaultConcretePathIndexElement() {
+		super(null);
 	}
 	
 	@Override
@@ -26,36 +29,39 @@ public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexEleme
 	}
 
 	@Override
-	public VariableID getVariableID(ThreadInfo ti) {
+	public Map<AccessPath, VariableID> getVariableID(ThreadInfo ti) {
 		ConcretePathElement previous = getPrevious();
-		VariableID var = previous.getVariableID(ti);
+		Map<AccessPath, VariableID> vars = previous.getVariableID(ti);
+		Map<AccessPath, VariableID> ret = new HashMap<AccessPath, VariableID>();
 		
-		if (var instanceof PartialVariableID) {
-				ElementInfo ei = ((PartialVariableID)var).getInfo();
-				
-				if (ei.getClassInfo().isArray()) {
-					ConcretePath indexPath = (ConcretePath) getIndex();
-					CompleteVariableID index = indexPath.resolve();
+		for (AccessPath path : vars.keySet()) {
+			VariableID var = vars.get(path);
+		
+			if (var instanceof CompleteVariableID) continue;
+			
+			ElementInfo ei = ((PartialVariableID)var).getInfo();
+			
+			if (ei.getClassInfo().isArray()) {
+				for (int i = 0; i < ei.getArrayFields().arrayLength(); ++i) {
+					AccessPath clone = (AccessPath) path.clone();
+					
+					clone.appendIndexElement(new Constant(i));
 
 					if (ei.getClassInfo().isReferenceArray()) {
-						try {
-							return new PartialVariableID(ti.getElementInfo(ei.getReferenceElement(index.getInteger())));
-						} catch (Exception e) {
-							System.err.println("Cannot continue resolving path");
-							return null; //TODO: unless we know the precise index we cannot continue along the path 
-						}
+						ret.put(clone, new PartialVariableID(ti.getElementInfo(ei.getArrayFields().getReferenceValue(i))));
+					} else {
+						ret.put(clone, new ArrayElementID(ei.getObjectRef(), i));
 					}
-					
-					return new ArrayElementID(ei.getObjectRef(), index);
 				}
+			}
 		}
 		
-		return null;
+		return ret;
 	}
 	
 	@Override
 	public Object clone() {
-		DefaultConcretePathIndexElement clone = new DefaultConcretePathIndexElement(getIndex());
+		DefaultConcretePathIndexElement clone = new DefaultConcretePathIndexElement();
 		
 		if (getNext() != null) {
 			clone.setNext((AccessPathMiddleElement) getNext().clone());

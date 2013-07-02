@@ -30,6 +30,14 @@ public class AccessPath extends Expression implements Cloneable {
 		tail = root;
 	}
 	
+	public AccessPathRootElement getRoot() {
+		return root;
+	}
+	
+	public AccessPathElement getTail() {
+		return tail;
+	}
+	
 	protected void appendElement(AccessPathMiddleElement element) {
 		tail.setNext(element);
 		element.setPrevious(tail);

@@ -1,6 +1,11 @@
 package gov.nasa.jpf.abstraction.predicate.concrete.impl;
 
+import java.nio.file.AccessMode;
+import java.util.HashMap;
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathRootElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathSubElement;
@@ -8,7 +13,9 @@ import gov.nasa.jpf.abstraction.predicate.concrete.ObjectFieldID;
 import gov.nasa.jpf.abstraction.predicate.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.StaticFieldID;
 import gov.nasa.jpf.abstraction.predicate.concrete.VariableID;
+import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathMiddleElement;
+import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathRootElement;
 import gov.nasa.jpf.abstraction.predicate.grammar.impl.DefaultAccessPathSubElement;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -25,33 +32,44 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 	}
 
 	@Override
-	public VariableID getVariableID(ThreadInfo ti) {
+	public Map<AccessPath, VariableID> getVariableID(ThreadInfo ti) {
 		ConcretePathElement previous = getPrevious();
-		VariableID var = previous.getVariableID(ti);
+		Map<AccessPath, VariableID> vars = previous.getVariableID(ti);
+		Map<AccessPath, VariableID> ret = new HashMap<AccessPath, VariableID>();
 		
-		if (var == null) return null;
-		if (var instanceof CompleteVariableID) return null;
+		for (AccessPath path : vars.keySet()) {
+			VariableID var = vars.get(path);
 
-		ElementInfo ei = ((PartialVariableID)var).getInfo();
+			if (var instanceof CompleteVariableID) continue;
+
+			ElementInfo ei = ((PartialVariableID)var).getInfo();
 		
-		Object object = ei.getFieldValueObject(getName());
-		
-		if (previous instanceof ConcretePathRootElement) {
-			ConcretePathRootElement root = (ConcretePathRootElement) previous;
+			Object object = ei.getFieldValueObject(getName());
+
+			path.appendSubElement(getName());
+
+			if (previous instanceof ConcretePathRootElement) {
+				ConcretePathRootElement root = (ConcretePathRootElement) previous;
 			
-			switch (root.getType()) {
-			case STATIC:
-				if (!(object instanceof ElementInfo)) {
-					return new StaticFieldID(ei.getClassInfo().getName(), getName());
+				if (root.getType() == ConcretePath.Type.STATIC) {
+					if (!(object instanceof ElementInfo)) {
+						// STATIC PRIMITIVE FIELD
+						ret.put(path, new StaticFieldID(ei.getClassInfo().getName(), getName()));
+						continue;
+					}
 				}
+			}
+			
+			if (object instanceof ElementInfo) {
+				// STRUCTURED FIELD (PATH NOT YET COMPLETE)
+				ret.put(path, new PartialVariableID((ElementInfo)object));
+			} else {
+				// PRIMITIVE FIELD
+				ret.put(path, new ObjectFieldID(ei.getObjectRef(), getName()));
 			}
 		}
 		
-		if (object instanceof ElementInfo) {
-			return new PartialVariableID((ElementInfo)object);
-		}
-		
-		return new ObjectFieldID(ei.getObjectRef(), getName());
+		return ret;
 	}
 	
 	@Override
