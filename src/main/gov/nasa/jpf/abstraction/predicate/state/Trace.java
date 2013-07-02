@@ -9,7 +9,7 @@ public class Trace {
 	private Stack<State> states = new Stack<State>();
 	
 	private Trace() {
-		states.push(new State(new FlatSymbolTable()));
+		states.push(new State(new FlatSymbolTable(), new FlatPredicateValuation()));
 	}
 	
 	public static Trace getInstance() {

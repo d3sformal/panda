@@ -49,7 +49,7 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 		    	sf.setOperandAttr(attribute);
     		}
         } else {
-        	System.err.println(getClass().getSimpleName() + ": unknown local variable");
+        	//TODO System.err.println(getClass().getSimpleName() + ": unknown local variable");
         }
 
 		return ret;

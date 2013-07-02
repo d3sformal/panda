@@ -23,7 +23,6 @@ public class ScopedSymbolTable implements SymbolTable {
 		
 		return instance;
 	}
-	
 
 	@Override
 	public Set<AccessPath> lookupAccessPaths(AccessPath prefix) {

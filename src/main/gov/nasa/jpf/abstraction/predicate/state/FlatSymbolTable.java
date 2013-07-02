@@ -72,7 +72,7 @@ public class FlatSymbolTable implements SymbolTable, Cloneable {
 	
 	@Override
 	public String toString() {
-		String ret = "--------------------- (" + path2num.size() + ")\n";
+		String ret = "--SYMBOLS------------ (" + path2num.size() + ")\n";
 		
 		int padding = 0;
 

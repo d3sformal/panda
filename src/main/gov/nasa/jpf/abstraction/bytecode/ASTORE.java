@@ -69,7 +69,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 				}
 			}
 		} else {
-        	System.err.println(getClass().getSimpleName() + ": unknown local variable");
+        	//TODO System.err.println(getClass().getSimpleName() + ": unknown local variable");
         }
 		
 		return ret;
