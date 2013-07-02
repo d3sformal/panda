@@ -95,6 +95,11 @@ public class AbstractInstructionFactory extends
 	}
 	
 	// bytecodes
+
+	@Override
+	public Instruction aaload() {
+		return (filter.isInstrumentedClass(ci) ? new AALOAD() : super.aaload());
+	}
 	
 	@Override
 	public Instruction aload(int index) {

@@ -45,10 +45,6 @@ public class ConcretePath extends AccessPath {
 	
 	@Override
 	public void appendIndexElement(Expression index) {
-		throw new RuntimeException("Concrete path cannot cope with expressions.");
-	}
-	
-	public void appendIndexElement(int index) {
 		appendElement(new DefaultConcretePathIndexElement(index));
 	}
 	
