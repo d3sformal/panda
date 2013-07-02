@@ -105,6 +105,11 @@ public class AbstractInstructionFactory extends
 	public Instruction areturn() {
 		return (filter.isInstrumentedClass(ci) ? new ARETURN() : super.areturn());
 	}
+	
+	@Override
+	public Instruction astore(int index) {
+		return (filter.isInstrumentedClass(ci) ? new ASTORE(index) : super.astore(index));
+	}
 
 	@Override
 	public Instruction d2f() {
@@ -511,6 +516,16 @@ public class AbstractInstructionFactory extends
 		return (filter.isInstrumentedClass(ci) ? new LXOR() : super.lxor());
 	}
 
+	@Override
+	public Instruction putfield(String fieldName, String clsName, String fieldDescriptor) {
+		return (filter.isInstrumentedClass(ci) ? new PUTFIELD(fieldName, clsName, fieldDescriptor) : super.putfield(fieldName, clsName, fieldDescriptor));
+	}
+	
+	@Override
+	public Instruction putstatic(String fieldName, String clsName, String fieldDescriptor) {
+		return (filter.isInstrumentedClass(ci) ? new PUTSTATIC(fieldName, clsName, fieldDescriptor) : super.putstatic(fieldName, clsName, fieldDescriptor));
+	}
+	
 	@Override
 	public Instruction tableswitch(int defaultTargetPc, int low, int high) {
 		return filter.isInstrumentedClass(ci) 

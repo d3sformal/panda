@@ -38,7 +38,7 @@ public class F2D extends gov.nasa.jpf.jvm.bytecode.F2D {
 		AbstractValue abs_val = null;
 		
 		if (attr != null) {
-			abs_val = (AbstractValue) attr.abstractValue;
+			abs_val = attr.abstractValue;
 		}
 
 		if (abs_val == null) {

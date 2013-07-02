@@ -37,7 +37,7 @@ public class LongUnaryOperatorExecutor extends UnaryOperatorExecutor<Long> {
 	
 	@Override
 	protected AbstractValue getAbstractValue(StackFrame sf) {
-		return (AbstractValue)((Attribute)sf.getOperandAttr(1)).abstractValue;
+		return ((Attribute)sf.getOperandAttr(1)).abstractValue;
 	}
 
 	@Override

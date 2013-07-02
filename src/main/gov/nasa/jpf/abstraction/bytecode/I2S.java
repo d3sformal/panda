@@ -38,7 +38,7 @@ public class I2S extends gov.nasa.jpf.jvm.bytecode.I2S {
 		AbstractValue abs_val = null;
 		
 		if (attr != null) {
-			abs_val = (AbstractValue) attr.abstractValue;
+			abs_val = attr.abstractValue;
 		}
 
 		if (abs_val == null) {

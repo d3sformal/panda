@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction;
 
-import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
+import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 
 public class Attribute {
 	public AbstractValue abstractValue;

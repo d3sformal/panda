@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -32,7 +32,7 @@ public class INVOKEINTERFACE extends gov.nasa.jpf.jvm.bytecode.INVOKEINTERFACE {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		ScopedSymbolTable.getInstance().methodCall();
+		ScopedSymbolTable.getInstance().processMethodCall();
 		
 		return ret;
 	}

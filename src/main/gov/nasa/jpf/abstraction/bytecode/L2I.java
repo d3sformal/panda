@@ -37,7 +37,7 @@ public class L2I extends gov.nasa.jpf.jvm.bytecode.L2I {
 		AbstractValue abs_val = null;
 		
 		if (attr != null) {
-			abs_val = (AbstractValue) attr.abstractValue;
+			abs_val = attr.abstractValue;
 		}
 
 		if (abs_val == null) {

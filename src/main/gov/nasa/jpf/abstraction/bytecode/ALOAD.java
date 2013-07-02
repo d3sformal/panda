@@ -19,7 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
+import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -35,20 +35,22 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 	@Override
 	public Instruction execute(ThreadInfo ti) {
 		StackFrame sf = ti.getModifiableTopFrame();
-		LocalVarInfo var = sf.getLocalVarInfo(index);
+		LocalVarInfo var = getLocalVarInfo();
 		
 		Instruction ret = super.execute(ti);
-		
-		if (var != null) {
-			ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
-			ConcretePath path = new ConcretePath(var.getName(), ti, ei, ConcretePath.Type.HEAP);
+	
+        if (var != null) {	
+    		ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
+	    	ConcretePath path = new ConcretePath(var.getName(), ti, ei, ConcretePath.Type.HEAP);
 			
-			if (ei != null) {
-				Attribute attribute = new Attribute(null, path);
+    		if (ei != null) {
+	    		Attribute attribute = new Attribute(null, path);
 
-				sf.setOperandAttr(attribute);
-			}
-		}
+		    	sf.setOperandAttr(attribute);
+    		}
+        } else {
+        	System.err.println(getClass().getSimpleName() + ": unknown local variable");
+        }
 
 		return ret;
 	}
