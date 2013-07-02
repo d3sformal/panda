@@ -37,7 +37,6 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		//TODO
 		/*
 		 * current objRef may have an access path in the attribute
 		 * we need to find all paths in Symbol table whose prefix it is
@@ -47,39 +46,31 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		 * new paths need to be registered in Symbol table
 		 */
 		StackFrame sf = ti.getModifiableTopFrame();
-		LocalVarInfo var = getMethodInfo().getLocalVars()[index];
-
-		String v1 = null;
-		String v2 = null;
-		String v3 = null;
-		
-		try { v1 = getLocalVarInfo().getName(); } catch (Exception e) {}
-		try { v2 = sf.getLocalVarInfo(index).getName(); } catch (Exception e) {}
-		try { v3 = getMethodInfo().getLocalVars()[index].getName(); } catch (Exception e) {}
-		
-		System.err.println("S " + ((v1 != null && v2 != null && v3 != null && v1.equals(v2) && v2.equals(v3)) || (v1 == v2 && v2 == v3 && v1 == null) ? "OK" : "EE") + " " + v1 + " " + v2 + " " + v3);
-
-		ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
+		LocalVarInfo var = getLocalVarInfo();
 
 		Attribute attribute = (Attribute) sf.getOperandAttr();
 		
 		Instruction ret = super.execute(ti);
 		
-		if (attribute != null) {
-			ConcretePath prefix = attribute.accessPath;
+		if (var != null) {
+			ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
 
-			for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
-				CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
+			if (attribute != null) {
+				ConcretePath prefix = attribute.accessPath;
 
-				ConcretePath clone = (ConcretePath) path.clone();
-				
-				System.err.println(">> " + var.getName());
+				for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
+					CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
+
+					ConcretePath clone = (ConcretePath) path.clone();
 			
-				AccessPath.reRoot(clone, prefix, new ConcretePath(var.getName(), ti, ei, ConcretePath.Type.HEAP));
+					AccessPath.reRoot(clone, prefix, new ConcretePath(var.getName(), ti, ei, ConcretePath.Type.HEAP));
 
-				ScopedSymbolTable.getInstance().registerPathToVariable(clone, variableID);
+					ScopedSymbolTable.getInstance().registerPathToVariable(clone, variableID);
+				}
 			}
-		}
+		} else {
+        	System.err.println(getClass().getSimpleName() + ": unknown local variable");
+        }
 		
 		return ret;
 	}
