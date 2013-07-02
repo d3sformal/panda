@@ -4,5 +4,5 @@ id2thread[schedule[1]].priority < id2thread[schedule[2]].priority
 schedule_size = 0
 schedule_size < 3
 schTh.priority = 10
-not(j < i)
+j >= i
 j = 0

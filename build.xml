@@ -115,15 +115,17 @@
     </javac>
   </target>
 
-  <target name="grammar">
+  <target name="-compile-grammar">
     <java jar="lib/antlr-4.0-complete.jar" fork="true">
-      <arg value="src/main/gov/nasa/jpf/abstraction/predicate/grammar/Predicates.g4" />
       <arg value="-package" />
       <arg value="gov.nasa.jpf.abstraction.predicate.parser" />
+      <arg value="-o" />
+      <arg value="${basedir}/src/main/gov/nasa/jpf/abstraction/predicate/parser" />
+      <arg value="${basedir}/src/main/gov/nasa/jpf/abstraction/predicate/grammar/Predicates.g4" />
     </java>
   </target>
 
-  <target name="-compile-main" if="have_main" depends="grammar">
+  <target name="-compile-main" if="have_main" depends="-compile-grammar">
     <mkdir dir="build/main"/>
     <javac srcdir="src/main" destdir="build/main"
            debug="${debug}" source="${src_level}" deprecation="${deprecation}"

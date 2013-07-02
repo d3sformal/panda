@@ -1,5 +1,5 @@
 [static]
-not(image.Image.SIZE < 0)
+image.Image.SIZE >= 0
 
 [object image.Image]
 this.pixels.length = image.Image.SIZE
