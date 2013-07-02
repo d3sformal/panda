@@ -18,11 +18,12 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import java.util.Collection;
+import java.util.Map;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -48,10 +49,10 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 			if (path != null) {
 				path.appendSubElement(getFieldName());
 			
-				Collection<CompleteVariableID> numbers = path.resolve().values();
+				Map<AccessPath, CompleteVariableID> vars = path.resolve();
 				
-				if (!numbers.isEmpty()) {
-					ScopedSymbolTable.getInstance().registerPathToVariable(path, numbers.iterator().next());
+				for (AccessPath p : vars.keySet()) {
+					ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
 				}
 			}
 		
