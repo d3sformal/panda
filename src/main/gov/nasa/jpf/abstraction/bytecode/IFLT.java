@@ -52,8 +52,8 @@ public class IFLT extends gov.nasa.jpf.jvm.bytecode.IFLT implements AbstractBran
 	}
 
 	@Override
-	public AbstractBoolean getCondition(AbstractValue abs_v1, AbstractValue abs_v2) {
-		return Abstraction._lt(0, abs_v1, 0, null);
+	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
+		return Abstraction._lt(v1, abs_v1, 0, null);
 	}
 
 }

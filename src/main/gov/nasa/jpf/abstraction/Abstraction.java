@@ -1352,7 +1352,7 @@ public abstract class Abstraction {
 	}
 
 	public AbstractBoolean _eq(AbstractValue left, AbstractValue right) {
-		throw new RuntimeException("ge not implemented");
+		throw new RuntimeException("eq not implemented");
 	}
 
 	public AbstractBoolean _eq(AbstractValue left, int right) {

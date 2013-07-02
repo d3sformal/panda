@@ -52,8 +52,8 @@ public class IFNE extends gov.nasa.jpf.jvm.bytecode.IFNE implements AbstractBran
 	}
 
 	@Override
-	public AbstractBoolean getCondition(AbstractValue abs_v1, AbstractValue abs_v2) {
-		return Abstraction._ne(0, abs_v1, 0, null);
+	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
+		return Abstraction._ne(v1, abs_v1, 0, null);
 	}
 
 }

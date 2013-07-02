@@ -52,8 +52,8 @@ public class IFEQ extends gov.nasa.jpf.jvm.bytecode.IFEQ implements AbstractBran
 	}
 
 	@Override
-	public AbstractBoolean getCondition(AbstractValue abs_v1, AbstractValue abs_v2) {
-		return Abstraction._eq(0, abs_v1, 0, null);
+	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
+		return Abstraction._eq(v1, abs_v1, 0, null);
 	}
 
 }
