@@ -1,10 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate;
 
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.predicate.common.Predicates;
-import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
-import gov.nasa.jpf.abstraction.predicate.common.State;
-import gov.nasa.jpf.abstraction.predicate.common.Trace;
+import gov.nasa.jpf.abstraction.predicate.grammar.Predicates;
+import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.State;
+import gov.nasa.jpf.abstraction.predicate.state.Trace;
 
 public class PredicateAbstraction extends Abstraction {
 	private Predicates predicateSet;

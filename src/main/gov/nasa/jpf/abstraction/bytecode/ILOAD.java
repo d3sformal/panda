@@ -19,9 +19,9 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.predicate.common.CompleteVariableID;
-import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
-import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
