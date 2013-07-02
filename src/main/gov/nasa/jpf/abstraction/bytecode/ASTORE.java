@@ -47,11 +47,23 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		 * new paths need to be registered in Symbol table
 		 */
 		StackFrame sf = ti.getModifiableTopFrame();
-		LocalVarInfo var = getMethodInfo().getLocalVars()[index];
+		LocalVarInfo var = getLocalVarInfo();
+		
+		String v1 = null;
+		String v2 = null;
+		String v3 = null;
+		
+		try { v1 = getLocalVarInfo().getName(); } catch (Exception e) {}
+		try { v2 = sf.getLocalVarInfo(index).getName(); } catch (Exception e) {}
+		try { v3 = getMethodInfo().getLocalVars()[index].getName(); } catch (Exception e) {}
+		
+		System.err.println("S " + ((v1 != null && v2 != null && v3 != null && v1.equals(v2) && v2.equals(v3)) || (v1 == v2 && v2 == v3 && v1 == null) ? "OK" : "EE") + " " + v1 + " " + v2 + " " + v3);
 
 		ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
 
 		Attribute attribute = (Attribute) sf.getOperandAttr();
+		
+		Instruction ret = super.execute(ti);
 		
 		if (attribute != null) {
 			ConcretePath prefix = attribute.accessPath;
@@ -67,6 +79,6 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 			}
 		}
 		
-		return super.execute(ti);
+		return ret;
 	}
 }
