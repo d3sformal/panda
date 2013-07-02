@@ -158,6 +158,9 @@ For each instruction we must update (process) only the predicates affected by th
 Original value is preserved for other (unaffected) predicates.
 This may save a considerable number of calls to the SMT solver.
 
+When the name of a local variable is not available for some reason (e.g., the class file does not contain debugging information), then we must update all predicates over local variables of the given method.
+One option would be to take all predicates that refer to some local variable of the given method (they are all relevant in that case).
+
 In the case of bytecode instructions that read or modify some array element, the set of relevant predicates contains all predicates that refer to the respective array variable and to variables aliased with it. 
 This means especially predicates over the given array that do not use constant indexes.
 
