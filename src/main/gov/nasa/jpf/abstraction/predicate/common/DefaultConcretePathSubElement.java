@@ -15,16 +15,16 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 	}
 
 	@Override
-	public Object getObject(ThreadInfo ti) {
+	public VariableID getVariableID(ThreadInfo ti) {
 		ConcretePathElement previous = getPrevious();
-		Object object = previous.getObject(ti);
+		VariableID var = previous.getVariableID(ti);
 		
-		if (object == null) return null;
-		if (!(object instanceof ElementInfo)) return null;
+		if (var == null) return null;
+		if (var instanceof CompleteVariableID) return null;
 
-		ElementInfo ei = (ElementInfo) object;
+		ElementInfo ei = ((PartialVariableID)var).getInfo();
 		
-		object = ei.getFieldValueObject(getName());
+		Object object = ei.getFieldValueObject(getName());
 		
 		if (previous instanceof ConcretePathRootElement) {
 			ConcretePathRootElement root = (ConcretePathRootElement) previous;
@@ -37,11 +37,11 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 			}
 		}
 		
-		if (!(object instanceof ElementInfo)) {
-			return new ObjectFieldID(ei.getObjectRef(), getName());
+		if (object instanceof ElementInfo) {
+			return new PartialVariableID((ElementInfo)object);
 		}
 		
-		return object;
+		return new ObjectFieldID(ei.getObjectRef(), getName());
 	}
 	
 	@Override

@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-public class ObjectFieldID extends VariableID {
+public class ObjectFieldID extends CompleteVariableID {
 	
 	private int objRef;
 	private String fieldName;

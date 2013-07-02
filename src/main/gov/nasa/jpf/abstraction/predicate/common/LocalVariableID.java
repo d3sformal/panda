@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-public class LocalVariableID extends VariableID {
+public class LocalVariableID extends CompleteVariableID {
 	private int index;
 	private String name;
 

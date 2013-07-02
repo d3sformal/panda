@@ -19,16 +19,16 @@ public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexEleme
 	}
 
 	@Override
-	public Object getObject(ThreadInfo ti) {
+	public VariableID getVariableID(ThreadInfo ti) {
 		ConcretePathElement previous = getPrevious();
-		Object object = previous.getObject(ti);
+		VariableID var = previous.getVariableID(ti);
 		
-		if (object instanceof ElementInfo) {
-				ElementInfo ei = (ElementInfo) object;
+		if (var instanceof PartialVariableID) {
+				ElementInfo ei = ((PartialVariableID)var).getInfo();
 				
 				if (ei.getClassInfo().isArray()) {
 					if (ei.getClassInfo().isReferenceArray()) {
-						return ti.getElementInfo(ei.getArrayFields().getReferenceValue(index));
+						return new PartialVariableID(ti.getElementInfo(ei.getArrayFields().getReferenceValue(index)));
 					}
 					
 					return new ArrayElementID(ei.getObjectRef(), index);

@@ -28,17 +28,17 @@ public class ScopedSymbolTable implements SymbolTable {
 	}
 
 	@Override
-	public Set<AccessPath> lookupEquivalentAccessPaths(VariableID number) {
+	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID number) {
 		return scopes.lastElement().lookupEquivalentAccessPaths(number);
 	}
 
 	@Override
-	public VariableID resolvePath(AccessPath path) {
+	public CompleteVariableID resolvePath(AccessPath path) {
 		return scopes.lastElement().resolvePath(path);
 	}
 	
 	@Override
-	public void registerPathToVariable(AccessPath path, VariableID number) {
+	public void registerPathToVariable(AccessPath path, CompleteVariableID number) {
 		scopes.lastElement().registerPathToVariable(path, number);
 	}
 	

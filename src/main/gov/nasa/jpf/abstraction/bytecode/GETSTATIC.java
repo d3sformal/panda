@@ -19,8 +19,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.predicate.common.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
-import gov.nasa.jpf.abstraction.predicate.common.VariableID;
 import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -42,7 +42,7 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 		if (path != null) {
 			path.appendSubElement(getFieldName());
 			
-			VariableID number = path.resolve();
+			CompleteVariableID number = path.resolve();
 			
 			if (number != null) {
 				ScopedSymbolTable.getInstance().registerPathToVariable(path, number);

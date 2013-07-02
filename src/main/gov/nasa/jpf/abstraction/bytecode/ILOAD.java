@@ -19,8 +19,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.predicate.common.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
-import gov.nasa.jpf.abstraction.predicate.common.VariableID;
 import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -44,7 +44,7 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);
 			Attribute attribute = new Attribute(null, path);
 				
-			VariableID number = path.resolve();
+			CompleteVariableID number = path.resolve();
 				
 			if (number != null) {
 				ScopedSymbolTable.getInstance().registerPathToVariable(path, number);

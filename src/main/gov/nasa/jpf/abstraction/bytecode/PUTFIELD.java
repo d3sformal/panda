@@ -20,8 +20,8 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
-import gov.nasa.jpf.abstraction.predicate.common.VariableID;
 import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -49,7 +49,7 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 				pathRoot.appendSubElement(getFieldName());
 			
                 if (source == null) {
-    				VariableID number = pathRoot.resolve();
+    				CompleteVariableID number = pathRoot.resolve();
 			
 	    			if (number != null) {
 		    			ScopedSymbolTable.getInstance().registerPathToVariable(pathRoot, number);
@@ -59,7 +59,7 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 
                     if (prefix != null) {
                         for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
-            				VariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
+            				CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
 
 		    		        ConcretePath newPath = (ConcretePath) path.clone();
                             ConcretePath newPathRoot = (ConcretePath) pathRoot.clone();

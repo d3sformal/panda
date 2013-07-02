@@ -8,8 +8,8 @@ import java.util.Comparator;
 
 public class FlatSymbolTable implements SymbolTable, Cloneable {
 	
-	private HashMap<AccessPath, VariableID> path2num = new HashMap<AccessPath, VariableID>();
-	private HashMap<VariableID, Set<AccessPath>> num2paths = new HashMap<VariableID, Set<AccessPath>>();
+	private HashMap<AccessPath, CompleteVariableID> path2num = new HashMap<AccessPath, CompleteVariableID>();
+	private HashMap<CompleteVariableID, Set<AccessPath>> num2paths = new HashMap<CompleteVariableID, Set<AccessPath>>();
 
 	@Override
 	public Set<AccessPath> lookupAccessPaths(AccessPath prefix) {
@@ -25,12 +25,12 @@ public class FlatSymbolTable implements SymbolTable, Cloneable {
 	}
 
 	@Override
-	public Set<AccessPath> lookupEquivalentAccessPaths(VariableID number) {
+	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID number) {
 		return num2paths.get(number);
 	}
 
 	@Override
-	public VariableID resolvePath(AccessPath path) {
+	public CompleteVariableID resolvePath(AccessPath path) {
 		return path2num.get(path);
 	}
 	
@@ -39,14 +39,14 @@ public class FlatSymbolTable implements SymbolTable, Cloneable {
 	public FlatSymbolTable clone() {
 		FlatSymbolTable clone = new FlatSymbolTable();
 		
-		clone.path2num = (HashMap<AccessPath, VariableID>)path2num.clone();
-		clone.num2paths = (HashMap<VariableID, Set<AccessPath>>)num2paths.clone();
+		clone.path2num = (HashMap<AccessPath, CompleteVariableID>)path2num.clone();
+		clone.num2paths = (HashMap<CompleteVariableID, Set<AccessPath>>)num2paths.clone();
 		
 		return clone;
 	}
 
 	@Override
-	public void registerPathToVariable(AccessPath path, VariableID number) {
+	public void registerPathToVariable(AccessPath path, CompleteVariableID number) {
 		if (!num2paths.containsKey(number)) {
 			num2paths.put(number, new HashSet<AccessPath>());
 		}

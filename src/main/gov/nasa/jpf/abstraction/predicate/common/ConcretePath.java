@@ -45,12 +45,12 @@ public class ConcretePath extends AccessPath {
 		appendElement(new DefaultConcretePathIndexElement(index));
 	}
 	
-	public VariableID resolve() {
+	public CompleteVariableID resolve() {
 		ConcretePathElement element = (ConcretePathElement) tail;
-		Object object = element.getObject(ti);
+		VariableID var = element.getVariableID(ti);
 		
-		if (object instanceof VariableID) {
-			return (VariableID) object;
+		if (var instanceof CompleteVariableID) {
+			return (CompleteVariableID) var;
 		}
 		
 		return null;

@@ -20,9 +20,9 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.common.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.common.ScopedSymbolTable;
-import gov.nasa.jpf.abstraction.predicate.common.VariableID;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -69,7 +69,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 			ConcretePath prefix = attribute.accessPath;
 
 			for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
-				VariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
+				CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
 
 				ConcretePath clone = (ConcretePath) path.clone();
 				

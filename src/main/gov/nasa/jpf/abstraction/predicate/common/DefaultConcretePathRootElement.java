@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
+import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -39,7 +40,7 @@ public class DefaultConcretePathRootElement extends DefaultAccessPathRootElement
 	}
 
 	@Override
-	public Object getObject(ThreadInfo ti) {
+	public VariableID getVariableID(ThreadInfo ti) {
 		/**
 		 * If the path is of a primitive form (one element)
 		 * it necessarily refers to a primitive local variable.
@@ -50,8 +51,12 @@ public class DefaultConcretePathRootElement extends DefaultAccessPathRootElement
 
 			return new LocalVariableID(info.getName(), info.getSlotIndex());
 		}
+		
+		if (rootObject instanceof ElementInfo) {
+			return new PartialVariableID((ElementInfo)rootObject);
+		}
 
-		return rootObject;
+		return null;
 	}
 	
 	@Override
