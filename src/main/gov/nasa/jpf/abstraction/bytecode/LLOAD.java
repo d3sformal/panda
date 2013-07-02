@@ -27,9 +27,9 @@ import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
+public class LLOAD extends gov.nasa.jpf.jvm.bytecode.LLOAD {
 
-	public ILOAD(int index) {
+	public LLOAD(int index) {
 		super(index);
 	}
 	
@@ -50,7 +50,7 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 				ScopedSymbolTable.getInstance().registerPathToVariable(path, number);
 			}
 
-			sf.setOperandAttr(attribute);
+			sf.setLongOperandAttr(attribute);
 		}
 
 		return ret;
