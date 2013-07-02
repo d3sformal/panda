@@ -5,22 +5,11 @@ class A {
 }
 
 public class Array {
-	private static int LENGTH;
-
 	public static void main(String[] args) {
-		LENGTH = 1;
-
-		A x[] = new A[LENGTH];
-		int y[] = new int[LENGTH];
-
-		for (int i = 0; i < LENGTH; ++i) {
-			x[i] = new A();
-
-			if (i % 2 == 0) {
-				x[i].f = y[i];
-			} else {
-				y[i] = x[i].f;
-			}
-		}
+		A a[] = new A[1];
+		a[0] = new A();
+		int i = a[0].f;
+		
+		System.out.println(i);
 	}
 }

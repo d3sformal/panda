@@ -5,9 +5,9 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.predicate.concrete.ArrayElementID;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
-import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathIndexElement;
+import gov.nasa.jpf.abstraction.predicate.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.predicate.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.VariableID;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
@@ -20,7 +20,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexElement implements ConcretePathIndexElement {
 	
 	public DefaultConcretePathIndexElement() {
-		super(null);
+		super(new EmptyExpression());
 	}
 	
 	@Override

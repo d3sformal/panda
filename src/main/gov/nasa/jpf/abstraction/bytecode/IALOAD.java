@@ -20,12 +20,11 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
+public class IALOAD extends gov.nasa.jpf.jvm.bytecode.IALOAD {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
@@ -33,12 +32,12 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 		
 		Instruction ret = super.execute(ti);
 		
-		Attribute attr = (Attribute) sf.getOperandAttr(1);
+		Attribute attr1 = (Attribute) sf.getOperandAttr(1);
 		
-		System.err.println("AALOAD " + (attr == null ? attr : attr.accessPath.toString(AccessPath.NotationPolicy.DOT_NOTATION)));
+		System.err.println("IALOAD " + attr1);
 		
-		if (attr != null) {
-			ConcretePath path1 = attr.accessPath;
+		if (attr1 != null) {
+			ConcretePath path1 = attr1.accessPath;
 
 			if (path1 != null) {
 				path1.appendIndexElement(null);
