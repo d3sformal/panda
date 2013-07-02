@@ -37,7 +37,7 @@ public class AbstractListener extends PropertyListenerAdapter {
 	
 	@Override
 	public void stateAdvanced(Search search) {
-		AbstractInstructionFactory.abs.advance();
+		AbstractInstructionFactory.abs.forward();
 	}
 
 	@Override

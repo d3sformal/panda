@@ -14,7 +14,7 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void advance() {
+	public void forward() {
 		System.err.println("Trace++");
 		Trace trace = Trace.getInstance();
 		

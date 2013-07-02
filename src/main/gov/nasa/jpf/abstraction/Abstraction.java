@@ -48,7 +48,7 @@ public abstract class Abstraction {
 		throw new RuntimeException("abstract_map not implemented");
 	}
 	
-	public void advance() {
+	public void forward() {
 	}
 	
 	public void backtrack() {

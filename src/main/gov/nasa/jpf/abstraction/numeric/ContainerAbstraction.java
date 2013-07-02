@@ -146,9 +146,9 @@ public class ContainerAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void advance() {
+	public void forward() {
 		for (Abstraction abs : list) {
-			abs.advance();
+			abs.forward();
 		}
 	}
 	
