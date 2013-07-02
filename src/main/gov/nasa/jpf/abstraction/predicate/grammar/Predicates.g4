@@ -59,6 +59,18 @@ predicate returns [Predicate val]
 	| a=expression '<' b=expression {
 		$ctx.val = new LessThan($a.val, $b.val);
 	}
+	| a=expression '>' b=expression {
+		$ctx.val = new LessThan($b.val, $a.val);
+	}
+	| a=expression '<=' b=expression {
+		$ctx.val = new Negation(new LessThan($b.val, $a.val));
+	}
+	| a=expression '>=' b=expression {
+		$ctx.val = new Negation(new LessThan($a.val, $b.val));
+	}
+	| a=expression '!=' b=expression {
+		$ctx.val = new Negation(new Equals($a.val, $b.val));
+	}
 	;
 
 expression returns [Expression val]
