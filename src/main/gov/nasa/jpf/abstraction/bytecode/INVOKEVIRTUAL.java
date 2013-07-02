@@ -32,7 +32,7 @@ public class INVOKEVIRTUAL extends gov.nasa.jpf.jvm.bytecode.INVOKEVIRTUAL {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		ScopedSymbolTable.getInstance().methodCall();
+		ScopedSymbolTable.getInstance().processMethodCall();
 		
 		return ret;
 	}

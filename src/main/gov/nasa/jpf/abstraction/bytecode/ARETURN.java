@@ -28,7 +28,7 @@ public class ARETURN extends gov.nasa.jpf.jvm.bytecode.ARETURN {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		ScopedSymbolTable.getInstance().methodReturn();
+		ScopedSymbolTable.getInstance().processMethodReturn();
 		
 		return ret;
 	}

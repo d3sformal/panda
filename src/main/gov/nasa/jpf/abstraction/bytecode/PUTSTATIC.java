@@ -47,7 +47,7 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
     		VariableID number = pathRoot.resolve();
 			
 	    	if (number != null) {
-		    	ScopedSymbolTable.getInstance().register(pathRoot, number);
+		    	ScopedSymbolTable.getInstance().registerPathToVariable(pathRoot, number);
 			}
         } else {
             ConcretePath prefix = source.accessPath;
@@ -61,7 +61,7 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 
                     AccessPath.reRoot(newPath, prefix, newPathRoot);
 
-		            ScopedSymbolTable.getInstance().register(newPath, variableID);
+		            ScopedSymbolTable.getInstance().registerPathToVariable(newPath, variableID);
 			    }
             }
         }

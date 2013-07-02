@@ -38,26 +38,26 @@ public class ScopedSymbolTable implements SymbolTable {
 	}
 	
 	@Override
-	public void register(AccessPath path, VariableID number) {
-		scopes.lastElement().register(path, number);
+	public void registerPathToVariable(AccessPath path, VariableID number) {
+		scopes.lastElement().registerPathToVariable(path, number);
 	}
 	
-	public void methodCall() {
+	public void processMethodCall() {
 		scopes.push(new FlatSymbolTable());
 	}
 	
-	public void methodReturn() {
+	public void processMethodReturn() {
 		if (scopes.size() > 1) {
 			scopes.pop();
 		}
 	}
 	
-	public void recover(FlatSymbolTable scope) {
+	public void restore(FlatSymbolTable scope) {
 		scopes.pop();
 		scopes.push(scope.clone());
 	}
 	
-	public FlatSymbolTable memorise() {
+	public FlatSymbolTable memorize() {
 		return scopes.lastElement().clone();
 	}
 	

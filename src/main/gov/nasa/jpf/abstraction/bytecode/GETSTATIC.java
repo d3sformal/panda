@@ -45,7 +45,7 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 			VariableID number = path.resolve();
 			
 			if (number != null) {
-				ScopedSymbolTable.getInstance().register(path, number);
+				ScopedSymbolTable.getInstance().registerPathToVariable(path, number);
 			}
 		}
 		

@@ -18,7 +18,7 @@ public class PredicateAbstraction extends Abstraction {
 		System.err.println("Trace++");
 		Trace trace = Trace.getInstance();
 		
-		State state = new State(ScopedSymbolTable.getInstance().memorise());
+		State state = new State(ScopedSymbolTable.getInstance().memorize());
 		
 		trace.push(state);
 		
@@ -33,6 +33,6 @@ public class PredicateAbstraction extends Abstraction {
 		
 		trace.pop();
 		
-		ScopedSymbolTable.getInstance().recover(trace.top().symbolTable);
+		ScopedSymbolTable.getInstance().restore(trace.top().symbolTable);
 	}
 }

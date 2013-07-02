@@ -32,7 +32,7 @@ public class INVOKESPECIAL extends gov.nasa.jpf.jvm.bytecode.INVOKESPECIAL {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		ScopedSymbolTable.getInstance().methodCall();
+		ScopedSymbolTable.getInstance().processMethodCall();
 		
 		return ret;
 	}

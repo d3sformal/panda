@@ -28,7 +28,7 @@ public class LRETURN extends gov.nasa.jpf.jvm.bytecode.LRETURN {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		ScopedSymbolTable.getInstance().methodReturn();
+		ScopedSymbolTable.getInstance().processMethodReturn();
 		
 		return ret;
 	}

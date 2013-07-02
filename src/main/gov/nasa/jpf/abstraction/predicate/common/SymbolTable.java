@@ -8,6 +8,6 @@ public interface SymbolTable {
 	public Set<AccessPath> lookupEquivalentAccessPaths(VariableID number);
 	public VariableID resolvePath(AccessPath path);
 	
-	public void register(AccessPath path, VariableID number);
+	public void registerPathToVariable(AccessPath path, VariableID number);
 	
 }

@@ -46,7 +46,7 @@ public class FlatSymbolTable implements SymbolTable, Cloneable {
 	}
 
 	@Override
-	public void register(AccessPath path, VariableID number) {
+	public void registerPathToVariable(AccessPath path, VariableID number) {
 		if (!num2paths.containsKey(number)) {
 			num2paths.put(number, new HashSet<AccessPath>());
 		}

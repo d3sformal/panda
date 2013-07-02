@@ -47,7 +47,7 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 			VariableID number = path.resolve();
 				
 			if (number != null) {
-				ScopedSymbolTable.getInstance().register(path, number);
+				ScopedSymbolTable.getInstance().registerPathToVariable(path, number);
 			}
 
 			sf.setOperandAttr(attribute);

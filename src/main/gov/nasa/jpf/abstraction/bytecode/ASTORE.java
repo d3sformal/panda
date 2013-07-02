@@ -77,7 +77,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 			
 				AccessPath.reRoot(clone, prefix, new ConcretePath(var.getName(), ti, ei, ConcretePath.Type.HEAP));
 
-				ScopedSymbolTable.getInstance().register(clone, variableID);
+				ScopedSymbolTable.getInstance().registerPathToVariable(clone, variableID);
 			}
 		}
 		
