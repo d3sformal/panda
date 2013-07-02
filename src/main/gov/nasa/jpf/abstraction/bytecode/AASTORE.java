@@ -29,28 +29,22 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
+public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 	
-	public PUTFIELD(String fieldName, String classType, String fieldDescriptor) {
-		super(fieldName, classType, fieldDescriptor);
-	}
-
 	@Override
-	public Instruction execute(ThreadInfo ti) {		
+	public Instruction execute(ThreadInfo ti) {
 		StackFrame sf = ti.getModifiableTopFrame();
 		
-        Attribute source = (Attribute) sf.getOperandAttr(0);
-		Attribute destination = (Attribute) sf.getOperandAttr(1);
+        Attribute source = (Attribute) sf.getOperandAttr(2);
+		Attribute destination = (Attribute) sf.getOperandAttr(0);
 
 		Instruction ret = super.execute(ti);
-		
+
 		if (destination != null) {
 			ConcretePath pathRoot = destination.accessPath;
 		
 			if (pathRoot != null) {
-				pathRoot.appendSubElement(getFieldName());
-				
-				System.err.println(pathRoot.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " := ?");
+				pathRoot.appendIndexElement(null);
 			
                 if (source == null) {
                 	Map<AccessPath, CompleteVariableID> vars = pathRoot.resolve();

@@ -102,6 +102,11 @@ public class AbstractInstructionFactory extends
 	}
 	
 	@Override
+	public Instruction aastore() {
+		return (filter.isInstrumentedClass(ci) ? new AASTORE() : super.aastore());
+	}
+	
+	@Override
 	public Instruction aload(int index) {
 		return (filter.isInstrumentedClass(ci) ? new ALOAD(index) : super.aload(index));
 	}
