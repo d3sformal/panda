@@ -33,7 +33,7 @@ public class BinaryIfInstructionExecutor {
 		// the condition is abstract
 		System.out.printf("%s> Values: %d (%s) %d (%s)\n", name, v2, abs_v2, v1, abs_v1);
 
-		AbstractBoolean abs_condition = br.getCondition(abs_v1, abs_v2);
+		AbstractBoolean abs_condition = br.getCondition(v1, abs_v1, v2, abs_v2);
 
 		if (abs_condition == AbstractBoolean.TRUE) {
 			conditionValue = true;

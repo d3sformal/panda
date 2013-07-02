@@ -11,7 +11,7 @@ public interface AbstractBranching {
 
 	public Instruction getSelf();
 	
-	public AbstractBoolean getCondition(AbstractValue abs_v1, AbstractValue abs_v2);
+	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2);
 	
 	public Instruction getTarget();
 	public Instruction getNext(ThreadInfo ti);

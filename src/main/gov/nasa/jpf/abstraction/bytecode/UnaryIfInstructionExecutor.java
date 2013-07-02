@@ -29,7 +29,7 @@ public class UnaryIfInstructionExecutor {
 		// the condition is abstract
 		System.out.printf("%s> Values: %d (%s)\n", name, sf.peek(0), abs_v);
 
-		AbstractBoolean abs_condition = br.getCondition(abs_v, null);
+		AbstractBoolean abs_condition = br.getCondition(0, abs_v, 0, null);
 
 		if (abs_condition == AbstractBoolean.TRUE) {
 			conditionValue = true;
