@@ -29,9 +29,9 @@ public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexEleme
 	}
 
 	@Override
-	public Map<AccessPath, VariableID> getVariableID(ThreadInfo ti) {
+	public Map<AccessPath, VariableID> getVariableIDs(ThreadInfo ti) {
 		ConcretePathElement previous = getPrevious();
-		Map<AccessPath, VariableID> vars = previous.getVariableID(ti);
+		Map<AccessPath, VariableID> vars = previous.getVariableIDs(ti);
 		Map<AccessPath, VariableID> ret = new HashMap<AccessPath, VariableID>();
 		
 		for (AccessPath path : vars.keySet()) {

@@ -64,7 +64,7 @@ public class ConcretePath extends AccessPath {
 	public Map<AccessPath, CompleteVariableID> resolve() {
 		ConcretePathElement element = (ConcretePathElement) tail;
 		
-		Map<AccessPath, VariableID> vars = element.getVariableID(ti);
+		Map<AccessPath, VariableID> vars = element.getVariableIDs(ti);
 		Map<AccessPath, CompleteVariableID> ret = new HashMap<AccessPath, CompleteVariableID>();
 		
 		for (AccessPath path : vars.keySet()) {

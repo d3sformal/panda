@@ -52,7 +52,7 @@ public class DefaultConcretePathRootElement extends DefaultAccessPathRootElement
 	}
 
 	@Override
-	public Map<AccessPath, VariableID> getVariableID(ThreadInfo ti) {
+	public Map<AccessPath, VariableID> getVariableIDs(ThreadInfo ti) {
 		/**
 		 * If the path is of a primitive form (one element)
 		 * it necessarily refers to a primitive local variable.
