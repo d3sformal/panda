@@ -34,20 +34,10 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
+		Instruction ret = super.execute(ti);
+
 		StackFrame sf = ti.getModifiableTopFrame();
 		LocalVarInfo var = getLocalVarInfo();
-		
-		String v1 = null;
-		String v2 = null;
-		String v3 = null;
-		
-		try { v1 = getLocalVarInfo().getName(); } catch (Exception e) {}
-		try { v2 = sf.getLocalVarInfo(index).getName(); } catch (Exception e) {}
-		try { v3 = getMethodInfo().getLocalVars()[index].getName(); } catch (Exception e) {}
-		
-		System.err.println("L " + ((v1 != null && v2 != null && v3 != null && v1.equals(v2) && v2.equals(v3)) || (v1 == v2 && v2 == v3 && v1 == null) ? "OK" : "EE") + " " + v1 + " " + v2 + " " + v3);
-		
-		Instruction ret = super.execute(ti);
 	
         if (var != null) {	
     		ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));

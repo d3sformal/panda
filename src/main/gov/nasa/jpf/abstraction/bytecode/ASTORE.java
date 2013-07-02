@@ -47,8 +47,8 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		 * new paths need to be registered in Symbol table
 		 */
 		StackFrame sf = ti.getModifiableTopFrame();
-		LocalVarInfo var = getLocalVarInfo();
-		
+		LocalVarInfo var = getMethodInfo().getLocalVars()[index];
+
 		String v1 = null;
 		String v2 = null;
 		String v3 = null;
@@ -72,6 +72,8 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 				VariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
 
 				ConcretePath clone = (ConcretePath) path.clone();
+				
+				System.err.println(">> " + var.getName());
 			
 				AccessPath.reRoot(clone, prefix, new ConcretePath(var.getName(), ti, ei, ConcretePath.Type.HEAP));
 
