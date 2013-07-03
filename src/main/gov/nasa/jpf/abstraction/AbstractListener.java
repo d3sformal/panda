@@ -21,9 +21,6 @@ package gov.nasa.jpf.abstraction;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
-import gov.nasa.jpf.vm.VM;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.search.Search;
 
 public class AbstractListener extends PropertyListenerAdapter {
@@ -32,7 +29,8 @@ public class AbstractListener extends PropertyListenerAdapter {
 	}
 
 	@Override
-	public void instructionExecuted(VM vm, ThreadInfo ti, Instruction insn, Instruction exec) {
+	public void searchStarted(Search search) {
+		AbstractInstructionFactory.abs.start();
 	}
 	
 	@Override

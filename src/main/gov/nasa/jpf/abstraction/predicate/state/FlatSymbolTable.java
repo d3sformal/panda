@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Comparator;
 
-public class FlatSymbolTable implements SymbolTable, Cloneable {
+public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	private HashMap<AccessPath, CompleteVariableID> path2num = new HashMap<AccessPath, CompleteVariableID>();
 	private HashMap<CompleteVariableID, Set<AccessPath>> num2paths = new HashMap<CompleteVariableID, Set<AccessPath>>();
