@@ -102,19 +102,12 @@ public class AccessPath extends Expression implements Cloneable {
 	
 	@Override
 	public String toString() {
-		return root.toString();
+		return toString(policy);
 	}
 	
+	@Override
 	public String toString(NotationPolicy policy) {
-		NotationPolicy original = AccessPath.policy;
-		
-		AccessPath.policy = policy;
-		
-		String ret = toString();
-		
-		AccessPath.policy = original;
-		
-		return ret;
+		return root.toString(policy);
 	}
 	
 	@Override

@@ -1,8 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.grammar.impl;
 
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath.NotationPolicy;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathIndexElement;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathMiddleElement;
 import gov.nasa.jpf.abstraction.predicate.grammar.Expression;
 
 public class DefaultAccessPathIndexElement extends DefaultAccessPathMiddleElement implements AccessPathIndexElement {
@@ -16,30 +15,6 @@ public class DefaultAccessPathIndexElement extends DefaultAccessPathMiddleElemen
 	public Expression getIndex() {
 		return index;
 	}
-	
-	@Override
-	public String toString() {
-		switch (AccessPath.policy) {
-		case DOT_NOTATION:
-			String ret = "[" + index.toString() + "]";
-			
-			if (getNext() != null) {
-				ret += getNext().toString();
-			}
-			
-			return ret;
-		case FUNCTION_NOTATION:
-			String format = "%s";
-			
-			if (getNext() != null) {
-				format = String.format(format, getNext().toString());
-			}
-
-			return String.format(format, "aread(arr, %s, " + index.toString() + ")");
-		default:
-			return null;
-		}
-	}
 
     @Override
     public boolean equals(Object o) {
@@ -52,7 +27,29 @@ public class DefaultAccessPathIndexElement extends DefaultAccessPathMiddleElemen
         return false;
     }
 	
+	@Override
+	public String toString(NotationPolicy policy) {
+		switch (policy) {
+		case DOT_NOTATION:
+			String ret = "[" + index.toString(policy) + "]";
+			
+			if (getNext() != null) {
+				ret += getNext().toString(policy);
+			}
+			
+			return ret;
+		case FUNCTION_NOTATION:
+			String format = "%s";
+			
+			if (getNext() != null) {
+				format = String.format(format, getNext().toString(policy));
+			}
 
+			return String.format(format, "aread(arr, %s, " + index.toString(policy) + ")");
+		default:
+			return null;
+		}
+	}
 	
 	@Override
 	public DefaultAccessPathIndexElement clone() {

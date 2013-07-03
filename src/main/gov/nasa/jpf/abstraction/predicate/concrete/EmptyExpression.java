@@ -14,7 +14,7 @@ public class EmptyExpression extends Expression {
 	}
 	
 	@Override
-	public String toString() {
+	public String toString(AccessPath.NotationPolicy policy) {
 		return " ? ";
 	}
 

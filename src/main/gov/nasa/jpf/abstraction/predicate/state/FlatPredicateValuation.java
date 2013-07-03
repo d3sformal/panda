@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.grammar.Context;
 import gov.nasa.jpf.abstraction.predicate.grammar.Predicate;
 
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		padding += 4;
 		
 		for (Predicate p : valuations.keySet()) {
-			String predicate = p.toString();
+			String predicate = p.toString(AccessPath.NotationPolicy.DOT_NOTATION);
 			String pad = "";
 			
 			for (int i = 0; i < padding - predicate.length(); ++i) {
@@ -68,7 +69,25 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
 	@Override
 	public void reevaluate(Set<AccessPath> affected) {
-		System.err.println("SMT: " + affected);
+		System.err.println("SMT: ");
+		
+		System.err.println("\tREACTION TO:");
+		for (AccessPath path : affected) {
+			System.err.println("\t\t" + path.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+		}
+		
+		System.err.println("\tAFFECTS:");
+		for (Predicate predicate : valuations.keySet()) {
+			boolean affects = false;
+
+			for (AccessPath path : affected) {
+				affects = affects || predicate.getPaths().contains(path);
+			}
+			
+			if (affects) {
+				System.err.println("\t\t" + predicate.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+			}
+		}
 	}
 	
 }

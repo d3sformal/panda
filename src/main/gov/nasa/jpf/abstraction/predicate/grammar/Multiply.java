@@ -6,7 +6,7 @@ public class Multiply extends Operation {
 	}
 	
 	@Override
-	public String toString() {
-		return "(" + a.toString() + " * " + b.toString() + ")";
+	public String toString(AccessPath.NotationPolicy policy) {
+		return "(" + a.toString(policy) + " * " + b.toString(policy) + ")";
 	}
 }

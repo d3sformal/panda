@@ -1,7 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.grammar.impl;
 
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathMiddleElement;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathRootElement;
 
 public class DefaultAccessPathRootElement extends DefaultAccessPathElement implements AccessPathRootElement {
@@ -17,13 +16,13 @@ public class DefaultAccessPathRootElement extends DefaultAccessPathElement imple
 	}
 
 	@Override
-	public String toString() {
-		switch (AccessPath.policy) {
+	public String toString(AccessPath.NotationPolicy policy) {
+		switch (policy) {
 		case DOT_NOTATION:
 			String ret = name;
 		
 			if (getNext() != null) {
-				ret += getNext().toString();
+				ret += getNext().toString(policy);
 			}
 		
 			return ret;
@@ -31,7 +30,7 @@ public class DefaultAccessPathRootElement extends DefaultAccessPathElement imple
 			String format = "%s";
 			
 			if (getNext() != null) {
-				format = String.format(format, getNext().toString());
+				format = String.format(format, getNext().toString(policy));
 			}
 
 			return String.format(format, name);

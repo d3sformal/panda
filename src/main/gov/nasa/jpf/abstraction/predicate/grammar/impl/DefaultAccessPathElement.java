@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.grammar.impl;
 
+import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathElement;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathMiddleElement;
 
@@ -20,4 +21,8 @@ public abstract class DefaultAccessPathElement implements AccessPathElement {
 	@Override
 	public abstract DefaultAccessPathElement clone();
 
+	@Override
+	public String toString() {
+		return toString(AccessPath.policy);
+	}
 }

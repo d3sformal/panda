@@ -16,7 +16,7 @@ public class Constant extends Expression {
 	}
 	
 	@Override
-	public String toString() {
+	public String toString(AccessPath.NotationPolicy policy) {
 		return ((Integer)value).toString();
 	}
 }
