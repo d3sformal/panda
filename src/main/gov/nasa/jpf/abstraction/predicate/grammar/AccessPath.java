@@ -128,10 +128,10 @@ public class AccessPath extends Expression implements Cloneable {
 	}
 	
 	@Override
-	public Object clone() {
+	public AccessPath clone() {
 		AccessPath path = new AccessPath();
 		
-		path.root = (AccessPathRootElement) root.clone();
+		path.root = root.clone();
 		path.tail = path.root;
 		
 		AccessPathElement next = path.root;

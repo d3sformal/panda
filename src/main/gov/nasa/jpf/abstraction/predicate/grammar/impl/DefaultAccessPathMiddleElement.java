@@ -19,6 +19,6 @@ public abstract class DefaultAccessPathMiddleElement extends DefaultAccessPathEl
 	}
 	
 	@Override
-	public abstract Object clone();
+	public abstract DefaultAccessPathMiddleElement clone();
 
 }

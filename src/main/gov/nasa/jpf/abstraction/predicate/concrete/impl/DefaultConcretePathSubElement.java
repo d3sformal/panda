@@ -1,6 +1,5 @@
 package gov.nasa.jpf.abstraction.predicate.concrete.impl;
 
-import java.nio.file.AccessMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,8 +13,6 @@ import gov.nasa.jpf.abstraction.predicate.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.StaticFieldID;
 import gov.nasa.jpf.abstraction.predicate.concrete.VariableID;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathMiddleElement;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathRootElement;
 import gov.nasa.jpf.abstraction.predicate.grammar.impl.DefaultAccessPathSubElement;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -73,11 +70,12 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 	}
 	
 	@Override
-	public Object clone() {
+	public DefaultConcretePathSubElement clone() {
 		DefaultConcretePathSubElement clone = new DefaultConcretePathSubElement(getName());
 		
 		if (getNext() != null) {
-			clone.setNext((AccessPathMiddleElement) getNext().clone());
+			clone.setNext(getNext().clone());
+			clone.getNext().setPrevious(clone);
 		}
 		
 		return clone;

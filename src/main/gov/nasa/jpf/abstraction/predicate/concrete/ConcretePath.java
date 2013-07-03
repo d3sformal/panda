@@ -80,15 +80,21 @@ public class ConcretePath extends AccessPath {
 		return ret;
 	}
 	
+	public Map<AccessPath, VariableID> partialResolve() {
+		ConcretePathElement element = (ConcretePathElement) tail;
+		
+		return element.getVariableIDs(ti);
+	}
+	
 	@Override
-	public Object clone() {
+	public ConcretePath clone() {
 		ConcretePath path = new ConcretePath();
 		
 		path.rootObject = rootObject;
 		path.type = type;
 		path.ti = ti;
 		
-		path.root = (AccessPathRootElement) root.clone();
+		path.root = root.clone();
 		path.tail = path.root;
 		
 		AccessPathElement next = path.root;
