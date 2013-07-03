@@ -1,11 +1,13 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.grammar.Context;
 import gov.nasa.jpf.abstraction.predicate.grammar.Predicate;
 import gov.nasa.jpf.abstraction.predicate.grammar.Predicates;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Stack;
 
 public class ScopedPredicateValuation implements PredicateValuation, Scoped {
@@ -94,6 +96,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	@Override
 	public String toString() {
 		return scopes.lastElement().toString();
+	}
+
+	@Override
+	public void reevaluate(Set<AccessPath> affected) {
+		scopes.lastElement().reevaluate(affected);
 	}
 
 }

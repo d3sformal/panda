@@ -11,6 +11,6 @@ public interface SymbolTable {
 	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID number);
 	public CompleteVariableID resolvePath(AccessPath path);
 	
-	public void registerPathToVariable(AccessPath path, CompleteVariableID number);
+	public boolean registerPathToVariable(AccessPath path, CompleteVariableID number);
 	
 }

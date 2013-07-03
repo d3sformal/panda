@@ -43,8 +43,8 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public void registerPathToVariable(AccessPath path, CompleteVariableID number) {
-		scopes.lastElement().registerPathToVariable(path, number);
+	public boolean registerPathToVariable(AccessPath path, CompleteVariableID number) {
+		return scopes.lastElement().registerPathToVariable(path, number);
 	}
 	
 	@Override

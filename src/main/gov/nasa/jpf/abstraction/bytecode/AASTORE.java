@@ -18,12 +18,15 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -45,12 +48,18 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 		
 			if (pathRoot != null) {
 				pathRoot.appendIndexElement(null);
+				
+				Set<AccessPath> affected = new HashSet<AccessPath>();
 			
                 if (source == null) {
                 	Map<AccessPath, CompleteVariableID> vars = pathRoot.resolve();
     				
     				for (AccessPath p : vars.keySet()) {
-    					ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
+    					boolean modified = ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
+    					
+    					if (modified) {
+    						affected.add(p);
+    					}
     				}
                 } else {
                     ConcretePath prefix = source.accessPath;
@@ -64,11 +73,17 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
                             	AccessPath.reRoot(newPath, prefix, newPrefix);
                             	
                             	// Re-registers self
-    		            		ScopedSymbolTable.getInstance().registerPathToVariable(newPath, variableID);
+    		            		boolean modified = ScopedSymbolTable.getInstance().registerPathToVariable(newPath, variableID);
+    		            		
+    		            		if (modified) {
+    	    						affected.add(newPath);
+    	    					}
                             }
 			            }
                     }
                 }
+                
+                ScopedPredicateValuation.getInstance().reevaluate(affected);
 			}
 		}
 		

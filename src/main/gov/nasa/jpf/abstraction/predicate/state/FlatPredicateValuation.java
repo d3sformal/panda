@@ -1,10 +1,12 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.grammar.Predicate;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class FlatPredicateValuation implements PredicateValuation, Scope {
 	private HashMap<Predicate, TruthValue> valuations = new HashMap<Predicate, TruthValue>();
@@ -62,6 +64,11 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		ret += "---------------------\n";
 		
 		return ret;
+	}
+
+	@Override
+	public void reevaluate(Set<AccessPath> affected) {
+		System.err.println("SMT: " + affected);
 	}
 	
 }

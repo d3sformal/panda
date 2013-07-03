@@ -50,7 +50,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 
 	@Override
-	public void registerPathToVariable(AccessPath path, CompleteVariableID number) {
+	public boolean registerPathToVariable(AccessPath path, CompleteVariableID number) {
+		boolean modified = false;
+		
 		if (!num2paths.containsKey(number)) {
 			num2paths.put(number, new HashSet<AccessPath>());
 		}
@@ -62,11 +64,15 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		if (path2num.containsKey(path) && !path2num.get(path).equals(number)) {
 			VariableID old = path2num.get(path);
 			num2paths.get(old).remove(path);
+			
+			modified = true;
 		}
 		
 		path2num.remove(path);
 		path2num.put(path, number);		
 		num2paths.get(number).add(path);
+		
+		return modified;
 	}
 	
 	@Override
