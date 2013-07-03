@@ -37,10 +37,11 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 
 	@Override
 	public Instruction execute(ThreadInfo ti) {		
-		StackFrame sf = ti.getModifiableTopFrame();
-		
-		ConcretePath path = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);		
 		Instruction ret = super.execute(ti);
+		
+        if (ret == this) return this;
+        
+        ConcretePath path = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
 		
 		if (path != null) {
 			path.appendSubElement(getFieldName());
@@ -52,6 +53,7 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 			}
 		}
 		
+		StackFrame sf = ti.getTopFrame();
 		sf.setOperandAttr(new Attribute(null, path));
 		
 		return ret;

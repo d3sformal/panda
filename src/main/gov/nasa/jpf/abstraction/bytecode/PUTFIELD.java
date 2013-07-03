@@ -37,10 +37,14 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 
 	@Override
 	public Instruction execute(ThreadInfo ti) {		
-		StackFrame sf = ti.getModifiableTopFrame();
-		
+		StackFrame sf = ti.getTopFrame();
         Attribute source = (Attribute) sf.getOperandAttr(0);
 		Attribute destination = (Attribute) sf.getOperandAttr(1);
+		
+		Instruction ret = super.execute(ti);
+		
+		if (ret == this) return this;
+		
 		ConcretePath from = null;
 		ConcretePath to = null;
 		
@@ -49,8 +53,6 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 			to = destination.accessPath;
 			to.appendSubElement(getFieldName());
 		}
-
-		Instruction ret = super.execute(ti);
 
 		Set<AccessPath> affected = ScopedSymbolTable.getInstance().assign(from, to);
 

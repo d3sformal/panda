@@ -38,10 +38,11 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		StackFrame sf = ti.getModifiableTopFrame();
 		LocalVarInfo var = getLocalVarInfo();
 		
 		Instruction ret = super.execute(ti);
+		
+		if (ret == this) return this;
 		
 		if (var != null) {
 			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);
@@ -53,6 +54,7 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 				ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
 			}
 
+			StackFrame sf = ti.getTopFrame();
 			sf.setOperandAttr(attribute);
 		}
 

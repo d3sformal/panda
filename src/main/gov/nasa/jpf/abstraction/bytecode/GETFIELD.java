@@ -37,11 +37,12 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 
 	@Override
 	public Instruction execute(ThreadInfo ti) {		
-		StackFrame sf = ti.getModifiableTopFrame();
-		
-		Attribute attribute = (Attribute) sf.getOperandAttr();
+		StackFrame sf = ti.getTopFrame();
+		Attribute attribute = (Attribute) sf.getOperandAttr(0);
 		
 		Instruction ret = super.execute(ti);
+		
+        if (ret == this) return this;
 		
 		if (attribute != null) {
 			ConcretePath path = attribute.accessPath;
@@ -55,7 +56,8 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 					ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
 				}
 			}
-		
+
+			sf = ti.getTopFrame();
 			sf.setOperandAttr(new Attribute(null, path));
 		}
 		

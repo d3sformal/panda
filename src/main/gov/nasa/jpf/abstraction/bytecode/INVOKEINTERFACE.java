@@ -32,6 +32,8 @@ public class INVOKEINTERFACE extends gov.nasa.jpf.jvm.bytecode.INVOKEINTERFACE {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
+		if (ret == this) return this;
+		
 		ScopedSymbolTable.getInstance().processMethodCall();
 		
 		return ret;

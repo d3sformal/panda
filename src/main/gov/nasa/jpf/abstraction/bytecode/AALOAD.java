@@ -28,11 +28,12 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		StackFrame sf = ti.getModifiableTopFrame();
-		
+		StackFrame sf = ti.getTopFrame();
 		Attribute attr = (Attribute) sf.getOperandAttr(1);
-		
+
 		Instruction ret = super.execute(ti);
+		
+		if (ret == this) return this;
 		
 		if (attr != null) {
 			ConcretePath path = attr.accessPath;
@@ -41,7 +42,8 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 				path.appendIndexElement(null);
 				
 				Attribute attribute = new Attribute(null, path);
-						
+
+				sf = ti.getTopFrame();
 				sf.setOperandAttr(attribute);
 			}
 		}

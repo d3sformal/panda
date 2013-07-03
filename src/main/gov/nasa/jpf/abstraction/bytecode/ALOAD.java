@@ -34,12 +34,14 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		StackFrame sf = ti.getModifiableTopFrame();
 		LocalVarInfo var = getLocalVarInfo();
 		
 		Instruction ret = super.execute(ti);
+		
+		if (ret == this) return this;
 	
-        if (var != null) {	
+        if (var != null) {
+        	StackFrame sf = ti.getTopFrame();
     		ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
 	    	ConcretePath path = new ConcretePath(var.getName(), ti, ei, ConcretePath.Type.HEAP);
 			

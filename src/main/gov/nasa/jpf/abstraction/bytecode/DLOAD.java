@@ -38,10 +38,11 @@ public class DLOAD extends gov.nasa.jpf.jvm.bytecode.DLOAD {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		StackFrame sf = ti.getModifiableTopFrame();
 		LocalVarInfo var = getLocalVarInfo();
 		
 		Instruction ret = super.execute(ti);
+		
+        if (ret == this) return this;
 		
 		if (var != null) {
 			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);
@@ -53,6 +54,7 @@ public class DLOAD extends gov.nasa.jpf.jvm.bytecode.DLOAD {
 				ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
 			}
 
+			StackFrame sf = ti.getTopFrame();
 			sf.setLongOperandAttr(attribute);
 		}
 

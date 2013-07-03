@@ -33,10 +33,14 @@ public class DASTORE extends gov.nasa.jpf.jvm.bytecode.DASTORE {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		StackFrame sf = ti.getModifiableTopFrame();
-		
+		StackFrame sf = ti.getTopFrame();		
         Attribute source = (Attribute) sf.getOperandAttr(0);
 		Attribute destination = (Attribute) sf.getOperandAttr(2);
+
+		Instruction ret = super.execute(ti);
+		
+        if (ret == this) return this;
+		
 		ConcretePath from = null;
 		ConcretePath to = null;
 		
@@ -45,8 +49,6 @@ public class DASTORE extends gov.nasa.jpf.jvm.bytecode.DASTORE {
 			to = destination.accessPath;
 			to.appendIndexElement(null);
 		}
-
-		Instruction ret = super.execute(ti);
 
 		Set<AccessPath> affected = ScopedSymbolTable.getInstance().assign(from, to);
 

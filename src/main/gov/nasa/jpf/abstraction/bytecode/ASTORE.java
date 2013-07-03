@@ -38,10 +38,14 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		StackFrame sf = ti.getModifiableTopFrame();
+		StackFrame sf = ti.getTopFrame();
 		LocalVarInfo var = getLocalVarInfo();
-		
         Attribute source = (Attribute) sf.getOperandAttr(0);
+
+		Instruction ret = super.execute(ti);
+        
+        if (ret == this) return this;
+        
 		ConcretePath from = null;
 		ConcretePath to = null;
 		
@@ -51,8 +55,6 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		} else {
 			System.err.println(getClass().getSimpleName() + " FAIL " + getLocalVariableName());
 		}
-
-		Instruction ret = super.execute(ti);
 
 		Set<AccessPath> affected = ScopedSymbolTable.getInstance().assign(from, to);
 

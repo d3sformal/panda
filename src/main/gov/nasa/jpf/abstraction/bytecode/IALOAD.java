@@ -28,22 +28,22 @@ public class IALOAD extends gov.nasa.jpf.jvm.bytecode.IALOAD {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		StackFrame sf = ti.getModifiableTopFrame();
+		StackFrame sf = ti.getTopFrame();
+		Attribute attr = (Attribute) sf.getOperandAttr(1);
 		
 		Instruction ret = super.execute(ti);
 		
-		Attribute attr1 = (Attribute) sf.getOperandAttr(1);
+        if (ret == this) return this;
 		
-		System.err.println("IALOAD " + attr1);
-		
-		if (attr1 != null) {
-			ConcretePath path1 = attr1.accessPath;
+		if (attr != null) {
+			ConcretePath path = attr.accessPath;
 
-			if (path1 != null) {
-				path1.appendIndexElement(null);
+			if (path != null) {
+				path.appendIndexElement(null);
 				
-				Attribute attribute = new Attribute(null, path1);
-						
+				Attribute attribute = new Attribute(null, path);
+
+				sf = ti.getTopFrame();
 				sf.setOperandAttr(attribute);
 			}
 		}

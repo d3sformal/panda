@@ -37,17 +37,19 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 
 	@Override
 	public Instruction execute(ThreadInfo ti) {        
-		StackFrame sf = ti.getModifiableTopFrame();
-		
-        Attribute source = (Attribute) sf.getOperandAttr();
+		StackFrame sf = ti.getTopFrame();
+        Attribute source = (Attribute) sf.getOperandAttr(0);
+        
+        Instruction ret = super.execute(ti);
+        
+        if (ret == this) return this;
+        
 		ConcretePath from = null;
 		ConcretePath to = null;
 		
 		if (source != null) from = source.accessPath;
 		to = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
         to.appendSubElement(getFieldName());
-
-		Instruction ret = super.execute(ti);
 
 		Set<AccessPath> affected = ScopedSymbolTable.getInstance().assign(from, to);
 
