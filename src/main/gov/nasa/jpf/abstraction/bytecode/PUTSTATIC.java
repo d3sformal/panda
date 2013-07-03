@@ -18,6 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
@@ -38,16 +40,17 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 		StackFrame sf = ti.getModifiableTopFrame();
 		
         Attribute source = (Attribute) sf.getOperandAttr();
-        ConcretePath pathRoot = new ConcretePath(getClassName(), ti, ti.getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
+        
+		Instruction ret = super.execute(ti);
+        
+        ConcretePath pathRoot = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
         pathRoot.appendSubElement(getFieldName());
 
-		Instruction ret = super.execute(ti);
-
         if (source == null) {
-    		CompleteVariableID number = pathRoot.resolve();
+        	Map<AccessPath, CompleteVariableID> vars = pathRoot.resolve();
 			
-	    	if (number != null) {
-		    	ScopedSymbolTable.getInstance().registerPathToVariable(pathRoot, number);
+			for (AccessPath p : vars.keySet()) {
+				ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
 			}
         } else {
             ConcretePath prefix = source.accessPath;
@@ -56,8 +59,8 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
                 for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
             	    CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
 
-		    		ConcretePath newPath = (ConcretePath) path.clone();
-                    ConcretePath newPathRoot = (ConcretePath) pathRoot.clone();
+		    		AccessPath newPath = path.clone();
+                    AccessPath newPathRoot = pathRoot.clone();
 
                     AccessPath.reRoot(newPath, prefix, newPathRoot);
 

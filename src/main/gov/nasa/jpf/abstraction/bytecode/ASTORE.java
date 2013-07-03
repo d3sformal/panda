@@ -23,7 +23,6 @@ import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
-import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
@@ -53,17 +52,15 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		Instruction ret = super.execute(ti);
 		
 		if (var != null) {
-			ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
-
 			if (attribute != null) {
 				ConcretePath prefix = attribute.accessPath;
 
 				for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
 					CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
 
-					ConcretePath clone = (ConcretePath) path.clone();
+					AccessPath clone = path.clone();
 			
-					AccessPath.reRoot(clone, prefix, new ConcretePath(var.getName(), ti, ei, ConcretePath.Type.HEAP));
+					AccessPath.reRoot(clone, prefix, new AccessPath(var.getName()));
 
 					ScopedSymbolTable.getInstance().registerPathToVariable(clone, variableID);
 				}

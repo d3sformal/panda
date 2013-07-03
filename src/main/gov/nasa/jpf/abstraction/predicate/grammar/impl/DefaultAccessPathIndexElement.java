@@ -55,11 +55,12 @@ public class DefaultAccessPathIndexElement extends DefaultAccessPathMiddleElemen
 
 	
 	@Override
-	public Object clone() {
+	public DefaultAccessPathIndexElement clone() {
 		DefaultAccessPathIndexElement clone = new DefaultAccessPathIndexElement(index);
 		
 		if (getNext() != null) {
-			clone.setNext((AccessPathMiddleElement) getNext().clone());
+			clone.setNext(getNext().clone());
+			clone.getNext().setPrevious(clone);
 		}
 		
 		return clone;

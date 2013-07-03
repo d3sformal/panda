@@ -52,11 +52,12 @@ public class DefaultAccessPathRootElement extends DefaultAccessPathElement imple
     }
 	
 	@Override
-	public Object clone() {
+	public DefaultAccessPathRootElement clone() {
 		DefaultAccessPathRootElement clone = new DefaultAccessPathRootElement(name);
 		
 		if (getNext() != null) {
-			clone.setNext((AccessPathMiddleElement) getNext().clone());
+			clone.setNext(getNext().clone());
+			clone.getNext().setPrevious(clone);
 		}
 		
 		return clone;

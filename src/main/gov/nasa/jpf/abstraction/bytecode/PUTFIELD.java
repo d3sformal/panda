@@ -18,6 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
@@ -41,7 +43,7 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		Attribute destination = (Attribute) sf.getOperandAttr(1);
 
 		Instruction ret = super.execute(ti);
-
+		
 		if (destination != null) {
 			ConcretePath pathRoot = destination.accessPath;
 		
@@ -49,11 +51,11 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 				pathRoot.appendSubElement(getFieldName());
 			
                 if (source == null) {
-    				CompleteVariableID number = pathRoot.resolve();
-			
-	    			if (number != null) {
-		    			ScopedSymbolTable.getInstance().registerPathToVariable(pathRoot, number);
-			    	}
+                	Map<AccessPath, CompleteVariableID> vars = pathRoot.resolve();
+    				
+    				for (AccessPath p : vars.keySet()) {
+    					ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
+    				}
                 } else {
                     ConcretePath prefix = source.accessPath;
 
@@ -61,8 +63,8 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
                         for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
             				CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
 
-		    		        ConcretePath newPath = (ConcretePath) path.clone();
-                            ConcretePath newPathRoot = (ConcretePath) pathRoot.clone();
+		    		        AccessPath newPath = path.clone();
+                            AccessPath newPathRoot = pathRoot.clone();
 
         	    			AccessPath.reRoot(newPath, prefix, newPathRoot);
 
@@ -71,8 +73,6 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
                     }
                 }
 			}
-		
-			sf.setOperandAttr(new Attribute(null, pathRoot));
 		}
 		
 		return ret;

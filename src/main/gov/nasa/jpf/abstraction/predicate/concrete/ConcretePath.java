@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.concrete;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.predicate.concrete.impl.DefaultConcretePathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.impl.DefaultConcretePathRootElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.impl.DefaultConcretePathSubElement;
@@ -34,6 +37,16 @@ public class ConcretePath extends AccessPath {
 	}
 	
 	@Override
+	public ConcretePathRootElement getRoot() {
+		return (ConcretePathRootElement) super.getRoot();
+	}
+	
+	@Override
+	public ConcretePathElement getTail() {
+		return (ConcretePathElement) super.getTail();
+	}
+	
+	@Override
 	protected AccessPathRootElement createRootElement(String name) {
 		return new DefaultConcretePathRootElement(name, rootObject, type);
 	}
@@ -45,33 +58,43 @@ public class ConcretePath extends AccessPath {
 	
 	@Override
 	public void appendIndexElement(Expression index) {
-		throw new RuntimeException("Concrete path cannot cope with expressions.");
+		appendElement(new DefaultConcretePathIndexElement());
 	}
 	
-	public void appendIndexElement(int index) {
-		appendElement(new DefaultConcretePathIndexElement(index));
-	}
-	
-	public CompleteVariableID resolve() {
+	public Map<AccessPath, CompleteVariableID> resolve() {
 		ConcretePathElement element = (ConcretePathElement) tail;
-		VariableID var = element.getVariableID(ti);
 		
-		if (var instanceof CompleteVariableID) {
-			return (CompleteVariableID) var;
+		Map<AccessPath, VariableID> vars = element.getVariableIDs(ti);
+		Map<AccessPath, CompleteVariableID> ret = new HashMap<AccessPath, CompleteVariableID>();
+		
+		for (AccessPath path : vars.keySet()) {
+			VariableID var = vars.get(path);
+
+			if (var instanceof CompleteVariableID) {
+				CompleteVariableID completeVar = (CompleteVariableID) var;
+
+				ret.put(path, completeVar);
+			}
 		}
 		
-		return null;
+		return ret;
+	}
+	
+	public Map<AccessPath, VariableID> partialResolve() {
+		ConcretePathElement element = (ConcretePathElement) tail;
+		
+		return element.getVariableIDs(ti);
 	}
 	
 	@Override
-	public Object clone() {
+	public ConcretePath clone() {
 		ConcretePath path = new ConcretePath();
 		
 		path.rootObject = rootObject;
 		path.type = type;
 		path.ti = ti;
 		
-		path.root = (AccessPathRootElement) root.clone();
+		path.root = root.clone();
 		path.tail = path.root;
 		
 		AccessPathElement next = path.root;

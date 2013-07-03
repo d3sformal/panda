@@ -18,42 +18,34 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import java.util.Map;
-
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
+public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 	
-	public GETSTATIC(String fieldName, String classType, String fieldDescriptor) {
-		super(fieldName, classType, fieldDescriptor);
-	}
-
 	@Override
-	public Instruction execute(ThreadInfo ti) {		
+	public Instruction execute(ThreadInfo ti) {
 		StackFrame sf = ti.getModifiableTopFrame();
 		
-		ConcretePath path = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);		
+		Attribute attr = (Attribute) sf.getOperandAttr(1);
+		
 		Instruction ret = super.execute(ti);
 		
-		if (path != null) {
-			path.appendSubElement(getFieldName());
-			
-			Map<AccessPath, CompleteVariableID> vars = path.resolve();
-			
-			for (AccessPath p : vars.keySet()) {
-				ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
+		if (attr != null) {
+			ConcretePath path = attr.accessPath;
+
+			if (path != null) {
+				path.appendIndexElement(null);
+				
+				Attribute attribute = new Attribute(null, path);
+						
+				sf.setOperandAttr(attribute);
 			}
 		}
-		
-		sf.setOperandAttr(new Attribute(null, path));
-		
+
 		return ret;
 	}
 }

@@ -18,6 +18,6 @@ public abstract class DefaultAccessPathElement implements AccessPathElement {
 	}
 	
 	@Override
-	public abstract Object clone();
+	public abstract DefaultAccessPathElement clone();
 
 }

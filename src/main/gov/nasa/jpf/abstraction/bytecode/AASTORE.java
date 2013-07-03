@@ -29,30 +29,48 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
+public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 	
-	public GETSTATIC(String fieldName, String classType, String fieldDescriptor) {
-		super(fieldName, classType, fieldDescriptor);
-	}
-
 	@Override
-	public Instruction execute(ThreadInfo ti) {		
+	public Instruction execute(ThreadInfo ti) {
 		StackFrame sf = ti.getModifiableTopFrame();
 		
-		ConcretePath path = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);		
+        Attribute source = (Attribute) sf.getOperandAttr(0);
+		Attribute destination = (Attribute) sf.getOperandAttr(2);
+
 		Instruction ret = super.execute(ti);
+
+		if (destination != null) {
+			ConcretePath pathRoot = destination.accessPath;
 		
-		if (path != null) {
-			path.appendSubElement(getFieldName());
+			if (pathRoot != null) {
+				pathRoot.appendIndexElement(null);
 			
-			Map<AccessPath, CompleteVariableID> vars = path.resolve();
-			
-			for (AccessPath p : vars.keySet()) {
-				ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
+                if (source == null) {
+                	Map<AccessPath, CompleteVariableID> vars = pathRoot.resolve();
+    				
+    				for (AccessPath p : vars.keySet()) {
+    					ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
+    				}
+                } else {
+                    ConcretePath prefix = source.accessPath;
+
+                    if (prefix != null) {
+                        for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
+            				CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
+
+                            for (AccessPath newPrefix : pathRoot.partialResolve().keySet()) {
+                            	AccessPath newPath = path.clone();
+                            	AccessPath.reRoot(newPath, prefix, newPrefix);
+                            	
+                            	// Re-registers self
+    		            		ScopedSymbolTable.getInstance().registerPathToVariable(newPath, variableID);
+                            }
+			            }
+                    }
+                }
 			}
 		}
-		
-		sf.setOperandAttr(new Attribute(null, path));
 		
 		return ret;
 	}
