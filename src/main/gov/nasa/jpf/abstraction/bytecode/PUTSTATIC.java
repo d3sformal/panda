@@ -40,10 +40,11 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 		StackFrame sf = ti.getModifiableTopFrame();
 		
         Attribute source = (Attribute) sf.getOperandAttr();
-        ConcretePath pathRoot = new ConcretePath(getClassName(), ti, ti.getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
-        pathRoot.appendSubElement(getFieldName());
-
+        
 		Instruction ret = super.execute(ti);
+        
+        ConcretePath pathRoot = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
+        pathRoot.appendSubElement(getFieldName());
 
         if (source == null) {
         	Map<AccessPath, CompleteVariableID> vars = pathRoot.resolve();
@@ -58,8 +59,8 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
                 for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
             	    CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
 
-		    		AccessPath newPath = (AccessPath) path.clone();
-                    AccessPath newPathRoot = (AccessPath) pathRoot.clone();
+		    		AccessPath newPath = path.clone();
+                    AccessPath newPathRoot = pathRoot.clone();
 
                     AccessPath.reRoot(newPath, prefix, newPathRoot);
 

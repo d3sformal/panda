@@ -35,12 +35,12 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 		Instruction ret = super.execute(ti);
 		
 		if (attr != null) {
-			ConcretePath path1 = attr.accessPath;
+			ConcretePath path = attr.accessPath;
 
-			if (path1 != null) {
-				path1.appendIndexElement(null);
+			if (path != null) {
+				path.appendIndexElement(null);
 				
-				Attribute attribute = new Attribute(null, path1);
+				Attribute attribute = new Attribute(null, path);
 						
 				sf.setOperandAttr(attribute);
 			}

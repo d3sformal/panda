@@ -35,8 +35,8 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 	public Instruction execute(ThreadInfo ti) {
 		StackFrame sf = ti.getModifiableTopFrame();
 		
-        Attribute source = (Attribute) sf.getOperandAttr(2);
-		Attribute destination = (Attribute) sf.getOperandAttr(0);
+        Attribute source = (Attribute) sf.getOperandAttr(0);
+		Attribute destination = (Attribute) sf.getOperandAttr(2);
 
 		Instruction ret = super.execute(ti);
 
@@ -56,21 +56,23 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
                     ConcretePath prefix = source.accessPath;
 
                     if (prefix != null) {
+                    	System.err.println(pathRoot.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " := " + prefix.toString(AccessPath.NotationPolicy.DOT_NOTATION));
                         for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
             				CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
 
-		    		        AccessPath newPath = (AccessPath) path.clone();
-                            AccessPath newPathRoot = (AccessPath) pathRoot.clone();
-
-        	    			AccessPath.reRoot(newPath, prefix, newPathRoot);
-
-		            		ScopedSymbolTable.getInstance().registerPathToVariable(newPath, variableID);
+		    		        
+                            for (AccessPath newPrefix : pathRoot.partialResolve().keySet()) {
+                            	AccessPath newPath = path.clone();
+                            	AccessPath.reRoot(newPath, prefix, newPrefix);
+                            	
+                            	System.err.println("\t" + newPath.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " := " + path.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+                            	
+    		            		ScopedSymbolTable.getInstance().registerPathToVariable(newPath, variableID);
+                            }
 			            }
                     }
                 }
 			}
-		
-			sf.setOperandAttr(new Attribute(null, pathRoot));
 		}
 		
 		return ret;

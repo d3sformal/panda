@@ -10,6 +10,9 @@ public class Array {
 	static {
 		static_a[0] = new A();
 		static_a[1] = new A();
+		static_a[0].f = 1;
+		static_a[1].f = 2;
+		static_a[0] = static_a[1];
 	}
 	
 	public static void main(String[] args) {

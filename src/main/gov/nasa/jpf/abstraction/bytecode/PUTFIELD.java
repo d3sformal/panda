@@ -49,8 +49,6 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		
 			if (pathRoot != null) {
 				pathRoot.appendSubElement(getFieldName());
-				
-				System.err.println(pathRoot.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " := ?");
 			
                 if (source == null) {
                 	Map<AccessPath, CompleteVariableID> vars = pathRoot.resolve();
@@ -65,8 +63,8 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
                         for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
             				CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
 
-		    		        AccessPath newPath = (AccessPath) path.clone();
-                            AccessPath newPathRoot = (AccessPath) pathRoot.clone();
+		    		        AccessPath newPath = path.clone();
+                            AccessPath newPathRoot = pathRoot.clone();
 
         	    			AccessPath.reRoot(newPath, prefix, newPathRoot);
 
@@ -75,8 +73,6 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
                     }
                 }
 			}
-		
-			sf.setOperandAttr(new Attribute(null, pathRoot));
 		}
 		
 		return ret;
