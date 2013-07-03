@@ -48,6 +48,9 @@ public abstract class Abstraction {
 		throw new RuntimeException("abstract_map not implemented");
 	}
 	
+	public void start() {
+	}
+	
 	public void forward() {
 	}
 	

@@ -6,14 +6,13 @@ import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import java.util.Set;
 import java.util.Stack;
 
-public class ScopedSymbolTable implements SymbolTable {
+public class ScopedSymbolTable implements SymbolTable, Scoped {
 	
 	private static ScopedSymbolTable instance;
 	
 	private Stack<FlatSymbolTable> scopes = new Stack<FlatSymbolTable>();
 
 	private ScopedSymbolTable() {
-		scopes.push(Trace.getInstance().top().symbolTable.clone()); //initial
 	}
 	
 	public static ScopedSymbolTable getInstance() {
@@ -22,6 +21,10 @@ public class ScopedSymbolTable implements SymbolTable {
 		}
 		
 		return instance;
+	}
+	
+	public FlatSymbolTable createDefaultSymbolTable() {
+		return new FlatSymbolTable();
 	}
 
 	@Override
@@ -42,23 +45,40 @@ public class ScopedSymbolTable implements SymbolTable {
 	@Override
 	public void registerPathToVariable(AccessPath path, CompleteVariableID number) {
 		scopes.lastElement().registerPathToVariable(path, number);
+		
+		System.err.println(scopes.lastElement().toString());
 	}
 	
+	@Override
 	public void processMethodCall() {
-		scopes.push(new FlatSymbolTable());
+		scopes.push(createDefaultSymbolTable());
 	}
 	
+	@Override
 	public void processMethodReturn() {
-		if (scopes.size() > 1) {
-			scopes.pop();
+		scopes.pop();
+	}
+	
+	@Override
+	public void store(Scope scope) {
+		if (scope instanceof FlatSymbolTable) {
+			scopes.push((FlatSymbolTable) scope.clone());
+		} else {
+			throw new RuntimeException("Invalid scope type being pushed!");
 		}
 	}
 	
-	public void restore(FlatSymbolTable scope) {
-		scopes.pop();
-		scopes.push(scope.clone());
+	@Override
+	public void restore(Scope scope) {
+		if (scope instanceof FlatSymbolTable) {
+			scopes.pop();
+			scopes.push((FlatSymbolTable) scope.clone());
+		} else {
+			throw new RuntimeException("Invalid scope type being pushed!");
+		}
 	}
 	
+	@Override
 	public FlatSymbolTable memorize() {
 		return scopes.lastElement().clone();
 	}
