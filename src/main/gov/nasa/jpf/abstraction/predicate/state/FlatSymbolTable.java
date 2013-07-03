@@ -1,11 +1,13 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.concrete.VariableID;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Comparator;
@@ -50,8 +52,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 
 	@Override
-	public boolean registerPathToVariable(AccessPath path, CompleteVariableID number) {
-		boolean modified = false;
+	public Set<AccessPath> registerPathToVariable(AccessPath path, CompleteVariableID number) {
+		Set<AccessPath> affected = new HashSet<AccessPath>();
 		
 		if (!num2paths.containsKey(number)) {
 			num2paths.put(number, new HashSet<AccessPath>());
@@ -65,14 +67,44 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			VariableID old = path2num.get(path);
 			num2paths.get(old).remove(path);
 			
-			modified = true;
+			affected.add(path);
 		}
 		
 		path2num.remove(path);
 		path2num.put(path, number);		
 		num2paths.get(number).add(path);
 		
-		return modified;
+		return affected;
+	}
+	
+	@Override
+	public Set<AccessPath> assign(ConcretePath from, ConcretePath to) {	
+		Set<AccessPath> affected = new HashSet<AccessPath>();
+		
+		if (to == null) return affected; //TODO verify
+			
+		if (from == null) {
+			Map<AccessPath, CompleteVariableID> vars = to.resolve();
+
+			// ASSIGN A PRIMITIVE VALUE - STORES NEW VALUE
+    		for (AccessPath p : vars.keySet()) {
+    			affected.addAll(registerPathToVariable(p, vars.get(p)));
+    		}
+		} else {
+			for (AccessPath path : lookupAccessPaths(from)) {
+				CompleteVariableID variableID = resolvePath(path);
+
+				for (AccessPath newFrom : from.partialResolve().keySet()) {
+					AccessPath newPath = path.clone();
+					AccessPath.reRoot(newPath, from, newFrom);
+
+					// REWRITE ALL PRIMITIVE SUB FIELDS (NO MATTER ITS DEPTH)
+					affected.addAll(registerPathToVariable(newPath, variableID));
+				}
+			}
+		}
+               
+		return affected;
 	}
 	
 	@Override

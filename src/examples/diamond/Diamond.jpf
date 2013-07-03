@@ -1,0 +1,10 @@
+@using=jpf-abstraction
+
+target=diamond.Diamond
+
+classpath=${jpf-abstraction}/build/examples
+sourcepath=${jpf-abstraction}/src/examples
+
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/diamond/Diamond.pred
+
+listener=gov.nasa.jpf.abstraction.AbstractListener

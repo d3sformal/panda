@@ -69,6 +69,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
 	@Override
 	public void reevaluate(Set<AccessPath> affected) {
+		/*
 		System.err.println("SMT: ");
 		
 		System.err.println("\tREACTION TO:");
@@ -88,6 +89,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				System.err.println("\t\t" + predicate.toString(AccessPath.NotationPolicy.DOT_NOTATION));
 			}
 		}
+		*/
 	}
 	
 }

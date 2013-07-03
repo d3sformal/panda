@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 
 import java.util.Set;
@@ -43,8 +44,13 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public boolean registerPathToVariable(AccessPath path, CompleteVariableID number) {
+	public Set<AccessPath> registerPathToVariable(AccessPath path, CompleteVariableID number) {
 		return scopes.lastElement().registerPathToVariable(path, number);
+	}
+	
+	@Override
+	public Set<AccessPath> assign(ConcretePath from, ConcretePath to) {
+		return scopes.lastElement().assign(from, to);
 	}
 	
 	@Override
