@@ -51,7 +51,7 @@ public class DLOAD extends gov.nasa.jpf.jvm.bytecode.DLOAD {
 			Map<AccessPath, CompleteVariableID> vars = path.resolve();
 			
 			for (AccessPath p : vars.keySet()) {
-				ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
+				ScopedSymbolTable.getInstance().load(p, vars.get(p));
 			}
 
 			StackFrame sf = ti.getTopFrame();

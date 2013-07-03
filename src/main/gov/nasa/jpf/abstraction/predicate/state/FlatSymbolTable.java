@@ -51,8 +51,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return clone;
 	}
 
-	@Override
-	public Set<AccessPath> registerPathToVariable(AccessPath path, CompleteVariableID number) {
+	private Set<AccessPath> registerPathToVariable(AccessPath path, CompleteVariableID number) {
 		Set<AccessPath> affected = new HashSet<AccessPath>();
 		
 		if (!num2paths.containsKey(number)) {
@@ -75,6 +74,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		num2paths.get(number).add(path);
 		
 		return affected;
+	}
+	
+	@Override
+	public Set<AccessPath> load(AccessPath path, CompleteVariableID number) {
+		return registerPathToVariable(path, number);
 	}
 	
 	@Override
