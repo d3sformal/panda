@@ -18,12 +18,9 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
@@ -43,47 +40,19 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 		StackFrame sf = ti.getModifiableTopFrame();
 		
         Attribute source = (Attribute) sf.getOperandAttr();
-        
+		ConcretePath from = null;
+		ConcretePath to = null;
+		
+		if (source != null) from = source.accessPath;
+		to = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
+        to.appendSubElement(getFieldName());
+
 		Instruction ret = super.execute(ti);
-        
-        ConcretePath pathRoot = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
-        pathRoot.appendSubElement(getFieldName());
-        
-		Set<AccessPath> affected = new HashSet<AccessPath>();
 
-        if (source == null) {
-        	Map<AccessPath, CompleteVariableID> vars = pathRoot.resolve();
-			
-			for (AccessPath p : vars.keySet()) {
-				boolean modified = ScopedSymbolTable.getInstance().registerPathToVariable(p, vars.get(p));
-				
-				if (modified) {
-	            	affected.add(p);
-	            }
-			}
-        } else {
-            ConcretePath prefix = source.accessPath;
+		Set<AccessPath> affected = ScopedSymbolTable.getInstance().assign(from, to);
 
-            if (prefix != null) {
-                for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
-            	    CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
-
-		    		AccessPath newPath = path.clone();
-                    AccessPath newPathRoot = pathRoot.clone();
-
-                    AccessPath.reRoot(newPath, prefix, newPathRoot);
-
-		            boolean modified = ScopedSymbolTable.getInstance().registerPathToVariable(newPath, variableID);
-		            
-		            if (modified) {
-		            	affected.add(newPath);
-		            }
-			    }
-            }
-        }
-        
-        ScopedPredicateValuation.getInstance().reevaluate(affected);
-
+		ScopedPredicateValuation.getInstance().reevaluate(affected);
+		
 		return ret;
 	}
 }

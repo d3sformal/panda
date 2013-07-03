@@ -44,7 +44,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		int padding = 0;
 		
 		for (Predicate p : valuations.keySet()) {
-			String predicate = p.toString();
+			String predicate = p.toString(AccessPath.NotationPolicy.DOT_NOTATION);
 
 			padding = padding < predicate.length() ? predicate.length() : padding;
 		}
@@ -69,6 +69,8 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
 	@Override
 	public void reevaluate(Set<AccessPath> affected) {
+		if (affected.isEmpty()) return;
+
 		System.err.println("SMT: ");
 		
 		System.err.println("\tREACTION TO:");
