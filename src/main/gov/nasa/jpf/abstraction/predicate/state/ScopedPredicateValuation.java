@@ -12,8 +12,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	private static ScopedPredicateValuation instance;
 	
 	private Stack<FlatPredicateValuation> scopes = new Stack<FlatPredicateValuation>();
-	private Predicates predicateSet = null;
-
+	private Predicates predicateSet;
+	
 	private ScopedPredicateValuation() {
 	}
 	
@@ -25,7 +25,12 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		return instance;
 	}
 	
-	public FlatPredicateValuation createDefaultPredicateValuation() {
+	public void setPredicateSet(Predicates predicateSet) {
+		this.predicateSet = predicateSet;
+	}
+	
+	@Override
+	public FlatPredicateValuation createDefaultScope() {
 		FlatPredicateValuation valuation = new FlatPredicateValuation();
 		
 		for (Context context : predicateSet.contexts) {
@@ -35,10 +40,6 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		}
 		
 		return valuation;
-	}
-	
-	public void setPredicateSet(Predicates predicateSet) {
-		this.predicateSet = predicateSet;
 	}
 
 	@Override
@@ -58,7 +59,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	
 	@Override
 	public void processMethodCall() {
-		scopes.push(createDefaultPredicateValuation());
+		scopes.push(createDefaultScope());
 	}
 
 	@Override

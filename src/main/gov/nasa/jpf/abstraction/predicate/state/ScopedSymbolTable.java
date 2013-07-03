@@ -7,11 +7,10 @@ import java.util.Set;
 import java.util.Stack;
 
 public class ScopedSymbolTable implements SymbolTable, Scoped {
-	
 	private static ScopedSymbolTable instance;
-	
-	private Stack<FlatSymbolTable> scopes = new Stack<FlatSymbolTable>();
 
+	private Stack<FlatSymbolTable> scopes = new Stack<FlatSymbolTable>();
+	
 	private ScopedSymbolTable() {
 	}
 	
@@ -23,7 +22,8 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		return instance;
 	}
 	
-	public FlatSymbolTable createDefaultSymbolTable() {
+	@Override
+	public FlatSymbolTable createDefaultScope() {
 		return new FlatSymbolTable();
 	}
 
@@ -51,7 +51,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	
 	@Override
 	public void processMethodCall() {
-		scopes.push(createDefaultSymbolTable());
+		scopes.push(createDefaultScope());
 	}
 	
 	@Override

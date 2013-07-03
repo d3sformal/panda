@@ -22,8 +22,8 @@ public class PredicateAbstraction extends Abstraction {
 		
 		ScopedPredicateValuation.getInstance().setPredicateSet(predicateSet);
 		
-		FlatSymbolTable symbols = ScopedSymbolTable.getInstance().createDefaultSymbolTable();
-		FlatPredicateValuation predicates = ScopedPredicateValuation.getInstance().createDefaultPredicateValuation();
+		FlatSymbolTable symbols = ScopedSymbolTable.getInstance().createDefaultScope();
+		FlatPredicateValuation predicates = ScopedPredicateValuation.getInstance().createDefaultScope();
 		
 		State state = new State(symbols, predicates);
 		
@@ -38,16 +38,12 @@ public class PredicateAbstraction extends Abstraction {
 		System.err.println("Trace++");
 		Trace trace = Trace.getInstance();
 		
-		FlatSymbolTable symbols = ScopedSymbolTable.getInstance().createDefaultSymbolTable();
-		FlatPredicateValuation predicates = ScopedPredicateValuation.getInstance().createDefaultPredicateValuation();
+		FlatSymbolTable symbols = ScopedSymbolTable.getInstance().createDefaultScope();
+		FlatPredicateValuation predicates = ScopedPredicateValuation.getInstance().createDefaultScope();
 		
 		State state = new State(symbols, predicates);
 		
 		trace.push(state);
-		
-		//TODO: DEBUG:
-		System.err.println(state.symbolTable.toString());
-		System.err.println(state.predicateValuation.toString());
 	}
 	
 	@Override
