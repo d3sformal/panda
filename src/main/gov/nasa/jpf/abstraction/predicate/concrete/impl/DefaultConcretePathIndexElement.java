@@ -11,6 +11,7 @@ import gov.nasa.jpf.abstraction.predicate.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.predicate.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.VariableID;
 import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.grammar.Constant;
 import gov.nasa.jpf.abstraction.predicate.grammar.impl.DefaultAccessPathIndexElement;
 import gov.nasa.jpf.vm.ElementInfo;
@@ -56,6 +57,11 @@ public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexEleme
 		}
 		
 		return ret;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		return o instanceof AccessPathIndexElement;
 	}
 	
 	@Override

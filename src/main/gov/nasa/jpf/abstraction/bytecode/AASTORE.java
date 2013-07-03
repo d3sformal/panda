@@ -56,17 +56,14 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
                     ConcretePath prefix = source.accessPath;
 
                     if (prefix != null) {
-                    	System.err.println(pathRoot.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " := " + prefix.toString(AccessPath.NotationPolicy.DOT_NOTATION));
                         for (AccessPath path : ScopedSymbolTable.getInstance().lookupAccessPaths(prefix)) {
             				CompleteVariableID variableID = ScopedSymbolTable.getInstance().resolvePath(path);
 
-		    		        
                             for (AccessPath newPrefix : pathRoot.partialResolve().keySet()) {
                             	AccessPath newPath = path.clone();
                             	AccessPath.reRoot(newPath, prefix, newPrefix);
                             	
-                            	System.err.println("\t" + newPath.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " := " + path.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-                            	
+                            	// Re-registers self
     		            		ScopedSymbolTable.getInstance().registerPathToVariable(newPath, variableID);
                             }
 			            }
