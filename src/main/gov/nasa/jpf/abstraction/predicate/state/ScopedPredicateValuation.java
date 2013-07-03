@@ -90,5 +90,10 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	public FlatPredicateValuation memorize() {
 		return scopes.lastElement().clone();
 	}
+	
+	@Override
+	public String toString() {
+		return scopes.lastElement().toString();
+	}
 
 }

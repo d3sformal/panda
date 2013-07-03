@@ -45,8 +45,6 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	@Override
 	public void registerPathToVariable(AccessPath path, CompleteVariableID number) {
 		scopes.lastElement().registerPathToVariable(path, number);
-		
-		System.err.println(scopes.lastElement().toString());
 	}
 	
 	@Override
@@ -81,6 +79,11 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	@Override
 	public FlatSymbolTable memorize() {
 		return scopes.lastElement().clone();
+	}
+	
+	@Override
+	public String toString() {
+		return scopes.lastElement().toString();
 	}
 	
 }
