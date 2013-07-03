@@ -140,6 +140,11 @@ public class AbstractInstructionFactory extends
 	public Instruction dadd() {
 		return (filter.isInstrumentedClass(ci) ? new DADD() : super.dadd());
 	}
+	
+	@Override
+	public Instruction dastore() {
+		return (filter.isInstrumentedClass(ci) ? new DASTORE() : super.dastore());
+	}
 
 	@Override
 	public Instruction dcmpg() {
@@ -199,6 +204,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction fadd() {
 		return (filter.isInstrumentedClass(ci) ? new FADD() : super.fadd());
+	}
+	
+	@Override
+	public Instruction fastore() {
+		return (filter.isInstrumentedClass(ci) ? new FASTORE() : super.fastore());
 	}
 
 	@Override
@@ -279,6 +289,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction iand() {
 		return (filter.isInstrumentedClass(ci) ? new IAND() : super.iand());
+	}
+	
+	@Override
+	public Instruction iastore() {
+		return (filter.isInstrumentedClass(ci) ? new IASTORE() : super.iastore());
 	}
 
 	@Override
@@ -418,6 +433,11 @@ public class AbstractInstructionFactory extends
 	public Instruction ishl() {
 		return (filter.isInstrumentedClass(ci) ? new ISHL() : super.ishl());
 	}
+	
+	@Override
+	public Instruction istore(int index) {
+		return (filter.isInstrumentedClass(ci) ? new ISTORE(index) : super.istore(index));
+	}
 
 	@Override
 	public Instruction ishr() {
@@ -462,6 +482,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction land() {
 		return (filter.isInstrumentedClass(ci) ? new LAND() : super.land());
+	}
+	
+	@Override
+	public Instruction lastore() {
+		return (filter.isInstrumentedClass(ci) ? new LASTORE() : super.lastore());
 	}
 
 	@Override

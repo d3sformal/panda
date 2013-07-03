@@ -29,7 +29,7 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
+public class LASTORE extends gov.nasa.jpf.jvm.bytecode.LASTORE {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
