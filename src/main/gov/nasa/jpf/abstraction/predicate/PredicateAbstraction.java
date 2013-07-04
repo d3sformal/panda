@@ -24,11 +24,13 @@ public class PredicateAbstraction extends Abstraction {
 	// FOR ALL INSTANCES
 	private static ScopedSymbolTable symbolTable = new ScopedSymbolTable();
 	private ScopedPredicateValuation predicateValuation;
+	private Trace trace;
 	
 	public PredicateAbstraction(Predicates predicateSet) {
-		predicateValuation = new ScopedPredicateValuation(predicateSet);
-		
 		instances.add(this);
+
+		predicateValuation = new ScopedPredicateValuation(predicateSet);
+		trace = new Trace();
 	}
 	
 	public static void load(Map<AccessPath, CompleteVariableID> vars) {
@@ -80,9 +82,7 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void start() {
-		Trace trace = Trace.getInstance();
-			
+	public void start() {	
 		FlatSymbolTable symbols = symbolTable.createDefaultScope();
 		FlatPredicateValuation predicates = predicateValuation.createDefaultScope();
 		
@@ -97,7 +97,6 @@ public class PredicateAbstraction extends Abstraction {
 	@Override
 	public void forward() {
 		System.err.println("Trace++");
-		Trace trace = Trace.getInstance();
 		
 		FlatSymbolTable symbols = symbolTable.createDefaultScope();
 		FlatPredicateValuation predicates = predicateValuation.createDefaultScope();
@@ -110,7 +109,6 @@ public class PredicateAbstraction extends Abstraction {
 	@Override
 	public void backtrack() {
 		System.err.println("Trace--");
-		Trace trace = Trace.getInstance();
 		
 		trace.pop();
 		
