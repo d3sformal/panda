@@ -11,23 +11,10 @@ import java.util.Set;
 import java.util.Stack;
 
 public class ScopedPredicateValuation implements PredicateValuation, Scoped {
-	private static ScopedPredicateValuation instance;
-	
 	private Stack<FlatPredicateValuation> scopes = new Stack<FlatPredicateValuation>();
 	private Predicates predicateSet;
 	
-	private ScopedPredicateValuation() {
-	}
-	
-	public static ScopedPredicateValuation getInstance() {
-		if (instance == null) {
-			instance = new ScopedPredicateValuation();
-		}
-		
-		return instance;
-	}
-	
-	public void setPredicateSet(Predicates predicateSet) {
+	public ScopedPredicateValuation(Predicates predicateSet) {
 		this.predicateSet = predicateSet;
 	}
 	

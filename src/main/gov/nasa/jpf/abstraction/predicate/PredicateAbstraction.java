@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.predicate.grammar.Predicates;
 import gov.nasa.jpf.abstraction.predicate.state.FlatPredicateValuation;
@@ -10,27 +13,43 @@ import gov.nasa.jpf.abstraction.predicate.state.State;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
 
 public class PredicateAbstraction extends Abstraction {
-	private Predicates predicateSet;
+	private static List<PredicateAbstraction> instances = new LinkedList<PredicateAbstraction>();
+
+	private ScopedSymbolTable symbolTable;
+	private ScopedPredicateValuation predicateValuation;
 	
 	public PredicateAbstraction(Predicates predicateSet) {
-		this.predicateSet = predicateSet;
+		symbolTable = new ScopedSymbolTable();
+		predicateValuation = new ScopedPredicateValuation(predicateSet);
+		
+		instances.add(this);
+	}
+	
+	public static List<PredicateAbstraction> getInstances() {
+		return instances;
+	}
+	
+	public ScopedSymbolTable getSymbolTable() {
+		return symbolTable;
+	}
+	
+	public ScopedPredicateValuation getPredicateValuation() {
+		return predicateValuation;
 	}
 	
 	@Override
 	public void start() {
 		Trace trace = Trace.getInstance();
-		
-		ScopedPredicateValuation.getInstance().setPredicateSet(predicateSet);
-		
-		FlatSymbolTable symbols = ScopedSymbolTable.getInstance().createDefaultScope();
-		FlatPredicateValuation predicates = ScopedPredicateValuation.getInstance().createDefaultScope();
+			
+		FlatSymbolTable symbols = getSymbolTable().createDefaultScope();
+		FlatPredicateValuation predicates = getPredicateValuation().createDefaultScope();
 		
 		State state = new State(symbols, predicates);
 		
 		trace.push(state);
 		
-		ScopedSymbolTable.getInstance().store(trace.top().symbolTable);
-		ScopedPredicateValuation.getInstance().store(trace.top().predicateValuation);
+		getSymbolTable().store(trace.top().symbolTable);
+		getPredicateValuation().store(trace.top().predicateValuation);
 	}
 
 	@Override
@@ -38,8 +57,8 @@ public class PredicateAbstraction extends Abstraction {
 		System.err.println("Trace++");
 		Trace trace = Trace.getInstance();
 		
-		FlatSymbolTable symbols = ScopedSymbolTable.getInstance().createDefaultScope();
-		FlatPredicateValuation predicates = ScopedPredicateValuation.getInstance().createDefaultScope();
+		FlatSymbolTable symbols = getSymbolTable().createDefaultScope();
+		FlatPredicateValuation predicates = getPredicateValuation().createDefaultScope();
 		
 		State state = new State(symbols, predicates);
 		
@@ -53,7 +72,7 @@ public class PredicateAbstraction extends Abstraction {
 		
 		trace.pop();
 		
-		ScopedSymbolTable.getInstance().restore(trace.top().symbolTable);
-		ScopedPredicateValuation.getInstance().restore(trace.top().predicateValuation);
+		getSymbolTable().restore(trace.top().symbolTable);
+		getPredicateValuation().restore(trace.top().predicateValuation);
 	}
 }

@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -30,7 +30,9 @@ public class ARETURN extends gov.nasa.jpf.jvm.bytecode.ARETURN {
 		
 		if (ret == this) return this;
 		
-		ScopedSymbolTable.getInstance().processMethodReturn();
+		for (PredicateAbstraction abs : PredicateAbstraction.getInstances()) {
+			abs.getSymbolTable().processMethodReturn();
+		}
 		
 		return ret;
 	}

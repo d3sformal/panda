@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -34,8 +34,10 @@ public class INVOKESPECIAL extends gov.nasa.jpf.jvm.bytecode.INVOKESPECIAL {
 		
 		if (ret == this) return this;
 		
-		ScopedSymbolTable.getInstance().processMethodCall();
-		
+		for (PredicateAbstraction abs : PredicateAbstraction.getInstances()) {
+			abs.getSymbolTable().processMethodCall();
+		}
+
 		return ret;
 	}
 }

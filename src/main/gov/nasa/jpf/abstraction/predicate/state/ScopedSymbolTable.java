@@ -8,20 +8,7 @@ import java.util.Set;
 import java.util.Stack;
 
 public class ScopedSymbolTable implements SymbolTable, Scoped {
-	private static ScopedSymbolTable instance;
-
 	private Stack<FlatSymbolTable> scopes = new Stack<FlatSymbolTable>();
-	
-	private ScopedSymbolTable() {
-	}
-	
-	public static ScopedSymbolTable getInstance() {
-		if (instance == null) {
-			instance = new ScopedSymbolTable();
-		}
-		
-		return instance;
-	}
 	
 	@Override
 	public FlatSymbolTable createDefaultScope() {

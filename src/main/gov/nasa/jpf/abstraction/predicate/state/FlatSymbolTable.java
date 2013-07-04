@@ -85,12 +85,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public Set<AccessPath> assign(ConcretePath from, ConcretePath to) {	
 		Set<AccessPath> affected = new HashSet<AccessPath>();
 		
-		if (to == null) {
-			System.err.println("UNKNOWN ASSIGN");
-			return affected; //TODO verify
-		}
-		
-		System.err.print(to.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+		if (to == null) return affected; //TODO verify
 			
 		if (from == null) {
 			Map<AccessPath, CompleteVariableID> vars = to.resolve();
@@ -99,9 +94,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
     		for (AccessPath p : vars.keySet()) {
     			affected.addAll(registerPathToVariable(p, vars.get(p)));
     		}
-		} else {
-			System.err.print(" := " + from.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-			
+		} else {	
 			for (AccessPath path : lookupAccessPaths(from)) {
 				CompleteVariableID variableID = resolvePath(path);
 
@@ -114,8 +107,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				}
 			}
 		}
-		
-		System.err.println();
                
 		return affected;
 	}
