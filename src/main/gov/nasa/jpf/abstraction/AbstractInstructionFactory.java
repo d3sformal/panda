@@ -120,6 +120,26 @@ public class AbstractInstructionFactory extends
 	public Instruction astore(int index) {
 		return (filter.isInstrumentedClass(ci) ? new ASTORE(index) : super.astore(index));
 	}
+	
+	@Override
+	public Instruction baload() {
+		return (filter.isInstrumentedClass(ci) ? new BALOAD() : super.baload());
+	}
+	
+	@Override
+	public Instruction bastore() {
+		return (filter.isInstrumentedClass(ci) ? new BASTORE() : super.bastore());
+	}
+	
+	@Override
+	public Instruction caload() {
+		return (filter.isInstrumentedClass(ci) ? new CALOAD() : super.caload());
+	}
+	
+	@Override
+	public Instruction castore() {
+		return (filter.isInstrumentedClass(ci) ? new CASTORE() : super.castore());
+	}
 
 	@Override
 	public Instruction d2f() {
@@ -139,6 +159,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction dadd() {
 		return (filter.isInstrumentedClass(ci) ? new DADD() : super.dadd());
+	}
+	
+	@Override
+	public Instruction daload() {
+		return (filter.isInstrumentedClass(ci) ? new DALOAD() : super.daload());
 	}
 	
 	@Override
@@ -204,6 +229,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction fadd() {
 		return (filter.isInstrumentedClass(ci) ? new FADD() : super.fadd());
+	}
+	
+	@Override
+	public Instruction faload() {
+		return (filter.isInstrumentedClass(ci) ? new FALOAD() : super.faload());
 	}
 	
 	@Override
@@ -289,6 +319,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction iand() {
 		return (filter.isInstrumentedClass(ci) ? new IAND() : super.iand());
+	}
+
+	@Override
+	public Instruction iaload() {
+		return (filter.isInstrumentedClass(ci) ? new IALOAD() : super.iaload());
 	}
 	
 	@Override
@@ -490,6 +525,11 @@ public class AbstractInstructionFactory extends
 	}
 	
 	@Override
+	public Instruction laload() {
+		return (filter.isInstrumentedClass(ci) ? new LALOAD() : super.laload());
+	}
+	
+	@Override
 	public Instruction lastore() {
 		return (filter.isInstrumentedClass(ci) ? new LASTORE() : super.lastore());
 	}
@@ -574,6 +614,16 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction return_() {
 		return (filter.isInstrumentedClass(ci) ? new RETURN() : super.return_());
+	}
+	
+	@Override
+	public Instruction saload() {
+		return (filter.isInstrumentedClass(ci) ? new SALOAD() : super.saload());
+	}
+	
+	@Override
+	public Instruction sastore() {
+		return (filter.isInstrumentedClass(ci) ? new SASTORE() : super.sastore());
 	}
 	
 	@Override
