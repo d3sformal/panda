@@ -1,6 +1,7 @@
-package gov.nasa.jpf.abstraction.predicate;
+package gov.nasa.jpf.abstraction.predicate.util;
 
 import gov.nasa.jpf.ListenerAdapter;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
