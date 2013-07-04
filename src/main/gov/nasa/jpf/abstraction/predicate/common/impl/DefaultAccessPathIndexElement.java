@@ -1,8 +1,8 @@
-package gov.nasa.jpf.abstraction.predicate.grammar.impl;
+package gov.nasa.jpf.abstraction.predicate.common.impl;
 
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath.NotationPolicy;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathIndexElement;
-import gov.nasa.jpf.abstraction.predicate.grammar.Expression;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPathIndexElement;
+import gov.nasa.jpf.abstraction.predicate.common.Expression;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath.NotationPolicy;
 
 public class DefaultAccessPathIndexElement extends DefaultAccessPathMiddleElement implements AccessPathIndexElement {
 	private Expression index;

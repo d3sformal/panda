@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.grammar.Predicate;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 public interface PredicateValuation {
 	public void put(Predicate predicate, TruthValue value);

@@ -8,7 +8,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.AbstractionFactory;
-import gov.nasa.jpf.abstraction.predicate.grammar.Predicates;
+import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
 

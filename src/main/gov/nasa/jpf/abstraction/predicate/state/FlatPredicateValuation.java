@@ -1,8 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.grammar.Context;
-import gov.nasa.jpf.abstraction.predicate.grammar.Predicate;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.Context;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 import java.util.HashMap;
 import java.util.Iterator;

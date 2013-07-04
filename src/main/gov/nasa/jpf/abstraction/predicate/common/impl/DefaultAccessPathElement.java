@@ -1,8 +1,8 @@
-package gov.nasa.jpf.abstraction.predicate.grammar.impl;
+package gov.nasa.jpf.abstraction.predicate.common.impl;
 
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathElement;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathMiddleElement;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPathElement;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPathMiddleElement;
 
 public abstract class DefaultAccessPathElement implements AccessPathElement {
 	

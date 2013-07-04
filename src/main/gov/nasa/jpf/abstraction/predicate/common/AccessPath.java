@@ -1,8 +1,8 @@
-package gov.nasa.jpf.abstraction.predicate.grammar;
+package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.abstraction.predicate.grammar.impl.DefaultAccessPathIndexElement;
-import gov.nasa.jpf.abstraction.predicate.grammar.impl.DefaultAccessPathRootElement;
-import gov.nasa.jpf.abstraction.predicate.grammar.impl.DefaultAccessPathSubElement;
+import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathIndexElement;
+import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathRootElement;
+import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathSubElement;
 
 import java.util.ArrayList;
 import java.util.List;

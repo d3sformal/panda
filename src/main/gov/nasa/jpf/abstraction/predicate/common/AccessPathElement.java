@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction.predicate.grammar;
+package gov.nasa.jpf.abstraction.predicate.common;
 
 public interface AccessPathElement extends Cloneable {
 	public AccessPathMiddleElement getNext();

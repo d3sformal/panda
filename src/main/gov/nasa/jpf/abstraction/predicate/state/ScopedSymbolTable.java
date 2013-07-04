@@ -1,8 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 
 import java.util.Set;
 import java.util.Stack;

@@ -1,7 +1,7 @@
-package gov.nasa.jpf.abstraction.predicate.grammar.impl;
+package gov.nasa.jpf.abstraction.predicate.common.impl;
 
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathRootElement;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPathRootElement;
 
 public class DefaultAccessPathRootElement extends DefaultAccessPathElement implements AccessPathRootElement {
 	private String name;

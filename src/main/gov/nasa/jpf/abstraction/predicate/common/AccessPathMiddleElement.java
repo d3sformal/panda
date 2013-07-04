@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction.predicate.grammar;
+package gov.nasa.jpf.abstraction.predicate.common;
 
 public interface AccessPathMiddleElement extends AccessPathElement {
 	public AccessPathElement getPrevious();

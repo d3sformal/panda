@@ -3,6 +3,10 @@ package gov.nasa.jpf.abstraction.predicate.concrete.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPathIndexElement;
+import gov.nasa.jpf.abstraction.predicate.common.Constant;
+import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.ArrayElementID;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathElement;
@@ -10,10 +14,6 @@ import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.predicate.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.VariableID;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathIndexElement;
-import gov.nasa.jpf.abstraction.predicate.grammar.Constant;
-import gov.nasa.jpf.abstraction.predicate.grammar.impl.DefaultAccessPathIndexElement;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 

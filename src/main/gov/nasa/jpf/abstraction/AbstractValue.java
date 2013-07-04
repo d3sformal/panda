@@ -17,7 +17,7 @@
 // DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 package gov.nasa.jpf.abstraction;
 
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 
 import java.util.Set;
 

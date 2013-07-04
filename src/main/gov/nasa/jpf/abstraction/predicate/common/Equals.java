@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction.predicate.grammar;
+package gov.nasa.jpf.abstraction.predicate.common;
 
 public class Equals extends Comparison {
 	public Equals(Expression a, Expression b) {

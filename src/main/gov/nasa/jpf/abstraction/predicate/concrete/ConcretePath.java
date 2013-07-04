@@ -3,13 +3,13 @@ package gov.nasa.jpf.abstraction.predicate.concrete;
 import java.util.HashMap;
 import java.util.Map;
 
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPathElement;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPathRootElement;
+import gov.nasa.jpf.abstraction.predicate.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.concrete.impl.DefaultConcretePathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.impl.DefaultConcretePathRootElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.impl.DefaultConcretePathSubElement;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathElement;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPathRootElement;
-import gov.nasa.jpf.abstraction.predicate.grammar.Expression;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public class ConcretePath extends AccessPath {
