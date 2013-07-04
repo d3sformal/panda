@@ -113,7 +113,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	@Override
 	public String toString() {
-		String ret = "--SYMBOLS------------ (" + path2num.size() + ")\n";
+		String ret = "";
 		
 		int padding = 0;
 
@@ -144,9 +144,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			
 			ret += path + pad + path2num.get(p) + "\n";
 		}
-		
-		ret += "---------------------\n";
-		
+
 		return ret;
 	}
 

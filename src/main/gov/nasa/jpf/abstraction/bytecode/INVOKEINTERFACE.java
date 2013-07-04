@@ -34,9 +34,7 @@ public class INVOKEINTERFACE extends gov.nasa.jpf.jvm.bytecode.INVOKEINTERFACE {
 		
 		if (ret == this) return this;
 		
-		for (PredicateAbstraction abs : PredicateAbstraction.getInstances()) {
-			abs.getSymbolTable().processMethodCall();
-		}
+		PredicateAbstraction.processMethodCall();
 
 		return ret;
 	}

@@ -30,9 +30,7 @@ public class DRETURN extends gov.nasa.jpf.jvm.bytecode.DRETURN {
 		
         if (ret == this) return this;
 		
-        for (PredicateAbstraction abs : PredicateAbstraction.getInstances()) {
-			abs.getSymbolTable().processMethodReturn();
-		}
+        PredicateAbstraction.processMethodReturn();
 
 		return ret;
 	}

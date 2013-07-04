@@ -52,11 +52,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 			
 				Map<AccessPath, CompleteVariableID> vars = path.resolve();
 				
-				for (AccessPath p : vars.keySet()) {
-					for (PredicateAbstraction abs : PredicateAbstraction.getInstances()) {
-						abs.getSymbolTable().load(p, vars.get(p));
-					}
-				}
+				PredicateAbstraction.load(vars);
 			}
 
 			sf = ti.getTopFrame();

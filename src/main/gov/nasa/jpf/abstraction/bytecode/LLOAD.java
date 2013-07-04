@@ -50,11 +50,7 @@ public class LLOAD extends gov.nasa.jpf.jvm.bytecode.LLOAD {
 				
 			Map<AccessPath, CompleteVariableID> vars = path.resolve();
 			
-			for (AccessPath p : vars.keySet()) {
-				for (PredicateAbstraction abs : PredicateAbstraction.getInstances()) {
-					abs.getSymbolTable().load(p, vars.get(p));
-				}
-			}
+			PredicateAbstraction.load(vars);
 
 			StackFrame sf = ti.getTopFrame();
 			sf.setLongOperandAttr(attribute);

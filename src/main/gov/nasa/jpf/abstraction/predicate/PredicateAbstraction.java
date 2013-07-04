@@ -2,8 +2,13 @@ package gov.nasa.jpf.abstraction.predicate;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.grammar.Predicates;
 import gov.nasa.jpf.abstraction.predicate.state.FlatPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
@@ -15,41 +20,78 @@ import gov.nasa.jpf.abstraction.predicate.state.Trace;
 public class PredicateAbstraction extends Abstraction {
 	private static List<PredicateAbstraction> instances = new LinkedList<PredicateAbstraction>();
 
-	private ScopedSymbolTable symbolTable;
+	// SYMBOLS DO NOT DEPEND ON ABSTRACTION AND DO NOT NEED TO BE MANAGED SEPARATELY
+	// FOR ALL INSTANCES
+	private static ScopedSymbolTable symbolTable = new ScopedSymbolTable();
 	private ScopedPredicateValuation predicateValuation;
 	
 	public PredicateAbstraction(Predicates predicateSet) {
-		symbolTable = new ScopedSymbolTable();
 		predicateValuation = new ScopedPredicateValuation(predicateSet);
 		
 		instances.add(this);
 	}
 	
-	public static List<PredicateAbstraction> getInstances() {
-		return instances;
+	public static void load(Map<AccessPath, CompleteVariableID> vars) {
+		for (AccessPath path : vars.keySet()) {
+			symbolTable.load(path, vars.get(path));
+		}
 	}
 	
-	public ScopedSymbolTable getSymbolTable() {
-		return symbolTable;
+	public static void assign(ConcretePath from, ConcretePath to) {
+		Set<AccessPath> affected = symbolTable.assign(from, to);
+
+		for (PredicateAbstraction abs : instances) {
+			abs.predicateValuation.reevaluate(affected);
+		}
 	}
 	
-	public ScopedPredicateValuation getPredicateValuation() {
-		return predicateValuation;
+	public static void processMethodCall() {
+		symbolTable.processMethodCall();
+
+		for (PredicateAbstraction abs : instances) {
+			abs.predicateValuation.processMethodCall();
+		}
+	}
+	
+	public static void processMethodReturn() {
+		symbolTable.processMethodReturn();
+
+		for (PredicateAbstraction abs : instances) {
+			abs.predicateValuation.processMethodReturn();
+		}
+	}
+	
+	public static List<ScopedSymbolTable> getSymbolTables() {
+		List<ScopedSymbolTable> symbolTables = new LinkedList<ScopedSymbolTable>();
+		
+		symbolTables.add(symbolTable);
+		
+		return symbolTables;
+	}
+	
+	public static List<ScopedPredicateValuation> getPredicateValuations() {
+		List<ScopedPredicateValuation> predicateValuations = new LinkedList<ScopedPredicateValuation>();
+		
+		for (PredicateAbstraction abs : instances) {
+			predicateValuations.add(abs.predicateValuation);
+		}
+		
+		return predicateValuations;
 	}
 	
 	@Override
 	public void start() {
 		Trace trace = Trace.getInstance();
 			
-		FlatSymbolTable symbols = getSymbolTable().createDefaultScope();
-		FlatPredicateValuation predicates = getPredicateValuation().createDefaultScope();
+		FlatSymbolTable symbols = symbolTable.createDefaultScope();
+		FlatPredicateValuation predicates = predicateValuation.createDefaultScope();
 		
 		State state = new State(symbols, predicates);
 		
 		trace.push(state);
 		
-		getSymbolTable().store(trace.top().symbolTable);
-		getPredicateValuation().store(trace.top().predicateValuation);
+		symbolTable.store(trace.top().symbolTable);
+		predicateValuation.store(trace.top().predicateValuation);
 	}
 
 	@Override
@@ -57,8 +99,8 @@ public class PredicateAbstraction extends Abstraction {
 		System.err.println("Trace++");
 		Trace trace = Trace.getInstance();
 		
-		FlatSymbolTable symbols = getSymbolTable().createDefaultScope();
-		FlatPredicateValuation predicates = getPredicateValuation().createDefaultScope();
+		FlatSymbolTable symbols = symbolTable.createDefaultScope();
+		FlatPredicateValuation predicates = predicateValuation.createDefaultScope();
 		
 		State state = new State(symbols, predicates);
 		
@@ -72,7 +114,7 @@ public class PredicateAbstraction extends Abstraction {
 		
 		trace.pop();
 		
-		getSymbolTable().restore(trace.top().symbolTable);
-		getPredicateValuation().restore(trace.top().predicateValuation);
+		symbolTable.restore(trace.top().symbolTable);
+		predicateValuation.restore(trace.top().predicateValuation);
 	}
 }

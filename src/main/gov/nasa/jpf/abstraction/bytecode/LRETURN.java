@@ -30,9 +30,7 @@ public class LRETURN extends gov.nasa.jpf.jvm.bytecode.LRETURN {
 		
 		if (ret == this) return this;
 		
-		for (PredicateAbstraction abs : PredicateAbstraction.getInstances()) {
-			abs.getSymbolTable().processMethodReturn();
-		}
+		PredicateAbstraction.processMethodReturn();
 
 		return ret;
 	}

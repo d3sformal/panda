@@ -34,9 +34,7 @@ public class INVOKEVIRTUAL extends gov.nasa.jpf.jvm.bytecode.INVOKEVIRTUAL {
 		
 		if (ret == this) return this;
 		
-		for (PredicateAbstraction abs : PredicateAbstraction.getInstances()) {
-			abs.getSymbolTable().processMethodCall();
-		}
+		PredicateAbstraction.processMethodCall();
 
 		return ret;
 	}

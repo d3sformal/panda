@@ -38,9 +38,9 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	}
 
 	@Override
-	public String toString() {
-		String ret = "--PREDICATES--------- (" + valuations.size() + ")\n";
-		
+	public String toString() {	
+		String ret = "";
+
 		int padding = 0;
 		
 		for (Predicate p : valuations.keySet()) {
@@ -61,8 +61,6 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
 			ret += predicate + pad + valuations.get(p) + "\n";
 		}
-		
-		ret += "---------------------\n";
 		
 		return ret;
 	}

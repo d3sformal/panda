@@ -30,9 +30,7 @@ public class ARETURN extends gov.nasa.jpf.jvm.bytecode.ARETURN {
 		
 		if (ret == this) return this;
 		
-		for (PredicateAbstraction abs : PredicateAbstraction.getInstances()) {
-			abs.getSymbolTable().processMethodReturn();
-		}
+		PredicateAbstraction.processMethodReturn();
 		
 		return ret;
 	}

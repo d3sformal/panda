@@ -18,12 +18,9 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import java.util.Set;
-
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
@@ -55,11 +52,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 			System.err.println(getClass().getSimpleName() + " FAIL " + getLocalVariableName());
 		}
 
-		for (PredicateAbstraction abs : PredicateAbstraction.getInstances()) {
-			Set<AccessPath> affected = abs.getSymbolTable().assign(from, to);
-
-			abs.getPredicateValuation().reevaluate(affected);
-		}
+		PredicateAbstraction.assign(from, to);
 		
 		return ret;
 	}
