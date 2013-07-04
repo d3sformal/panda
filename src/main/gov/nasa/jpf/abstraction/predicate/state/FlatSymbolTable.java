@@ -14,7 +14,22 @@ import java.util.Comparator;
 
 public class FlatSymbolTable implements SymbolTable, Scope {
 	
+	/**
+	 *  Maps PATH to a VARIABLEID
+	 *  
+	 *  a -> local var a
+	 *  b.a -> static field a
+	 *  c.a -> heap field a
+	 *  d[1] -> heap array element number 1
+	 */
 	private HashMap<AccessPath, CompleteVariableID> path2num = new HashMap<AccessPath, CompleteVariableID>();
+	
+	/**
+	 * Maps VARIABLEID to all known (from the point of our execution) PATHS
+	 * 
+	 * heap field a -> {x.y.a, z.a, u[1].a}
+	 * ...
+	 */
 	private HashMap<CompleteVariableID, Set<AccessPath>> num2paths = new HashMap<CompleteVariableID, Set<AccessPath>>();
 
 	@Override
