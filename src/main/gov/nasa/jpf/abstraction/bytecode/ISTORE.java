@@ -34,7 +34,7 @@ public class ISTORE extends gov.nasa.jpf.jvm.bytecode.ISTORE {
 			System.err.println(getClass().getSimpleName() + " FAIL " + getLocalVariableName());
 		}
 
-		PredicateAbstraction.assign(from, to);
+		PredicateAbstraction.processStore(from, to);
 		
 		return ret;
 	}

@@ -33,14 +33,14 @@ public class PredicateAbstraction extends Abstraction {
 		trace = new Trace();
 	}
 	
-	public static void load(Map<AccessPath, CompleteVariableID> vars) {
+	public static void processLoad(Map<AccessPath, CompleteVariableID> vars) {
 		for (AccessPath path : vars.keySet()) {
-			symbolTable.load(path, vars.get(path));
+			symbolTable.processLoad(path, vars.get(path));
 		}
 	}
 	
-	public static void assign(ConcretePath from, ConcretePath to) {
-		Set<AccessPath> affected = symbolTable.assign(from, to);
+	public static void processStore(ConcretePath from, ConcretePath to) {
+		Set<AccessPath> affected = symbolTable.processStore(from, to);
 
 		for (PredicateAbstraction abs : instances) {
 			abs.predicateValuation.reevaluate(affected);

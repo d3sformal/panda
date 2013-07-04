@@ -50,7 +50,7 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 				
 			Map<AccessPath, CompleteVariableID> vars = path.resolve();
 			
-			PredicateAbstraction.load(vars);
+			PredicateAbstraction.processLoad(vars);
 
 			StackFrame sf = ti.getTopFrame();
 			sf.setOperandAttr(attribute);

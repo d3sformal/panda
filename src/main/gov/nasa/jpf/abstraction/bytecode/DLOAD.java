@@ -50,7 +50,7 @@ public class DLOAD extends gov.nasa.jpf.jvm.bytecode.DLOAD {
 				
 			Map<AccessPath, CompleteVariableID> vars = path.resolve();
 			
-			PredicateAbstraction.load(vars);
+			PredicateAbstraction.processLoad(vars);
 
 			StackFrame sf = ti.getTopFrame();
 			sf.setLongOperandAttr(attribute);

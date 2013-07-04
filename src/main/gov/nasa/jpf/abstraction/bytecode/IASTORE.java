@@ -46,7 +46,7 @@ public class IASTORE extends gov.nasa.jpf.jvm.bytecode.IASTORE {
 			to.appendIndexElement(null);
 		}
 
-		PredicateAbstraction.assign(from, to);
+		PredicateAbstraction.processStore(from, to);
 		
 		return ret;
 	}

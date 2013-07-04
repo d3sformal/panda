@@ -12,7 +12,7 @@ public interface SymbolTable {
 	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID number);
 	public CompleteVariableID resolvePath(AccessPath path);
 	
-	public Set<AccessPath> load(AccessPath path, CompleteVariableID number);
-	public Set<AccessPath> assign(ConcretePath from, ConcretePath to);
+	public Set<AccessPath> processLoad(AccessPath path, CompleteVariableID number);
+	public Set<AccessPath> processStore(ConcretePath from, ConcretePath to);
 	
 }

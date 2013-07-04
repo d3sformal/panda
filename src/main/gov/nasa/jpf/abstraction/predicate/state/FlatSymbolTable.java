@@ -77,12 +77,12 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 	
 	@Override
-	public Set<AccessPath> load(AccessPath path, CompleteVariableID number) {
+	public Set<AccessPath> processLoad(AccessPath path, CompleteVariableID number) {
 		return registerPathToVariable(path, number);
 	}
 	
 	@Override
-	public Set<AccessPath> assign(ConcretePath from, ConcretePath to) {	
+	public Set<AccessPath> processStore(ConcretePath from, ConcretePath to) {	
 		Set<AccessPath> affected = new HashSet<AccessPath>();
 		
 		if (to == null) return affected; //TODO verify

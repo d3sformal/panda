@@ -31,13 +31,13 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public Set<AccessPath> load(AccessPath path, CompleteVariableID number) {
-		return scopes.lastElement().load(path, number);
+	public Set<AccessPath> processLoad(AccessPath path, CompleteVariableID number) {
+		return scopes.lastElement().processLoad(path, number);
 	}
 	
 	@Override
-	public Set<AccessPath> assign(ConcretePath from, ConcretePath to) {
-		return scopes.lastElement().assign(from, to);
+	public Set<AccessPath> processStore(ConcretePath from, ConcretePath to) {
+		return scopes.lastElement().processStore(from, to);
 	}
 	
 	@Override

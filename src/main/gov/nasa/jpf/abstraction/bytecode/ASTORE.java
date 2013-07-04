@@ -52,7 +52,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 			System.err.println(getClass().getSimpleName() + " FAIL " + getLocalVariableName());
 		}
 
-		PredicateAbstraction.assign(from, to);
+		PredicateAbstraction.processStore(from, to);
 		
 		return ret;
 	}

@@ -46,7 +46,7 @@ public class LASTORE extends gov.nasa.jpf.jvm.bytecode.LASTORE {
 			to.appendIndexElement(null);
 		}
 
-		PredicateAbstraction.assign(from, to);
+		PredicateAbstraction.processStore(from, to);
 		
 		return ret;
 	}
