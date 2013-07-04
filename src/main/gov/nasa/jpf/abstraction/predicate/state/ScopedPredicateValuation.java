@@ -89,5 +89,10 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	public void reevaluate(Set<AccessPath> affected) {
 		scopes.lastElement().reevaluate(affected);
 	}
+	
+	@Override
+	public int count() {
+		return scopes.size();
+	}
 
 }

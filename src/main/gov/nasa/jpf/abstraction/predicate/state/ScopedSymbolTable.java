@@ -78,5 +78,10 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	public String toString() {
 		return scopes.lastElement().toString();
 	}
+
+	@Override
+	public int count() {
+		return scopes.size();
+	}
 	
 }

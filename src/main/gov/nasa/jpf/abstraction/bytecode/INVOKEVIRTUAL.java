@@ -32,7 +32,7 @@ public class INVOKEVIRTUAL extends gov.nasa.jpf.jvm.bytecode.INVOKEVIRTUAL {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		if (ret != getNext(ti)) return ret;
+		if (ret == this || ret != ti.getPC()) return ret;
 		
 		PredicateAbstraction.processMethodCall();
 

@@ -7,4 +7,5 @@ public interface Scoped {
 	public void store(Scope scope);
 	public void restore(Scope scope);
 	public Scope memorize();
+	public int count();
 }

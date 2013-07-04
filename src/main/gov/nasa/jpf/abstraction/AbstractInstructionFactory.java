@@ -398,6 +398,11 @@ public class AbstractInstructionFactory extends
 	public Instruction invokeinterface(String clsName, String methodName, String methodSignature) {
 		return (filter.isInstrumentedClass(ci) ? new INVOKEINTERFACE(clsName, methodName, methodSignature) : super.invokeinterface(clsName, methodName, methodSignature));
 	}
+	
+	@Override
+	public Instruction invokeclinit(ClassInfo info) {
+		return (filter.isInstrumentedClass(ci) ? new INVOKECLINIT(info) : super.invokeclinit(info));
+	}
 
 	@Override
 	public Instruction invokespecial(String clsName, String methodName, String methodSignature) {
@@ -550,6 +555,11 @@ public class AbstractInstructionFactory extends
 	public Instruction lxor() {
 		return (filter.isInstrumentedClass(ci) ? new LXOR() : super.lxor());
 	}
+	
+	@Override
+	public Instruction nativereturn() {
+		return (filter.isInstrumentedClass(ci) ? new NATIVERETURN() : super.nativereturn());
+	}
 
 	@Override
 	public Instruction putfield(String fieldName, String clsName, String fieldDescriptor) {
@@ -559,6 +569,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction putstatic(String fieldName, String clsName, String fieldDescriptor) {
 		return (filter.isInstrumentedClass(ci) ? new PUTSTATIC(fieldName, clsName, fieldDescriptor) : super.putstatic(fieldName, clsName, fieldDescriptor));
+	}
+	
+	@Override
+	public Instruction return_() {
+		return (filter.isInstrumentedClass(ci) ? new RETURN() : super.return_());
 	}
 	
 	@Override
