@@ -1,16 +1,12 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
-import gov.nasa.jpf.abstraction.predicate.grammar.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
-import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-
-import java.util.Set;
 
 public class ISTORE extends gov.nasa.jpf.jvm.bytecode.ISTORE {
 
@@ -38,9 +34,7 @@ public class ISTORE extends gov.nasa.jpf.jvm.bytecode.ISTORE {
 			System.err.println(getClass().getSimpleName() + " FAIL " + getLocalVariableName());
 		}
 
-		Set<AccessPath> affected = ScopedSymbolTable.getInstance().assign(from, to);
-
-		ScopedPredicateValuation.getInstance().reevaluate(affected);
+		PredicateAbstraction.assign(from, to);
 		
 		return ret;
 	}
