@@ -39,7 +39,7 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 	public Instruction execute(ThreadInfo ti) {		
 		Instruction ret = super.execute(ti);
 		
-        if (ret == this) return this;
+		if (ret != getNext(ti)) return ret;
         
         ConcretePath path = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
 		

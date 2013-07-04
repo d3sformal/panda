@@ -35,7 +35,7 @@ public class IASTORE extends gov.nasa.jpf.jvm.bytecode.IASTORE {
 		
 		Instruction ret = super.execute(ti);
 
-		if (ret == this) return this;
+		if (ret != getNext(ti)) return ret;
 		
 		ConcretePath from = null;
 		ConcretePath to = null;

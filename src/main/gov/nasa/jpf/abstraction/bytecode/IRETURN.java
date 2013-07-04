@@ -28,7 +28,7 @@ public class IRETURN extends gov.nasa.jpf.jvm.bytecode.IRETURN {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		if (ret == this) return this;
+		if (ret != getNext(ti)) return ret;
 		
 		PredicateAbstraction.processMethodReturn();
 

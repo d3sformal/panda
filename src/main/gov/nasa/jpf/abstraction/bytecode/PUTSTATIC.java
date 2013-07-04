@@ -38,7 +38,7 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
         
         Instruction ret = super.execute(ti);
         
-        if (ret == this) return this;
+		if (ret != getNext(ti)) return ret;
         
 		ConcretePath from = null;
 		ConcretePath to = null;

@@ -42,7 +42,7 @@ public class LLOAD extends gov.nasa.jpf.jvm.bytecode.LLOAD {
 		
 		Instruction ret = super.execute(ti);
 		
-		if (ret == this) return this;
+		if (ret != getNext(ti)) return ret;
 		
 		if (var != null) {
 			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);

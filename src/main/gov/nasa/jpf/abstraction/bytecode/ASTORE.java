@@ -40,7 +40,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 
 		Instruction ret = super.execute(ti);
         
-        if (ret == this) return this;
+		if (ret != getNext(ti)) return ret;
         
 		ConcretePath from = null;
 		ConcretePath to = null;

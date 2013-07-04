@@ -38,7 +38,7 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 		
 		Instruction ret = super.execute(ti);
 		
-		if (ret == this) return this;
+		if (ret != getNext(ti)) return ret;
 	
         if (var != null) {
         	StackFrame sf = ti.getTopFrame();

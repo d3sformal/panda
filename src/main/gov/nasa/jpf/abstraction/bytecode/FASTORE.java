@@ -35,7 +35,7 @@ public class FASTORE extends gov.nasa.jpf.jvm.bytecode.FASTORE {
 		
 		Instruction ret = super.execute(ti);
 
-        if (ret == this) return this;
+		if (ret != getNext(ti)) return ret;
 		
 		ConcretePath from = null;
 		ConcretePath to = null;

@@ -42,7 +42,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 		
 		Instruction ret = super.execute(ti);
 		
-        if (ret == this) return this;
+		if (ret != getNext(ti)) return ret;
 		
 		if (attribute != null) {
 			ConcretePath path = attribute.accessPath;

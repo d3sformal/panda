@@ -33,7 +33,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 
 		Instruction ret = super.execute(ti);
 		
-		if (ret == this) return this;
+		if (ret != getNext(ti)) return ret;
 		
 		if (attr != null) {
 			ConcretePath path = attr.accessPath;
