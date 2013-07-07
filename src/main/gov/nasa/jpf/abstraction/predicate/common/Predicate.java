@@ -5,4 +5,7 @@ import java.util.List;
 public abstract class Predicate {
 	public abstract List<AccessPath> getPaths();
 	public abstract String toString(AccessPath.NotationPolicy policy);
+    public String toString() {
+        return toString(AccessPath.policy);
+    }
 }
