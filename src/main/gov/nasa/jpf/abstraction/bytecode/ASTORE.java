@@ -45,7 +45,11 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		ConcretePath from = null;
 		ConcretePath to = null;
 		
-		if (source != null) from = source.accessPath;
+		if (source != null) {
+			if (source.expression instanceof ConcretePath) {
+				from = (ConcretePath) source.expression;
+			}
+		}
 		if (var != null) {
 			to = new ConcretePath(getLocalVariableName(), ti, var, ConcretePath.Type.LOCAL);
 		} else {

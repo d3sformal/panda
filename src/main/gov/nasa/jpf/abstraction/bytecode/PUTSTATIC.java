@@ -43,7 +43,11 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 		ConcretePath from = null;
 		ConcretePath to = null;
 		
-		if (source != null) from = source.accessPath;
+		if (source != null) {
+			if (source.expression instanceof ConcretePath) {
+				from = (ConcretePath) source.expression;
+			}
+		}
 		to = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
         to.appendSubElement(getFieldName());
 

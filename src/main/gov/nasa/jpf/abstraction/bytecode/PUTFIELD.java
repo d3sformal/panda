@@ -44,9 +44,16 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		ConcretePath from = null;
 		ConcretePath to = null;
 		
-		if (source != null) from = source.accessPath;
+		if (source != null) {
+			if (source.expression instanceof ConcretePath) {
+				from = (ConcretePath) source.expression;
+			}
+		}
 		if (destination != null) {
-			to = destination.accessPath;
+			if (destination.expression instanceof ConcretePath) {
+				to = (ConcretePath) destination.expression;
+			}
+
 			to.appendSubElement(getFieldName());
 		}
 

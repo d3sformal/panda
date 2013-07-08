@@ -38,16 +38,16 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 	@Override
 	public Instruction execute(ThreadInfo ti) {		
 		StackFrame sf = ti.getTopFrame();
-		Attribute attribute = (Attribute) sf.getOperandAttr(0);
+		Attribute attr = (Attribute) sf.getOperandAttr(0);
 		
 		Instruction ret = super.execute(ti);
 		
 		if (ret != getNext(ti)) return ret;
 		
-		if (attribute != null) {
-			ConcretePath path = attribute.accessPath;
-		
-			if (path != null) {
+		if (attr != null) {
+			if (attr.expression instanceof ConcretePath) {
+				ConcretePath path = (ConcretePath) attr.expression;
+				
 				path.appendSubElement(getFieldName());
 			
 				Map<AccessPath, CompleteVariableID> vars = path.resolve();
@@ -56,7 +56,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 			}
 
 			sf = ti.getTopFrame();
-			sf.setOperandAttr(new Attribute(null, path));
+			sf.setOperandAttr(new Attribute(null, attr.expression));
 		}
 		
 		return ret;
