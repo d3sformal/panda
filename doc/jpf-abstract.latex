@@ -197,7 +197,7 @@ When executing a call to the method $m$, truth values of predicates over \code{t
 The same must be done when executing a return instruction --- with parameters of reference types and with the returned value.
 Truth value of predicates that refer only to fields of some object (via \code{this}) must be preserved between different method calls on the object, i.e. the value at the entry to some call on the object must be the same as the value at the exit from a previous call on the object (assuming that variables and fields referred to by the predicate were not explicitly modified between the calls).
 
-New values of predicates will be computed with the help of an SMT solver. We could use the standard approach based on weakest preconditions or something else.
+New values of predicates are computed with the help of an SMT solver. We use the standard approach based on weakest preconditions for assignment statements $v = e$, where $v$ can be any program variable (local variable, object field, array element) and $e$ can be any arithmetic expression.
 
 The following algorithm summarizes the procedure for computing new values of relevant predicates at some instruction.
 The set $\text{AffectedPaths}$ contains all access paths affected by the given instruction, and the function expression $paths(p)$ returns all access paths referred to by the predicate $p$.
