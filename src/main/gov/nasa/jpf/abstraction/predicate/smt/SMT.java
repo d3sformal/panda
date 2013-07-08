@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPathElement;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPathSubElement;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
@@ -12,8 +15,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SMT {
 	
@@ -81,25 +86,56 @@ public class SMT {
 	
 	public Map<Predicate, TruthValue> valuatePredicates(List<Predicate> predicates) throws IOException {
 		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
+		
+		Set<String> vars = new HashSet<String>();
+		Set<String> fields = new HashSet<String>();
 
 		String input = "";
+		
+		for (Predicate predicate : predicates) {
+			for (AccessPath path : predicate.getPaths()) {
+				AccessPathElement element = path.getRoot();
+				
+				vars.add("var_" + path.getRoot().getName());
+				
+				while (element != null) {
+					if (element instanceof AccessPathSubElement) {
+						AccessPathSubElement subElement = (AccessPathSubElement) element;
+
+						fields.add("field_" + subElement.getName());
+					}
+					
+					element = element.getNext();
+				}
+			}
+		}
+		
+		for (String var : vars) {
+			input += "(declare-fun " + var + " () Int)";
+		}
+		
+		for (String field : fields) {
+			input += "(declare-fun " + field + " (Int) Int)";
+		}
 
 		for (Predicate predicate : predicates) {
 			//TODO
 			String condition = "true";
 			
 			input +=
-				" (push 1)" +
-				" (assert " + condition + ")" +
-				" (check-sat)" +
-				" (pop 1)" +
-				" (push 1)" +
-				" (assert (not " + condition + "))" +
-				" (check-sat)" +
-				" (pop 1)";
+				"(push 1)" +
+				"(assert " + condition + ")" +
+				"(check-sat)" +
+				"(pop 1)" +
+				"(push 1)" +
+				"(assert (not " + condition + "))" +
+				"(check-sat)" +
+				"(pop 1)";
 		}
 		
 		input += " (exit)";
+		
+		System.err.println(input);
 		
 		Boolean[] sat = isSatisfiable(input);
 		int i = 0;
