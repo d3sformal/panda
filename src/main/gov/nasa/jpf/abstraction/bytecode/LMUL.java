@@ -20,6 +20,9 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.predicate.common.Expression;
+import gov.nasa.jpf.abstraction.predicate.common.Multiply;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -41,12 +44,25 @@ public class LMUL extends gov.nasa.jpf.jvm.bytecode.LMUL implements AbstractBina
 	}
 
 	@Override
-	public AbstractValue getResult(Long v1, AbstractValue abs_v1, Long v2, AbstractValue abs_v2) {
+	public Attribute getResult(Long v1, Attribute attr1, Long v2, Attribute attr2) {
+		AbstractValue abs_v1 = null;
+		AbstractValue abs_v2 = null;
+		Expression expr1 = null;
+		Expression expr2 = null;
+		
+		if (attr1 != null) {
+			abs_v1 = attr1.abstractValue;
+			expr1 = attr1.expression;
+		}
+		if (attr2 != null) {
+			abs_v2 = attr2.abstractValue;
+			expr2 = attr2.expression;
+		}
 		
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return Abstraction._mul(v1, abs_v1, v2, abs_v2);
+		return new Attribute(Abstraction._mul(v1, abs_v1, v2, abs_v2), new Multiply(expr1, expr2));
 	}
 
 	@Override

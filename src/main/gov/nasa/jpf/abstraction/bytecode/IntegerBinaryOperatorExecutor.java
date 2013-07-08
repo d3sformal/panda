@@ -18,7 +18,6 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.vm.StackFrame;
 
@@ -35,13 +34,13 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
 	}
 	
 	@Override
-	protected AbstractValue getLeftAbstractValue(StackFrame sf) {
-		return getAbstractValue(sf, 0);
+	protected Attribute getLeftAttribute(StackFrame sf) {
+		return getAttribute(sf, 0);
 	}
 
 	@Override
-	protected AbstractValue getRightAbstractValue(StackFrame sf) {
-		return getAbstractValue(sf, 1);
+	protected Attribute getRightAttribute(StackFrame sf) {
+		return getAttribute(sf, 1);
 	}
 
 	@Override
@@ -55,12 +54,12 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
 	}
 
 	@Override
-	protected void storeResult(AbstractValue result, StackFrame sf) {
+	protected void storeResult(Attribute result, StackFrame sf) {
 		sf.pop();
 		sf.pop();
 		
 		sf.push(0);
-		sf.setOperandAttr(new Attribute(result, null));
+		sf.setOperandAttr(result);
 	}
 
 }

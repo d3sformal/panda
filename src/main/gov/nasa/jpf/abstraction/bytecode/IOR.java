@@ -20,6 +20,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -41,12 +42,21 @@ public class IOR extends gov.nasa.jpf.jvm.bytecode.IOR implements AbstractBinary
 	}
 
 	@Override
-	public AbstractValue getResult(Integer v1, AbstractValue abs_v1, Integer v2, AbstractValue abs_v2) {
+	public Attribute getResult(Integer v1, Attribute attr1, Integer v2, Attribute attr2) {
+		AbstractValue abs_v1 = null;
+		AbstractValue abs_v2 = null;
 		
+		if (attr1 != null) {
+			abs_v1 = attr1.abstractValue;
+		}
+		if (attr2 != null) {
+			abs_v2 = attr2.abstractValue;
+		}
+
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return Abstraction._or(v1, abs_v1, v2, abs_v2);
+		return new Attribute(Abstraction._or(v1, abs_v1, v2, abs_v2), null);
 	}
 
 	@Override

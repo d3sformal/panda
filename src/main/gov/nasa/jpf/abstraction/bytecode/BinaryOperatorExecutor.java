@@ -36,8 +36,14 @@ public abstract class BinaryOperatorExecutor<T> {
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
 
-		AbstractValue abs_v1 = getLeftAbstractValue(sf);
-		AbstractValue abs_v2 = getRightAbstractValue(sf);
+		Attribute attr1 = getLeftAttribute(sf);
+		Attribute attr2 = getRightAttribute(sf);
+		
+		AbstractValue abs_v1 = null;
+		AbstractValue abs_v2 = null;
+		
+		if (attr1 != null) abs_v1 = attr1.abstractValue;
+		if (attr2 != null) abs_v2 = attr2.abstractValue;
 
 		if (abs_v1 == null && abs_v2 == null) {
 			return op.executeConcrete(ti);
@@ -46,13 +52,13 @@ public abstract class BinaryOperatorExecutor<T> {
 		T v1 = getLeftOperand(sf);
 		T v2 = getRightOperand(sf);
 
-		AbstractValue result = op.getResult(v1, abs_v1, v2, abs_v2);
+		Attribute result = op.getResult(v1, attr1, v2, attr2);
 
 		System.out.printf("%s> Values: %s (%s), %s (%s)\n", name, v2.toString(), abs_v2, v1.toString(), abs_v1);
 
-		if (result.isComposite()) {
+		if (result.abstractValue.isComposite()) {
 			if (!ti.isFirstStepInsn()) { // first time around
-				int size = result.getTokensNumber();
+				int size = result.abstractValue.getTokensNumber();
 				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
 				ss.setNextChoiceGenerator(cg);
 
@@ -63,7 +69,7 @@ public abstract class BinaryOperatorExecutor<T> {
 				assert (cg instanceof FocusAbstractChoiceGenerator);
 
 				int key = (Integer) cg.getNextChoice();
-				result = result.getToken(key);
+				result.abstractValue = result.abstractValue.getToken(key);
 			}
 		}
 		
@@ -74,19 +80,13 @@ public abstract class BinaryOperatorExecutor<T> {
 		return op.getNext(ti);
 	}
 	
-	protected AbstractValue getAbstractValue(StackFrame sf, int index) {
-		Attribute attr = (Attribute)sf.getOperandAttr(index);
-		
-		if (attr != null) {
-			return attr.abstractValue;
-		}
-		
-		return null;
+	protected Attribute getAttribute(StackFrame sf, int index) {
+		return (Attribute)sf.getOperandAttr(index);
 	}
 
-	abstract protected AbstractValue getLeftAbstractValue(StackFrame sf);
-	abstract protected AbstractValue getRightAbstractValue(StackFrame sf);
+	abstract protected Attribute getLeftAttribute(StackFrame sf);
+	abstract protected Attribute getRightAttribute(StackFrame sf);
 	abstract protected T getLeftOperand(StackFrame sf);
 	abstract protected T getRightOperand(StackFrame sf);
-	abstract protected void storeResult(AbstractValue result, StackFrame sf);
+	abstract protected void storeResult(Attribute result, StackFrame sf);
 }
