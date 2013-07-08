@@ -1,11 +1,14 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.common.Context;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -67,6 +70,8 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
 	@Override
 	public void reevaluate(Set<AccessPath> affected) {
+		List<Predicate> predicates = new LinkedList<Predicate>();
+
 		if (affected.isEmpty()) return;
 
 		System.err.println("SMT: ");
@@ -85,8 +90,16 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			}
 			
 			if (affects) {
+				predicates.add(predicate);
+
 				System.err.println("\t\t" + predicate.toString(AccessPath.NotationPolicy.DOT_NOTATION));
 			}
+		}
+		
+		try {
+			valuations = new SMT().valuatePredicates(predicates);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
