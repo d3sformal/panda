@@ -19,6 +19,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -46,7 +48,7 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 	    	ConcretePath path = new ConcretePath(var.getName(), ti, ei, ConcretePath.Type.HEAP);
 			
     		if (ei != null) {
-	    		Attribute attribute = new Attribute(null, path);
+	    		Attribute attribute = new NonEmptyAttribute(null, path);
 
 		    	sf.setOperandAttr(attribute);
     		}

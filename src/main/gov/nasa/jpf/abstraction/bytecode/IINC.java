@@ -85,7 +85,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 		Attribute attr = (Attribute) sf.getLocalAttr(index);
 		
 		if (attr != null) { 
-			return attr.abstractValue;
+			return attr.getAbstractValue();
 		}
 		
 		return null;

@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -40,7 +41,9 @@ public abstract class UnaryOperatorExecutor<T> {
 
 		AbstractValue abs_v = null;
 		
-		if (attr != null) abs_v = attr.abstractValue;
+		if (attr == null) attr = new EmptyAttribute();
+		
+		abs_v = attr.getAbstractValue();
 
 		if (abs_v == null) {
 			return op.executeConcrete(ti);
@@ -52,9 +55,9 @@ public abstract class UnaryOperatorExecutor<T> {
 
 		System.out.printf("%s> Values: %s (%s)\n", name, v.toString(), abs_v);
 
-		if (result.abstractValue.isComposite()) {
+		if (result.getAbstractValue().isComposite()) {
 			if (!ti.isFirstStepInsn()) { // first time around
-				int size = result.abstractValue.getTokensNumber();
+				int size = result.getAbstractValue().getTokensNumber();
 				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
 				ss.setNextChoiceGenerator(cg);
 
@@ -65,7 +68,7 @@ public abstract class UnaryOperatorExecutor<T> {
 				assert (cg instanceof FocusAbstractChoiceGenerator);
 
 				int key = (Integer) cg.getNextChoice();
-				result.abstractValue = result.abstractValue.getToken(key);
+				result.setAbstractValue(result.getAbstractValue().getToken(key));
 			}
 		}
 		

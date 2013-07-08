@@ -44,8 +44,8 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 		ConcretePath to = null;
 		
 		if (source != null) {
-			if (source.expression instanceof ConcretePath) {
-				from = (ConcretePath) source.expression;
+			if (source.getExpression() instanceof ConcretePath) {
+				from = (ConcretePath) source.getExpression();
 			}
 		}
 		to = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);

@@ -66,7 +66,7 @@ public class BinaryIfInstructionExecutor {
 		Attribute attr = (Attribute)sf.getOperandAttr(index);
 		
 		if (attr != null) {
-			return attr.abstractValue;
+			return attr.getAbstractValue();
 		}
 		
 		return null;

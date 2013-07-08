@@ -39,7 +39,7 @@ public class D2I extends gov.nasa.jpf.jvm.bytecode.D2I {
 		AbstractValue abs_val = null;
 		
 		if (attr != null) {
-			abs_val = attr.abstractValue;
+			abs_val = attr.getAbstractValue();
 		}
 
 		if (abs_val == null) {

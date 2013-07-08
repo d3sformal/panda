@@ -21,6 +21,8 @@ package gov.nasa.jpf.abstraction.bytecode;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
@@ -46,7 +48,7 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 		
 		if (var != null) {
 			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);
-			Attribute attribute = new Attribute(null, path);
+			Attribute attribute = new NonEmptyAttribute(null, path);
 				
 			Map<AccessPath, CompleteVariableID> vars = path.resolve();
 			

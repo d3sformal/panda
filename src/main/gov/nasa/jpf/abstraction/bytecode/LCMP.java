@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
@@ -42,21 +43,14 @@ public class LCMP extends gov.nasa.jpf.jvm.bytecode.LCMP implements AbstractBina
 	}
 
 	@Override
-	public Attribute getResult(Long v1, Attribute attr1, Long v2, Attribute attr2) {
-		AbstractValue abs_v1 = null;
-		AbstractValue abs_v2 = null;
-		
-		if (attr1 != null) {
-			abs_v1 = attr1.abstractValue;
-		}
-		if (attr2 != null) {
-			abs_v2 = attr2.abstractValue;
-		}
+	public NonEmptyAttribute getResult(Long v1, Attribute attr1, Long v2, Attribute attr2) {
+		AbstractValue abs_v1 = attr1.getAbstractValue();
+		AbstractValue abs_v2 = attr2.getAbstractValue();
 		
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new Attribute(Abstraction._cmpl(v1, abs_v1, v2, abs_v2), null);
+		return new NonEmptyAttribute(Abstraction._cmpl(v1, abs_v1, v2, abs_v2), null);
 	}
 
 	@Override

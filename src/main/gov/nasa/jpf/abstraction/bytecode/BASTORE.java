@@ -41,13 +41,13 @@ public class BASTORE extends gov.nasa.jpf.jvm.bytecode.BASTORE {
 		ConcretePath to = null;
 		
 		if (source != null) {
-			if (source.expression instanceof ConcretePath) {
-				from = (ConcretePath) source.expression;
+			if (source.getExpression() instanceof ConcretePath) {
+				from = (ConcretePath) source.getExpression();
 			}
 		}
 		if (destination != null) {
-			if (destination.expression instanceof ConcretePath) {
-				to = (ConcretePath) destination.expression;
+			if (destination.getExpression() instanceof ConcretePath) {
+				to = (ConcretePath) destination.getExpression();
 			}
 
 			to.appendIndexElement(null);

@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
@@ -45,8 +46,8 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 		if (ret != getNext(ti)) return ret;
 		
 		if (attr != null) {
-			if (attr.expression instanceof ConcretePath) {
-				ConcretePath path = (ConcretePath) attr.expression;
+			if (attr.getExpression() instanceof ConcretePath) {
+				ConcretePath path = (ConcretePath) attr.getExpression();
 				
 				path.appendSubElement(getFieldName());
 			
@@ -56,7 +57,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 			}
 
 			sf = ti.getTopFrame();
-			sf.setOperandAttr(new Attribute(null, attr.expression));
+			sf.setOperandAttr(new NonEmptyAttribute(null, attr.getExpression()));
 		}
 		
 		return ret;

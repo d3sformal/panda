@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -42,21 +43,14 @@ public class IXOR extends gov.nasa.jpf.jvm.bytecode.IXOR implements AbstractBina
 	}
 
 	@Override
-	public Attribute getResult(Integer v1, Attribute attr1, Integer v2, Attribute attr2) {
-		AbstractValue abs_v1 = null;
-		AbstractValue abs_v2 = null;
-		
-		if (attr1 != null) {
-			abs_v1 = attr1.abstractValue;
-		}
-		if (attr2 != null) {
-			abs_v2 = attr2.abstractValue;
-		}
+	public NonEmptyAttribute getResult(Integer v1, Attribute attr1, Integer v2, Attribute attr2) {
+		AbstractValue abs_v1 = attr1.getAbstractValue();
+		AbstractValue abs_v2 = attr2.getAbstractValue();
 		
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new Attribute(Abstraction._xor(v1, abs_v1, v2, abs_v2), null);
+		return new NonEmptyAttribute(Abstraction._xor(v1, abs_v1, v2, abs_v2), null);
 	}
 
 	@Override

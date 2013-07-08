@@ -38,7 +38,7 @@ public class I2L extends gov.nasa.jpf.jvm.bytecode.I2L {
 		AbstractValue abs_val = null;
 		
 		if (attr != null) {
-			abs_val = attr.abstractValue;
+			abs_val = attr.getAbstractValue();
 		}
 
 		if (abs_val == null) {

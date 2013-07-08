@@ -19,13 +19,14 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public interface AbstractBinaryOperator<T> {
 	public Instruction executeConcrete(ThreadInfo ti);
 	
-	public Attribute getResult(T v1, Attribute attr1, T v2, Attribute attr2);
+	public NonEmptyAttribute getResult(T v1, Attribute attr1, T v2, Attribute attr2);
 
 	public Instruction getSelf();
 	public Instruction getNext(ThreadInfo ti);

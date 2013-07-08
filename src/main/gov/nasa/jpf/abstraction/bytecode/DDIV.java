@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.common.Divide;
 import gov.nasa.jpf.abstraction.predicate.common.Expression;
 import gov.nasa.jpf.vm.Instruction;
@@ -44,25 +45,16 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV implements AbstractBina
 	}
 
 	@Override
-	public Attribute getResult(Double v1, Attribute attr1, Double v2, Attribute attr2) {
-		AbstractValue abs_v1 = null;
-		AbstractValue abs_v2 = null;
-		Expression expr1 = null;
-		Expression expr2 = null;
-		
-		if (attr1 != null) {
-			abs_v1 = attr1.abstractValue;
-			expr1 = attr1.expression;
-		}
-		if (attr2 != null) {
-			abs_v2 = attr2.abstractValue;
-			expr2 = attr2.expression;
-		}
+	public NonEmptyAttribute getResult(Double v1, Attribute attr1, Double v2, Attribute attr2) {
+		AbstractValue abs_v1 = attr1.getAbstractValue();
+		AbstractValue abs_v2 = attr2.getAbstractValue();
+		Expression expr1 = attr1.getExpression();
+		Expression expr2 = attr2.getExpression();
 
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new Attribute(Abstraction._div(v1, abs_v1, v2, abs_v2), new Divide(expr1, expr2));
+		return new NonEmptyAttribute(Abstraction._div(v1, abs_v1, v2, abs_v2), new Divide(expr1, expr2));
 	}
 
 	@Override

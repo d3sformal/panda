@@ -28,8 +28,8 @@ public class ISTORE extends gov.nasa.jpf.jvm.bytecode.ISTORE {
 		ConcretePath to = null;
 		
 		if (source != null) {
-			if (source.expression instanceof ConcretePath) {
-				from = (ConcretePath) source.expression;
+			if (source.getExpression() instanceof ConcretePath) {
+				from = (ConcretePath) source.getExpression();
 			}
 		}
 		if (var != null) {

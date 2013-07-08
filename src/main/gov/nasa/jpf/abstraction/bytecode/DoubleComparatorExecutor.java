@@ -60,7 +60,7 @@ public class DoubleComparatorExecutor extends BinaryOperatorExecutor<Double> {
 		sf.popDouble();
 		sf.popDouble();
 		
-		SignsValue s_result = (SignsValue) result.abstractValue;
+		SignsValue s_result = (SignsValue) result.getAbstractValue();
 
 		if (s_result == SignsAbstraction.NEG) {
 			sf.push(-1);

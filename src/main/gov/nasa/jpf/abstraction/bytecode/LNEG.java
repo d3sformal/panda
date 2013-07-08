@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -43,16 +44,12 @@ public class LNEG extends gov.nasa.jpf.jvm.bytecode.LNEG implements AbstractUnar
 
 	@Override
 	public Attribute getResult(Long v, Attribute attr) {
-		AbstractValue abs_v = null;
-		
-		if (attr != null) {
-			abs_v = attr.abstractValue;
-		}
+		AbstractValue abs_v = attr.getAbstractValue();
 
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new Attribute(Abstraction._neg(abs_v), null);
+		return new NonEmptyAttribute(Abstraction._neg(abs_v), null);
 	}
 
 	@Override

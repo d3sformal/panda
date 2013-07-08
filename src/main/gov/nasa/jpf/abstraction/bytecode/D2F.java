@@ -39,7 +39,7 @@ public class D2F extends gov.nasa.jpf.jvm.bytecode.D2F {
 		AbstractValue abs_val = null;
 		
 		if (attr != null) {
-			abs_val = attr.abstractValue;
+			abs_val = attr.getAbstractValue();
 		}
 
 		if (abs_val == null) {

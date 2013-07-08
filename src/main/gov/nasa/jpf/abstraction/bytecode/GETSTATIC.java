@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
@@ -52,7 +53,7 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 		}
 		
 		StackFrame sf = ti.getTopFrame();
-		sf.setOperandAttr(new Attribute(null, path));
+		sf.setOperandAttr(new NonEmptyAttribute(null, path));
 		
 		return ret;
 	}

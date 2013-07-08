@@ -61,7 +61,7 @@ public class UnaryIfInstructionExecutor {
 		Attribute attr = (Attribute)sf.getOperandAttr();
 		
 		if (attr != null) {
-			return attr.abstractValue;
+			return attr.getAbstractValue();
 		}
 		
 		return null;

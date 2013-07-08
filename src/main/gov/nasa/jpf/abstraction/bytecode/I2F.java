@@ -38,7 +38,7 @@ public class I2F extends gov.nasa.jpf.jvm.bytecode.I2F {
 		AbstractValue abs_val = null;
 		
 		if (attr != null) {
-			abs_val = attr.abstractValue;
+			abs_val = attr.getAbstractValue();
 		}
 
 		if (abs_val == null) {

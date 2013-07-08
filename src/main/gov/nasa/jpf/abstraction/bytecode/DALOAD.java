@@ -19,6 +19,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -36,12 +38,12 @@ public class DALOAD extends gov.nasa.jpf.jvm.bytecode.DALOAD {
 		if (ret != getNext(ti)) return ret;
 		
 		if (attr != null) {
-			if (attr.expression instanceof ConcretePath) {
-				ConcretePath path = (ConcretePath) attr.expression;
+			if (attr.getExpression() instanceof ConcretePath) {
+				ConcretePath path = (ConcretePath) attr.getExpression();
 				
 				path.appendIndexElement(null);
 				
-				Attribute attribute = new Attribute(null, path);
+				Attribute attribute = new NonEmptyAttribute(null, path);
 
 				sf = ti.getTopFrame();
 				sf.setLongOperandAttr(attribute);

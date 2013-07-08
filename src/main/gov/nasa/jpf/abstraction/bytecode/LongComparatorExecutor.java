@@ -60,7 +60,7 @@ public class LongComparatorExecutor extends BinaryOperatorExecutor<Long> {
 		sf.popLong();
 		sf.popLong();
 		
-		SignsValue s_result = (SignsValue) result.abstractValue;
+		SignsValue s_result = (SignsValue) result.getAbstractValue();
 
 		if (s_result == SignsAbstraction.NEG) {
 			sf.push(-1);
