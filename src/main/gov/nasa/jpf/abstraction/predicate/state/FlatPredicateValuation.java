@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -70,7 +71,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
 	@Override
 	public void reevaluate(Set<AccessPath> affected) {
-		List<Predicate> predicates = new LinkedList<Predicate>();
+		List<Predicate> affectedPredicates = new LinkedList<Predicate>();
 
 		if (affected.isEmpty()) return;
 
@@ -90,14 +91,18 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			}
 			
 			if (affects) {
-				predicates.add(predicate);
+				affectedPredicates.add(predicate);
 
 				System.err.println("\t\t" + predicate.toString(AccessPath.NotationPolicy.DOT_NOTATION));
 			}
 		}
 		
 		try {
-			valuations = new SMT().valuatePredicates(predicates);
+			Map<Predicate, TruthValue> newValuations = new SMT().valuatePredicates(affectedPredicates);
+		
+			for (Predicate predicate : newValuations.keySet()) {
+				valuations.put(predicate, newValuations.get(predicate));
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

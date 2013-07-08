@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SMT {
 	
@@ -43,7 +44,7 @@ public class SMT {
 	}
 	
 	private Boolean[] isSatisfiable(String input) throws IOException {
-		ArrayList<Boolean> values = new ArrayList<Boolean>();
+		List<Boolean> values = new ArrayList<Boolean>();
 			
 		String output = "";
 		
@@ -78,8 +79,8 @@ public class SMT {
 		return values.toArray(new Boolean[values.size()]);
 	}
 	
-	public HashMap<Predicate, TruthValue> valuatePredicates(List<Predicate> predicates) throws IOException {
-		HashMap<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
+	public Map<Predicate, TruthValue> valuatePredicates(List<Predicate> predicates) throws IOException {
+		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 
 		String input = "";
 

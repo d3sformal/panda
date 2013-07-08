@@ -80,9 +80,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		if (path2num.containsKey(path) && !path2num.get(path).equals(number)) {
 			VariableID old = path2num.get(path);
 			num2paths.get(old).remove(path);
-			
-			affected.add(path);
 		}
+		
+		affected.add(path);
 		
 		path2num.remove(path);
 		path2num.put(path, number);		
