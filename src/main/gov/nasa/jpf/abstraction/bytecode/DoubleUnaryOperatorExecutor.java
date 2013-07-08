@@ -18,7 +18,6 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.vm.StackFrame;
 
@@ -35,8 +34,8 @@ public class DoubleUnaryOperatorExecutor extends UnaryOperatorExecutor<Double> {
 	}
 
 	@Override
-	protected AbstractValue getAbstractValue(StackFrame sf) {
-		return getAbstractValue(sf, 1);
+	protected Attribute getAttribute(StackFrame sf) {
+		return getAttribute(sf, 1);
 	}
 
 
@@ -46,11 +45,11 @@ public class DoubleUnaryOperatorExecutor extends UnaryOperatorExecutor<Double> {
 	}
 
 	@Override
-	final protected void storeResult(AbstractValue result, StackFrame sf) {
+	final protected void storeResult(Attribute result, StackFrame sf) {
 		sf.popDouble();
 		
 		sf.pushDouble(0);
-		sf.setLongOperandAttr(new Attribute(result, null));
+		sf.setLongOperandAttr(result);
 	}
 
 }

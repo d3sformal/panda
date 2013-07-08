@@ -18,14 +18,14 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractValue;
+import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public interface AbstractUnaryOperator<T> {
 	public Instruction executeConcrete(ThreadInfo ti);
 	
-	public AbstractValue getResult(T v, AbstractValue abs_v);
+	public Attribute getResult(T v, Attribute attr);
 
 	public Instruction getSelf();
 	public Instruction getNext(ThreadInfo ti);

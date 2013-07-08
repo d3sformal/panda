@@ -36,7 +36,11 @@ public abstract class UnaryOperatorExecutor<T> {
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
 
-		AbstractValue abs_v = getAbstractValue(sf);
+		Attribute attr = getAttribute(sf);
+
+		AbstractValue abs_v = null;
+		
+		if (attr != null) abs_v = attr.abstractValue;
 
 		if (abs_v == null) {
 			return op.executeConcrete(ti);
@@ -44,13 +48,13 @@ public abstract class UnaryOperatorExecutor<T> {
 
 		T v = getOperand(sf);
 
-		AbstractValue result = op.getResult(v, abs_v);
+		Attribute result = op.getResult(v, attr);
 
 		System.out.printf("%s> Values: %s (%s)\n", name, v.toString(), abs_v);
 
-		if (result.isComposite()) {
+		if (result.abstractValue.isComposite()) {
 			if (!ti.isFirstStepInsn()) { // first time around
-				int size = result.getTokensNumber();
+				int size = result.abstractValue.getTokensNumber();
 				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
 				ss.setNextChoiceGenerator(cg);
 
@@ -61,7 +65,7 @@ public abstract class UnaryOperatorExecutor<T> {
 				assert (cg instanceof FocusAbstractChoiceGenerator);
 
 				int key = (Integer) cg.getNextChoice();
-				result = result.getToken(key);
+				result.abstractValue = result.abstractValue.getToken(key);
 			}
 		}
 		
@@ -72,17 +76,11 @@ public abstract class UnaryOperatorExecutor<T> {
 		return op.getNext(ti);
 	}
 	
-	protected AbstractValue getAbstractValue(StackFrame sf, int index) {
-		Attribute attr = (Attribute)sf.getOperandAttr(index);
-		
-		if (attr != null) {
-			return attr.abstractValue;
-		}
-		
-		return null;
+	protected Attribute getAttribute(StackFrame sf, int index) {
+		return (Attribute)sf.getOperandAttr(index);
 	}
 	
-	abstract protected AbstractValue getAbstractValue(StackFrame sf);
+	abstract protected Attribute getAttribute(StackFrame sf);
 	abstract protected T getOperand(StackFrame sf);
-	abstract protected void storeResult(AbstractValue result, StackFrame sf);
+	abstract protected void storeResult(Attribute result, StackFrame sf);
 }
