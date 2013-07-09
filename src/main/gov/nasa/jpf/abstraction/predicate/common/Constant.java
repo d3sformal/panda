@@ -16,7 +16,12 @@ public class Constant extends Expression {
 	}
 	
 	@Override
-	public String toString(AccessPath.NotationPolicy policy) {
+	public String toString() {
 		return ((Integer)value).toString();
+	}
+
+	@Override
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
 	}
 }

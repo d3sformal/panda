@@ -68,7 +68,6 @@ public class SMT {
 
 		try {
 			while ((output = out.readLine()) != null) {
-				System.err.println("'" + output + "' " + output.matches("^sat$"));
 				values.add(output.matches("^sat$"));
 			}
 		} catch (IOException e) {
@@ -82,6 +81,14 @@ public class SMT {
 		}
 		
 		return values.toArray(new Boolean[values.size()]);
+	}
+	
+	private static String predicateToString(Predicate predicate) {
+		PredicatesSMTStringifier stringifier = new PredicatesSMTStringifier();
+		
+		predicate.accept(stringifier);
+		
+		return stringifier.getString();
 	}
 	
 	public Map<Predicate, TruthValue> valuatePredicates(List<Predicate> predicates) throws IOException {
@@ -119,8 +126,7 @@ public class SMT {
 		}
 
 		for (Predicate predicate : predicates) {
-			//TODO
-			String condition = "true";
+			String condition = predicateToString(predicate);
 			
 			input +=
 				"(push 1)" +

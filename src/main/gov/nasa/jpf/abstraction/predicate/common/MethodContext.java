@@ -21,13 +21,14 @@ public class MethodContext extends Context {
 		
 		method = path;
 	}
+	
+	public AccessPath getMethod() {
+		return method;
+	}
 
 	@Override
-	public String toString() {
-		String ret = "[method " + method.toString(AccessPath.NotationPolicy.DOT_NOTATION) + "]\n";
-		
-		ret = super.toString();
-		
-		return ret;
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
 	}
+
 }

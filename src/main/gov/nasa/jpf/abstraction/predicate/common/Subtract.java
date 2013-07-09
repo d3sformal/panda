@@ -5,9 +5,9 @@ public class Subtract extends Operation {
 	public Subtract(Expression a, Expression b) {
 		super(a, b);
 	}
-	
+
 	@Override
-	public String toString(AccessPath.NotationPolicy policy) {
-		return "(" + a.toString(policy) + " - " + b.toString(policy) + ")";
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
 	}
 }

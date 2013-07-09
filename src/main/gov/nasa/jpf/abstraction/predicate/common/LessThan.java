@@ -6,7 +6,7 @@ public class LessThan extends Comparison {
 	}
 	
 	@Override
-	public String toString(AccessPath.NotationPolicy policy) {
-		return a.toString(policy) + " < " + b.toString(policy);
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
 	}
 }

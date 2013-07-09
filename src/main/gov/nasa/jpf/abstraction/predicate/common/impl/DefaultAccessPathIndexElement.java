@@ -2,7 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.common.impl;
 
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.common.Expression;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPath.NotationPolicy;
+import gov.nasa.jpf.abstraction.predicate.common.PredicatesVisitor;
 
 public class DefaultAccessPathIndexElement extends DefaultAccessPathMiddleElement implements AccessPathIndexElement {
 	private Expression index;
@@ -28,30 +28,6 @@ public class DefaultAccessPathIndexElement extends DefaultAccessPathMiddleElemen
     }
 	
 	@Override
-	public String toString(NotationPolicy policy) {
-		switch (policy) {
-		case DOT_NOTATION:
-			String ret = "[" + index.toString(policy) + "]";
-			
-			if (getNext() != null) {
-				ret += getNext().toString(policy);
-			}
-			
-			return ret;
-		case FUNCTION_NOTATION:
-			String format = "%s";
-			
-			if (getNext() != null) {
-				format = String.format(format, getNext().toString(policy));
-			}
-
-			return String.format(format, "aread(arr, %s, " + index.toString(policy) + ")");
-		default:
-			return null;
-		}
-	}
-	
-	@Override
 	public DefaultAccessPathIndexElement clone() {
 		DefaultAccessPathIndexElement clone = new DefaultAccessPathIndexElement(index);
 		
@@ -61,6 +37,11 @@ public class DefaultAccessPathIndexElement extends DefaultAccessPathMiddleElemen
 		}
 		
 		return clone;
+	}
+
+	@Override
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
 	}
 
 }

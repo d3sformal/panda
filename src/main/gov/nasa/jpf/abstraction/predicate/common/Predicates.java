@@ -2,7 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.common;
 
 import java.util.List;
 
-public class Predicates {
+public class Predicates implements PredicatesVisitable {
 	public List<Context> contexts;
 	
 	public Predicates(List<Context> contexts) {
@@ -10,13 +10,16 @@ public class Predicates {
 	}
 	
 	@Override
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
+	}
+	
+	@Override
 	public String toString() {
-		String ret = "";
+		PredicatesStringifier stringifier = AccessPath.getDefaultStringifier();
 		
-		for (Context c : contexts) {
-			ret += c.toString() + "\n";
-		}
+		accept(stringifier);
 		
-		return ret;
+		return stringifier.getString();
 	}
 }

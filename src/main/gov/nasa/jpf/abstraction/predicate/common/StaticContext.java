@@ -17,10 +17,9 @@ public class StaticContext extends Context {
 	public StaticContext(List<Predicate> predicates) {
 		super(predicates);
 	}
-	
-	@Override
-	public String toString() {
-		return "[static]\n" + super.toString();
-	}
 
+	@Override
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
+	}
 }
