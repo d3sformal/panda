@@ -1,0 +1,2 @@
+[method array.Array.main]
+a[0].f = 1
