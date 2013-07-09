@@ -97,7 +97,7 @@ public class SMT {
 		Set<String> vars = new HashSet<String>();
 		Set<String> fields = new HashSet<String>();
 
-		String input = "";
+		String input = "(set-logic QF_AUFLIA)";
 		
 		for (Predicate predicate : predicates) {
 			for (AccessPath path : predicate.getPaths()) {
@@ -139,7 +139,7 @@ public class SMT {
 				"(pop 1)";
 		}
 		
-		input += " (exit)";
+		input += "(exit)";
 		
 		System.err.println(input);
 		
