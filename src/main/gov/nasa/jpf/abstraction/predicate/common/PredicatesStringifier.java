@@ -31,7 +31,7 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 
 	@Override
 	public void visit(MethodContext context) {
-		ret += "[object " + context.getMethod().toString(NotationPolicy.DOT_NOTATION) + "]\n";
+		ret += "[method " + context.getMethod().toString(NotationPolicy.DOT_NOTATION) + "]\n";
 
 		for (Predicate p : context.predicates) {
 			p.accept(this);
