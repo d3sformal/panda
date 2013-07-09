@@ -27,7 +27,10 @@ public class SMT {
 	
 	public SMT() throws IOException {
 		try {
-			String[] args = new String[] {System.getProperty("user.dir") + "/bin/mathsat"};
+			String[] args = new String[] {
+				System.getProperty("user.dir") + "/bin/mathsat",
+				"-theory.arr.enabled=true"
+			};
 			String[] env  = new String[] {};
 
 			Process mathsat = Runtime.getRuntime().exec(args, env);
@@ -98,6 +101,8 @@ public class SMT {
 		Set<String> fields = new HashSet<String>();
 
 		String input = "(set-logic QF_AUFLIA)";
+		
+		input += "(declare-fun arr () (Array Int (Array Int Int)))";
 		
 		for (Predicate predicate : predicates) {
 			for (AccessPath path : predicate.getPaths()) {

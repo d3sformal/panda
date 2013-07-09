@@ -141,7 +141,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 		
 		element.getIndex().accept(indexVisitor);
 		
-		ret = String.format(ret, "(arr %s " + indexVisitor.getString() + ")");
+		ret = String.format(ret, "(select (select arr %s) " + indexVisitor.getString() + ")");
 	}
 
 }
