@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
+import gov.nasa.jpf.abstraction.predicate.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 
@@ -86,8 +87,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 
 	@Override
-	public void reevaluate(Set<AccessPath> affected) {
-		scopes.lastElement().reevaluate(affected);
+	public void reevaluate(Set<AccessPath> affected, Expression expression) {
+		scopes.lastElement().reevaluate(affected, expression);
 	}
 	
 	@Override

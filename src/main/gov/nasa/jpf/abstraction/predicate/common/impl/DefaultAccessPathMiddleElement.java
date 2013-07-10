@@ -1,7 +1,9 @@
 package gov.nasa.jpf.abstraction.predicate.common.impl;
 
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathElement;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathMiddleElement;
+import gov.nasa.jpf.abstraction.predicate.common.Expression;
 
 public abstract class DefaultAccessPathMiddleElement extends DefaultAccessPathElement implements AccessPathMiddleElement,
 		AccessPathElement {
@@ -20,5 +22,7 @@ public abstract class DefaultAccessPathMiddleElement extends DefaultAccessPathEl
 	
 	@Override
 	public abstract DefaultAccessPathMiddleElement clone();
-
+	
+	@Override
+	public abstract DefaultAccessPathMiddleElement replace(AccessPath formerPath, Expression expression);
 }

@@ -19,4 +19,9 @@ public class EmptyExpression extends Expression {
 		visitor.visit(this);
 	}
 
+	@Override
+	public Expression replace(AccessPath formerPath, Expression expression) {
+		return this;
+	}
+
 }

@@ -18,7 +18,8 @@ public class Array {
 	public static void main(String[] args) {
 		A a[] = static_a;
 		int i = a[0].f;
+        a[0].f = i + 2;
 		
-		System.out.println(i);
+		System.out.println(a[0].f + i);
 	}
 }

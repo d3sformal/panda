@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common.impl;
 
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.common.PredicatesVisitor;
@@ -42,6 +43,18 @@ public class DefaultAccessPathIndexElement extends DefaultAccessPathMiddleElemen
 	@Override
 	public void accept(PredicatesVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public DefaultAccessPathIndexElement replace(AccessPath formerPath, Expression expression) {
+		DefaultAccessPathIndexElement replaced = new DefaultAccessPathIndexElement(index.replace(formerPath, expression));
+		
+		if (getNext() != null) {
+			replaced.setNext(getNext().replace(formerPath, expression));
+			replaced.getNext().setPrevious(replaced);
+		}
+		
+		return replaced;
 	}
 
 }

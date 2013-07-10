@@ -148,4 +148,21 @@ public class AccessPath extends Expression implements Cloneable {
 		visitor.visit(this);
 	}
 
+	@Override
+	public AccessPath replace(AccessPath formerPath, Expression expression) {
+		AccessPath path = new AccessPath();
+		
+		path.root = root.replace(formerPath, expression);
+		path.tail = path.root;
+		
+		AccessPathElement next = path.root;
+		
+		while (next != null) {
+			path.tail = next;
+			next = next.getNext();
+		}
+		
+		return path;
+	}
+
 }

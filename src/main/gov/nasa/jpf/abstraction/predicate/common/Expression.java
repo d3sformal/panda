@@ -7,6 +7,7 @@ public abstract class Expression implements PredicatesVisitable {
 	protected List<AccessPath> paths = new ArrayList<AccessPath>();
 	
 	public abstract List<AccessPath> getPaths();
+	public abstract Expression replace(AccessPath formerPath, Expression expression);
 	
     public String toString() {
     	return toString(AccessPath.policy);

@@ -4,6 +4,7 @@ import java.util.List;
 
 public abstract class Predicate implements PredicatesVisitable {
 	public abstract List<AccessPath> getPaths();
+	public abstract Predicate replace(AccessPath formerPath, Expression expression);
 	
     public String toString() {
     	return toString(AccessPath.policy);

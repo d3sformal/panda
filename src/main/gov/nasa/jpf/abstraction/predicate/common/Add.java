@@ -9,4 +9,9 @@ public class Add extends Operation {
 	public void accept(PredicatesVisitor visitor) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public Add replace(AccessPath formerPath, Expression expression) {
+		return new Add(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	}
 }

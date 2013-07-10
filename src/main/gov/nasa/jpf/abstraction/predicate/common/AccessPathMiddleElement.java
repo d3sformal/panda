@@ -6,4 +6,7 @@ public interface AccessPathMiddleElement extends AccessPathElement {
 	
 	@Override
 	public AccessPathMiddleElement clone();
+	
+	@Override
+	public AccessPathMiddleElement replace(AccessPath formerPath, Expression expression);
 }

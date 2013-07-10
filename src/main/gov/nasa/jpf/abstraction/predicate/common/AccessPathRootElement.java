@@ -5,4 +5,7 @@ public interface AccessPathRootElement extends AccessPathElement {
 	
 	@Override
 	public AccessPathRootElement clone();
+	
+	@Override
+	public AccessPathRootElement replace(AccessPath formerPath, Expression expression);
 }

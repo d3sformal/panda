@@ -10,4 +10,9 @@ public class Subtract extends Operation {
 	public void accept(PredicatesVisitor visitor) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public Subtract replace(AccessPath formerPath, Expression expression) {
+		return new Subtract(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	}
 }

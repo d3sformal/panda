@@ -53,7 +53,7 @@ public class PredicateAbstraction extends Abstraction {
 		Set<AccessPath> affected = symbolTable.processStore(fromPath, to);
 
 		for (PredicateAbstraction abs : instances) {
-			abs.predicateValuation.reevaluate(affected);
+			abs.predicateValuation.reevaluate(affected, null);
 		}
 		
 		//Weakest Precondition: predicate.replace(to, from);

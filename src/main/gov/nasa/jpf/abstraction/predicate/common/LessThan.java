@@ -9,4 +9,9 @@ public class LessThan extends Comparison {
 	public void accept(PredicatesVisitor visitor) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public LessThan replace(AccessPath formerPath, Expression expression) {
+		return new LessThan(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	}
 }

@@ -24,4 +24,9 @@ public class Constant extends Expression {
 	public void accept(PredicatesVisitor visitor) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public Expression replace(AccessPath formerPath, Expression expression) {
+		return this;
+	}
 }

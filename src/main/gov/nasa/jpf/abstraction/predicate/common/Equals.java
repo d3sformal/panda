@@ -9,4 +9,9 @@ public class Equals extends Comparison {
 	public void accept(PredicatesVisitor visitor) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public Equals replace(AccessPath formerPath, Expression expression) {
+		return new Equals(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	}
 }

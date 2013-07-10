@@ -9,4 +9,9 @@ public class Multiply extends Operation {
 	public void accept(PredicatesVisitor visitor) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public Multiply replace(AccessPath formerPath, Expression expression) {
+		return new Multiply(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	}
 }

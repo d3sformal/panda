@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 
@@ -70,7 +71,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	}
 
 	@Override
-	public void reevaluate(Set<AccessPath> affected) {
+	public void reevaluate(Set<AccessPath> affected, Expression expression) {
 		List<Predicate> affectedPredicates = new LinkedList<Predicate>();
 
 		if (affected.isEmpty()) return;
@@ -85,15 +86,20 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		System.err.println("\tAFFECTS:");
 		for (Predicate predicate : valuations.keySet()) {
 			boolean affects = false;
+			
+			Predicate weakestPrecondition = predicate;
 
 			for (AccessPath path : affected) {
 				affects = affects || predicate.getPaths().contains(path);
+				
+				//TODO cope with arrays whose ambiguity makes it not work properly
+				weakestPrecondition = weakestPrecondition.replace(path, expression);
 			}
 			
 			if (affects) {
 				affectedPredicates.add(predicate);
 
-				System.err.println("\t\t" + predicate.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+				System.err.println("\t\t" + predicate + " " + weakestPrecondition);
 			}
 		}
 		

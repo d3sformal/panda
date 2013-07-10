@@ -18,4 +18,9 @@ public class Negation extends Predicate {
 	public void accept(PredicatesVisitor visitor) {
 		visitor.visit(this);
 	}
+
+	@Override
+	public Negation replace(AccessPath formerPath, Expression expression) {
+		return new Negation(predicate.replace(formerPath, expression));
+	}
 }
