@@ -93,6 +93,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				affects = affects || predicate.getPaths().contains(path);
 				
 				//TODO cope with arrays whose ambiguity makes it not work properly
+				System.err.println("\t\t" + path + " / " + expression + "\t [REPLACE]");
 				weakestPrecondition = weakestPrecondition.replace(path, expression);
 			}
 			

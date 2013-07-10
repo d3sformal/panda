@@ -420,8 +420,7 @@ public class AbstractInstructionFactory extends
 
 	@Override
 	public Instruction iinc(int localVarIndex, int incConstant) {
-		return (filter.isInstrumentedClass(ci) ? new IINC(localVarIndex,
-				incConstant) : super.iinc(localVarIndex, incConstant));
+		return (filter.isInstrumentedClass(ci) ? new IINC(localVarIndex, incConstant) : super.iinc(localVarIndex, incConstant));
 	}
 	
 	@Override
