@@ -57,7 +57,7 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 			to.appendSubElement(getFieldName());
 		}
 
-		PredicateAbstraction.processStore(from, to);
+		PredicateAbstraction.processStore(from, to, sf);
 		
 		return ret;
 	}

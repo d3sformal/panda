@@ -53,7 +53,7 @@ public class DASTORE extends gov.nasa.jpf.jvm.bytecode.DASTORE {
 			to.appendIndexElement(null);
 		}
 
-		PredicateAbstraction.processStore(from, to);
+		PredicateAbstraction.processStore(from, to, sf);
 		
 		return ret;
 	}

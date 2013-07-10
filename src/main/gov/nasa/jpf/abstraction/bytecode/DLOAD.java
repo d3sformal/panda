@@ -22,7 +22,6 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
