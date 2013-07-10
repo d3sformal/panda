@@ -205,6 +205,11 @@ public class AbstractInstructionFactory extends
 	public Instruction dreturn() {
 		return (filter.isInstrumentedClass(ci) ? new DRETURN() : super.dreturn());
 	}
+	
+	@Override
+	public Instruction dstore(int index) {
+		return (filter.isInstrumentedClass(ci) ? new DSTORE(index) : super.dstore(index));
+	}
 
 	@Override
 	public Instruction dsub() {
@@ -274,6 +279,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction freturn() {
 		return (filter.isInstrumentedClass(ci) ? new FRETURN() : super.freturn());
+	}
+	
+	@Override
+	public Instruction fstore(int index) {
+		return (filter.isInstrumentedClass(ci) ? new FSTORE(index) : super.fstore(index));
 	}
 
 	@Override
@@ -579,6 +589,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction lshr() {
 		return (filter.isInstrumentedClass(ci) ? new LSHR() : super.lshr());
+	}
+	
+	@Override
+	public Instruction lstore(int index) {
+		return (filter.isInstrumentedClass(ci) ? new LSTORE(index) : super.lstore(index));
 	}
 
 	@Override

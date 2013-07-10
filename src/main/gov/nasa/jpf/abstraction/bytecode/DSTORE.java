@@ -9,9 +9,9 @@ import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class ISTORE extends gov.nasa.jpf.jvm.bytecode.ISTORE {
+public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
 
-	public ISTORE(int index) {
+	public DSTORE(int index) {
 		super(index);
 	}
 	
@@ -19,7 +19,7 @@ public class ISTORE extends gov.nasa.jpf.jvm.bytecode.ISTORE {
 	public Instruction execute(ThreadInfo ti) {
 		StackFrame sf = ti.getTopFrame();
 		LocalVarInfo var = getLocalVarInfo();		
-        Attribute source = (Attribute) sf.getOperandAttr(0);
+        Attribute source = (Attribute) sf.getOperandAttr(1);
         
         if (source == null) source = new EmptyAttribute();
 
