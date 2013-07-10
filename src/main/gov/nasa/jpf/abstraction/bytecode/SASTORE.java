@@ -53,7 +53,7 @@ public class SASTORE extends gov.nasa.jpf.jvm.bytecode.SASTORE {
 			to.appendIndexElement(null);
 		}
 
-		PredicateAbstraction.processStore(from, to, sf);
+		PredicateAbstraction.processStore(from, to);
 		
 		return ret;
 	}

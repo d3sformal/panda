@@ -9,6 +9,7 @@ import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
@@ -19,7 +20,6 @@ import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.State;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
 import gov.nasa.jpf.vm.LocalVarInfo;
-import gov.nasa.jpf.vm.StackFrame;
 
 public class PredicateAbstraction extends Abstraction {
 	private static List<PredicateAbstraction> instances = new LinkedList<PredicateAbstraction>();
@@ -43,26 +43,20 @@ public class PredicateAbstraction extends Abstraction {
 		}
 	}
 	
-	public static void processStore(ConcretePath from, ConcretePath to, StackFrame sf) {
-		Set<AccessPath> affected = symbolTable.processStore(from, to);
+	public static void processStore(Expression from, ConcretePath to) {
+		ConcretePath fromPath = null;
+		
+		if (from instanceof ConcretePath) {
+			fromPath = (ConcretePath) from;
+		}
+		
+		Set<AccessPath> affected = symbolTable.processStore(fromPath, to);
 
 		for (PredicateAbstraction abs : instances) {
 			abs.predicateValuation.reevaluate(affected);
 		}
 		
-		System.err.println("===== Stack expressions =====");
-		for (int i = 0; i < sf.getLocalVariableCount(); ++i) {
-			Attribute attr = (Attribute) sf.getLocalAttr(i);
-			
-			if (attr == null) attr = new EmptyAttribute();
-			
-			LocalVarInfo var = sf.getLocalVarInfo(i);
-			
-			String name = var == null ? null : var.getName();
-
-			System.err.println("\t" + name  + ": " + attr.getExpression());
-		}
-		System.err.println("\n");
+		//Weakest Precondition: predicate.replace(to, from);
 	}
 	
 	public static void processMethodCall() {

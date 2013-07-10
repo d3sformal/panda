@@ -53,7 +53,7 @@ public class CASTORE extends gov.nasa.jpf.jvm.bytecode.CASTORE {
 			to.appendIndexElement(null);
 		}
 
-		PredicateAbstraction.processStore(from, to, sf);
+		PredicateAbstraction.processStore(from, to);
 		
 		return ret;
 	}

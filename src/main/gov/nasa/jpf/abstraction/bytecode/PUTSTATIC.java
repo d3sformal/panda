@@ -51,7 +51,7 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 		to = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
         to.appendSubElement(getFieldName());
 
-        PredicateAbstraction.processStore(from, to, sf);
+        PredicateAbstraction.processStore(from, to);
 		
 		return ret;
 	}

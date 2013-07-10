@@ -53,7 +53,7 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 			to.appendIndexElement(null);
 		}
 
-		PredicateAbstraction.processStore(from, to, sf);
+		PredicateAbstraction.processStore(from, to);
 		
 		return ret;
 	}

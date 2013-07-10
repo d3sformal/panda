@@ -40,7 +40,7 @@ public class FSTORE extends gov.nasa.jpf.jvm.bytecode.FSTORE {
 		sf = ti.getModifiableTopFrame();
 		sf.setLocalAttr(getLocalVariableIndex(), source);
 
-		PredicateAbstraction.processStore(from, to, sf);
+		PredicateAbstraction.processStore(from, to);
 		
 		return ret;
 	}

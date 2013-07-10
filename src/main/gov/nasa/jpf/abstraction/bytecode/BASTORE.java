@@ -53,7 +53,7 @@ public class BASTORE extends gov.nasa.jpf.jvm.bytecode.BASTORE {
 			to.appendIndexElement(null);
 		}
 
-		PredicateAbstraction.processStore(from, to, sf);
+		PredicateAbstraction.processStore(from, to);
 		
 		return ret;
 	}

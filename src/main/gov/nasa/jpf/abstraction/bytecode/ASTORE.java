@@ -60,7 +60,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		sf = ti.getModifiableTopFrame();
 		sf.setLocalAttr(getLocalVariableIndex(), source);
 
-		PredicateAbstraction.processStore(from, to, sf);
+		PredicateAbstraction.processStore(from, to);
 		
 		return ret;
 	}

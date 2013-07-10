@@ -53,7 +53,7 @@ public class FASTORE extends gov.nasa.jpf.jvm.bytecode.FASTORE {
 			to.appendIndexElement(null);
 		}
 
-		PredicateAbstraction.processStore(from, to, sf);
+		PredicateAbstraction.processStore(from, to);
 		
 		return ret;
 	}
