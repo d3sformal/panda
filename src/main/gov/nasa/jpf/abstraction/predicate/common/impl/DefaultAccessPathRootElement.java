@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.common.impl;
 
-import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathRootElement;
+import gov.nasa.jpf.abstraction.predicate.common.PredicatesVisitor;
 
 public class DefaultAccessPathRootElement extends DefaultAccessPathElement implements AccessPathRootElement {
 	private String name;
@@ -13,30 +13,6 @@ public class DefaultAccessPathRootElement extends DefaultAccessPathElement imple
 	@Override
 	public String getName() {
 		return name;
-	}
-
-	@Override
-	public String toString(AccessPath.NotationPolicy policy) {
-		switch (policy) {
-		case DOT_NOTATION:
-			String ret = name;
-		
-			if (getNext() != null) {
-				ret += getNext().toString(policy);
-			}
-		
-			return ret;
-		case FUNCTION_NOTATION:
-			String format = "%s";
-			
-			if (getNext() != null) {
-				format = String.format(format, getNext().toString(policy));
-			}
-
-			return String.format(format, name);
-		default:
-			return null;
-		}
 	}
 
     @Override
@@ -60,6 +36,11 @@ public class DefaultAccessPathRootElement extends DefaultAccessPathElement imple
 		}
 		
 		return clone;
+	}
+
+	@Override
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
 	}
 
 }

@@ -3,6 +3,8 @@ package gov.nasa.jpf.abstraction.predicate.common;
 import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathRootElement;
 import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathSubElement;
+import gov.nasa.jpf.abstraction.predicate.common.impl.PredicatesDotStringifier;
+import gov.nasa.jpf.abstraction.predicate.common.impl.PredicatesFunctionStringifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,20 @@ public class AccessPath extends Expression implements Cloneable {
 	}
 	
 	public static NotationPolicy policy = NotationPolicy.FUNCTION_NOTATION;
+	
+	public static PredicatesStringifier getDefaultStringifier() {
+		return getStringifier(policy);
+	}
+	
+	public static PredicatesStringifier getStringifier(NotationPolicy policy) {
+		switch (policy) {
+		case DOT_NOTATION:
+			return new PredicatesDotStringifier();
+		case FUNCTION_NOTATION:
+			return new PredicatesFunctionStringifier();
+		}
+		return null;
+	}
 	
 	protected AccessPathRootElement root;
 	protected AccessPathElement tail;
@@ -101,16 +117,6 @@ public class AccessPath extends Expression implements Cloneable {
 	}
 	
 	@Override
-	public String toString() {
-		return toString(policy);
-	}
-	
-	@Override
-	public String toString(NotationPolicy policy) {
-		return root.toString(policy);
-	}
-	
-	@Override
 	public int hashCode() {
 		return toString(NotationPolicy.DOT_NOTATION).hashCode();
 	}
@@ -135,6 +141,11 @@ public class AccessPath extends Expression implements Cloneable {
 		}
 		
 		return path;
+	}
+
+	@Override
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
 	}
 
 }

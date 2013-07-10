@@ -13,9 +13,9 @@ public class Negation extends Predicate {
 	public List<AccessPath> getPaths() {
 		return predicate.getPaths();
 	}
-	
+
 	@Override
-	public String toString(AccessPath.NotationPolicy policy) {
-		return "not(" + predicate.toString(policy) + ")";
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
 	}
 }

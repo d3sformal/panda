@@ -22,12 +22,17 @@ import java.util.Set;
 
 public class SMT {
 	
+	private static String SEPARATOR = "";
+	
 	private BufferedWriter in = null;
 	private BufferedReader out = null;
 	
 	public SMT() throws IOException {
 		try {
-			String[] args = new String[] {System.getProperty("user.dir") + "/bin/mathsat"};
+			String[] args = new String[] {
+				System.getProperty("user.dir") + "/bin/mathsat",
+				"-theory.arr.enabled=true"
+			};
 			String[] env  = new String[] {};
 
 			Process mathsat = Runtime.getRuntime().exec(args, env);
@@ -68,7 +73,6 @@ public class SMT {
 
 		try {
 			while ((output = out.readLine()) != null) {
-				System.err.println("'" + output + "' " + output.matches("^sat$"));
 				values.add(output.matches("^sat$"));
 			}
 		} catch (IOException e) {
@@ -83,14 +87,14 @@ public class SMT {
 		
 		return values.toArray(new Boolean[values.size()]);
 	}
-	
-	public Map<Predicate, TruthValue> valuatePredicates(List<Predicate> predicates) throws IOException {
-		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
-		
+
+	private String prepareInput(List<Predicate> predicates) {
 		Set<String> vars = new HashSet<String>();
 		Set<String> fields = new HashSet<String>();
 
-		String input = "";
+		String input = "(set-logic QF_AUFLIA)" + SEPARATOR;
+		
+		input += "(declare-fun arr () (Array Int (Array Int Int)))" + SEPARATOR + SEPARATOR;
 		
 		for (Predicate predicate : predicates) {
 			for (AccessPath path : predicate.getPaths()) {
@@ -111,31 +115,46 @@ public class SMT {
 		}
 		
 		for (String var : vars) {
-			input += "(declare-fun " + var + " () Int)";
+			input += "(declare-fun " + var + " () Int)" + SEPARATOR;
 		}
 		
 		for (String field : fields) {
-			input += "(declare-fun " + field + " (Int) Int)";
+			input += "(declare-fun " + field + " (Int) Int)" + SEPARATOR;
 		}
 
 		for (Predicate predicate : predicates) {
-			//TODO
-			String condition = "true";
+			String condition = predicateToString(predicate);
 			
 			input +=
-				"(push 1)" +
-				"(assert " + condition + ")" +
-				"(check-sat)" +
-				"(pop 1)" +
-				"(push 1)" +
-				"(assert (not " + condition + "))" +
-				"(check-sat)" +
-				"(pop 1)";
+				SEPARATOR +
+				"(push 1)" + SEPARATOR +
+				"(assert " + condition + ")" + SEPARATOR +
+				"(check-sat)" + SEPARATOR +
+				"(pop 1)" + SEPARATOR +
+				SEPARATOR +
+				"(push 1)" + SEPARATOR +
+				"(assert (not " + condition + "))" + SEPARATOR +
+				"(check-sat)" + SEPARATOR +
+				"(pop 1)" + SEPARATOR;
 		}
 		
-		input += " (exit)";
+		input += SEPARATOR + "(exit)" + SEPARATOR;
 		
-		System.err.println(input);
+		return input;
+	}
+	
+	private static String predicateToString(Predicate predicate) {
+		PredicatesSMTStringifier stringifier = new PredicatesSMTStringifier();
+		
+		predicate.accept(stringifier);
+		
+		return stringifier.getString();
+	}
+	
+	public Map<Predicate, TruthValue> valuatePredicates(List<Predicate> predicates) throws IOException {
+		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
+		
+		String input = prepareInput(predicates);
 		
 		Boolean[] sat = isSatisfiable(input);
 		int i = 0;

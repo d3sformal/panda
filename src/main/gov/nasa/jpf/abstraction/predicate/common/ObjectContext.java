@@ -22,12 +22,12 @@ public class ObjectContext extends Context {
 		object = path;
 	}
 	
+	public AccessPath getObject() {
+		return object;
+	}
+
 	@Override
-	public String toString() {
-		String ret = "[object " + object.toString(AccessPath.NotationPolicy.DOT_NOTATION) + "]\n";
-		
-		ret += super.toString();
-		
-		return ret;
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
 	}	
 }
