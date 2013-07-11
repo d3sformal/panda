@@ -10,6 +10,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{ulem}
+\usepackage{multirow}
 
 \lstset{language=Java}
 
@@ -198,6 +199,57 @@ The same must be done when executing a return instruction --- with parameters of
 Truth value of predicates that refer only to fields of some object (via \code{this}) must be preserved between different method calls on the object, i.e. the value at the entry to some call on the object must be the same as the value at the exit from a previous call on the object (assuming that variables and fields referred to by the predicate were not explicitly modified between the calls).
 
 New values of predicates are computed with the help of an SMT solver. We use the standard approach based on weakest preconditions for assignment statements $v = e$, where $v$ can be any program variable (local variable, object field, array element) and $e$ can be any arithmetic expression.
+We use logic formulas $\bigwedge \nu(P) \Rightarrow \mathit{WP}(s,p)$, where $\bigwedge \nu(P)$ represents truth values of relevant predicates in the current dynamic program state, as input for the SMT solver.
+The following table shows weakest preconditions for assignment statements. The symbol $F_x$ denotes any valid atomic predicate over the expression $x$ that is not covered by other lines of the table for a given statement.
+Weakest preconditions capture aliasing --- e.g., truth value of the weakest precondition for the statement \code{o.f = e} and the predicate $\mathit{fread}(f,o') \ \mathrm{relop} \ u$ depends on whether $o = o'$.
+
+\begin{table*}[!h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{1}{|c|}{ Statement $s$ } & \multicolumn{1}{|c|}{ Predicate $p$ } & \multicolumn{1}{|c|}{ $WP(s,p)$ } \\ 
+\hline
+
+\multirow{1}*{ \code{w = w'} } 
+ & $ F_w $ & $ p[w'/w] $ \\
+
+\hline
+
+\multirow{2}*{ \code{w = e} } 
+ & $ w \ \mathrm{relop} \ u $ & $ e \ \mathrm{relop} \ u $ \\
+\cline{2-3}
+ & $ F_w $ & $ \mathrm{false} $ \\
+
+\hline
+
+\multirow{2}*{ \code{o.f = e} } 
+ & $ \mathit{fread}(f,o') \ \mathrm{relop} \ u $ & $ \mathit{fread}(\mathit{fwrite}(f,o,e),o') \ \mathrm{relop} \ u $ \\
+\cline{2-3}
+ & $ F_{\mathit{fread}(f,o)} $ & $ \mathrm{false} $ \\
+
+\hline
+
+\multirow{5}*{ \code{o = new C} }
+ & $ o = w $ & $ \mathrm{false} $ \\
+\cline{2-3}
+ & $ o = \mathrm{null} $ & $ \mathrm{false} $ \\
+\cline{2-3}
+ & $ \mathit{fread}(f,o) \ \mathrm{relop} \ u $ & $ \mathrm{false} $ \\
+\cline{2-3}
+ & $ F_o $ & $ \mathrm{false} $ \\
+
+\hline
+
+\multirow{2}*{ \code{a[i] = e} }
+ & $ \mathit{aread}(\mathrm{arr},a',i') \ \mathrm{relop} \ u $ & $ \mathit{aread}(\mathit{awrite}(\mathrm{arr},a,i,e),a',i') \ \mathrm{relop} \ u $ \\
+\cline{2-3}
+ & $ F_{\mathit{aread}(\mathrm{arr},a,i)} $ & $ \mathrm{false} $ \\
+
+\hline
+\end{tabular}
+\end{table*}
+
+\FloatBarrier
 
 The following algorithm summarizes the procedure for computing new values of relevant predicates at some instruction.
 The set $\text{AffectedPaths}$ contains all access paths affected by the given instruction, and the function expression $paths(p)$ returns all access paths referred to by the predicate $p$.
