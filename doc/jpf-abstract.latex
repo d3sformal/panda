@@ -240,8 +240,10 @@ Weakest preconditions capture aliasing --- e.g., truth value of the weakest prec
 
 \hline
 
-\multirow{2}*{ \code{a[i] = e} }
+\multirow{3}*{ \code{a[i] = e} }
  & $ \mathit{aread}(\mathrm{arr},a',i') \ \mathrm{relop} \ u $ & $ \mathit{aread}(\mathit{awrite}(\mathrm{arr},a,i,e),a',i') \ \mathrm{relop} \ u $ \\
+\cline{2-3}
+ & $ \mathit{aread}(\mathrm{arr},b,\mathit{aread}(\mathrm{arr},a',i')) \ \mathrm{relop} \ u $ & $ \mathit{aread}(\mathrm{arr},b,\mathit{aread}(\mathit{awrite}(\mathrm{arr},a,i,e),a',i')) \ \mathrm{relop} \ u $ \\
 \cline{2-3}
  & $ F_{\mathit{aread}(\mathrm{arr},a,i)} $ & $ \mathrm{false} $ \\
 
