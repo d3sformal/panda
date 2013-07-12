@@ -17,7 +17,15 @@
 // DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 package gov.nasa.jpf.abstraction;
 
+import java.util.Map;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.predicate.common.Expression;
+import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 
 /**
  * Common root class for numeric abstractions.
@@ -55,6 +63,18 @@ public abstract class Abstraction {
 	}
 	
 	public void backtrack() {
+	}
+	
+	public void processLoad(Map<AccessPath, CompleteVariableID> vars) {
+	}
+	
+	public void processStore(Expression from, ConcretePath to) {
+	}
+	
+	public void processMethodCall() {
+	}
+	
+	public void processMethodReturn() {
 	}
 
 	/**

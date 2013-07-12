@@ -1,13 +1,9 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
@@ -19,31 +15,29 @@ import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.State;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
-import gov.nasa.jpf.vm.LocalVarInfo;
 
 public class PredicateAbstraction extends Abstraction {
-	private static List<PredicateAbstraction> instances = new LinkedList<PredicateAbstraction>();
-
 	// SYMBOLS DO NOT DEPEND ON ABSTRACTION AND DO NOT NEED TO BE MANAGED SEPARATELY
 	// FOR ALL INSTANCES
-	private static ScopedSymbolTable symbolTable = new ScopedSymbolTable();
+	private ScopedSymbolTable symbolTable;
 	private ScopedPredicateValuation predicateValuation;
 	private Trace trace;
 	
 	public PredicateAbstraction(Predicates predicateSet) {
-		instances.add(this);
-
+		symbolTable = new ScopedSymbolTable();
 		predicateValuation = new ScopedPredicateValuation(predicateSet);
 		trace = new Trace();
 	}
 	
-	public static void processLoad(Map<AccessPath, CompleteVariableID> vars) {
+	@Override
+	public void processLoad(Map<AccessPath, CompleteVariableID> vars) {
 		for (AccessPath path : vars.keySet()) {
 			symbolTable.processLoad(path, vars.get(path));
 		}
 	}
 	
-	public static void processStore(Expression from, ConcretePath to) {
+	@Override
+	public void processStore(Expression from, ConcretePath to) {
 		ConcretePath fromPath = null;
 		
 		if (from instanceof ConcretePath) {
@@ -52,45 +46,27 @@ public class PredicateAbstraction extends Abstraction {
 		
 		Set<AccessPath> affected = symbolTable.processStore(fromPath, to);
 
-		for (PredicateAbstraction abs : instances) {
-			abs.predicateValuation.reevaluate(affected, null);
-		}
-		
-		//Weakest Precondition: predicate.replace(to, from);
+		predicateValuation.reevaluate(affected, null);
 	}
 	
-	public static void processMethodCall() {
+	@Override
+	public void processMethodCall() {
 		symbolTable.processMethodCall();
-
-		for (PredicateAbstraction abs : instances) {
-			abs.predicateValuation.processMethodCall();
-		}
+		predicateValuation.processMethodCall();
 	}
 	
-	public static void processMethodReturn() {
+	@Override
+	public void processMethodReturn() {
 		symbolTable.processMethodReturn();
-
-		for (PredicateAbstraction abs : instances) {
-			abs.predicateValuation.processMethodReturn();
-		}
+		predicateValuation.processMethodReturn();
 	}
 	
-	public static List<ScopedSymbolTable> getSymbolTables() {
-		List<ScopedSymbolTable> symbolTables = new LinkedList<ScopedSymbolTable>();
-		
-		symbolTables.add(symbolTable);
-		
-		return symbolTables;
+	public ScopedSymbolTable getSymbolTable() {		
+		return symbolTable;
 	}
 	
-	public static List<ScopedPredicateValuation> getPredicateValuations() {
-		List<ScopedPredicateValuation> predicateValuations = new LinkedList<ScopedPredicateValuation>();
-		
-		for (PredicateAbstraction abs : instances) {
-			predicateValuations.add(abs.predicateValuation);
-		}
-		
-		return predicateValuations;
+	public ScopedPredicateValuation getPredicateValuation() {	
+		return predicateValuation;
 	}
 	
 	@Override

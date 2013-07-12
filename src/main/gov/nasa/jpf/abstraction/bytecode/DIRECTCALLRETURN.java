@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -30,7 +30,7 @@ public class DIRECTCALLRETURN extends gov.nasa.jpf.jvm.bytecode.DIRECTCALLRETURN
 		
 		if (ret == this || ret != ti.getPC()) return ret;
 		
-        PredicateAbstraction.processMethodReturn();
+        AbstractInstructionFactory.abs.processMethodReturn();
 
 		return ret;
 	}

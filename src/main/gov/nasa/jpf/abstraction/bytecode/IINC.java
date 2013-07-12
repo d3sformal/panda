@@ -18,6 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
@@ -102,7 +103,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 			sf.setLocalVariable(index, 0, false);
 		}
 		
-		PredicateAbstraction.processStore(expression, new ConcretePath(sf.getLocalVarInfo(index).getName(), ti, var, ConcretePath.Type.LOCAL));
+		AbstractInstructionFactory.abs.processStore(expression, new ConcretePath(sf.getLocalVarInfo(index).getName(), ti, var, ConcretePath.Type.LOCAL));
 
 		return getNext(ti);
 	}

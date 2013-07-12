@@ -20,9 +20,9 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import java.util.Map;
 
+import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
@@ -53,7 +53,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 			
 				Map<AccessPath, CompleteVariableID> vars = path.resolve();
 				
-				PredicateAbstraction.processLoad(vars);
+				AbstractInstructionFactory.abs.processLoad(vars);
 			}
 
 			sf = ti.getTopFrame();
