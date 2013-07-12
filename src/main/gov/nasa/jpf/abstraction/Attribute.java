@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction;
 
-import gov.nasa.jpf.abstraction.predicate.common.Expression;
+import gov.nasa.jpf.abstraction.common.Expression;
 
 public interface Attribute {
 	public AbstractValue getAbstractValue();

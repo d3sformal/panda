@@ -19,9 +19,9 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
-import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;

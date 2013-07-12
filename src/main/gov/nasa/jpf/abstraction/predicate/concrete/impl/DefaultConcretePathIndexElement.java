@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.predicate.concrete.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.common.Constant;
 import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathIndexElement;

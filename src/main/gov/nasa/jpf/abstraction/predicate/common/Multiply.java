@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
+import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.Expression;
+
 public class Multiply extends Operation {
 	public Multiply(Expression a, Expression b) {
 		super(a, b);

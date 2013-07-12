@@ -2,9 +2,8 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
+import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;

@@ -21,10 +21,10 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.common.Add;
-import gov.nasa.jpf.abstraction.predicate.common.Expression;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 

@@ -19,7 +19,6 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 

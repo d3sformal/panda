@@ -21,10 +21,10 @@ package gov.nasa.jpf.abstraction.bytecode;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
+import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
-import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;

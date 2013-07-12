@@ -3,11 +3,11 @@ package gov.nasa.jpf.abstraction.predicate.concrete.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathMiddleElement;
 import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathRootElement;
-import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathRootElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.LocalVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.PartialVariableID;

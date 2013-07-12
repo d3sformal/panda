@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
+import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.concrete.EmptyExpression;
 
 public interface PredicatesVisitor {

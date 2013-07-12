@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
+import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.Expression;
+
 
 public class Subtract extends Operation {
 	public Subtract(Expression a, Expression b) {

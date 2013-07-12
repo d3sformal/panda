@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.abstraction.predicate.common.AccessPath.NotationPolicy;
+import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.AccessPath.NotationPolicy;
 import gov.nasa.jpf.abstraction.predicate.concrete.EmptyExpression;
 
 public abstract class PredicatesStringifier implements PredicatesVisitor {

@@ -4,11 +4,11 @@ import java.util.Map;
 import java.util.Set;
 
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.common.Expression;
+import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.concrete.CompleteVariableID;
-import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.state.FlatPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;

@@ -1,8 +1,8 @@
 grammar Predicates;
 
 @header {
+	import gov.nasa.jpf.abstraction.common.*;
 	import gov.nasa.jpf.abstraction.predicate.common.*;
-	import gov.nasa.jpf.abstraction.predicate.common.impl.*;
 }
 
 predicates returns [Predicates val]

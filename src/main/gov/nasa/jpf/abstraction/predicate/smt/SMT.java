@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
-import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathElement;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathSubElement;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;

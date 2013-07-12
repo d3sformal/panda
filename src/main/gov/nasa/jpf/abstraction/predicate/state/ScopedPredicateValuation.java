@@ -1,8 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
-import gov.nasa.jpf.abstraction.predicate.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
-import gov.nasa.jpf.abstraction.predicate.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 
