@@ -5,12 +5,12 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathMiddleElement;
 import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathRootElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathRootElement;
 import gov.nasa.jpf.abstraction.predicate.concrete.LocalVariableID;
-import gov.nasa.jpf.abstraction.predicate.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.predicate.concrete.VariableID;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;

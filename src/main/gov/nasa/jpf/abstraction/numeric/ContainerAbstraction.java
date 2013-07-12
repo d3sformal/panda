@@ -20,10 +20,15 @@ package gov.nasa.jpf.abstraction.numeric;
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This abstraction is designed to combine other numeric abstractions.
@@ -67,6 +72,34 @@ public class ContainerAbstraction extends Abstraction {
 			}
 */
 		return num;
+	}
+    
+    @Override
+    public void processStore(Expression from, ConcretePath to) {
+    	for (Abstraction abs : list) {
+    		abs.processStore(from, to);
+    	}
+    }
+    
+    @Override
+    public void processLoad(Map<AccessPath, CompleteVariableID> vars) {
+    	for (Abstraction abs : list) {
+    		abs.processLoad(vars);
+    	}
+    }
+    
+    @Override
+    public void processMethodCall() {
+    	for (Abstraction abs : list) {
+    		abs.processMethodCall();
+    	}
+	}
+	
+    @Override
+	public void processMethodReturn() {
+    	for (Abstraction abs : list) {
+    		abs.processMethodReturn();
+    	}
 	}
     
     public ContainerValue create(List<AbstractValue> lst) {

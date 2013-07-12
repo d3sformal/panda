@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.concrete;
 
+import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
+
 
 public class LocalVariableID extends CompleteVariableID {
 	private int index;
