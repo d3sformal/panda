@@ -46,7 +46,7 @@ public class PredicateAbstraction extends Abstraction {
 		
 		Set<AccessPath> affected = symbolTable.processStore(fromPath, to);
 
-		predicateValuation.reevaluate(affected, null);
+		predicateValuation.reevaluate(affected, from);
 	}
 	
 	@Override

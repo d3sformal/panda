@@ -3,6 +3,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 
 import java.io.IOException;
@@ -72,7 +73,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
 	@Override
 	public void reevaluate(Set<AccessPath> affected, Expression expression) {
-		List<Predicate> affectedPredicates = new LinkedList<Predicate>();
+		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
 
 		if (affected.isEmpty()) return;
 
@@ -93,19 +94,18 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				affects = affects || predicate.getPaths().contains(path);
 				
 				//TODO cope with arrays whose ambiguity makes it not work properly
-				System.err.println("\t\t" + path + " / " + expression + "\t [REPLACE]");
 				weakestPrecondition = weakestPrecondition.replace(path, expression);
 			}
 			
 			if (affects) {
-				affectedPredicates.add(predicate);
+				predicates.put(predicate, new PredicateDeterminant(weakestPrecondition, valuations));
 
-				System.err.println("\t\t" + predicate + " " + weakestPrecondition);
+				System.err.println("\t\t" + predicate);
 			}
 		}
 		
 		try {
-			Map<Predicate, TruthValue> newValuations = new SMT().valuatePredicates(affectedPredicates);
+			Map<Predicate, TruthValue> newValuations = new SMT().valuatePredicates(predicates);
 		
 			for (Predicate predicate : newValuations.keySet()) {
 				valuations.put(predicate, newValuations.get(predicate));

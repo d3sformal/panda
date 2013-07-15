@@ -3,6 +3,7 @@ package gov.nasa.jpf.abstraction.predicate.smt;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathElement;
 import gov.nasa.jpf.abstraction.predicate.common.AccessPathSubElement;
+import gov.nasa.jpf.abstraction.predicate.common.Negation;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
@@ -88,29 +89,29 @@ public class SMT {
 		return values.toArray(new Boolean[values.size()]);
 	}
 
-	private String prepareInput(List<Predicate> predicates) {
+	private String prepareInput(Map<Predicate, PredicateDeterminant> predicates) {
 		Set<String> vars = new HashSet<String>();
 		Set<String> fields = new HashSet<String>();
 
 		String input = "(set-logic QF_AUFLIA)" + SEPARATOR;
 		
 		input += "(declare-fun arr () (Array Int (Array Int Int)))" + SEPARATOR + SEPARATOR;
-		
-		for (Predicate predicate : predicates) {
-			for (AccessPath path : predicate.getPaths()) {
-				AccessPathElement element = path.getRoot();
-				
-				vars.add("var_" + path.getRoot().getName());
-				
-				while (element != null) {
-					if (element instanceof AccessPathSubElement) {
-						AccessPathSubElement subElement = (AccessPathSubElement) element;
 
-						fields.add("field_" + subElement.getName());
-					}
-					
-					element = element.getNext();
-				}
+		/**
+		 * Collect all variable and field names from all weakest preconditions
+		 */
+		for (Predicate predicate : predicates.keySet()) {
+			collectVarsAndFields(vars, fields, predicates.get(predicate).weakestPrecondition);
+		}
+		
+		/**
+		 * Collect all variable and field names from all relevant 
+		 */
+		for (Predicate predicate : predicates.keySet()) {
+			Set<Predicate> determinants = predicates.get(predicate).determinants.keySet();
+			
+			for (Predicate determinant : determinants) {
+				collectVarsAndFields(vars, fields, determinant);
 			}
 		}
 		
@@ -122,18 +123,18 @@ public class SMT {
 			input += "(declare-fun " + field + " (Int) Int)" + SEPARATOR;
 		}
 
-		for (Predicate predicate : predicates) {
-			String condition = predicateToString(predicate);
+		for (Predicate predicate : predicates.keySet()) {
+			PredicateDeterminant det = predicates.get(predicate);
 			
 			input +=
 				SEPARATOR +
 				"(push 1)" + SEPARATOR +
-				"(assert " + condition + ")" + SEPARATOR +
+				"(assert " + predicateDeterminantToString(det.weakestPrecondition, det.determinants) + ")" + SEPARATOR +
 				"(check-sat)" + SEPARATOR +
 				"(pop 1)" + SEPARATOR +
 				SEPARATOR +
 				"(push 1)" + SEPARATOR +
-				"(assert (not " + condition + "))" + SEPARATOR +
+				"(assert " + predicateDeterminantToString(new Negation(det.weakestPrecondition), det.determinants) + ")" + SEPARATOR +
 				"(check-sat)" + SEPARATOR +
 				"(pop 1)" + SEPARATOR;
 		}
@@ -141,6 +142,24 @@ public class SMT {
 		input += SEPARATOR + "(exit)" + SEPARATOR;
 		
 		return input;
+	}
+
+	private void collectVarsAndFields(Set<String> vars, Set<String> fields, Predicate predicate) {
+		for (AccessPath path : predicate.getPaths()) {
+			AccessPathElement element = path.getRoot();
+			
+			vars.add("var_" + path.getRoot().getName());
+			
+			while (element != null) {
+				if (element instanceof AccessPathSubElement) {
+					AccessPathSubElement subElement = (AccessPathSubElement) element;
+
+					fields.add("field_" + subElement.getName());
+				}
+				
+				element = element.getNext();
+			}
+		}
 	}
 	
 	private static String predicateToString(Predicate predicate) {
@@ -151,7 +170,34 @@ public class SMT {
 		return stringifier.getString();
 	}
 	
-	public Map<Predicate, TruthValue> valuatePredicates(List<Predicate> predicates) throws IOException {
+	private static String predicateDeterminantToString(Predicate weakestPrecondition, Map<Predicate, TruthValue> determinants) {
+		String ret = "true";
+		
+		for (Predicate predicate : determinants.keySet()) {
+			String condition = predicateToString(predicate);
+			
+			switch (determinants.get(predicate)) {
+			case SATISFIABLE:
+				ret = "(and " + ret + " " + condition + ")";
+				break;
+			case UNSATISFIABLE:
+				ret = "(and " + ret + " (not " + condition + "))";
+				break;
+			default:
+				/**
+				 * UNKNOWN: (a or not(a)) ~ true ... redundant
+				 * UNDEFINED: value cannot be affected by this predicate
+				 */
+				break;
+			}
+		}
+		
+		ret = "(=> " + ret + " " + predicateToString(weakestPrecondition) + ")";
+		
+		return ret;
+	}
+	
+	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateDeterminant> predicates) throws IOException {
 		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 		
 		String input = prepareInput(predicates);
@@ -159,7 +205,7 @@ public class SMT {
 		Boolean[] sat = isSatisfiable(input);
 		int i = 0;
 		
-		for (Predicate predicate : predicates) {
+		for (Predicate predicate : predicates.keySet()) {
 			if (sat[i] && sat[i + 1]) {
 				valuation.put(predicate, TruthValue.UNKNOWN);
 			} else if (sat[i]) {
