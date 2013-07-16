@@ -53,7 +53,7 @@ public class SMT {
 		}
 	}
 	
-	private Boolean[] isSatisfiable(String input) throws IOException {
+	private Boolean[] isValid(String input) throws IOException {
 		List<Boolean> values = new ArrayList<Boolean>();
 			
 		String output = "";
@@ -176,10 +176,10 @@ public class SMT {
 			String condition = predicateToString(predicate);
 			
 			switch (determinants.get(predicate)) {
-			case SATISFIABLE:
+			case TRUE:
 				ret = "(and " + ret + " " + condition + ")";
 				break;
-			case UNSATISFIABLE:
+			case FALSE:
 				ret = "(and " + ret + " (not " + condition + "))";
 				break;
 			default:
@@ -201,16 +201,16 @@ public class SMT {
 		
 		String input = prepareInput(predicates);
 		
-		Boolean[] sat = isSatisfiable(input);
+		Boolean[] valid = isValid(input);
 		int i = 0;
 		
 		for (Predicate predicate : predicates.keySet()) {
-			if (sat[i] && sat[i + 1]) {
-				valuation.put(predicate, TruthValue.UNDEFINED);
-			} else if (sat[i]) {
-				valuation.put(predicate, TruthValue.SATISFIABLE);
-			} else if (sat[i + 1]) {
-				valuation.put(predicate, TruthValue.UNSATISFIABLE);
+			if (valid[i] && valid[i + 1]) {
+				valuation.put(predicate, TruthValue.UNKNOWN);
+			} else if (valid[i]) {
+				valuation.put(predicate, TruthValue.TRUE);
+			} else if (valid[i + 1]) {
+				valuation.put(predicate, TruthValue.FALSE);
 			} else {
 				valuation.put(predicate, TruthValue.UNKNOWN);
 			}

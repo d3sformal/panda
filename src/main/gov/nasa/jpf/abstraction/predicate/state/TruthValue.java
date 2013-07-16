@@ -1,8 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 public enum TruthValue {
-	SATISFIABLE,
-	UNSATISFIABLE,
+	TRUE,
+	FALSE,
 	UNKNOWN,
 	UNDEFINED
 }
