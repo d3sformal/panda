@@ -149,7 +149,11 @@ public class AccessPath extends Expression implements Cloneable {
 	}
 
 	@Override
-	public AccessPath replace(AccessPath formerPath, Expression expression) {
+	public Expression replace(AccessPath formerPath, Expression expression) {
+		if (equals(formerPath)) {
+			return expression;
+		}
+
 		AccessPath path = new AccessPath();
 		
 		path.root = root.replace(formerPath, expression);

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Constant extends Expression {
-	public int value;
+	public Object value;
 	
-	public Constant(int value) {
+	public Constant(Object value) {
 		this.value = value;
 	}
 
@@ -17,7 +17,7 @@ public class Constant extends Expression {
 	
 	@Override
 	public String toString() {
-		return ((Integer)value).toString();
+		return value.toString();
 	}
 
 	@Override

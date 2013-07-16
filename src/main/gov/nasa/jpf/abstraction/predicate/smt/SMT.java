@@ -3,7 +3,6 @@ package gov.nasa.jpf.abstraction.predicate.smt;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.AccessPathElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
-import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 

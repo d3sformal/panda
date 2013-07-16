@@ -89,21 +89,21 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		for (Predicate predicate : valuations.keySet()) {
 			boolean affects = false;
 			
-			Predicate positiveWeakestPrecondition = predicate;
-			Predicate negativeWeakestPrecondition = new Negation(predicate);
+			Predicate weakestPrecondition = predicate;
 
 			for (AccessPath path : affected) {
 				affects = affects || predicate.getPaths().contains(path);
 				
 				//TODO cope with arrays whose ambiguity makes it not work properly
-				positiveWeakestPrecondition = positiveWeakestPrecondition.replace(path, expression);
-				negativeWeakestPrecondition = negativeWeakestPrecondition.replace(path, expression);
+				if (expression != null) {
+					weakestPrecondition = weakestPrecondition.replace(path, expression);
+				}
 			}
 			
 			if (affects) {
-				predicates.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, valuations));
+				predicates.put(predicate, new PredicateDeterminant(weakestPrecondition, new Negation(weakestPrecondition), valuations));
 
-				System.err.println("\t\t" + predicate);
+				System.err.println("\t\t" + predicate + " [" + weakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION) + "]");
 			}
 		}
 		
