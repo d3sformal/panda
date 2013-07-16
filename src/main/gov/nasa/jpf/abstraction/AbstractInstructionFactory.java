@@ -340,6 +340,41 @@ public class AbstractInstructionFactory extends
 	public Instruction iastore() {
 		return (filter.isInstrumentedClass(ci) ? new IASTORE() : super.iastore());
 	}
+	
+	@Override
+	public Instruction iconst_m1() {
+		return (filter.isInstrumentedClass(ci) ? new ICONST(-1) : super.iconst_m1());
+	}
+
+	@Override
+	public Instruction iconst_0() {
+		return (filter.isInstrumentedClass(ci) ? new ICONST(0) : super.iconst_0());
+	}
+
+	@Override
+	public Instruction iconst_1() {
+		return (filter.isInstrumentedClass(ci) ? new ICONST(1) : super.iconst_1());
+	}
+
+	@Override
+	public Instruction iconst_2() {
+		return (filter.isInstrumentedClass(ci) ? new ICONST(2) : super.iconst_2());
+	}
+
+	@Override
+	public Instruction iconst_3() {
+		return (filter.isInstrumentedClass(ci) ? new ICONST(3) : super.iconst_3());
+	}
+
+	@Override
+	public Instruction iconst_4() {
+		return (filter.isInstrumentedClass(ci) ? new ICONST(4) : super.iconst_4());
+	}
+
+	@Override
+	public Instruction iconst_5() {
+		return (filter.isInstrumentedClass(ci) ? new ICONST(5) : super.iconst_5());
+	}
 
 	@Override
 	public Instruction idiv() {
