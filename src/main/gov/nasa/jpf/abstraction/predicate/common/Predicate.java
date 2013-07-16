@@ -2,6 +2,8 @@ package gov.nasa.jpf.abstraction.predicate.common;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
+import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
 
 import java.util.List;
 

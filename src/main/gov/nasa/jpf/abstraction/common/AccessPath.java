@@ -1,15 +1,10 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathElement;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathMiddleElement;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathRootElement;
-import gov.nasa.jpf.abstraction.predicate.common.PredicatesStringifier;
-import gov.nasa.jpf.abstraction.predicate.common.PredicatesVisitor;
-import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathIndexElement;
-import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathRootElement;
-import gov.nasa.jpf.abstraction.predicate.common.impl.DefaultAccessPathSubElement;
-import gov.nasa.jpf.abstraction.predicate.common.impl.PredicatesDotStringifier;
-import gov.nasa.jpf.abstraction.predicate.common.impl.PredicatesFunctionStringifier;
+import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathIndexElement;
+import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathRootElement;
+import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathSubElement;
+import gov.nasa.jpf.abstraction.common.impl.PredicatesDotStringifier;
+import gov.nasa.jpf.abstraction.common.impl.PredicatesFunctionStringifier;
 
 import java.util.ArrayList;
 import java.util.List;

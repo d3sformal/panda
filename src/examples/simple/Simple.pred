@@ -1,3 +1,4 @@
 [method simple.Simple.main]
 i < 2
 i >= 0
+i = 0

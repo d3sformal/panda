@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
@@ -88,17 +89,19 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		for (Predicate predicate : valuations.keySet()) {
 			boolean affects = false;
 			
-			Predicate weakestPrecondition = predicate;
+			Predicate positiveWeakestPrecondition = predicate;
+			Predicate negativeWeakestPrecondition = new Negation(predicate);
 
 			for (AccessPath path : affected) {
 				affects = affects || predicate.getPaths().contains(path);
 				
 				//TODO cope with arrays whose ambiguity makes it not work properly
-				weakestPrecondition = weakestPrecondition.replace(path, expression);
+				positiveWeakestPrecondition = positiveWeakestPrecondition.replace(path, expression);
+				negativeWeakestPrecondition = negativeWeakestPrecondition.replace(path, expression);
 			}
 			
 			if (affects) {
-				predicates.put(predicate, new PredicateDeterminant(weakestPrecondition, valuations));
+				predicates.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, valuations));
 
 				System.err.println("\t\t" + predicate);
 			}

@@ -1,9 +1,9 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathElement;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathSubElement;
-import gov.nasa.jpf.abstraction.predicate.common.Negation;
+import gov.nasa.jpf.abstraction.common.AccessPathElement;
+import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
+import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
@@ -74,7 +74,7 @@ public class SMT {
 
 		try {
 			while ((output = out.readLine()) != null) {
-				values.add(output.matches("^sat$"));
+				values.add(output.matches("^unsat$"));
 			}
 		} catch (IOException e) {
 			System.err.println("SMT refuses to provide output.");
@@ -101,7 +101,7 @@ public class SMT {
 		 * Collect all variable and field names from all weakest preconditions
 		 */
 		for (Predicate predicate : predicates.keySet()) {
-			collectVarsAndFields(vars, fields, predicates.get(predicate).weakestPrecondition);
+			collectVarsAndFields(vars, fields, predicates.get(predicate).positiveWeakestPrecondition);
 		}
 		
 		/**
@@ -129,12 +129,12 @@ public class SMT {
 			input +=
 				SEPARATOR +
 				"(push 1)" + SEPARATOR +
-				"(assert " + predicateDeterminantToString(det.weakestPrecondition, det.determinants) + ")" + SEPARATOR +
+				"(assert (not " + predicateDeterminantToString(det.positiveWeakestPrecondition, det.determinants) + "))" + SEPARATOR +
 				"(check-sat)" + SEPARATOR +
 				"(pop 1)" + SEPARATOR +
 				SEPARATOR +
 				"(push 1)" + SEPARATOR +
-				"(assert " + predicateDeterminantToString(new Negation(det.weakestPrecondition), det.determinants) + ")" + SEPARATOR +
+				"(assert (not " + predicateDeterminantToString(det.negativeWeakestPrecondition, det.determinants) + "))" + SEPARATOR +
 				"(check-sat)" + SEPARATOR +
 				"(pop 1)" + SEPARATOR;
 		}

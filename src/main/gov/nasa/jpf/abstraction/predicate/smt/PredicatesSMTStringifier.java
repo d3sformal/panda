@@ -1,17 +1,17 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathIndexElement;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathRootElement;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathSubElement;
-import gov.nasa.jpf.abstraction.predicate.common.Add;
-import gov.nasa.jpf.abstraction.predicate.common.Divide;
+import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
+import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
+import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
+import gov.nasa.jpf.abstraction.common.Add;
+import gov.nasa.jpf.abstraction.common.Divide;
+import gov.nasa.jpf.abstraction.common.Modulo;
+import gov.nasa.jpf.abstraction.common.Multiply;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
+import gov.nasa.jpf.abstraction.common.Subtract;
 import gov.nasa.jpf.abstraction.predicate.common.Equals;
 import gov.nasa.jpf.abstraction.predicate.common.LessThan;
-import gov.nasa.jpf.abstraction.predicate.common.Modulo;
-import gov.nasa.jpf.abstraction.predicate.common.Multiply;
-import gov.nasa.jpf.abstraction.predicate.common.Negation;
-import gov.nasa.jpf.abstraction.predicate.common.PredicatesStringifier;
-import gov.nasa.jpf.abstraction.predicate.common.Subtract;
 
 public class PredicatesSMTStringifier extends PredicatesStringifier {
 	

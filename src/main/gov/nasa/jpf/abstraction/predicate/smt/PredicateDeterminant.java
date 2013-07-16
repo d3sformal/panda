@@ -6,11 +6,13 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
 public class PredicateDeterminant {
-	public Predicate weakestPrecondition;
+	public Predicate positiveWeakestPrecondition;
+	public Predicate negativeWeakestPrecondition;
 	public Map<Predicate, TruthValue> determinants;
 	
-	public PredicateDeterminant(Predicate weakestPrecondition, Map<Predicate, TruthValue> determinants) {
-		this.weakestPrecondition = weakestPrecondition;
+	public PredicateDeterminant(Predicate positiveWeakestPrecondition, Predicate negativeWeakestPrecondition, Map<Predicate, TruthValue> determinants) {
+		this.positiveWeakestPrecondition = positiveWeakestPrecondition;
+		this.negativeWeakestPrecondition = negativeWeakestPrecondition;
 		this.determinants = determinants;
 	}
 }

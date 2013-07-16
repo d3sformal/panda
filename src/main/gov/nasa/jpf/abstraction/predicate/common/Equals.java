@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.common;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
 public class Equals extends Comparison {
 	public Equals(Expression a, Expression b) {

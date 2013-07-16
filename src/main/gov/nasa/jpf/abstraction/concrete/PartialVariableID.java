@@ -1,6 +1,5 @@
 package gov.nasa.jpf.abstraction.concrete;
 
-import gov.nasa.jpf.abstraction.predicate.concrete.VariableID;
 import gov.nasa.jpf.vm.ElementInfo;
 
 public class PartialVariableID extends VariableID {

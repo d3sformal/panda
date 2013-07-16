@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
+import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+
 import java.util.List;
 
 /**

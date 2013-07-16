@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
+import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
+
 import java.util.List;
 
 public abstract class Context implements PredicatesVisitable {

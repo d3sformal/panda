@@ -4,15 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.AccessPathElement;
+import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathElement;
-import gov.nasa.jpf.abstraction.predicate.common.AccessPathRootElement;
-import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathElement;
-import gov.nasa.jpf.abstraction.predicate.concrete.ConcretePathRootElement;
-import gov.nasa.jpf.abstraction.predicate.concrete.VariableID;
-import gov.nasa.jpf.abstraction.predicate.concrete.impl.DefaultConcretePathIndexElement;
-import gov.nasa.jpf.abstraction.predicate.concrete.impl.DefaultConcretePathRootElement;
-import gov.nasa.jpf.abstraction.predicate.concrete.impl.DefaultConcretePathSubElement;
+import gov.nasa.jpf.abstraction.concrete.impl.DefaultConcretePathIndexElement;
+import gov.nasa.jpf.abstraction.concrete.impl.DefaultConcretePathRootElement;
+import gov.nasa.jpf.abstraction.concrete.impl.DefaultConcretePathSubElement;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public class ConcretePath extends AccessPath {
