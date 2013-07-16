@@ -5,36 +5,33 @@ import gov.nasa.jpf.vm.ThreadInfo;
 
 public class JPFInstructionAdaptor {
 
+	public static Instruction getStandardNextInstruction(gov.nasa.jpf.jvm.bytecode.INVOKESTATIC curInsn, ThreadInfo curTh)
+	{
+		return curInsn.getInvokedMethod(curTh).getFirstInsn();
+	}
+
+	public static Instruction getStandardNextInstruction(gov.nasa.jpf.jvm.bytecode.INVOKESPECIAL curInsn, ThreadInfo curTh)
+	{
+		return curInsn.getInvokedMethod(curTh).getFirstInsn();
+	}
+
+	public static Instruction getStandardNextInstruction(gov.nasa.jpf.jvm.bytecode.VirtualInvocation curInsn, ThreadInfo curTh)
+	{
+		return invokeInsn.getInvokedMethod(curTh, curTh.getCalleeThis(curInsn.getArgSize())).getFirstInsn();
+	}
+
+	public static Instruction getStandardNextInstruction(gov.nasa.jpf.jvm.bytecode.DIRECTCALLRETURN curInsn, ThreadInfo curTh)
+	{
+		return curTh.getCallerStackFrame().getPC();
+	}
+
+	public static Instruction getStandardNextInstruction(gov.nasa.jpf.jvm.bytecode.ReturnInstruction curInsn, ThreadInfo curTh)
+	{
+		return curTh.getCallerStackFrame().getPC().getNext();
+	}
+
 	public static Instruction getStandardNextInstruction(gov.nasa.jpf.vm.Instruction curInsn, ThreadInfo curTh)
 	{
-		if (curInsn instanceof gov.nasa.jpf.jvm.bytecode.INVOKESTATIC)
-		{
-			return ((gov.nasa.jpf.jvm.bytecode.INVOKESTATIC) curInsn).getInvokedMethod(curTh).getFirstInsn();
-		}
-
-		if (curInsn instanceof gov.nasa.jpf.jvm.bytecode.INVOKESPECIAL)
-		{
-			return ((gov.nasa.jpf.jvm.bytecode.INVOKESPECIAL) curInsn).getInvokedMethod(curTh).getFirstInsn();
-		}
-
-		if (curInsn instanceof gov.nasa.jpf.jvm.bytecode.VirtualInvocation)
-		{
-			gov.nasa.jpf.jvm.bytecode.VirtualInvocation invokeInsn = (gov.nasa.jpf.jvm.bytecode.VirtualInvocation) curInsn;
-
-			return invokeInsn.getInvokedMethod(curTh, curTh.getCalleeThis(invokeInsn.getArgSize())).getFirstInsn();
-		}
-
-		if (curInsn instanceof gov.nasa.jpf.jvm.bytecode.DIRECTCALLRETURN)
-		{
-			return curTh.getCallerStackFrame().getPC();
-		}
-
-		if (curInsn instanceof gov.nasa.jpf.jvm.bytecode.ReturnInstruction)
-		{
-			return curTh.getCallerStackFrame().getPC().getNext();
-		}
-
-		// default case
 		return curInsn.getNext(curTh);
 	}
 
