@@ -48,7 +48,11 @@ public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexEleme
 					clone.appendIndexElement(new Constant(i));
 
 					if (ei.getClassInfo().isReferenceArray()) {
-						ret.put(clone, new PartialVariableID(ti.getElementInfo(ei.getArrayFields().getReferenceValue(i))));
+						ElementInfo info = ti.getElementInfo(ei.getArrayFields().getReferenceValue(i));
+						
+						if (info != null) {
+							ret.put(clone, new PartialVariableID(info));
+						}
 					} else {
 						ret.put(clone, new ArrayElementID(ei.getObjectRef(), i));
 					}
