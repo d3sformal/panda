@@ -32,7 +32,9 @@ public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		if (ret == this || ret != ti.getPC()) return ret;
+		if (JPFInstructionAdaptor.testInvokeStaticInstructionAbortion(this, ret, ti)) {
+			return ret;
+		}
 		
 		AbstractInstructionFactory.abs.processMethodCall();
 

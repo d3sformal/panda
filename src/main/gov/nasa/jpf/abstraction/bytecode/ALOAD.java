@@ -21,7 +21,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -40,7 +39,9 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 		
 		Instruction ret = super.execute(ti);
 		
-		if (ret != getNext(ti)) return ret;
+		if (JPFInstructionAdaptor.testLocalVarInstructionAbortion(this, ret, ti)) {
+			return ret;
+		}
 	
         if (var != null) {
         	StackFrame sf = ti.getTopFrame();

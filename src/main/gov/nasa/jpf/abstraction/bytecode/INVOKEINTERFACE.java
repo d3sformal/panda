@@ -32,7 +32,9 @@ public class INVOKEINTERFACE extends gov.nasa.jpf.jvm.bytecode.INVOKEINTERFACE {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		if (ret == this || ret != ti.getPC()) return ret;
+		if (JPFInstructionAdaptor.testVirtualInvocationInstructionAbortion(this, ret, ti)) {
+			return ret;
+		}
 		
 		AbstractInstructionFactory.abs.processMethodCall();
 

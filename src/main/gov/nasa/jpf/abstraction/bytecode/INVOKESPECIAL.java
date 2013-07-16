@@ -32,7 +32,9 @@ public class INVOKESPECIAL extends gov.nasa.jpf.jvm.bytecode.INVOKESPECIAL {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		if (ret == this || ret != ti.getPC()) return ret;
+		if (JPFInstructionAdaptor.testInvokeSpecialInstructionAbortion(this, ret, ti)) {
+			return ret;
+		}
 		
 		AbstractInstructionFactory.abs.processMethodCall();
 

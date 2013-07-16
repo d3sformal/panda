@@ -34,7 +34,9 @@ public class SALOAD extends gov.nasa.jpf.jvm.bytecode.SALOAD {
 		
 		Instruction ret = super.execute(ti);
 		
-		if (ret != getNext(ti)) return ret;
+		if (JPFInstructionAdaptor.testArrayElementInstructionAbortion(this, ret, ti)) {
+			return ret;
+		}
 		
 		if (attr != null) {
 			if (attr.getExpression() instanceof ConcretePath) {

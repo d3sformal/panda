@@ -35,7 +35,9 @@ public class BASTORE extends gov.nasa.jpf.jvm.bytecode.BASTORE {
 		
 		Instruction ret = super.execute(ti);
 
-		if (ret != getNext(ti)) return ret;
+		if (JPFInstructionAdaptor.testArrayElementInstructionAbortion(this, ret, ti)) {
+			return ret;
+		}
 		
 		ConcretePath from = null;
 		ConcretePath to = null;

@@ -21,7 +21,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -35,7 +34,9 @@ public class DALOAD extends gov.nasa.jpf.jvm.bytecode.DALOAD {
 		
 		Instruction ret = super.execute(ti);
 		
-		if (ret != getNext(ti)) return ret;
+		if (JPFInstructionAdaptor.testArrayElementInstructionAbortion(this, ret, ti)) {
+			return ret;
+		}
 		
 		if (attr != null) {
 			if (attr.getExpression() instanceof ConcretePath) {

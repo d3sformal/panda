@@ -39,7 +39,9 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		
 		Instruction ret = super.execute(ti);
 		
-		if (ret != getNext(ti)) return ret;
+		if (JPFInstructionAdaptor.testFieldInstructionAbortion(this, ret, ti)) {
+			return ret;
+		}
 		
 		ConcretePath from = null;
 		ConcretePath to = null;

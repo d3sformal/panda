@@ -20,7 +20,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -36,7 +35,9 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 
 		Instruction ret = super.execute(ti);
 		
-		if (ret != getNext(ti)) return ret;
+		if (JPFInstructionAdaptor.testArrayElementInstructionAbortion(this, ret, ti)) {
+			return ret;
+		}
 
 		ConcretePath from = null;
 		ConcretePath to = null;

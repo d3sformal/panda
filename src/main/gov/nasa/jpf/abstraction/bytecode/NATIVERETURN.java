@@ -28,7 +28,9 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		if (ret != getNext(ti)) return ret;
+		if (JPFInstructionAdaptor.testReturnInstructionAbortion(this, ret, ti)) {
+			return ret;
+		}
 		
 		AbstractInstructionFactory.abs.processMethodReturn();
 		

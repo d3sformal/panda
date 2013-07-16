@@ -28,7 +28,9 @@ public class RETURN extends gov.nasa.jpf.jvm.bytecode.RETURN {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction ret = super.execute(ti);
 		
-		if (ret == this || ret != ti.getPC().getNext()) return ret;
+		if (JPFInstructionAdaptor.testReturnInstructionAbortion(this, ret, ti)) {
+			return ret;
+		}
 		
         AbstractInstructionFactory.abs.processMethodReturn();
 

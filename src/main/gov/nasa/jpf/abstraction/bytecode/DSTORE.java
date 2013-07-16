@@ -25,7 +25,9 @@ public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
 
 		Instruction ret = super.execute(ti);
         
-		if (ret != getNext(ti)) return ret;
+		if (JPFInstructionAdaptor.testLocalVarInstructionAbortion(this, ret, ti)) {
+			return ret;
+		}
         
 		ConcretePath from = null;
 		ConcretePath to = null;
