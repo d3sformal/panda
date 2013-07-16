@@ -6,9 +6,9 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class ICONST extends gov.nasa.jpf.jvm.bytecode.ICONST {
+public class DCONST extends gov.nasa.jpf.jvm.bytecode.DCONST {
 
-	public ICONST(int value) {
+	public DCONST(int value) {
 		super(value);
 	}
 	

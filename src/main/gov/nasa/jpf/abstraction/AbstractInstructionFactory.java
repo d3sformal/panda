@@ -180,6 +180,16 @@ public class AbstractInstructionFactory extends
 	public Instruction dcmpl() {
 		return (filter.isInstrumentedClass(ci) ? new DCMPL() : super.dcmpl());
 	}
+	
+	@Override
+	public Instruction dconst_0() {
+		return (filter.isInstrumentedClass(ci) ? new DCONST(0) : super.dconst_0());
+	}
+	
+	@Override
+	public Instruction dconst_1() {
+		return (filter.isInstrumentedClass(ci) ? new DCONST(1) : super.dconst_1());
+	}
 
 	@Override
 	public Instruction ddiv() {
@@ -254,6 +264,21 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction fcmpl() {
 		return (filter.isInstrumentedClass(ci) ? new FCMPL() : super.fcmpl());
+	}
+	
+	@Override
+	public Instruction fconst_0() {
+		return (filter.isInstrumentedClass(ci) ? new FCONST(0) : super.fconst_0());
+	}
+	
+	@Override
+	public Instruction fconst_1() {
+		return (filter.isInstrumentedClass(ci) ? new FCONST(1) : super.fconst_1());
+	}
+	
+	@Override
+	public Instruction fconst_2() {
+		return (filter.isInstrumentedClass(ci) ? new FCONST(2) : super.fconst_2());
 	}
 
 	@Override
@@ -577,7 +602,57 @@ public class AbstractInstructionFactory extends
 	public Instruction lastore() {
 		return (filter.isInstrumentedClass(ci) ? new LASTORE() : super.lastore());
 	}
-
+	
+	@Override
+	public Instruction lconst_0() {
+		return (filter.isInstrumentedClass(ci) ? new LCONST(0) : super.lconst_0());
+	}
+	
+	@Override
+	public Instruction lconst_1() {
+		return (filter.isInstrumentedClass(ci) ? new LCONST(1) : super.lconst_1());
+	}
+	
+	@Override
+	public Instruction ldc(int v) {
+		return (filter.isInstrumentedClass(ci) ? new LDC(v) : super.ldc(v));
+	}
+	
+	@Override
+	public Instruction ldc(float f) {
+		return (filter.isInstrumentedClass(ci) ? new LDC(f) : super.ldc(f));
+	}
+	
+	@Override
+	public Instruction ldc(String v, boolean isClass) {
+		return (filter.isInstrumentedClass(ci) ? new LDC(v, isClass) : super.ldc(v, isClass));
+	}
+	
+	@Override
+	public Instruction ldc_w(int v) {
+		return (filter.isInstrumentedClass(ci) ? new LDC_W(v) : super.ldc_w(v));
+	}
+	
+	@Override
+	public Instruction ldc_w(float f) {
+		return (filter.isInstrumentedClass(ci) ? new LDC_W(f) : super.ldc_w(f));
+	}
+	
+	@Override
+	public Instruction ldc_w(String v, boolean isClass) {
+		return (filter.isInstrumentedClass(ci) ? new LDC_W(v, isClass) : super.ldc_w(v, isClass));
+	}
+	
+	@Override
+	public Instruction ldc2_w(long l) {
+		return (filter.isInstrumentedClass(ci) ? new LDC2_W(l) : super.ldc2_w(l));
+	}
+	
+	@Override
+	public Instruction ldc2_w(double d) {
+		return (filter.isInstrumentedClass(ci) ? new LDC2_W(d) : super.ldc2_w(d));
+	}
+	
 	@Override
 	public Instruction ldiv() {
 		return (filter.isInstrumentedClass(ci) ? new LDIV() : super.ldiv());
