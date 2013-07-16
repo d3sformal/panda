@@ -206,13 +206,13 @@ public class SMT {
 		
 		for (Predicate predicate : predicates.keySet()) {
 			if (sat[i] && sat[i + 1]) {
-				valuation.put(predicate, TruthValue.UNKNOWN);
+				valuation.put(predicate, TruthValue.UNDEFINED);
 			} else if (sat[i]) {
 				valuation.put(predicate, TruthValue.SATISFIABLE);
 			} else if (sat[i + 1]) {
 				valuation.put(predicate, TruthValue.UNSATISFIABLE);
 			} else {
-				valuation.put(predicate, TruthValue.UNDEFINED);
+				valuation.put(predicate, TruthValue.UNKNOWN);
 			}
 			
 			i += 2;
