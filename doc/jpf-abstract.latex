@@ -133,6 +133,8 @@ In each state, we will store valuations of all predicates defined in the current
 We may preserve the concrete values of some variables too (i.e., not setting them to 0 like in the original Abstract Pathfinder), because they may be useful in deciding values of certain predicates with the SMT solver (see below).
 However, this would negatively impact the benefits of abstraction (reduced state space). We can let the user decide (make this configurable).
 
+The initial value of each predicate is \texttt{undef} (\texttt{unknown}). When a new heap object is allocated, all predicates over its fields will have the value \texttt{unknown}.
+
 We will use a {\bf single global container} for current values of all predicates. Values will not be stored in attributes for objects, fields, and local variables (stack frame slots).
 The container is a map from predicates to their values.
 This approach has several benefits:
@@ -252,6 +254,8 @@ Weakest preconditions capture aliasing --- e.g., truth value of the weakest prec
 \end{table*}
 
 \FloatBarrier
+
+If some relevant predicate has the value \texttt{unknown} in the current dynamic program state, then we add \texttt{true} (i.e., nothing) into the sub-formula $\bigwedge \nu(P)$.
 
 The following algorithm summarizes the procedure for computing new values of relevant predicates at some instruction.
 The set $\text{AffectedPaths}$ contains all access paths affected by the given instruction, and the function expression $paths(p)$ returns all access paths referred to by the predicate $p$.
