@@ -10,7 +10,10 @@ import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
 import gov.nasa.jpf.abstraction.common.Subtract;
+import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
+import gov.nasa.jpf.abstraction.predicate.common.Disjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Equals;
+import gov.nasa.jpf.abstraction.predicate.common.Implication;
 import gov.nasa.jpf.abstraction.predicate.common.LessThan;
 
 public class PredicatesSMTStringifier extends PredicatesStringifier {
@@ -20,6 +23,45 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 		ret += "(not ";
 		
 		predicate.predicate.accept(this);
+		
+		ret += ")";
+	}
+	
+	@Override
+	public void visit(Conjunction predicate) {
+		ret += "(and ";
+		
+		predicate.a.accept(this);
+		
+		ret += " ";
+		
+		predicate.b.accept(this);
+		
+		ret += ")";
+	}
+	
+	@Override
+	public void visit(Disjunction predicate) {
+		ret += "(or ";
+		
+		predicate.a.accept(this);
+		
+		ret += " ";
+		
+		predicate.b.accept(this);
+		
+		ret += ")";
+	}
+	
+	@Override
+	public void visit(Implication predicate) {
+		ret += "(=> ";
+		
+		predicate.a.accept(this);
+		
+		ret += " ";
+		
+		predicate.b.accept(this);
 		
 		ret += ")";
 	}

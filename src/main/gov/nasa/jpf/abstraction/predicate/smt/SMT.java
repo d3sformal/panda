@@ -3,7 +3,11 @@ package gov.nasa.jpf.abstraction.predicate.smt;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.AccessPathElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
+import gov.nasa.jpf.abstraction.predicate.common.Implication;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.common.Tautology;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
 import java.io.BufferedReader;
@@ -128,12 +132,12 @@ public class SMT {
 			input +=
 				SEPARATOR +
 				"(push 1)" + SEPARATOR +
-				"(assert (not " + predicateDeterminantToString(det.positiveWeakestPrecondition, det.determinants) + "))" + SEPARATOR +
+				"(assert (not " + createFormula(det.positiveWeakestPrecondition, det.determinants) + "))" + SEPARATOR +
 				"(check-sat)" + SEPARATOR +
 				"(pop 1)" + SEPARATOR +
 				SEPARATOR +
 				"(push 1)" + SEPARATOR +
-				"(assert (not " + predicateDeterminantToString(det.negativeWeakestPrecondition, det.determinants) + "))" + SEPARATOR +
+				"(assert (not " + createFormula(det.negativeWeakestPrecondition, det.determinants) + "))" + SEPARATOR +
 				"(check-sat)" + SEPARATOR +
 				"(pop 1)" + SEPARATOR;
 		}
@@ -161,26 +165,18 @@ public class SMT {
 		}
 	}
 	
-	private static String predicateToString(Predicate predicate) {
+	private static String createFormula(Predicate weakestPrecondition, Map<Predicate, TruthValue> determinants) {
 		PredicatesSMTStringifier stringifier = new PredicatesSMTStringifier();
+
+		Predicate formula = new Tautology();
 		
-		predicate.accept(stringifier);
-		
-		return stringifier.getString();
-	}
-	
-	private static String predicateDeterminantToString(Predicate weakestPrecondition, Map<Predicate, TruthValue> determinants) {
-		String ret = "true";
-		
-		for (Predicate predicate : determinants.keySet()) {
-			String condition = predicateToString(predicate);
-			
+		for (Predicate predicate : determinants.keySet()) {		
 			switch (determinants.get(predicate)) {
 			case TRUE:
-				ret = "(and " + ret + " " + condition + ")";
+				formula = new Conjunction(formula, predicate);
 				break;
 			case FALSE:
-				ret = "(and " + ret + " (not " + condition + "))";
+				formula = new Conjunction(formula, new Negation(predicate));
 				break;
 			default:
 				/**
@@ -191,9 +187,11 @@ public class SMT {
 			}
 		}
 		
-		ret = "(=> " + ret + " " + predicateToString(weakestPrecondition) + ")";
+		formula = new Implication(formula, weakestPrecondition);
 		
-		return ret;
+		formula.accept(stringifier);
+		
+		return stringifier.getString();
 	}
 	
 	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateDeterminant> predicates) throws IOException {
