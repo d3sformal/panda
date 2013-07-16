@@ -101,7 +101,13 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			}
 			
 			if (affects) {
-				predicates.put(predicate, new PredicateDeterminant(weakestPrecondition, new Negation(weakestPrecondition), valuations));
+				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+				
+				for (Predicate determinant : weakestPrecondition.determinantClosure(valuations.keySet())) {
+					determinants.put(determinant, valuations.get(determinant));
+				}
+				
+				predicates.put(predicate, new PredicateDeterminant(weakestPrecondition, new Negation(weakestPrecondition), determinants));
 
 				System.err.println("\t\t" + predicate + " [" + weakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION) + "]");
 			}

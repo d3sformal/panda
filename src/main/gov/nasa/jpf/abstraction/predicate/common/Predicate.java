@@ -5,7 +5,9 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class Predicate implements PredicatesVisitable {
 	public abstract List<AccessPath> getPaths();
@@ -20,5 +22,37 @@ public abstract class Predicate implements PredicatesVisitable {
 		accept(stringifier);
 		
 		return stringifier.getString();
+	}
+    
+    private Set<Predicate> selectDeterminants(Set<Predicate> universe) {
+    	Set<Predicate> ret = new HashSet<Predicate>();
+    	
+    	for (Predicate candidate : universe) {
+			List<AccessPath> candidatePaths = candidate.getPaths();
+
+			for (AccessPath path : getPaths()) {
+				if (candidatePaths.contains(path)) {
+					ret.add(candidate);
+				}
+			}
+		}
+    	
+    	return ret;
+    }
+    
+	public Set<Predicate> determinantClosure(Set<Predicate> universe) {
+		Set<Predicate> ret = selectDeterminants(universe);
+		
+		int formerSize = 0;
+		
+		while (formerSize != ret.size()) {
+			formerSize = ret.size();
+
+			for (Predicate predicate : ret) {
+				ret.addAll(predicate.selectDeterminants(universe));
+			}
+		}
+		
+		return ret;
 	}
 }
