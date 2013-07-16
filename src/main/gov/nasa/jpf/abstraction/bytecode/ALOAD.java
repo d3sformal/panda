@@ -36,13 +36,9 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 	@Override
 	public Instruction execute(ThreadInfo ti) {
 		LocalVarInfo var = getLocalVarInfo();
-		
-		Instruction ret = super.execute(ti);
-		
-		if (JPFInstructionAdaptor.testLocalVarInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
 	
+		Instruction actualNextInsn = super.execute(ti);
+		
         if (var != null) {
         	StackFrame sf = ti.getTopFrame();
     		ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
@@ -57,6 +53,6 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
         	//TODO System.err.println(getClass().getSimpleName() + ": unknown local variable");
         }
 
-		return ret;
+		return actualNextInsn;
 	}
 }

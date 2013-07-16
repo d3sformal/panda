@@ -41,10 +41,12 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 		StackFrame sf = ti.getTopFrame();
 		Attribute attr = (Attribute) sf.getOperandAttr(0);
 		
-		Instruction ret = super.execute(ti);
+		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+		Instruction actualNextInsn = super.execute(ti);
 		
-		if (JPFInstructionAdaptor.testFieldInstructionAbortion(this, ret, ti)) {
-			return ret;
+		if (JPFInstructionAdaptor.testFieldInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+			return actualNextInsn;
 		}
 		
 		if (attr != null) {
@@ -62,6 +64,6 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 			sf.setOperandAttr(new NonEmptyAttribute(null, attr.getExpression()));
 		}
 		
-		return ret;
+		return actualNextInsn;
 	}
 }

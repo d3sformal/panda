@@ -33,11 +33,13 @@ public class IASTORE extends gov.nasa.jpf.jvm.bytecode.IASTORE {
         Attribute source = (Attribute) sf.getOperandAttr(0);
 		Attribute destination = (Attribute) sf.getOperandAttr(2);
 		
-		Instruction ret = super.execute(ti);
+		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
-		if (JPFInstructionAdaptor.testArrayElementInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
+		Instruction actualNextInsn = super.execute(ti);
+		
+		if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+			return actualNextInsn;
+		}       
 		
 		ConcretePath from = null;
 		ConcretePath to = null;
@@ -57,6 +59,6 @@ public class IASTORE extends gov.nasa.jpf.jvm.bytecode.IASTORE {
 
 		AbstractInstructionFactory.abs.processStore(from, to);
 		
-		return ret;
+		return actualNextInsn;
 	}
 }

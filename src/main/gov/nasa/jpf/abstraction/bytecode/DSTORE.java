@@ -23,12 +23,8 @@ public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
         
         if (source == null) source = new EmptyAttribute();
 
-		Instruction ret = super.execute(ti);
-        
-		if (JPFInstructionAdaptor.testLocalVarInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
-        
+		Instruction actualNextInsn = super.execute(ti);
+		
 		ConcretePath from = null;
 		ConcretePath to = null;
 		
@@ -44,6 +40,6 @@ public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
 
 		AbstractInstructionFactory.abs.processStore(from, to);
 		
-		return ret;
+		return actualNextInsn;
 	}
 }

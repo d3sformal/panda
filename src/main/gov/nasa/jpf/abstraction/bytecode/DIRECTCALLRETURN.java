@@ -26,14 +26,17 @@ public class DIRECTCALLRETURN extends gov.nasa.jpf.jvm.bytecode.DIRECTCALLRETURN
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		Instruction ret = super.execute(ti);
+
+		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+		Instruction actualNextInsn = super.execute(ti);
 		
-		if (JPFInstructionAdaptor.testDirectCallReturnInstructionAbortion(this, ret, ti)) {
-			return ret;
+		if (JPFInstructionAdaptor.testDirectCallReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+			return actualNextInsn;
 		}
 		
         AbstractInstructionFactory.abs.processMethodReturn();
 
-		return ret;
+		return actualNextInsn;
 	}
 }

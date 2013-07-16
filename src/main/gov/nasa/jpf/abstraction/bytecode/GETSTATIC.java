@@ -36,13 +36,16 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 	}
 
 	@Override
-	public Instruction execute(ThreadInfo ti) {		
-		Instruction ret = super.execute(ti);
+	public Instruction execute(ThreadInfo ti) {
+
+		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+		Instruction actualNextInsn = super.execute(ti);
 		
-		if (JPFInstructionAdaptor.testFieldInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
-        
+		if (JPFInstructionAdaptor.testFieldInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+			return actualNextInsn;
+		} 
+		
         ConcretePath path = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
 		
 		if (path != null) {
@@ -56,6 +59,6 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 		StackFrame sf = ti.getTopFrame();
 		sf.setOperandAttr(new NonEmptyAttribute(null, path));
 		
-		return ret;
+		return actualNextInsn;
 	}
 }

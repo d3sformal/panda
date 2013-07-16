@@ -41,12 +41,8 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
         
         if (source == null) source = new EmptyAttribute();
 
-		Instruction ret = super.execute(ti);
-        
-		if (JPFInstructionAdaptor.testLocalVarInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
-        
+		Instruction actualNextInsn = super.execute(ti);
+		
 		ConcretePath from = null;
 		ConcretePath to = null;
 		
@@ -64,6 +60,6 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 
 		AbstractInstructionFactory.abs.processStore(from, to);
 		
-		return ret;
+		return actualNextInsn;
 	}
 }

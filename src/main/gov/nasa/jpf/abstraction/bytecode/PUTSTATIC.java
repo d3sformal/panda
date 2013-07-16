@@ -35,13 +35,15 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 	public Instruction execute(ThreadInfo ti) {        
 		StackFrame sf = ti.getTopFrame();
         Attribute source = (Attribute) sf.getOperandAttr(0);
-        
-        Instruction ret = super.execute(ti);
-        
-        if (JPFInstructionAdaptor.testFieldInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
-        
+
+		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+		Instruction actualNextInsn = super.execute(ti);
+		
+		if (JPFInstructionAdaptor.testFieldInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+			return actualNextInsn;
+		}   
+
 		ConcretePath from = null;
 		ConcretePath to = null;
 		
@@ -55,6 +57,6 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 
         AbstractInstructionFactory.abs.processStore(from, to);
 		
-		return ret;
+		return actualNextInsn;
 	}
 }

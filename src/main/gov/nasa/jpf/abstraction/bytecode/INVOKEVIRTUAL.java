@@ -30,14 +30,17 @@ public class INVOKEVIRTUAL extends gov.nasa.jpf.jvm.bytecode.INVOKEVIRTUAL {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		Instruction ret = super.execute(ti);
+
+		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+		Instruction actualNextInsn = super.execute(ti);
 		
-		if (JPFInstructionAdaptor.testVirtualInvocationInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
+		if (JPFInstructionAdaptor.testVirtualInvocationInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+			return actualNextInsn;
+		}  
 		
 		AbstractInstructionFactory.abs.processMethodCall();
 
-		return ret;
+		return actualNextInsn;
 	}
 }

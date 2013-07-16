@@ -32,13 +32,15 @@ public class SASTORE extends gov.nasa.jpf.jvm.bytecode.SASTORE {
 		StackFrame sf = ti.getTopFrame();
         Attribute source = (Attribute) sf.getOperandAttr(0);
 		Attribute destination = (Attribute) sf.getOperandAttr(2);
-		
-		Instruction ret = super.execute(ti);
 
-		if (JPFInstructionAdaptor.testArrayElementInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
+		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+		Instruction actualNextInsn = super.execute(ti);
 		
+		if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+			return actualNextInsn;
+		}       
+
 		ConcretePath from = null;
 		ConcretePath to = null;
 		
@@ -57,6 +59,6 @@ public class SASTORE extends gov.nasa.jpf.jvm.bytecode.SASTORE {
 
 		AbstractInstructionFactory.abs.processStore(from, to);
 		
-		return ret;
+		return actualNextInsn;
 	}
 }

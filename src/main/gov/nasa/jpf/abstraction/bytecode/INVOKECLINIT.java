@@ -31,14 +31,17 @@ public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		Instruction ret = super.execute(ti);
+
+		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+		Instruction actualNextInsn = super.execute(ti);
 		
-		if (JPFInstructionAdaptor.testInvokeStaticInstructionAbortion(this, ret, ti)) {
-			return ret;
+		if (JPFInstructionAdaptor.testInvokeStaticInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+			return actualNextInsn;
 		}
 		
 		AbstractInstructionFactory.abs.processMethodCall();
 
-		return ret;
+		return actualNextInsn;
 	}
 }

@@ -33,12 +33,14 @@ public class LASTORE extends gov.nasa.jpf.jvm.bytecode.LASTORE {
         Attribute source = (Attribute) sf.getOperandAttr(0);
 		Attribute destination = (Attribute) sf.getOperandAttr(2);
 
-		Instruction ret = super.execute(ti);
+		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+		Instruction actualNextInsn = super.execute(ti);
 		
-		if (JPFInstructionAdaptor.testArrayElementInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
-		
+		if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+			return actualNextInsn;
+		}      
+
 		ConcretePath from = null;
 		ConcretePath to = null;
 		
@@ -57,6 +59,6 @@ public class LASTORE extends gov.nasa.jpf.jvm.bytecode.LASTORE {
 
 		AbstractInstructionFactory.abs.processStore(from, to);
 		
-		return ret;
+		return actualNextInsn;
 	}
 }

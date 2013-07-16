@@ -26,14 +26,17 @@ public class DRETURN extends gov.nasa.jpf.jvm.bytecode.DRETURN {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		Instruction ret = super.execute(ti);
+
+		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+		Instruction actualNextInsn = super.execute(ti);
 		
-		if (JPFInstructionAdaptor.testReturnInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
+		if (JPFInstructionAdaptor.testReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+			return actualNextInsn;
+		} 
 		
         AbstractInstructionFactory.abs.processMethodReturn();
 
-		return ret;
+		return actualNextInsn;
 	}
 }

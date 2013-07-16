@@ -41,11 +41,7 @@ public class LLOAD extends gov.nasa.jpf.jvm.bytecode.LLOAD {
 	public Instruction execute(ThreadInfo ti) {
 		LocalVarInfo var = getLocalVarInfo();
 		
-		Instruction ret = super.execute(ti);
-		
-		if (JPFInstructionAdaptor.testLocalVarInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
+		Instruction actualNextInsn = super.execute(ti);
 		
 		if (var != null) {
 			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);
@@ -59,6 +55,6 @@ public class LLOAD extends gov.nasa.jpf.jvm.bytecode.LLOAD {
 			sf.setLongOperandAttr(attribute);
 		}
 
-		return ret;
+		return actualNextInsn;
 	}
 }

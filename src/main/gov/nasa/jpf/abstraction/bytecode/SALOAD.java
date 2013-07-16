@@ -32,11 +32,13 @@ public class SALOAD extends gov.nasa.jpf.jvm.bytecode.SALOAD {
 		StackFrame sf = ti.getTopFrame();
 		Attribute attr = (Attribute) sf.getOperandAttr(1);
 		
-		Instruction ret = super.execute(ti);
+		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+		Instruction actualNextInsn = super.execute(ti);
 		
-		if (JPFInstructionAdaptor.testArrayElementInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
+		if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+			return actualNextInsn;
+		}      
 		
 		if (attr != null) {
 			if (attr.getExpression() instanceof ConcretePath) {
@@ -51,6 +53,6 @@ public class SALOAD extends gov.nasa.jpf.jvm.bytecode.SALOAD {
 			}
 		}
 
-		return ret;
+		return actualNextInsn;
 	}
 }

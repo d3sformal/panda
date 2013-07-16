@@ -41,11 +41,7 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 	public Instruction execute(ThreadInfo ti) {
 		LocalVarInfo var = getLocalVarInfo();
 		
-		Instruction ret = super.execute(ti);
-		
-		if (JPFInstructionAdaptor.testLocalVarInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
+		Instruction actualNextInsn = super.execute(ti);
 		
 		if (var != null) {
 			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);
@@ -59,6 +55,6 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 			sf.setOperandAttr(attribute);
 		}
 
-		return ret;
+		return actualNextInsn;
 	}
 }

@@ -37,11 +37,13 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
         Attribute source = (Attribute) sf.getOperandAttr(0);
 		Attribute destination = (Attribute) sf.getOperandAttr(1);
 		
-		Instruction ret = super.execute(ti);
+		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+		Instruction actualNextInsn = super.execute(ti);
 		
-		if (JPFInstructionAdaptor.testFieldInstructionAbortion(this, ret, ti)) {
-			return ret;
-		}
+		if (JPFInstructionAdaptor.testFieldInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+			return actualNextInsn;
+		}  
 		
 		ConcretePath from = null;
 		ConcretePath to = null;
@@ -61,6 +63,6 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 
 		AbstractInstructionFactory.abs.processStore(from, to);
 		
-		return ret;
+		return actualNextInsn;
 	}
 }

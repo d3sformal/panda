@@ -202,6 +202,7 @@ Truth value of predicates that refer only to fields of some object (via \code{th
 
 New values of predicates are computed with the help of an SMT solver. We use the standard approach based on weakest preconditions for assignment statements $v = e$, where $v$ can be any program variable (local variable, object field, array element) and $e$ can be any arithmetic expression.
 We use logic formulas $\bigwedge \nu(P) \Rightarrow \mathit{WP}(s,p)$, where $\bigwedge \nu(P)$ represents truth values of relevant predicates in the current dynamic program state, as input for the SMT solver.
+The set $P$ is a transitive closure of the set of predicates that share a path with $p$ or with some element already in $P$.
 The following table shows weakest preconditions for assignment statements. The symbol $F_x$ denotes any valid atomic predicate over the expression $x$ that is not covered by other lines of the table for a given statement.
 Weakest preconditions capture aliasing --- e.g., truth value of the weakest precondition for the statement \code{o.f = e} and the predicate $\mathit{fread}(f,o') \ \mathrm{relop} \ u$ depends on whether $o = o'$.
 
