@@ -1,8 +1,11 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
+import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
+import gov.nasa.jpf.abstraction.predicate.common.Disjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Equals;
+import gov.nasa.jpf.abstraction.predicate.common.Implication;
 import gov.nasa.jpf.abstraction.predicate.common.LessThan;
 import gov.nasa.jpf.abstraction.predicate.common.MethodContext;
 import gov.nasa.jpf.abstraction.predicate.common.ObjectContext;
