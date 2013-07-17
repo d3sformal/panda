@@ -4,6 +4,7 @@ import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Contradiction extends Predicate {
