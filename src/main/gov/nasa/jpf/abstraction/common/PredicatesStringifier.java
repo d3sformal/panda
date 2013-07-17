@@ -128,7 +128,7 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 	public void visit(Implication predicate) {
 		ret += "(";
 		
-		predicate.a.accept(this);
+		((Negation)predicate.a).predicate.accept(this);
 
 		ret += " => ";
 		
