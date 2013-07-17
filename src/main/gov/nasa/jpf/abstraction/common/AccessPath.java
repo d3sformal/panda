@@ -169,4 +169,17 @@ public class AccessPath extends Expression implements Cloneable {
 		return path;
 	}
 
+	public AccessPath cutTail() {
+		AccessPath prefix = clone();
+		
+		if (prefix.tail instanceof AccessPathMiddleElement) {
+			AccessPathMiddleElement tail = (AccessPathMiddleElement) prefix.tail;
+			
+			prefix.tail = tail.getPrevious();
+			prefix.tail.setNext(null);
+		}
+		
+		return prefix;
+	}
+
 }

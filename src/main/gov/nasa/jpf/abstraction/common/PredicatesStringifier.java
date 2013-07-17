@@ -14,10 +14,13 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.common.StaticContext;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
+import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 
 public abstract class PredicatesStringifier implements PredicatesVisitor {
 	
 	protected String ret = "";
+	protected AccessPath path = null;
+	protected Expression expression = null;
 	
 	public String getString() {
 		return ret;
@@ -128,13 +131,25 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 	public void visit(Implication predicate) {
 		ret += "(";
 		
-		((Negation)predicate.a).predicate.accept(this);
+		predicate.a.accept(this);
 
 		ret += " => ";
 		
 		predicate.b.accept(this);
 		
 		ret += ")";
+	}
+	
+	@Override
+	public void visit(UpdatedPredicate predicate) {
+		path = predicate.path;
+		expression = predicate.expression;
+		
+		if (path.getRoot() == path.getTail()) {
+			predicate.predicate.replace(path, expression).accept(this);
+		} else {
+			predicate.predicate.accept(this);
+		}
 	}
 
 	@Override

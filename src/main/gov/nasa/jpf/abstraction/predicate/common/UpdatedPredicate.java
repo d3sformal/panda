@@ -1,0 +1,49 @@
+package gov.nasa.jpf.abstraction.predicate.common;
+
+import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+
+import java.util.LinkedList;
+import java.util.List;
+
+public class UpdatedPredicate extends Predicate {
+	
+	public Predicate predicate;
+	public AccessPath path;
+	public Expression expression;
+	
+	public UpdatedPredicate(Predicate predicate, AccessPath path, Expression expression) {
+		this.predicate = predicate;
+		this.path = path;
+		this.expression = expression;
+	}
+
+	@Override
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	@Override
+	public List<AccessPath> getPaths() {
+		List<AccessPath> ret = new LinkedList<AccessPath>();
+		
+		ret.addAll(predicate.getPaths());
+		
+		if (ret.contains(path)) {
+			ret.addAll(expression.getPaths());
+			
+			if (path.getRoot() == path.getTail()) {
+				ret.remove(path);
+			}
+		}
+		
+		return ret;
+	}
+
+	@Override
+	public Predicate replace(AccessPath formerPath, Expression expression) {
+		return new UpdatedPredicate(predicate.replace(formerPath, expression), this.path, this.expression);
+	}
+
+}

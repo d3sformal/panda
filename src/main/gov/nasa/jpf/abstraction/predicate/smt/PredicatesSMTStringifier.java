@@ -57,7 +57,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	public void visit(Implication predicate) {
 		ret += "(=> ";
 		
-		((Negation)predicate.a).predicate.accept(this);
+		predicate.a.accept(this);
 		
 		ret += " ";
 		
@@ -168,7 +168,23 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 			element.getNext().accept(this);
 		}
 		
-		ret = String.format(ret, "(field_" + element.getName() + " %s)");
+		String field = "field_" + element.getName();
+		
+		if (path != null && path.getTail() instanceof AccessPathSubElement) {
+			AccessPathSubElement updatedField = (AccessPathSubElement) path.getTail();
+			
+			if (updatedField.getName().equals(element.getName())) {
+				PredicatesSMTStringifier updatePrefixVisitor = new PredicatesSMTStringifier();
+				PredicatesSMTStringifier updateExpressionVisitor = new PredicatesSMTStringifier();
+				
+				path.cutTail().accept(updatePrefixVisitor);
+				expression.accept(updateExpressionVisitor);
+				
+				field = "(update field_" + element.getName() + " " + updatePrefixVisitor.getString() + " " + updateExpressionVisitor.getString() + ")";
+			}
+		}
+		
+		ret = String.format(ret, "(" + field + " %s)");
 	}
 
 	@Override
@@ -183,7 +199,22 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 		
 		element.getIndex().accept(indexVisitor);
 		
-		ret = String.format(ret, "(select (select arr %s) " + indexVisitor.getString() + ")");
+		String array = "arr";
+		
+		if (path != null && path.getTail() instanceof AccessPathIndexElement) {
+			AccessPathIndexElement index = (AccessPathIndexElement) path.getTail();
+			PredicatesSMTStringifier updatePrefixVisitor = new PredicatesSMTStringifier();
+			PredicatesSMTStringifier updateIndexVisitor = new PredicatesSMTStringifier();
+			PredicatesSMTStringifier updateExpressionVisitor = new PredicatesSMTStringifier();
+				
+			path.cutTail().accept(updatePrefixVisitor);
+			index.getIndex().accept(updateIndexVisitor);
+			expression.accept(updateExpressionVisitor);
+				
+			array = "(update arr " + updatePrefixVisitor.getString() + " (update (select arr " + updatePrefixVisitor.getString() + ") " + updateIndexVisitor.getString() + " " + updateExpressionVisitor.getString() + "))";
+		}
+		
+		ret = String.format(ret, "(select (select " + array + " %s) " + indexVisitor.getString() + ")");
 	}
 
 }

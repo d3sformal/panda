@@ -4,6 +4,7 @@ import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 
@@ -12,7 +13,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 public class FlatPredicateValuation implements PredicateValuation, Scope {
 	private HashMap<Predicate, TruthValue> valuations = new HashMap<Predicate, TruthValue>();
@@ -71,35 +71,30 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	}
 
 	@Override
-	public void reevaluate(Set<AccessPath> affected, Expression expression) {
+	public void reevaluate(AccessPath path, Expression expression) {
 		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
 
-		if (affected.isEmpty()) return;
+		if (path == null) return;
 
 		System.err.println("SMT: ");
 		
 		System.err.println("\tREACTION TO:");
-		for (AccessPath path : affected) {
-			System.err.println("\t\t" + path.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-		}
+		System.err.println("\t\t" + path.toString(AccessPath.NotationPolicy.DOT_NOTATION));
 		
 		System.err.println("\tAFFECTS:");
 		for (Predicate predicate : valuations.keySet()) {
-			boolean affects = false;
+			boolean affects = predicate.getPaths().contains(path);
 			
 			Predicate positiveWeakestPrecondition = predicate;
 			Predicate negativeWeakestPrecondition = new Negation(predicate);
 
-			for (AccessPath path : affected) {
-				affects = affects || predicate.getPaths().contains(path);
+			affects = predicate.getPaths().contains(path);
 				
-				if (expression != null) {
-					//TODO cope with all the precondition constructions
-					positiveWeakestPrecondition = positiveWeakestPrecondition.replace(path, expression);
-					negativeWeakestPrecondition = negativeWeakestPrecondition.replace(path, expression);
-				}
+			if (expression != null) {
+				positiveWeakestPrecondition = new UpdatedPredicate(positiveWeakestPrecondition, path, expression);
+				negativeWeakestPrecondition = new UpdatedPredicate(negativeWeakestPrecondition, path, expression);
 			}
-			
+
 			if (affects) {
 				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 				

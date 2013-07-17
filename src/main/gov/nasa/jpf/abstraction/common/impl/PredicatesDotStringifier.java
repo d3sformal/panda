@@ -20,6 +20,22 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 	public void visit(AccessPathSubElement element) {
 		ret += "." + element.getName();
 		
+		if (path != null && path.getTail() instanceof AccessPathSubElement) {
+			AccessPathSubElement field = (AccessPathSubElement) path.getTail();
+			
+			if (field.getName().equals(element.getName())) {
+				ret += "|";
+				
+				path.accept(this);
+				
+				ret += " := ";
+				
+				expression.accept(this);
+				
+				ret += "|";
+			}
+		}
+		
 		if (element.getNext() == null) return;
 		
 		element.getNext().accept(this);
@@ -32,6 +48,18 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 		element.getIndex().accept(this);
 		
 		ret += "]";
+		
+		if (path != null && path.getTail() instanceof AccessPathIndexElement) {	
+			ret += "|";
+				
+			path.accept(this);
+				
+			ret += " := ";
+				
+			expression.accept(this);
+				
+			ret += "|";
+		}
 		
 		if (element.getNext() == null) return;
 		
