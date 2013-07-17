@@ -86,8 +86,32 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		for (Predicate predicate : valuations.keySet()) {
 			boolean affects = false;
 			
-			for (AccessPath path : resolvedAffected) {
-				affects = affects || predicate.getPaths().contains(path);
+			/**
+			 * Affected may contain completely different paths:
+			 * 
+			 * assume a == b.c == d.e.f[ ? ]
+			 * then
+			 * 
+			 * a.x := 3
+			 * 
+			 * causes
+			 * 
+			 * a.x, b.c.x, d.e.f[ ? ].x
+			 * 
+			 * be affected paths, hence
+			 * 
+			 * a.x = 3
+			 * b.c.x + 2 = g + h
+			 * d.e.f[0].x / 3 = 4
+			 * d.e.f[1].x / 3 = 4
+			 * d.e.f[k + l * m].x / 3 = 4
+			 * 
+			 * are affected predicates
+			 */
+			for (AccessPath path1 : resolvedAffected) {
+				for (AccessPath path2 : predicate.getPaths()) {
+					affects = affects || path1.similar(path2);
+				}
 			}
 			
 			Predicate positiveWeakestPrecondition = predicate;
