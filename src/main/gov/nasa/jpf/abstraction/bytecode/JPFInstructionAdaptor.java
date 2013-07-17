@@ -17,7 +17,7 @@ public class JPFInstructionAdaptor {
 
 	public static Instruction getStandardNextInstruction(gov.nasa.jpf.jvm.bytecode.VirtualInvocation curInsn, ThreadInfo curTh)
 	{
-		return invokeInsn.getInvokedMethod(curTh, curTh.getCalleeThis(curInsn.getArgSize())).getFirstInsn();
+		return curInsn.getInvokedMethod(curTh, curTh.getCalleeThis(curInsn.getArgSize())).getFirstInsn();
 	}
 
 	public static Instruction getStandardNextInstruction(gov.nasa.jpf.jvm.bytecode.DIRECTCALLRETURN curInsn, ThreadInfo curTh)
