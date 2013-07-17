@@ -7,8 +7,8 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
+import gov.nasa.jpf.abstraction.predicate.smt.SMTException;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -116,12 +116,13 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		}
 		
 		try {
+			@SuppressWarnings("unchecked")
 			Map<Predicate, TruthValue> newValuations = new SMT().valuatePredicates(predicates);
 		
 			for (Predicate predicate : newValuations.keySet()) {
 				valuations.put(predicate, newValuations.get(predicate));
 			}
-		} catch (IOException e) {
+		} catch (SMTException e) {
 			e.printStackTrace();
 		}
 	}

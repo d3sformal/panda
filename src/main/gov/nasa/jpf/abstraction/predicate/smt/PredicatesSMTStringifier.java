@@ -184,7 +184,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 			}
 		}
 		
-		ret = String.format(ret, "(" + field + " %s)");
+		ret = String.format(ret, "(select " + field + " %s)");
 	}
 
 	@Override

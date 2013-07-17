@@ -26,12 +26,12 @@ import java.util.Set;
 
 public class SMT {
 	
-	private static String SEPARATOR = "";
+	private static String SEPARATOR = "\n";
 	
 	private BufferedWriter in = null;
 	private BufferedReader out = null;
 	
-	public SMT() throws IOException {
+	public SMT() throws SMTException {
 		try {
 			String[] args = new String[] {
 				System.getProperty("user.dir") + "/bin/mathsat",
@@ -53,11 +53,11 @@ public class SMT {
 		} catch (IOException e) {
 			System.err.println("SMT will not start.");
 			
-			throw e;
+			throw new SMTException(e);
 		}
 	}
 	
-	private Boolean[] isValid(String input) throws IOException {
+	private Boolean[] isValid(String input) throws SMTException {
 		List<Boolean> values = new ArrayList<Boolean>();
 			
 		String output = "";
@@ -68,24 +68,35 @@ public class SMT {
 		} catch (IOException e) {
 			System.err.println("SMT refuses input.");
 			
-			throw e;
+			throw new SMTException(e);
 		} finally {
 			if (in != null) {
-				in.close();
+				try {
+					in.close();
+				} catch (IOException e) {
+					throw new SMTException(e);
+				}
 			}
 		}
 
 		try {
 			while ((output = out.readLine()) != null) {
+				if (!output.matches("^(un)?sat$")) {
+					throw new SMTException("SMT replied with '" + output + "'");
+				}
 				values.add(output.matches("^unsat$"));
 			}
 		} catch (IOException e) {
 			System.err.println("SMT refuses to provide output.");
 			
-			throw e;
+			throw new SMTException(e);
 		} finally {
 			if (out != null) {
-				out.close();
+				try {
+					out.close();
+				} catch (IOException e) {
+					throw new SMTException(e);
+				}
 			}
 		}
 		
@@ -123,7 +134,7 @@ public class SMT {
 		}
 		
 		for (String field : fields) {
-			input += "(declare-fun " + field + " (Int) Int)" + SEPARATOR;
+			input += "(declare-fun " + field + " () (Array Int Int))" + SEPARATOR;
 		}
 
 		for (Predicate predicate : predicates.keySet()) {
@@ -194,7 +205,7 @@ public class SMT {
 		return stringifier.getString();
 	}
 	
-	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateDeterminant> predicates) throws IOException {
+	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateDeterminant> predicates) throws SMTException {
 		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 		
 		String input = prepareInput(predicates);
