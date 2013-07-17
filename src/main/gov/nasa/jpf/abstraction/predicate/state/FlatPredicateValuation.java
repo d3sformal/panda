@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class FlatPredicateValuation implements PredicateValuation, Scope {
 	private HashMap<Predicate, TruthValue> valuations = new HashMap<Predicate, TruthValue>();
@@ -71,28 +72,30 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	}
 
 	@Override
-	public void reevaluate(AccessPath path, Expression expression) {
+	public void reevaluate(AccessPath affected, Set<AccessPath> resolvedAffected, Expression expression) {
 		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
 
-		if (path == null) return;
+		if (affected == null) return;
 
 		System.err.println("SMT: ");
 		
 		System.err.println("\tREACTION TO:");
-		System.err.println("\t\t" + path.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+		System.err.println("\t\t" + affected.toString(AccessPath.NotationPolicy.DOT_NOTATION));
 		
 		System.err.println("\tAFFECTS:");
 		for (Predicate predicate : valuations.keySet()) {
-			boolean affects = predicate.getPaths().contains(path);
+			boolean affects = false;
+			
+			for (AccessPath path : resolvedAffected) {
+				affects = affects || predicate.getPaths().contains(path);
+			}
 			
 			Predicate positiveWeakestPrecondition = predicate;
 			Predicate negativeWeakestPrecondition = new Negation(predicate);
-
-			affects = predicate.getPaths().contains(path);
 				
 			if (expression != null) {
-				positiveWeakestPrecondition = new UpdatedPredicate(positiveWeakestPrecondition, path, expression);
-				negativeWeakestPrecondition = new UpdatedPredicate(negativeWeakestPrecondition, path, expression);
+				positiveWeakestPrecondition = new UpdatedPredicate(positiveWeakestPrecondition, affected, expression);
+				negativeWeakestPrecondition = new UpdatedPredicate(negativeWeakestPrecondition, affected, expression);
 			}
 
 			if (affects) {

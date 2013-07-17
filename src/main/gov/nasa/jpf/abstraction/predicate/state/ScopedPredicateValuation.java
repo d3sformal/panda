@@ -106,8 +106,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 
 	@Override
-	public void reevaluate(AccessPath affected, Expression expression) {
-		scopes.lastElement().reevaluate(affected, expression);
+	public void reevaluate(AccessPath affected, Set<AccessPath> resolvedAffected, Expression expression) {
+		scopes.lastElement().reevaluate(affected, resolvedAffected, expression);
 	}
 	
 	@Override

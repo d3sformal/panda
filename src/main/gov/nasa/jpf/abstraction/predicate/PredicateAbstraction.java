@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate;
 
 import java.util.Map;
+import java.util.Set;
 
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.AccessPath;
@@ -42,9 +43,9 @@ public class PredicateAbstraction extends Abstraction {
 			fromPath = (ConcretePath) from;
 		}
 		
-		symbolTable.processStore(fromPath, to);
+		Set<AccessPath> resolvedAffected = symbolTable.processStore(fromPath, to);
 
-		predicateValuation.reevaluate(to, from);
+		predicateValuation.reevaluate(to, resolvedAffected, from);
 	}
 	
 	@Override
