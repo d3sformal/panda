@@ -8,6 +8,8 @@ import gov.nasa.jpf.abstraction.common.impl.PredicatesFunctionStringifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AccessPath extends Expression implements Cloneable {
 	public static enum NotationPolicy {
@@ -38,12 +40,25 @@ public class AccessPath extends Expression implements Cloneable {
 		return new DefaultAccessPathRootElement(name);
 	}
 	
+	protected void initialise(String name) {
+		String[] packageLocation = name.split("\\.");
+				
+		root = createRootElement(packageLocation[0]);
+		tail = root;
+		
+		for (int i = 1; i < packageLocation.length; ++i) {
+			appendSubElement(packageLocation[i]);
+		}
+	}
+	
 	protected AccessPath() {
 	}
 	
 	public AccessPath(String name) {
 		root = createRootElement(name);
 		tail = root;
+		
+		initialise(name);
 	}
 	
 	public AccessPathRootElement getRoot() {

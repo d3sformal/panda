@@ -32,8 +32,7 @@ public class ConcretePath extends AccessPath {
 		this.type = type;
 		this.ti = ti;
 		
-		root = createRootElement(name);
-		tail = root;
+		initialise(name);
 	}
 	
 	@Override
