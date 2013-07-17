@@ -3,8 +3,11 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
+import gov.nasa.jpf.abstraction.predicate.common.MethodContext;
+import gov.nasa.jpf.abstraction.predicate.common.ObjectContext;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
+import gov.nasa.jpf.vm.MethodInfo;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -20,10 +23,26 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public FlatPredicateValuation createDefaultScope() {
+	public FlatPredicateValuation createDefaultScope(MethodInfo method) {
 		FlatPredicateValuation valuation = new FlatPredicateValuation();
 		
+		if (method == null) return valuation;
+
 		for (Context context : predicateSet.contexts) {
+			if (context instanceof MethodContext) {
+				MethodContext methodContext = (MethodContext) context;
+
+				if (!methodContext.getMethod().toString(AccessPath.NotationPolicy.DOT_NOTATION).equals(method.getBaseName())) {
+					continue;
+				}
+			} else if (context instanceof ObjectContext) {
+				ObjectContext objectContext = (ObjectContext) context;
+				
+				if (!objectContext.getObject().toString(AccessPath.NotationPolicy.DOT_NOTATION).equals(method.getClassName())) {
+					continue;
+				}
+			}
+
 			for (Predicate predicate : context.predicates) {
 				valuation.put(predicate, TruthValue.UNDEFINED);
 			}
@@ -48,8 +67,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public void processMethodCall() {
-		scopes.push(createDefaultScope());
+	public void processMethodCall(MethodInfo method) {
+		scopes.push(createDefaultScope(method));
 	}
 
 	@Override

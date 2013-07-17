@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.AccessPath;
@@ -15,10 +16,9 @@ import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.State;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
+import gov.nasa.jpf.vm.MethodInfo;
 
 public class PredicateAbstraction extends Abstraction {
-	// SYMBOLS DO NOT DEPEND ON ABSTRACTION AND DO NOT NEED TO BE MANAGED SEPARATELY
-	// FOR ALL INSTANCES
 	private ScopedSymbolTable symbolTable;
 	private ScopedPredicateValuation predicateValuation;
 	private Trace trace;
@@ -50,9 +50,9 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processMethodCall() {
-		symbolTable.processMethodCall();
-		predicateValuation.processMethodCall();
+	public void processMethodCall(MethodInfo method) {
+		symbolTable.processMethodCall(method);
+		predicateValuation.processMethodCall(method);
 	}
 	
 	@Override
@@ -70,9 +70,9 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void start() {	
-		FlatSymbolTable symbols = symbolTable.createDefaultScope();
-		FlatPredicateValuation predicates = predicateValuation.createDefaultScope();
+	public void start(MethodInfo method) {	
+		FlatSymbolTable symbols = symbolTable.createDefaultScope(method);
+		FlatPredicateValuation predicates = predicateValuation.createDefaultScope(method);
 		
 		State state = new State(symbols, predicates);
 		
@@ -83,11 +83,11 @@ public class PredicateAbstraction extends Abstraction {
 	}
 
 	@Override
-	public void forward() {
+	public void forward(MethodInfo method) {
 		System.err.println("Trace++");
 		
-		FlatSymbolTable symbols = symbolTable.createDefaultScope();
-		FlatPredicateValuation predicates = predicateValuation.createDefaultScope();
+		FlatSymbolTable symbols = symbolTable.createDefaultScope(method);
+		FlatPredicateValuation predicates = predicateValuation.createDefaultScope(method);
 		
 		State state = new State(symbols, predicates);
 		

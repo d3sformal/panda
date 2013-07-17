@@ -39,7 +39,7 @@ public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
 			return actualNextInsn;
 		} 
 		
-		AbstractInstructionFactory.abs.processMethodCall();
+		AbstractInstructionFactory.abs.processMethodCall(ti.getTopFrameMethodInfo());
 
 		return actualNextInsn;
 	}

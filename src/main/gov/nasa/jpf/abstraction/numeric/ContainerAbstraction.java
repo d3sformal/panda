@@ -25,6 +25,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.util.Pair;
+import gov.nasa.jpf.vm.MethodInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,9 +90,9 @@ public class ContainerAbstraction extends Abstraction {
     }
     
     @Override
-    public void processMethodCall() {
+    public void processMethodCall(MethodInfo method) {
     	for (Abstraction abs : list) {
-    		abs.processMethodCall();
+    		abs.processMethodCall(method);
     	}
 	}
 	
@@ -179,9 +180,16 @@ public class ContainerAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void forward() {
+	public void start(MethodInfo method) {
 		for (Abstraction abs : list) {
-			abs.forward();
+			abs.start(method);
+		}
+	}
+	
+	@Override
+	public void forward(MethodInfo method) {
+		for (Abstraction abs : list) {
+			abs.forward(method);
 		}
 	}
 	

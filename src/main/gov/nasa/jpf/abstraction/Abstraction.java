@@ -26,6 +26,7 @@ import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.vm.MethodInfo;
 
 /**
  * Common root class for numeric abstractions.
@@ -56,10 +57,10 @@ public abstract class Abstraction {
 		throw new RuntimeException("abstract_map not implemented");
 	}
 	
-	public void start() {
+	public void start(MethodInfo method) {
 	}
 	
-	public void forward() {
+	public void forward(MethodInfo method) {
 	}
 	
 	public void backtrack() {
@@ -71,7 +72,7 @@ public abstract class Abstraction {
 	public void processStore(Expression from, ConcretePath to) {
 	}
 	
-	public void processMethodCall() {
+	public void processMethodCall(MethodInfo method) {
 	}
 	
 	public void processMethodReturn() {

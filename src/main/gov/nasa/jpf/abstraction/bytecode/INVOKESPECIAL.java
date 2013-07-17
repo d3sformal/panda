@@ -39,7 +39,7 @@ public class INVOKESPECIAL extends gov.nasa.jpf.jvm.bytecode.INVOKESPECIAL {
 			return actualNextInsn;
 		}
 		
-		AbstractInstructionFactory.abs.processMethodCall();
+		AbstractInstructionFactory.abs.processMethodCall(ti.getTopFrameMethodInfo());
 
 		return actualNextInsn;
 	}

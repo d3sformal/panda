@@ -39,7 +39,7 @@ public class INVOKEVIRTUAL extends gov.nasa.jpf.jvm.bytecode.INVOKEVIRTUAL {
 			return actualNextInsn;
 		}  
 		
-		AbstractInstructionFactory.abs.processMethodCall();
+		AbstractInstructionFactory.abs.processMethodCall(ti.getTopFrameMethodInfo());
 
 		return actualNextInsn;
 	}

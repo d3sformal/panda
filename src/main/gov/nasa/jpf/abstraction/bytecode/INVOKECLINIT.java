@@ -40,7 +40,7 @@ public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
 			return actualNextInsn;
 		}
 		
-		AbstractInstructionFactory.abs.processMethodCall();
+		AbstractInstructionFactory.abs.processMethodCall(ti.getTopFrameMethodInfo());
 
 		return actualNextInsn;
 	}

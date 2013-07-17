@@ -3,6 +3,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.vm.MethodInfo;
 
 import java.util.Set;
 import java.util.Stack;
@@ -11,7 +12,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	private Stack<FlatSymbolTable> scopes = new Stack<FlatSymbolTable>();
 	
 	@Override
-	public FlatSymbolTable createDefaultScope() {
+	public FlatSymbolTable createDefaultScope(MethodInfo method) {
 		return new FlatSymbolTable();
 	}
 
@@ -41,8 +42,8 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public void processMethodCall() {
-		scopes.push(createDefaultScope());
+	public void processMethodCall(MethodInfo method) {
+		scopes.push(createDefaultScope(method));
 	}
 	
 	@Override

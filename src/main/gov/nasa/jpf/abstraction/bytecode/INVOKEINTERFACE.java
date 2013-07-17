@@ -39,7 +39,7 @@ public class INVOKEINTERFACE extends gov.nasa.jpf.jvm.bytecode.INVOKEINTERFACE {
 			return actualNextInsn;
 		}
 		
-		AbstractInstructionFactory.abs.processMethodCall();
+		AbstractInstructionFactory.abs.processMethodCall(ti.getTopFrameMethodInfo());
 
 		return actualNextInsn;
 	}
