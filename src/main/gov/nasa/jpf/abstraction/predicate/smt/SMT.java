@@ -190,7 +190,7 @@ public class SMT {
 		formula = new Implication(formula, weakestPrecondition);
 		
 		formula.accept(stringifier);
-		
+				
 		return stringifier.getString();
 	}
 	

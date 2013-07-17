@@ -58,11 +58,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 		
 		AbstractValue abs_v = attr.getAbstractValue();
 		
-		Expression expression = attr.getExpression();
-
-		if (expression == null) expression = new ConcretePath(sf.getLocalVarInfo(index).getName(), ti, var, ConcretePath.Type.LOCAL);
-
-		expression = new Add(expression, new Constant(increment));
+		Expression expression = new Add(new ConcretePath(sf.getLocalVarInfo(index).getName(), ti, var, ConcretePath.Type.LOCAL), new Constant(increment));
 		
 		if (abs_v == null) {
 			Attribute result = new NonEmptyAttribute(null, expression);

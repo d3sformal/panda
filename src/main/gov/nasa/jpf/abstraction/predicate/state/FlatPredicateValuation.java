@@ -10,8 +10,6 @@ import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -89,27 +87,36 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		for (Predicate predicate : valuations.keySet()) {
 			boolean affects = false;
 			
-			Predicate weakestPrecondition = predicate;
+			Predicate positiveWeakestPrecondition = predicate;
+			Predicate negativeWeakestPrecondition = new Negation(predicate);
 
 			for (AccessPath path : affected) {
 				affects = affects || predicate.getPaths().contains(path);
 				
-				//TODO cope with arrays whose ambiguity makes it not work properly
 				if (expression != null) {
-					weakestPrecondition = weakestPrecondition.replace(path, expression);
+					//TODO cope with all the precondition constructions
+					positiveWeakestPrecondition = positiveWeakestPrecondition.replace(path, expression);
+					negativeWeakestPrecondition = negativeWeakestPrecondition.replace(path, expression);
 				}
 			}
 			
 			if (affects) {
 				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 				
-				for (Predicate determinant : weakestPrecondition.determinantClosure(valuations.keySet())) {
+				for (Predicate determinant : positiveWeakestPrecondition.determinantClosure(valuations.keySet())) {
+					determinants.put(determinant, valuations.get(determinant));
+				}
+				for (Predicate determinant : negativeWeakestPrecondition.determinantClosure(valuations.keySet())) {
 					determinants.put(determinant, valuations.get(determinant));
 				}
 				
-				predicates.put(predicate, new PredicateDeterminant(weakestPrecondition, new Negation(weakestPrecondition), determinants));
+				predicates.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
 
-				System.err.println("\t\t" + predicate + " [" + weakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION) + "]");
+				System.err.print("\t\t" + predicate + " [" + positiveWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION) + ", " + negativeWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION) + "] [");
+				for (Predicate det : determinants.keySet()) {
+					System.err.print(det.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " :: " + determinants.get(det) + "; ");
+				}
+				System.err.println("]");
 			}
 		}
 		

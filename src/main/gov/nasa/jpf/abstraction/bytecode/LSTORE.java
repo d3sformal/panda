@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
@@ -25,12 +26,9 @@ public class LSTORE extends gov.nasa.jpf.jvm.bytecode.LSTORE {
 
 		Instruction actualNextInsn = super.execute(ti);
         
-		ConcretePath from = null;
+		Expression from = source.getExpression();
 		ConcretePath to = null;
 		
-		if (source.getExpression() instanceof ConcretePath) {
-			from = (ConcretePath) source.getExpression();
-		}
 		if (var != null) {
 			to = new ConcretePath(getLocalVariableName(), ti, var, ConcretePath.Type.LOCAL);
 		}
