@@ -8,6 +8,9 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
 public class EmptyExpression extends Expression {
+	
+	protected EmptyExpression() {
+	}
 
 	@Override
 	public List<AccessPath> getPaths() {
@@ -22,6 +25,15 @@ public class EmptyExpression extends Expression {
 	@Override
 	public Expression replace(AccessPath formerPath, Expression expression) {
 		return this;
+	}
+	
+	public static EmptyExpression create() {
+		return new EmptyExpression();
+	}
+	
+	@Override
+	public EmptyExpression clone() {
+		return create();
 	}
 
 }

@@ -43,13 +43,18 @@ public class FloatUnaryOperatorExecutor extends UnaryOperatorExecutor<Float> {
 	final protected Float getOperand(StackFrame sf) {
 		return sf.peekFloat(0);
 	}
+	
+	@Override
+	final protected void storeAttribute(Attribute result, StackFrame sf) {
+		sf.setOperandAttr(result);
+	}
 
 	@Override
 	final protected void storeResult(Attribute result, StackFrame sf) {
 		sf.popFloat();
 		
 		sf.pushFloat(0);
-		sf.setOperandAttr(result);
+		storeAttribute(result, sf);
 	}
 
 }

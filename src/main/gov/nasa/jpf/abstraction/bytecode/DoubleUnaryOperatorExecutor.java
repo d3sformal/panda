@@ -43,13 +43,18 @@ public class DoubleUnaryOperatorExecutor extends UnaryOperatorExecutor<Double> {
 	final protected Double getOperand(StackFrame sf) {
 		return sf.peekDouble(0);
 	}
+	
+	@Override
+	final protected void storeAttribute(Attribute result, StackFrame sf) {
+		sf.setLongOperandAttr(result);
+	}
 
 	@Override
 	final protected void storeResult(Attribute result, StackFrame sf) {
 		sf.popDouble();
 		
 		sf.pushDouble(0);
-		sf.setLongOperandAttr(result);
+		storeAttribute(result, sf);
 	}
 
 }

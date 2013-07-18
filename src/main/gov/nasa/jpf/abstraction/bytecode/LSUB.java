@@ -54,7 +54,7 @@ public class LSUB extends gov.nasa.jpf.jvm.bytecode.LSUB implements AbstractBina
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new NonEmptyAttribute(Abstraction._sub(v1, abs_v1, v2, abs_v2), new Subtract(expr1, expr2));
+		return new NonEmptyAttribute(Abstraction._sub(v1, abs_v1, v2, abs_v2), Subtract.create(expr1, expr2));
 	}
 
 	@Override

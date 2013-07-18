@@ -6,12 +6,12 @@ import java.util.Map;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathIndexElement;
 import gov.nasa.jpf.abstraction.concrete.ArrayElementID;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePathElement;
 import gov.nasa.jpf.abstraction.concrete.ConcretePathIndexElement;
-import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
 import gov.nasa.jpf.vm.ElementInfo;
@@ -19,8 +19,8 @@ import gov.nasa.jpf.vm.ThreadInfo;
 
 public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexElement implements ConcretePathIndexElement {
 	
-	public DefaultConcretePathIndexElement() {
-		super(new EmptyExpression());
+	public DefaultConcretePathIndexElement(Expression index) {
+		super(index);
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexEleme
 				for (int i = 0; i < ei.getArrayFields().arrayLength(); ++i) {
 					AccessPath clone = path.clone();
 					
-					clone.appendIndexElement(new Constant(i));
+					clone.appendIndexElement(Constant.create(i));
 
 					if (ei.getClassInfo().isReferenceArray()) {
 						ElementInfo info = ti.getElementInfo(ei.getArrayFields().getReferenceValue(i));
@@ -70,7 +70,7 @@ public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexEleme
 	
 	@Override
 	public DefaultConcretePathIndexElement clone() {
-		DefaultConcretePathIndexElement clone = new DefaultConcretePathIndexElement();
+		DefaultConcretePathIndexElement clone = new DefaultConcretePathIndexElement(getIndex().clone());
 		
 		if (getNext() != null) {
 			clone.setNext(getNext().clone());

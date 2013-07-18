@@ -6,19 +6,7 @@ import java.util.List;
 public class Constant extends Expression {
 	public Number value;
 	
-	public Constant(int value) {
-		this.value = value;
-	}
-	
-	public Constant(float value) {
-		this.value = value;
-	}
-	
-	public Constant(long value) {
-		this.value = value;
-	}
-	
-	public Constant(double value) {
+	protected Constant(Number value) {
 		this.value = value;
 	}
 
@@ -38,7 +26,28 @@ public class Constant extends Expression {
 	}
 
 	@Override
-	public Expression replace(AccessPath formerPath, Expression expression) {
+	public Constant replace(AccessPath formerPath, Expression expression) {
 		return this;
+	}
+	
+	public static Constant create(int value) {
+		return new Constant(value);
+	}
+	
+	public static Constant create(float value) {
+		return new Constant(value);
+	}
+	
+	public static Constant create(long value) {
+		return new Constant(value);
+	}
+	
+	public static Constant create(double value) {
+		return new Constant(value);
+	}
+	
+	@Override
+	public Constant clone() {
+		return new Constant(value);
 	}
 }

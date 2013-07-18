@@ -26,10 +26,10 @@ public class LDC2_W extends gov.nasa.jpf.jvm.bytecode.LDC2_W {
 		
 		switch (getType()) {
 		case LONG:
-			expression = new Constant(getValue());
+			expression = Constant.create(getValue());
 			break;
 		case DOUBLE:
-			expression = new Constant(getDoubleValue());
+			expression = Constant.create(getDoubleValue());
 			break;
 		default:
 			expression = null;

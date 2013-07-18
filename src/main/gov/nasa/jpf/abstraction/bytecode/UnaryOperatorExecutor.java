@@ -44,14 +44,18 @@ public abstract class UnaryOperatorExecutor<T> {
 		if (attr == null) attr = new EmptyAttribute();
 		
 		abs_v = attr.getAbstractValue();
-
-		if (abs_v == null) {
-			return op.executeConcrete(ti);
-		}
-
+		
 		T v = getOperand(sf);
 
 		Attribute result = op.getResult(v, attr);
+
+		if (abs_v == null) {
+			Instruction ret = op.executeConcrete(ti);
+			
+			storeAttribute(result, sf);
+			
+			return ret;
+		}
 
 		System.out.printf("%s> Values: %s (%s)\n", name, v.toString(), abs_v);
 
@@ -85,5 +89,6 @@ public abstract class UnaryOperatorExecutor<T> {
 	
 	abstract protected Attribute getAttribute(StackFrame sf);
 	abstract protected T getOperand(StackFrame sf);
+	abstract protected void storeAttribute(Attribute result, StackFrame sf);
 	abstract protected void storeResult(Attribute result, StackFrame sf);
 }

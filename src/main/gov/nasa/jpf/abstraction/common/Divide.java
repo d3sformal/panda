@@ -2,7 +2,7 @@ package gov.nasa.jpf.abstraction.common;
 
 
 public class Divide extends Operation {
-	public Divide(Expression a, Expression b) {
+	protected Divide(Expression a, Expression b) {
 		super(a, b);
 	}
 
@@ -14,5 +14,16 @@ public class Divide extends Operation {
 	@Override
 	public Divide replace(AccessPath formerPath, Expression expression) {
 		return new Divide(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	}
+	
+	public static Divide create(Expression a, Expression b) {
+		if (!argumentsDefined(a, b)) return null;
+		
+		return new Divide(a, b);
+	}
+	
+	@Override
+	public Divide clone() {
+		return create(a.clone(), b.clone());
 	}
 }

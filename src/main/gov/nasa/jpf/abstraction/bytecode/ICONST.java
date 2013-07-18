@@ -17,7 +17,7 @@ public class ICONST extends gov.nasa.jpf.jvm.bytecode.ICONST {
 		Instruction ret = super.execute(ti);
 		
 		StackFrame sf = ti.getModifiableTopFrame();
-		sf.setOperandAttr(new NonEmptyAttribute(null, new Constant(getValue())));
+		sf.setOperandAttr(new NonEmptyAttribute(null, Constant.create(getValue())));
 		
 		return ret;
 	}

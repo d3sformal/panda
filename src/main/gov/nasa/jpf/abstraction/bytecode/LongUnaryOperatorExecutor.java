@@ -42,13 +42,18 @@ public class LongUnaryOperatorExecutor extends UnaryOperatorExecutor<Long> {
 	protected Long getOperand(StackFrame sf) {
 		return sf.peekLong(0);
 	}
+	
+	@Override
+	final protected void storeAttribute(Attribute result, StackFrame sf) {
+		sf.setLongOperandAttr(result);
+	}
 
 	@Override
 	protected void storeResult(Attribute result, StackFrame sf) {
 		sf.popLong();
 		
 		sf.pushLong(0);
-		sf.setLongOperandAttr(result);
+		storeAttribute(result, sf);
 	}
 
 }

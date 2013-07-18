@@ -30,10 +30,10 @@ public class LDC_W extends gov.nasa.jpf.jvm.bytecode.LDC_W {
 		
 		switch (getType()) {
 		case INT:
-			expression = new Constant(getValue());
+			expression = Constant.create(getValue());
 			break;
 		case FLOAT:
-			expression = new Constant(getFloatValue());
+			expression = Constant.create(getFloatValue());
 			break;
 		default:
 			expression = null;

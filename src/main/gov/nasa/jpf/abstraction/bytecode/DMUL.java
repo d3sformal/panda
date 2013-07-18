@@ -54,7 +54,7 @@ public class DMUL extends gov.nasa.jpf.jvm.bytecode.DMUL implements AbstractBina
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new NonEmptyAttribute(Abstraction._mul(v1, abs_v1, v2, abs_v2), new Multiply(expr1, expr2));
+		return new NonEmptyAttribute(Abstraction._mul(v1, abs_v1, v2, abs_v2), Multiply.create(expr1, expr2));
 	}
 
 	@Override

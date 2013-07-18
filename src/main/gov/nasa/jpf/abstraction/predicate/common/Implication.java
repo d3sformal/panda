@@ -8,8 +8,8 @@ public class Implication extends Disjunction {
 	public Predicate a;
 	public Predicate b;
 
-	public Implication(Predicate a, Predicate b) {
-		super(new Negation(a), b);
+	protected Implication(Predicate a, Predicate b) {
+		super(Negation.create(a), b);
 		
 		this.a = a;
 		this.b = b;
@@ -18,6 +18,19 @@ public class Implication extends Disjunction {
 	@Override
 	public void accept(PredicatesVisitor visitor) {
 		visitor.visit(this);
+	}
+	
+	public static Predicate create(Predicate a, Predicate b) {
+		if (!argumentsDefined(a, b)) return null;
+		
+		if (a instanceof Tautology) {
+			return b;
+		}
+		if (a instanceof Contradiction) {
+			return Tautology.create();
+		}
+		
+		return new Implication(a, b);
 	}
 
 }

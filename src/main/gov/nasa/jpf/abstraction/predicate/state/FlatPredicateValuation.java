@@ -115,11 +115,11 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			}
 			
 			Predicate positiveWeakestPrecondition = predicate;
-			Predicate negativeWeakestPrecondition = new Negation(predicate);
+			Predicate negativeWeakestPrecondition = Negation.create(predicate);
 				
 			if (expression != null) {
-				positiveWeakestPrecondition = new UpdatedPredicate(positiveWeakestPrecondition, affected, expression);
-				negativeWeakestPrecondition = new UpdatedPredicate(negativeWeakestPrecondition, affected, expression);
+				positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
+				negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
 			}
 
 			if (affects) {

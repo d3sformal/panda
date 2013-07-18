@@ -54,6 +54,10 @@ public class LongComparatorExecutor extends BinaryOperatorExecutor<Long> {
 	final protected Long getRightOperand(StackFrame sf) {
 		return sf.peekLong(2);
 	}
+	
+	@Override
+	protected void storeAttribute(Attribute result, StackFrame sf) {
+	}
 
 	@Override
 	final protected void storeResult(Attribute result, StackFrame sf) {

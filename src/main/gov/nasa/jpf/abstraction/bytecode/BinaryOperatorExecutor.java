@@ -48,15 +48,19 @@ public abstract class BinaryOperatorExecutor<T> {
 
 		abs_v1 = attr1.getAbstractValue();
 		abs_v2 = attr2.getAbstractValue();
-
-		if (abs_v1 == null && abs_v2 == null) {
-			return op.executeConcrete(ti);
-		}
-
+		
 		T v1 = getLeftOperand(sf);
 		T v2 = getRightOperand(sf);
 
 		Attribute result = op.getResult(v1, attr1, v2, attr2);
+
+		if (abs_v1 == null && abs_v2 == null) {
+			Instruction ret = op.executeConcrete(ti);
+			
+			storeAttribute(result, sf);
+			
+			return ret;
+		}
 
 		System.out.printf("%s> Values: %s (%s), %s (%s)\n", name, v2.toString(), abs_v2, v1.toString(), abs_v1);
 
@@ -92,5 +96,6 @@ public abstract class BinaryOperatorExecutor<T> {
 	abstract protected Attribute getRightAttribute(StackFrame sf);
 	abstract protected T getLeftOperand(StackFrame sf);
 	abstract protected T getRightOperand(StackFrame sf);
+	abstract protected void storeAttribute(Attribute result, StackFrame sf);
 	abstract protected void storeResult(Attribute result, StackFrame sf);
 }

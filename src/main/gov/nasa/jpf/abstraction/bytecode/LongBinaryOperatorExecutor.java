@@ -52,6 +52,11 @@ public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
 	protected Long getRightOperand(StackFrame sf) {
 		return sf.peekLong(2);
 	}
+	
+	@Override
+	final protected void storeAttribute(Attribute result, StackFrame sf) {
+		sf.setLongOperandAttr(result);
+	}
 
 	@Override
 	protected void storeResult(Attribute result, StackFrame sf) {
@@ -59,7 +64,7 @@ public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
 		sf.popLong();
 		
 		sf.pushLong(0);
-		sf.setLongOperandAttr(result);
+		storeAttribute(result, sf);
 	}
 
 }

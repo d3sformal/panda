@@ -17,8 +17,7 @@ public class BIPUSH extends gov.nasa.jpf.jvm.bytecode.BIPUSH {
 		Instruction ret = super.execute(ti);
 		
 		StackFrame sf = ti.getModifiableTopFrame();
-		System.err.println(">>>>>>>>>>>> CONST: " + getValue());
-		sf.setOperandAttr(new NonEmptyAttribute(null, new Constant(getValue())));
+		sf.setOperandAttr(new NonEmptyAttribute(null, Constant.create(getValue())));
 		
 		return ret;
 	}

@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Tautology extends Predicate {
+	
+	protected Tautology() {
+	}
 
 	@Override
 	public void accept(PredicatesVisitor visitor) {
@@ -22,6 +25,10 @@ public class Tautology extends Predicate {
 	@Override
 	public Predicate replace(AccessPath formerPath, Expression expression) {
 		return this;
+	}
+	
+	public static Predicate create() {
+		return new Tautology();
 	}
 
 }

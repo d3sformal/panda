@@ -5,7 +5,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
 public class Equals extends Comparison {
-	public Equals(Expression a, Expression b) {
+	protected Equals(Expression a, Expression b) {
 		super(a, b);
 	}
 
@@ -17,5 +17,11 @@ public class Equals extends Comparison {
 	@Override
 	public Equals replace(AccessPath formerPath, Expression expression) {
 		return new Equals(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	}
+	
+	public static Predicate create(Expression a, Expression b) {
+		if (!argumentsDefined(a, b)) return null;
+		
+		return new Equals(a, b);
 	}
 }

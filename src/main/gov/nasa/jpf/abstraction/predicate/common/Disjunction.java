@@ -4,16 +4,9 @@ import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Disjunction extends Predicate {
-	public Predicate a;
-	public Predicate b;
-	
-	public Disjunction(Predicate a, Predicate b) {
-		this.a = a;
-		this.b = b;
+public class Disjunction extends Junction {
+	protected Disjunction(Predicate a, Predicate b) {
+		super(a, b);
 	}
 
 	@Override
@@ -22,13 +15,27 @@ public class Disjunction extends Predicate {
 	}
 
 	@Override
-	public List<AccessPath> getPaths() {
-		return new ArrayList<AccessPath>();
-	}
-
-	@Override
 	public Predicate replace(AccessPath formerPath, Expression expression) {
-		return new Conjunction(a.replace(formerPath, expression), b.replace(formerPath, expression));
+		return create(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	}
+	
+	public static Predicate create(Predicate a, Predicate b) {
+		if (!argumentsDefined(a, b)) return null;
+		
+		if (a instanceof Tautology) {
+			return Tautology.create();
+		}
+		if (b instanceof Tautology) {
+			return Tautology.create();
+		}
+		if (a instanceof Contradiction) {
+			return b;
+		}
+		if (b instanceof Contradiction) {
+			return a;
+		}
+
+		return new Conjunction(a, b);
 	}
 
 }

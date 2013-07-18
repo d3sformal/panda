@@ -54,6 +54,10 @@ public class FloatComparatorExecutor extends BinaryOperatorExecutor<Float> {
 	final protected Float getRightOperand(StackFrame sf) {
 		return sf.peekFloat(1);
 	}
+	
+	@Override
+	protected void storeAttribute(Attribute result, StackFrame sf) {
+	}
 
 	@Override
 	final protected void storeResult(Attribute result, StackFrame sf) {

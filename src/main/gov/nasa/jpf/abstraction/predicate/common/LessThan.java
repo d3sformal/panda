@@ -5,7 +5,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
 public class LessThan extends Comparison {
-	public LessThan(Expression a, Expression b) {
+	protected LessThan(Expression a, Expression b) {
 		super(a, b);
 	}
 	
@@ -17,5 +17,11 @@ public class LessThan extends Comparison {
 	@Override
 	public LessThan replace(AccessPath formerPath, Expression expression) {
 		return new LessThan(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	}
+	
+	public static Predicate create(Expression a, Expression b) {
+		if (!argumentsDefined(a, b)) return null;
+		
+		return new LessThan(a, b);
 	}
 }

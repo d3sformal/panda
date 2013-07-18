@@ -45,31 +45,31 @@ predicatelist returns [List<Predicate> val]
 
 predicate returns [Predicate val]
 	: 'true' {
-		$ctx.val = new Equals(new Constant(1), new Constant(1));
+		$ctx.val = Tautology.create();
 	}
 	| 'false' {
-		$ctx.val = new Equals(new Constant(0), new Constant(1));
+		$ctx.val = Contradiction.create();
 	}
 	| 'not' '(' p=predicate ')' {
-		$ctx.val = new Negation($p.val);
+		$ctx.val = Negation.create($p.val);
 	}
 	| a=expression '=' b=expression {
-		$ctx.val = new Equals($a.val, $b.val);
+		$ctx.val = Equals.create($a.val, $b.val);
 	}
 	| a=expression '<' b=expression {
-		$ctx.val = new LessThan($a.val, $b.val);
+		$ctx.val = LessThan.create($a.val, $b.val);
 	}
 	| a=expression '>' b=expression {
-		$ctx.val = new LessThan($b.val, $a.val);
+		$ctx.val = LessThan.create($b.val, $a.val);
 	}
 	| a=expression '<=' b=expression {
-		$ctx.val = new Negation(new LessThan($b.val, $a.val));
+		$ctx.val = Negation.create(LessThan.create($b.val, $a.val));
 	}
 	| a=expression '>=' b=expression {
-		$ctx.val = new Negation(new LessThan($a.val, $b.val));
+		$ctx.val = Negation.create(LessThan.create($a.val, $b.val));
 	}
 	| a=expression '!=' b=expression {
-		$ctx.val = new Negation(new Equals($a.val, $b.val));
+		$ctx.val = Negation.create(Equals.create($a.val, $b.val));
 	}
 	;
 
@@ -78,10 +78,10 @@ expression returns [Expression val]
 		$ctx.val = $t.val;
 	}
 	| a=term '+' b=term {
-		$ctx.val = new Add($a.val, $b.val);
+		$ctx.val = Add.create($a.val, $b.val);
 	}
 	| a=term '-' b=term {
-		$ctx.val = new Subtract($a.val, $b.val);
+		$ctx.val = Subtract.create($a.val, $b.val);
 	}
 	;
 
@@ -90,16 +90,16 @@ term returns [Expression val]
 		$ctx.val = $f.val;
 	}
 	| a=factor '*' b=factor {
-		$ctx.val = new Multiply($ctx.a.val, $ctx.b.val);
+		$ctx.val = Multiply.create($ctx.a.val, $ctx.b.val);
 	}
 	| a=factor '/' b=factor {
-		$ctx.val = new Divide($ctx.a.val, $ctx.b.val);
+		$ctx.val = Divide.create($ctx.a.val, $ctx.b.val);
 	}
 	;
 
 factor returns [Expression val]
 	: CONSTANT {
-		$ctx.val = new Constant(Integer.parseInt($CONSTANT.text));
+		$ctx.val = Constant.create(Integer.parseInt($CONSTANT.text));
 	}
 	| p=path {
 		$ctx.val = $p.val;

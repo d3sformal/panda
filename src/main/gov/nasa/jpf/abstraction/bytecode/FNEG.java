@@ -21,6 +21,9 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Subtract;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -45,11 +48,12 @@ public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG implements AbstractUnar
 	@Override
 	public Attribute getResult(Float v, Attribute attr) {
 		AbstractValue abs_v = attr.getAbstractValue();
+		Expression expr = attr.getExpression();
 		
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new NonEmptyAttribute(Abstraction._neg(abs_v), null);
+		return new NonEmptyAttribute(Abstraction._neg(abs_v), Subtract.create(Constant.create(0), expr));
 	}
 
 	@Override

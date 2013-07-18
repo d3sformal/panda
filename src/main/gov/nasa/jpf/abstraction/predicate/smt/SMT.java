@@ -180,15 +180,15 @@ public class SMT {
 	private static String createFormula(Predicate weakestPrecondition, Map<Predicate, TruthValue> determinants) {
 		PredicatesSMTStringifier stringifier = new PredicatesSMTStringifier();
 
-		Predicate formula = new Tautology();
+		Predicate formula = Tautology.create();
 		
 		for (Predicate predicate : determinants.keySet()) {		
 			switch (determinants.get(predicate)) {
 			case TRUE:
-				formula = new Conjunction(formula, predicate);
+				formula = Conjunction.create(formula, predicate);
 				break;
 			case FALSE:
-				formula = new Conjunction(formula, new Negation(predicate));
+				formula = Conjunction.create(formula, Negation.create(predicate));
 				break;
 			default:
 				/**
@@ -199,7 +199,7 @@ public class SMT {
 			}
 		}
 		
-		formula = new Implication(formula, weakestPrecondition);
+		formula = Implication.create(formula, weakestPrecondition);
 		
 		formula.accept(stringifier);
 				

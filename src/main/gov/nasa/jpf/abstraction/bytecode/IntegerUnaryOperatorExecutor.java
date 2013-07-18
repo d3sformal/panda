@@ -43,13 +43,18 @@ public class IntegerUnaryOperatorExecutor extends UnaryOperatorExecutor<Integer>
 	final protected Integer getOperand(StackFrame sf) {
 		return sf.peek(0);
 	}
+	
+	@Override
+	final protected void storeAttribute(Attribute result, StackFrame sf) {
+		sf.setOperandAttr(result);
+	}
 
 	@Override
 	final protected void storeResult(Attribute result, StackFrame sf) {
 		sf.pop();
 		
 		sf.push(0);
-		sf.setOperandAttr(result);
+		storeAttribute(result, sf);
 	}
 
 }

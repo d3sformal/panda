@@ -1,20 +1,19 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
-import gov.nasa.jpf.abstraction.common.Expression;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Comparison extends Predicate {
-	public Expression a;
-	public Expression b;
+public abstract class Junction extends Predicate {
+	public Predicate a;
+	public Predicate b;
 	
-	protected Comparison(Expression a, Expression b) {
+	protected Junction(Predicate a, Predicate b) {
 		this.a = a;
 		this.b = b;
 	}
-	
+
 	@Override
 	public List<AccessPath> getPaths() {
 		List<AccessPath> ret = new ArrayList<AccessPath>();
@@ -25,7 +24,7 @@ public abstract class Comparison extends Predicate {
 		return ret;
 	}
 	
-	protected static boolean argumentsDefined(Expression a, Expression b) {
+	public static boolean argumentsDefined(Predicate a, Predicate b) {
 		return a != null && b != null;
 	}
 }

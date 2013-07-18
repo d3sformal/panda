@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Contradiction extends Predicate {
+	
+	protected Contradiction() {
+	}
 
 	@Override
 	public void accept(PredicatesVisitor visitor) {
@@ -22,6 +25,10 @@ public class Contradiction extends Predicate {
 	@Override
 	public Predicate replace(AccessPath formerPath, Expression expression) {
 		return this;
+	}
+	
+	public static Predicate create() {
+		return new Contradiction();
 	}
 
 }

@@ -54,7 +54,7 @@ public class IDIV extends gov.nasa.jpf.jvm.bytecode.IDIV implements AbstractBina
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new NonEmptyAttribute(Abstraction._div(v1, abs_v1, v2, abs_v2), new Divide(expr1, expr2));
+		return new NonEmptyAttribute(Abstraction._div(v1, abs_v1, v2, abs_v2), Divide.create(expr1, expr2));
 	}
 
 	@Override

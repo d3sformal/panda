@@ -52,6 +52,11 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
 	protected Integer getRightOperand(StackFrame sf) {
 		return sf.peek(1);
 	}
+	
+	@Override
+	final protected void storeAttribute(Attribute result, StackFrame sf) {
+		sf.setOperandAttr(result);
+	}
 
 	@Override
 	protected void storeResult(Attribute result, StackFrame sf) {
@@ -59,7 +64,7 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
 		sf.pop();
 		
 		sf.push(0);
-		sf.setOperandAttr(result);
+		storeAttribute(result, sf);
 	}
 
 }

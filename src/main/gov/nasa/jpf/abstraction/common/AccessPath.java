@@ -9,7 +9,7 @@ import gov.nasa.jpf.abstraction.common.impl.PredicatesFunctionStringifier;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccessPath extends Expression implements Cloneable {
+public class AccessPath extends Expression {
 	public static enum NotationPolicy {
 		DOT_NOTATION,
 		FUNCTION_NOTATION

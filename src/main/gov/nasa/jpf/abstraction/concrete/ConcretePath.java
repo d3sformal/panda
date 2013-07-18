@@ -57,7 +57,11 @@ public class ConcretePath extends AccessPath {
 	
 	@Override
 	public void appendIndexElement(Expression index) {
-		appendElement(new DefaultConcretePathIndexElement());
+		if (index == null) {
+			index = EmptyExpression.create();
+		}
+		
+		appendElement(new DefaultConcretePathIndexElement(index));
 	}
 	
 	public Map<AccessPath, CompleteVariableID> resolve() {

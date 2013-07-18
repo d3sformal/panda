@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.common;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Expression implements PredicatesVisitable {
+public abstract class Expression implements PredicatesVisitable, Cloneable {
 	protected List<AccessPath> paths = new ArrayList<AccessPath>();
 	
 	public abstract List<AccessPath> getPaths();
@@ -19,4 +19,7 @@ public abstract class Expression implements PredicatesVisitable {
 		
 		return stringifier.getString();
 	}
+    
+    @Override
+    public abstract Expression clone();
 }

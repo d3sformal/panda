@@ -50,11 +50,11 @@ public class IADD extends gov.nasa.jpf.jvm.bytecode.IADD implements AbstractBina
 		AbstractValue abs_v2 = attr2.getAbstractValue();
 		Expression expr1 = attr1.getExpression();
 		Expression expr2 = attr2.getExpression();
-		
+				
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new NonEmptyAttribute(Abstraction._add(v1, abs_v1, v2, abs_v2), new Add(expr1, expr2));
+		return new NonEmptyAttribute(Abstraction._add(v1, abs_v1, v2, abs_v2), Add.create(expr1, expr2));
 	}
 
 	@Override

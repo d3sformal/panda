@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.common;
 
 
 public class Subtract extends Operation {
-	public Subtract(Expression a, Expression b) {
+	protected Subtract(Expression a, Expression b) {
 		super(a, b);
 	}
 
@@ -15,5 +15,16 @@ public class Subtract extends Operation {
 	@Override
 	public Subtract replace(AccessPath formerPath, Expression expression) {
 		return new Subtract(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	}
+	
+	public static Subtract create(Expression a, Expression b) {
+		if (!argumentsDefined(a, b)) return null;
+		
+		return new Subtract(a, b);
+	}
+	
+	@Override
+	public Subtract clone() {
+		return create(a.clone(), b.clone());
 	}
 }

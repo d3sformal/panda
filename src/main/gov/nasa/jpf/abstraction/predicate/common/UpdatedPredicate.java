@@ -13,7 +13,7 @@ public class UpdatedPredicate extends Predicate {
 	public AccessPath path;
 	public Expression expression;
 	
-	public UpdatedPredicate(Predicate predicate, AccessPath path, Expression expression) {
+	protected UpdatedPredicate(Predicate predicate, AccessPath path, Expression expression) {
 		this.predicate = predicate;
 		this.path = path;
 		this.expression = expression;
@@ -41,7 +41,14 @@ public class UpdatedPredicate extends Predicate {
 
 	@Override
 	public Predicate replace(AccessPath formerPath, Expression expression) {
-		return new UpdatedPredicate(predicate.replace(formerPath, expression), this.path, this.expression);
+		return create(predicate.replace(formerPath, expression), this.path, this.expression);
+	}
+	
+	public static Predicate create(Predicate predicate, AccessPath path, Expression expression) {
+		if (predicate == null) return null;
+		if (path == null || expression == null) return null;
+		
+		return new UpdatedPredicate(predicate, path, expression);
 	}
 
 }

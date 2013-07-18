@@ -54,6 +54,10 @@ public class DoubleComparatorExecutor extends BinaryOperatorExecutor<Double> {
 	final protected Double getRightOperand(StackFrame sf) {
 		return sf.peekDouble(2);
 	}
+	
+	@Override
+	protected void storeAttribute(Attribute result, StackFrame sf) {
+	}
 
 	@Override
 	final protected void storeResult(Attribute result, StackFrame sf) {
