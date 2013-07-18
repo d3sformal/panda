@@ -8,8 +8,6 @@ import gov.nasa.jpf.abstraction.common.impl.PredicatesFunctionStringifier;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class AccessPath extends Expression implements Cloneable {
 	public static enum NotationPolicy {
