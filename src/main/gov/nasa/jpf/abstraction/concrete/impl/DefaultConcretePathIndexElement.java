@@ -63,10 +63,12 @@ public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexEleme
 		return ret;
 	}
 	
+	/*
 	@Override
 	public boolean equals(Object o) {
 		return o instanceof AccessPathIndexElement;
 	}
+	*/
 	
 	@Override
 	public DefaultConcretePathIndexElement clone() {

@@ -29,10 +29,8 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processLoad(Map<AccessPath, CompleteVariableID> vars) {
-		for (AccessPath path : vars.keySet()) {
-			symbolTable.processLoad(path, vars.get(path));
-		}
+	public void processLoad(ConcretePath from) {
+		symbolTable.processLoad(from);
 	}
 	
 	@Override

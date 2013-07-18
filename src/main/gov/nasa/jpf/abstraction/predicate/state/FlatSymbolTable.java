@@ -47,7 +47,18 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
 	@Override
 	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID number) {
-		return num2paths.get(number);
+		Set<AccessPath> ret = num2paths.get(number);
+		
+		if (number == null || ret == null) {
+			ret = new HashSet<AccessPath>(); 
+		}
+		
+		return ret;
+	}
+	
+	@Override
+	public Set<AccessPath> lookupEquivalentAccessPaths(AccessPath path) {
+		return lookupEquivalentAccessPaths(resolvePath(path));
 	}
 
 	@Override
@@ -65,64 +76,153 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		
 		return clone;
 	}
+	
+	private void setPathToVar(AccessPath path, CompleteVariableID number) {
+		initialiseNumberToPaths(number);
 
-	private Set<AccessPath> registerPathToVariable(AccessPath path, CompleteVariableID number) {
-		Set<AccessPath> affected = new HashSet<AccessPath>();
+		path2num.put(path, number);
+		num2paths.get(number).add(path);
+	}
+	
+	private void unsetPath(AccessPath path) {
+		CompleteVariableID var = path2num.get(path);
 		
+		initialiseNumberToPaths(var);
+
+		Set<AccessPath> paths = num2paths.get(var);
+		
+		if (paths.isEmpty()) {
+			num2paths.remove(var);
+		}
+		
+		path2num.remove(path);
+	}
+	
+	private void initialiseNumberToPaths(CompleteVariableID number) {
 		if (!num2paths.containsKey(number)) {
 			num2paths.put(number, new HashSet<AccessPath>());
 		}
+	}
+	
+	@Override
+	public void processLoad(ConcretePath from) {
+		
+		Map<AccessPath, CompleteVariableID> vars = from.resolve();
+		
+		if (vars.size() > 1) System.err.println("Ambiguous load. Most probably due to array[exp].");
+		
+		if (!vars.isEmpty()) {
+			AccessPath source = vars.keySet().iterator().next();
 
-		// TODO: verify
-		// Current state: path -> number1 ... implies ... number1 -> {..., path, ...}
-		// Update: path -> number2
-		// Therefore: number1 -> {...}
-		if (path2num.containsKey(path) && !path2num.get(path).equals(number)) {
-			VariableID old = path2num.get(path);
-			num2paths.get(old).remove(path);
+			unsetPath(source);
+			setPathToVar(source, vars.get(source));
 		}
+	}
+	
+	private Set<AccessPath> processPrimitiveStore(AccessPath destination, CompleteVariableID var) {
+		// ASSIGN A PRIMITIVE VALUE - STORES NEW VALUE
+		Set<AccessPath> affected = new HashSet<AccessPath>();
 		
-		affected.add(path);
-		
-		path2num.remove(path);
-		path2num.put(path, number);		
-		num2paths.get(number).add(path);
+    	Set<AccessPath> equivalentPaths = lookupEquivalentAccessPaths(destination);
+    	equivalentPaths.add(destination);
+    			
+    	affected.addAll(equivalentPaths);
+    			
+    	for (AccessPath equivalentPath : equivalentPaths) {
+    		
+    		System.err.println();
+    		System.err.println(">>>> PRIMITIVE " + equivalentPath.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " -> " + var);
+    		System.err.println();
+    		
+    		unsetPath(equivalentPath);
+    		setPathToVar(equivalentPath, var);
+    	}
 		
 		return affected;
 	}
 	
-	@Override
-	public Set<AccessPath> processLoad(AccessPath path, CompleteVariableID number) {
-		return registerPathToVariable(path, number);
+	private Set<AccessPath> processObjectStore(AccessPath destinationPrefix, AccessPath sourcePrefix) {
+		// ASSIGN AN OBJECT OR ARRAY
+		Set<AccessPath> affected = new HashSet<AccessPath>();
+		
+		Set<AccessPath> sources = lookupAccessPaths(sourcePrefix);
+		
+		for (AccessPath source : sources) {
+			AccessPath destinationPath = source.clone();
+			AccessPath newPrefix = destinationPrefix.clone();
+
+			AccessPath.reRoot(destinationPath, sourcePrefix, newPrefix);
+			
+			// TODO:
+			//
+			// a.b = c
+			// a.b.x := X
+			//
+			// affected:
+			//
+			// a.b.x.*
+			// c.x.* !!! !!! !!!
+			Set<AccessPath> equivalentPaths = lookupEquivalentAccessPaths(destinationPath);
+			equivalentPaths.add(destinationPath);
+			// >>> TODO <<<<
+			// Test whether any of the equivalentPaths is affected by the store
+
+			for (AccessPath equivalentPath : equivalentPaths) {
+				// REWRITE ALL PRIMITIVE SUB FIELDS (NO MATTER ITS DEPTH)
+				
+				System.err.println();
+				System.err.println(">>>> OBJECT " + equivalentPath.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " -> " + resolvePath(source));
+				System.err.println();
+				
+				unsetPath(equivalentPath);
+				setPathToVar(equivalentPath, resolvePath(source));
+			
+				affected.add(equivalentPath);
+			}
+		}
+		
+		return affected;
 	}
 	
 	@Override
 	public Set<AccessPath> processStore(ConcretePath from, ConcretePath to) {	
 		Set<AccessPath> affected = new HashSet<AccessPath>();
 		
-		if (to == null) return affected; //TODO verify
+		if (to == null) {
+			System.err.println("Undefined destination in store.");
 			
-		if (from == null) {
-			Map<AccessPath, CompleteVariableID> vars = to.resolve();
-
-			// ASSIGN A PRIMITIVE VALUE - STORES NEW VALUE
-    		for (AccessPath p : vars.keySet()) {
-    			affected.addAll(registerPathToVariable(p, vars.get(p)));
-    		}
-		} else {	
-			for (AccessPath path : lookupAccessPaths(from)) {
-				CompleteVariableID variableID = resolvePath(path);
-
-				for (AccessPath newFrom : from.partialResolve().keySet()) {
-					AccessPath newPath = path.clone();
-					AccessPath.reRoot(newPath, from, newFrom);
-
-					// REWRITE ALL PRIMITIVE SUB FIELDS (NO MATTER ITS DEPTH)
-					affected.addAll(registerPathToVariable(newPath, variableID));
-				}
-			}
+			return affected;
 		}
-               
+		
+		Map<AccessPath, CompleteVariableID> vars = to.resolve();
+		
+		if (vars.size() > 1) System.err.println("Ambiguous store. Most probably due to array[exp] := primitive.");
+			
+		if (!vars.isEmpty()) {
+			AccessPath destination = vars.keySet().iterator().next();
+
+			return processPrimitiveStore(destination, vars.get(destination));
+		}
+		
+		if (from == null) {
+			System.err.println("Undefined source in store of an object.");
+
+			return affected;
+		}
+		
+		Map<AccessPath, VariableID> destinationPartialVars = to.partialResolve();
+		Map<AccessPath, VariableID> sourcePartialVars = from.partialResolve();
+		
+		if (destinationPartialVars.size() > 1) System.err.println("Ambiguous store. Most probably due to array[exp] := object.");
+		if (sourcePartialVars.size() > 1) System.err.println("Ambiguous store. Most probably due to array[exp] := object.");
+
+		if (!destinationPartialVars.isEmpty() && !sourcePartialVars.isEmpty()) {
+			AccessPath destination = destinationPartialVars.keySet().iterator().next();
+			AccessPath source = sourcePartialVars.keySet().iterator().next();
+
+			return processObjectStore(destination, source);
+		}
+		
 		return affected;
 	}
 	

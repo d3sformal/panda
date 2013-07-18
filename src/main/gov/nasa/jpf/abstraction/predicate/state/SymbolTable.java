@@ -10,9 +10,10 @@ public interface SymbolTable {
 	
 	public Set<AccessPath> lookupAccessPaths(AccessPath prefix);
 	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID number);
+	public Set<AccessPath> lookupEquivalentAccessPaths(AccessPath path);
 	public CompleteVariableID resolvePath(AccessPath path);
 	
-	public Set<AccessPath> processLoad(AccessPath path, CompleteVariableID number);
+	public void processLoad(ConcretePath from);
 	public Set<AccessPath> processStore(ConcretePath from, ConcretePath to);
 	
 }

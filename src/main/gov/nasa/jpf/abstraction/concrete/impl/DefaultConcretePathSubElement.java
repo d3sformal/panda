@@ -46,11 +46,17 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 			if (var instanceof PartialClassID) {
 				// CLASS
 				PartialClassID classID = (PartialClassID) var;
-				
-				if (classID.complete() && !(object instanceof ElementInfo)) {
-					// STATIC PRIMITIVE FIELD
+								
+				if (classID.complete()) {
+					if (object instanceof ElementInfo) {
+						// STATIC OBJECT FIELD
 
-					ret.put(path, new StaticFieldID(ei.getClassInfo().getName(), getName()));
+						ret.put(path, new PartialVariableID((ElementInfo)object));
+					} else {
+						// STATIC PRIMITIVE FIELD
+
+						ret.put(path, new StaticFieldID(ei.getClassInfo().getName(), getName()));
+					}
 				} else {
 					// NOT YET COMPLETE PATH package.package.Class
 					classID.extend(getName());

@@ -25,6 +25,11 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID number) {
 		return scopes.lastElement().lookupEquivalentAccessPaths(number);
 	}
+	
+	@Override
+	public Set<AccessPath> lookupEquivalentAccessPaths(AccessPath path) {
+		return scopes.lastElement().lookupEquivalentAccessPaths(path);
+	}
 
 	@Override
 	public CompleteVariableID resolvePath(AccessPath path) {
@@ -32,8 +37,8 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public Set<AccessPath> processLoad(AccessPath path, CompleteVariableID number) {
-		return scopes.lastElement().processLoad(path, number);
+	public void processLoad(ConcretePath from) {
+		scopes.lastElement().processLoad(from);
 	}
 	
 	@Override

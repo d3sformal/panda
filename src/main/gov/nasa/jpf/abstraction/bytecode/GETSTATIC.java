@@ -51,9 +51,7 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 		if (path != null) {
 			path.appendSubElement(getFieldName());
 			
-			Map<AccessPath, CompleteVariableID> vars = path.resolve();
-			
-			AbstractInstructionFactory.abs.processLoad(vars);
+			AbstractInstructionFactory.abs.processLoad(path);
 		}
 		
 		StackFrame sf = ti.getTopFrame();

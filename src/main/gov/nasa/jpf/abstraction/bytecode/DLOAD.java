@@ -46,10 +46,8 @@ public class DLOAD extends gov.nasa.jpf.jvm.bytecode.DLOAD {
 		if (var != null) {
 			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);
 			Attribute attribute = new NonEmptyAttribute(null, path);
-				
-			Map<AccessPath, CompleteVariableID> vars = path.resolve();
 			
-			AbstractInstructionFactory.abs.processLoad(vars);
+			AbstractInstructionFactory.abs.processLoad(path);
 
 			StackFrame sf = ti.getTopFrame();
 			sf.setLongOperandAttr(attribute);

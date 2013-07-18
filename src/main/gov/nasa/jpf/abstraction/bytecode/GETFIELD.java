@@ -54,10 +54,8 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 				ConcretePath path = (ConcretePath) attr.getExpression();
 				
 				path.appendSubElement(getFieldName());
-			
-				Map<AccessPath, CompleteVariableID> vars = path.resolve();
 				
-				AbstractInstructionFactory.abs.processLoad(vars);
+				AbstractInstructionFactory.abs.processLoad(path);
 			}
 
 			sf = ti.getTopFrame();

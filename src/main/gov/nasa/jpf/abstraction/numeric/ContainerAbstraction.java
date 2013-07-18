@@ -83,9 +83,9 @@ public class ContainerAbstraction extends Abstraction {
     }
     
     @Override
-    public void processLoad(Map<AccessPath, CompleteVariableID> vars) {
+    public void processLoad(ConcretePath from) {
     	for (Abstraction abs : list) {
-    		abs.processLoad(vars);
+    		abs.processLoad(from);
     	}
     }
     

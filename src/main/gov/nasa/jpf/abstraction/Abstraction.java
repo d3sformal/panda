@@ -66,7 +66,7 @@ public abstract class Abstraction {
 	public void backtrack() {
 	}
 	
-	public void processLoad(Map<AccessPath, CompleteVariableID> vars) {
+	public void processLoad(ConcretePath from) {
 	}
 	
 	public void processStore(Expression from, ConcretePath to) {
