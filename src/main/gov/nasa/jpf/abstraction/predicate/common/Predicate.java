@@ -41,6 +41,7 @@ public abstract class Predicate implements PredicatesVisitable {
     }
     
 	public Set<Predicate> determinantClosure(Set<Predicate> universe) {
+		Set<Predicate> cur;
 		Set<Predicate> ret = selectDeterminants(universe);
 		
 		int formerSize = 0;
@@ -48,9 +49,13 @@ public abstract class Predicate implements PredicatesVisitable {
 		while (formerSize != ret.size()) {
 			formerSize = ret.size();
 
+			cur = new HashSet<Predicate>();
+
 			for (Predicate predicate : ret) {
-				ret.addAll(predicate.selectDeterminants(universe));
+				cur.addAll(predicate.selectDeterminants(universe));
 			}
+			
+			ret = cur;
 		}
 		
 		return ret;
