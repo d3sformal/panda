@@ -24,13 +24,19 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 			AccessPathSubElement field = (AccessPathSubElement) path.getTail();
 			
 			if (field.getName().equals(element.getName())) {
+				PredicatesDotStringifier updatedPathStringifier = new PredicatesDotStringifier();
+				PredicatesDotStringifier updatedExpressionStringifier = new PredicatesDotStringifier();
+				
+				path.accept(updatedPathStringifier);
+				expression.accept(updatedExpressionStringifier);
+				
 				ret += "|";
 				
-				path.accept(this);
+				ret += updatedPathStringifier.getString();
 				
 				ret += " := ";
 				
-				expression.accept(this);
+				ret += updatedExpressionStringifier.getString();
 				
 				ret += "|";
 			}
@@ -50,14 +56,20 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 		ret += "]";
 		
 		if (path != null && path.getTail() instanceof AccessPathIndexElement) {	
+			PredicatesDotStringifier updatedPathStringifier = new PredicatesDotStringifier();
+			PredicatesDotStringifier updatedExpressionStringifier = new PredicatesDotStringifier();
+			
+			path.accept(updatedPathStringifier);
+			expression.accept(updatedExpressionStringifier);
+			
 			ret += "|";
-				
-			path.accept(this);
-				
+			
+			ret += updatedPathStringifier.getString();
+			
 			ret += " := ";
-				
-			expression.accept(this);
-				
+			
+			ret += updatedExpressionStringifier.getString();
+			
 			ret += "|";
 		}
 		
