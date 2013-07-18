@@ -26,7 +26,7 @@ import java.util.Set;
 
 public class SMT {
 	
-	private static String SEPARATOR = "\n";
+	private static String SEPARATOR = "";
 	
 	private BufferedWriter in = null;
 	private BufferedReader out = null;
@@ -103,13 +103,14 @@ public class SMT {
 		return values.toArray(new Boolean[values.size()]);
 	}
 
-	private String prepareInput(Map<Predicate, PredicateDeterminant> predicates) {
+	private String prepareInput(Map<Predicate, PredicateDeterminant> predicates, String separator) {
 		Set<String> vars = new HashSet<String>();
 		Set<String> fields = new HashSet<String>();
 
-		String input = "(set-logic QF_AUFLIA)" + SEPARATOR;
+		String input = "(set-logic QF_AUFLIA)" + separator;
 		
-		input += "(declare-fun arr () (Array Int (Array Int Int)))" + SEPARATOR + SEPARATOR;
+		input += "(declare-fun arr () (Array Int (Array Int Int)))" + separator;
+		input += separator;
 
 		/**
 		 * Collect all variable and field names from all weakest preconditions
@@ -130,30 +131,30 @@ public class SMT {
 		}
 		
 		for (String var : vars) {
-			input += "(declare-fun " + var + " () Int)" + SEPARATOR;
+			input += "(declare-fun " + var + " () Int)" + separator;
 		}
 		
 		for (String field : fields) {
-			input += "(declare-fun " + field + " () (Array Int Int))" + SEPARATOR;
+			input += "(declare-fun " + field + " () (Array Int Int))" + separator;
 		}
 
 		for (Predicate predicate : predicates.keySet()) {
 			PredicateDeterminant det = predicates.get(predicate);
 			
 			input +=
-				SEPARATOR +
-				"(push 1)" + SEPARATOR +
-				"(assert (not " + createFormula(det.positiveWeakestPrecondition, det.determinants) + "))" + SEPARATOR +
-				"(check-sat)" + SEPARATOR +
-				"(pop 1)" + SEPARATOR +
-				SEPARATOR +
-				"(push 1)" + SEPARATOR +
-				"(assert (not " + createFormula(det.negativeWeakestPrecondition, det.determinants) + "))" + SEPARATOR +
-				"(check-sat)" + SEPARATOR +
-				"(pop 1)" + SEPARATOR;
+				separator +
+				"(push 1)" + separator +
+				"(assert (not " + createFormula(det.positiveWeakestPrecondition, det.determinants) + "))" + separator +
+				"(check-sat)" + separator +
+				"(pop 1)" + separator +
+				separator +
+				"(push 1)" + separator +
+				"(assert (not " + createFormula(det.negativeWeakestPrecondition, det.determinants) + "))" + separator +
+				"(check-sat)" + separator +
+				"(pop 1)" + separator;
 		}
 		
-		input += SEPARATOR + "(exit)" + SEPARATOR;
+		input += separator + "(exit)" + separator;
 		
 		return input;
 	}
@@ -208,9 +209,16 @@ public class SMT {
 	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateDeterminant> predicates) throws SMTException {
 		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 		
-		String input = prepareInput(predicates);
+		String input = prepareInput(predicates, SEPARATOR);
 		
-		Boolean[] valid = isValid(input);
+		Boolean[] valid;
+		
+		try {
+			valid = isValid(input);
+		} catch (SMTException e) {
+			throw new SMTException("SMT failed on:\n" + prepareInput(predicates, "\n") + "\n" + e.getMessage());
+		}
+
 		int i = 0;
 		
 		for (Predicate predicate : predicates.keySet()) {
