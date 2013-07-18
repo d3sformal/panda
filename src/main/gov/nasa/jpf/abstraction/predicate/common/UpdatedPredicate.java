@@ -29,13 +29,11 @@ public class UpdatedPredicate extends Predicate {
 		List<AccessPath> ret = new LinkedList<AccessPath>();
 		
 		ret.addAll(predicate.getPaths());
+		ret.addAll(expression.getPaths());
 		
-		if (ret.contains(path)) {
-			ret.addAll(expression.getPaths());
-			
-			if (path.getRoot() == path.getTail()) {
-				ret.remove(path);
-			}
+		// ONLY variable paths (single element - varname) get replaced, other paths stay in the expressions
+		if (path.getRoot() != path.getTail()) {
+			ret.add(path);
 		}
 		
 		return ret;
