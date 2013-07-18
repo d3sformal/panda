@@ -4,9 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Constant extends Expression {
-	public Object value;
+	public Number value;
 	
-	public Constant(Object value) {
+	public Constant(int value) {
+		this.value = value;
+	}
+	
+	public Constant(float value) {
+		this.value = value;
+	}
+	
+	public Constant(long value) {
+		this.value = value;
+	}
+	
+	public Constant(double value) {
 		this.value = value;
 	}
 
