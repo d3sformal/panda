@@ -4,6 +4,7 @@ import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
 import gov.nasa.jpf.abstraction.common.Add;
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Modulo;
 import gov.nasa.jpf.abstraction.common.Multiply;
@@ -147,6 +148,15 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	@Override
 	public void visit(Modulo expression) {
 		visit((Subtract)expression);
+	}
+	
+	@Override
+	public void visit(Constant expression) {
+		if (expression.value.doubleValue() < 0) {
+			ret += "(- 0 " + (-expression.value.doubleValue()) + ")";
+		} else {
+			ret += expression;
+		}
 	}
 
 	@Override
