@@ -135,12 +135,16 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				predicates.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
 
 				System.err.println("\t\t" + predicate.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-				System.err.println("\t\t\t" + positiveWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION) + ", " + negativeWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-				System.err.println("\t\t\t[");
+				System.err.println("\t\t\t[ Weakest Preconditions");
+				System.err.println("\t\t\t\t+ " + positiveWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+				System.err.println("\t\t\t\t- " + negativeWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+				System.err.println("\t\t\t]");
+				System.err.println("\t\t\t[ Relevant");
 				for (Predicate det : determinants.keySet()) {
 					System.err.println("\t\t\t\t" + det.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " :: " + determinants.get(det));
 				}
 				System.err.println("\t\t\t]");
+				System.err.println();
 			}
 		}
 		

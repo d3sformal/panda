@@ -3,9 +3,35 @@ package gov.nasa.jpf.abstraction.common.impl;
 import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
+import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
+import gov.nasa.jpf.abstraction.predicate.common.Equals;
+import gov.nasa.jpf.abstraction.predicate.common.LessThan;
 
 public class PredicatesDotStringifier extends PredicatesStringifier {
+
+	@Override
+	public void visit(Negation expression) {
+		if (expression.predicate instanceof LessThan) {
+			LessThan lt = (LessThan) expression.predicate;
+			
+			lt.a.accept(this);
+			
+			ret += " >= ";
+			
+			lt.b.accept(this);
+		} else if (expression.predicate instanceof Equals) {
+			Equals lt = (Equals) expression.predicate;
+			
+			lt.a.accept(this);
+			
+			ret += " != ";
+			
+			lt.b.accept(this);
+		} else {
+			super.visit(expression);
+		}
+	}
 
 	@Override
 	public void visit(AccessPathRootElement element) {
