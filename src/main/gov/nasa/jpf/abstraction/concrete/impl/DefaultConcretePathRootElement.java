@@ -7,6 +7,7 @@ import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.AccessPathMiddleElement;
 import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathRootElement;
+import gov.nasa.jpf.abstraction.concrete.PartialClassID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.concrete.ConcretePathRootElement;
 import gov.nasa.jpf.abstraction.concrete.LocalVariableID;
@@ -58,18 +59,26 @@ public class DefaultConcretePathRootElement extends DefaultAccessPathRootElement
 		 * it necessarily refers to a primitive local variable.
 		 */
 		Map<AccessPath, VariableID> ret = new HashMap<AccessPath, VariableID>();
-
-		if (type == ConcretePath.Type.LOCAL) {
+		
+		if (rootObject == null) return ret;
+		
+		switch (type) {
+		case LOCAL:
+			// LOCAL VARIABLE
 			LocalVarInfo info = (LocalVarInfo) rootObject;
 
-			// LOCAL VARIABLE
 			ret.put(new AccessPath(getName()), new LocalVariableID(info.getName(), info.getSlotIndex()));
-		} else if (rootObject instanceof ElementInfo) {
-			
+			break;
+		case STATIC:
+			// STATIC PATH
+			ret.put(new AccessPath(getName()), new PartialClassID((ElementInfo)rootObject, getName()));
+			break;
+		case HEAP:
 			// INCOMPLETE PATH
 			ret.put(new AccessPath(getName()), new PartialVariableID((ElementInfo)rootObject));
+			break;
 		}
-
+		
 		return ret;
 	}
 	

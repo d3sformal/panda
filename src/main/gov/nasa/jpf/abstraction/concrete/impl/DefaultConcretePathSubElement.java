@@ -5,10 +5,9 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathSubElement;
+import gov.nasa.jpf.abstraction.concrete.PartialClassID;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
-import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.concrete.ConcretePathElement;
-import gov.nasa.jpf.abstraction.concrete.ConcretePathRootElement;
 import gov.nasa.jpf.abstraction.concrete.ConcretePathSubElement;
 import gov.nasa.jpf.abstraction.concrete.ObjectFieldID;
 import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
@@ -38,30 +37,33 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 			VariableID var = vars.get(path);
 
 			if (var instanceof CompleteVariableID) continue;
-
-			ElementInfo ei = ((PartialVariableID)var).getInfo();
-		
-			Object object = ei.getFieldValueObject(getName());
-
+			
 			path.appendSubElement(getName());
+			
+			ElementInfo ei = ((PartialVariableID)var).getInfo();
+			Object object = ei.getFieldValueObject(getName());
+			
+			if (var instanceof PartialClassID) {
+				// CLASS
+				PartialClassID classID = (PartialClassID) var;
+				
+				if (classID.complete() && !(object instanceof ElementInfo)) {
+					// STATIC PRIMITIVE FIELD
 
-			if (previous instanceof ConcretePathRootElement) {
-				ConcretePathRootElement root = (ConcretePathRootElement) previous;
-			
-				if (root.getType() == ConcretePath.Type.STATIC) {
-					if (!(object instanceof ElementInfo)) {
-						// STATIC PRIMITIVE FIELD
-						ret.put(path, new StaticFieldID(ei.getClassInfo().getName(), getName()));
-						continue;
-					}
+					ret.put(path, new StaticFieldID(ei.getClassInfo().getName(), getName()));
+				} else {
+					// NOT YET COMPLETE PATH package.package.Class
+					classID.extend(getName());
+
+					ret.put(path, var);
 				}
-			}
-			
-			if (object instanceof ElementInfo) {
+			} else if (object instanceof ElementInfo) {
 				// STRUCTURED FIELD (PATH NOT YET COMPLETE)
+				
 				ret.put(path, new PartialVariableID((ElementInfo)object));
 			} else {
 				// PRIMITIVE FIELD
+				
 				ret.put(path, new ObjectFieldID(ei.getObjectRef(), getName()));
 			}
 		}

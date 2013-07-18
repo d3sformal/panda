@@ -204,21 +204,15 @@ public class AccessPath extends Expression implements Cloneable {
 		AccessPathElement e2 = path.root;
 		
 		while (e1 != null && e2 != null) {
-			if (e1 instanceof AccessPathSubElement) {
-				AccessPathSubElement s1 = (AccessPathSubElement) e1;
-				
-				if (e2 instanceof AccessPathSubElement) {
-					AccessPathSubElement s2 = (AccessPathSubElement) e2;
-					
-					if (!s1.getName().equals(s2.getName())) {
-						return false;
-					}
-				} else {
-					return false;
-				}
+			if (e1.getClass() != e2.getClass()) {
+				return false;
 			}
-			if (e1 instanceof AccessPathIndexElement) {
-				if (!(e2 instanceof AccessPathIndexElement)) {
+
+			if (e1 instanceof AccessPathSubElement && e2 instanceof AccessPathSubElement) {
+				AccessPathSubElement s1 = (AccessPathSubElement) e1;
+				AccessPathSubElement s2 = (AccessPathSubElement) e2;
+					
+				if (!s1.getName().equals(s2.getName())) {
 					return false;
 				}
 			}
