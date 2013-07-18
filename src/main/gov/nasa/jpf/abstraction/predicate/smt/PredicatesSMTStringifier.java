@@ -180,7 +180,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 				path.cutTail().accept(updatePrefixVisitor);
 				expression.accept(updateExpressionVisitor);
 				
-				field = "(update field_" + element.getName() + " " + updatePrefixVisitor.getString() + " " + updateExpressionVisitor.getString() + ")";
+				field = "(store field_" + element.getName() + " " + updatePrefixVisitor.getString() + " " + updateExpressionVisitor.getString() + ")";
 			}
 		}
 		
@@ -211,7 +211,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 			index.getIndex().accept(updateIndexVisitor);
 			expression.accept(updateExpressionVisitor);
 				
-			array = "(update arr " + updatePrefixVisitor.getString() + " (update (select arr " + updatePrefixVisitor.getString() + ") " + updateIndexVisitor.getString() + " " + updateExpressionVisitor.getString() + "))";
+			array = "(store arr " + updatePrefixVisitor.getString() + " (store (select arr " + updatePrefixVisitor.getString() + ") " + updateIndexVisitor.getString() + " " + updateExpressionVisitor.getString() + "))";
 		}
 		
 		ret = String.format(ret, "(select (select " + array + " %s) " + indexVisitor.getString() + ")");
