@@ -5,15 +5,29 @@ import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
+import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ReturnInstruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 public class SymbolTableMonitor extends ListenerAdapter {
+	private boolean running = false;
+	
 	@Override
 	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
-		inspect(AbstractInstructionFactory.abs);
+		if (execInsn instanceof InvokeInstruction) {			
+			if (nextInsn.getMethodInfo().getName().equals("main")) {
+				running = true;
+			}
+		}
+		if (execInsn instanceof ReturnInstruction && execInsn.getMethodInfo().getName().equals("main")) {
+			running = false;
+		}
+		
+		if (running) {
+			inspect(AbstractInstructionFactory.abs);
+		}
 	}
 
 	private void inspect(Abstraction abs) {
