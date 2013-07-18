@@ -134,16 +134,19 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				
 				predicates.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
 
-				System.err.print("\t\t" + predicate + " [" + positiveWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION) + ", " + negativeWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION) + "] [");
+				System.err.println("\t\t" + predicate.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+				System.err.println("\t\t\t" + positiveWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION) + ", " + negativeWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+				System.err.println("\t\t\t[");
 				for (Predicate det : determinants.keySet()) {
-					System.err.print(det.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " :: " + determinants.get(det) + "; ");
+					System.err.println("\t\t\t\t" + det.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " :: " + determinants.get(det));
 				}
-				System.err.println("]");
+				System.err.println("\t\t\t]");
 			}
 		}
 		
+		if (predicates.isEmpty()) return;
+		
 		try {
-			@SuppressWarnings("unchecked")
 			Map<Predicate, TruthValue> newValuations = new SMT().valuatePredicates(predicates);
 		
 			for (Predicate predicate : newValuations.keySet()) {
