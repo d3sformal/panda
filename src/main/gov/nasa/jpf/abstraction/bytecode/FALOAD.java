@@ -20,6 +20,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -30,7 +31,11 @@ public class FALOAD extends gov.nasa.jpf.jvm.bytecode.FALOAD {
 	@Override
 	public Instruction execute(ThreadInfo ti) {		
 		StackFrame sf = ti.getTopFrame();
-		Attribute attr = (Attribute) sf.getOperandAttr(1);
+		Attribute arrayAttr = (Attribute) sf.getOperandAttr(1);
+		Attribute indexAttr = (Attribute) sf.getOperandAttr(0);
+		
+		if (arrayAttr == null) arrayAttr = new EmptyAttribute();
+		if (indexAttr == null) arrayAttr = new EmptyAttribute();
 	
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
@@ -40,18 +45,17 @@ public class FALOAD extends gov.nasa.jpf.jvm.bytecode.FALOAD {
 			return actualNextInsn;
 		}    
 
-		if (attr != null) {
-			if (attr.getExpression() instanceof ConcretePath) {
-				ConcretePath path = (ConcretePath) attr.getExpression();
-				
-				path.appendIndexElement(null);
-				
-				Attribute attribute = new NonEmptyAttribute(null, path);
+		if (arrayAttr.getExpression() instanceof ConcretePath) {
+			ConcretePath path = (ConcretePath) arrayAttr.getExpression();
+			
+			path.appendIndexElement(indexAttr.getExpression());
+			
+			Attribute attribute = new NonEmptyAttribute(null, path);
 
-				sf = ti.getTopFrame();
-				sf.setOperandAttr(attribute);
-			}
+			sf = ti.getTopFrame();
+			sf.setOperandAttr(attribute);
 		}
+
 
 		return actualNextInsn;
 	}

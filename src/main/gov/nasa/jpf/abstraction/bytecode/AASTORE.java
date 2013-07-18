@@ -20,7 +20,9 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -31,7 +33,12 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 	public Instruction execute(ThreadInfo ti) {
 		StackFrame sf = ti.getTopFrame();
 		Attribute source = (Attribute) sf.getOperandAttr(0);
+		Attribute index = (Attribute) sf.getOperandAttr(1);
 		Attribute destination = (Attribute) sf.getOperandAttr(2);
+		
+		if (source == null) source = new EmptyAttribute();
+		if (index == null) index = new EmptyAttribute();
+		if (destination == null) destination = new EmptyAttribute();
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
@@ -41,23 +48,15 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 			return actualNextInsn;
 		} 
 		
-		ConcretePath from = null;
+		Expression from = source.getExpression();
 		ConcretePath to = null;
 		
-		if (source != null) {
-			if (source.getExpression() instanceof ConcretePath) {
-				from = (ConcretePath) source.getExpression();
-			}
-		}
-		if (destination != null) {
-			if (destination.getExpression() instanceof ConcretePath) {
-				to = (ConcretePath) destination.getExpression();
-			}
+		if (destination.getExpression() instanceof ConcretePath) {
+			to = (ConcretePath) destination.getExpression();
+			to.appendIndexElement(index.getExpression());
 
-			to.appendIndexElement(null);
+			AbstractInstructionFactory.abs.processStore(from, to);
 		}
-
-		AbstractInstructionFactory.abs.processStore(from, to);
 		
 		return actualNextInsn;
 	}
