@@ -51,8 +51,6 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		}
 		if (var != null) {
 			to = new ConcretePath(getLocalVariableName(), ti, var, ConcretePath.Type.LOCAL);
-		} else {
-			System.err.println(getClass().getSimpleName() + " FAIL " + getLocalVariableName());
 		}
 		
 		sf = ti.getModifiableTopFrame();
