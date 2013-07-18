@@ -132,6 +132,11 @@ public class AbstractInstructionFactory extends
 	}
 	
 	@Override
+	public Instruction bipush(int val) {
+		return (filter.isInstrumentedClass(ci) ? new BIPUSH(val) : super.bipush(val));
+	}
+	
+	@Override
 	public Instruction caload() {
 		return (filter.isInstrumentedClass(ci) ? new CALOAD() : super.caload());
 	}
@@ -748,6 +753,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction sastore() {
 		return (filter.isInstrumentedClass(ci) ? new SASTORE() : super.sastore());
+	}
+	
+	@Override
+	public Instruction sipush(int val) {
+		return (filter.isInstrumentedClass(ci) ? new SIPUSH(val) : super.sipush(val));
 	}
 	
 	@Override
