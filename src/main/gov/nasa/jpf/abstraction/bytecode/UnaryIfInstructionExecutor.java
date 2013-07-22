@@ -37,22 +37,21 @@ public class UnaryIfInstructionExecutor {
 		if (expr != null) {
 			switch (AbstractInstructionFactory.abs.processBranching(Equals.create(expr, Constant.create(0)))) {
 			case TRUE:
-				System.err.println("BRANCHING: " + expr.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " = 0 TRUE");
-				
 				sf.pop();
 				
 				return br.getTarget();
 			case FALSE:
-				System.err.println("BRANCHING: " + expr.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " = 0 FALSE");
-
 				sf.pop();
 				
 				return br.getNext(ti);
 			case UNKNOWN:
-				System.err.println("BRANCHING: " + expr.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " = 0 UNKNOWN");
-				break;
+				ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
+				ss.setNextChoiceGenerator(cg);
+				
+				attr.setExpression(null);
+
+				return br.getSelf();
 			case UNDEFINED:
-				System.err.println("BRANCHING: " + expr.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " = 0 UNDEFINED");
 				break;
 			}
 		}
