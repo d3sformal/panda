@@ -30,16 +30,16 @@ public class AbstractListener extends PropertyListenerAdapter {
 
 	@Override
 	public void searchStarted(Search search) {
-		AbstractInstructionFactory.abs.start(search.getVM().getCurrentThread().getTopFrameMethodInfo());
+		GlobalAbstraction.getInstance().start(search.getVM().getCurrentThread().getTopFrameMethodInfo());
 	}
 	
 	@Override
 	public void stateAdvanced(Search search) {
-		AbstractInstructionFactory.abs.forward(search.getVM().getCurrentThread().getTopFrameMethodInfo());
+		GlobalAbstraction.getInstance().forward(search.getVM().getCurrentThread().getTopFrameMethodInfo());
 	}
 
 	@Override
 	public void stateBacktracked(Search search) {
-		AbstractInstructionFactory.abs.backtrack();
+		GlobalAbstraction.getInstance().backtrack();
 	}
 }

@@ -18,12 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import java.util.Map;
-
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.common.AccessPath;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
@@ -47,7 +43,7 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);
 			Attribute attribute = new NonEmptyAttribute(null, path);
 						
-			AbstractInstructionFactory.abs.processLoad(path);
+			GlobalAbstraction.getInstance().processLoad(path);
 
 			StackFrame sf = ti.getTopFrame();
 			sf.setOperandAttr(attribute);

@@ -18,8 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
@@ -60,7 +60,7 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 			to.appendSubElement(getFieldName());
 		}
 
-		AbstractInstructionFactory.abs.processStore(from, to);
+		GlobalAbstraction.getInstance().processStore(from, to);
 		
 		return actualNextInsn;
 	}

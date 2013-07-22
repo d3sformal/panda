@@ -19,7 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
@@ -55,7 +55,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		sf = ti.getModifiableTopFrame();
 		sf.setLocalAttr(getLocalVariableIndex(), source);
 
-		AbstractInstructionFactory.abs.processStore(from, to);
+		GlobalAbstraction.getInstance().processStore(from, to);
 		
 		return actualNextInsn;
 	}

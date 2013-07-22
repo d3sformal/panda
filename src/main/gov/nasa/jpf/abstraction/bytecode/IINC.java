@@ -18,11 +18,11 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -98,7 +98,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 			sf.setLocalVariable(index, 0, false);
 		}
 		
-		AbstractInstructionFactory.abs.processStore(expression, new ConcretePath(sf.getLocalVarInfo(index).getName(), ti, var, ConcretePath.Type.LOCAL));
+		GlobalAbstraction.getInstance().processStore(expression, new ConcretePath(sf.getLocalVarInfo(index).getName(), ti, var, ConcretePath.Type.LOCAL));
 
 		return getNext(ti);
 	}

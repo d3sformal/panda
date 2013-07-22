@@ -44,8 +44,6 @@ public class AbstractInstructionFactory extends
 
 	InstructionFactoryFilter filter;
 
-	public static Abstraction abs;
-
 	public AbstractInstructionFactory(Config conf) {
 
 		System.out.println("Running Abstract PathFinder ...");
@@ -84,11 +82,11 @@ public class AbstractInstructionFactory extends
 		}
 
 		if (abs_list.size() == 0) {
-			abs = null;
+			GlobalAbstraction.set(conf.getTarget(), null);
 		} else if (abs_list.size() == 1) {
-			abs = abs_list.get(0);
+			GlobalAbstraction.set(conf.getTarget(), abs_list.get(0));
 		} else {
-			abs = new ContainerAbstraction(abs_list);
+			GlobalAbstraction.set(conf.getTarget(), new ContainerAbstraction(abs_list));
 			System.out
 					.println("### jpf-abstraction: CONTAINER abstraction turned on");
 		}

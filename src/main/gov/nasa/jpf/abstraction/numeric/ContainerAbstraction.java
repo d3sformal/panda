@@ -112,13 +112,7 @@ public class ContainerAbstraction extends Abstraction {
     	for (Abstraction abs : list) {
     		TruthValue sub = abs.processBranching(predicate);
     		
-    		if (sub != TruthValue.UNDEFINED) {
-    			if (ret == TruthValue.UNDEFINED) {
-    				ret = sub;
-    			} else if (ret != sub) {
-    				ret = TruthValue.UNKNOWN;
-    			}
-    		}
+   			ret = TruthValue.or(ret, sub);
     	}
     	
     	return ret;

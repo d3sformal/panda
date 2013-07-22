@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -39,7 +39,7 @@ public class INVOKEVIRTUAL extends gov.nasa.jpf.jvm.bytecode.INVOKEVIRTUAL {
 			return actualNextInsn;
 		}  
 		
-		AbstractInstructionFactory.abs.processMethodCall(ti.getTopFrameMethodInfo());
+		GlobalAbstraction.getInstance().processMethodCall(ti.getTopFrameMethodInfo());
 
 		return actualNextInsn;
 	}

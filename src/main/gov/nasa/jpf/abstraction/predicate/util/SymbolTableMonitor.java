@@ -1,8 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.util;
 
 import gov.nasa.jpf.ListenerAdapter;
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
@@ -26,7 +26,7 @@ public class SymbolTableMonitor extends ListenerAdapter {
 		}
 		
 		if (running) {
-			inspect(AbstractInstructionFactory.abs);
+			inspect(GlobalAbstraction.getInstance().get());
 		}
 	}
 

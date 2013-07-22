@@ -23,7 +23,7 @@ import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.vm.StackFrame;
 
-public class FloatComparatorExecutor extends BinaryOperatorExecutor<Float> {
+public class FloatComparatorExecutor extends BinaryComparatorExecutor<Float> {
 
 	private static FloatComparatorExecutor instance;
 

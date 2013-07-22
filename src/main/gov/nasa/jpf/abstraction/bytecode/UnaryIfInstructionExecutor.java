@@ -2,9 +2,9 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -34,13 +34,28 @@ public class UnaryIfInstructionExecutor {
 		abs_v = attr.getAbstractValue();
 		expr = attr.getExpression();
 		
+		boolean conditionValue;
+		
+		// PREDICATE ABSTRACTION
 		if (expr != null) {
-			switch (AbstractInstructionFactory.abs.processBranching(Equals.create(expr, Constant.create(0)))) {
-			case TRUE:
+			if (ti.isFirstStepInsn()) {
+				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+					
+				assert (cg instanceof AbstractChoiceGenerator) : "expected AbstractChoiceGenerator, got: " + cg;
+				
+				conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
+				
+				sf.pop();
+				
+				return (conditionValue ? br.getTarget() : br.getNext(ti));
+			}
+
+			switch (GlobalAbstraction.getInstance().processBranching(Equals.create(expr, Constant.create(0)))) {
+			case FALSE:
 				sf.pop();
 				
 				return br.getTarget();
-			case FALSE:
+			case TRUE:
 				sf.pop();
 				
 				return br.getNext(ti);
@@ -48,15 +63,11 @@ public class UnaryIfInstructionExecutor {
 				ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
 				ss.setNextChoiceGenerator(cg);
 				
-				attr.setExpression(null);
-
 				return br.getSelf();
 			case UNDEFINED:
 				break;
 			}
-		}
-		
-		boolean conditionValue;
+		}		
 
 		if (abs_v == null) { // the condition is concrete
 			return br.executeConcrete(ti);
@@ -65,6 +76,7 @@ public class UnaryIfInstructionExecutor {
 		// the condition is abstract
 		System.out.printf("%s> Values: %d (%s)\n", name, sf.peek(0), abs_v);
 
+		// NUMERIC ABSTRACTION
 		AbstractBoolean abs_condition = br.getCondition(0, abs_v, 0, null);
 
 		if (abs_condition == AbstractBoolean.TRUE) {

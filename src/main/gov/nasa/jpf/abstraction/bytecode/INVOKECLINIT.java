@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -40,7 +40,7 @@ public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
 			return actualNextInsn;
 		}
 		
-		AbstractInstructionFactory.abs.processMethodCall(ti.getTopFrameMethodInfo());
+		GlobalAbstraction.getInstance().processMethodCall(ti.getTopFrameMethodInfo());
 
 		return actualNextInsn;
 	}
