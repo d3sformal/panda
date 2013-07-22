@@ -2,8 +2,14 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
+import gov.nasa.jpf.abstraction.predicate.common.Equals;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -18,7 +24,38 @@ public class UnaryIfInstructionExecutor {
 
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
-		AbstractValue abs_v = getAbstractValue(sf);
+		Attribute attr = (Attribute) sf.getOperandAttr();
+		
+		AbstractValue abs_v = null;
+		Expression expr = null;
+		
+		if (attr == null) attr = new EmptyAttribute();
+
+		abs_v = attr.getAbstractValue();
+		expr = attr.getExpression();
+		
+		if (expr != null) {
+			switch (AbstractInstructionFactory.abs.processBranching(Equals.create(expr, Constant.create(0)))) {
+			case TRUE:
+				System.err.println("BRANCHING: " + expr.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " = 0 TRUE");
+				
+				sf.pop();
+				
+				return br.getTarget();
+			case FALSE:
+				System.err.println("BRANCHING: " + expr.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " = 0 FALSE");
+
+				sf.pop();
+				
+				return br.getNext(ti);
+			case UNKNOWN:
+				System.err.println("BRANCHING: " + expr.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " = 0 UNKNOWN");
+				break;
+			case UNDEFINED:
+				System.err.println("BRANCHING: " + expr.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " = 0 UNDEFINED");
+				break;
+			}
+		}
 		
 		boolean conditionValue;
 
@@ -55,15 +92,5 @@ public class UnaryIfInstructionExecutor {
 		sf.pop();
 		
 		return (conditionValue ? br.getTarget() : br.getNext(ti));
-	}
-	
-	public AbstractValue getAbstractValue(StackFrame sf) {
-		Attribute attr = (Attribute)sf.getOperandAttr();
-		
-		if (attr != null) {
-			return attr.getAbstractValue();
-		}
-		
-		return null;
 	}
 }

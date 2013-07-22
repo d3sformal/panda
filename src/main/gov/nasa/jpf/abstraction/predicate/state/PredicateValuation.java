@@ -13,4 +13,5 @@ public interface PredicateValuation {
 	public TruthValue get(Predicate predicate);
 	public Iterator<Map.Entry<Predicate, TruthValue>> iterator();
 	public void reevaluate(AccessPath affected, Set<AccessPath> resolvedAffected, Expression expression);
+	public TruthValue evaluate(Predicate predicate);
 }

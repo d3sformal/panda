@@ -24,6 +24,8 @@ import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.util.Pair;
 import gov.nasa.jpf.vm.MethodInfo;
 
@@ -102,6 +104,25 @@ public class ContainerAbstraction extends Abstraction {
     		abs.processMethodReturn();
     	}
 	}
+    
+    @Override
+    public TruthValue processBranching(Predicate predicate) {
+    	TruthValue ret = TruthValue.UNDEFINED;
+
+    	for (Abstraction abs : list) {
+    		TruthValue sub = abs.processBranching(predicate);
+    		
+    		if (sub != TruthValue.UNDEFINED) {
+    			if (ret == TruthValue.UNDEFINED) {
+    				ret = sub;
+    			} else if (ret != sub) {
+    				ret = TruthValue.UNKNOWN;
+    			}
+    		}
+    	}
+    	
+    	return ret;
+    }
     
     public ContainerValue create(List<AbstractValue> lst) {
     	ContainerValue res = new ContainerValue(lst);

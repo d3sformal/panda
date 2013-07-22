@@ -8,6 +8,7 @@ import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.state.FlatPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
@@ -15,6 +16,7 @@ import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.State;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.MethodInfo;
 
 public class PredicateAbstraction extends Abstraction {
@@ -56,6 +58,11 @@ public class PredicateAbstraction extends Abstraction {
 	public void processMethodReturn() {
 		symbolTable.processMethodReturn();
 		predicateValuation.processMethodReturn();
+	}
+	
+	@Override
+	public TruthValue processBranching(Predicate predicate) {
+		return predicateValuation.evaluate(predicate);
 	}
 	
 	public ScopedSymbolTable getSymbolTable() {		

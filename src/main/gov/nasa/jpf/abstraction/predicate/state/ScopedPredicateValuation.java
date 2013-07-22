@@ -111,6 +111,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
+	public TruthValue evaluate(Predicate predicate) {
+		return scopes.lastElement().evaluate(predicate);
+	}
+	
+	@Override
 	public int count() {
 		return scopes.size();
 	}

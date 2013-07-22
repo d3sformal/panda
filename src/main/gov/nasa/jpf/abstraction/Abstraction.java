@@ -17,15 +17,11 @@
 // DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 package gov.nasa.jpf.abstraction;
 
-import java.util.Map;
-import java.util.Set;
-
-import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.MethodInfo;
 
 /**
@@ -76,6 +72,10 @@ public abstract class Abstraction {
 	}
 	
 	public void processMethodReturn() {
+	}
+	
+	public TruthValue processBranching(Predicate predicate) {
+		return TruthValue.UNDEFINED;
 	}
 
 	/**

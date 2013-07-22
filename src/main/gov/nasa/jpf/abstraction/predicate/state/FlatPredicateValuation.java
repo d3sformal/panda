@@ -161,4 +161,32 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		}
 	}
 	
+	@Override
+	public TruthValue evaluate(Predicate predicate) {
+		Predicate positiveWeakestPrecondition = predicate;
+		Predicate negativeWeakestPrecondition = Negation.create(predicate);
+
+		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
+		Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+			
+		for (Predicate determinant : positiveWeakestPrecondition.determinantClosure(valuations.keySet())) {
+			determinants.put(determinant, valuations.get(determinant));
+		}
+		for (Predicate determinant : negativeWeakestPrecondition.determinantClosure(valuations.keySet())) {
+			determinants.put(determinant, valuations.get(determinant));
+		}
+		
+		predicates.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
+		
+		try {
+			Map<Predicate, TruthValue> valuation = new SMT().valuatePredicates(predicates);
+		
+			return valuation.get(predicate);
+		} catch (SMTException e) {
+			e.printStackTrace();
+		}
+		
+		return TruthValue.UNDEFINED;
+	}
+	
 }
