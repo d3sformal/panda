@@ -683,7 +683,7 @@ public class IntervalAbstraction extends Abstraction {
 	 *         numerically greater than the operand.
 	 */
 	@Override
-	public AbstractValue _cmp(AbstractValue left, AbstractValue right) {
+	public SignsValue _cmp(AbstractValue left, AbstractValue right) {
 		boolean n = false, z = false, p = false;
 		if (_gt(left, right) != AbstractBoolean.FALSE)
 			p = true;
@@ -702,7 +702,7 @@ public class IntervalAbstraction extends Abstraction {
 	 *         numerically greater than the operand.
 	 */	
 	@Override
-	public AbstractValue _cmpg(AbstractValue left, AbstractValue right) {
+	public SignsValue _cmpg(AbstractValue left, AbstractValue right) {
 		boolean n = false, z = false, p = false;
 		if (_gt(left, right) != AbstractBoolean.FALSE)
 			p = true;
@@ -721,7 +721,7 @@ public class IntervalAbstraction extends Abstraction {
 	 *         numerically greater than the operand.
 	 */	
 	@Override
-	public AbstractValue _cmpl(AbstractValue left, AbstractValue right) {
+	public SignsValue _cmpl(AbstractValue left, AbstractValue right) {
 		boolean n = false, z = false, p = false;
 		if (_gt(left, right) != AbstractBoolean.FALSE)
 			p = true;

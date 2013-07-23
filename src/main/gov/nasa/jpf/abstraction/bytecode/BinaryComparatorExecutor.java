@@ -18,7 +18,6 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
@@ -27,6 +26,7 @@ import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.abstraction.predicate.common.Equals;
 import gov.nasa.jpf.abstraction.predicate.common.LessThan;
@@ -36,7 +36,6 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
 
 public abstract class BinaryComparatorExecutor<T> {
 
@@ -99,7 +98,7 @@ public abstract class BinaryComparatorExecutor<T> {
 				return cmp.getNext(ti);
 			}
 			
-			ChoiceGenerator<?> cg = new IntIntervalGenerator("abstract", -1, 1, 1);
+			ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(SignsAbstraction.getInstance().getDomainSize());
 			ss.setNextChoiceGenerator(cg);
 			
 			return cmp.getSelf();
