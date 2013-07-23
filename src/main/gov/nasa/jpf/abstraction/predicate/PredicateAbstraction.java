@@ -55,14 +55,14 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processMethodReturn() {
+	public void processMethodReturn(MethodInfo method) {
 		symbolTable.processMethodReturn();
 		predicateValuation.processMethodReturn();
 	}
 	
 	@Override
-	public TruthValue processBranching(Predicate predicate) {
-		return predicateValuation.evaluate(predicate);
+	public TruthValue evaluatePredicate(Predicate predicate) {
+		return predicateValuation.evaluatePredicate(predicate);
 	}
 	
 	public ScopedSymbolTable getSymbolTable() {		

@@ -20,7 +20,7 @@ public class UnaryIfInstructionExecutor {
 
 	final public Instruction execute(AbstractBranching br, ThreadInfo ti) {
 		
-		String name = br.getClass().getName();
+		String name = br.getClass().getSimpleName();
 
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
@@ -50,7 +50,7 @@ public class UnaryIfInstructionExecutor {
 				return (conditionValue ? br.getTarget() : br.getNext(ti));
 			}
 
-			switch (GlobalAbstraction.getInstance().processBranching(Equals.create(expr, Constant.create(0)))) {
+			switch (GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(expr, Constant.create(0)))) {
 			case FALSE:
 				sf.pop();
 				

@@ -7,6 +7,7 @@ import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ReturnInstruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
@@ -16,12 +17,18 @@ public class SymbolTableMonitor extends ListenerAdapter {
 	
 	@Override
 	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
-		if (execInsn instanceof InvokeInstruction) {			
-			if (nextInsn.getMethodInfo().getName().equals("main")) {
+		String targetClass = vm.getJPF().getConfig().getTarget();
+
+		if (execInsn instanceof InvokeInstruction) {
+			MethodInfo method = nextInsn.getMethodInfo();
+
+			if (method.getClassName().equals(targetClass) && method.getName().equals("main")) {
 				running = true;
 			}
 		}
-		if (execInsn instanceof ReturnInstruction && execInsn.getMethodInfo().getName().equals("main")) {
+		
+		MethodInfo method = execInsn.getMethodInfo();
+		if (execInsn instanceof ReturnInstruction && method.getClassName().equals(targetClass) && method.getName().equals("main")) {
 			running = false;
 		}
 		

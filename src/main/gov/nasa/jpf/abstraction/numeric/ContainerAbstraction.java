@@ -99,18 +99,18 @@ public class ContainerAbstraction extends Abstraction {
 	}
 	
     @Override
-	public void processMethodReturn() {
+	public void processMethodReturn(MethodInfo method) {
     	for (Abstraction abs : list) {
-    		abs.processMethodReturn();
+    		abs.processMethodReturn(method);
     	}
 	}
     
     @Override
-    public TruthValue processBranching(Predicate predicate) {
+    public TruthValue evaluatePredicate(Predicate predicate) {
     	TruthValue ret = TruthValue.UNDEFINED;
 
     	for (Abstraction abs : list) {
-    		TruthValue sub = abs.processBranching(predicate);
+    		TruthValue sub = abs.evaluatePredicate(predicate);
     		
    			ret = TruthValue.or(ret, sub);
     	}

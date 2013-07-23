@@ -32,7 +32,7 @@ public abstract class UnaryOperatorExecutor<T> {
 
 	final public Instruction execute(AbstractUnaryOperator<T> op, ThreadInfo ti) {
 
-		String name = op.getClass().getName();
+		String name = op.getClass().getSimpleName();
 		
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();

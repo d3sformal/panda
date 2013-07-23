@@ -14,7 +14,7 @@ public class BinaryIfInstructionExecutor {
 
 	final public Instruction execute(AbstractBranching br, ThreadInfo ti) {
 		
-		String name = br.getClass().getName();
+		String name = br.getClass().getSimpleName();
 
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();

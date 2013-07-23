@@ -72,10 +72,10 @@ public abstract class Abstraction {
 	public void processMethodCall(MethodInfo method) {
 	}
 	
-	public void processMethodReturn() {
+	public void processMethodReturn(MethodInfo method) {
 	}
 	
-	public TruthValue processBranching(Predicate predicate) {
+	public TruthValue evaluatePredicate(Predicate predicate) {
 		return TruthValue.UNDEFINED;
 	}
 

@@ -23,6 +23,7 @@ import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
@@ -41,7 +42,7 @@ public abstract class BinaryComparatorExecutor<T> {
 
 	final public Instruction execute(AbstractBinaryOperator<T> cmp, ThreadInfo ti) {
 		
-		String name = cmp.getClass().getName();
+		String name = cmp.getClass().getSimpleName();
 		
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
@@ -55,72 +56,50 @@ public abstract class BinaryComparatorExecutor<T> {
 		if (attr1 == null) attr1 = new EmptyAttribute();
 		if (attr2 == null) attr2 = new EmptyAttribute();
 		
-		Attribute result;
+		Attribute result = null;
 		
-		if (attr1.getExpression() != null && attr2.getExpression() != null) {
-			if (ti.isFirstStepInsn()) {
-				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-				
-				Integer comparison = (Integer) cg.getNextChoice();
-				
-				result = new NonEmptyAttribute(new SignsValue(comparison), Constant.create(comparison));
-				
-				storeResult(result, sf);
-				
-				return cmp.getSelf();
+		if (attr1.getExpression() != null && attr2.getExpression() != null) {			
+			TruthValue lt = GlobalAbstraction.getInstance().evaluatePredicate(LessThan.create(attr1.getExpression(), attr2.getExpression()));
+			TruthValue eq = GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(attr1.getExpression(), attr2.getExpression()));
+			TruthValue gt = null;
+						
+			if (TruthValue.and(lt, eq) == TruthValue.UNDEFINED) {
+				gt = TruthValue.UNDEFINED;
+			} else if (TruthValue.and(lt, eq) == TruthValue.FALSE) {
+				gt = TruthValue.TRUE;
+			} else if (lt == TruthValue.TRUE || eq == TruthValue.TRUE) {
+				gt = TruthValue.FALSE;
+			} else {
+				gt = TruthValue.UNKNOWN;
 			}
 			
-			TruthValue lt = GlobalAbstraction.getInstance().processBranching(LessThan.create(attr1.getExpression(), attr2.getExpression()));
-			TruthValue eq = GlobalAbstraction.getInstance().processBranching(Equals.create(attr1.getExpression(), attr2.getExpression()));
-			TruthValue gt = TruthValue.or(lt, eq) == TruthValue.UNKNOWN ? TruthValue.UNKNOWN : TruthValue.TRUE; 
-			
-			if (lt == TruthValue.TRUE) {
-				result = new NonEmptyAttribute(Abstraction._cmpg(0, abs_v1, 1, abs_v2), Constant.create(1));
-				
-				storeResult(result, sf);
+			// UNDEFINED MEANS THERE WAS NO ABSTRACTION TO DECIDE THE VALIDITY OF THE PREDICATE
+			if (gt != TruthValue.UNDEFINED) {
+				result = new NonEmptyAttribute(SignsAbstraction.getInstance().create(lt != TruthValue.FALSE, eq != TruthValue.FALSE, gt != TruthValue.FALSE), null);
 
-				return cmp.getNext(ti);
+				System.err.printf("%s> Expressions: %s, %s\n", name, attr1.getExpression().toString(AccessPath.NotationPolicy.DOT_NOTATION), attr2.getExpression().toString(AccessPath.NotationPolicy.DOT_NOTATION));
 			}
-			
-			if (eq == TruthValue.TRUE) {
-				result = new NonEmptyAttribute(Abstraction._cmpg(0, abs_v1, 0, abs_v2), Constant.create(0));
-				
-				storeResult(result, sf);
-
-				return cmp.getNext(ti);
-			}
-			
-			if (gt == TruthValue.TRUE) {
-				result = new NonEmptyAttribute(Abstraction._cmpg(1, abs_v1, 0, abs_v2), Constant.create(-1));
-				
-				storeResult(result, sf);
-
-				return cmp.getNext(ti);
-			}
-			
-			ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(SignsAbstraction.getInstance().getDomainSize());
-			ss.setNextChoiceGenerator(cg);
-			
-			return cmp.getSelf();
 		}
-
-		abs_v1 = attr1.getAbstractValue();
-		abs_v2 = attr2.getAbstractValue();
 		
-		T v1 = getLeftOperand(sf);
-		T v2 = getRightOperand(sf);
+		if (result == null) {
+			abs_v1 = attr1.getAbstractValue();
+			abs_v2 = attr2.getAbstractValue();
+		
+			T v1 = getLeftOperand(sf);
+			T v2 = getRightOperand(sf);
 
-		result = cmp.getResult(v1, attr1, v2, attr2);
+			result = cmp.getResult(v1, attr1, v2, attr2);
 
-		if (abs_v1 == null && abs_v2 == null) {
-			Instruction ret = cmp.executeConcrete(ti);
+			if (abs_v1 == null && abs_v2 == null) {
+				Instruction ret = cmp.executeConcrete(ti);
 			
-			storeAttribute(result, sf);
+				storeAttribute(result, sf);
 			
-			return ret;
+				return ret;
+			}
+			
+			System.out.printf("%s> Values: %s (%s), %s (%s)\n", name, v2.toString(), abs_v2, v1.toString(), abs_v1);
 		}
-
-		System.out.printf("%s> Values: %s (%s), %s (%s)\n", name, v2.toString(), abs_v2, v1.toString(), abs_v1);
 
 		if (result.getAbstractValue().isComposite()) {
 			if (!ti.isFirstStepInsn()) { // first time around
@@ -136,10 +115,11 @@ public abstract class BinaryComparatorExecutor<T> {
 
 				int key = (Integer) cg.getNextChoice();
 				result.setAbstractValue(result.getAbstractValue().getToken(key));
+				result.setExpression(null);
 			}
 		}
 		
-		System.out.printf("%s> Result: %s\n", name, result);
+		System.out.printf("%s> Result: %s\n", name, result.getAbstractValue());
 
 		storeResult(result, sf);
 

@@ -162,7 +162,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	}
 	
 	@Override
-	public TruthValue evaluate(Predicate predicate) {
+	public TruthValue evaluatePredicate(Predicate predicate) {
 		Predicate positiveWeakestPrecondition = predicate;
 		Predicate negativeWeakestPrecondition = Negation.create(predicate);
 
