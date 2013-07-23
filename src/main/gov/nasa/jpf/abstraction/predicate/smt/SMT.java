@@ -111,12 +111,13 @@ public class SMT {
 		
 		input += "(declare-fun arr () (Array Int (Array Int Int)))" + separator;
 		input += separator;
-
+		
 		/**
 		 * Collect all variable and field names from all weakest preconditions
 		 */
 		for (Predicate predicate : predicates.keySet()) {
 			collectVarsAndFields(vars, fields, predicates.get(predicate).positiveWeakestPrecondition);
+			collectVarsAndFields(vars, fields, predicates.get(predicate).negativeWeakestPrecondition);
 		}
 		
 		/**

@@ -80,7 +80,7 @@ public class AccessPath extends Expression {
 	public void appendIndexElement(Expression index) {
 		appendElement(new DefaultAccessPathIndexElement(index));
 
-		paths.addAll(index.paths);
+		paths.addAll(index.getPaths());
 	}
 	
 	public static void reRoot(AccessPath path, AccessPath oldPrefix, AccessPath newPrefix) {

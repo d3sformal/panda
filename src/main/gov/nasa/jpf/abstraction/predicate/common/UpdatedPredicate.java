@@ -33,7 +33,7 @@ public class UpdatedPredicate extends Predicate {
 		
 		// ONLY variable paths (single element - varname) get replaced, other paths stay in the expressions
 		if (path.getRoot() != path.getTail()) {
-			ret.add(path);
+			ret.addAll(path.getPaths());
 		}
 		
 		return ret;
