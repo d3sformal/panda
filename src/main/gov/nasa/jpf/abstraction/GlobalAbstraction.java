@@ -107,7 +107,7 @@ public class GlobalAbstraction extends Abstraction {
 	
 	@Override
 	public TruthValue evaluatePredicate(Predicate predicate) {
-		if (!running) return TruthValue.FALSE;
+		if (!running) return TruthValue.UNDEFINED;
 		
 		return abs.evaluatePredicate(predicate);
 	}
