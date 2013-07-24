@@ -216,9 +216,9 @@ public class ContainerAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void backtrack() {
+	public void backtrack(MethodInfo method) {
 		for (Abstraction abs : list) {
-			abs.backtrack();
+			abs.backtrack(method);
 		}
 	}
 	

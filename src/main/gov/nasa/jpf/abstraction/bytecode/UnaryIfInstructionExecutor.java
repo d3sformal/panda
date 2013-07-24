@@ -39,9 +39,9 @@ public class UnaryIfInstructionExecutor {
 		
 		// PREDICATE ABSTRACTION
 		if (expr != null) {
-			TruthValue eq = GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(expr, Constant.create(0)));
+			TruthValue pred = GlobalAbstraction.getInstance().evaluatePredicate(br.createPredicate(expr, Constant.create(0)));
 
-			switch (eq) {
+			switch (pred) {
 			case TRUE:
 				abs_condition = AbstractBoolean.TRUE;
 				break;
@@ -53,7 +53,7 @@ public class UnaryIfInstructionExecutor {
 				break;
 			}
 						
-			if (eq != TruthValue.UNDEFINED) {
+			if (pred != TruthValue.UNDEFINED) {
 				System.out.printf("%s> Predicate: %s = 0\n", name, expr.toString(AccessPath.NotationPolicy.DOT_NOTATION));
 			}
 		}		

@@ -20,6 +20,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
@@ -35,11 +36,13 @@ public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
 
 		Instruction actualNextInsn = super.execute(ti);
 		
+		MethodInfo method = ti.getTopFrameMethodInfo();
+		
 		if (JPFInstructionAdaptor.testInvokeStaticInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
-		} 
-		
-		GlobalAbstraction.getInstance().processMethodCall(ti.getTopFrameMethodInfo());
+		}
+				
+		GlobalAbstraction.getInstance().processMethodCall(method);
 
 		return actualNextInsn;
 	}

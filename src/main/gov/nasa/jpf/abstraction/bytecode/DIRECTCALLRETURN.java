@@ -36,7 +36,7 @@ public class DIRECTCALLRETURN extends gov.nasa.jpf.jvm.bytecode.DIRECTCALLRETURN
 		if (JPFInstructionAdaptor.testDirectCallReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}
-		
+				
         GlobalAbstraction.getInstance().processMethodReturn(method);
 
 		return actualNextInsn;

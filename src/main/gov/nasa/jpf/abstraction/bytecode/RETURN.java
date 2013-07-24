@@ -35,8 +35,8 @@ public class RETURN extends gov.nasa.jpf.jvm.bytecode.RETURN {
 		
 		if (JPFInstructionAdaptor.testReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
-		}    
-
+		}
+		
 		GlobalAbstraction.getInstance().processMethodReturn(method);
 
 		return actualNextInsn;

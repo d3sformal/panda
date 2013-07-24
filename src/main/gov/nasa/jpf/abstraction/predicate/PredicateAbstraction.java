@@ -8,11 +8,11 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
-import gov.nasa.jpf.abstraction.predicate.state.FlatPredicateValuation;
-import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.State;
+import gov.nasa.jpf.abstraction.predicate.state.SymbolTableStack;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.MethodInfo;
@@ -80,36 +80,26 @@ public class PredicateAbstraction extends Abstraction {
 	
 	@Override
 	public void start(MethodInfo method) {	
-		FlatSymbolTable symbols = symbolTable.createDefaultScope(method);
-		FlatPredicateValuation predicates = predicateValuation.createDefaultScope(method);
+		SymbolTableStack symbols = new SymbolTableStack();
+		PredicateValuationStack predicates = new PredicateValuationStack();
 		
 		State state = new State(symbols, predicates);
 		
 		trace.push(state);
-		
-		symbolTable.store(trace.top().symbolTable);
-		predicateValuation.store(trace.top().predicateValuation);
 	}
 
 	@Override
-	public void forward(MethodInfo method) {
-		System.err.println("Trace++");
-		
-		FlatSymbolTable symbols = symbolTable.createDefaultScope(method);
-		FlatPredicateValuation predicates = predicateValuation.createDefaultScope(method);
-		
-		State state = new State(symbols, predicates);
+	public void forward(MethodInfo method) {		
+		State state = new State(symbolTable.memorize(), predicateValuation.memorize());
 		
 		trace.push(state);
 	}
 	
 	@Override
-	public void backtrack() {
-		System.err.println("Trace--");
-		
+	public void backtrack(MethodInfo method) {		
 		trace.pop();
 		
-		symbolTable.restore(trace.top().symbolTable);
-		predicateValuation.restore(trace.top().predicateValuation);
+		symbolTable.restore(trace.top().symbolTableStack);
+		predicateValuation.restore(trace.top().predicateValuationStack);
 	}
 }

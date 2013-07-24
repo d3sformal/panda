@@ -7,6 +7,7 @@ import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
+import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ReturnInstruction;
@@ -14,13 +15,10 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 public class SymbolTableMonitor extends ListenerAdapter {
-	private boolean running = false;
 	
 	@Override
-	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
-		running = RunDetector.detectRunning(vm, nextInsn, execInsn, running);
-		
-		if (running) {
+	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {		
+		if (RunDetector.isRunning()) {
 			inspect(GlobalAbstraction.getInstance().get());
 		}
 	}
@@ -34,9 +32,13 @@ public class SymbolTableMonitor extends ListenerAdapter {
 			}
 		} else if (abs instanceof PredicateAbstraction) {
 			PredicateAbstraction predicate = (PredicateAbstraction) abs;
-			System.out.println("--SYMBOLS--");
-			System.out.print(predicate.getSymbolTable().toString());
-			System.out.println("--------------");
+			String table = predicate.getSymbolTable().toString();
+			System.out.println(
+				"--SYMBOLS " + predicate.getSymbolTable().count() + " --\n" +
+				table +
+				"--------------"
+			);
+			System.out.flush();
 		}		
 	}
 }

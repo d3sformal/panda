@@ -60,7 +60,7 @@ public abstract class Abstraction {
 	public void forward(MethodInfo method) {
 	}
 	
-	public void backtrack() {
+	public void backtrack(MethodInfo method) {
 	}
 	
 	public void processLoad(ConcretePath from) {

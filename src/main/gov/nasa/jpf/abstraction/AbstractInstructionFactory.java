@@ -82,11 +82,11 @@ public class AbstractInstructionFactory extends
 		}
 
 		if (abs_list.size() == 0) {
-			GlobalAbstraction.set(conf.getTarget(), null);
+			GlobalAbstraction.set(null);
 		} else if (abs_list.size() == 1) {
-			GlobalAbstraction.set(conf.getTarget(), abs_list.get(0));
+			GlobalAbstraction.set(abs_list.get(0));
 		} else {
-			GlobalAbstraction.set(conf.getTarget(), new ContainerAbstraction(abs_list));
+			GlobalAbstraction.set(new ContainerAbstraction(abs_list));
 			System.out
 					.println("### jpf-abstraction: CONTAINER abstraction turned on");
 		}

@@ -21,6 +21,10 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.predicate.common.Equals;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
@@ -54,6 +58,11 @@ public class IFNE extends gov.nasa.jpf.jvm.bytecode.IFNE implements AbstractBran
 	@Override
 	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
 		return Abstraction._ne(v1, abs_v1, 0, null);
+	}
+	
+	@Override
+	public Predicate createPredicate(Expression expr1, Expression expr2) {
+		return Negation.create(Equals.create(expr1, expr2));
 	}
 
 }

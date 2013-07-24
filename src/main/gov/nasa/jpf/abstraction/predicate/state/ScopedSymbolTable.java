@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.Stack;
 
 public class ScopedSymbolTable implements SymbolTable, Scoped {
-	private Stack<FlatSymbolTable> scopes = new Stack<FlatSymbolTable>();
+	private SymbolTableStack scopes = new SymbolTableStack();
 	
 	@Override
 	public FlatSymbolTable createDefaultScope(MethodInfo method) {
@@ -18,37 +18,37 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 
 	@Override
 	public Set<AccessPath> lookupAccessPaths(AccessPath prefix) {
-		return scopes.lastElement().lookupAccessPaths(prefix);
+		return scopes.top().lookupAccessPaths(prefix);
 	}
 
 	@Override
 	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID var) {
-		return scopes.lastElement().lookupEquivalentAccessPaths(var);
+		return scopes.top().lookupEquivalentAccessPaths(var);
 	}
 	
 	@Override
 	public Set<AccessPath> lookupEquivalentAccessPaths(AccessPath path) {
-		return scopes.lastElement().lookupEquivalentAccessPaths(path);
+		return scopes.top().lookupEquivalentAccessPaths(path);
 	}
 
 	@Override
 	public Set<CompleteVariableID> resolvePath(AccessPath path) {
-		return scopes.lastElement().resolvePath(path);
+		return scopes.top().resolvePath(path);
 	}
 	
 	@Override
 	public void processLoad(ConcretePath from) {
-		scopes.lastElement().processLoad(from);
+		scopes.top().processLoad(from);
 	}
 	
 	@Override
 	public Set<AccessPath> processPrimitiveStore(ConcretePath to) {
-		return scopes.lastElement().processPrimitiveStore(to);
+		return scopes.top().processPrimitiveStore(to);
 	}
 	
 	@Override
 	public Set<AccessPath> processObjectStore(ConcretePath from, ConcretePath to) {
-		return scopes.lastElement().processObjectStore(from, to);
+		return scopes.top().processObjectStore(from, to);
 	}
 	
 	@Override
@@ -71,28 +71,27 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public void restore(Scope scope) {
-		if (scope instanceof FlatSymbolTable) {
-			scopes.pop();
-			scopes.push((FlatSymbolTable) scope.clone());
+	public void restore(Scopes scopes) {
+		if (scopes instanceof SymbolTableStack) {
+			this.scopes = (SymbolTableStack) scopes;
 		} else {
-			throw new RuntimeException("Invalid scope type being pushed!");
+			throw new RuntimeException("Invalid scopes type being restored!");
 		}
 	}
 	
 	@Override
-	public FlatSymbolTable memorize() {
-		return scopes.lastElement().clone();
+	public SymbolTableStack memorize() {
+		return scopes.clone();
 	}
 	
 	@Override
 	public String toString() {
-		return scopes.lastElement().toString();
+		return scopes.count() > 0 ? scopes.top().toString() : "";
 	}
 
 	@Override
 	public int count() {
-		return scopes.size();
+		return scopes.count() > 0 ? scopes.top().count() : 0;
 	}
 	
 }

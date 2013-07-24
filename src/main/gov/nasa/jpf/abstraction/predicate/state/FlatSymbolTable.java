@@ -230,7 +230,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	@Override
 	public String toString() {
-		String ret = "";
+		StringBuilder ret = new StringBuilder();
 		
 		int padding = 0;
 
@@ -253,18 +253,26 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		
 		for (AccessPath p : paths) {
 			String path = p.toString(AccessPath.NotationPolicy.DOT_NOTATION);
-			String pad = "";
+			StringBuilder pad = new StringBuilder();
 			
 			for (int i = 0; i < padding - path.length(); ++i) {
-				pad += " ";
+				pad.append(" ");
 			}
 						
 			for (CompleteVariableID var : path2vars.get(p)) {
-				ret += path + pad + var + "\n";
+				ret.append(path);
+				ret.append(pad);
+				ret.append(var);
+				ret.append("\n");
 			}
 		}
 
-		return ret;
+		return ret.toString();
+	}
+	
+	@Override
+	public int count() {
+		return path2vars.keySet().size();
 	}
 
 }

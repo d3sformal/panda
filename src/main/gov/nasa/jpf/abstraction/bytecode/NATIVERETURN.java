@@ -35,8 +35,8 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
 		
 		if (JPFInstructionAdaptor.testReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
-		}    
-
+		}
+		
 		GlobalAbstraction.getInstance().processMethodReturn(method);
 		
 		return actualNextInsn;

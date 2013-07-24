@@ -45,7 +45,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
 	@Override
 	public String toString() {	
-		String ret = "";
+		StringBuilder ret = new StringBuilder();
 
 		int padding = 0;
 		
@@ -59,30 +59,25 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		
 		for (Predicate p : valuations.keySet()) {
 			String predicate = p.toString(AccessPath.NotationPolicy.DOT_NOTATION);
-			String pad = "";
+			StringBuilder pad = new StringBuilder();
 			
 			for (int i = 0; i < padding - predicate.length(); ++i) {
-				pad += " ";
+				pad.append(" ");
 			}
 
-			ret += predicate + pad + valuations.get(p) + "\n";
+			ret.append(predicate);
+			ret.append(pad);
+			ret.append(valuations.get(p));
+			ret.append("\n");
 		}
 		
-		return ret;
+		return ret.toString();
 	}
 
 	@Override
 	public void reevaluate(AccessPath affected, Set<AccessPath> resolvedAffected, Expression expression) {
 		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
 
-		if (affected == null) return;
-
-		System.err.println("SMT: ");
-		
-		System.err.println("\tREACTION TO:");
-		System.err.println("\t\t" + affected.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-		
-		System.err.println("\tAFFECTS:");
 		for (Predicate predicate : valuations.keySet()) {
 			boolean affects = false;
 			
@@ -133,18 +128,6 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				}
 				
 				predicates.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
-
-				System.err.println("\t\t" + predicate.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-				System.err.println("\t\t\t[ Weakest Preconditions");
-				System.err.println("\t\t\t\t+ " + positiveWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-				System.err.println("\t\t\t\t- " + negativeWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-				System.err.println("\t\t\t]");
-				System.err.println("\t\t\t[ Relevant");
-				for (Predicate det : determinants.keySet()) {
-					System.err.println("\t\t\t\t" + det.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " :: " + determinants.get(det));
-				}
-				System.err.println("\t\t\t]");
-				System.err.println();
 			}
 		}
 		
@@ -152,10 +135,8 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		
 		try {
 			Map<Predicate, TruthValue> newValuations = new SMT().valuatePredicates(predicates);
-		
-			for (Predicate predicate : newValuations.keySet()) {
-				valuations.put(predicate, newValuations.get(predicate));
-			}
+			
+			valuations.putAll(newValuations);
 		} catch (SMTException e) {
 			e.printStackTrace();
 		}
@@ -187,6 +168,11 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		}
 		
 		return TruthValue.UNDEFINED;
+	}
+	
+	@Override
+	public int count() {
+		return valuations.keySet().size();
 	}
 	
 }

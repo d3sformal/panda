@@ -10,24 +10,18 @@ import gov.nasa.jpf.vm.MethodInfo;
 public class GlobalAbstraction extends Abstraction {
 	private static GlobalAbstraction instance;
 	
-	public static void set(String targetClass, Abstraction abs) {
-		instance = new GlobalAbstraction(targetClass, abs);
+	public static void set(Abstraction abs) {
+		instance = new GlobalAbstraction(abs);
 	}
 	
 	public static GlobalAbstraction getInstance() {
 		return instance;
 	}
 	
-	private String targetClass;
 	private Abstraction abs;
-	private boolean running;
 	
-	private GlobalAbstraction(String targetClass, Abstraction abs) {
-		this.targetClass = targetClass;
+	private GlobalAbstraction(Abstraction abs) {
 		this.abs = abs;
-		this.running = false;
-		
-		System.err.println(targetClass);
 	}
 	
 	public Abstraction get() {
@@ -70,52 +64,44 @@ public class GlobalAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void backtrack() {
-		abs.backtrack();
+	public void backtrack(MethodInfo method) {
+		abs.backtrack(method);
 	}
 	
 	@Override
 	public void processLoad(ConcretePath from) {
-		if (!running) return;
+		if (!RunDetector.isRunning()) return;
 
 		abs.processLoad(from);
 	}
 	
 	@Override
 	public void processPrimitiveStore(Expression from, ConcretePath to) {
-		if (!running) return;
+		if (!RunDetector.isRunning()) return;
 		
 		abs.processPrimitiveStore(from, to);
 	}
 	
 	@Override
 	public void processObjectStore(ConcretePath from, ConcretePath to) {
-		if (!running) return;
+		if (!RunDetector.isRunning()) return;
 		
 		abs.processObjectStore(from, to);
 	}
 	
 	@Override
 	public void processMethodCall(MethodInfo method) {
-		if (RunDetector.detectRunning(targetClass, method, true) == true) {
-			running = true;
-		}
-		
 		abs.processMethodCall(method);
 	}
 	
 	@Override
 	public void processMethodReturn(MethodInfo method) {
-		if (RunDetector.detectRunning(targetClass, method, false) == false) {
-			running = false;
-		}
-
 		abs.processMethodReturn(method);
 	}
 	
 	@Override
 	public TruthValue evaluatePredicate(Predicate predicate) {
-		if (!running) return TruthValue.UNDEFINED;
+		if (!RunDetector.isRunning()) return TruthValue.UNDEFINED;
 		
 		return abs.evaluatePredicate(predicate);
 	}

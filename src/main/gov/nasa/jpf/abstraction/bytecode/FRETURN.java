@@ -35,8 +35,8 @@ public class FRETURN extends gov.nasa.jpf.jvm.bytecode.FRETURN {
 		
 		if (JPFInstructionAdaptor.testReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
-		} 
-		 
+		}
+				 
         GlobalAbstraction.getInstance().processMethodReturn(method);
 
 		return actualNextInsn;

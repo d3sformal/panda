@@ -35,8 +35,8 @@ public class LRETURN extends gov.nasa.jpf.jvm.bytecode.LRETURN {
 		
 		if (JPFInstructionAdaptor.testReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
-		}   
-		
+		}
+				
 		GlobalAbstraction.getInstance().processMethodReturn(method);
 
 		return actualNextInsn;

@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.Stack;
 
 public class ScopedPredicateValuation implements PredicateValuation, Scoped {
-	private Stack<FlatPredicateValuation> scopes = new Stack<FlatPredicateValuation>();
+	private PredicateValuationStack scopes = new PredicateValuationStack();
 	private Predicates predicateSet;
 	
 	public ScopedPredicateValuation(Predicates predicateSet) {
@@ -53,17 +53,17 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 
 	@Override
 	public void put(Predicate predicate, TruthValue value) {
-		scopes.lastElement().put(predicate, value);
+		scopes.top().put(predicate, value);
 	}
 
 	@Override
 	public TruthValue get(Predicate predicate) {
-		return scopes.lastElement().get(predicate);
+		return scopes.top().get(predicate);
 	}
 
 	@Override
 	public Iterator<Entry<Predicate, TruthValue>> iterator() {
-		return scopes.lastElement().iterator();
+		return scopes.top().iterator();
 	}
 	
 	@Override
@@ -86,38 +86,37 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public void restore(Scope scope) {
-		if (scope instanceof FlatPredicateValuation) {
-			scopes.pop();
-			scopes.push((FlatPredicateValuation) scope.clone());
+	public void restore(Scopes scopes) {
+		if (scopes instanceof PredicateValuationStack) {
+			this.scopes = (PredicateValuationStack) scopes;
 		} else {
-			throw new RuntimeException("Invalid scope type being pushed!");
+			throw new RuntimeException("Invalid scopes type being restored!");
 		}
 	}
 	
 	@Override
-	public FlatPredicateValuation memorize() {
-		return scopes.lastElement().clone();
+	public PredicateValuationStack memorize() {
+		return scopes.clone();
 	}
 	
 	@Override
 	public String toString() {
-		return scopes.lastElement().toString();
+		return scopes.count() > 0 ? scopes.top().toString() : "";
 	}
 
 	@Override
 	public void reevaluate(AccessPath affected, Set<AccessPath> resolvedAffected, Expression expression) {
-		scopes.lastElement().reevaluate(affected, resolvedAffected, expression);
+		scopes.top().reevaluate(affected, resolvedAffected, expression);
 	}
 	
 	@Override
 	public TruthValue evaluatePredicate(Predicate predicate) {
-		return scopes.lastElement().evaluatePredicate(predicate);
+		return scopes.top().evaluatePredicate(predicate);
 	}
 	
 	@Override
 	public int count() {
-		return scopes.size();
+		return scopes.count() > 0 ? scopes.top().count() : 0;
 	}
 
 }
