@@ -1,12 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-import java.util.Map;
 import java.util.Set;
 
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
@@ -36,14 +34,21 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processStore(Expression from, ConcretePath to) {
+	public void processPrimitiveStore(Expression from, ConcretePath to) {
 		ConcretePath fromPath = null;
 		
 		if (from instanceof ConcretePath) {
 			fromPath = (ConcretePath) from;
 		}
 		
-		Set<AccessPath> resolvedAffected = symbolTable.processStore(fromPath, to);
+		Set<AccessPath> resolvedAffected = symbolTable.processPrimitiveStore(to);
+
+		predicateValuation.reevaluate(to, resolvedAffected, from);
+	}
+	
+	@Override
+	public void processObjectStore(ConcretePath from, ConcretePath to) {	
+		Set<AccessPath> resolvedAffected = symbolTable.processObjectStore(from, to);
 
 		predicateValuation.reevaluate(to, resolvedAffected, from);
 	}

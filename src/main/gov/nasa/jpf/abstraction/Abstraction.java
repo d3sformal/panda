@@ -66,7 +66,20 @@ public abstract class Abstraction {
 	public void processLoad(ConcretePath from) {
 	}
 	
-	public void processStore(Expression from, ConcretePath to) {
+	public final void processStore(Expression from, ConcretePath to) {
+		if (from instanceof ConcretePath && ((ConcretePath)from).resolve().isEmpty()) {
+			//Path resolves to objRefs
+			processObjectStore((ConcretePath) from, to);
+		} else {
+			//Path resolves to an expression over primitive types
+			processPrimitiveStore(from, to);
+		}
+	}
+	
+	public void processPrimitiveStore(Expression from, ConcretePath to) {
+	}
+	
+	public void processObjectStore(ConcretePath from, ConcretePath to) {
 	}
 	
 	public void processMethodCall(MethodInfo method) {

@@ -9,11 +9,12 @@ import java.util.Set;
 public interface SymbolTable {
 	
 	public Set<AccessPath> lookupAccessPaths(AccessPath prefix);
-	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID number);
+	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID var);
 	public Set<AccessPath> lookupEquivalentAccessPaths(AccessPath path);
-	public CompleteVariableID resolvePath(AccessPath path);
+	public Set<CompleteVariableID> resolvePath(AccessPath path);
 	
 	public void processLoad(ConcretePath from);
-	public Set<AccessPath> processStore(ConcretePath from, ConcretePath to);
+	public Set<AccessPath> processPrimitiveStore(ConcretePath to);
+	public Set<AccessPath> processObjectStore(ConcretePath from, ConcretePath to);
 	
 }

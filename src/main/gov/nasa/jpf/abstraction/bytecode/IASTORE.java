@@ -55,7 +55,7 @@ public class IASTORE extends gov.nasa.jpf.jvm.bytecode.IASTORE {
 			to = (ConcretePath) destination.getExpression();
 			to.appendIndexElement(index.getExpression());
 
-			GlobalAbstraction.getInstance().processStore(from, to);
+			GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
 		}
 		
 		return actualNextInsn;

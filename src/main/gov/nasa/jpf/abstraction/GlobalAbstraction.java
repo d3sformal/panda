@@ -4,6 +4,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.MethodInfo;
 
 public class GlobalAbstraction extends Abstraction {
@@ -81,15 +82,22 @@ public class GlobalAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processStore(Expression from, ConcretePath to) {
+	public void processPrimitiveStore(Expression from, ConcretePath to) {
 		if (!running) return;
 		
-		abs.processStore(from, to);
+		abs.processPrimitiveStore(from, to);
+	}
+	
+	@Override
+	public void processObjectStore(ConcretePath from, ConcretePath to) {
+		if (!running) return;
+		
+		abs.processObjectStore(from, to);
 	}
 	
 	@Override
 	public void processMethodCall(MethodInfo method) {
-		if (method.getClassName().equals(targetClass) && method.getName().equals("main")) {
+		if (RunDetector.detectRunning(targetClass, method, true) == true) {
 			running = true;
 		}
 		
@@ -98,7 +106,7 @@ public class GlobalAbstraction extends Abstraction {
 	
 	@Override
 	public void processMethodReturn(MethodInfo method) {
-		if (method.getClassName().equals(targetClass) && method.getName().equals("main")) {
+		if (RunDetector.detectRunning(targetClass, method, false) == false) {
 			running = false;
 		}
 

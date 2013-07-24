@@ -36,7 +36,7 @@ public class LSTORE extends gov.nasa.jpf.jvm.bytecode.LSTORE {
 		sf = ti.getModifiableTopFrame();
 		sf.setLocalAttr(getLocalVariableIndex(), source);
 
-		GlobalAbstraction.getInstance().processStore(from, to);
+		GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
 		
 		return actualNextInsn;
 	}

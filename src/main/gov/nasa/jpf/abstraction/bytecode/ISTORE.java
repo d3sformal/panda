@@ -36,7 +36,7 @@ public class ISTORE extends gov.nasa.jpf.jvm.bytecode.ISTORE {
 		sf = ti.getModifiableTopFrame();
 		sf.setLocalAttr(getLocalVariableIndex(), source);
 
-		GlobalAbstraction.getInstance().processStore(from, to);
+		GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
 		
 		return actualNextInsn;
 	}

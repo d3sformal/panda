@@ -43,7 +43,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 
 		Instruction actualNextInsn = super.execute(ti);
 		
-		Expression from = source.getExpression();
+		ConcretePath from = (ConcretePath) source.getExpression();
 		ConcretePath to = null;
 
 		if (getLocalVarInfo() != null) {
@@ -55,7 +55,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		sf = ti.getModifiableTopFrame();
 		sf.setLocalAttr(getLocalVariableIndex(), source);
 
-		GlobalAbstraction.getInstance().processStore(from, to);
+		GlobalAbstraction.getInstance().processObjectStore(from, to);
 		
 		return actualNextInsn;
 	}

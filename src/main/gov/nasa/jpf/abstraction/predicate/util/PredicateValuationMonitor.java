@@ -5,6 +5,7 @@ import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MethodInfo;
@@ -17,20 +18,7 @@ public class PredicateValuationMonitor extends ListenerAdapter {
 	
 	@Override
 	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
-		String targetClass = vm.getJPF().getConfig().getTarget();
-
-		if (execInsn instanceof InvokeInstruction) {
-			MethodInfo method = nextInsn.getMethodInfo();
-
-			if (method.getClassName().equals(targetClass) && method.getName().equals("main")) {
-				running = true;
-			}
-		}
-		
-		MethodInfo method = execInsn.getMethodInfo();
-		if (execInsn instanceof ReturnInstruction && method.getClassName().equals(targetClass) && method.getName().equals("main")) {
-			running = false;
-		}
+		running = RunDetector.detectRunning(vm, nextInsn, execInsn, running);
 		
 		if (running) {
 			inspect(GlobalAbstraction.getInstance().get());

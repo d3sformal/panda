@@ -55,7 +55,7 @@ public class LASTORE extends gov.nasa.jpf.jvm.bytecode.LASTORE {
 			to = (ConcretePath) destination.getExpression();
 			to.appendIndexElement(index.getExpression());
 
-			GlobalAbstraction.getInstance().processStore(from, to);
+			GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
 		}
 		
 		return actualNextInsn;

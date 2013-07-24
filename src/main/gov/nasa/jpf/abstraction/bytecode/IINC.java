@@ -98,7 +98,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 			sf.setLocalVariable(index, 0, false);
 		}
 		
-		GlobalAbstraction.getInstance().processStore(expression, new ConcretePath(sf.getLocalVarInfo(index).getName(), ti, var, ConcretePath.Type.LOCAL));
+		GlobalAbstraction.getInstance().processPrimitiveStore(expression, new ConcretePath(sf.getLocalVarInfo(index).getName(), ti, var, ConcretePath.Type.LOCAL));
 
 		return getNext(ti);
 	}

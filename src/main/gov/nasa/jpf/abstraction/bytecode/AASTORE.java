@@ -20,7 +20,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
@@ -48,14 +47,14 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 			return actualNextInsn;
 		} 
 		
-		Expression from = source.getExpression();
+		ConcretePath from = (ConcretePath) source.getExpression();
 		ConcretePath to = null;
 		
 		if (destination.getExpression() instanceof ConcretePath) {
 			to = (ConcretePath) destination.getExpression();
 			to.appendIndexElement(index.getExpression());
 
-			GlobalAbstraction.getInstance().processStore(from, to);
+			GlobalAbstraction.getInstance().processObjectStore(from, to);
 		}
 		
 		return actualNextInsn;

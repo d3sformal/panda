@@ -55,7 +55,7 @@ public class DASTORE extends gov.nasa.jpf.jvm.bytecode.DASTORE {
 			to = (ConcretePath) destination.getExpression();
 			to.appendIndexElement(index.getExpression());
 
-			GlobalAbstraction.getInstance().processStore(from, to);
+			GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
 		}
 		
 		return actualNextInsn;
