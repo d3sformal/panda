@@ -96,6 +96,18 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		var2paths.get(var).add(path);
 	}
 	
+	private void setPathToVars(AccessPath path, Set<CompleteVariableID> vars) {
+		for (CompleteVariableID var : vars) {
+			setPathToVar(path, var);
+		}
+	}
+	
+	private void setPathsToVars(Set<AccessPath> paths, Set<CompleteVariableID> vars) {
+		for (AccessPath path : paths) {
+			setPathToVars(path, vars);
+		}
+	}
+	
 	private void unsetPath(AccessPath path) {
 		initialisePathToNumbers(path);
 		
@@ -167,41 +179,46 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return affected;
 	}
 	
-	private Set<AccessPath> processObjectStore(AccessPath destinationPrefix, AccessPath sourcePrefix) {
-		// ASSIGN AN OBJECT OR ARRAY
+	private Set<AccessPath> processObjectStore(Set<AccessPath> destinationCandidates, Set<AccessPath> sourceCandidates) {
 		Set<AccessPath> affected = new HashSet<AccessPath>();
-		
-		Set<AccessPath> sources = lookupAccessPaths(sourcePrefix);
-		
-		for (AccessPath source : sources) {
-			AccessPath destinationPath = source.clone();
-			AccessPath newPrefix = destinationPrefix.clone();
 
-			AccessPath.reRoot(destinationPath, sourcePrefix, newPrefix);
-			
-			// TODO:
-			//
-			// a.b = c
-			// a.b.x := X
-			//
-			// affected:
-			//
-			// a.b.x.*
-			// c.x.* !!! !!! !!!
-			Set<AccessPath> equivalentPaths = lookupEquivalentAccessPaths(destinationPath);
-			equivalentPaths.add(destinationPath);
-			// >>> TODO <<<<
-			// Test whether any of the equivalentPaths is affected by the store
-
-			for (AccessPath equivalentPath : equivalentPaths) {
-				// REWRITE ALL PRIMITIVE SUB FIELDS (NO MATTER ITS DEPTH)
+		for (AccessPath destinationPrefix : destinationCandidates) {
+			for (AccessPath sourcePrefix : sourceCandidates) {
+				// ASSIGN AN OBJECT OR ARRAY				
+				Set<AccessPath> sources = lookupAccessPaths(sourcePrefix);
 				
-				unsetPath(equivalentPath);
-				for (CompleteVariableID var : resolvePath(source)) {
-					setPathToVar(equivalentPath, var);
+				for (AccessPath source : sources) {
+					AccessPath destinationPath = source.clone();
+					AccessPath newPrefix = destinationPrefix.clone();
+
+					AccessPath.reRoot(destinationPath, sourcePrefix, newPrefix);
+					
+					// TODO:
+					//
+					// a.b = c
+					// a.b.x := X
+					//
+					// affected:
+					//
+					// a.b.x.*
+					// c.x.* !!! !!! !!!
+					Set<AccessPath> equivalentPaths = lookupEquivalentAccessPaths(destinationPath);
+					equivalentPaths.add(destinationPath);
+					// >>> TODO <<<<
+					// Test whether any of the equivalentPaths is affected by the store
+
+					// IF THE WRITE WAS UNAMBIGUOUS REWRITE
+					// ELSE ONLY ADD POSSIBILITIES
+					if (destinationCandidates.size() == 1) {
+						for (AccessPath equivalentPath : equivalentPaths) {	
+							unsetPath(equivalentPath);
+						}
+					}
+					
+					setPathsToVars(equivalentPaths, resolvePath(source));
+					
+					affected.addAll(equivalentPaths);
 				}
-			
-				affected.add(equivalentPath);
 			}
 		}
 		
@@ -219,13 +236,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		Set<AccessPath> destinationCandidates = destinationPrefix.partialResolve().keySet();
 		Set<AccessPath> sourceCandidates = sourcePrefix.partialResolve().keySet();
 
-		for (AccessPath destinationPath : destinationCandidates) {
-			for (AccessPath sourcePath : sourceCandidates) {
-				affected.addAll(processObjectStore(destinationPath, sourcePath));
-			}
-		}
-		
-		return affected;
+		return processObjectStore(destinationCandidates, sourceCandidates);
 	}
 	
 	@Override
