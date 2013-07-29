@@ -210,6 +210,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 						}
 
 						setPathToVars(newPath, resolvePath(source));
+						
+						// TODO: affected var.length if var instanceof array
+						
 						affected.add(newPath);
 					}
 				}
@@ -222,6 +225,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				}
 				
 				setPathToVars(destination, resolvePath(sourceCandidate));
+				
+				// TODO: affected var.length if var instanceof array
+				
 				affected.add(destination);
 			}
 		}

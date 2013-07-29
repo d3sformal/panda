@@ -34,7 +34,6 @@ import gov.nasa.jpf.abstraction.numeric.RangeAbstractionFactory;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstractionFactory;
 import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstractionFactory;
-
 import gov.nasa.jpf.util.InstructionFactoryFilter;
 
 public class AbstractInstructionFactory extends
@@ -112,6 +111,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction areturn() {
 		return (filter.isInstrumentedClass(ci) ? new ARETURN() : super.areturn());
+	}
+	
+	@Override
+	public Instruction arraylength() {
+		return (filter.isInstrumentedClass(ci) ? new ARRAYLENGTH() : super.arraylength());
 	}
 	
 	@Override

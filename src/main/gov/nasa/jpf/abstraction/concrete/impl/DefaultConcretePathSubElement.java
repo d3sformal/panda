@@ -5,6 +5,7 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathSubElement;
+import gov.nasa.jpf.abstraction.concrete.ArrayLengthID;
 import gov.nasa.jpf.abstraction.concrete.PartialClassID;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePathElement;
@@ -68,6 +69,10 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 				// STRUCTURED FIELD (PATH NOT YET COMPLETE)
 				
 				ret.put(path, new PartialVariableID((ElementInfo)object));
+			} else if (ei.isArray() && getName().equals("length")) {
+				// ARRAY LENGTH "FIELD"
+
+				ret.put(path, new ArrayLengthID(ei.getObjectRef()));
 			} else {
 				// PRIMITIVE FIELD
 				

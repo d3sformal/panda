@@ -6,10 +6,9 @@ import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.AccessPath;
-import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
-import gov.nasa.jpf.abstraction.predicate.common.Equals;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
@@ -25,8 +24,8 @@ public class BinaryIfInstructionExecutor {
 
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
-		Attribute attr1 = (Attribute) sf.getOperandAttr();
-		Attribute attr2 = (Attribute) sf.getOperandAttr();
+		Attribute attr1 = (Attribute) sf.getOperandAttr(1);
+		Attribute attr2 = (Attribute) sf.getOperandAttr(0);
 		
 		if (attr1 == null) attr1 = new EmptyAttribute();
 		if (attr2 == null) attr2 = new EmptyAttribute();
@@ -40,9 +39,10 @@ public class BinaryIfInstructionExecutor {
 		
 		// PREDICATE ABSTRACTION
 		if (expr1 != null) {
-			TruthValue pred = GlobalAbstraction.getInstance().evaluatePredicate(br.createPredicate(expr1, expr2));
+			Predicate predicate = br.createPredicate(expr1, expr2);
+			TruthValue truth = GlobalAbstraction.getInstance().evaluatePredicate(predicate);
 
-			switch (pred) {
+			switch (truth) {
 			case TRUE:
 				abs_condition = AbstractBoolean.TRUE;
 				break;
@@ -54,8 +54,8 @@ public class BinaryIfInstructionExecutor {
 				break;
 			}
 						
-			if (pred != TruthValue.UNDEFINED) {
-				System.out.printf("%s> Predicate: %s = 0\n", name, expr1.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+			if (truth != TruthValue.UNDEFINED) {
+				System.out.printf("%s> Predicate: %s\n", name, predicate.toString(AccessPath.NotationPolicy.DOT_NOTATION));
 			}
 		}		
 
