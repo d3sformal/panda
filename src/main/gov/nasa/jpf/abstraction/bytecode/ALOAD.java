@@ -19,6 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
@@ -46,11 +47,11 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 			
     		if (ei != null) {
 	    		Attribute attribute = new NonEmptyAttribute(null, path);
+	    		
+	    		GlobalAbstraction.getInstance().processLoad(path);
 
 		    	sf.setOperandAttr(attribute);
     		}
-        } else {
-        	//TODO System.err.println(getClass().getSimpleName() + ": unknown local variable");
         }
 
 		return actualNextInsn;

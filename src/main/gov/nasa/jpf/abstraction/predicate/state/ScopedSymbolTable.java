@@ -1,12 +1,11 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.VariableID;
 import gov.nasa.jpf.vm.MethodInfo;
 
 import java.util.Set;
-import java.util.Stack;
 
 public class ScopedSymbolTable implements SymbolTable, Scoped {
 	private SymbolTableStack scopes = new SymbolTableStack();
@@ -22,18 +21,13 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 
 	@Override
-	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID var) {
+	public Set<AccessPath> lookupEquivalentAccessPaths(VariableID var) {
 		return scopes.top().lookupEquivalentAccessPaths(var);
 	}
 	
 	@Override
 	public Set<AccessPath> lookupEquivalentAccessPaths(AccessPath path) {
 		return scopes.top().lookupEquivalentAccessPaths(path);
-	}
-
-	@Override
-	public Set<CompleteVariableID> resolvePath(AccessPath path) {
-		return scopes.top().resolvePath(path);
 	}
 	
 	@Override

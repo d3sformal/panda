@@ -50,4 +50,15 @@ public class Constant extends Expression {
 	public Constant clone() {
 		return new Constant(value);
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Constant) {
+			Constant c = (Constant) o;
+			
+			return value.equals(c.value);
+		}
+		
+		return false;
+	}
 }

@@ -10,6 +10,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.impl.DefaultConcretePathIndexElement;
 import gov.nasa.jpf.abstraction.concrete.impl.DefaultConcretePathRootElement;
 import gov.nasa.jpf.abstraction.concrete.impl.DefaultConcretePathSubElement;
+import gov.nasa.jpf.abstraction.concrete.impl.PathResolution;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public class ConcretePath extends AccessPath {
@@ -67,7 +68,7 @@ public class ConcretePath extends AccessPath {
 	public Map<AccessPath, CompleteVariableID> resolve() {
 		ConcretePathElement element = (ConcretePathElement) tail;
 		
-		Map<AccessPath, VariableID> vars = element.getVariableIDs(ti);
+		Map<AccessPath, VariableID> vars = element.getVariableIDs(ti).current;
 		Map<AccessPath, CompleteVariableID> ret = new HashMap<AccessPath, CompleteVariableID>();
 		
 		for (AccessPath path : vars.keySet()) {
@@ -86,7 +87,11 @@ public class ConcretePath extends AccessPath {
 	public Map<AccessPath, VariableID> partialResolve() {
 		ConcretePathElement element = (ConcretePathElement) tail;
 		
-		return element.getVariableIDs(ti);
+		PathResolution resolution = element.getVariableIDs(ti);
+		
+		resolution.processed.putAll(resolution.current);
+		
+		return resolution.processed;
 	}
 	
 	@Override

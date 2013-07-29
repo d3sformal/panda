@@ -28,9 +28,10 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 	}
 
 	@Override
-	public Map<AccessPath, VariableID> getVariableIDs(ThreadInfo ti) {
+	public PathResolution getVariableIDs(ThreadInfo ti) {
 		ConcretePathElement previous = getPrevious();
-		Map<AccessPath, VariableID> vars = previous.getVariableIDs(ti);
+		PathResolution resolution = previous.getVariableIDs(ti);
+		Map<AccessPath, VariableID> vars = resolution.current;
 		Map<AccessPath, VariableID> ret = new HashMap<AccessPath, VariableID>();
 		
 		for (AccessPath path : vars.keySet()) {
@@ -74,7 +75,10 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 			}
 		}
 		
-		return ret;
+		resolution.processed.putAll(resolution.current);
+		resolution.current = ret;
+		
+		return resolution;
 	}
 	
 	@Override

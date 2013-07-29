@@ -53,14 +53,14 @@ public class DefaultConcretePathRootElement extends DefaultAccessPathRootElement
 	}
 
 	@Override
-	public Map<AccessPath, VariableID> getVariableIDs(ThreadInfo ti) {
+	public PathResolution getVariableIDs(ThreadInfo ti) {
 		/**
 		 * If the path is of a primitive form (one element)
 		 * it necessarily refers to a primitive local variable.
 		 */
 		Map<AccessPath, VariableID> ret = new HashMap<AccessPath, VariableID>();
 		
-		if (rootObject == null) return ret;
+		if (rootObject == null) return new PathResolution();
 		
 		switch (type) {
 		case LOCAL:
@@ -79,7 +79,7 @@ public class DefaultConcretePathRootElement extends DefaultAccessPathRootElement
 			break;
 		}
 		
-		return ret;
+		return new PathResolution(ret);
 	}
 	
 	@Override

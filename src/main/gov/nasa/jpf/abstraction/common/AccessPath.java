@@ -33,6 +33,7 @@ public class AccessPath extends Expression {
 	
 	protected AccessPathRootElement root;
 	protected AccessPathElement tail;
+	protected int length;
 	
 	protected AccessPathRootElement createRootElement(String name) {
 		return new DefaultAccessPathRootElement(name);
@@ -55,6 +56,7 @@ public class AccessPath extends Expression {
 	public AccessPath(String name) {
 		root = createRootElement(name);
 		tail = root;
+		length = 1;
 		
 		initialise(name);
 	}
@@ -67,10 +69,15 @@ public class AccessPath extends Expression {
 		return tail;
 	}
 	
+	public int getLength() {
+		return length;
+	}
+	
 	protected void appendElement(AccessPathMiddleElement element) {
 		tail.setNext(element);
 		element.setPrevious(tail);
 		tail = element;
+		++length;
 	}
 	
 	public void appendSubElement(String name) {
@@ -107,6 +114,8 @@ public class AccessPath extends Expression {
 		AccessPathElement prefixElement = root;
 		AccessPathElement pathElement = path.root;
 		
+		if (getLength() > path.getLength()) return false;
+		
 		while (prefixElement != null && pathElement != null) {
             if (!prefixElement.equals(pathElement)) {
                 return false;
@@ -117,6 +126,10 @@ public class AccessPath extends Expression {
 		}
 		
 		return prefixElement == null || pathElement != null;
+	}
+	
+	public boolean isProperPrefix(AccessPath path) {
+		return getLength() < path.getLength() && isPrefix(path);
 	}
 	
 	@Override
@@ -145,6 +158,7 @@ public class AccessPath extends Expression {
 		
 		path.root = root.clone();
 		path.tail = path.root;
+		path.length = length;
 		
 		AccessPathElement next = path.root;
 		
@@ -171,6 +185,7 @@ public class AccessPath extends Expression {
 		
 		path.root = root.replace(formerPath, expression);
 		path.tail = path.root;
+		path.length = length;
 		
 		AccessPathElement next = path.root;
 		
@@ -190,12 +205,17 @@ public class AccessPath extends Expression {
 			
 			prefix.tail = tail.getPrevious();
 			prefix.tail.setNext(null);
+			--prefix.length;
 		}
 		
 		return prefix;
 	}
 	
 	public boolean similar(AccessPath path) {
+		if (length != path.length) {
+			return false;
+		}
+
 		if (!this.root.getName().equals(path.root.getName())) {
 			return false;
 		}

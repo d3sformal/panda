@@ -3,13 +3,17 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.VariableID;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Comparator;
+
+import org.opt4j.operator.algebra.Var;
 
 public class FlatSymbolTable implements SymbolTable, Scope {
 	
@@ -21,7 +25,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	 *  c.a -> heap field a
 	 *  d[1] -> heap array element number 1
 	 */
-	private HashMap<AccessPath, Set<CompleteVariableID>> path2vars = new HashMap<AccessPath, Set<CompleteVariableID>>();
+	private HashMap<AccessPath, Set<VariableID>> prefixToVariableIDs = new HashMap<AccessPath, Set<VariableID>>();
 	
 	/**
 	 * Maps VARIABLEID to all known (from the point of our execution) PATHS
@@ -29,13 +33,13 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	 * heap field a -> {x.y.a, z.a, u[1].a}
 	 * ...
 	 */
-	private HashMap<CompleteVariableID, Set<AccessPath>> var2paths = new HashMap<CompleteVariableID, Set<AccessPath>>();
+	private HashMap<VariableID, Set<AccessPath>> variableIDToPrefixes = new HashMap<VariableID, Set<AccessPath>>();
 
 	@Override
 	public Set<AccessPath> lookupAccessPaths(AccessPath prefix) {
 		Set<AccessPath> ret = new HashSet<AccessPath>();
 		
-		for (AccessPath path : path2vars.keySet()) {
+		for (AccessPath path : prefixToVariableIDs.keySet()) {
 			if (prefix.isPrefix(path)) {
 				ret.add(path);
 			}
@@ -45,8 +49,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 
 	@Override
-	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID var) {
-		Set<AccessPath> ret = var2paths.get(var);
+	public Set<AccessPath> lookupEquivalentAccessPaths(VariableID var) {
+		Set<AccessPath> ret = variableIDToPrefixes.get(var);
 		
 		if (var == null || ret == null) {
 			ret = new HashSet<AccessPath>(); 
@@ -59,19 +63,18 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public Set<AccessPath> lookupEquivalentAccessPaths(AccessPath path) {
 		Set<AccessPath> ret = new HashSet<AccessPath>();
 		
-		for (CompleteVariableID var : resolvePath(path)) {
+		for (VariableID var : resolvePath(path)) {
 			ret.addAll(lookupEquivalentAccessPaths(var));
 		}
 		
 		return ret;
 	}
 
-	@Override
-	public Set<CompleteVariableID> resolvePath(AccessPath path) {
-		Set<CompleteVariableID> ret = path2vars.get(path);
+	private Set<VariableID> resolvePath(AccessPath path) {
+		Set<VariableID> ret = prefixToVariableIDs.get(path);
 		
 		if (path == null || ret == null) {
-			ret = new HashSet<CompleteVariableID>();
+			return new HashSet<VariableID>();
 		}
 		
 		return ret;
@@ -82,84 +85,64 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public FlatSymbolTable clone() {
 		FlatSymbolTable clone = new FlatSymbolTable();
 		
-		clone.path2vars = (HashMap<AccessPath, Set<CompleteVariableID>>)path2vars.clone();
-		clone.var2paths = (HashMap<CompleteVariableID, Set<AccessPath>>)var2paths.clone();
+		clone.prefixToVariableIDs = (HashMap<AccessPath, Set<VariableID>>)prefixToVariableIDs.clone();
+		clone.variableIDToPrefixes = (HashMap<VariableID, Set<AccessPath>>)variableIDToPrefixes.clone();
 		
 		return clone;
 	}
 	
-	private void setPathToVar(AccessPath path, CompleteVariableID var) {
+	private void setPathToVar(AccessPath path, VariableID var) {
 		initialisePathToNumbers(path);
 		initialiseNumberToPaths(var);
 
-		path2vars.get(path).add(var);
-		var2paths.get(var).add(path);
+		prefixToVariableIDs.get(path).add(var);
+		variableIDToPrefixes.get(var).add(path);
 	}
 	
-	private void setPathToVars(AccessPath path, Set<CompleteVariableID> vars) {
-		for (CompleteVariableID var : vars) {
+	private void setPathToVars(AccessPath path, Set<VariableID> vars) {
+		for (VariableID var : vars) {
 			setPathToVar(path, var);
-		}
-	}
-	
-	private void setPathsToVars(Set<AccessPath> paths, Set<CompleteVariableID> vars) {
-		for (AccessPath path : paths) {
-			setPathToVars(path, vars);
 		}
 	}
 	
 	private void unsetPath(AccessPath path) {
 		initialisePathToNumbers(path);
 		
-		Set<CompleteVariableID> vars = path2vars.get(path);
+		Set<VariableID> vars = prefixToVariableIDs.get(path);
 		
-		for (CompleteVariableID number : vars) {
+		for (VariableID number : vars) {
 			initialiseNumberToPaths(number);
 
-			Set<AccessPath> paths = var2paths.get(number);
+			Set<AccessPath> paths = variableIDToPrefixes.get(number);
 		
 			if (paths.isEmpty()) {
-				var2paths.remove(number);
+				variableIDToPrefixes.remove(number);
 			}
 		}
 		
-		path2vars.remove(path);
+		prefixToVariableIDs.remove(path);
 	}
 	
 	private void initialisePathToNumbers(AccessPath path) {
-		if (!path2vars.containsKey(path)) {
-			path2vars.put(path, new HashSet<CompleteVariableID>());
+		if (!prefixToVariableIDs.containsKey(path)) {
+			prefixToVariableIDs.put(path, new HashSet<VariableID>());
 		}
 	}
 	
-	private void initialiseNumberToPaths(CompleteVariableID var) {
-		if (!var2paths.containsKey(var)) {
-			var2paths.put(var, new HashSet<AccessPath>());
+	private void initialiseNumberToPaths(VariableID var) {
+		if (!variableIDToPrefixes.containsKey(var)) {
+			variableIDToPrefixes.put(var, new HashSet<AccessPath>());
 		}
 	}
 	
 	@Override
 	public void processLoad(ConcretePath from) {
-		Map<AccessPath, CompleteVariableID> vars = from.resolve();
+		Map<AccessPath, VariableID> vars = from.partialResolve();
 		
 		for (AccessPath source : vars.keySet()) {
 			unsetPath(source);
 			setPathToVar(source, vars.get(source));
 		}
-	}
-	
-	private Set<AccessPath> processPrimitiveStore(AccessPath destination, CompleteVariableID var) {
-		// ASSIGN A PRIMITIVE VALUE - STORES NEW VALUE (REWRITES DATA => NO PATH UNSETTING, VARID STAY THE SAME, ONLY THE VALUES CHANGED)
-		setPathToVar(destination, var);
-		
-		Set<AccessPath> affected = new HashSet<AccessPath>();
-		
-    	Set<AccessPath> equivalentPaths = lookupEquivalentAccessPaths(destination);
-    	equivalentPaths.add(destination);
-    			
-    	affected.addAll(equivalentPaths);
-		
-		return affected;
 	}
 	
 	@Override
@@ -173,53 +156,13 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		Map<AccessPath, CompleteVariableID> destinationCandidates = destination.resolve();
 		
 		for (AccessPath destinationPath : destinationCandidates.keySet()) {
-			affected.addAll(processPrimitiveStore(destinationPath, destinationCandidates.get(destinationPath)));
-		}
-		
-		return affected;
-	}
-	
-	private Set<AccessPath> processObjectStore(Set<AccessPath> destinationCandidates, Set<AccessPath> sourceCandidates) {
-		Set<AccessPath> affected = new HashSet<AccessPath>();
-
-		for (AccessPath destinationPrefix : destinationCandidates) {
-			for (AccessPath sourcePrefix : sourceCandidates) {
-				// ASSIGN AN OBJECT OR ARRAY				
-				Set<AccessPath> sources = lookupAccessPaths(sourcePrefix);
-				
-				for (AccessPath source : sources) {
-					AccessPath destinationPath = source.clone();
-					AccessPath newPrefix = destinationPrefix.clone();
-
-					AccessPath.reRoot(destinationPath, sourcePrefix, newPrefix);
-					
-					// TODO:
-					//
-					// a.b = c
-					// a.b.x := X
-					//
-					// affected:
-					//
-					// a.b.x.*
-					// c.x.* !!! !!! !!!
-					Set<AccessPath> equivalentPaths = lookupEquivalentAccessPaths(destinationPath);
-					equivalentPaths.add(destinationPath);
-					// >>> TODO <<<<
-					// Test whether any of the equivalentPaths is affected by the store
-
-					// IF THE WRITE WAS UNAMBIGUOUS REWRITE
-					// ELSE ONLY ADD POSSIBILITIES
-					if (destinationCandidates.size() == 1) {
-						for (AccessPath equivalentPath : equivalentPaths) {	
-							unsetPath(equivalentPath);
-						}
-					}
-					
-					setPathsToVars(equivalentPaths, resolvePath(source));
-					
-					affected.addAll(equivalentPaths);
-				}
-			}
+			// ASSIGN A PRIMITIVE VALUE - STORES NEW VALUE (REWRITES DATA => NO PATH UNSETTING, VARID STAY THE SAME, ONLY THE VALUES CHANGED)
+			setPathToVar(destinationPath, destinationCandidates.get(destinationPath));
+						
+	    	Set<AccessPath> equivalentPaths = lookupEquivalentAccessPaths(destinationPath);
+	    	equivalentPaths.add(destinationPath);
+	    			
+	    	affected.addAll(equivalentPaths);
 		}
 		
 		return affected;
@@ -234,9 +177,55 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		}
 		
 		Set<AccessPath> destinationCandidates = destinationPrefix.partialResolve().keySet();
-		Set<AccessPath> sourceCandidates = sourcePrefix.partialResolve().keySet();
+		Map<AccessPath, VariableID> sourceCandidates = sourcePrefix.partialResolve();
 
-		return processObjectStore(destinationCandidates, sourceCandidates);
+		// IF THE WRITE WAS UNAMBIGUOUS REWRITE
+        // ELSE ONLY ADD POSSIBILITIES
+		boolean unambiguous = destinationCandidates.size() == 1;
+		
+		for (AccessPath destination : destinationCandidates) {
+			Set<AccessPath> affectedObjectPaths = new HashSet<AccessPath>();
+
+			for (AccessPath affectedPrefixCandidate : prefixToVariableIDs.keySet()) {
+				if (affectedPrefixCandidate.isProperPrefix(destination) && affectedPrefixCandidate.getLength() >= destination.getLength() - 1) {
+					AccessPath affectedPrefix = affectedPrefixCandidate;
+
+					affectedObjectPaths.addAll(lookupEquivalentAccessPaths(affectedPrefix));
+				}
+			}
+
+			
+			for (AccessPath sourceCandidate : sourceCandidates.keySet()) {
+				for (AccessPath source : lookupAccessPaths(sourceCandidate)) {
+					for (AccessPath prefix : affectedObjectPaths) {
+						AccessPath newPath = source.clone();
+						AccessPath oldPrefix = sourceCandidate.cutTail();
+						AccessPath newPrefix = prefix.clone();
+						AccessPath.reRoot(newPath, oldPrefix, newPrefix);
+
+						if (unambiguous) {
+							for (AccessPath subobjects : lookupAccessPaths(newPath)) {
+								unsetPath(subobjects);
+							}
+						}
+
+						setPathToVars(newPath, resolvePath(source));
+						affected.add(newPath);
+					}
+					
+					if (unambiguous) {
+						for (AccessPath subobjects : lookupAccessPaths(destination)) {
+							unsetPath(subobjects);
+						}
+					}
+
+					setPathToVars(destination, resolvePath(source));
+					affected.add(destination);
+				}
+			}
+		}
+		
+		return affected;
 	}
 	
 	@Override
@@ -245,7 +234,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		
 		int padding = 0;
 
-		for (AccessPath p : path2vars.keySet()) {
+		for (AccessPath p : prefixToVariableIDs.keySet()) {
 			String path = p.toString(AccessPath.NotationPolicy.DOT_NOTATION);
 			
 			padding = padding < path.length() ? path.length() : padding;
@@ -260,7 +249,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
             }
         });
 
-        paths.addAll(path2vars.keySet());
+        paths.addAll(prefixToVariableIDs.keySet());
 		
 		for (AccessPath p : paths) {
 			String path = p.toString(AccessPath.NotationPolicy.DOT_NOTATION);
@@ -269,13 +258,15 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			for (int i = 0; i < padding - path.length(); ++i) {
 				pad.append(" ");
 			}
-						
-			for (CompleteVariableID var : path2vars.get(p)) {
-				ret.append(path);
-				ret.append(pad);
+			
+			ret.append(path);
+			ret.append(pad);
+			ret.append("{ ");
+			for (VariableID var : prefixToVariableIDs.get(p)) {
 				ret.append(var);
-				ret.append("\n");
+				ret.append(" ");
 			}
+			ret.append("}\n");
 		}
 
 		return ret.toString();
@@ -283,7 +274,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	@Override
 	public int count() {
-		return path2vars.keySet().size();
+		return prefixToVariableIDs.keySet().size();
 	}
 
 }

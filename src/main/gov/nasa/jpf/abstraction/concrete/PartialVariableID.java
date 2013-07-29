@@ -12,4 +12,8 @@ public class PartialVariableID extends VariableID {
 	public ElementInfo getInfo() {
 		return info;
 	}
+	
+	public String toString() {
+		return "ref(" + info.getObjectRef() + ")";
+	}
 }
