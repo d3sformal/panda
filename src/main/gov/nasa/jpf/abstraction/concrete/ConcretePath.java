@@ -94,6 +94,12 @@ public class ConcretePath extends AccessPath {
 		return resolution.processed;
 	}
 	
+	public Map<AccessPath, VariableID> partialExhaustiveResolve() {
+		ConcretePathElement element = (ConcretePathElement) tail;
+		
+		return element.getVariableIDs(ti).current;
+	}
+	
 	@Override
 	public ConcretePath clone() {
 		ConcretePath path = new ConcretePath();

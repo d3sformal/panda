@@ -5,6 +5,7 @@ import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
 
+import java.nio.file.AccessMode;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -176,11 +177,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			return affected;
 		}
 		
-		Set<AccessPath> destinationCandidates = destinationPrefix.partialResolve().keySet();
+		Set<AccessPath> destinationCandidates = destinationPrefix.partialExhaustiveResolve().keySet();
 		Map<AccessPath, VariableID> sourceCandidates = sourcePrefix.partialResolve();
 
 		// IF THE WRITE WAS UNAMBIGUOUS REWRITE
-        // ELSE ONLY ADD POSSIBILITIES
+		// ELSE ONLY ADD POSSIBILITIES
 		boolean unambiguous = destinationCandidates.size() == 1;
 		
 		for (AccessPath destination : destinationCandidates) {
@@ -194,7 +195,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				}
 			}
 
-			
 			for (AccessPath sourceCandidate : sourceCandidates.keySet()) {
 				for (AccessPath source : lookupAccessPaths(sourceCandidate)) {
 					for (AccessPath prefix : affectedObjectPaths) {
@@ -212,16 +212,17 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 						setPathToVars(newPath, resolvePath(source));
 						affected.add(newPath);
 					}
-					
-					if (unambiguous) {
-						for (AccessPath subobjects : lookupAccessPaths(destination)) {
-							unsetPath(subobjects);
-						}
-					}
-
-					setPathToVars(destination, resolvePath(source));
-					affected.add(destination);
 				}
+				
+				
+				if (unambiguous) {
+					for (AccessPath subobjects : lookupAccessPaths(destination)) {
+						unsetPath(subobjects);
+					}
+				}
+				
+				setPathToVars(destination, resolvePath(sourceCandidate));
+				affected.add(destination);
 			}
 		}
 		
