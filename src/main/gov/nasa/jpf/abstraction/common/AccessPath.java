@@ -243,5 +243,16 @@ public class AccessPath extends Expression {
 		
 		return e1 == null && e2 == null;
 	}
+	
+	public AccessPathElement getElement(int index) {
+		AccessPathElement ret = root;
+		
+		while (index > 0) {
+			ret = ret.getNext();
+			--index;
+		}
+		
+		return ret;
+	}
 
 }

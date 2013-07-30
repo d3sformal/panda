@@ -30,7 +30,7 @@ public class FSTORE extends gov.nasa.jpf.jvm.bytecode.FSTORE {
 		ConcretePath to = null;
 		
 		if (var != null) {
-			to = new ConcretePath(getLocalVariableName(), ti, var, ConcretePath.Type.LOCAL);
+			to = ConcretePath.createLocalVarPath(getLocalVariableName(), ti, var);
 		}
 		
 		sf = ti.getModifiableTopFrame();

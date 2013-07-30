@@ -30,7 +30,7 @@ public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
 		ConcretePath to = null;
 		
 		if (var != null) {
-			to = new ConcretePath(getLocalVariableName(), ti, var, ConcretePath.Type.LOCAL);
+			to = ConcretePath.createLocalVarPath(getLocalVariableName(), ti, var);
 		}
 		
 		sf = ti.getModifiableTopFrame();

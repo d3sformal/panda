@@ -14,6 +14,8 @@ public class Symbols {
 		A x[] = new A[] { new A(), new A() };
 		A y = new A();
 		A z = new A();
+		A w[][] = new A[2][2];
+		w[0] = x;
 		
 		x[0].b = new B();
 		x[0].b.i = 1;

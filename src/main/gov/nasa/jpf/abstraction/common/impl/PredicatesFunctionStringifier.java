@@ -4,6 +4,7 @@ import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
+import gov.nasa.jpf.abstraction.concrete.Array;
 
 public class PredicatesFunctionStringifier extends PredicatesStringifier {
 
@@ -73,6 +74,19 @@ public class PredicatesFunctionStringifier extends PredicatesStringifier {
 		}
 		
 		ret = String.format(ret, "aread(" + array + ", %s, " + indexVisitor.getString() + ")");
+	}
+	
+	@Override
+	public void visit(Array expression) {
+		PredicatesFunctionStringifier lengthStringifier = new PredicatesFunctionStringifier();
+		
+		expression.length.accept(lengthStringifier);
+		
+		ret += "array(0, ";
+		
+		ret += lengthStringifier.getString();
+
+		ret += ")";
 	}
 
 }

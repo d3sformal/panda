@@ -34,20 +34,14 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processPrimitiveStore(Expression from, ConcretePath to) {
-		ConcretePath fromPath = null;
-		
-		if (from instanceof ConcretePath) {
-			fromPath = (ConcretePath) from;
-		}
-		
+	public void processPrimitiveStore(Expression from, ConcretePath to) {		
 		Set<AccessPath> resolvedAffected = symbolTable.processPrimitiveStore(to);
 
 		predicateValuation.reevaluate(to, resolvedAffected, from);
 	}
 	
 	@Override
-	public void processObjectStore(ConcretePath from, ConcretePath to) {	
+	public void processObjectStore(Expression from, ConcretePath to) {	
 		Set<AccessPath> resolvedAffected = symbolTable.processObjectStore(from, to);
 
 		predicateValuation.reevaluate(to, resolvedAffected, from);

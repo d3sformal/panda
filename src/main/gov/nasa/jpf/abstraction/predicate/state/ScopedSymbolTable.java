@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
 import gov.nasa.jpf.vm.MethodInfo;
@@ -41,7 +42,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public Set<AccessPath> processObjectStore(ConcretePath from, ConcretePath to) {
+	public Set<AccessPath> processObjectStore(Expression from, ConcretePath to) {
 		return scopes.top().processObjectStore(from, to);
 	}
 	

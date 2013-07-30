@@ -30,7 +30,7 @@ public class LSTORE extends gov.nasa.jpf.jvm.bytecode.LSTORE {
 		ConcretePath to = null;
 		
 		if (var != null) {
-			to = new ConcretePath(getLocalVariableName(), ti, var, ConcretePath.Type.LOCAL);
+			to = ConcretePath.createLocalVarPath(getLocalVariableName(), ti, var);
 		}
 		
 		sf = ti.getModifiableTopFrame();

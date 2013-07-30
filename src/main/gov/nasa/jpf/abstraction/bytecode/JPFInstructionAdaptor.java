@@ -68,4 +68,8 @@ public class JPFInstructionAdaptor {
 		return actualNextInsn == curInsn || actualNextInsn != expectedNextInsn;
 	}
 
+	public static boolean testNewArrayInstructionAbort(gov.nasa.jpf.jvm.bytecode.NewArrayInstruction curInsn, ThreadInfo ti, Instruction expectedNextInsn, Instruction actualNextInsn) {
+		return actualNextInsn != expectedNextInsn;
+	}
+
 }

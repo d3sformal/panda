@@ -5,6 +5,7 @@ import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
+import gov.nasa.jpf.abstraction.concrete.Array;
 import gov.nasa.jpf.abstraction.predicate.common.Equals;
 import gov.nasa.jpf.abstraction.predicate.common.LessThan;
 
@@ -102,6 +103,19 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 		if (element.getNext() == null) return;
 		
 		element.getNext().accept(this);
+	}
+
+	@Override
+	public void visit(Array expression) {
+		PredicatesDotStringifier lengthStringifier = new PredicatesDotStringifier();
+		
+		expression.length.accept(lengthStringifier);
+		
+		ret += "[ 0 .. ";
+		
+		ret += lengthStringifier.getString();
+
+		ret += " ]";
 	}
 
 }

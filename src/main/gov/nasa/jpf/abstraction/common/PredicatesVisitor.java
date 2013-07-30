@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.concrete.Array;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
@@ -39,4 +40,5 @@ public interface PredicatesVisitor {
 	public void visit(AccessPathSubElement element);
 	public void visit(AccessPathIndexElement element);
 	public void visit(Constant expression);
+	public void visit(Array expression);
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathSubElement;
 import gov.nasa.jpf.abstraction.concrete.ArrayLengthID;
+import gov.nasa.jpf.abstraction.concrete.ObjectReference;
 import gov.nasa.jpf.abstraction.concrete.PartialClassID;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePathElement;
@@ -42,7 +43,7 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 			
 			path.appendSubElement(getName());
 			
-			ElementInfo ei = ((PartialVariableID)var).getInfo();
+			ElementInfo ei = ((PartialVariableID)var).getRef().getElementInfo();
 			Object object = ei.getFieldValueObject(getName());
 			
 			if (var instanceof PartialClassID) {
@@ -53,7 +54,7 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 					if (object instanceof ElementInfo) {
 						// STATIC OBJECT FIELD
 
-						ret.put(path, new PartialVariableID((ElementInfo)object));
+						ret.put(path, new PartialVariableID(DefaultConcretePathElement.createStaticFieldReference(ti, getName(), ei)));
 					} else {
 						// STATIC PRIMITIVE FIELD
 
@@ -68,7 +69,7 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 			} else if (object instanceof ElementInfo) {
 				// STRUCTURED FIELD (PATH NOT YET COMPLETE)
 				
-				ret.put(path, new PartialVariableID((ElementInfo)object));
+				ret.put(path, new PartialVariableID(DefaultConcretePathElement.createObjectFieldReference(ti, getName(), ei)));
 			} else if (ei.isArray() && getName().equals("length")) {
 				// ARRAY LENGTH "FIELD"
 

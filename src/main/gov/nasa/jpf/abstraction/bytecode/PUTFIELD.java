@@ -23,6 +23,7 @@ import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
+import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -40,6 +41,9 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		Attribute destination = (Attribute) sf.getOperandAttr(1);
 		
 		if (source == null) source = new EmptyAttribute();
+		
+		ElementInfo ei = ti.getElementInfo(sf.peek(1));
+		ei.setFieldAttr(getFieldInfo(), source);
 		
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 

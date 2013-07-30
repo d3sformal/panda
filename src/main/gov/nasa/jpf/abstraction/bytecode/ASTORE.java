@@ -25,6 +25,7 @@ import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -37,19 +38,20 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 	@Override
 	public Instruction execute(ThreadInfo ti) {
 		StackFrame sf = ti.getTopFrame();
+		LocalVarInfo var = getLocalVarInfo();
         Attribute source = (Attribute) sf.getOperandAttr(0);
         
         if (source == null) source = new EmptyAttribute();
 
 		Instruction actualNextInsn = super.execute(ti);
 		
-		ConcretePath from = (ConcretePath) source.getExpression();
+		Expression from = source.getExpression();
 		ConcretePath to = null;
 
 		if (getLocalVarInfo() != null) {
 			ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
 			
-			to = new ConcretePath(getLocalVariableName(), ti, ei, ConcretePath.Type.HEAP);
+			to = ConcretePath.createLocalVarRootedHeapObjectPath(getLocalVariableName(), ti, ei, var);
 		}
 		
 		sf = ti.getModifiableTopFrame();

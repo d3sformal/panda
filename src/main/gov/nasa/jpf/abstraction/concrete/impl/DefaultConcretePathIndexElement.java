@@ -12,6 +12,7 @@ import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePathElement;
 import gov.nasa.jpf.abstraction.concrete.ConcretePathIndexElement;
 import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
+import gov.nasa.jpf.abstraction.concrete.Reference;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -39,22 +40,22 @@ public class DefaultConcretePathIndexElement extends DefaultAccessPathIndexEleme
 		
 			if (var instanceof CompleteVariableID) continue;
 			
-			ElementInfo ei = ((PartialVariableID)var).getInfo();
+			Reference ref = ((PartialVariableID)var).getRef();
 			
-			if (ei.getClassInfo().isArray()) {
-				for (int i = 0; i < ei.getArrayFields().arrayLength(); ++i) {
+			if (ref.getElementInfo().getClassInfo().isArray()) {
+				for (int i = 0; i < ref.getElementInfo().getArrayFields().arrayLength(); ++i) {
 					AccessPath clone = path.clone();
 					
 					clone.appendIndexElement(Constant.create(i));
 
-					if (ei.getClassInfo().isReferenceArray()) {
-						ElementInfo info = ti.getElementInfo(ei.getArrayFields().getReferenceValue(i));
+					if (ref.getElementInfo().getClassInfo().isReferenceArray()) {
+						ElementInfo info = ti.getElementInfo(ref.getElementInfo().getArrayFields().getReferenceValue(i));
 						
 						if (info != null) {
-							ret.put(clone, new PartialVariableID(info));
+							ret.put(clone, new PartialVariableID(DefaultConcretePathElement.createArrayElementReference(ti, i, ref.getElementInfo())));
 						}
 					} else {
-						ret.put(clone, new ArrayElementID(ei.getObjectRef(), i));
+						ret.put(clone, new ArrayElementID(ref.getObjectRef(), i));
 					}
 				}
 			}

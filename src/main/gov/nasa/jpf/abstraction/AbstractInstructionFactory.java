@@ -107,6 +107,11 @@ public class AbstractInstructionFactory extends
 	public Instruction aload(int index) {
 		return (filter.isInstrumentedClass(ci) ? new ALOAD(index) : super.aload(index));
 	}
+	
+	@Override
+	public Instruction anewarray(String typeDescriptor) {
+		return (filter.isInstrumentedClass(ci) ? new ANEWARRAY(typeDescriptor) : super.anewarray(typeDescriptor));
+	}
 
 	@Override
 	public Instruction areturn() {
@@ -730,6 +735,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction nativereturn() {
 		return (filter.isInstrumentedClass(ci) ? new NATIVERETURN() : super.nativereturn());
+	}
+	
+	@Override
+	public Instruction newarray(int typeCode) {
+		return (filter.isInstrumentedClass(ci) ? new NEWARRAY(typeCode) : super.newarray(typeCode));
 	}
 
 	@Override

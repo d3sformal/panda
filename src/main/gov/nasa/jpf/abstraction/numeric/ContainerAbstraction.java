@@ -85,7 +85,7 @@ public class ContainerAbstraction extends Abstraction {
     }
     
     @Override
-    public void processObjectStore(ConcretePath from, ConcretePath to) {
+    public void processObjectStore(Expression from, ConcretePath to) {
     	for (Abstraction abs : list) {
     		abs.processObjectStore(from, to);
     	}

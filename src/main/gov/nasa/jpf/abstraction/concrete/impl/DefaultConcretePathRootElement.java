@@ -3,15 +3,19 @@ package gov.nasa.jpf.abstraction.concrete.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.AccessPathMiddleElement;
 import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathRootElement;
+import gov.nasa.jpf.abstraction.concrete.ArrayReference;
+import gov.nasa.jpf.abstraction.concrete.ObjectReference;
 import gov.nasa.jpf.abstraction.concrete.PartialClassID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.concrete.ConcretePathRootElement;
 import gov.nasa.jpf.abstraction.concrete.LocalVariableID;
 import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
+import gov.nasa.jpf.abstraction.concrete.Reference;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -19,13 +23,15 @@ import gov.nasa.jpf.vm.ThreadInfo;
 
 public class DefaultConcretePathRootElement extends DefaultAccessPathRootElement implements ConcretePathRootElement {
 
-	private Object rootObject;
+	private ElementInfo ei;
+	private LocalVarInfo info;
 	private ConcretePath.Type type;
 
-	public DefaultConcretePathRootElement(String name, Object rootObject, ConcretePath.Type type) {
+	public DefaultConcretePathRootElement(String name, ElementInfo ei, LocalVarInfo info, ConcretePath.Type type) {
 		super(name);
 
-		this.rootObject = rootObject;
+		this.ei = ei;
+		this.info = info;
 		this.type = type;
 	}
 
@@ -60,22 +66,20 @@ public class DefaultConcretePathRootElement extends DefaultAccessPathRootElement
 		 */
 		Map<AccessPath, VariableID> ret = new HashMap<AccessPath, VariableID>();
 		
-		if (rootObject == null) return new PathResolution();
-		
+		if (ei == null && info == null) return new PathResolution();
+				
 		switch (type) {
 		case LOCAL:
 			// LOCAL VARIABLE
-			LocalVarInfo info = (LocalVarInfo) rootObject;
-
 			ret.put(new AccessPath(getName()), new LocalVariableID(info.getName(), info.getSlotIndex()));
 			break;
 		case STATIC:
 			// STATIC PATH
-			ret.put(new AccessPath(getName()), new PartialClassID((ElementInfo)rootObject, getName()));
+			ret.put(new AccessPath(getName()), new PartialClassID(new ObjectReference(ei), getName()));
 			break;
 		case HEAP:
 			// INCOMPLETE PATH
-			ret.put(new AccessPath(getName()), new PartialVariableID((ElementInfo)rootObject));
+			ret.put(new AccessPath(getName()), new PartialVariableID(DefaultConcretePathElement.createLocalVarReference(ti, ei, info)));
 			break;
 		}
 		
@@ -84,7 +88,7 @@ public class DefaultConcretePathRootElement extends DefaultAccessPathRootElement
 	
 	@Override
 	public DefaultConcretePathRootElement clone() {
-		DefaultConcretePathRootElement clone = new DefaultConcretePathRootElement(getName(), rootObject, type);
+		DefaultConcretePathRootElement clone = new DefaultConcretePathRootElement(getName(), ei, info, type);
 		
 		if (getNext() != null) {
 			clone.setNext(getNext().clone());

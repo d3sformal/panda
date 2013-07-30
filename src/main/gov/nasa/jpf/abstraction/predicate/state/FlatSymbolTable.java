@@ -1,20 +1,20 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.AccessPathElement;
+import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
+import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
 
-import java.nio.file.AccessMode;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Comparator;
-
-import org.opt4j.operator.algebra.Var;
 
 public class FlatSymbolTable implements SymbolTable, Scope {
 	
@@ -170,30 +170,59 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 	
 	@Override
-	public Set<AccessPath> processObjectStore(ConcretePath sourcePrefix, ConcretePath destinationPrefix) {
+	public Set<AccessPath> processObjectStore(Expression sourceExpression, ConcretePath destinationPrefix) {
 		Set<AccessPath> affected = new HashSet<AccessPath>();
+		
+		ConcretePath sourcePrefix = null;
+		
+		if (sourceExpression instanceof ConcretePath) {
+			sourcePrefix = (ConcretePath) sourceExpression;
+		}
 
 		if (sourcePrefix == null || destinationPrefix == null) {
 			return affected;
 		}
 		
 		Set<AccessPath> destinationCandidates = destinationPrefix.partialExhaustiveResolve().keySet();
-		Map<AccessPath, VariableID> sourceCandidates = sourcePrefix.partialResolve();
-
-		// IF THE WRITE WAS UNAMBIGUOUS REWRITE
-		// ELSE ONLY ADD POSSIBILITIES
 		boolean unambiguous = destinationCandidates.size() == 1;
 		
-		for (AccessPath destination : destinationCandidates) {
+		Map<AccessPath, VariableID> sourceCandidates = sourcePrefix.partialResolve();
+
+		Map<AccessPath, Set<VariableID>> rewrites = new HashMap<AccessPath, Set<VariableID>>();
+		
+		for (AccessPath destination : destinationCandidates) {			
 			Set<AccessPath> affectedObjectPaths = new HashSet<AccessPath>();
 
 			for (AccessPath affectedPrefixCandidate : prefixToVariableIDs.keySet()) {
 				if (affectedPrefixCandidate.isProperPrefix(destination) && affectedPrefixCandidate.getLength() >= destination.getLength() - 1) {
 					AccessPath affectedPrefix = affectedPrefixCandidate;
+					
+					AccessPathElement element = destination.getElement(affectedPrefix.getLength());
 
-					affectedObjectPaths.addAll(lookupEquivalentAccessPaths(affectedPrefix));
+					for (AccessPath equivalentObjectPathPrefix : lookupEquivalentAccessPaths(affectedPrefix)) {
+						AccessPath equivalentObjectPath = equivalentObjectPathPrefix.clone();
+						
+						if (element instanceof AccessPathSubElement) {
+							AccessPathSubElement sub = (AccessPathSubElement) element;
+							
+							equivalentObjectPath.appendSubElement(sub.getName());
+						} else if (element instanceof AccessPathIndexElement) {
+							AccessPathIndexElement index = (AccessPathIndexElement) element;
+							
+							equivalentObjectPath.appendIndexElement(index.getIndex());
+						}
+						
+						affectedObjectPaths.add(equivalentObjectPath);
+					}
 				}
 			}
+			
+			/*
+			for (AccessPath affectedObjectPath : affectedObjectPaths) {
+				AccessPath.policy = AccessPath.NotationPolicy.DOT_NOTATION;
+				System.out.println("AFFECTED OBJECT: " + affectedObjectPath);
+			}
+			*/
 
 			for (AccessPath sourceCandidate : sourceCandidates.keySet()) {
 				for (AccessPath source : lookupAccessPaths(sourceCandidate)) {
@@ -202,34 +231,37 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 						AccessPath oldPrefix = sourceCandidate.cutTail();
 						AccessPath newPrefix = prefix.clone();
 						AccessPath.reRoot(newPath, oldPrefix, newPrefix);
-
-						if (unambiguous) {
-							for (AccessPath subobjects : lookupAccessPaths(newPath)) {
-								unsetPath(subobjects);
-							}
+						
+						System.out.println("( " + oldPrefix + " / " + newPrefix + " ) " + source + " = " + newPath);
+						
+						if (!rewrites.containsKey(newPath)) {
+							rewrites.put(newPath, new HashSet<VariableID>());
 						}
-
-						setPathToVars(newPath, resolvePath(source));
 						
-						// TODO: affected var.length if var instanceof array
-						
-						affected.add(newPath);
+						rewrites.get(newPath).addAll(resolvePath(source));
 					}
+				}			
+				
+				if (!rewrites.containsKey(destination)) {
+					rewrites.put(destination, new HashSet<VariableID>());
 				}
 				
-				
-				if (unambiguous) {
-					for (AccessPath subobjects : lookupAccessPaths(destination)) {
-						unsetPath(subobjects);
-					}
-				}
-				
-				setPathToVars(destination, resolvePath(sourceCandidate));
-				
-				// TODO: affected var.length if var instanceof array
-				
-				affected.add(destination);
+				rewrites.get(destination).addAll(resolvePath(sourceCandidate));
 			}
+		}
+		
+		for (AccessPath path : rewrites.keySet()) {
+			if (unambiguous) {
+				for (AccessPath subobjects : lookupAccessPaths(path)) {
+					unsetPath(subobjects);
+				}
+			}
+
+			setPathToVars(path, rewrites.get(path));
+			
+			// TODO: affected var.length if var instanceof array
+			
+			affected.add(path);
 		}
 		
 		return affected;

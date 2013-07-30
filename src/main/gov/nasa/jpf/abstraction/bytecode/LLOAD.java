@@ -40,7 +40,7 @@ public class LLOAD extends gov.nasa.jpf.jvm.bytecode.LLOAD {
 		Instruction actualNextInsn = super.execute(ti);
 		
 		if (var != null) {
-			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);
+			ConcretePath path = ConcretePath.createLocalVarPath(var.getName(), ti, var);
 			Attribute attribute = new NonEmptyAttribute(null, path);
 						
 			GlobalAbstraction.getInstance().processLoad(path);
