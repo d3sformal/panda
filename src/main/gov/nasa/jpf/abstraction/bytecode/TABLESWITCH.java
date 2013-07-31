@@ -18,6 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import java.util.ArrayList;
+
 import gov.nasa.jpf.JPFException;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -28,8 +30,7 @@ import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
  * ..., index  => ...
  * WARNING: it actually duplicates LOOKUPSWITCH behavior
  */
-public class TABLESWITCH extends SwitchInstruction implements
-		gov.nasa.jpf.vm.TableSwitchInstruction {
+public class TABLESWITCH extends SwitchInstruction implements gov.nasa.jpf.vm.TableSwitchInstruction {
 
 	int min, max;
 
@@ -48,11 +49,6 @@ public class TABLESWITCH extends SwitchInstruction implements
 		} else {
 			throw new JPFException("illegal tableswitch target: " + value);
 		}
-	}
-
-	@Override
-	protected Instruction executeConditional(ThreadInfo ti) {
-		throw new UnsupportedOperationException(); // makes no sense with abstractions
 	}
 
 	@Override
@@ -77,6 +73,17 @@ public class TABLESWITCH extends SwitchInstruction implements
 	@Override
 	public void accept(InstructionVisitor insVisitor) {
 		insVisitor.visit(this);
+	}
+	
+	@Override
+	public int[] getMatches() {
+		int[] matches = new int[max - min + 1];
+		
+		for (int i = 0; i < matches.length; ++i) {
+			matches[i] = i;
+		}
+		
+		return matches;
 	}
 
 }

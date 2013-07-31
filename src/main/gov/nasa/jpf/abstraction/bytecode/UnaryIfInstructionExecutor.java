@@ -9,7 +9,6 @@ import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
-import gov.nasa.jpf.abstraction.predicate.common.Equals;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
@@ -27,13 +26,10 @@ public class UnaryIfInstructionExecutor {
 		StackFrame sf = ti.getModifiableTopFrame();
 		Attribute attr = (Attribute) sf.getOperandAttr();
 		
-		AbstractValue abs_v = null;
-		Expression expr = null;
-		
 		if (attr == null) attr = new EmptyAttribute();
 
-		abs_v = attr.getAbstractValue();
-		expr = attr.getExpression();
+		AbstractValue abs_v = attr.getAbstractValue();
+		Expression expr = attr.getExpression();
 		
 		AbstractBoolean abs_condition = null;
 		

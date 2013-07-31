@@ -24,7 +24,13 @@ import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.abstraction.predicate.common.Equals;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
@@ -36,8 +42,7 @@ import gov.nasa.jpf.vm.choice.IntChoiceFromList;
  * common root class for LOOKUPSWITCH and TABLESWITCH insns
  *
  */
-public abstract class SwitchInstruction extends
-		gov.nasa.jpf.jvm.bytecode.SwitchInstruction {
+public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.SwitchInstruction {
 
 	protected SwitchInstruction(int defaultTarget, int numberOfTargets) {
 		super(defaultTarget, numberOfTargets);
@@ -53,28 +58,59 @@ public abstract class SwitchInstruction extends
 		if (attr == null) attr = new EmptyAttribute();
 		
 		AbstractValue abs_v = attr.getAbstractValue();
+		Expression expr = attr.getExpression();
+		
+		ArrayList<Integer> choices = null;
+		
+		if (expr != null) {
+			attr.setExpression(null);
+			
+			ArrayList<Integer> choiceCandidates = new ArrayList<Integer>();
+			boolean predicateAbstractionFailed = false;
 
-		if (abs_v == null) {
-			return super.execute(ti);
-		} else if (!ti.isFirstStepInsn()) {
+			for (int match : getMatches()) {
+				TruthValue pred = GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(expr, Constant.create(match)));
+				
+				if (pred == TruthValue.UNDEFINED) {
+					predicateAbstractionFailed = true;
+					break;
+				}
+				
+				if (pred != TruthValue.FALSE) {
+					choiceCandidates.add(match);
+				}
+			}
+			
+			if (!predicateAbstractionFailed) {
+				choices = choiceCandidates;
+				System.out.printf("Switch> Expression: %s\n", expr);
+			}
+		}
+
+		if (choices == null) {
+			if (abs_v == null) {
+				return super.execute(ti);
+			}
+			
+			choices = new ArrayList<Integer>();
+
 			lastIdx = DEFAULT;
 			int value = sf.peek(0);
 			System.out.printf("Switch> Value: %d (%s)\n", value, abs_v);
 
-			ArrayList<Integer> choices = new ArrayList<Integer>();
 			for (int i = 0, l = matches.length; i < l; i++) {
-				AbstractBoolean result = Abstraction._eq(value, abs_v,
-						matches[i], null);
-				System.out.printf("Switch> Check %d -- %s\n", matches[i],
-						result);
+				AbstractBoolean result = Abstraction._eq(value, abs_v, matches[i], null);
+			
+				System.out.printf("Switch> Check %d -- %s\n", matches[i], result);
+			
 				if (result != AbstractBoolean.FALSE) {
 					choices.add(i);
-// Uncomment to jump after the first exact match like the switch operator
-// does with concrete values 					
-//					if (result == AbstractBoolean.TRUE)
-//						break;
 				}
 			}
+		}
+		
+		if (!ti.isFirstStepInsn()) {
+			
 			
 			if (choices.size() > 0) {
 				int[] param = new int[choices.size()];
@@ -89,8 +125,7 @@ public abstract class SwitchInstruction extends
 				return mi.getInstructionAt(target);
 			}
 		} else {
-			ChoiceGenerator<?> cg = ss.getCurrentChoiceGenerator("abstractSwitchAll",
-					IntChoiceFromList.class);
+			ChoiceGenerator<?> cg = ss.getCurrentChoiceGenerator("abstractSwitchAll", IntChoiceFromList.class);
 			int idx = ((IntChoiceFromList) cg).getNextChoice();
 			sf.pop();
 
