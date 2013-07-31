@@ -733,6 +733,11 @@ public class AbstractInstructionFactory extends
 	}
 	
 	@Override
+	public Instruction multianewarray(String typeName, int dimensions) {
+		return (filter.isInstrumentedClass(ci) ? new MULTIANEWARRAY(typeName, dimensions) : super.multianewarray(typeName, dimensions));
+	}
+	
+	@Override
 	public Instruction nativereturn() {
 		return (filter.isInstrumentedClass(ci) ? new NATIVERETURN() : super.nativereturn());
 	}
