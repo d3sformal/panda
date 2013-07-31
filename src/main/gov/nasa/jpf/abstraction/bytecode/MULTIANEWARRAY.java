@@ -7,7 +7,6 @@ import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.concrete.Array;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
-import gov.nasa.jpf.vm.ArrayFields;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
