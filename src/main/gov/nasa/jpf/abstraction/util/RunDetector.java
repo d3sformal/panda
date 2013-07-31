@@ -11,7 +11,8 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 public class RunDetector {
-	private static Stack<Boolean> running = new Stack<Boolean>();
+	private static Stack<Boolean> runningHistory = new Stack<Boolean>();
+	private static boolean running = false;
 	
 	private static boolean detectRunningMethod(String targetClass, MethodInfo method) {
 		if (method.getClassName().equals(targetClass)) {
@@ -24,7 +25,7 @@ public class RunDetector {
 	}
 	
 	public static void initialiseNotRunning() {
-		running.push(false);
+		runningHistory.add(running);
 	}
 	
 	public static void detectRunning(VM vm, Instruction nextInsn, Instruction execInsn) {
@@ -32,15 +33,13 @@ public class RunDetector {
 
 		if (execInsn instanceof InvokeInstruction) {
 			if (detectRunningMethod(targetClass, nextInsn.getMethodInfo())) {
-				running.pop();
-				running.push(true);
+				running = true;
 			}
 		}
 		
 		if (execInsn instanceof ReturnInstruction) {
 			if (detectRunningMethod(targetClass, execInsn.getMethodInfo())) {
-				running.pop();
-				running.push(false);
+				running = false;
 			}
 		}
 	}
@@ -55,14 +54,15 @@ public class RunDetector {
 	}
 
 	public static void advance() {
-		running.push(running.lastElement());
+		runningHistory.push(running);
 	}
 
 	public static void backtrack() {
-		running.pop();
+		runningHistory.pop();
+		running = runningHistory.peek();
 	}
 
 	public static boolean isRunning() {
-		return running.lastElement();
+		return running;
 	}
 }
