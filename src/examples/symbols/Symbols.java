@@ -11,7 +11,10 @@ class B {
 public class Symbols {
 
 	public static void main(String[] args) {
-		A x[] = new A[] { new A(), new A() };
+		A x[] = new A[2];
+		x[0] = new A();
+		x[1] = new A();
+		
 		A y = new A();
 		A z = new A();
 		A w[][] = new A[2][2];

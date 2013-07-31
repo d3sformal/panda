@@ -5,7 +5,8 @@ import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
-import gov.nasa.jpf.abstraction.concrete.Array;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.predicate.common.Equals;
 import gov.nasa.jpf.abstraction.predicate.common.LessThan;
 
@@ -106,7 +107,7 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 	}
 
 	@Override
-	public void visit(Array expression) {
+	public void visit(AnonymousArray expression) {
 		PredicatesDotStringifier lengthStringifier = new PredicatesDotStringifier();
 		
 		expression.length.accept(lengthStringifier);
@@ -116,6 +117,15 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 		ret += lengthStringifier.getString();
 
 		ret += " ]";
+	}
+
+	@Override
+	public void visit(AnonymousObject expression) {
+		ret += "{";
+		
+		ret += expression.ei.getObjectRef();
+
+		ret += "}";
 	}
 
 }

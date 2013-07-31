@@ -8,14 +8,12 @@ import gov.nasa.jpf.vm.ElementInfo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Array extends Expression {
+public class AnonymousObject extends AnonymousExpression {
 	
 	public ElementInfo ei;
-	public Expression length;
 	
-	protected Array(ElementInfo ei, Expression length) {
+	protected AnonymousObject(ElementInfo ei) {
 		this.ei = ei;
-		this.length = length;
 	}
 
 	@Override
@@ -35,15 +33,17 @@ public class Array extends Expression {
 
 	@Override
 	public Expression clone() {
-		return create(ei, length);
+		return create(ei);
 	}
 	
-	public static Array create(ElementInfo ei, Expression length) {
-		if (length == null) {
-			return null;
-		}
-
-		return new Array(ei, length);
+	public static AnonymousObject create(ElementInfo ei) {
+		return new AnonymousObject(ei);
+	}
+	
+	
+	@Override
+	public PartialVariableID generateVariableID() {
+		return new PartialVariableID(new ObjectReference(ei));
 	}
 
 }

@@ -743,6 +743,11 @@ public class AbstractInstructionFactory extends
 	}
 	
 	@Override
+	public Instruction new_(String clsName) {
+		return (filter.isInstrumentedClass(ci) ? new NEW(clsName) : super.new_(clsName));
+	}
+	
+	@Override
 	public Instruction newarray(int typeCode) {
 		return (filter.isInstrumentedClass(ci) ? new NEWARRAY(typeCode) : super.newarray(typeCode));
 	}

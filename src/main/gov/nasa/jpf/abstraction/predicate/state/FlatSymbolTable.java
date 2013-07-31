@@ -5,10 +5,9 @@ import gov.nasa.jpf.abstraction.common.AccessPathElement;
 import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.ArrayReference;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
-import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
 
 import java.util.HashMap;
@@ -181,12 +180,34 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			sourcePrefix = (ConcretePath) sourceExpression;
 		}
 
-		if (sourcePrefix == null || destinationPrefix == null) {
+		if (destinationPrefix == null) {
 			return affected;
 		}
 		
 		Set<AccessPath> destinationCandidates = destinationPrefix.partialExhaustiveResolve().keySet();
 		boolean unambiguous = destinationCandidates.size() == 1;
+		
+		if (sourceExpression instanceof AnonymousExpression) {
+			AnonymousExpression anonymous = (AnonymousExpression) sourceExpression;
+			
+			System.out.println("ANONYMOUS OBJECT");
+			
+			for (AccessPath destination : destinationCandidates) {
+				if (unambiguous) {
+					for (AccessPath subobjects : lookupAccessPaths(destination)) {
+						unsetPath(subobjects);
+					}
+				}
+				
+				setPathToVar(destination, anonymous.generateVariableID());
+				
+				affected.add(destination);
+			}
+		}
+		
+		if (sourcePrefix == null) {
+			return affected;
+		}
 		
 		Map<AccessPath, VariableID> sourceCandidates = sourcePrefix.partialResolve();
 
@@ -225,11 +246,12 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				for (AccessPath source : lookupAccessPaths(sourceCandidate)) {
 					for (AccessPath prefix : affectedObjectPaths) {
 						AccessPath newPath = source.clone();
-						AccessPath oldPrefix = sourceCandidate.cutTail();
+						AccessPath oldPrefix = sourceCandidate;
 						AccessPath newPrefix = prefix.clone();
 						AccessPath.reRoot(newPath, oldPrefix, newPrefix);
 						
-						//System.out.println("( " + oldPrefix + " / " + newPrefix + " ) " + source + " = " + newPath);
+						AccessPath.policy = AccessPath.NotationPolicy.DOT_NOTATION;
+						System.out.println("( " + oldPrefix + " / " + prefix + " ) " + source + " = " + newPath);
 						
 						if (!rewrites.containsKey(newPath)) {
 							rewrites.put(newPath, new HashSet<VariableID>());
