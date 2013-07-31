@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
@@ -46,7 +48,11 @@ public abstract class SwitchInstruction extends
 		
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
-		AbstractValue abs_v = (AbstractValue) sf.getOperandAttr(0);
+		Attribute attr = (Attribute) sf.getOperandAttr(0);
+		
+		if (attr == null) attr = new EmptyAttribute();
+		
+		AbstractValue abs_v = attr.getAbstractValue();
 
 		if (abs_v == null) {
 			return super.execute(ti);
