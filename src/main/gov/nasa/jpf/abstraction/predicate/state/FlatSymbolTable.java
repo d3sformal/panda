@@ -190,8 +190,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		if (sourceExpression instanceof AnonymousExpression) {
 			AnonymousExpression anonymous = (AnonymousExpression) sourceExpression;
 			
-			System.out.println("ANONYMOUS OBJECT");
-			
 			for (AccessPath destination : destinationCandidates) {
 				if (unambiguous) {
 					for (AccessPath subobjects : lookupAccessPaths(destination)) {
@@ -249,10 +247,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 						AccessPath oldPrefix = sourceCandidate;
 						AccessPath newPrefix = prefix.clone();
 						AccessPath.reRoot(newPath, oldPrefix, newPrefix);
-						
-						AccessPath.policy = AccessPath.NotationPolicy.DOT_NOTATION;
-						System.out.println("( " + oldPrefix + " / " + prefix + " ) " + source + " = " + newPath);
-						
+												
 						if (!rewrites.containsKey(newPath)) {
 							rewrites.put(newPath, new HashSet<VariableID>());
 						}
