@@ -7,12 +7,16 @@ import gov.nasa.jpf.abstraction.predicate.common.MethodContext;
 import gov.nasa.jpf.abstraction.predicate.common.ObjectContext;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
+import gov.nasa.jpf.abstraction.predicate.smt.SMT;
+import gov.nasa.jpf.abstraction.predicate.smt.SMTException;
 import gov.nasa.jpf.vm.MethodInfo;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Stack;
 
 public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	private PredicateValuationStack scopes = new PredicateValuationStack();
@@ -27,6 +31,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		FlatPredicateValuation valuation = new FlatPredicateValuation();
 		
 		if (method == null) return valuation;
+		
+		Set<Predicate> predicates = new HashSet<Predicate>();
 
 		for (Context context : predicateSet.contexts) {
 			if (context instanceof MethodContext) {
@@ -43,9 +49,26 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				}
 			}
 
-			for (Predicate predicate : context.predicates) {
+			predicates.addAll(context.predicates);
+		}
+		
+		try {
+			Map<Predicate, TruthValue> initialValuation = new SMT().valuatePredicates(predicates);
+			
+			for (Predicate predicate : predicates) {
+				// IF NOT A TAUTOLOGY OR CONTRADICTION
+				if (initialValuation.get(predicate) == TruthValue.UNKNOWN) {
+					valuation.put(predicate, TruthValue.UNDEFINED);
+				} else {
+					valuation.put(predicate, initialValuation.get(predicate));
+				}
+			}
+		} catch (SMTException e) {			
+			for (Predicate predicate : predicates) {
 				valuation.put(predicate, TruthValue.UNDEFINED);
 			}
+			
+			e.printStackTrace();
 		}
 		
 		return valuation;
