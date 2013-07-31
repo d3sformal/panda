@@ -29,6 +29,7 @@ public class Symbols {
 		x[0].b = y.b;
 		
 		y = z;
+		x = new A[10];
 	}
 
 }

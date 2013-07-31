@@ -117,18 +117,19 @@ public class SMT {
 		for (String field : fields) {
 			input += "(declare-fun " + field + " () (Array Int Int))" + separator;
 		}
+		
+		input += separator;
 
 		for (String formula : formulas) {
 			input +=
-				separator +
 				"(push 1)" + separator +
-				"(assert (not " + formula + "))" + separator +
+				"(assert " + formula + ")" + separator +
 				"(check-sat)" + separator +
 				"(pop 1)" + separator +
 				separator;
 		}
 		
-		input += separator + "(exit)" + separator;
+		input += "(exit)" + separator;
 		
 		return input;
 	}
@@ -208,7 +209,7 @@ public class SMT {
 	private static String createFormula(Predicate predicate) {
 		PredicatesSMTStringifier stringifier = new PredicatesSMTStringifier();
 		
-		predicate.accept(stringifier);
+		Negation.create(predicate).accept(stringifier);
 		
 		return stringifier.getString();
 	}
@@ -237,14 +238,14 @@ public class SMT {
 		
 		formula = Implication.create(formula, weakestPrecondition);
 		
-		formula.accept(stringifier);
+		Negation.create(formula).accept(stringifier);
 				
 		return stringifier.getString();
 	}
 	
 	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateDeterminant> predicates) throws SMTException {	
 		String input = prepareInput(predicates, SEPARATOR);
-	
+			
 		return evaluate(predicates.keySet(), input);
 	}
 	

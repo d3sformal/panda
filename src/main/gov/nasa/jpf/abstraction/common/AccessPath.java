@@ -255,4 +255,37 @@ public class AccessPath extends Expression {
 		return ret;
 	}
 
+	public boolean similarPrefix(AccessPath path) {
+		if (length > path.length) {
+			return false;
+		}
+
+		if (!this.root.getName().equals(path.root.getName())) {
+			return false;
+		}
+		
+		AccessPathElement e1 = this.root;
+		AccessPathElement e2 = path.root;
+		
+		while (e1 != null && e2 != null) {
+			if (e1.getClass() != e2.getClass()) {
+				return false;
+			}
+
+			if (e1 instanceof AccessPathSubElement && e2 instanceof AccessPathSubElement) {
+				AccessPathSubElement s1 = (AccessPathSubElement) e1;
+				AccessPathSubElement s2 = (AccessPathSubElement) e2;
+					
+				if (!s1.getName().equals(s2.getName())) {
+					return false;
+				}
+			}
+			
+			e1 = e1.getNext();
+			e2 = e2.getNext();
+		}
+		
+		return e1 == null || e2 != null;
+	}
+
 }

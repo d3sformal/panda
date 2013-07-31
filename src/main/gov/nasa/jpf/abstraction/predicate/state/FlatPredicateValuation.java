@@ -105,7 +105,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			 */
 			for (AccessPath path1 : resolvedAffected) {
 				for (AccessPath path2 : predicate.getPaths()) {
-					affects = affects || path1.similar(path2);
+					affects = affects || path1.similarPrefix(path2);
 				}
 			}
 			
