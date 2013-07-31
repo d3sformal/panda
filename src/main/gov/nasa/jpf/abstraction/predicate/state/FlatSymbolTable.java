@@ -5,8 +5,10 @@ import gov.nasa.jpf.abstraction.common.AccessPathElement;
 import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.concrete.ArrayReference;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
 
 import java.util.HashMap;
@@ -217,12 +219,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				}
 			}
 			
-			/*
-			for (AccessPath affectedObjectPath : affectedObjectPaths) {
-				AccessPath.policy = AccessPath.NotationPolicy.DOT_NOTATION;
-				System.out.println("AFFECTED OBJECT: " + affectedObjectPath);
-			}
-			*/
+			affected.addAll(affectedObjectPaths);
 
 			for (AccessPath sourceCandidate : sourceCandidates.keySet()) {
 				for (AccessPath source : lookupAccessPaths(sourceCandidate)) {
@@ -232,7 +229,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 						AccessPath newPrefix = prefix.clone();
 						AccessPath.reRoot(newPath, oldPrefix, newPrefix);
 						
-						System.out.println("( " + oldPrefix + " / " + newPrefix + " ) " + source + " = " + newPath);
+						//System.out.println("( " + oldPrefix + " / " + newPrefix + " ) " + source + " = " + newPath);
 						
 						if (!rewrites.containsKey(newPath)) {
 							rewrites.put(newPath, new HashSet<VariableID>());
@@ -259,9 +256,29 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
 			setPathToVars(path, rewrites.get(path));
 			
-			// TODO: affected var.length if var instanceof array
-			
-			affected.add(path);
+			/*
+			//SHOULD NOT BE EMPTY
+			//ALL VARS SHOULD BE OF THE SAME TYPE
+			// 1) PARTIAL
+			//   a) OBJECT REF
+			//   b) ARRAY REF
+			// 2) COMPLETE
+			VariableID var = rewrites.get(path).iterator().next();
+
+			if (var instanceof PartialVariableID) {
+				PartialVariableID partialVar = (PartialVariableID) var;
+				
+				if (partialVar.getRef() instanceof ArrayReference) {
+					AccessPath lengthPath = path.clone();
+					lengthPath.appendSubElement("length");
+
+					affected.add(lengthPath);
+				}
+			} else {
+				affected.add(path);
+			}
+			*/
+
 		}
 		
 		return affected;
