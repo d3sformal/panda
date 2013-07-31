@@ -5,6 +5,8 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathSubElement;
+import gov.nasa.jpf.abstraction.concrete.ArrayLengthID;
+import gov.nasa.jpf.abstraction.concrete.ObjectReference;
 import gov.nasa.jpf.abstraction.concrete.PartialClassID;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePathElement;
@@ -28,9 +30,10 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 	}
 
 	@Override
-	public Map<AccessPath, VariableID> getVariableIDs(ThreadInfo ti) {
+	public PathResolution getVariableIDs(ThreadInfo ti) {
 		ConcretePathElement previous = getPrevious();
-		Map<AccessPath, VariableID> vars = previous.getVariableIDs(ti);
+		PathResolution resolution = previous.getVariableIDs(ti);
+		Map<AccessPath, VariableID> vars = resolution.current;
 		Map<AccessPath, VariableID> ret = new HashMap<AccessPath, VariableID>();
 		
 		for (AccessPath path : vars.keySet()) {
@@ -40,17 +43,23 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 			
 			path.appendSubElement(getName());
 			
-			ElementInfo ei = ((PartialVariableID)var).getInfo();
+			ElementInfo ei = ((PartialVariableID)var).getRef().getElementInfo();
 			Object object = ei.getFieldValueObject(getName());
 			
 			if (var instanceof PartialClassID) {
 				// CLASS
 				PartialClassID classID = (PartialClassID) var;
-				
-				if (classID.complete() && !(object instanceof ElementInfo)) {
-					// STATIC PRIMITIVE FIELD
+								
+				if (classID.complete()) {
+					if (object instanceof ElementInfo) {
+						// STATIC OBJECT FIELD
 
-					ret.put(path, new StaticFieldID(ei.getClassInfo().getName(), getName()));
+						ret.put(path, new PartialVariableID(DefaultConcretePathElement.createStaticFieldReference(ti, getName(), ei)));
+					} else {
+						// STATIC PRIMITIVE FIELD
+
+						ret.put(path, new StaticFieldID(ei.getClassInfo().getName(), getName()));
+					}
 				} else {
 					// NOT YET COMPLETE PATH package.package.Class
 					classID.extend(getName());
@@ -60,7 +69,11 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 			} else if (object instanceof ElementInfo) {
 				// STRUCTURED FIELD (PATH NOT YET COMPLETE)
 				
-				ret.put(path, new PartialVariableID((ElementInfo)object));
+				ret.put(path, new PartialVariableID(DefaultConcretePathElement.createObjectFieldReference(ti, getName(), ei)));
+			} else if (ei.isArray() && getName().equals("length")) {
+				// ARRAY LENGTH "FIELD"
+
+				ret.put(path, new ArrayLengthID(ei.getObjectRef()));
 			} else {
 				// PRIMITIVE FIELD
 				
@@ -68,7 +81,10 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 			}
 		}
 		
-		return ret;
+		resolution.processed.putAll(resolution.current);
+		resolution.current = ret;
+		
+		return resolution;
 	}
 	
 	@Override

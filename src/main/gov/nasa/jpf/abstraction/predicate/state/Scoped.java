@@ -7,7 +7,7 @@ public interface Scoped {
 	public void processMethodCall(MethodInfo method);
 	public void processMethodReturn();
 	public void store(Scope scope);
-	public void restore(Scope scope);
-	public Scope memorize();
+	public void restore(Scopes scopes);
+	public Scopes memorize();
 	public int count();
 }

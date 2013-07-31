@@ -18,12 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import java.util.Map;
-
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.common.AccessPath;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
@@ -44,12 +40,10 @@ public class DLOAD extends gov.nasa.jpf.jvm.bytecode.DLOAD {
 		Instruction actualNextInsn = super.execute(ti);
 		
 		if (var != null) {
-			ConcretePath path = new ConcretePath(var.getName(), ti, var, ConcretePath.Type.LOCAL);
+			ConcretePath path = ConcretePath.createLocalVarPath(var.getName(), ti, var);
 			Attribute attribute = new NonEmptyAttribute(null, path);
-				
-			Map<AccessPath, CompleteVariableID> vars = path.resolve();
 			
-			AbstractInstructionFactory.abs.processLoad(vars);
+			GlobalAbstraction.getInstance().processLoad(path);
 
 			StackFrame sf = ti.getTopFrame();
 			sf.setLongOperandAttr(attribute);

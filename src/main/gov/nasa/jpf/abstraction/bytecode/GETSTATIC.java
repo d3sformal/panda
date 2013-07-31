@@ -18,11 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import java.util.Map;
-
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
-import gov.nasa.jpf.abstraction.common.AccessPath;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
@@ -46,14 +42,12 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 			return actualNextInsn;
 		} 
 		
-        ConcretePath path = new ConcretePath(getClassName(), ti, getClassInfo().getStaticElementInfo(), ConcretePath.Type.STATIC);
+        ConcretePath path = ConcretePath.createStaticFieldPath(getClassName(), ti, getClassInfo().getStaticElementInfo());
 		
 		if (path != null) {
 			path.appendSubElement(getFieldName());
 			
-			Map<AccessPath, CompleteVariableID> vars = path.resolve();
-			
-			AbstractInstructionFactory.abs.processLoad(vars);
+			GlobalAbstraction.getInstance().processLoad(path);
 		}
 		
 		StackFrame sf = ti.getTopFrame();

@@ -18,12 +18,11 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -58,7 +57,8 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 		
 		AbstractValue abs_v = attr.getAbstractValue();
 		
-		Expression expression = Add.create(new ConcretePath(sf.getLocalVarInfo(index).getName(), ti, var, ConcretePath.Type.LOCAL), Constant.create(increment));
+		ConcretePath path = ConcretePath.createLocalVarPath(sf.getLocalVarInfo(index).getName(), ti, var);
+		Expression expression = Add.create(path, Constant.create(increment));
 		
 		if (abs_v == null) {
 			Attribute result = new NonEmptyAttribute(null, expression);
@@ -75,9 +75,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 
 				if (!ti.isFirstStepInsn()) { // first time around
 					int size = result.getAbstractValue().getTokensNumber();
-					
-					System.out.println("size "+size);//should be 3
-					
+										
 					ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
 					ss.setNextChoiceGenerator(cg);
 					
@@ -98,7 +96,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 			sf.setLocalVariable(index, 0, false);
 		}
 		
-		AbstractInstructionFactory.abs.processStore(expression, new ConcretePath(sf.getLocalVarInfo(index).getName(), ti, var, ConcretePath.Type.LOCAL));
+		GlobalAbstraction.getInstance().processPrimitiveStore(expression, path);
 
 		return getNext(ti);
 	}

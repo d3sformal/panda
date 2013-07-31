@@ -17,15 +17,12 @@
 // DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
 package gov.nasa.jpf.abstraction;
 
-import java.util.Map;
-import java.util.Set;
-
-import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.numeric.SignsValue;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.MethodInfo;
 
 /**
@@ -63,19 +60,37 @@ public abstract class Abstraction {
 	public void forward(MethodInfo method) {
 	}
 	
-	public void backtrack() {
+	public void backtrack(MethodInfo method) {
 	}
 	
-	public void processLoad(Map<AccessPath, CompleteVariableID> vars) {
+	public void processLoad(ConcretePath from) {
 	}
 	
-	public void processStore(Expression from, ConcretePath to) {
+	public final void processStore(Expression from, ConcretePath to) {
+		if (from instanceof ConcretePath && ((ConcretePath)from).resolve().isEmpty()) {
+			//Path resolves to objRefs
+			processObjectStore(from, to);
+		} else {
+			//Path resolves to an expression over primitive types
+			//There are no expression over objref
+			processPrimitiveStore(from, to);
+		}
+	}
+	
+	public void processPrimitiveStore(Expression from, ConcretePath to) {
+	}
+	
+	public void processObjectStore(Expression from, ConcretePath to) {
 	}
 	
 	public void processMethodCall(MethodInfo method) {
 	}
 	
-	public void processMethodReturn() {
+	public void processMethodReturn(MethodInfo method) {
+	}
+	
+	public TruthValue evaluatePredicate(Predicate predicate) {
+		return TruthValue.UNDEFINED;
 	}
 
 	/**
@@ -247,9 +262,9 @@ public abstract class Abstraction {
 	 * @see	#abstractMap(long)
 	 * @see	#_cmp(AbstractValue)
 	 */	
-	public static AbstractValue _cmp(long v1, AbstractValue abs_v1, long v2,
+	public static SignsValue _cmp(long v1, AbstractValue abs_v1, long v2,
 			AbstractValue abs_v2) {
-		AbstractValue result = null;
+		SignsValue result = null;
 		if (abs_v2 != null) {
 			if (abs_v1 != null)
 				result = abs_v2.abs._cmp(abs_v2, abs_v1);
@@ -273,9 +288,9 @@ public abstract class Abstraction {
 	 * @see	#abstractMap(double)
 	 * @see	#_cmp(AbstractValue)
 	 */		
-	public static AbstractValue _cmpg(double v1, AbstractValue abs_v1, double v2,
+	public static SignsValue _cmpg(double v1, AbstractValue abs_v1, double v2,
 			AbstractValue abs_v2) {
-		AbstractValue result = null;
+		SignsValue result = null;
 		if (abs_v2 != null) {
 			if (abs_v1 != null)
 				result = abs_v2.abs._cmpg(abs_v2, abs_v1);
@@ -299,9 +314,9 @@ public abstract class Abstraction {
 	 * @see	#abstractMap(float)
 	 * @see	#_cmp(AbstractValue)
 	 */		
-	public static AbstractValue _cmpg(float v1, AbstractValue abs_v1, float v2,
+	public static SignsValue _cmpg(float v1, AbstractValue abs_v1, float v2,
 			AbstractValue abs_v2) {
-		AbstractValue result = null;
+		SignsValue result = null;
 		if (abs_v2 != null) {
 			if (abs_v1 != null)
 				result = abs_v2.abs._cmpg(abs_v2, abs_v1);
@@ -325,9 +340,9 @@ public abstract class Abstraction {
 	 * @see	#abstractMap(double)
 	 * @see	#_cmp(AbstractValue)
 	 */			
-	public static AbstractValue _cmpl(double v1, AbstractValue abs_v1, double v2,
+	public static SignsValue _cmpl(double v1, AbstractValue abs_v1, double v2,
 			AbstractValue abs_v2) {
-		AbstractValue result = null;
+		SignsValue result = null;
 		if (abs_v2 != null) {
 			if (abs_v1 != null)
 				result = abs_v2.abs._cmpl(abs_v2, abs_v1);
@@ -351,9 +366,9 @@ public abstract class Abstraction {
 	 * @see	#abstractMap(float)
 	 * @see	#_cmp(AbstractValue)
 	 */			
-	public static AbstractValue _cmpl(float v1, AbstractValue abs_v1, float v2,
+	public static SignsValue _cmpl(float v1, AbstractValue abs_v1, float v2,
 			AbstractValue abs_v2) {
-		AbstractValue result = null;
+		SignsValue result = null;
 		if (abs_v2 != null) {
 			if (abs_v1 != null)
 				result = abs_v2.abs._cmpl(abs_v2, abs_v1);
@@ -1215,7 +1230,7 @@ public abstract class Abstraction {
 	 *         than the operand; and Signs.POS if this AbstractValue is
 	 *         numerically greater than the operand.
 	 */
-	public AbstractValue _cmp(AbstractValue left, AbstractValue right) {
+	public SignsValue _cmp(AbstractValue left, AbstractValue right) {
 		boolean n = false, z = false, p = false;
 		if (_gt(left, right) != AbstractBoolean.FALSE)
 			p = true;
@@ -1227,7 +1242,7 @@ public abstract class Abstraction {
 		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
-	public AbstractValue _cmp(AbstractValue left, long right) {
+	public SignsValue _cmp(AbstractValue left, long right) {
 		return _cmp(left, left.abs.abstractMap(right));
 	}
 
@@ -1237,7 +1252,7 @@ public abstract class Abstraction {
 	 *         than the operand; and Signs.POS if this AbstractValue is
 	 *         numerically greater than the operand.
 	 */	
-	public AbstractValue _cmpg(AbstractValue left, AbstractValue right) {
+	public SignsValue _cmpg(AbstractValue left, AbstractValue right) {
 		boolean n = false, z = false, p = false;
 		if (_gt(left, right) != AbstractBoolean.FALSE)
 			p = true;
@@ -1249,11 +1264,11 @@ public abstract class Abstraction {
 		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
-	public AbstractValue _cmpg(AbstractValue left, float right) {
+	public SignsValue _cmpg(AbstractValue left, float right) {
 		return _cmpg(left, left.abs.abstractMap(right));
 	}
 
-	public AbstractValue _cmpg(AbstractValue left, double right) {
+	public SignsValue _cmpg(AbstractValue left, double right) {
 		return _cmpg(left, left.abs.abstractMap(right));
 	}
 
@@ -1263,7 +1278,7 @@ public abstract class Abstraction {
 	 *         than the operand; and Signs.POS if this AbstractValue is
 	 *         numerically greater than the operand.
 	 */	
-	public AbstractValue _cmpl(AbstractValue left, AbstractValue right) {
+	public SignsValue _cmpl(AbstractValue left, AbstractValue right) {
 		boolean n = false, z = false, p = false;
 		if (_gt(left, right) != AbstractBoolean.FALSE)
 			p = true;
@@ -1275,11 +1290,11 @@ public abstract class Abstraction {
 		return SignsAbstraction.getInstance().create(n, z, p);
 	}
 
-	public AbstractValue _cmpl(AbstractValue left, float right) {
+	public SignsValue _cmpl(AbstractValue left, float right) {
 		return _cmpl(left, left.abs.abstractMap(right));
 	}
 
-	public AbstractValue _cmpl(AbstractValue left, double right) {
+	public SignsValue _cmpl(AbstractValue left, double right) {
 		return _cmpl(left, left.abs.abstractMap(right));
 	}
 
@@ -1319,23 +1334,23 @@ public abstract class Abstraction {
 		return _bitwise_xor(left, left.abs.abstractMap(right));
 	}
 
-	protected final AbstractValue _cmp_reverse(AbstractValue left, long right) {
+	protected final SignsValue _cmp_reverse(AbstractValue left, long right) {
 		return _cmp(left.abs.abstractMap(right), left);
 	}
 
-	protected final AbstractValue _cmpg_reverse(AbstractValue left, double right) {
+	protected final SignsValue _cmpg_reverse(AbstractValue left, double right) {
 		return _cmpg(left.abs.abstractMap(right), left);
 	}
 
-	protected final AbstractValue _cmpg_reverse(AbstractValue left, float right) {
+	protected final SignsValue _cmpg_reverse(AbstractValue left, float right) {
 		return _cmpg(left.abs.abstractMap(right), left);
 	}
 
-	protected final AbstractValue _cmpl_reverse(AbstractValue left, double right) {
+	protected final SignsValue _cmpl_reverse(AbstractValue left, double right) {
 		return _cmpl(left.abs.abstractMap(right), left);
 	}
 
-	protected final AbstractValue _cmpl_reverse(AbstractValue left, float right) {
+	protected final SignsValue _cmpl_reverse(AbstractValue left, float right) {
 		return _cmpl(left.abs.abstractMap(right), left);
 	}
 

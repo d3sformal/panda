@@ -24,6 +24,8 @@ import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.util.Pair;
 import gov.nasa.jpf.vm.MethodInfo;
 
@@ -76,16 +78,23 @@ public class ContainerAbstraction extends Abstraction {
 	}
     
     @Override
-    public void processStore(Expression from, ConcretePath to) {
+    public void processPrimitiveStore(Expression from, ConcretePath to) {
     	for (Abstraction abs : list) {
-    		abs.processStore(from, to);
+    		abs.processPrimitiveStore(from, to);
     	}
     }
     
     @Override
-    public void processLoad(Map<AccessPath, CompleteVariableID> vars) {
+    public void processObjectStore(Expression from, ConcretePath to) {
     	for (Abstraction abs : list) {
-    		abs.processLoad(vars);
+    		abs.processObjectStore(from, to);
+    	}
+    }
+    
+    @Override
+    public void processLoad(ConcretePath from) {
+    	for (Abstraction abs : list) {
+    		abs.processLoad(from);
     	}
     }
     
@@ -97,11 +106,24 @@ public class ContainerAbstraction extends Abstraction {
 	}
 	
     @Override
-	public void processMethodReturn() {
+	public void processMethodReturn(MethodInfo method) {
     	for (Abstraction abs : list) {
-    		abs.processMethodReturn();
+    		abs.processMethodReturn(method);
     	}
 	}
+    
+    @Override
+    public TruthValue evaluatePredicate(Predicate predicate) {
+    	TruthValue ret = TruthValue.UNDEFINED;
+
+    	for (Abstraction abs : list) {
+    		TruthValue sub = abs.evaluatePredicate(predicate);
+    		
+   			ret = TruthValue.or(ret, sub);
+    	}
+    	
+    	return ret;
+    }
     
     public ContainerValue create(List<AbstractValue> lst) {
     	ContainerValue res = new ContainerValue(lst);
@@ -194,9 +216,9 @@ public class ContainerAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void backtrack() {
+	public void backtrack(MethodInfo method) {
 		for (Abstraction abs : list) {
-			abs.backtrack();
+			abs.backtrack(method);
 		}
 	}
 	
@@ -475,7 +497,7 @@ public class ContainerAbstraction extends Abstraction {
 	 *         numerically greater than the operand.
 	 */
 	@Override
-	public AbstractValue _cmp(AbstractValue left, AbstractValue right) {
+	public SignsValue _cmp(AbstractValue left, AbstractValue right) {
 		boolean n = false, z = false, p = false;
 		if (_gt(left, right) != AbstractBoolean.FALSE)
 			p = true;
@@ -494,7 +516,7 @@ public class ContainerAbstraction extends Abstraction {
 	 *         numerically greater than the operand.
 	 */
 	@Override
-	public AbstractValue _cmpg(AbstractValue left, AbstractValue right) {
+	public SignsValue _cmpg(AbstractValue left, AbstractValue right) {
 		boolean n = false, z = false, p = false;
 		if (_gt(left, right) != AbstractBoolean.FALSE)
 			p = true;
@@ -513,7 +535,7 @@ public class ContainerAbstraction extends Abstraction {
 	 *         numerically greater than the operand.
 	 */
 	@Override
-	public AbstractValue _cmpl(AbstractValue left, AbstractValue right) {
+	public SignsValue _cmpl(AbstractValue left, AbstractValue right) {
 		boolean n = false, z = false, p = false;
 		if (_gt(left, right) != AbstractBoolean.FALSE)
 			p = true;

@@ -34,7 +34,6 @@ import gov.nasa.jpf.abstraction.numeric.RangeAbstractionFactory;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstractionFactory;
 import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstractionFactory;
-
 import gov.nasa.jpf.util.InstructionFactoryFilter;
 
 public class AbstractInstructionFactory extends
@@ -43,8 +42,6 @@ public class AbstractInstructionFactory extends
 	ClassInfo ci;
 
 	InstructionFactoryFilter filter;
-
-	public static Abstraction abs;
 
 	public AbstractInstructionFactory(Config conf) {
 
@@ -84,11 +81,11 @@ public class AbstractInstructionFactory extends
 		}
 
 		if (abs_list.size() == 0) {
-			abs = null;
+			GlobalAbstraction.set(null);
 		} else if (abs_list.size() == 1) {
-			abs = abs_list.get(0);
+			GlobalAbstraction.set(abs_list.get(0));
 		} else {
-			abs = new ContainerAbstraction(abs_list);
+			GlobalAbstraction.set(new ContainerAbstraction(abs_list));
 			System.out
 					.println("### jpf-abstraction: CONTAINER abstraction turned on");
 		}
@@ -110,10 +107,20 @@ public class AbstractInstructionFactory extends
 	public Instruction aload(int index) {
 		return (filter.isInstrumentedClass(ci) ? new ALOAD(index) : super.aload(index));
 	}
+	
+	@Override
+	public Instruction anewarray(String typeDescriptor) {
+		return (filter.isInstrumentedClass(ci) ? new ANEWARRAY(typeDescriptor) : super.anewarray(typeDescriptor));
+	}
 
 	@Override
 	public Instruction areturn() {
 		return (filter.isInstrumentedClass(ci) ? new ARETURN() : super.areturn());
+	}
+	
+	@Override
+	public Instruction arraylength() {
+		return (filter.isInstrumentedClass(ci) ? new ARRAYLENGTH() : super.arraylength());
 	}
 	
 	@Override
@@ -726,8 +733,23 @@ public class AbstractInstructionFactory extends
 	}
 	
 	@Override
+	public Instruction multianewarray(String typeName, int dimensions) {
+		return (filter.isInstrumentedClass(ci) ? new MULTIANEWARRAY(typeName, dimensions) : super.multianewarray(typeName, dimensions));
+	}
+	
+	@Override
 	public Instruction nativereturn() {
 		return (filter.isInstrumentedClass(ci) ? new NATIVERETURN() : super.nativereturn());
+	}
+	
+	@Override
+	public Instruction new_(String clsName) {
+		return (filter.isInstrumentedClass(ci) ? new NEW(clsName) : super.new_(clsName));
+	}
+	
+	@Override
+	public Instruction newarray(int typeCode) {
+		return (filter.isInstrumentedClass(ci) ? new NEWARRAY(typeCode) : super.newarray(typeCode));
 	}
 
 	@Override

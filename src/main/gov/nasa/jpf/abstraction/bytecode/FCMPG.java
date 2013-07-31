@@ -46,7 +46,7 @@ public class FCMPG extends gov.nasa.jpf.jvm.bytecode.FCMPG implements AbstractBi
 	public NonEmptyAttribute getResult(Float v1, Attribute attr1, Float v2, Attribute attr2) {
 		AbstractValue abs_v1 = attr1.getAbstractValue();
 		AbstractValue abs_v2 = attr2.getAbstractValue();
-
+		
 		/**
 		 * Performs the adequate operation over abstractions
 		 */

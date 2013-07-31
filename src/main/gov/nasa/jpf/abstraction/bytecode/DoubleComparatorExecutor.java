@@ -19,11 +19,13 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.vm.StackFrame;
 
-public class DoubleComparatorExecutor extends BinaryOperatorExecutor<Double> {
+public class DoubleComparatorExecutor extends BinaryComparatorExecutor<Double> {
 
 	private static DoubleComparatorExecutor instance;
 
@@ -68,10 +70,13 @@ public class DoubleComparatorExecutor extends BinaryOperatorExecutor<Double> {
 
 		if (s_result == SignsAbstraction.NEG) {
 			sf.push(-1);
+			sf.setOperandAttr(new NonEmptyAttribute(null, Constant.create(-1)));
 		} else if (s_result == SignsAbstraction.POS) {
 			sf.push(+1);
+			sf.setOperandAttr(new NonEmptyAttribute(null, Constant.create(+1)));
 		} else {
 			sf.push(0);
+			sf.setOperandAttr(new NonEmptyAttribute(null, Constant.create( 0)));
 		}
 	}
 

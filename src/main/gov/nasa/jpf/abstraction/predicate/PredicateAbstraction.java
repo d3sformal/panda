@@ -1,20 +1,20 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-import java.util.Map;
 import java.util.Set;
 
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
-import gov.nasa.jpf.abstraction.predicate.state.FlatPredicateValuation;
-import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.State;
+import gov.nasa.jpf.abstraction.predicate.state.SymbolTableStack;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.MethodInfo;
 
 public class PredicateAbstraction extends Abstraction {
@@ -29,23 +29,22 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processLoad(Map<AccessPath, CompleteVariableID> vars) {
-		for (AccessPath path : vars.keySet()) {
-			symbolTable.processLoad(path, vars.get(path));
-		}
+	public void processLoad(ConcretePath from) {
+		symbolTable.processLoad(from);
 	}
 	
 	@Override
-	public void processStore(Expression from, ConcretePath to) {
-		ConcretePath fromPath = null;
-		
-		if (from instanceof ConcretePath) {
-			fromPath = (ConcretePath) from;
-		}
-		
-		Set<AccessPath> resolvedAffected = symbolTable.processStore(fromPath, to);
+	public void processPrimitiveStore(Expression from, ConcretePath to) {		
+		Set<AccessPath> affected = symbolTable.processPrimitiveStore(to);
 
-		predicateValuation.reevaluate(to, resolvedAffected, from);
+		predicateValuation.reevaluate(to, affected, from);
+	}
+	
+	@Override
+	public void processObjectStore(Expression from, ConcretePath to) {	
+		Set<AccessPath> affected = symbolTable.processObjectStore(from, to);
+		
+		predicateValuation.reevaluate(to, affected, from);
 	}
 	
 	@Override
@@ -55,9 +54,14 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processMethodReturn() {
+	public void processMethodReturn(MethodInfo method) {
 		symbolTable.processMethodReturn();
 		predicateValuation.processMethodReturn();
+	}
+	
+	@Override
+	public TruthValue evaluatePredicate(Predicate predicate) {
+		return predicateValuation.evaluatePredicate(predicate);
 	}
 	
 	public ScopedSymbolTable getSymbolTable() {		
@@ -70,36 +74,26 @@ public class PredicateAbstraction extends Abstraction {
 	
 	@Override
 	public void start(MethodInfo method) {	
-		FlatSymbolTable symbols = symbolTable.createDefaultScope(method);
-		FlatPredicateValuation predicates = predicateValuation.createDefaultScope(method);
+		SymbolTableStack symbols = new SymbolTableStack();
+		PredicateValuationStack predicates = new PredicateValuationStack();
 		
 		State state = new State(symbols, predicates);
 		
 		trace.push(state);
-		
-		symbolTable.store(trace.top().symbolTable);
-		predicateValuation.store(trace.top().predicateValuation);
 	}
 
 	@Override
-	public void forward(MethodInfo method) {
-		System.err.println("Trace++");
-		
-		FlatSymbolTable symbols = symbolTable.createDefaultScope(method);
-		FlatPredicateValuation predicates = predicateValuation.createDefaultScope(method);
-		
-		State state = new State(symbols, predicates);
+	public void forward(MethodInfo method) {		
+		State state = new State(symbolTable.memorize(), predicateValuation.memorize());
 		
 		trace.push(state);
 	}
 	
 	@Override
-	public void backtrack() {
-		System.err.println("Trace--");
-		
+	public void backtrack(MethodInfo method) {		
 		trace.pop();
 		
-		symbolTable.restore(trace.top().symbolTable);
-		predicateValuation.restore(trace.top().predicateValuation);
+		symbolTable.restore(trace.top().symbolTableStack);
+		predicateValuation.restore(trace.top().predicateValuationStack);
 	}
 }

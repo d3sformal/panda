@@ -18,28 +18,36 @@
 package gov.nasa.jpf.abstraction;
 
 // does not work well for static methods:summary not printed for errors
-import gov.nasa.jpf.Config;
-import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.search.Search;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 public class AbstractListener extends PropertyListenerAdapter {
 
-	public AbstractListener(Config conf, JPF jpf) {
-	}
-
 	@Override
 	public void searchStarted(Search search) {
-		AbstractInstructionFactory.abs.start(search.getVM().getCurrentThread().getTopFrameMethodInfo());
+		RunDetector.initialiseNotRunning();
+		GlobalAbstraction.getInstance().start(search.getVM().getCurrentThread().getTopFrameMethodInfo());
 	}
 	
 	@Override
 	public void stateAdvanced(Search search) {
-		AbstractInstructionFactory.abs.forward(search.getVM().getCurrentThread().getTopFrameMethodInfo());
+		RunDetector.advance();
+		GlobalAbstraction.getInstance().forward(search.getVM().getCurrentThread().getTopFrameMethodInfo());
 	}
 
 	@Override
 	public void stateBacktracked(Search search) {
-		AbstractInstructionFactory.abs.backtrack();
+		RunDetector.backtrack();
+		GlobalAbstraction.getInstance().backtrack(search.getVM().getCurrentThread().getTopFrameMethodInfo());
 	}
+	
+	@Override
+	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
+		RunDetector.detectRunning(vm, nextInsn, execInsn);
+	}
+	
 }

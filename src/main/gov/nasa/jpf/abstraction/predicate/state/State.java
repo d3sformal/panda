@@ -1,12 +1,11 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
-
 public class State {
-	public FlatSymbolTable symbolTable;
-	public FlatPredicateValuation predicateValuation;
+	public SymbolTableStack symbolTableStack;
+	public PredicateValuationStack predicateValuationStack;
 	
-	public State(FlatSymbolTable symbolTable, FlatPredicateValuation predicateValuation) {
-		this.symbolTable = symbolTable;
-		this.predicateValuation = predicateValuation;
+	public State(SymbolTableStack symbolTableStack, PredicateValuationStack predicateValuationStack) {
+		this.symbolTableStack = symbolTableStack;
+		this.predicateValuationStack = predicateValuationStack;
 	}
 }

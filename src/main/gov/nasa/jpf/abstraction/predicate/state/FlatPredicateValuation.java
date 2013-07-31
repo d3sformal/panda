@@ -3,6 +3,8 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
@@ -45,7 +47,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
 	@Override
 	public String toString() {	
-		String ret = "";
+		StringBuilder ret = new StringBuilder();
 
 		int padding = 0;
 		
@@ -59,30 +61,25 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		
 		for (Predicate p : valuations.keySet()) {
 			String predicate = p.toString(AccessPath.NotationPolicy.DOT_NOTATION);
-			String pad = "";
+			StringBuilder pad = new StringBuilder();
 			
 			for (int i = 0; i < padding - predicate.length(); ++i) {
-				pad += " ";
+				pad.append(" ");
 			}
 
-			ret += predicate + pad + valuations.get(p) + "\n";
+			ret.append(predicate);
+			ret.append(pad);
+			ret.append(valuations.get(p));
+			ret.append("\n");
 		}
 		
-		return ret;
+		return ret.toString();
 	}
 
 	@Override
 	public void reevaluate(AccessPath affected, Set<AccessPath> resolvedAffected, Expression expression) {
 		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
 
-		if (affected == null) return;
-
-		System.err.println("SMT: ");
-		
-		System.err.println("\tREACTION TO:");
-		System.err.println("\t\t" + affected.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-		
-		System.err.println("\tAFFECTS:");
 		for (Predicate predicate : valuations.keySet()) {
 			boolean affects = false;
 			
@@ -110,19 +107,24 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			 */
 			for (AccessPath path1 : resolvedAffected) {
 				for (AccessPath path2 : predicate.getPaths()) {
-					affects = affects || path1.similar(path2);
+					affects = affects || path1.similarPrefix(path2);
 				}
-			}
-			
-			Predicate positiveWeakestPrecondition = predicate;
-			Predicate negativeWeakestPrecondition = Negation.create(predicate);
-				
-			if (expression != null) {
-				positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
-				negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
 			}
 
 			if (affects) {
+				Predicate positiveWeakestPrecondition = predicate;
+				Predicate negativeWeakestPrecondition = Negation.create(predicate);
+					
+				if (expression != null) {
+					if (expression instanceof AnonymousExpression) {
+						positiveWeakestPrecondition = Contradiction.create();
+						negativeWeakestPrecondition = Contradiction.create();
+					} else {
+						positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
+						negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
+					}
+				}
+				
 				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 				
 				for (Predicate determinant : positiveWeakestPrecondition.determinantClosure(valuations.keySet())) {
@@ -133,18 +135,6 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				}
 				
 				predicates.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
-
-				System.err.println("\t\t" + predicate.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-				System.err.println("\t\t\t[ Weakest Preconditions");
-				System.err.println("\t\t\t\t+ " + positiveWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-				System.err.println("\t\t\t\t- " + negativeWeakestPrecondition.toString(AccessPath.NotationPolicy.DOT_NOTATION));
-				System.err.println("\t\t\t]");
-				System.err.println("\t\t\t[ Relevant");
-				for (Predicate det : determinants.keySet()) {
-					System.err.println("\t\t\t\t" + det.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " :: " + determinants.get(det));
-				}
-				System.err.println("\t\t\t]");
-				System.err.println();
 			}
 		}
 		
@@ -152,13 +142,44 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		
 		try {
 			Map<Predicate, TruthValue> newValuations = new SMT().valuatePredicates(predicates);
-		
-			for (Predicate predicate : newValuations.keySet()) {
-				valuations.put(predicate, newValuations.get(predicate));
-			}
+			
+			valuations.putAll(newValuations);
 		} catch (SMTException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public TruthValue evaluatePredicate(Predicate predicate) {
+		Predicate positiveWeakestPrecondition = predicate;
+		Predicate negativeWeakestPrecondition = Negation.create(predicate);
+
+		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
+		Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+			
+		for (Predicate determinant : positiveWeakestPrecondition.determinantClosure(valuations.keySet())) {
+			determinants.put(determinant, valuations.get(determinant));
+		}
+		for (Predicate determinant : negativeWeakestPrecondition.determinantClosure(valuations.keySet())) {
+			determinants.put(determinant, valuations.get(determinant));
+		}
+		
+		predicates.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
+		
+		try {
+			Map<Predicate, TruthValue> valuation = new SMT().valuatePredicates(predicates);
+		
+			return valuation.get(predicate);
+		} catch (SMTException e) {
+			e.printStackTrace();
+		}
+		
+		return TruthValue.UNDEFINED;
+	}
+	
+	@Override
+	public int count() {
+		return valuations.keySet().size();
 	}
 	
 }

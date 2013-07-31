@@ -20,7 +20,5 @@ public class Array {
 		int i = a[0].f;
 		i = -1;
         a[0].f = i + 2;
-		
-		System.out.println(a[0].f + i);
 	}
 }

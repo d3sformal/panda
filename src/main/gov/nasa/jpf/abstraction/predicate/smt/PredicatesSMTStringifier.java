@@ -11,6 +11,8 @@ import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
 import gov.nasa.jpf.abstraction.common.Subtract;
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Disjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Equals;
@@ -225,6 +227,14 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 		}
 		
 		ret = String.format(ret, "(select (select " + array + " %s) " + indexVisitor.getString() + ")");
+	}
+
+	@Override
+	public void visit(AnonymousArray expression) {
+	}
+
+	@Override
+	public void visit(AnonymousObject expression) {		
 	}
 
 }

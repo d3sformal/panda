@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.common;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
 import java.util.LinkedList;
@@ -33,7 +34,7 @@ public class UpdatedPredicate extends Predicate {
 		
 		// ONLY variable paths (single element - varname) get replaced, other paths stay in the expressions
 		if (path.getRoot() != path.getTail()) {
-			ret.add(path);
+			ret.addAll(path.getPaths());
 		}
 		
 		return ret;
@@ -47,6 +48,20 @@ public class UpdatedPredicate extends Predicate {
 	public static Predicate create(Predicate predicate, AccessPath path, Expression expression) {
 		if (predicate == null) return null;
 		if (path == null || expression == null) return null;
+		
+		if (predicate instanceof Negation) {
+			Negation n = (Negation) predicate;
+
+			return Negation.create(create(n.predicate, path, expression));
+		}
+		
+		if (predicate instanceof Tautology) {
+			return predicate;
+		}
+		
+		if (predicate instanceof Contradiction) {
+			return predicate;
+		}
 		
 		return new UpdatedPredicate(predicate, path, expression);
 	}

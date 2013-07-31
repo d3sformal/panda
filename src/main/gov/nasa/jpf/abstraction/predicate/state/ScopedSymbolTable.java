@@ -1,15 +1,15 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.VariableID;
 import gov.nasa.jpf.vm.MethodInfo;
 
 import java.util.Set;
-import java.util.Stack;
 
 public class ScopedSymbolTable implements SymbolTable, Scoped {
-	private Stack<FlatSymbolTable> scopes = new Stack<FlatSymbolTable>();
+	private SymbolTableStack scopes = new SymbolTableStack();
 	
 	@Override
 	public FlatSymbolTable createDefaultScope(MethodInfo method) {
@@ -18,27 +18,32 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 
 	@Override
 	public Set<AccessPath> lookupAccessPaths(AccessPath prefix) {
-		return scopes.lastElement().lookupAccessPaths(prefix);
+		return scopes.top().lookupAccessPaths(prefix);
 	}
 
 	@Override
-	public Set<AccessPath> lookupEquivalentAccessPaths(CompleteVariableID number) {
-		return scopes.lastElement().lookupEquivalentAccessPaths(number);
-	}
-
-	@Override
-	public CompleteVariableID resolvePath(AccessPath path) {
-		return scopes.lastElement().resolvePath(path);
+	public Set<AccessPath> lookupEquivalentAccessPaths(VariableID var) {
+		return scopes.top().lookupEquivalentAccessPaths(var);
 	}
 	
 	@Override
-	public Set<AccessPath> processLoad(AccessPath path, CompleteVariableID number) {
-		return scopes.lastElement().processLoad(path, number);
+	public Set<AccessPath> lookupEquivalentAccessPaths(AccessPath path) {
+		return scopes.top().lookupEquivalentAccessPaths(path);
 	}
 	
 	@Override
-	public Set<AccessPath> processStore(ConcretePath from, ConcretePath to) {
-		return scopes.lastElement().processStore(from, to);
+	public void processLoad(ConcretePath from) {
+		scopes.top().processLoad(from);
+	}
+	
+	@Override
+	public Set<AccessPath> processPrimitiveStore(ConcretePath to) {
+		return scopes.top().processPrimitiveStore(to);
+	}
+	
+	@Override
+	public Set<AccessPath> processObjectStore(Expression from, ConcretePath to) {
+		return scopes.top().processObjectStore(from, to);
 	}
 	
 	@Override
@@ -61,28 +66,27 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public void restore(Scope scope) {
-		if (scope instanceof FlatSymbolTable) {
-			scopes.pop();
-			scopes.push((FlatSymbolTable) scope.clone());
+	public void restore(Scopes scopes) {
+		if (scopes instanceof SymbolTableStack) {
+			this.scopes = (SymbolTableStack) scopes;
 		} else {
-			throw new RuntimeException("Invalid scope type being pushed!");
+			throw new RuntimeException("Invalid scopes type being restored!");
 		}
 	}
 	
 	@Override
-	public FlatSymbolTable memorize() {
-		return scopes.lastElement().clone();
+	public SymbolTableStack memorize() {
+		return scopes.clone();
 	}
 	
 	@Override
 	public String toString() {
-		return scopes.lastElement().toString();
+		return scopes.count() > 0 ? scopes.top().toString() : "";
 	}
 
 	@Override
 	public int count() {
-		return scopes.size();
+		return scopes.count() > 0 ? scopes.top().count() : 0;
 	}
 	
 }

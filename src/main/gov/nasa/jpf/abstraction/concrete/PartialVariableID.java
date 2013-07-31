@@ -1,15 +1,17 @@
 package gov.nasa.jpf.abstraction.concrete;
 
-import gov.nasa.jpf.vm.ElementInfo;
-
 public class PartialVariableID extends VariableID {
-	private ElementInfo info;
+	private Reference ref;
 	
-	public PartialVariableID(ElementInfo info) {
-		this.info = info;
+	public PartialVariableID(Reference ref) {
+		this.ref = ref;
 	}
 	
-	public ElementInfo getInfo() {
-		return info;
+	public Reference getRef() {
+		return ref;
+	}
+	
+	public String toString() {
+		return "ref(" + ref + ")";
 	}
 }

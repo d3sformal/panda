@@ -32,7 +32,7 @@ public abstract class BinaryOperatorExecutor<T> {
 
 	final public Instruction execute(AbstractBinaryOperator<T> op, ThreadInfo ti) {
 		
-		String name = op.getClass().getName();
+		String name = op.getClass().getSimpleName();
 		
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();

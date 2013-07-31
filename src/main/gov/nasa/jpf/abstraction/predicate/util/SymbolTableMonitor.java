@@ -1,32 +1,25 @@
 package gov.nasa.jpf.abstraction.predicate.util;
 
 import gov.nasa.jpf.ListenerAdapter;
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
+import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ReturnInstruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 public class SymbolTableMonitor extends ListenerAdapter {
-	private boolean running = false;
 	
 	@Override
-	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
-		if (execInsn instanceof InvokeInstruction) {			
-			if (nextInsn.getMethodInfo().getName().equals("main")) {
-				running = true;
-			}
-		}
-		if (execInsn instanceof ReturnInstruction && execInsn.getMethodInfo().getName().equals("main")) {
-			running = false;
-		}
-		
-		if (running) {
-			inspect(AbstractInstructionFactory.abs);
+	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {		
+		if (RunDetector.isRunning()) {
+			inspect(GlobalAbstraction.getInstance().get());
 		}
 	}
 
@@ -39,9 +32,13 @@ public class SymbolTableMonitor extends ListenerAdapter {
 			}
 		} else if (abs instanceof PredicateAbstraction) {
 			PredicateAbstraction predicate = (PredicateAbstraction) abs;
-			System.out.println("--SYMBOLS--");
-			System.out.print(predicate.getSymbolTable().toString());
-			System.out.println("--------------");
+			String table = predicate.getSymbolTable().toString();
+			System.out.println(
+				"--SYMBOLS " + predicate.getSymbolTable().count() + " --\n" +
+				table +
+				"--------------"
+			);
+			System.out.flush();
 		}		
 	}
 }

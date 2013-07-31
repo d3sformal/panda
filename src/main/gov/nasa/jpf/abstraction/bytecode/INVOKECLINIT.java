@@ -18,9 +18,10 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractInstructionFactory;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
@@ -36,11 +37,13 @@ public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
 
 		Instruction actualNextInsn = super.execute(ti);
 		
+		MethodInfo method = ti.getTopFrameMethodInfo();
+		
 		if (JPFInstructionAdaptor.testInvokeStaticInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}
 		
-		AbstractInstructionFactory.abs.processMethodCall(ti.getTopFrameMethodInfo());
+		GlobalAbstraction.getInstance().processMethodCall(method);
 
 		return actualNextInsn;
 	}

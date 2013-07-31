@@ -21,6 +21,10 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.predicate.common.LessThan;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
@@ -56,4 +60,9 @@ public class IFGE extends gov.nasa.jpf.jvm.bytecode.IFGE implements AbstractBran
 		return Abstraction._ge(v1, abs_v1, 0, null);
 	}
 
+	@Override
+	public Predicate createPredicate(Expression expr1, Expression expr2) {
+		return Negation.create(LessThan.create(expr1, expr2));
+	}
+	
 }

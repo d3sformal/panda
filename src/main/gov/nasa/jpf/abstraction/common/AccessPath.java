@@ -33,6 +33,7 @@ public class AccessPath extends Expression {
 	
 	protected AccessPathRootElement root;
 	protected AccessPathElement tail;
+	protected int length;
 	
 	protected AccessPathRootElement createRootElement(String name) {
 		return new DefaultAccessPathRootElement(name);
@@ -55,6 +56,7 @@ public class AccessPath extends Expression {
 	public AccessPath(String name) {
 		root = createRootElement(name);
 		tail = root;
+		length = 1;
 		
 		initialise(name);
 	}
@@ -67,10 +69,15 @@ public class AccessPath extends Expression {
 		return tail;
 	}
 	
+	public int getLength() {
+		return length;
+	}
+	
 	protected void appendElement(AccessPathMiddleElement element) {
 		tail.setNext(element);
 		element.setPrevious(tail);
 		tail = element;
+		++length;
 	}
 	
 	public void appendSubElement(String name) {
@@ -80,7 +87,7 @@ public class AccessPath extends Expression {
 	public void appendIndexElement(Expression index) {
 		appendElement(new DefaultAccessPathIndexElement(index));
 
-		paths.addAll(index.paths);
+		paths.addAll(index.getPaths());
 	}
 	
 	public static void reRoot(AccessPath path, AccessPath oldPrefix, AccessPath newPrefix) {
@@ -107,6 +114,8 @@ public class AccessPath extends Expression {
 		AccessPathElement prefixElement = root;
 		AccessPathElement pathElement = path.root;
 		
+		if (getLength() > path.getLength()) return false;
+		
 		while (prefixElement != null && pathElement != null) {
             if (!prefixElement.equals(pathElement)) {
                 return false;
@@ -117,6 +126,10 @@ public class AccessPath extends Expression {
 		}
 		
 		return prefixElement == null || pathElement != null;
+	}
+	
+	public boolean isProperPrefix(AccessPath path) {
+		return getLength() < path.getLength() && isPrefix(path);
 	}
 	
 	@Override
@@ -145,6 +158,7 @@ public class AccessPath extends Expression {
 		
 		path.root = root.clone();
 		path.tail = path.root;
+		path.length = length;
 		
 		AccessPathElement next = path.root;
 		
@@ -166,11 +180,20 @@ public class AccessPath extends Expression {
 		if (equals(formerPath)) {
 			return expression;
 		}
+		
+		if (formerPath.isPrefix(this) && expression instanceof AccessPath) {
+			AccessPath newPath = clone();
+			AccessPath newPrefix = ((AccessPath)expression).clone();
+			AccessPath.reRoot(newPath, formerPath, newPrefix);
+			
+			return newPath;
+		}
 
 		AccessPath path = new AccessPath();
 		
 		path.root = root.replace(formerPath, expression);
 		path.tail = path.root;
+		path.length = length;
 		
 		AccessPathElement next = path.root;
 		
@@ -190,12 +213,17 @@ public class AccessPath extends Expression {
 			
 			prefix.tail = tail.getPrevious();
 			prefix.tail.setNext(null);
+			--prefix.length;
 		}
 		
 		return prefix;
 	}
 	
 	public boolean similar(AccessPath path) {
+		if (length != path.length) {
+			return false;
+		}
+
 		if (!this.root.getName().equals(path.root.getName())) {
 			return false;
 		}
@@ -222,6 +250,50 @@ public class AccessPath extends Expression {
 		}
 		
 		return e1 == null && e2 == null;
+	}
+	
+	public AccessPathElement getElement(int index) {
+		AccessPathElement ret = root;
+		
+		while (index > 0) {
+			ret = ret.getNext();
+			--index;
+		}
+		
+		return ret;
+	}
+
+	public boolean similarPrefix(AccessPath path) {
+		if (length > path.length) {
+			return false;
+		}
+
+		if (!this.root.getName().equals(path.root.getName())) {
+			return false;
+		}
+		
+		AccessPathElement e1 = this.root;
+		AccessPathElement e2 = path.root;
+		
+		while (e1 != null && e2 != null) {
+			if (e1.getClass() != e2.getClass()) {
+				return false;
+			}
+
+			if (e1 instanceof AccessPathSubElement && e2 instanceof AccessPathSubElement) {
+				AccessPathSubElement s1 = (AccessPathSubElement) e1;
+				AccessPathSubElement s2 = (AccessPathSubElement) e2;
+					
+				if (!s1.getName().equals(s2.getName())) {
+					return false;
+				}
+			}
+			
+			e1 = e1.getNext();
+			e2 = e2.getNext();
+		}
+		
+		return e1 == null || e2 != null;
 	}
 
 }

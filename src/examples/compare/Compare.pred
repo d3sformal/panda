@@ -1,0 +1,3 @@
+[method compare.Compare.main]
+a < 4
+b < 3

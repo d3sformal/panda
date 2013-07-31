@@ -19,6 +19,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
@@ -49,6 +50,8 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 			ConcretePath path = (ConcretePath) arrayAttr.getExpression();
 				
 			path.appendIndexElement(indexAttr.getExpression());
+			
+			GlobalAbstraction.getInstance().processLoad(path);
 				
 			Attribute attribute = new NonEmptyAttribute(null, path);
 

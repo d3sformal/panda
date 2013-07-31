@@ -10,6 +10,9 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.impl.DefaultConcretePathIndexElement;
 import gov.nasa.jpf.abstraction.concrete.impl.DefaultConcretePathRootElement;
 import gov.nasa.jpf.abstraction.concrete.impl.DefaultConcretePathSubElement;
+import gov.nasa.jpf.abstraction.concrete.impl.PathResolution;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public class ConcretePath extends AccessPath {
@@ -21,14 +24,24 @@ public class ConcretePath extends AccessPath {
 	}
 	
 	public Type type;
-	public Object rootObject;
+	public ElementInfo ei;
+	public LocalVarInfo info;
 	public ThreadInfo ti;
 	
 	protected ConcretePath() {
 	}
+	
+	protected ConcretePath(String name, ThreadInfo ti, LocalVarInfo info, Type type) {
+		this(name, ti, null, info, type);
+	}
+	
+	protected ConcretePath(String name, ThreadInfo ti, ElementInfo ei, Type type) {
+		this(name, ti, ei, null, type);
+	}
 
-	public ConcretePath(String name, ThreadInfo ti, Object rootObject, Type type) {
-		this.rootObject = rootObject;
+	protected ConcretePath(String name, ThreadInfo ti, ElementInfo ei, LocalVarInfo info, Type type) {
+		this.ei = ei;
+		this.info = info;
 		this.type = type;
 		this.ti = ti;
 		
@@ -47,7 +60,7 @@ public class ConcretePath extends AccessPath {
 	
 	@Override
 	protected AccessPathRootElement createRootElement(String name) {
-		return new DefaultConcretePathRootElement(name, rootObject, type);
+		return new DefaultConcretePathRootElement(name, ei, info, type);
 	}
 	
 	@Override
@@ -67,7 +80,7 @@ public class ConcretePath extends AccessPath {
 	public Map<AccessPath, CompleteVariableID> resolve() {
 		ConcretePathElement element = (ConcretePathElement) tail;
 		
-		Map<AccessPath, VariableID> vars = element.getVariableIDs(ti);
+		Map<AccessPath, VariableID> vars = element.getVariableIDs(ti).current;
 		Map<AccessPath, CompleteVariableID> ret = new HashMap<AccessPath, CompleteVariableID>();
 		
 		for (AccessPath path : vars.keySet()) {
@@ -86,14 +99,24 @@ public class ConcretePath extends AccessPath {
 	public Map<AccessPath, VariableID> partialResolve() {
 		ConcretePathElement element = (ConcretePathElement) tail;
 		
-		return element.getVariableIDs(ti);
+		PathResolution resolution = element.getVariableIDs(ti);
+		
+		resolution.processed.putAll(resolution.current);
+		
+		return resolution.processed;
+	}
+	
+	public Map<AccessPath, VariableID> partialExhaustiveResolve() {
+		ConcretePathElement element = (ConcretePathElement) tail;
+		
+		return element.getVariableIDs(ti).current;
 	}
 	
 	@Override
 	public ConcretePath clone() {
 		ConcretePath path = new ConcretePath();
 		
-		path.rootObject = rootObject;
+		path.ei = ei;
 		path.type = type;
 		path.ti = ti;
 		
@@ -108,6 +131,18 @@ public class ConcretePath extends AccessPath {
 		}
 		
 		return path;
+	}
+	
+	public static ConcretePath createStaticFieldPath(String root, ThreadInfo ti, ElementInfo ei) {
+		return new ConcretePath(root, ti, ei, Type.STATIC);
+	}
+	
+	public static ConcretePath createLocalVarPath(String root, ThreadInfo ti, LocalVarInfo info) {
+		return new ConcretePath(root, ti, info, Type.LOCAL);
+	}
+	
+	public static ConcretePath createLocalVarRootedHeapObjectPath(String root, ThreadInfo ti, ElementInfo ei, LocalVarInfo info) {
+		return new ConcretePath(root, ti, ei, info, Type.HEAP);
 	}
 
 }

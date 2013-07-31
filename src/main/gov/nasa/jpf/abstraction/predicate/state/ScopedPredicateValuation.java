@@ -7,15 +7,19 @@ import gov.nasa.jpf.abstraction.predicate.common.MethodContext;
 import gov.nasa.jpf.abstraction.predicate.common.ObjectContext;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
+import gov.nasa.jpf.abstraction.predicate.smt.SMT;
+import gov.nasa.jpf.abstraction.predicate.smt.SMTException;
 import gov.nasa.jpf.vm.MethodInfo;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Stack;
 
 public class ScopedPredicateValuation implements PredicateValuation, Scoped {
-	private Stack<FlatPredicateValuation> scopes = new Stack<FlatPredicateValuation>();
+	private PredicateValuationStack scopes = new PredicateValuationStack();
 	private Predicates predicateSet;
 	
 	public ScopedPredicateValuation(Predicates predicateSet) {
@@ -27,6 +31,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		FlatPredicateValuation valuation = new FlatPredicateValuation();
 		
 		if (method == null) return valuation;
+		
+		Set<Predicate> predicates = new HashSet<Predicate>();
 
 		for (Context context : predicateSet.contexts) {
 			if (context instanceof MethodContext) {
@@ -43,9 +49,26 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				}
 			}
 
-			for (Predicate predicate : context.predicates) {
+			predicates.addAll(context.predicates);
+		}
+		
+		try {
+			Map<Predicate, TruthValue> initialValuation = new SMT().valuatePredicates(predicates);
+			
+			for (Predicate predicate : predicates) {
+				// IF NOT A TAUTOLOGY OR CONTRADICTION
+				if (initialValuation.get(predicate) == TruthValue.UNKNOWN) {
+					valuation.put(predicate, TruthValue.UNDEFINED);
+				} else {
+					valuation.put(predicate, initialValuation.get(predicate));
+				}
+			}
+		} catch (SMTException e) {			
+			for (Predicate predicate : predicates) {
 				valuation.put(predicate, TruthValue.UNDEFINED);
 			}
+			
+			e.printStackTrace();
 		}
 		
 		return valuation;
@@ -53,17 +76,17 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 
 	@Override
 	public void put(Predicate predicate, TruthValue value) {
-		scopes.lastElement().put(predicate, value);
+		scopes.top().put(predicate, value);
 	}
 
 	@Override
 	public TruthValue get(Predicate predicate) {
-		return scopes.lastElement().get(predicate);
+		return scopes.top().get(predicate);
 	}
 
 	@Override
 	public Iterator<Entry<Predicate, TruthValue>> iterator() {
-		return scopes.lastElement().iterator();
+		return scopes.top().iterator();
 	}
 	
 	@Override
@@ -86,33 +109,37 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public void restore(Scope scope) {
-		if (scope instanceof FlatPredicateValuation) {
-			scopes.pop();
-			scopes.push((FlatPredicateValuation) scope.clone());
+	public void restore(Scopes scopes) {
+		if (scopes instanceof PredicateValuationStack) {
+			this.scopes = (PredicateValuationStack) scopes;
 		} else {
-			throw new RuntimeException("Invalid scope type being pushed!");
+			throw new RuntimeException("Invalid scopes type being restored!");
 		}
 	}
 	
 	@Override
-	public FlatPredicateValuation memorize() {
-		return scopes.lastElement().clone();
+	public PredicateValuationStack memorize() {
+		return scopes.clone();
 	}
 	
 	@Override
 	public String toString() {
-		return scopes.lastElement().toString();
+		return scopes.count() > 0 ? scopes.top().toString() : "";
 	}
 
 	@Override
 	public void reevaluate(AccessPath affected, Set<AccessPath> resolvedAffected, Expression expression) {
-		scopes.lastElement().reevaluate(affected, resolvedAffected, expression);
+		scopes.top().reevaluate(affected, resolvedAffected, expression);
+	}
+	
+	@Override
+	public TruthValue evaluatePredicate(Predicate predicate) {
+		return scopes.top().evaluatePredicate(predicate);
 	}
 	
 	@Override
 	public int count() {
-		return scopes.size();
+		return scopes.count() > 0 ? scopes.top().count() : 0;
 	}
 
 }
