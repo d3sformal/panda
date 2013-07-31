@@ -180,6 +180,14 @@ public class AccessPath extends Expression {
 		if (equals(formerPath)) {
 			return expression;
 		}
+		
+		if (formerPath.isPrefix(this) && expression instanceof AccessPath) {
+			AccessPath newPath = clone();
+			AccessPath newPrefix = ((AccessPath)expression).clone();
+			AccessPath.reRoot(newPath, formerPath, newPrefix);
+			
+			return newPath;
+		}
 
 		AccessPath path = new AccessPath();
 		

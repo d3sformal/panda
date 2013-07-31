@@ -5,20 +5,20 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.ElementInfo;
 
 public class ArrayReference extends Reference {
-	private Expression length;
+	private Expression array;
 	
-	public ArrayReference(ElementInfo ei, Expression length) {
+	public ArrayReference(ElementInfo ei, Expression array) {
 		super(ei);
 		
-		if (length != null) {
-			this.length = length;
-		} else {
-			this.length = EmptyExpression.create();
+		if (!(array instanceof ConcretePath) && !(array instanceof AnonymousArray)) {
+			throw new RuntimeException("Bad array reference '" + array + "'.");
 		}
+		
+		this.array = array;
 	}
 	
 	@Override
 	public String toString() {	
-		return super.toString() + " " + length.toString(AccessPath.NotationPolicy.DOT_NOTATION); 
+		return super.toString() + " " + array.toString(AccessPath.NotationPolicy.DOT_NOTATION); 
 	}
 }

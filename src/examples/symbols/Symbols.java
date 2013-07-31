@@ -11,28 +11,32 @@ class B {
 public class Symbols {
 
 	public static void main(String[] args) {
-		A x[] = new A[2];
-		x[0] = new A();
-		x[1] = new A();
+		A k[] = new A[2];
+		A l[] = new A[1];
+		A m = new A();
+		A n = new A();
+		A o[][] = new A[2][2];
 		
-		A y = new A();
-		A z = new A();
-		A w[][] = new A[2][2];
-		w[0] = x;
-		
-		x[0].b = new B();
-		x[0].b.i = 1;
-		
-		x[1].b = new B();
-		x[1].b.i = 2;
-		
-		y.b = new B();
-		y.b.i = 3;
+		k[0] = new A();
+		k[1] = new A();
 
-		x[0].b = y.b;
+		o[0] = k;
 		
-		y = z;
-		x = new A[10];
+		k[0].b = new B();
+		k[0].b.i = 1;
+		
+		k[1].b = new B();
+		k[1].b.i = 2;
+		
+		m.b = new B();
+		m.b.i = 3;
+
+		k[0].b = m.b;
+		
+		m = n;
+		k = new A[10];
+		
+		k = l;
 	}
 
 }

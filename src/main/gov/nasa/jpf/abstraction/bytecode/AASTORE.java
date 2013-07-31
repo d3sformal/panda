@@ -44,7 +44,10 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 
 		ElementInfo ei = ti.getElementInfo(sf.peek(2));
 		ArrayFields fields = ei.getArrayFields();
-		fields.addFieldAttr(fields.arrayLength(), sf.peek(1), source);
+		
+		for (int i = 0; i < fields.arrayLength(); ++i) {
+			fields.addFieldAttr(fields.arrayLength(), i, source);
+		}
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 

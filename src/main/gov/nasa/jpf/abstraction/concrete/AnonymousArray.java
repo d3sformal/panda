@@ -48,7 +48,7 @@ public class AnonymousArray extends AnonymousExpression {
 	
 	@Override
 	public PartialVariableID generateVariableID() {
-		return new PartialVariableID(new ArrayReference(ei, length));
+		return new PartialVariableID(new ArrayReference(ei, this));
 	}
 
 }

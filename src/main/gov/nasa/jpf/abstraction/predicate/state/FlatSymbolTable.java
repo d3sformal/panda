@@ -238,6 +238,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				}
 			}
 			
+			affectedObjectPaths.add(destination);
 			affected.addAll(affectedObjectPaths);
 
 			for (AccessPath sourceCandidate : sourceCandidates.keySet()) {
@@ -272,30 +273,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			}
 
 			setPathToVars(path, rewrites.get(path));
-			
-			/*
-			//SHOULD NOT BE EMPTY
-			//ALL VARS SHOULD BE OF THE SAME TYPE
-			// 1) PARTIAL
-			//   a) OBJECT REF
-			//   b) ARRAY REF
-			// 2) COMPLETE
-			VariableID var = rewrites.get(path).iterator().next();
-
-			if (var instanceof PartialVariableID) {
-				PartialVariableID partialVar = (PartialVariableID) var;
-				
-				if (partialVar.getRef() instanceof ArrayReference) {
-					AccessPath lengthPath = path.clone();
-					lengthPath.appendSubElement("length");
-
-					affected.add(lengthPath);
-				}
-			} else {
-				affected.add(path);
-			}
-			*/
-
 		}
 		
 		return affected;

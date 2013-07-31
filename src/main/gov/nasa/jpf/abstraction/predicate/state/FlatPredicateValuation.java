@@ -3,6 +3,8 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
@@ -108,16 +110,21 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 					affects = affects || path1.similarPrefix(path2);
 				}
 			}
-			
-			Predicate positiveWeakestPrecondition = predicate;
-			Predicate negativeWeakestPrecondition = Negation.create(predicate);
-				
-			if (expression != null) {
-				positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
-				negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
-			}
 
 			if (affects) {
+				Predicate positiveWeakestPrecondition = predicate;
+				Predicate negativeWeakestPrecondition = Negation.create(predicate);
+					
+				if (expression != null) {
+					if (expression instanceof AnonymousExpression) {
+						positiveWeakestPrecondition = Contradiction.create();
+						negativeWeakestPrecondition = Contradiction.create();
+					} else {
+						positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
+						negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
+					}
+				}
+				
 				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 				
 				for (Predicate determinant : positiveWeakestPrecondition.determinantClosure(valuations.keySet())) {
