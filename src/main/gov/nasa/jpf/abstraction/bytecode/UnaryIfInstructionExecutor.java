@@ -38,9 +38,7 @@ public class UnaryIfInstructionExecutor {
 		if (!ti.isFirstStepInsn()) { // first time around
 		
 			// PREDICATE ABSTRACTION
-			if (expr != null) {
-				attr.setExpression(null);
-				
+			if (expr != null) {				
 				TruthValue pred = GlobalAbstraction.getInstance().evaluatePredicate(br.createPredicate(expr, Constant.create(0)));
 	
 				switch (pred) {

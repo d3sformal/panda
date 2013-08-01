@@ -2,7 +2,7 @@ package scheduler;
 
 public class Scheduler
 {
-    private static int SCHEDULE_SIZE = 1000;
+    private static int SCHEDULE_SIZE = 5;
 
 	public static void main(String[] args) {
 		ThreadInfo[] id2thread = new ThreadInfo[3];
@@ -21,9 +21,15 @@ public class Scheduler
 		int schedule_size = 0;
 		int[] schedule = new int[SCHEDULE_SIZE];
 
+		int i = 0;
+		int j = 0;
+		int k = 0;
+		ThreadInfo actTh;
+		ThreadInfo schTh;
+		
 		// set of active threads is iterated when to make scheduling decisions
-		for (int k = 0; k < id2thread.length; ++k) {
-			ThreadInfo actTh = id2thread[k];
+		for (k = 0; k < /*id2thread.length*/ 3; ++k) {
+			actTh = id2thread[k];
 
 			if (!actTh.active) continue;
 
@@ -35,12 +41,12 @@ public class Scheduler
 			else
 			{
 				// the info object is retrieved for each active thread
-				for (int i = 0; i < schedule_size; ++i) {
-					ThreadInfo schTh = id2thread[schedule[i]];
+				for (i = 0; i < schedule_size; ++i) {
+					schTh = id2thread[schedule[i]];
 
 					if (actTh.priority > schTh.priority) {
             	        // insert into the scheduling queue
-                	    for (int j = schedule_size - 1; j >= i; --j) {
+                	    for (j = schedule_size - 1; j >= i; --j) {
                     	    schedule[j + 1] = schedule[j];
 	                    }
    						schedule[i] = k;

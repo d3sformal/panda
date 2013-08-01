@@ -207,6 +207,11 @@ public class AbstractInstructionFactory extends
 	public Instruction ddiv() {
 		return (filter.isInstrumentedClass(ci) ? new DDIV() : super.ddiv());
 	}
+	
+	@Override
+	public Instruction dload(int index) {
+		return (filter.isInstrumentedClass(ci) ? new DLOAD(index) : super.dload(index));
+	}
 
 	@Override
 	public Instruction dmul() {
@@ -296,6 +301,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction fdiv() {
 		return (filter.isInstrumentedClass(ci) ? new FDIV() : super.fdiv());
+	}
+	
+	@Override
+	public Instruction fload(int index) {
+		return (filter.isInstrumentedClass(ci) ? new FLOAD(index) : super.fload(index));
 	}
 
 	@Override
@@ -668,6 +678,11 @@ public class AbstractInstructionFactory extends
 	@Override
 	public Instruction ldiv() {
 		return (filter.isInstrumentedClass(ci) ? new LDIV() : super.ldiv());
+	}
+	
+	@Override
+	public Instruction lload(int index) {
+		return (filter.isInstrumentedClass(ci) ? new LLOAD(index) : super.lload(index));
 	}
 
 	@Override

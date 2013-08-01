@@ -40,14 +40,11 @@ public abstract class BinaryOperatorExecutor<T> {
 		Attribute attr1 = getLeftAttribute(sf);
 		Attribute attr2 = getRightAttribute(sf);
 		
-		AbstractValue abs_v1 = null;
-		AbstractValue abs_v2 = null;
-		
 		if (attr1 == null) attr1 = new EmptyAttribute();
 		if (attr2 == null) attr2 = new EmptyAttribute();
 
-		abs_v1 = attr1.getAbstractValue();
-		abs_v2 = attr2.getAbstractValue();
+		AbstractValue abs_v1 = attr1.getAbstractValue();
+		AbstractValue abs_v2 = attr2.getAbstractValue();
 		
 		T v1 = getLeftOperand(sf);
 		T v2 = getRightOperand(sf);

@@ -66,9 +66,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 			
 			System.out.println("EXPR: " + expr);
 			
-			if (expr != null) {
-				attr.setExpression(null);
-				
+			if (expr != null) {				
 				ArrayList<Integer> choiceCandidates = new ArrayList<Integer>();
 				boolean predicateAbstractionFailed = false;
 

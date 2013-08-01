@@ -41,8 +41,8 @@ public class AbstractListener extends PropertyListenerAdapter {
 
 	@Override
 	public void stateBacktracked(Search search) {
-		RunDetector.backtrack();
 		GlobalAbstraction.getInstance().backtrack(search.getVM().getCurrentThread().getTopFrameMethodInfo());
+		RunDetector.backtrack();
 	}
 	
 	@Override

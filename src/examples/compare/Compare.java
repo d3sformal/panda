@@ -9,7 +9,9 @@ public class Compare {
 		b = 2.4f;
 		
 		if (a * b < 12.0f) {
-			//...
+			int x = 0;
+		} else {
+			int y = 1;
 		}
 	}
 

@@ -68,7 +68,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	@Override
 	public void restore(Scopes scopes) {
 		if (scopes instanceof SymbolTableStack) {
-			this.scopes = (SymbolTableStack) scopes;
+			this.scopes = (SymbolTableStack) scopes.clone();
 		} else {
 			throw new RuntimeException("Invalid scopes type being restored!");
 		}

@@ -18,13 +18,15 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import gov.nasa.jpf.abstraction.AbstractValue;
-import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.AccessPath;
-import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
@@ -37,6 +39,7 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 
 public abstract class BinaryComparatorExecutor<T> {
 
@@ -50,73 +53,79 @@ public abstract class BinaryComparatorExecutor<T> {
 		Attribute attr1 = getLeftAttribute(sf);
 		Attribute attr2 = getRightAttribute(sf);
 		
-		AbstractValue abs_v1 = null;
-		AbstractValue abs_v2 = null;
-		
 		if (attr1 == null) attr1 = new EmptyAttribute();
 		if (attr2 == null) attr2 = new EmptyAttribute();
 		
+		AbstractValue abs_v1 = attr1.getAbstractValue();
+		AbstractValue abs_v2 = attr2.getAbstractValue();
+		Expression expr1 = attr1.getExpression();
+		Expression expr2 = attr2.getExpression();
+		
 		Attribute result = null;
 		
-		if (attr1.getExpression() != null && attr2.getExpression() != null) {			
-			TruthValue lt = GlobalAbstraction.getInstance().evaluatePredicate(LessThan.create(attr1.getExpression(), attr2.getExpression()));
-			TruthValue eq = GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(attr1.getExpression(), attr2.getExpression()));
-			TruthValue gt = null;
-						
-			if (TruthValue.and(lt, eq) == TruthValue.UNDEFINED) {
-				gt = TruthValue.UNDEFINED;
-			} else if (TruthValue.and(lt, eq) == TruthValue.FALSE) {
-				gt = TruthValue.TRUE;
-			} else if (lt == TruthValue.TRUE || eq == TruthValue.TRUE) {
-				gt = TruthValue.FALSE;
-			} else {
-				gt = TruthValue.UNKNOWN;
+		if (!ti.isFirstStepInsn()) { // first time around
+			if (expr1 != null && expr2 != null) {			
+				TruthValue lt = GlobalAbstraction.getInstance().evaluatePredicate(LessThan.create(expr1, expr2));
+				TruthValue eq = GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(expr1, expr2));
+				TruthValue gt = null;
+							
+				if (TruthValue.and(lt, eq) == TruthValue.UNDEFINED) {
+					gt = TruthValue.UNDEFINED;
+				} else if (TruthValue.and(lt, eq) == TruthValue.FALSE) {
+					gt = TruthValue.TRUE;
+				} else if (lt == TruthValue.TRUE || eq == TruthValue.TRUE) {
+					gt = TruthValue.FALSE;
+				} else {
+					gt = TruthValue.UNKNOWN;
+				}
+				
+				// UNDEFINED MEANS THERE WAS NO ABSTRACTION TO DECIDE THE VALIDITY OF THE PREDICATE
+				if (gt != TruthValue.UNDEFINED) {
+					result = new NonEmptyAttribute(SignsAbstraction.getInstance().create(lt != TruthValue.FALSE, eq != TruthValue.FALSE, gt != TruthValue.FALSE), null);
+	
+					System.err.printf("%s> Expressions: %s, %s\n", name, expr1.toString(AccessPath.NotationPolicy.DOT_NOTATION), expr2.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+				}
 			}
 			
-			// UNDEFINED MEANS THERE WAS NO ABSTRACTION TO DECIDE THE VALIDITY OF THE PREDICATE
-			if (gt != TruthValue.UNDEFINED) {
-				result = new NonEmptyAttribute(SignsAbstraction.getInstance().create(lt != TruthValue.FALSE, eq != TruthValue.FALSE, gt != TruthValue.FALSE), null);
-
-				System.err.printf("%s> Expressions: %s, %s\n", name, attr1.getExpression().toString(AccessPath.NotationPolicy.DOT_NOTATION), attr2.getExpression().toString(AccessPath.NotationPolicy.DOT_NOTATION));
+			if (result == null) {		
+				T v1 = getLeftOperand(sf);
+				T v2 = getRightOperand(sf);
+	
+				if (abs_v1 == null && abs_v2 == null) {
+					return cmp.executeConcrete(ti);
+				}
+				
+				result = cmp.getResult(v1, attr1, v2, attr2);
+				
+				System.out.printf("%s> Values: %s (%s), %s (%s)\n", name, v2.toString(), abs_v2, v1.toString(), abs_v1);
 			}
-		}
-		
-		if (result == null) {
-			abs_v1 = attr1.getAbstractValue();
-			abs_v2 = attr2.getAbstractValue();
-		
-			T v1 = getLeftOperand(sf);
-			T v2 = getRightOperand(sf);
-
-			result = cmp.getResult(v1, attr1, v2, attr2);
-
-			if (abs_v1 == null && abs_v2 == null) {
-				Instruction ret = cmp.executeConcrete(ti);
-			
-				storeAttribute(result, sf);
-			
-				return ret;
-			}
-			
-			System.out.printf("%s> Values: %s (%s), %s (%s)\n", name, v2.toString(), abs_v2, v1.toString(), abs_v1);
-		}
-
-		if (result.getAbstractValue().isComposite()) {
-			if (!ti.isFirstStepInsn()) { // first time around
+	
+			if (result.getAbstractValue().isComposite()) {
 				int size = result.getAbstractValue().getTokensNumber();
-				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
+				int i = 0;
+				int[] choices = new int[size];
+
+				for (AbstractValue choice : result.getAbstractValue().getTokens()) {
+					choices[i] = choice.getKey();
+					
+					++i;
+				}
+
+				ChoiceGenerator<?> cg = new IntChoiceFromList("abstractComparisonAll", choices);
 				ss.setNextChoiceGenerator(cg);
 
 				return cmp.getSelf();
-			} else { // this is what really returns results
-				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-
-				assert (cg instanceof FocusAbstractChoiceGenerator);
-
-				int key = (Integer) cg.getNextChoice();
-				result.setAbstractValue(result.getAbstractValue().getToken(key));
-				result.setExpression(null);
 			}
+		} else { // this is what really returns results
+			ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+
+			assert (cg instanceof IntChoiceFromList);
+
+			int key = (Integer) cg.getNextChoice();
+			
+			SignsValue custom = new SignsValue(key);
+			
+			result = new NonEmptyAttribute(SignsAbstraction.getInstance().create(custom.can_be_NEG(), custom.can_be_ZERO(), custom.can_be_POS()), null);
 		}
 		
 		System.out.printf("%s> Result: %s\n", name, result.getAbstractValue());

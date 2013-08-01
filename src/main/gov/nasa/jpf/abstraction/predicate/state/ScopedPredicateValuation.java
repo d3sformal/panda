@@ -11,7 +11,6 @@ import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.abstraction.predicate.smt.SMTException;
 import gov.nasa.jpf.vm.MethodInfo;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -115,7 +114,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	@Override
 	public void restore(Scopes scopes) {
 		if (scopes instanceof PredicateValuationStack) {
-			this.scopes = (PredicateValuationStack) scopes;
+			this.scopes = (PredicateValuationStack) scopes.clone();
 		} else {
 			throw new RuntimeException("Invalid scopes type being restored!");
 		}
