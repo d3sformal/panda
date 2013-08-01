@@ -91,6 +91,8 @@ public class AccessPath extends Expression {
 	}
 	
 	public static void reRoot(AccessPath path, AccessPath oldPrefix, AccessPath newPrefix) {
+		if (oldPrefix.equals(newPrefix)) return;
+		
 		AccessPathElement oldPrefixElement = oldPrefix.root;
 		AccessPathElement pathElement = path.root;
 		
@@ -105,7 +107,9 @@ public class AccessPath extends Expression {
 
 		newPrefix.tail.setNext(next);
 
-		if (next != null) {
+		if (next == null) {
+			path.tail = newPrefix.tail;
+		} else {
 			next.setPrevious(newPrefix.tail);
 		}
 	}
@@ -181,28 +185,30 @@ public class AccessPath extends Expression {
 			return expression;
 		}
 		
+		AccessPath path = this;
+		
 		if (formerPath.isPrefix(this) && expression instanceof AccessPath) {
 			AccessPath newPath = clone();
 			AccessPath newPrefix = ((AccessPath)expression).clone();
 			AccessPath.reRoot(newPath, formerPath, newPrefix);
 			
-			return newPath;
+			path = newPath;
 		}
 
-		AccessPath path = new AccessPath();
+		AccessPath ret = new AccessPath();
 		
-		path.root = root.replace(formerPath, expression);
-		path.tail = path.root;
-		path.length = length;
+		ret.root = path.getRoot().replace(formerPath, expression);
+		ret.tail = ret.root;
+		ret.length = path.getLength();
 		
-		AccessPathElement next = path.root;
+		AccessPathElement next = ret.root;
 		
 		while (next != null) {
-			path.tail = next;
+			ret.tail = next;
 			next = next.getNext();
 		}
 		
-		return path;
+		return ret;
 	}
 
 	public AccessPath cutTail() {
@@ -295,5 +301,27 @@ public class AccessPath extends Expression {
 		
 		return e1 == null || e2 != null;
 	}
+	
+	/*
+	//TODO TURN THIS INTO UNIT TESTS MAYBE ;)
+	public static void main(String[] args) {
+		AccessPath p = new AccessPath("a");
+		AccessPath l = new AccessPath("a");
+		l.appendSubElement("length");
+		p.appendIndexElement(l);
+		
+		AccessPath a = new AccessPath("a");
+		AccessPath c = new AccessPath("c");
+		
+		System.out.println(p.replace(a, c).toString(NotationPolicy.DOT_NOTATION));
+		
+		AccessPath x = new AccessPath("x");
+		x.appendSubElement("x");
+		AccessPath y = new AccessPath("y");
+		AccessPath.reRoot(x, x, y);
+		
+		System.out.println(x.toString(NotationPolicy.DOT_NOTATION) + " " + x.getTail().getClass().getSimpleName());
+	}
+	*/
 
 }
