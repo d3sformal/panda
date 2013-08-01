@@ -59,6 +59,7 @@ public class BinaryIfInstructionExecutor {
 			}
 		}		
 
+		// IF THE abs_condition COULD NOT BE DERIVED BY PREDICATE ABSTRACTION (IT IS NOT ACTIVE)
 		if (abs_condition == null) {
 			
 			if (abs_v1 == null && abs_v2 == null) { // the condition is concrete
