@@ -20,9 +20,39 @@ import java.util.Set;
 public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	private PredicateValuationStack scopes = new PredicateValuationStack();
 	private Predicates predicateSet;
+	private Map<Predicate, TruthValue> initialValuation;
 	
 	public ScopedPredicateValuation(Predicates predicateSet) {
 		this.predicateSet = predicateSet;
+		
+		Set<Predicate> predicates = new HashSet<Predicate>();
+
+		for (Context context : predicateSet.contexts) {
+			predicates.addAll(context.predicates);
+		}
+		
+		if (!predicates.isEmpty()) {
+			try {
+				initialValuation = new SMT().valuatePredicates(predicates);
+			
+				for (Predicate predicate : predicates) {
+					// IF NOT A TAUTOLOGY OR CONTRADICTION
+					if (initialValuation.get(predicate) == TruthValue.UNKNOWN) {
+						initialValuation.put(predicate, TruthValue.UNDEFINED);
+					} else {
+						initialValuation.put(predicate, initialValuation.get(predicate));
+					}
+				}
+				
+				return;
+			} catch (SMTException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		for (Predicate predicate : predicates) {
+			initialValuation.put(predicate, TruthValue.UNDEFINED);
+		}
 	}
 	
 	@Override
@@ -31,8 +61,6 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		if (method == null) return valuation;
 		
-		Set<Predicate> predicates = new HashSet<Predicate>();
-
 		for (Context context : predicateSet.contexts) {
 			if (context instanceof MethodContext) {
 				MethodContext methodContext = (MethodContext) context;
@@ -48,30 +76,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				}
 			}
 
-			predicates.addAll(context.predicates);
-		}
-		
-		if (!predicates.isEmpty()) {
-			try {
-				Map<Predicate, TruthValue> initialValuation = new SMT().valuatePredicates(predicates);
-			
-				for (Predicate predicate : predicates) {
-					// IF NOT A TAUTOLOGY OR CONTRADICTION
-					if (initialValuation.get(predicate) == TruthValue.UNKNOWN) {
-						valuation.put(predicate, TruthValue.UNDEFINED);
-					} else {
-						valuation.put(predicate, initialValuation.get(predicate));
-					}
-				}
-			
-				return valuation;
-			} catch (SMTException e) {
-				e.printStackTrace();
+			for (Predicate predicate : context.predicates) {
+				valuation.put(predicate, initialValuation.get(predicate));
 			}
-		}
-		
-		for (Predicate predicate : predicates) {
-			valuation.put(predicate, TruthValue.UNDEFINED);
 		}
 		
 		return valuation;
