@@ -60,57 +60,58 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 		AbstractValue abs_v = attr.getAbstractValue();
 		Expression expr = attr.getExpression();
 		
-		ArrayList<Integer> choices = null;
-		
-		if (expr != null) {
-			attr.setExpression(null);
-			
-			ArrayList<Integer> choiceCandidates = new ArrayList<Integer>();
-			boolean predicateAbstractionFailed = false;
-
-			for (int match : getMatches()) {
-				TruthValue pred = GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(expr, Constant.create(match)));
-				
-				if (pred == TruthValue.UNDEFINED) {
-					predicateAbstractionFailed = true;
-					break;
-				}
-				
-				if (pred != TruthValue.FALSE) {
-					choiceCandidates.add(match);
-				}
-			}
-			
-			if (!predicateAbstractionFailed) {
-				choices = choiceCandidates;
-				System.out.printf("Switch> Expression: %s\n", expr);
-			}
-		}
-
-		if (choices == null) {
-			if (abs_v == null) {
-				return super.execute(ti);
-			}
-			
-			choices = new ArrayList<Integer>();
-
-			lastIdx = DEFAULT;
-			int value = sf.peek(0);
-			System.out.printf("Switch> Value: %d (%s)\n", value, abs_v);
-
-			for (int i = 0, l = matches.length; i < l; i++) {
-				AbstractBoolean result = Abstraction._eq(value, abs_v, matches[i], null);
-			
-				System.out.printf("Switch> Check %d -- %s\n", matches[i], result);
-			
-				if (result != AbstractBoolean.FALSE) {
-					choices.add(i);
-				}
-			}
-		}
-		
 		if (!ti.isFirstStepInsn()) {
+
+			ArrayList<Integer> choices = null;
 			
+			System.out.println("EXPR: " + expr);
+			
+			if (expr != null) {
+				attr.setExpression(null);
+				
+				ArrayList<Integer> choiceCandidates = new ArrayList<Integer>();
+				boolean predicateAbstractionFailed = false;
+
+				for (int match : getMatches()) {
+					TruthValue pred = GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(expr, Constant.create(match)));
+					
+					if (pred == TruthValue.UNDEFINED) {
+						predicateAbstractionFailed = true;
+						break;
+					}
+					
+					if (pred != TruthValue.FALSE) {
+						choiceCandidates.add(match);
+					}
+				}
+				
+				if (!predicateAbstractionFailed) {
+					choices = choiceCandidates;
+					System.out.printf("Switch> Expression: %s %s\n", expr, choices);
+				}
+			}
+
+			if (choices == null) {
+				if (abs_v == null) {
+					return super.execute(ti);
+				}
+				
+				choices = new ArrayList<Integer>();
+
+				lastIdx = DEFAULT;
+				int value = sf.peek(0);
+				System.out.printf("Switch> Value: %d (%s)\n", value, abs_v);
+
+				for (int i = 0, l = matches.length; i < l; i++) {
+					AbstractBoolean result = Abstraction._eq(value, abs_v, matches[i], null);
+				
+					System.out.printf("Switch> Check %d -- %s\n", matches[i], result);
+				
+					if (result != AbstractBoolean.FALSE) {
+						choices.add(i);
+					}
+				}
+			}
 			
 			if (choices.size() > 0) {
 				int[] param = new int[choices.size()];
