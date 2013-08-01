@@ -83,7 +83,7 @@ public abstract class BinaryComparatorExecutor<T> {
 				if (gt != TruthValue.UNDEFINED) {
 					result = new NonEmptyAttribute(SignsAbstraction.getInstance().create(lt != TruthValue.FALSE, eq != TruthValue.FALSE, gt != TruthValue.FALSE), null);
 	
-					System.err.printf("%s> Expressions: %s, %s\n", name, expr1.toString(AccessPath.NotationPolicy.DOT_NOTATION), expr2.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+					System.out.printf("%s> Expressions: %s, %s\n", name, expr1.toString(AccessPath.NotationPolicy.DOT_NOTATION), expr2.toString(AccessPath.NotationPolicy.DOT_NOTATION));
 				}
 			}
 			
