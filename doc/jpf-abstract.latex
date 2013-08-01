@@ -89,9 +89,10 @@ Formulas that represent properties over arrays typically involve quantifiers.
 
 \subsection*{Identifiers}
 
-The first element (root) of an access path is a local variable name (including \code{this}) or a class name.
+The first element (root) of an access path must be a local variable name (including \code{this}) or a class name. The root is followed by zero or more field names.
 If some element of an access path is a variable or field of a reference type, then its value uniquely identifies the respective object by its heap address (objRef).
-The last element of an access path must be an expression (local variable, field, array element) of a numeric type (primitive, wrapper class), otherwise the whole expression does not make sense for us.
+The last element of a full access path must be an expression (local variable, field, array element) of a numeric type (primitive, wrapper class), otherwise the whole expression does not make sense for us.
+We also support prefixes of access paths that refer to heap objects.
 
 We must also consider the scope of local variables. 
 If some predicate contains an expression \ap{a}{}{f}, where \var{a} is a local variable of some method {\it m}, then the predicate is defined only in the scope of the method {\it m}.
@@ -156,8 +157,8 @@ For local variables, we can find their names via methods of the \code{StackFrame
 
 \subsection*{Updating}
 
-Truth values of some predicates are updated either when the current scope changes (call, return) or when JPF executes some data-manipulation instruction (getfield, iadd, etc).
-For each instruction we must update (process) only the predicates affected by the instruction. We identify relevant predicates using the access paths for the instruction operands.
+Truth values of some predicates are updated either when the current scope changes (call, return) or when JPF executes some data-manipulation instruction (getfield, istore, etc).
+For each instruction we must update (process) only the predicates affected by the instruction. We identify the affected predicates using the access paths for the instruction operands.
 Original value is preserved for other (unaffected) predicates.
 This may save a considerable number of calls to the SMT solver.
 
@@ -192,17 +193,26 @@ If JPF executes an instruction that uses \ap{a}{y.z}{f}, then we must update tru
 
 \FloatBarrier
 
-We also need a map from object references (ElementInfo) to all access paths that refer to a given object in the given scope (call context). 
-Using this map we can find aliased access paths and then predicates which must be updated when executing a particular instruction.
+We use a map from access paths to sets of variable IDs. A variable ID represents a primitive value of a numeric type or a heap object.
+Each access path can refer to a single object or primitive value, when we have a precise information, or it can refer to a set of objects (when we do not know precisely).
+This is like when a static pointer analysis finds a set of possible target objects (a points-to set) for each variable (access path) --- a set of objects that the variable can refer to at some point.
+An access path can be complete up to a local variable or an object field of a numeric data type (a predicate can refer to such an access path), or the access path can be only partial (prefix refering to a heap object).
+We also need a map from variable IDs (object references (ElementInfo), local variables) to sets of access paths. For a given variable ID, the map specifies the set of all access paths that may possibly refer to a given variable (object, value) in the given scope (call context).
+Using these maps we can find aliased access paths and then predicates which must be updated when executing a particular instruction.
+
+To correctly process an assignment statement \code{v := e}, it is necessary to find all affected access paths (that means \code{v} and all paths that may point to the same object as \code{v}) and update the mapping for all the access paths.
+We can find the set of affected access paths such that (1) we get the variable IDs pointed to by \code{v} from one map and then (2) for each variable ID we get all access paths that can refer to it from the second map.
+In case of the statement \code{a[i] = e}, the possibly affected access paths are all elements of the array (\code{a[0]***, ..., a[n]***}), because we do not know the precise value of \code{i} --- we do not know precisely which element of the array was modified with the new value, if \code{i} is an arbitrary expression.
 
 A special case are call and return instructions. 
 When executing a call to the method $m$, truth values of predicates over \code{this} and formal parameters of $m$ must be set according to truth values of predicates over the actual parameters for the call. 
-The same must be done when executing a return instruction --- with parameters of reference types and with the returned value.
+When executing a return instruction, truth values of predicates over the parameters of reference types and the returned value must be propagated to the caller.
 Truth value of predicates that refer only to fields of some object (via \code{this}) must be preserved between different method calls on the object, i.e. the value at the entry to some call on the object must be the same as the value at the exit from a previous call on the object (assuming that variables and fields referred to by the predicate were not explicitly modified between the calls).
 
 New values of predicates are computed with the help of an SMT solver. We use the standard approach based on weakest preconditions for assignment statements $v = e$, where $v$ can be any program variable (local variable, object field, array element) and $e$ can be any arithmetic expression.
-We use logic formulas $\bigwedge \nu(P) \Rightarrow \mathit{WP}(s,p)$, where $\bigwedge \nu(P)$ represents truth values of relevant predicates in the current dynamic program state, as input for the SMT solver.
-The set $P$ is a transitive closure of the set of predicates that share a path with $p$ or with some element already in $P$.
+We use logic formulas $\bigwedge \nu(D) \Rightarrow \mathit{WP}(s,p)$, where $\bigwedge \nu(D)$ represents truth values of relevant predicates in the current dynamic program state, as input for the SMT solver.
+The set $D$ (determining predicates) contains all predicates that are in the current scope (context), i.e. predicates defined for the current method and the receiver object ("\code{this}").
+We do not have to filter predicates based on access paths (sharing with $p$), because we make just two calls of the SMT solver for each assignment --- one for $\mathit{WP}(p)$ and the second for $\mathit{WP}(\lnot p)$ --- and not $2^N$ calls of the SMT solver where $N$ is the number of determining predicates.
 The following table shows weakest preconditions for assignment statements. The symbol $F_x$ denotes any valid atomic predicate over the expression $x$ that is not covered by other lines of the table for a given statement.
 Weakest preconditions capture aliasing --- e.g., truth value of the weakest precondition for the statement \code{o.f = e} and the predicate $\mathit{fread}(f,o') \ \mathrm{relop} \ u$ depends on whether $o = o'$.
 
@@ -218,37 +228,27 @@ Weakest preconditions capture aliasing --- e.g., truth value of the weakest prec
 
 \hline
 
-\multirow{2}*{ \code{w = e} } 
+\multirow{1}*{ \code{w = e} } 
  & $ w \ \mathrm{relop} \ u $ & $ e \ \mathrm{relop} \ u $ \\
-\cline{2-3}
- & $ F_w $ & $ \mathrm{false} $ \\
 
 \hline
 
-\multirow{2}*{ \code{o.f = e} } 
+\multirow{1}*{ \code{o.f = e} } 
  & $ \mathit{fread}(f,o') \ \mathrm{relop} \ u $ & $ \mathit{fread}(\mathit{fwrite}(f,o,e),o') \ \mathrm{relop} \ u $ \\
-\cline{2-3}
- & $ F_{\mathit{fread}(f,o)} $ & $ \mathrm{false} $ \\
 
 \hline
 
-\multirow{5}*{ \code{o = new C} }
+\multirow{2}*{ \code{o = new C} }
  & $ o = w $ & $ \mathrm{false} $ \\
 \cline{2-3}
- & $ o = \mathrm{null} $ & $ \mathrm{false} $ \\
-\cline{2-3}
  & $ \mathit{fread}(f,o) \ \mathrm{relop} \ u $ & $ \mathrm{false} $ \\
-\cline{2-3}
- & $ F_o $ & $ \mathrm{false} $ \\
 
 \hline
 
-\multirow{3}*{ \code{a[i] = e} }
+\multirow{2}*{ \code{a[i] = e} }
  & $ \mathit{aread}(\mathrm{arr},a',i') \ \mathrm{relop} \ u $ & $ \mathit{aread}(\mathit{awrite}(\mathrm{arr},a,i,e),a',i') \ \mathrm{relop} \ u $ \\
 \cline{2-3}
- & $ \mathit{aread}(\mathrm{arr},b,\mathit{aread}(\mathrm{arr},a',i')) \ \mathrm{relop} \ u $ & $ \mathit{aread}(\mathrm{arr},b,\mathit{aread}(\mathit{awrite}(\mathrm{arr},a,i,e),a',i')) \ \mathrm{relop} \ u $ \\
-\cline{2-3}
- & $ F_{\mathit{aread}(\mathrm{arr},a,i)} $ & $ \mathrm{false} $ \\
+ & $ \mathit{aread}(\mathrm{arr},b,\mathit{aread}(\mathrm{arr},a',i')) \ \mathrm{relop} \ u $ & $ \mathit{aread}(\mathit{awrite}(\mathrm{arr},a,i,e),b,\mathit{aread}(\mathit{awrite}(\mathrm{arr},a,i,e),a',i')) \ \mathrm{relop} \ u $ \\
 
 \hline
 \end{tabular}
@@ -256,7 +256,7 @@ Weakest preconditions capture aliasing --- e.g., truth value of the weakest prec
 
 \FloatBarrier
 
-If some relevant predicate has the value \texttt{unknown} in the current dynamic program state, then we add \texttt{true} (i.e., nothing) into the sub-formula $\bigwedge \nu(P)$.
+If some relevant predicate has the value \texttt{unknown} in the current dynamic program state, then we add \texttt{true} (i.e., nothing) into the sub-formula $\bigwedge \nu(D)$.
 
 The following algorithm summarizes the procedure for computing new values of relevant predicates at some instruction.
 The set $\text{AffectedPaths}$ contains all access paths affected by the given instruction, and the function expression $paths(p)$ returns all access paths referred to by the predicate $p$.
