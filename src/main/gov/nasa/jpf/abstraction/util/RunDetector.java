@@ -32,14 +32,18 @@ public class RunDetector {
 		if (execInsn instanceof InvokeInstruction) {
 			if (detectRunningMethod(targetClass, nextInsn.getMethodInfo())) {
 				running.running();
+				return;
 			}
 		}
 		
 		if (execInsn instanceof ReturnInstruction) {
 			if (detectRunningMethod(targetClass, execInsn.getMethodInfo())) {
 				running.notRunning();
+				return;
 			}
 		}
+		
+		running.touch();
 	}
 
 	public static void advance() {

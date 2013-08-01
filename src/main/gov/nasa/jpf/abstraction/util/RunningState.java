@@ -76,4 +76,15 @@ public class RunningState implements Cloneable {
 	public RunningState clone() {
 		return new RunningState(state);
 	}
+
+	public void touch() {
+		switch (state) {
+		case JUST_BEGAN_RUNNING:
+			state = State.RUNNING;
+			break;
+		case JUST_CEASED_RUNNING:
+			state = State.NOT_RUNNING;
+			break;
+		}
+	}
 }
