@@ -3,16 +3,14 @@ package gov.nasa.jpf.abstraction.util;
 import java.util.Stack;
 
 import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
-import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ReturnInstruction;
-import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 public class RunDetector {
-	private static Stack<Boolean> runningHistory = new Stack<Boolean>();
-	private static boolean running = false;
+	private static Stack<RunningState> runningHistory = new Stack<RunningState>();
+	private static RunningState running = new RunningState();
 	
 	private static boolean detectRunningMethod(String targetClass, MethodInfo method) {
 		if (method.getClassName().equals(targetClass)) {
@@ -25,7 +23,7 @@ public class RunDetector {
 	}
 	
 	public static void initialiseNotRunning() {
-		runningHistory.add(running);
+		runningHistory.add(running.clone());
 	}
 	
 	public static void detectRunning(VM vm, Instruction nextInsn, Instruction execInsn) {
@@ -33,36 +31,27 @@ public class RunDetector {
 
 		if (execInsn instanceof InvokeInstruction) {
 			if (detectRunningMethod(targetClass, nextInsn.getMethodInfo())) {
-				running = true;
+				running.running();
 			}
 		}
 		
 		if (execInsn instanceof ReturnInstruction) {
 			if (detectRunningMethod(targetClass, execInsn.getMethodInfo())) {
-				running = false;
+				running.notRunning();
 			}
 		}
 	}
-	
-	public static void detectRunning(Search search) {
-		VM vm = search.getVM();
-		ThreadInfo ti = vm.getCurrentThread();
-		Instruction nextInsn = ti.getNextPC();
-		Instruction execInsn = ti.getPC();
-		
-		detectRunning(search.getVM(), nextInsn, execInsn);
-	}
 
 	public static void advance() {
-		runningHistory.push(running);
+		runningHistory.push(running.clone());
 	}
 
 	public static void backtrack() {
 		runningHistory.pop();
-		running = runningHistory.peek();
+		running = runningHistory.peek().clone();
 	}
 
 	public static boolean isRunning() {
-		return running;
+		return running.hasBeenRunning();
 	}
 }
