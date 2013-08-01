@@ -52,23 +52,27 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			predicates.addAll(context.predicates);
 		}
 		
-		try {
-			Map<Predicate, TruthValue> initialValuation = new SMT().valuatePredicates(predicates);
+		if (!predicates.isEmpty()) {
+			try {
+				Map<Predicate, TruthValue> initialValuation = new SMT().valuatePredicates(predicates);
 			
-			for (Predicate predicate : predicates) {
-				// IF NOT A TAUTOLOGY OR CONTRADICTION
-				if (initialValuation.get(predicate) == TruthValue.UNKNOWN) {
-					valuation.put(predicate, TruthValue.UNDEFINED);
-				} else {
-					valuation.put(predicate, initialValuation.get(predicate));
+				for (Predicate predicate : predicates) {
+					// IF NOT A TAUTOLOGY OR CONTRADICTION
+					if (initialValuation.get(predicate) == TruthValue.UNKNOWN) {
+						valuation.put(predicate, TruthValue.UNDEFINED);
+					} else {
+						valuation.put(predicate, initialValuation.get(predicate));
+					}
 				}
-			}
-		} catch (SMTException e) {			
-			for (Predicate predicate : predicates) {
-				valuation.put(predicate, TruthValue.UNDEFINED);
-			}
 			
-			e.printStackTrace();
+				return valuation;
+			} catch (SMTException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		for (Predicate predicate : predicates) {
+			valuation.put(predicate, TruthValue.UNDEFINED);
 		}
 		
 		return valuation;
