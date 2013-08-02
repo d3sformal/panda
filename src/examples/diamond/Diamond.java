@@ -51,7 +51,8 @@ public class Diamond {
 	public static C getC() {
 		C c = new C();
 		
-		c.f = ++i;
+		++i;
+		c.f = i;
 		
 		return c;
 	}
@@ -59,7 +60,8 @@ public class Diamond {
 	public static D getD() {
 		D d = new D();
 		
-		d.f = ++i;
+		++i;
+		d.f = i;
 		
 		return d;
 	}

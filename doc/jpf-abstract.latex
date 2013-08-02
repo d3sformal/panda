@@ -77,12 +77,15 @@ Syntax of the predicates is captured by this grammar:
 
 <funpath> ::= `fread' `(' "fieldname" `,' <funpath> `)'
     \alt `aread' `(' `arr', `,' <funpath> `,' <expression> `)'
+    \alt `alength' `(' `arr', `,' <funpath> `)'
     \alt `fread' `(' "fieldname" `,' "classname" `)'
     \alt "varname"
 \end{grammar}
 
 The dot-notation (\ap{a}{b}{f}) is a syntactic sugar for the internal notation based on functions (fread, aread).
 All expressions with dots will be translated into the functions-based notation internally.
+
+The special function \code{alength} represents the length of a given array.
 
 The grammar does not include logic operators (and, or) and quantifiers, because we do not care much about properties here.
 Formulas that represent properties over arrays typically involve quantifiers.
@@ -157,7 +160,8 @@ For local variables, we can find their names via methods of the \code{StackFrame
 
 \subsection*{Updating}
 
-Truth values of some predicates are updated either when the current scope changes (call, return) or when JPF executes some data-manipulation instruction (getfield, istore, etc).
+Truth values of some predicates are updated either when the current scope changes (call, return) or when JPF executes some data-manipulation instruction (putfield, istore, etc).
+We process numerical operations (addition, etc) and load instructions using symbolic execution and update truth values of predicates only at assignment statements and method call boundaries.
 For each instruction we must update (process) only the predicates affected by the instruction. We identify the affected predicates using the access paths for the instruction operands.
 Original value is preserved for other (unaffected) predicates.
 This may save a considerable number of calls to the SMT solver.
@@ -193,15 +197,17 @@ If JPF executes an instruction that uses \ap{a}{y.z}{f}, then we must update tru
 
 \FloatBarrier
 
-We use a map from access paths to sets of variable IDs. A variable ID represents a primitive value of a numeric type or a heap object.
+We use a map from access paths to sets of value IDs. A value ID represents a primitive value of a numeric type or a heap object (reference).
 Each access path can refer to a single object or primitive value, when we have a precise information, or it can refer to a set of objects (when we do not know precisely).
 This is like when a static pointer analysis finds a set of possible target objects (a points-to set) for each variable (access path) --- a set of objects that the variable can refer to at some point.
 An access path can be complete up to a local variable or an object field of a numeric data type (a predicate can refer to such an access path), or the access path can be only partial (prefix refering to a heap object).
-We also need a map from variable IDs (object references (ElementInfo), local variables) to sets of access paths. For a given variable ID, the map specifies the set of all access paths that may possibly refer to a given variable (object, value) in the given scope (call context).
+We also need a map from value IDs (object references (ElementInfo), numeric values) to sets of access paths. For a given value ID, the map specifies the set of all access paths that may possibly refer to a given value (object) in the given scope (call context).
 Using these maps we can find aliased access paths and then predicates which must be updated when executing a particular instruction.
 
-To correctly process an assignment statement \code{v := e}, it is necessary to find all affected access paths (that means \code{v} and all paths that may point to the same object as \code{v}) and update the mapping for all the access paths.
-We can find the set of affected access paths such that (1) we get the variable IDs pointed to by \code{v} from one map and then (2) for each variable ID we get all access paths that can refer to it from the second map.
+To correctly process an assignment statement \code{v := e}, where \code{v} is an access path (local variable, object field), it is necessary to find all affected access paths (that means \code{v} and all paths that may point to the same object as \code{v}) and update the mapping for all the access paths.
+The mappings have to be updated for the whole subtree of \code{v} (all access paths with the prefix \code{v}) on the basis of the whole subtree of \code{e} --- this is important for assignment to an object field, e.g. \code{p.f := o}, when the access paths such as \ap{p}{f.g}{h} and \ap{o}{g}{h} exist.
+
+We can find the set of affected access paths in this way: (1) we get the value IDs pointed to by \code{v} from one map and then (2) for each value ID we get all access paths that can refer to it from the second map.
 In case of the statement \code{a[i] = e}, the possibly affected access paths are all elements of the array (\code{a[0]***, ..., a[n]***}), because we do not know the precise value of \code{i} --- we do not know precisely which element of the array was modified with the new value, if \code{i} is an arbitrary expression.
 
 A special case are call and return instructions. 
@@ -210,8 +216,8 @@ When executing a return instruction, truth values of predicates over the paramet
 Truth value of predicates that refer only to fields of some object (via \code{this}) must be preserved between different method calls on the object, i.e. the value at the entry to some call on the object must be the same as the value at the exit from a previous call on the object (assuming that variables and fields referred to by the predicate were not explicitly modified between the calls).
 
 New values of predicates are computed with the help of an SMT solver. We use the standard approach based on weakest preconditions for assignment statements $v = e$, where $v$ can be any program variable (local variable, object field, array element) and $e$ can be any arithmetic expression.
-We use logic formulas $\bigwedge \nu(D) \Rightarrow \mathit{WP}(s,p)$, where $\bigwedge \nu(D)$ represents truth values of relevant predicates in the current dynamic program state, as input for the SMT solver.
-The set $D$ (determining predicates) contains all predicates that are in the current scope (context), i.e. predicates defined for the current method and the receiver object ("\code{this}").
+We use logic formulas $\bigwedge \nu(D) \Rightarrow \mathit{WP}(s,p)$, where $\nu(D)$ represents truth values of relevant predicates in the current dynamic program state, as input for the SMT solver.
+The set $D$ (determining predicates) contains all predicates that are in the current scope (context), i.e. predicates defined for the current method and for the type (class) of the receiver object ("\code{this}").
 We do not have to filter predicates based on access paths (sharing with $p$), because we make just two calls of the SMT solver for each assignment --- one for $\mathit{WP}(p)$ and the second for $\mathit{WP}(\lnot p)$ --- and not $2^N$ calls of the SMT solver where $N$ is the number of determining predicates.
 The following table shows weakest preconditions for assignment statements. The symbol $F_x$ denotes any valid atomic predicate over the expression $x$ that is not covered by other lines of the table for a given statement.
 Weakest preconditions capture aliasing --- e.g., truth value of the weakest precondition for the statement \code{o.f = e} and the predicate $\mathit{fread}(f,o') \ \mathrm{relop} \ u$ depends on whether $o = o'$.
@@ -293,6 +299,12 @@ This figure illustrates all the steps that must be performed for each instructio
 
 \FloatBarrier
 
+\section*{Abstract state space}
+
+Predicate abstraction causes non-deterministic choices to be created only at branching instructions (if, switch). 
+If the condition evaluates to \code{unknown} at some instruction, a new choice generator is created such that all branches can be explored subsequently.
+We do not make choices at assignment statements for predicates that get the value \code{unknown}, but leave this up to the branching instruction that depends on the predicate value.
+
 \section*{Implementation}
 
 We will use the following mechanisms of JPF:
@@ -317,7 +329,13 @@ We will probably run the SMT solver in a separate process (not via a Java bindin
 How to use it: prepare input (command-line, string), execute the system process, and parse output ("sat", "unsat").
 Options: {\bf MathSAT 5} (the preferred one), Yices, CVC4, \ldots.
 
-\subsection*{State Matching over Predicates}
+The input to each call of the SMT solver contains also auxiliary clauses, which express the semantics of Java.
+For example, the clause $\mathit{alength}(arr,a) \ge 0$ for each variable $a$ of an array type.
+
+Symbolic execution of numerical operations and load instructions (\code{getfield}, \code{iload}) works with a symbolic stack.
+For example, when processing the bytecode instruction \code{iadd} and input symbolic values $x$ and $1$ on the symbolic stack, we get a symbolic expression $x+1$ and put it on the symbolic stack.
+
+\section*{State Matching over Predicates}
 
 For two states $s_1$ and $s_2$, where $s_1$ has been already visited before and $s_2$ is the currently processed state, we must determine whether $s_2$ is already covered by $s_1$ ($s_1 \sim s_2$, subsumption), i.e. we must decide whether to consider $s_2$ as already visited too.
 One option is to create formulas based on truth values of predicates and ask the SMT solver.
@@ -333,6 +351,13 @@ Variables captured in the predicates cannot be serialized normally. One option m
 
 Input: a set of predicates defined in a textual file. The name of the file (path) will be passed to the abstraction module through a {\tt .jpf} file.
 The user must define predicates over local variables of each method separately, predicates over instance fields of each class, and predicates over static fields (of all classes together).
+
+We impose certain restrictions on the input bytecode (Java source code).
+We do not support assignment statements which include store of some value into some variable (e.g., operations such as \code{++a} and \code{a = 1000}) on the right hand side.
+The result of the right hand side must be a value without any side effects, which is then stored into the variable (access path) specified at the left hand side of the assignment statement.
+Example number 1: statement \code{b = (a + 4) + (++a)} must be replaced with a sequence \code{t1 = a + 4; a = a + 1; b = t1 + a}.
+Example number 2: statement \code{b = (a + 4) + (a = 1000)} must be replaced with \code{t1 = a + 4; a = 1000; b = t1 + a}.
+There must be predicates over temporary variables --- for example, $a = 0$, $t1 = 4$, $t1 > 0$, $a = 1$, $b > 4$, etc (manually defined).
 
 \end{document}
 
