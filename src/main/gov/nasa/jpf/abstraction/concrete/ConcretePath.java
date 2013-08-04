@@ -75,6 +75,8 @@ public class ConcretePath extends AccessPath {
 		}
 		
 		appendElement(new DefaultConcretePathIndexElement(index));
+		
+		paths.addAll(index.getPaths());
 	}
 	
 	public Map<AccessPath, CompleteVariableID> resolve() {

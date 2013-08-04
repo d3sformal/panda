@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.smt;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.AccessPathElement;
+import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
@@ -27,7 +28,7 @@ import java.util.Set;
 
 public class SMT {
 	
-	private static String SEPARATOR = "";
+	private static String SEPARATOR = "\n";
 	
 	private BufferedWriter in = null;
 	private BufferedReader out = null;
@@ -243,19 +244,15 @@ public class SMT {
 		return stringifier.getString();
 	}
 	
-	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateDeterminant> predicates) throws SMTException {	
-		String input = prepareInput(predicates, SEPARATOR);
-			
-		return evaluate(predicates.keySet(), input);
+	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateDeterminant> predicates) throws SMTException {				
+		return evaluate(predicates.keySet(), prepareInput(predicates, ""), prepareInput(predicates, SEPARATOR));
 	}
 	
-	public Map<Predicate, TruthValue> valuatePredicates(Set<Predicate> predicates) throws SMTException {
-		String input = prepareInput(predicates, SEPARATOR);
-		
-		return evaluate(predicates, input);
+	public Map<Predicate, TruthValue> valuatePredicates(Set<Predicate> predicates) throws SMTException {		
+		return evaluate(predicates, prepareInput(predicates, ""), prepareInput(predicates, SEPARATOR));
 	}
 
-	private Map<Predicate, TruthValue> evaluate(Set<Predicate> predicates, String input) {
+	private Map<Predicate, TruthValue> evaluate(Set<Predicate> predicates, String input, String debugInput) {
 		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 		
 		Boolean[] valid;
@@ -263,7 +260,7 @@ public class SMT {
 		try {
 			valid = isValid(input);
 		} catch (SMTException e) {
-			throw new SMTException("SMT failed on:\n" + prepareInput(predicates, "\n") + "\n" + e.getMessage());
+			throw new SMTException("SMT failed on:\n" + debugInput + "\n" + e.getMessage());
 		}
 
 		int i = 0;
