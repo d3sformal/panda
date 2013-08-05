@@ -41,6 +41,7 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		Attribute destination = (Attribute) sf.getOperandAttr(1);
 		
 		if (source == null) source = new EmptyAttribute();
+		if (destination == null) destination = new EmptyAttribute();
 		
 		ElementInfo ei = ti.getElementInfo(sf.peek(1));
 		ei.setFieldAttr(getFieldInfo(), source);
@@ -56,15 +57,12 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		Expression from = source.getExpression();
 		ConcretePath to = null;
 
-		if (destination != null) {
-			if (destination.getExpression() instanceof ConcretePath) {
-				to = (ConcretePath) destination.getExpression();
-			}
-
+		if (destination.getExpression() instanceof ConcretePath) {
+			to = (ConcretePath) destination.getExpression();
 			to.appendSubElement(getFieldName());
+			
+			GlobalAbstraction.getInstance().processStore(from, to);
 		}
-
-		GlobalAbstraction.getInstance().processStore(from, to);
 		
 		return actualNextInsn;
 	}
