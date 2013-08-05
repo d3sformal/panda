@@ -24,10 +24,11 @@ public class StackExpressionMonitor extends ListenerAdapter {
 
 	private void inspect(StackFrame sf) {
 		System.out.println("--EXPRESSIONS --");
-		for (int i = 0; i < (sf.getTopPos() - sf.getLocalVariableCount()); i++)
+		for (int i = 0; i <= (sf.getTopPos() - sf.getLocalVariableCount()); i++)
 		{
 			Attribute attr = (Attribute) sf.getOperandAttr(i);
-			System.out.println(attr.getExpression().toString());
+			if ((attr != null) && (attr.getExpression() != null)) System.out.println("["+i+"]: " + attr.getExpression().toString());
+			else System.out.println("["+i+"]: null");
 		}
 		System.out.println("--------------");
 	}
