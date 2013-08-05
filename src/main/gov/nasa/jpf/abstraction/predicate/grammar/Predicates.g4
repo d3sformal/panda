@@ -10,6 +10,12 @@ predicates returns [Predicates val]
 		$ctx.val = new Predicates($cs.val);
 	}
 	;
+	
+standalonepath returns [AccessPath val]
+	: p=path {
+		$ctx.val = $p.val;
+	}
+	;
 
 contextlist returns [List<Context> val]
 	: /* EMPTY */ {

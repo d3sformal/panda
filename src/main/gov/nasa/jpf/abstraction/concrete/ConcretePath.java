@@ -1,10 +1,12 @@
 package gov.nasa.jpf.abstraction.concrete;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.AccessPathElement;
+import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.impl.DefaultConcretePathIndexElement;
@@ -124,10 +126,18 @@ public class ConcretePath extends AccessPath {
 		
 		path.root = root.clone();
 		path.tail = path.root;
+		path.length = length;
+		path.paths = new ArrayList<AccessPath>();
 		
 		AccessPathElement next = path.root;
 		
 		while (next != null) {
+			if (next instanceof AccessPathIndexElement) {
+				AccessPathIndexElement index = (AccessPathIndexElement) next;
+				
+				path.paths.addAll(index.getIndex().getPaths());
+			}
+			
 			path.tail = next;
 			next = next.getNext();
 		}

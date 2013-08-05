@@ -5,9 +5,19 @@ import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathRootElement;
 import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathSubElement;
 import gov.nasa.jpf.abstraction.common.impl.PredicatesDotStringifier;
 import gov.nasa.jpf.abstraction.common.impl.PredicatesFunctionStringifier;
+import gov.nasa.jpf.abstraction.predicate.common.Predicates;
+import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
+import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 
 public class AccessPath extends Expression {
 	public static enum NotationPolicy {
@@ -104,6 +114,7 @@ public class AccessPath extends Expression {
 		AccessPathMiddleElement next = (AccessPathMiddleElement) pathElement;
 
 		path.root = newPrefix.root;
+		path.paths = newPrefix.paths;
 
 		newPrefix.tail.setNext(next);
 
@@ -111,6 +122,16 @@ public class AccessPath extends Expression {
 			path.tail = newPrefix.tail;
 		} else {
 			next.setPrevious(newPrefix.tail);
+		}
+		
+		while (next != null) {
+			if (next instanceof AccessPathIndexElement) {
+				AccessPathIndexElement index = (AccessPathIndexElement) next;
+				
+				path.paths.addAll(index.getIndex().getPaths());
+			}
+
+			next = next.getNext();
 		}
 	}
 	
@@ -163,10 +184,17 @@ public class AccessPath extends Expression {
 		path.root = root.clone();
 		path.tail = path.root;
 		path.length = length;
+		path.paths = new ArrayList<AccessPath>();
 		
 		AccessPathElement next = path.root;
 		
 		while (next != null) {
+			if (next instanceof AccessPathIndexElement) {
+				AccessPathIndexElement index = (AccessPathIndexElement) next;
+				
+				path.paths.addAll(index.getIndex().getPaths());
+			}
+			
 			path.tail = next;
 			next = next.getNext();
 		}
@@ -204,6 +232,12 @@ public class AccessPath extends Expression {
 		AccessPathElement next = ret.root;
 		
 		while (next != null) {
+			if (next instanceof AccessPathIndexElement) {
+				AccessPathIndexElement index = (AccessPathIndexElement) next;
+				
+				ret.paths.addAll(index.getIndex().getPaths());
+			}
+
 			ret.tail = next;
 			next = next.getNext();
 		}
@@ -216,6 +250,12 @@ public class AccessPath extends Expression {
 		
 		if (prefix.tail instanceof AccessPathMiddleElement) {
 			AccessPathMiddleElement tail = (AccessPathMiddleElement) prefix.tail;
+			
+			if (tail instanceof AccessPathIndexElement) {
+				AccessPathIndexElement index = (AccessPathIndexElement) tail;
+
+				prefix.paths.removeAll(index.getIndex().getPaths());
+			}
 			
 			prefix.tail = tail.getPrevious();
 			prefix.tail.setNext(null);
@@ -302,26 +342,34 @@ public class AccessPath extends Expression {
 		return e1 == null || e2 != null;
 	}
 	
-	/*
+	public static AccessPath createFromString(String definition) throws IOException {
+		ANTLRInputStream chars = new ANTLRInputStream(definition);
+		PredicatesLexer lexer = new PredicatesLexer(chars);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		PredicatesParser parser = new PredicatesParser(tokens);
+	
+		return parser.standalonepath().val;
+	}
+	
 	//TODO TURN THIS INTO UNIT TESTS MAYBE ;)
-	public static void main(String[] args) {
-		AccessPath p = new AccessPath("a");
-		AccessPath l = new AccessPath("a");
-		l.appendSubElement("length");
-		p.appendIndexElement(l);
+	public static void main(String[] args) throws IOException {
+		AccessPath.policy = AccessPath.NotationPolicy.DOT_NOTATION;
 		
-		AccessPath a = new AccessPath("a");
-		AccessPath c = new AccessPath("c");
+		AccessPath p = createFromString("a[a.length - 1]");
 		
-		System.out.println(p.replace(a, c).toString(NotationPolicy.DOT_NOTATION));
+		AccessPath a = createFromString("a");
+		AccessPath c = createFromString("c");
 		
-		AccessPath x = new AccessPath("x");
-		x.appendSubElement("x");
-		AccessPath y = new AccessPath("y");
+		Expression e = p.replace(a, c);
+		
+		System.out.println(e + " " + e.getPaths());
+		
+		AccessPath x = createFromString("x.x");
+		AccessPath y = createFromString("y");
 		AccessPath.reRoot(x, x, y);
 		
-		System.out.println(x.toString(NotationPolicy.DOT_NOTATION) + " " + x.getTail().getClass().getSimpleName());
+		System.out.println(x + " " + x.getTail().getClass().getSimpleName());
 	}
-	*/
+	
 
 }
