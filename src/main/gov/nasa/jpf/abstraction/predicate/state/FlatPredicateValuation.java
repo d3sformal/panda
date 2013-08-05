@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
@@ -71,7 +72,10 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		
 		newValuations.put(predicate, value);
 		
-		if (VM.getVM().getJPF().getConfig().getBoolean("abstract.branch.reevaluate_predicates")) {
+		Config config = VM.getVM().getJPF().getConfig();
+		String key = "abstract.branch.reevaluate_predicates";
+		
+		if (config.containsKey(key) && config.getBoolean(key)) {
 			cascadeReevaluation(newValuations);
 		}
 		

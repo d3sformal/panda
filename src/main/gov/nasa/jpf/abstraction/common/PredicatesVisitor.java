@@ -36,6 +36,7 @@ public interface PredicatesVisitor {
 	public void visit(Multiply expression);
 	public void visit(Divide expression);
 	public void visit(Modulo expression);
+	public void visit(ArrayLength expression);
 	public void visit(AccessPath expression);
 	public void visit(AccessPathRootElement element);
 	public void visit(AccessPathSubElement element);

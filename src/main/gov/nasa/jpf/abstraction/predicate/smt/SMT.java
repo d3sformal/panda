@@ -2,11 +2,14 @@ package gov.nasa.jpf.abstraction.predicate.smt;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.AccessPathElement;
-import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
+import gov.nasa.jpf.abstraction.common.ArrayLength;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Implication;
+import gov.nasa.jpf.abstraction.predicate.common.LessThan;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
@@ -111,6 +114,9 @@ public class SMT {
 		input += "(declare-fun arr () (Array Int (Array Int Int)))" + separator;
 		input += separator;
 		
+		input += "(declare-fun alength (Int) Int)" + separator;
+		input += separator;
+		
 		for (String var : vars) {
 			input += "(declare-fun " + var + " () Int)" + separator;
 		}
@@ -134,18 +140,34 @@ public class SMT {
 		
 		return input;
 	}
+	
+	private Set<Predicate> createArrayLengthConstraints(Set<ArrayLength> expressions) {
+		Set<Predicate> clauses = new HashSet<Predicate>();
+		
+		for (ArrayLength expr : expressions) {
+			clauses.add(Negation.create(LessThan.create(expr, Constant.create(0))));
+		}
+		
+		return clauses;
+	}
 
 	private String prepareInput(Map<Predicate, PredicateDeterminant> predicates, String separator) {
 		Set<String> vars = new HashSet<String>();
 		Set<String> fields = new HashSet<String>();
 		List<String> formulas = new LinkedList<String>();
+		
+		PredicatesArrayLengthCollector collector = new PredicatesArrayLengthCollector();
 
 		/**
 		 * Collect all variable and field names from all weakest preconditions
 		 */
 		for (Predicate predicate : predicates.keySet()) {
+			collectVarsAndFields(vars, fields, predicate);
 			collectVarsAndFields(vars, fields, predicates.get(predicate).positiveWeakestPrecondition);
 			collectVarsAndFields(vars, fields, predicates.get(predicate).negativeWeakestPrecondition);
+			predicate.accept(collector);
+			predicates.get(predicate).positiveWeakestPrecondition.accept(collector);
+			predicates.get(predicate).negativeWeakestPrecondition.accept(collector);
 		}
 		
 		/**
@@ -156,14 +178,15 @@ public class SMT {
 			
 			for (Predicate determinant : determinants) {
 				collectVarsAndFields(vars, fields, determinant);
+				determinant.accept(collector);
 			}
 		}
 		
 		for (Predicate predicate : predicates.keySet()) {
 			PredicateDeterminant det = predicates.get(predicate);
 			
-			formulas.add(createFormula(det.positiveWeakestPrecondition, det.determinants));
-			formulas.add(createFormula(det.negativeWeakestPrecondition, det.determinants));
+			formulas.add(createFormula(det.positiveWeakestPrecondition, det.determinants, createArrayLengthConstraints(collector.getArrayLengthExpressions())));
+			formulas.add(createFormula(det.negativeWeakestPrecondition, det.determinants, createArrayLengthConstraints(collector.getArrayLengthExpressions())));
 		}
 		
 		return prepareInput(vars, fields, formulas, separator);
@@ -173,17 +196,20 @@ public class SMT {
 		Set<String> vars = new HashSet<String>();
 		Set<String> fields = new HashSet<String>();
 		List<String> formulas = new LinkedList<String>();
+		
+		PredicatesArrayLengthCollector collector = new PredicatesArrayLengthCollector();
 
 		/**
 		 * Collect all variable and field names from all weakest preconditions
 		 */
 		for (Predicate predicate : predicates) {
 			collectVarsAndFields(vars, fields, predicate);
+			predicate.accept(collector);
 		}
 		
 		for (Predicate predicate : predicates) {		
-			formulas.add(createFormula(predicate));
-			formulas.add(createFormula(Negation.create(predicate)));
+			formulas.add(createFormula(predicate, createArrayLengthConstraints(collector.getArrayLengthExpressions())));
+			formulas.add(createFormula(Negation.create(predicate), createArrayLengthConstraints(collector.getArrayLengthExpressions())));
 		}
 		
 		return prepareInput(vars, fields, formulas, separator);
@@ -207,18 +233,28 @@ public class SMT {
 		}
 	}
 	
-	private static String createFormula(Predicate predicate) {
+	private static String createFormula(Predicate predicate, Set<Predicate> additionalClauses) {
 		PredicatesSMTStringifier stringifier = new PredicatesSMTStringifier();
 		
-		Negation.create(predicate).accept(stringifier);
+		Predicate formula = Negation.create(predicate);
+		
+		for (Predicate clause : additionalClauses) {
+			formula = Conjunction.create(formula, clause);
+		}
+		
+		formula.accept(stringifier);
 		
 		return stringifier.getString();
 	}
 	
-	private static String createFormula(Predicate weakestPrecondition, Map<Predicate, TruthValue> determinants) {
+	private static String createFormula(Predicate weakestPrecondition, Map<Predicate, TruthValue> determinants, Set<Predicate> additionalClauses) {
 		PredicatesSMTStringifier stringifier = new PredicatesSMTStringifier();
 
 		Predicate formula = Tautology.create();
+		
+		for (Predicate clause : additionalClauses) {
+			formula = Conjunction.create(formula, clause);
+		}
 		
 		for (Predicate predicate : determinants.keySet()) {		
 			switch (determinants.get(predicate)) {
@@ -259,6 +295,7 @@ public class SMT {
 		
 		try {
 			valid = isValid(input);
+			System.out.println(debugInput);
 		} catch (SMTException e) {
 			throw new SMTException("SMT failed on:\n" + debugInput + "\n" + e.getMessage());
 		}

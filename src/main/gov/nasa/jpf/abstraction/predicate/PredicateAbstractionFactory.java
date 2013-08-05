@@ -26,7 +26,7 @@ public class PredicateAbstractionFactory extends AbstractionFactory {
 		
 			Predicates predicates = parser.predicates().val;
 			
-			System.err.println(predicates.toString());
+			System.out.println(predicates.toString());
 
 			return new PredicateAbstraction(predicates);
 		} catch (IOException e) {

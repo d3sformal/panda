@@ -1,5 +1,23 @@
-package gov.nasa.jpf.abstraction.common;
+package gov.nasa.jpf.abstraction.predicate.smt;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
+import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
+import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
+import gov.nasa.jpf.abstraction.common.Add;
+import gov.nasa.jpf.abstraction.common.ArrayLength;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Divide;
+import gov.nasa.jpf.abstraction.common.Modulo;
+import gov.nasa.jpf.abstraction.common.Multiply;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.Subtract;
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
@@ -16,219 +34,126 @@ import gov.nasa.jpf.abstraction.predicate.common.StaticContext;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
 import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 
-public abstract class PredicatesStringifier implements PredicatesVisitor {
+public class PredicatesArrayLengthCollector implements PredicatesVisitor {
 	
-	protected String ret = "";
-	protected AccessPath path = null;
-	protected Expression expression = null;
-	
-	public String getString() {
-		return ret;
-	}
+	private Set<ArrayLength> expressions = new HashSet<ArrayLength>(); 
 
 	@Override
-	public void visit(Predicates predicates) {		
-		for (Context c : predicates.contexts) {
-			c.accept(this);
-			ret += "\n";
+	public void visit(Predicates predicates) {
+		for (Context context : predicates.contexts) {
+			context.accept(this);
 		}
 	}
 
 	@Override
 	public void visit(ObjectContext context) {
-		ret += "[object " + context.getObject().toString(AccessPath.NotationPolicy.DOT_NOTATION) + "]\n";
-
-		for (Predicate p : context.predicates) {
-			p.accept(this);
-			ret += "\n";
+		for (Predicate predicate : context.predicates) {
+			predicate.accept(this);
 		}
 	}
 
 	@Override
 	public void visit(MethodContext context) {
-		ret += "[method " + context.getMethod().toString(AccessPath.NotationPolicy.DOT_NOTATION) + "]\n";
-
-		for (Predicate p : context.predicates) {
-			p.accept(this);
-			ret += "\n";
+		for (Predicate predicate : context.predicates) {
+			predicate.accept(this);
 		}
 	}
 
 	@Override
 	public void visit(StaticContext context) {
-		ret += "[static]\n";
-
-		for (Predicate p : context.predicates) {
-			p.accept(this);
-			ret += "\n";
+		for (Predicate predicate : context.predicates) {
+			predicate.accept(this);
 		}
 	}
 
 	@Override
 	public void visit(Negation predicate) {
-		ret += "not(";
-		
 		predicate.predicate.accept(this);
-		
-		ret += ")";
 	}
 
 	@Override
 	public void visit(LessThan predicate) {
 		predicate.a.accept(this);
-		
-		ret += " < ";
-		
 		predicate.b.accept(this);
 	}
 
 	@Override
 	public void visit(Equals predicate) {
 		predicate.a.accept(this);
-		
-		ret += " = ";
-		
 		predicate.b.accept(this);
 	}
-	
+
 	@Override
 	public void visit(Tautology predicate) {
-		ret += "true";
 	}
-	
+
 	@Override
 	public void visit(Contradiction predicate) {
-		ret += "false";
 	}
-	
+
 	@Override
 	public void visit(Conjunction predicate) {
-		ret += "(";
-		
 		predicate.a.accept(this);
-
-		ret += " and ";
-		
 		predicate.b.accept(this);
-		
-		ret += ")";
 	}
-	
+
 	@Override
 	public void visit(Disjunction predicate) {
-		ret += "(";
-		
 		predicate.a.accept(this);
-
-		ret += " or ";
-		
 		predicate.b.accept(this);
-		
-		ret += ")";
 	}
-	
+
 	@Override
 	public void visit(Implication predicate) {
-		ret += "(";
-		
 		predicate.a.accept(this);
-
-		ret += " => ";
-		
 		predicate.b.accept(this);
-		
-		ret += ")";
 	}
-	
+
 	@Override
-	public void visit(UpdatedPredicate predicate) {
-		path = predicate.path;
-		expression = predicate.expression;
-		
-		if (path.getRoot() == path.getTail()) {
-			predicate.predicate.replace(path, expression).accept(this);
-		} else {
-			predicate.predicate.accept(this);
-		}
+	public void visit(UpdatedPredicate predicate) {		
+		predicate.predicate.accept(this);
+		predicate.path.accept(this);
+		predicate.expression.accept(this);
 	}
 
 	@Override
 	public void visit(EmptyExpression expression) {
-		ret += " ? ";
 	}
 
 	@Override
 	public void visit(Add expression) {
-		ret += "(";
-		
 		expression.a.accept(this);
-		
-		ret += " + ";
-		
 		expression.b.accept(this);
-		
-		ret += ")";
 	}
 
 	@Override
 	public void visit(Subtract expression) {
-		ret += "(";
-		
 		expression.a.accept(this);
-		
-		ret += " - ";
-		
 		expression.b.accept(this);
-		
-		ret += ")";
 	}
 
 	@Override
 	public void visit(Multiply expression) {
-		ret += "(";
-		
 		expression.a.accept(this);
-		
-		ret += " * ";
-		
 		expression.b.accept(this);
-		
-		ret += ")";
 	}
 
 	@Override
 	public void visit(Divide expression) {
-		ret += "(";
-		
 		expression.a.accept(this);
-		
-		ret += " / ";
-		
 		expression.b.accept(this);
-		
-		ret += ")";
 	}
 
 	@Override
 	public void visit(Modulo expression) {
-		ret += "(";
-		
 		expression.a.accept(this);
-		
-		ret += " % ";
-		
 		expression.b.accept(this);
-		
-		ret += ")";
 	}
-	
+
 	@Override
 	public void visit(ArrayLength expression) {
-		ret += "alength(";
-		
+		expressions.add(expression);
 		expression.path.accept(this);
-		
-		ret += ")";
 	}
 
 	@Override
@@ -237,8 +162,41 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 	}
 
 	@Override
+	public void visit(AccessPathRootElement element) {
+		if (element.getNext() != null) {
+			element.getNext().accept(this);
+		}
+	}
+
+	@Override
+	public void visit(AccessPathSubElement element) {
+		if (element.getNext() != null) {
+			element.getNext().accept(this);
+		}
+	}
+
+	@Override
+	public void visit(AccessPathIndexElement element) {
+		if (element.getNext() != null) {
+			element.getIndex().accept(this);
+			element.getNext().accept(this);
+		}
+	}
+
+	@Override
 	public void visit(Constant expression) {
-		ret += expression.value;
+	}
+
+	@Override
+	public void visit(AnonymousObject expression) {
+	}
+
+	@Override
+	public void visit(AnonymousArray expression) {
+	}
+	
+	public Set<ArrayLength> getArrayLengthExpressions() {
+		return expressions;
 	}
 
 }
