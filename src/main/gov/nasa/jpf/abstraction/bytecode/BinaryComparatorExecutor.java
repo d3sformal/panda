@@ -33,6 +33,7 @@ import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.abstraction.predicate.common.Equals;
 import gov.nasa.jpf.abstraction.predicate.common.LessThan;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
@@ -64,7 +65,7 @@ public abstract class BinaryComparatorExecutor<T> {
 		Attribute result = null;
 		
 		if (!ti.isFirstStepInsn()) { // first time around
-			if (expr1 != null && expr2 != null) {			
+			if (expr1 != null && expr2 != null) {	
 				TruthValue lt = GlobalAbstraction.getInstance().evaluatePredicate(LessThan.create(expr1, expr2));
 				TruthValue eq = GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(expr1, expr2));
 				TruthValue gt = null;
@@ -126,6 +127,19 @@ public abstract class BinaryComparatorExecutor<T> {
 			SignsValue custom = new SignsValue(key);
 			
 			result = new NonEmptyAttribute(SignsAbstraction.getInstance().create(custom.can_be_NEG(), custom.can_be_ZERO(), custom.can_be_POS()), null);
+			
+			if (expr1 != null && expr2 != null) {
+				Predicate predicate = Equals.create(expr1, expr2);
+				
+				if (result.getAbstractValue() == SignsAbstraction.NEG) {
+					predicate = LessThan.create(expr1, expr2);
+				}
+				if (result.getAbstractValue() == SignsAbstraction.POS) {
+					predicate = LessThan.create(expr2, expr1);
+				}
+				
+				GlobalAbstraction.getInstance().forceValuation(predicate, TruthValue.TRUE);
+			}
 		}
 		
 		System.out.printf("%s> Result: %s\n", name, result.getAbstractValue());

@@ -1,3 +1,6 @@
 [method compare.Compare.main]
 a < 4
 b < 3
+
+k = 10
+i - k < j

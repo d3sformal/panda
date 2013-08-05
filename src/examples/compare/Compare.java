@@ -13,6 +13,18 @@ public class Compare {
 		} else {
 			int y = 1;
 		}
+		
+		int i, j, k;
+		
+		i = 10;
+		j = 100;
+		k = 10;
+		
+		if (i < j) {
+			int x = 2;
+		} else {
+			int y = 3;
+		}
 	}
 
 }

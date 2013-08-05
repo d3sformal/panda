@@ -64,6 +64,11 @@ public class PredicateAbstraction extends Abstraction {
 		return predicateValuation.evaluatePredicate(predicate);
 	}
 	
+	@Override
+	public void forceValuation(Predicate predicate, TruthValue valuation) {
+		predicateValuation.put(predicate, valuation);
+	}
+	
 	public ScopedSymbolTable getSymbolTable() {		
 		return symbolTable;
 	}

@@ -24,7 +24,7 @@ public abstract class Predicate implements PredicatesVisitable {
 		return stringifier.getString();
 	}
     
-    private Set<Predicate> selectDeterminants(Set<Predicate> universe) {
+    public Set<Predicate> selectDeterminants(Set<Predicate> universe) {
     	Set<Predicate> ret = new HashSet<Predicate>();
     	
     	for (Predicate candidate : universe) {

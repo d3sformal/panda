@@ -19,6 +19,21 @@ public enum TruthValue {
 		return UNKNOWN;
 	}
 	
+	public static TruthValue create(boolean isTrue, boolean isFalse) {
+		if (isTrue && isFalse) {
+			return UNKNOWN;
+		}
+		
+		if (isTrue) return TRUE;
+		if (isFalse) return FALSE;
+		
+		return UNDEFINED;
+	}
+	
+	public static TruthValue create(boolean isTrue) {
+		return create(isTrue, !isTrue);
+	}
+	
 	public static TruthValue and(TruthValue a, TruthValue b) {
 		return create(a.ordinal() & b.ordinal());
 	}

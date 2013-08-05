@@ -9,7 +9,7 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
-import gov.nasa.jpf.abstraction.predicate.smt.SMTException;
+import gov.nasa.jpf.vm.VM;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,10 +29,53 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		
 		return clone;
 	}
+	
+	private void cascadeReevaluation(Map<Predicate, TruthValue> updated) {
+		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
+		
+		int size = updated.size();
+		
+		for (Predicate affectedCandidate : valuations.keySet()) {
+			Set<Predicate> updatedDeterminants = affectedCandidate.selectDeterminants(updated.keySet());
+			
+			if (!updatedDeterminants.isEmpty()) {
+				Predicate positiveWeakestPrecondition = affectedCandidate;
+				Predicate negativeWeakestPrecondition = Negation.create(affectedCandidate);
+				
+				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+					
+				for (Predicate determinant : positiveWeakestPrecondition.determinantClosure(valuations.keySet())) {
+					determinants.put(determinant, valuations.get(determinant));
+				}
+				for (Predicate determinant : negativeWeakestPrecondition.determinantClosure(valuations.keySet())) {
+					determinants.put(determinant, valuations.get(determinant));
+				}
+				for (Predicate determinant : updatedDeterminants) {
+					determinants.put(determinant, updated.get(determinant));
+				}
+				
+				predicates.put(affectedCandidate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
+			}
+		}
+		
+		updated.putAll(new SMT().valuatePredicates(predicates));
+		
+		if (size != updated.size()) {
+			cascadeReevaluation(updated);
+		}
+	}
 
 	@Override
 	public void put(Predicate predicate, TruthValue value) {
-		valuations.put(predicate, value);
+		Map<Predicate, TruthValue> newValuations = new HashMap<Predicate, TruthValue>();
+		
+		newValuations.put(predicate, value);
+		
+		if (VM.getVM().getJPF().getConfig().getBoolean("abstract.branch.reevaluate_predicates")) {
+			cascadeReevaluation(newValuations);
+		}
+		
+		valuations.putAll(newValuations);
 	}
 
 	@Override
@@ -140,13 +183,9 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		
 		if (predicates.isEmpty()) return;
 		
-		try {
-			Map<Predicate, TruthValue> newValuations = new SMT().valuatePredicates(predicates);
+		Map<Predicate, TruthValue> newValuations = new SMT().valuatePredicates(predicates);
 			
-			valuations.putAll(newValuations);
-		} catch (SMTException e) {
-			e.printStackTrace();
-		}
+		valuations.putAll(newValuations);
 	}
 	
 	@Override
@@ -165,16 +204,10 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		}
 		
 		predicates.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
+
+		Map<Predicate, TruthValue> valuation = new SMT().valuatePredicates(predicates);
 		
-		try {
-			Map<Predicate, TruthValue> valuation = new SMT().valuatePredicates(predicates);
-		
-			return valuation.get(predicate);
-		} catch (SMTException e) {
-			e.printStackTrace();
-		}
-		
-		return TruthValue.UNDEFINED;
+		return valuation.get(predicate);
 	}
 	
 	@Override

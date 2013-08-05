@@ -105,4 +105,11 @@ public class GlobalAbstraction extends Abstraction {
 		
 		return abs.evaluatePredicate(predicate);
 	}
+	
+	@Override
+	public void forceValuation(Predicate predicate, TruthValue valuation) {
+		if (!RunDetector.isRunning()) return;
+		
+		abs.forceValuation(predicate, valuation);
+	}
 }

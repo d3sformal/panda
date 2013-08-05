@@ -20,9 +20,7 @@ package gov.nasa.jpf.abstraction.numeric;
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
@@ -31,7 +29,6 @@ import gov.nasa.jpf.vm.MethodInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This abstraction is designed to combine other numeric abstractions.
@@ -124,6 +121,13 @@ public class ContainerAbstraction extends Abstraction {
     	
     	return ret;
     }
+    
+    @Override
+    public void forceValuation(Predicate predicate, TruthValue valuation) {
+    	for (Abstraction abs : list) {
+    		abs.forceValuation(predicate, valuation);
+    	}
+	}
     
     public ContainerValue create(List<AbstractValue> lst) {
     	ContainerValue res = new ContainerValue(lst);

@@ -92,6 +92,9 @@ public abstract class Abstraction {
 	public TruthValue evaluatePredicate(Predicate predicate) {
 		return TruthValue.UNDEFINED;
 	}
+	
+	public void forceValuation(Predicate predicate, TruthValue valuation) {
+	}
 
 	/**
 	 * Computes abs_v2 + abs_v1, making calls to abstract_map

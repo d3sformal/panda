@@ -41,7 +41,7 @@ public class BinaryIfInstructionExecutor {
 		
 		if (!ti.isFirstStepInsn()) { // first time around
 			// PREDICATE ABSTRACTION
-			if (expr1 != null) {
+			if (expr1 != null && expr2 != null) {
 				Predicate predicate = br.createPredicate(expr1, expr2);
 				TruthValue truth = GlobalAbstraction.getInstance().evaluatePredicate(predicate);
 	
@@ -95,6 +95,12 @@ public class BinaryIfInstructionExecutor {
 			assert (cg instanceof AbstractChoiceGenerator) : "expected AbstractChoiceGenerator, got: " + cg;
 			
 			conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
+			
+			if (expr1 != null && expr2 != null) {
+				Predicate predicate = br.createPredicate(expr1, expr2);
+			
+				GlobalAbstraction.getInstance().forceValuation(predicate, TruthValue.create(conditionValue));
+			}
 		}
 
 		System.out.println(name + "> Result: " + conditionValue);
