@@ -20,3 +20,7 @@ k = 0
 k = 1
 k = 2
 k = 3
+alength(arrlen, id2thread) = 0
+alength(arrlen, id2thread) = 1
+alength(arrlen, id2thread) = 2
+alength(arrlen, id2thread) = 3 

@@ -70,10 +70,6 @@ public class DefaultConcretePathSubElement extends DefaultAccessPathSubElement i
 				// STRUCTURED FIELD (PATH NOT YET COMPLETE)
 				
 				ret.put(path, new PartialVariableID(DefaultConcretePathElement.createObjectFieldReference(ti, getName(), ei)));
-			} else if (ei.isArray() && getName().equals("length")) {
-				// ARRAY LENGTH "FIELD"
-
-				ret.put(path, new ArrayLengthID(ei.getObjectRef()));
 			} else {
 				// PRIMITIVE FIELD
 				

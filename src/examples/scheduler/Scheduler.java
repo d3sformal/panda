@@ -24,12 +24,10 @@ public class Scheduler
 		int i = 0;
 		int j = 0;
 		int k = 0;
-		ThreadInfo actTh;
-		ThreadInfo schTh;
 		
 		// set of active threads is iterated when to make scheduling decisions
-		for (k = 0; k < /*id2thread.length*/ 3; ++k) {
-			actTh = id2thread[k];
+		for (k = 0; k < id2thread.length; ++k) {
+			ThreadInfo actTh = id2thread[k];
 
 			if (!actTh.active) continue;
 
@@ -42,7 +40,7 @@ public class Scheduler
 			{
 				// the info object is retrieved for each active thread
 				for (i = 0; i < schedule_size; ++i) {
-					schTh = id2thread[schedule[i]];
+					ThreadInfo schTh = id2thread[schedule[i]];
 
 					if (actTh.priority > schTh.priority) {
             	        // insert into the scheduling queue
