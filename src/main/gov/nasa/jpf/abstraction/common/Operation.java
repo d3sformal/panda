@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.common;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Operation extends Expression {
+public abstract class Operation extends PrimitiveExpression {
 	public Expression a;
 	public Expression b;
 	

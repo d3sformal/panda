@@ -5,7 +5,6 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.vm.ElementInfo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AnonymousArray extends AnonymousExpression {
@@ -25,7 +24,7 @@ public class AnonymousArray extends AnonymousExpression {
 
 	@Override
 	public List<AccessPath> getPaths() {
-		return new ArrayList<AccessPath>();
+		return length.getPaths();
 	}
 
 	@Override

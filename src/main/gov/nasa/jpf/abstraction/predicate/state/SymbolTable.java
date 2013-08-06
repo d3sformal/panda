@@ -17,4 +17,6 @@ public interface SymbolTable {
 	public Set<AccessPath> processPrimitiveStore(ConcretePath to);
 	public Set<AccessPath> processObjectStore(Expression from, ConcretePath to);
 	
+	public boolean isArray(AccessPath path);
+	
 }

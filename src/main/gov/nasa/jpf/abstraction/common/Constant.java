@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.common;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Constant extends Expression {
+public class Constant extends PrimitiveExpression {
 	public Number value;
 	
 	protected Constant(Number value) {

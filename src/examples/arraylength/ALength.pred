@@ -1,2 +1,2 @@
 [method arraylength.ALength.main]
-alength(a) = -1
+alength(arrlen, a) = -1

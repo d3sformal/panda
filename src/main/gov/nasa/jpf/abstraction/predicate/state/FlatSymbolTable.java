@@ -6,8 +6,10 @@ import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.concrete.ArrayReference;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
 
 import java.util.HashMap;
@@ -325,6 +327,23 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	@Override
 	public int count() {
 		return prefixToVariableIDs.keySet().size();
+	}
+
+	@Override
+	public boolean isArray(AccessPath path) {
+		if (prefixToVariableIDs.containsKey(path)) {
+			for (VariableID var : prefixToVariableIDs.get(path)) {
+				if (var instanceof PartialVariableID) {
+					PartialVariableID partial = (PartialVariableID) var;
+					
+					return partial.getRef() instanceof ArrayReference;
+				}
+				
+				return false;
+			}
+		}
+		
+		return false;
 	}
 
 }

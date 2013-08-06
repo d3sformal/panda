@@ -5,6 +5,7 @@ import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
 import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.ArrayLength;
+import gov.nasa.jpf.abstraction.common.ArrayPath;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Modulo;
@@ -164,7 +165,33 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	
 	@Override
 	public void visit(ArrayLength expression) {
-		ret += "(alength ";
+		ret += "(select ";
+		
+		if (updatedPath != null && (newExpression instanceof ArrayPath || newExpression instanceof AnonymousArray)) {
+			ret += "(store arrlen ";
+			
+			updatedPath.accept(this);
+			
+			ret += " ";
+			
+			if (newExpression instanceof AnonymousArray) {
+				AnonymousArray array = (AnonymousArray) newExpression;
+				
+				array.length.accept(this);
+			} else {
+				ret += "(select arrlen ";
+				
+				newExpression.accept(this);
+				
+				ret += ")";
+			}
+			
+			ret += ")";
+		} else {
+			ret += "arrlen";
+		}
+		
+		ret += " ";
 		
 		expression.path.accept(this);
 		
@@ -192,15 +219,15 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 		
 		String field = "field_" + element.getName();
 		
-		if (path != null && path.getTail() instanceof AccessPathSubElement) {
-			AccessPathSubElement updatedField = (AccessPathSubElement) path.getTail();
+		if (updatedPath != null && updatedPath.getTail() instanceof AccessPathSubElement) {
+			AccessPathSubElement updatedField = (AccessPathSubElement) updatedPath.getTail();
 			
 			if (updatedField.getName().equals(element.getName())) {
 				PredicatesSMTStringifier updatePrefixVisitor = new PredicatesSMTStringifier();
 				PredicatesSMTStringifier updateExpressionVisitor = new PredicatesSMTStringifier();
 				
-				path.cutTail().accept(updatePrefixVisitor);
-				expression.accept(updateExpressionVisitor);
+				updatedPath.cutTail().accept(updatePrefixVisitor);
+				newExpression.accept(updateExpressionVisitor);
 				
 				field = "(store field_" + element.getName() + " " + updatePrefixVisitor.getString() + " " + updateExpressionVisitor.getString() + ")";
 			}
@@ -223,16 +250,16 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 		
 		String array = "arr";
 		
-		if (path != null && path.getTail() instanceof AccessPathIndexElement) {
-			AccessPathIndexElement index = (AccessPathIndexElement) path.getTail();
+		if (updatedPath != null && updatedPath.getTail() instanceof AccessPathIndexElement) {
+			AccessPathIndexElement index = (AccessPathIndexElement) updatedPath.getTail();
 			PredicatesSMTStringifier updatePrefixVisitor = new PredicatesSMTStringifier();
 			PredicatesSMTStringifier updateIndexVisitor = new PredicatesSMTStringifier();
 			PredicatesSMTStringifier updateExpressionVisitor = new PredicatesSMTStringifier();
 				
-			path.cutTail().accept(updatePrefixVisitor);
+			updatedPath.cutTail().accept(updatePrefixVisitor);
 			index.getIndex().accept(updateIndexVisitor);
-			expression.accept(updateExpressionVisitor);
-				
+			newExpression.accept(updateExpressionVisitor);
+			
 			array = "(store arr " + updatePrefixVisitor.getString() + " (store (select arr " + updatePrefixVisitor.getString() + ") " + updateIndexVisitor.getString() + " " + updateExpressionVisitor.getString() + "))";
 		}
 		
@@ -241,10 +268,12 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 
 	@Override
 	public void visit(AnonymousArray expression) {
+		ret += "fresh";
 	}
 
 	@Override
-	public void visit(AnonymousObject expression) {		
+	public void visit(AnonymousObject expression) {
+		ret += "fresh";
 	}
 
 }

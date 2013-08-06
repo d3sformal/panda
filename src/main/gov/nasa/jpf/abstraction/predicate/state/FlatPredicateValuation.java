@@ -163,13 +163,8 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				Predicate negativeWeakestPrecondition = Negation.create(predicate);
 					
 				if (expression != null) {
-					if (expression instanceof AnonymousExpression) {
-						positiveWeakestPrecondition = Contradiction.create();
-						negativeWeakestPrecondition = Contradiction.create();
-					} else {
-						positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
-						negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
-					}
+					positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
+					negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
 				}
 				
 				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();

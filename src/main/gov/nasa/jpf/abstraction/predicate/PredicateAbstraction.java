@@ -5,6 +5,8 @@ import java.util.Set;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.ObjectExpression;
+import gov.nasa.jpf.abstraction.common.PrimitiveExpression;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
@@ -37,14 +39,14 @@ public class PredicateAbstraction extends Abstraction {
 	public void processPrimitiveStore(Expression from, ConcretePath to) {		
 		Set<AccessPath> affected = symbolTable.processPrimitiveStore(to);
 
-		predicateValuation.reevaluate(to, affected, from);
+		predicateValuation.reevaluate(to, affected, PrimitiveExpression.wrap(from));
 	}
 	
 	@Override
 	public void processObjectStore(Expression from, ConcretePath to) {	
 		Set<AccessPath> affected = symbolTable.processObjectStore(from, to);
 		
-		predicateValuation.reevaluate(to, affected, from);
+		predicateValuation.reevaluate(to, affected, ObjectExpression.wrap(from, symbolTable));
 	}
 	
 	@Override

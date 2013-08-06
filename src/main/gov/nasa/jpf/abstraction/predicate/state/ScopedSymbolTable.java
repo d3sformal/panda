@@ -88,5 +88,10 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	public int count() {
 		return scopes.count() > 0 ? scopes.top().count() : 0;
 	}
+
+	@Override
+	public boolean isArray(AccessPath path) {
+		return scopes.top().isArray(path);
+	}
 	
 }

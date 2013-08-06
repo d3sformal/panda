@@ -54,7 +54,7 @@ public class UpdatedPredicate extends Predicate {
 
 			return Negation.create(create(n.predicate, path, expression));
 		}
-		
+
 		if (predicate instanceof Tautology) {
 			return predicate;
 		}

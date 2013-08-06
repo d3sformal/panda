@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
@@ -19,8 +20,8 @@ import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 public abstract class PredicatesStringifier implements PredicatesVisitor {
 	
 	protected String ret = "";
-	protected AccessPath path = null;
-	protected Expression expression = null;
+	protected AccessPath updatedPath = null;
+	protected Expression newExpression = null;
 	
 	public String getString() {
 		return ret;
@@ -142,11 +143,15 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 	
 	@Override
 	public void visit(UpdatedPredicate predicate) {
-		path = predicate.path;
-		expression = predicate.expression;
+		updatedPath = predicate.path;
+		newExpression = predicate.expression;
 		
-		if (path.getRoot() == path.getTail()) {
-			predicate.predicate.replace(path, expression).accept(this);
+		if (updatedPath.getRoot() == updatedPath.getTail()) {
+			if (newExpression instanceof AnonymousExpression) {
+				predicate.predicate.accept(this);
+			} else {
+				predicate.predicate.replace(updatedPath, newExpression).accept(this);
+			}
 		} else {
 			predicate.predicate.accept(this);
 		}
@@ -218,15 +223,6 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 		ret += " % ";
 		
 		expression.b.accept(this);
-		
-		ret += ")";
-	}
-	
-	@Override
-	public void visit(ArrayLength expression) {
-		ret += "alength(";
-		
-		expression.path.accept(this);
 		
 		ret += ")";
 	}

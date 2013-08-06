@@ -107,7 +107,7 @@ factor returns [Expression val]
 	: CONSTANT {
 		$ctx.val = Constant.create(Integer.parseInt($CONSTANT.text));
 	}
-	| 'alength' '(' p=path ')' {
+	| 'alength' '(' 'arrlen' ',' p=path ')' {
 		$ctx.val = ArrayLength.create($p.val);
 	}
 	| p=path {

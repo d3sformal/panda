@@ -11,6 +11,7 @@ import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.ArrayLength;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Divide;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Modulo;
 import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
@@ -34,9 +35,14 @@ import gov.nasa.jpf.abstraction.predicate.common.StaticContext;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
 import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 
-public class PredicatesArrayLengthCollector implements PredicatesVisitor {
+public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	
-	private Set<ArrayLength> expressions = new HashSet<ArrayLength>(); 
+	private AccessPath updatedPath = null;
+	private Expression newExpression = null;
+	
+	private Set<String> vars = new HashSet<String>();
+	private Set<String> fields = new HashSet<String>();
+	private Set<Predicate> additionalPredicates = new HashSet<Predicate>(); 
 
 	@Override
 	public void visit(Predicates predicates) {
@@ -110,7 +116,10 @@ public class PredicatesArrayLengthCollector implements PredicatesVisitor {
 	}
 
 	@Override
-	public void visit(UpdatedPredicate predicate) {		
+	public void visit(UpdatedPredicate predicate) {
+		updatedPath = predicate.path;
+		newExpression = predicate.expression;
+		
 		predicate.predicate.accept(this);
 		predicate.path.accept(this);
 		predicate.expression.accept(this);
@@ -152,7 +161,14 @@ public class PredicatesArrayLengthCollector implements PredicatesVisitor {
 
 	@Override
 	public void visit(ArrayLength expression) {
-		expressions.add(expression);
+		Predicate predicate = Negation.create(LessThan.create(expression, Constant.create(0)));
+		
+		if (updatedPath != null && newExpression != null) {
+			predicate = UpdatedPredicate.create(predicate, updatedPath, newExpression);
+		}
+		
+		additionalPredicates.add(predicate);
+		
 		expression.path.accept(this);
 	}
 
@@ -166,6 +182,8 @@ public class PredicatesArrayLengthCollector implements PredicatesVisitor {
 		if (element.getNext() != null) {
 			element.getNext().accept(this);
 		}
+		
+		vars.add(element.getName());
 	}
 
 	@Override
@@ -173,6 +191,8 @@ public class PredicatesArrayLengthCollector implements PredicatesVisitor {
 		if (element.getNext() != null) {
 			element.getNext().accept(this);
 		}
+		
+		fields.add(element.getName());
 	}
 
 	@Override
@@ -193,10 +213,19 @@ public class PredicatesArrayLengthCollector implements PredicatesVisitor {
 
 	@Override
 	public void visit(AnonymousArray expression) {
+		expression.length.accept(this);
 	}
 	
-	public Set<ArrayLength> getArrayLengthExpressions() {
-		return expressions;
+	public Set<Predicate> getAdditionalPredicates() {
+		return additionalPredicates;
+	}
+	
+	public Set<String> getVars() {
+		return vars;
+	}
+	
+	public Set<String> getFields() {
+		return fields;
 	}
 
 }

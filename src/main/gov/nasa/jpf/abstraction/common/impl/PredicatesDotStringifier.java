@@ -3,6 +3,8 @@ package gov.nasa.jpf.abstraction.common.impl;
 import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
 import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
 import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
+import gov.nasa.jpf.abstraction.common.ArrayLength;
+import gov.nasa.jpf.abstraction.common.ArrayPath;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
@@ -48,15 +50,15 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 	public void visit(AccessPathSubElement element) {
 		ret += "." + element.getName();
 		
-		if (path != null && path.getTail() instanceof AccessPathSubElement) {
-			AccessPathSubElement field = (AccessPathSubElement) path.getTail();
+		if (updatedPath != null && updatedPath.getTail() instanceof AccessPathSubElement) {
+			AccessPathSubElement field = (AccessPathSubElement) updatedPath.getTail();
 			
 			if (field.getName().equals(element.getName())) {
 				PredicatesDotStringifier updatedPathStringifier = new PredicatesDotStringifier();
 				PredicatesDotStringifier updatedExpressionStringifier = new PredicatesDotStringifier();
 				
-				path.accept(updatedPathStringifier);
-				expression.accept(updatedExpressionStringifier);
+				updatedPath.accept(updatedPathStringifier);
+				newExpression.accept(updatedExpressionStringifier);
 				
 				ret += "|";
 				
@@ -83,12 +85,12 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 		
 		ret += "]";
 		
-		if (path != null && path.getTail() instanceof AccessPathIndexElement) {	
+		if (updatedPath != null && updatedPath.getTail() instanceof AccessPathIndexElement) {	
 			PredicatesDotStringifier updatedPathStringifier = new PredicatesDotStringifier();
 			PredicatesDotStringifier updatedExpressionStringifier = new PredicatesDotStringifier();
 			
-			path.accept(updatedPathStringifier);
-			expression.accept(updatedExpressionStringifier);
+			updatedPath.accept(updatedPathStringifier);
+			newExpression.accept(updatedExpressionStringifier);
 			
 			ret += "|";
 			
@@ -126,6 +128,33 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 		ret += expression.ei.getObjectRef();
 
 		ret += "}";
+	}
+	
+	@Override
+	public void visit(ArrayLength expression) {
+		ret += "alength(arrlen, ";
+		
+		expression.path.accept(this);
+		
+		if (updatedPath != null && (newExpression instanceof ArrayPath || newExpression instanceof AnonymousArray)) {
+			PredicatesDotStringifier updatedPathStringifier = new PredicatesDotStringifier();
+			PredicatesDotStringifier updatedExpressionStringifier = new PredicatesDotStringifier();
+			
+			updatedPath.accept(updatedPathStringifier);
+			newExpression.accept(updatedExpressionStringifier);
+			
+			ret += "|";
+			
+			ret += updatedPathStringifier.getString();
+			
+			ret += " := ";
+			
+			ret += updatedExpressionStringifier.getString();
+			
+			ret += "|";
+		}
+		
+		ret += ")";
 	}
 
 }

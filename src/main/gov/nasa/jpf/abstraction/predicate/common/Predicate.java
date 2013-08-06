@@ -60,4 +60,20 @@ public abstract class Predicate implements PredicatesVisitable {
 		
 		return ret;
 	}
+	
+	@Override
+	public int hashCode() {
+		return toString(AccessPath.NotationPolicy.DOT_NOTATION).hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Predicate) {
+			Predicate p = (Predicate) o;
+
+			return toString(AccessPath.NotationPolicy.DOT_NOTATION).equals(p.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+		}
+		
+		return false;
+	}
 }
