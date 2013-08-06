@@ -77,7 +77,7 @@ Syntax of the predicates is captured by this grammar:
 
 <funpath> ::= `fread' `(' "fieldname" `,' <funpath> `)'
     \alt `aread' `(' `arr', `,' <funpath> `,' <expression> `)'
-    \alt `alength' `(' `arr', `,' <funpath> `)'
+    \alt `alength' `(' `arrlen', `,' <funpath> `)'
     \alt `fread' `(' "fieldname" `,' "classname" `)'
     \alt "varname"
 \end{grammar}
@@ -221,6 +221,7 @@ The set $D$ (determining predicates) contains all predicates that are in the cur
 We do not have to filter predicates based on access paths (sharing with $p$), because we make just two calls of the SMT solver for each assignment --- one for $\mathit{WP}(p)$ and the second for $\mathit{WP}(\lnot p)$ --- and not $2^N$ calls of the SMT solver where $N$ is the number of determining predicates.
 The following table shows weakest preconditions for assignment statements. The symbol $F_x$ denotes any valid atomic predicate over the expression $x$ that is not covered by other lines of the table for a given statement.
 Weakest preconditions capture aliasing --- e.g., truth value of the weakest precondition for the statement \code{o.f = e} and the predicate $\mathit{fread}(f,o') \ \mathrm{relop} \ u$ depends on whether $o = o'$.
+We use the symbol $\mathit{fresh}$ in the weakest preconditions. The symbol represents a newly allocated object that differs from the values of all expressions (variables) of a reference type (from all existing objects and arrays).
 
 \begin{table*}[!h]
 \centering
@@ -255,6 +256,15 @@ Weakest preconditions capture aliasing --- e.g., truth value of the weakest prec
  & $ \mathit{aread}(\mathrm{arr},a',i') \ \mathrm{relop} \ u $ & $ \mathit{aread}(\mathit{awrite}(\mathrm{arr},a,i,e),a',i') \ \mathrm{relop} \ u $ \\
 \cline{2-3}
  & $ \mathit{aread}(\mathrm{arr},b,\mathit{aread}(\mathrm{arr},a',i')) \ \mathrm{relop} \ u $ & $ \mathit{aread}(\mathit{awrite}(\mathrm{arr},a,i,e),b,\mathit{aread}(\mathit{awrite}(\mathrm{arr},a,i,e),a',i')) \ \mathrm{relop} \ u $ \\
+
+\hline
+
+\multirow{3}*{ \code{a = newarray[e]} }
+ & $ a = w $ & $ \mathrm{false} $ \\
+\cline{2-3}
+ & $ \mathit{aread}(\mathrm{arr},a',i) \ \mathrm{relop} \ u $ & $ \mathit{aread}(\mathit{awrite}(\mathrm{arr},a,\mathit{fresh}),a',i) \ \mathrm{relop} \ u $ \\
+\cline{2-3}
+ & $ \mathit{alength}(\mathrm{arrlen},a') \ \mathrm{relop} \ u $ & $ \mathit{alength}(\mathit{store}(\mathrm{arrlen},a,e),a') \ \mathrm{relop} \ u $ \\
 
 \hline
 \end{tabular}
@@ -305,6 +315,25 @@ Predicate abstraction causes non-deterministic choices to be created only at bra
 If the condition evaluates to \code{unknown} at some instruction, a new choice generator is created such that all branches can be explored subsequently.
 We do not make choices at assignment statements for predicates that get the value \code{unknown}, but leave this up to the branching instruction that depends on the predicate value.
 
+We improve precision of the predicate abstraction at branching instructions (\code{if}, \code{switch}).
+If the logic formula representing the condition $C$ has the value \code{unknown} according to the SMT solver, then we can exploit the precise value (\code{true} or \code{false}) of $C$ in each branch.
+We can give the precise value to logical formula representing $C$ in each branch, i.e. the value \code{true} in one branch and \code{false} in the other branch.
+The predicate corresponding to $C$ may or may not exist --- if the predicate exists then we can set (update) its value, and if the predicate does not exist then we can dynamically add new predicate with the proper value.
+
+In addition, we also refine values of other predicates at the beginning of each branch. For each predicate $p$ in the input set (universum) that has the value \code{unknown} and shares some access paths with $C$, we can check if the precise value of $C$ allows refining the truth value of $p$ to a more precise one.
+For the "true" branch (when $C$ has the value \code{true}), we use the following query for the SMT solver: is the formula $C \land D \Rightarrow P$ valid, respectively is the formula $C \land D \Rightarrow \lnot P$ valid, where the symbol $D$ represents determining predicates (their actual truth value).
+Truth values of other predicates are updated transitively --- for each updated predicate $p$, we must check (refine) all other predicates that share access paths with $p$ (with respect to aliasing). This process stops upon reaching the fixpoint.
+Refinement of other predicates besides $C$ is optional (configurable) via some property because it can be quite expensive (two calls of the SMT solver for each predicate) and thus the user can disable it.
+
+The following example shows refinement of the value of the predicate $a < 1$.
+\begin{lstlisting}
+  if (a < 0) { // a < 0 UNKNOWN, a < 1 UNKNOWN
+    // a < 0 TRUE, a < 1 TRUE
+  } else {
+    // a < 0 FALSE, a < 1 UNKNOWN
+  }
+\end{lstlisting}
+
 \section*{Implementation}
 
 We will use the following mechanisms of JPF:
@@ -329,8 +358,9 @@ We will probably run the SMT solver in a separate process (not via a Java bindin
 How to use it: prepare input (command-line, string), execute the system process, and parse output ("sat", "unsat").
 Options: {\bf MathSAT 5} (the preferred one), Yices, CVC4, \ldots.
 
-The input to each call of the SMT solver contains also auxiliary clauses, which express the semantics of Java.
-For example, the clause $\mathit{alength}(arr,a) \ge 0$ for each variable $a$ of an array type.
+The input to each call of the SMT solver contains also supporting auxiliary clauses, which express the semantics of Java, and clauses that restrict the value of the symbol $\mathit{fresh}$.
+For example, the clause $\mathit{alength}(arrlen,a) \ge 0$ for each variable $a$ of an array type.
+We use the clause $\mathit{fresh} \ne v$ for every $v$ that is an expression (variable) of a reference type.
 
 Symbolic execution of numerical operations and load instructions (\code{getfield}, \code{iload}) works with a symbolic stack.
 For example, when processing the bytecode instruction \code{iadd} and input symbolic values $x$ and $1$ on the symbolic stack, we get a symbolic expression $x+1$ and put it on the symbolic stack.
