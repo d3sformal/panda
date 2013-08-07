@@ -47,8 +47,7 @@ public class AbstractInstructionFactory extends
 
 		System.out.println("Running Abstract PathFinder ...");
 
-		filter = new ClassInfoFilter(null,
-				new String[] {/* "java.*", */"javax.*" }, null, null);
+		filter = new ClassInfoFilter(null, null, null, null);
 
 		Map<String, AbstractionFactory> abs_factory = new HashMap<String, AbstractionFactory>();
 		
