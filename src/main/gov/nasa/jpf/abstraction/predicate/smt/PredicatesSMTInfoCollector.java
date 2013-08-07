@@ -5,22 +5,24 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
-import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
-import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
-import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
+import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
+import gov.nasa.jpf.abstraction.common.access.Fresh;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.Add;
-import gov.nasa.jpf.abstraction.common.ArrayLength;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.Fresh;
 import gov.nasa.jpf.abstraction.common.Modulo;
 import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.Subtract;
-import gov.nasa.jpf.abstraction.common.impl.FreshRootElement;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
@@ -37,20 +39,15 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.common.StaticContext;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
-import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 
 public class PredicatesSMTInfoCollector implements PredicatesVisitor {
-	
-	private AccessPath updatedPath = null;
-	private Expression newExpression = null;
-	
 	private Set<String> vars = new HashSet<String>();
 	private Set<String> fields = new HashSet<String>();
 	
 	private Predicate lastPredicate = null;
 	private Map<Predicate, Set<Predicate>> additionalPredicates = new HashMap<Predicate, Set<Predicate>>();
 	
-	private Set<AccessPath> objects = new HashSet<AccessPath>();
+	private Set<AccessExpression> objects = new HashSet<AccessExpression>();
 
 	@Override
 	public void visit(Predicates predicates) {
@@ -138,18 +135,6 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	}
 
 	@Override
-	public void visit(UpdatedPredicate predicate) {
-		lastPredicate = predicate;
-		
-		updatedPath = predicate.path;
-		newExpression = predicate.expression;
-		
-		predicate.predicate.accept(this);
-		predicate.path.accept(this);
-		predicate.expression.accept(this);
-	}
-
-	@Override
 	public void visit(EmptyExpression expression) {
 	}
 
@@ -183,19 +168,6 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 		expression.b.accept(this);
 	}
 
-	@Override
-	public void visit(ArrayLength expression) {
-		Predicate predicate = Negation.create(LessThan.create(expression, Constant.create(0)));
-		
-		if (updatedPath != null && newExpression != null) {
-			predicate = UpdatedPredicate.create(predicate, updatedPath, newExpression);
-		}
-		
-		addAdditionalPredicate(predicate);
-		
-		expression.path.accept(this);
-	}
-
 	private void addAdditionalPredicate(Predicate predicate) {
 		if (!additionalPredicates.containsKey(lastPredicate)) {
 			additionalPredicates.put(lastPredicate, new HashSet<Predicate>());
@@ -204,53 +176,9 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 		additionalPredicates.get(lastPredicate).add(predicate);
 	}
 
-	@Override
-	public void visit(AccessPath expression) {
-		addObjects(expression);
-		
-		expression.getRoot().accept(this);
-	}
-
-	private void addObjects(AccessPath expression) {
-		if (expression.getRoot() instanceof FreshRootElement) return;
-		
-		AccessPath path = expression.clone();
-		
-		while (path.getLength() > 1) {
-			objects.add(path);
-			
-			path = path.cutTail();
-		}
-		
-		objects.add(path);
-	}
-
-	@Override
-	public void visit(AccessPathRootElement element) {
-		if (element.getNext() != null) {
-			element.getNext().accept(this);
-		}
-		
-		if (!(element instanceof FreshRootElement)) {
-			vars.add(element.getName());
-		}
-	}
-
-	@Override
-	public void visit(AccessPathSubElement element) {
-		if (element.getNext() != null) {
-			element.getNext().accept(this);
-		}
-		
-		fields.add(element.getName());
-	}
-
-	@Override
-	public void visit(AccessPathIndexElement element) {
-		element.getIndex().accept(this);
-		
-		if (element.getNext() != null) {
-			element.getNext().accept(this);
+	private void addObject(AccessExpression expression) {
+		if (!(expression.getRoot() instanceof Fresh)) {
+			objects.add(expression);
 		}
 	}
 
@@ -283,8 +211,67 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 		return fields;
 	}
 	
-	public Set<AccessPath> getObjects() {
+	public Set<AccessExpression> getObjects() {
 		return objects;
+	}
+
+	@Override
+	public void visit(Root expression) {
+		vars.add(expression.getName());
+	}
+
+	@Override
+	public void visit(Fresh expression) {	
+	}
+
+	@Override
+	public void visit(ObjectFieldRead expression) {
+		expression.getObject().accept(this);
+		
+		fields.add(expression.getName());
+		
+		addObject(expression);
+	}
+
+	@Override
+	public void visit(ObjectFieldWrite expression) {
+		expression.getObject().accept(this);
+		
+		fields.add(expression.getName());
+		
+		addObject(expression);
+	}
+
+	@Override
+	public void visit(ArrayElementRead expression) {
+		Predicate predicate = Negation.create(LessThan.create(expression, Constant.create(0)));
+		
+		addAdditionalPredicate(predicate);
+		
+		expression.getArray().accept(this);
+		
+		addObject(expression);
+	}
+
+	@Override
+	public void visit(ArrayElementWrite expression) {
+		expression.getArray().accept(this);
+		
+		addObject(expression);
+	}
+
+	@Override
+	public void visit(ArrayLengthRead expression) {
+		expression.getArray().accept(this);
+		
+		addObject(expression);
+	}
+
+	@Override
+	public void visit(ArrayLengthWrite expression) {
+		expression.getArray().accept(this);
+		
+		addObject(expression);
 	}
 
 }

@@ -1,160 +1,123 @@
 package gov.nasa.jpf.abstraction.common.impl;
 
-import gov.nasa.jpf.abstraction.common.AccessPathIndexElement;
-import gov.nasa.jpf.abstraction.common.AccessPathRootElement;
-import gov.nasa.jpf.abstraction.common.AccessPathSubElement;
-import gov.nasa.jpf.abstraction.common.ArrayLength;
-import gov.nasa.jpf.abstraction.common.ArrayPath;
-import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
-import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
+import gov.nasa.jpf.abstraction.common.access.Fresh;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
-import gov.nasa.jpf.abstraction.predicate.common.Equals;
-import gov.nasa.jpf.abstraction.predicate.common.LessThan;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 
 public class PredicatesDotStringifier extends PredicatesStringifier {
 
 	@Override
-	public void visit(Negation expression) {
-		if (expression.predicate instanceof LessThan) {
-			LessThan lt = (LessThan) expression.predicate;
-			
-			lt.a.accept(this);
-			
-			ret += " >= ";
-			
-			lt.b.accept(this);
-		} else if (expression.predicate instanceof Equals) {
-			Equals lt = (Equals) expression.predicate;
-			
-			lt.a.accept(this);
-			
-			ret += " != ";
-			
-			lt.b.accept(this);
-		} else {
-			super.visit(expression);
-		}
+	public void visit(Root expression) {
+		ret += expression.getName();
 	}
 
 	@Override
-	public void visit(AccessPathRootElement element) {
-		ret += element.getName();
-		
-		if (element.getNext() == null) return;
-		
-		element.getNext().accept(this);
+	public void visit(Fresh expression) {
+		ret += expression.getName();
 	}
 
 	@Override
-	public void visit(AccessPathSubElement element) {
-		ret += "." + element.getName();
+	public void visit(ObjectFieldRead expression) {
+		expression.getObject().accept(this);
 		
-		if (updatedPath != null && updatedPath.getTail() instanceof AccessPathSubElement) {
-			AccessPathSubElement field = (AccessPathSubElement) updatedPath.getTail();
-			
-			if (field.getName().equals(element.getName())) {
-				PredicatesDotStringifier updatedPathStringifier = new PredicatesDotStringifier();
-				PredicatesDotStringifier updatedExpressionStringifier = new PredicatesDotStringifier();
-				
-				updatedPath.accept(updatedPathStringifier);
-				newExpression.accept(updatedExpressionStringifier);
-				
-				ret += "|";
-				
-				ret += updatedPathStringifier.getString();
-				
-				ret += " := ";
-				
-				ret += updatedExpressionStringifier.getString();
-				
-				ret += "|";
-			}
-		}
+		ret += ".";
 		
-		if (element.getNext() == null) return;
-		
-		element.getNext().accept(this);
+		ret += expression.getName();
 	}
 
 	@Override
-	public void visit(AccessPathIndexElement element) {
+	public void visit(ObjectFieldWrite expression) {
+		ret += "| ";
+		
+		expression.getObject().accept(this);
+		
+		ret += ".";
+		
+		ret += expression.getName();
+		
+		ret += " := ";
+		
+		expression.getNewValue().accept(this);
+		
+		ret += " |";
+	}
+
+	@Override
+	public void visit(ArrayElementRead expression) {
+		expression.getArray().accept(this);
+		
 		ret += "[";
 		
-		element.getIndex().accept(this);
+		expression.getIndex().accept(this);
+		
+		ret += "]";
+	}
+
+	@Override
+	public void visit(ArrayElementWrite expression) {
+		ret += "| ";
+		
+		expression.getArray().accept(this);
+		
+		ret += "[";
+		
+		expression.getIndex().accept(this);
 		
 		ret += "]";
 		
-		if (updatedPath != null && updatedPath.getTail() instanceof AccessPathIndexElement) {	
-			PredicatesDotStringifier updatedPathStringifier = new PredicatesDotStringifier();
-			PredicatesDotStringifier updatedExpressionStringifier = new PredicatesDotStringifier();
-			
-			updatedPath.accept(updatedPathStringifier);
-			newExpression.accept(updatedExpressionStringifier);
-			
-			ret += "|";
-			
-			ret += updatedPathStringifier.getString();
-			
-			ret += " := ";
-			
-			ret += updatedExpressionStringifier.getString();
-			
-			ret += "|";
-		}
+		ret += " := ";
 		
-		if (element.getNext() == null) return;
+		expression.getNewValue().accept(this);
 		
-		element.getNext().accept(this);
+		ret += " |";
 	}
 
 	@Override
-	public void visit(AnonymousArray expression) {
-		PredicatesDotStringifier lengthStringifier = new PredicatesDotStringifier();
+	public void visit(ArrayLengthRead expression) {
+		ret += "alength(";
 		
-		expression.length.accept(lengthStringifier);
+		ret += "arrlen";
 		
-		ret += "[ 0 .. ";
+		ret += ", ";
 		
-		ret += lengthStringifier.getString();
+		expression.getArray().accept(this);
+		
+		ret += ")";
+	}
 
-		ret += " ]";
+	@Override
+	public void visit(ArrayLengthWrite expression) {
+		ret += "alengthupdate(";
+		
+		ret += "arrlen";
+		
+		ret += ", ";
+		
+		expression.getArray().accept(this);
+		
+		ret += ", ";
+		
+		expression.getNewValue().accept(this);
+		
+		ret += ")";
 	}
 
 	@Override
 	public void visit(AnonymousObject expression) {
-		ret += "{";
-		
-		ret += expression.ei.getObjectRef();
-
-		ret += "}";
+		ret += "object";
 	}
-	
+
 	@Override
-	public void visit(ArrayLength expression) {
-		ret += "alength(arrlen, ";
-		
-		expression.path.accept(this);
-		
-		if (updatedPath != null && (newExpression instanceof ArrayPath || newExpression instanceof AnonymousArray)) {
-			PredicatesDotStringifier updatedPathStringifier = new PredicatesDotStringifier();
-			PredicatesDotStringifier updatedExpressionStringifier = new PredicatesDotStringifier();
-			
-			updatedPath.accept(updatedPathStringifier);
-			newExpression.accept(updatedExpressionStringifier);
-			
-			ret += "|";
-			
-			ret += updatedPathStringifier.getString();
-			
-			ret += " := ";
-			
-			ret += updatedExpressionStringifier.getString();
-			
-			ret += "|";
-		}
-		
-		ret += ")";
+	public void visit(AnonymousArray expression) {
+		ret += "array";
 	}
 
 }

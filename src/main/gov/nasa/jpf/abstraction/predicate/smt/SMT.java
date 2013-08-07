@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
@@ -130,7 +130,7 @@ public class SMT {
 		return values.toArray(new Boolean[values.size()]);
 	}
 	
-	private String prepareInput(Set<String> vars, Set<String> fields, Set<AccessPath> objects, List<String> formulas, String separator) {
+	private String prepareInput(Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<String> formulas, String separator) {
 		String input = "(set-logic QF_AUFLIA)" + separator;
 		
 		input += "(declare-fun arr () (Array Int (Array Int Int)))" + separator;
@@ -148,7 +148,7 @@ public class SMT {
 		}
 		input += separator;
 		
-		for (AccessPath object : objects) {
+		for (AccessExpression object : objects) {
 			input += "(assert (distinct fresh " + convertToString(object) + "))" + separator;
 		}
 		input += separator;
@@ -203,7 +203,7 @@ public class SMT {
 		
 		Set<String> vars = collector.getVars();
 		Set<String> fields = collector.getFields();
-		Set<AccessPath> objects = collector.getObjects();
+		Set<AccessExpression> objects = collector.getObjects();
 		
 		return prepareInput(vars, fields, objects, formulas, separator);
 	}
@@ -229,7 +229,7 @@ public class SMT {
 		
 		Set<String> vars = collector.getVars();
 		Set<String> fields = collector.getFields();
-		Set<AccessPath> objects = collector.getObjects();
+		Set<AccessExpression> objects = collector.getObjects();
 		
 		return prepareInput(vars, fields, objects, formulas, separator);
 	}

@@ -108,7 +108,7 @@ factor returns [Expression val]
 		$ctx.val = Constant.create(Integer.parseInt($CONSTANT.text));
 	}
 	| 'alength' '(' 'arrlen' ',' p=path ')' {
-		$ctx.val = ArrayLength.create($p.val);
+		$ctx.val = ArrayLengthRead.create($p.val);
 	}
 	| p=path {
 		$ctx.val = $p.val;
@@ -118,35 +118,35 @@ factor returns [Expression val]
 	}
 	;
 	
-contextpath returns [AccessPath val]
+contextpath returns [AccessExpression val]
 	: f=ID {
-		$ctx.val = new AccessPath($f.text);
+		$ctx.val = Root.create($f.text);
 	}
 	| p=contextpath '.' f=ID {
 		$ctx.val = $p.val;
-		$ctx.val.appendSubElement($f.text);
+		ObjectFieldRead($ctx.val, $f.text);
 	}
 	;
 
-path returns [AccessPath val]
+path returns [AccessExpression val]
 	: f=ID {
 		$ctx.val = new AccessPath($f.text);
 	}
 	| p=path '.' f=ID {
 		$ctx.val = $p.val;
-		$ctx.val.appendSubElement($f.text);
+		ObjectFieldRead.create($ctx.val, $f.text);
 	}
 	| p=path '[' e=expression ']' {
 		$ctx.val = $p.val;
-		$ctx.val.appendIndexElement($e.val);
+		ArrayElementRead.create($ctx.val, $e.val);
 	}
 	| 'fread' '(' f=ID ',' p=path ')' {
 		$ctx.val = $p.val;
-		$ctx.val.appendSubElement($f.text);
+		ObjectFieldRead.create($ctx.val, $f.text);
 	}
 	| 'aread' '(' 'arr' ',' p=path ',' e=expression ')' {
 		$ctx.val = $p.val;
-		$ctx.val.appendIndexElement($e.val);
+		ArrayElementRead($ctx.val, $e.val);
 	}
 	;
 

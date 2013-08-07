@@ -1,5 +1,13 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
+import gov.nasa.jpf.abstraction.common.access.Fresh;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
@@ -14,7 +22,6 @@ import gov.nasa.jpf.abstraction.predicate.common.ObjectContext;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.common.StaticContext;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
-import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 
 public interface PredicatesVisitor {
 	public void visit(Predicates predicates);
@@ -29,18 +36,20 @@ public interface PredicatesVisitor {
 	public void visit(Conjunction predicate);
 	public void visit(Disjunction predicate);
 	public void visit(Implication predicate);
-	public void visit(UpdatedPredicate predicate);
 	public void visit(EmptyExpression expression);
 	public void visit(Add expression);
 	public void visit(Subtract expression);
 	public void visit(Multiply expression);
 	public void visit(Divide expression);
 	public void visit(Modulo expression);
-	public void visit(ArrayLength expression);
-	public void visit(AccessPath expression);
-	public void visit(AccessPathRootElement element);
-	public void visit(AccessPathSubElement element);
-	public void visit(AccessPathIndexElement element);
+	public void visit(Root expression);
+	public void visit(Fresh expression);
+	public void visit(ObjectFieldRead expression);
+	public void visit(ObjectFieldWrite expression);
+	public void visit(ArrayElementRead expression);
+	public void visit(ArrayElementWrite expression);
+	public void visit(ArrayLengthRead expression);
+	public void visit(ArrayLengthWrite expression);
 	public void visit(Constant expression);
 	public void visit(AnonymousObject expression);
 	public void visit(AnonymousArray expression);

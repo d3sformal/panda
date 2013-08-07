@@ -21,7 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -49,10 +49,10 @@ public class IASTORE extends gov.nasa.jpf.jvm.bytecode.IASTORE {
 		} 
 		
 		Expression from = source.getExpression();
-		ConcretePath to = null;
+		ConcreteAccessExpression to = null;
 		
-		if (destination.getExpression() instanceof ConcretePath) {
-			to = (ConcretePath) destination.getExpression();
+		if (destination.getExpression() instanceof ConcreteAccessExpression) {
+			to = (ConcreteAccessExpression) destination.getExpression();
 			to.appendIndexElement(index.getExpression());
 
 			GlobalAbstraction.getInstance().processPrimitiveStore(from, to);

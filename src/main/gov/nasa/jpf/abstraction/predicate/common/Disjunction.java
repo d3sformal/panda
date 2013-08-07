@@ -1,10 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
-public class Disjunction extends Junction {
+public class Disjunction extends Formula {
 	protected Disjunction(Predicate a, Predicate b) {
 		super(a, b);
 	}
@@ -15,7 +15,7 @@ public class Disjunction extends Junction {
 	}
 
 	@Override
-	public Predicate replace(AccessPath formerPath, Expression expression) {
+	public Predicate replace(AccessExpression formerPath, Expression expression) {
 		return create(a.replace(formerPath, expression), b.replace(formerPath, expression));
 	}
 	

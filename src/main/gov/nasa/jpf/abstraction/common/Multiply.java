@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
 public class Multiply extends Operation {
 	protected Multiply(Expression a, Expression b) {
@@ -12,7 +13,7 @@ public class Multiply extends Operation {
 	}
 
 	@Override
-	public Multiply replace(AccessPath formerPath, Expression expression) {
+	public Multiply replace(AccessExpression formerPath, Expression expression) {
 		return new Multiply(a.replace(formerPath, expression), b.replace(formerPath, expression));
 	}
 	

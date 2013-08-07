@@ -1,14 +1,15 @@
 package gov.nasa.jpf.abstraction.concrete;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.ObjectExpression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.vm.ElementInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AnonymousObject extends AnonymousExpression {
+public class AnonymousObject extends ObjectExpression implements AnonymousExpression {
 	
 	public ElementInfo ei;
 	
@@ -22,12 +23,12 @@ public class AnonymousObject extends AnonymousExpression {
 	}
 
 	@Override
-	public List<AccessPath> getPaths() {
-		return new ArrayList<AccessPath>();
+	public List<AccessExpression> getAccessExpressions() {
+		return new ArrayList<AccessExpression>();
 	}
 
 	@Override
-	public Expression replace(AccessPath formerPath, Expression expression) {
+	public Expression replace(AccessExpression formerPath, Expression expression) {
 		return this;
 	}
 

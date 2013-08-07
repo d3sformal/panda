@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
@@ -21,7 +21,7 @@ public class Predicates implements PredicatesVisitable {
 	
 	@Override
 	public String toString() {
-		PredicatesStringifier stringifier = AccessPath.getDefaultStringifier();
+		PredicatesStringifier stringifier = AccessExpression.getDefaultStringifier();
 		
 		accept(stringifier);
 		

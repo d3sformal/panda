@@ -20,7 +20,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
@@ -46,8 +46,8 @@ public class LALOAD extends gov.nasa.jpf.jvm.bytecode.LALOAD {
 			return actualNextInsn;
 		}       
 		
-		if (arrayAttr.getExpression() instanceof ConcretePath) {
-			ConcretePath path = (ConcretePath) arrayAttr.getExpression();
+		if (arrayAttr.getExpression() instanceof ConcreteAccessExpression) {
+			ConcreteAccessExpression path = (ConcreteAccessExpression) arrayAttr.getExpression();
 			
 			path.appendIndexElement(indexAttr.getExpression());
 			

@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+
 
 public class Modulo extends Subtract {
 	public Expression a;
@@ -18,7 +20,7 @@ public class Modulo extends Subtract {
 	}
 
 	@Override
-	public Modulo replace(AccessPath formerPath, Expression expression) {
+	public Modulo replace(AccessExpression formerPath, Expression expression) {
 		return new Modulo(a.replace(formerPath, expression), b.replace(formerPath, expression));
 	}
 	

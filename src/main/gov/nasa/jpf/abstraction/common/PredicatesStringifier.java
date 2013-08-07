@@ -1,8 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
-import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
@@ -17,13 +15,10 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.common.StaticContext;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
-import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 
 public abstract class PredicatesStringifier implements PredicatesVisitor {
 	
 	protected String ret = "";
-	protected AccessPath updatedPath = null;
-	protected Expression newExpression = null;
 	
 	public String getString() {
 		return ret;
@@ -39,7 +34,7 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 
 	@Override
 	public void visit(ObjectContext context) {
-		ret += "[object " + context.getObject().toString(AccessPath.NotationPolicy.DOT_NOTATION) + "]\n";
+		ret += "[object " + context.getObject().toString(AccessExpression.NotationPolicy.DOT_NOTATION) + "]\n";
 
 		for (Predicate p : context.predicates) {
 			p.accept(this);
@@ -49,7 +44,7 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 
 	@Override
 	public void visit(MethodContext context) {
-		ret += "[method " + context.getMethod().toString(AccessPath.NotationPolicy.DOT_NOTATION) + "]\n";
+		ret += "[method " + context.getMethod().toString(AccessExpression.NotationPolicy.DOT_NOTATION) + "]\n";
 
 		for (Predicate p : context.predicates) {
 			p.accept(this);
@@ -142,26 +137,6 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 		
 		ret += ")";
 	}
-	
-	@Override
-	public void visit(UpdatedPredicate predicate) {		
-		if (predicate.path.getRoot() == predicate.path.getTail()) {
-			if (predicate.expression instanceof AnonymousObject) {
-				predicate.expression = new Fresh();
-			}
-			
-			if (!(predicate.expression instanceof AnonymousArray)) {
-				predicate.predicate.replace(predicate.path, predicate.expression).accept(this);
-							
-				return;
-			}
-		}
-				
-		updatedPath = predicate.path;
-		newExpression = predicate.expression;
-			
-		predicate.predicate.accept(this);
-	}
 
 	@Override
 	public void visit(EmptyExpression expression) {
@@ -231,11 +206,6 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 		expression.b.accept(this);
 		
 		ret += ")";
-	}
-
-	@Override
-	public void visit(AccessPath expression) {
-		expression.getRoot().accept(this);
 	}
 
 	@Override

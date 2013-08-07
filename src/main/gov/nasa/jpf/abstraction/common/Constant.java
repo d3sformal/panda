@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +13,8 @@ public class Constant extends PrimitiveExpression {
 	}
 
 	@Override
-	public List<AccessPath> getPaths() {
-		return new ArrayList<AccessPath>();
+	public List<AccessExpression> getAccessExpressions() {
+		return new ArrayList<AccessExpression>();
 	}
 	
 	@Override
@@ -26,7 +28,7 @@ public class Constant extends PrimitiveExpression {
 	}
 
 	@Override
-	public Constant replace(AccessPath formerPath, Expression expression) {
+	public Constant replace(AccessExpression formerPath, Expression expression) {
 		return this;
 	}
 	

@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
 import gov.nasa.jpf.abstraction.predicate.common.MethodContext;
@@ -65,13 +65,13 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			if (context instanceof MethodContext) {
 				MethodContext methodContext = (MethodContext) context;
 
-				if (!methodContext.getMethod().toString(AccessPath.NotationPolicy.DOT_NOTATION).equals(method.getBaseName())) {
+				if (!methodContext.getMethod().toString(AccessExpression.NotationPolicy.DOT_NOTATION).equals(method.getBaseName())) {
 					continue;
 				}
 			} else if (context instanceof ObjectContext) {
 				ObjectContext objectContext = (ObjectContext) context;
 				
-				if (!objectContext.getObject().toString(AccessPath.NotationPolicy.DOT_NOTATION).equals(method.getClassName())) {
+				if (!objectContext.getObject().toString(AccessExpression.NotationPolicy.DOT_NOTATION).equals(method.getClassName())) {
 					continue;
 				}
 			}
@@ -138,7 +138,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 
 	@Override
-	public void reevaluate(AccessPath affected, Set<AccessPath> resolvedAffected, Expression expression) {
+	public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
 		scopes.top().reevaluate(affected, resolvedAffected, expression);
 	}
 	

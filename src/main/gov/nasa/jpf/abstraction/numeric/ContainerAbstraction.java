@@ -21,7 +21,7 @@ import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.util.Pair;
@@ -75,21 +75,21 @@ public class ContainerAbstraction extends Abstraction {
 	}
     
     @Override
-    public void processPrimitiveStore(Expression from, ConcretePath to) {
+    public void processPrimitiveStore(Expression from, ConcreteAccessExpression to) {
     	for (Abstraction abs : list) {
     		abs.processPrimitiveStore(from, to);
     	}
     }
     
     @Override
-    public void processObjectStore(Expression from, ConcretePath to) {
+    public void processObjectStore(Expression from, ConcreteAccessExpression to) {
     	for (Abstraction abs : list) {
     		abs.processObjectStore(from, to);
     	}
     }
     
     @Override
-    public void processLoad(ConcretePath from) {
+    public void processLoad(ConcreteAccessExpression from) {
     	for (Abstraction abs : list) {
     		abs.processLoad(from);
     	}

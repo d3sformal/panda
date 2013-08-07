@@ -20,7 +20,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -40,7 +40,7 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 		Instruction actualNextInsn = super.execute(ti);
 		
 		if (var != null) {
-			ConcretePath path = ConcretePath.createLocalVarPath(var.getName(), ti, var);
+			ConcreteAccessExpression path = ConcreteAccessExpression.createLocalVarPath(var.getName(), ti, var);
 			Attribute attribute = new NonEmptyAttribute(null, path);
 						
 			GlobalAbstraction.getInstance().processLoad(path);

@@ -20,7 +20,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -43,7 +43,7 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
         if (var != null) {
         	StackFrame sf = ti.getTopFrame();
     		ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
-	    	ConcretePath path = ConcretePath.createLocalVarRootedHeapObjectPath(var.getName(), ti, ei, var);
+	    	ConcreteAccessExpression path = ConcreteAccessExpression.createLocalVarRootedHeapObjectPath(var.getName(), ti, ei, var);
 			
     		if (ei != null) {
 	    		Attribute attribute = new NonEmptyAttribute(null, path);

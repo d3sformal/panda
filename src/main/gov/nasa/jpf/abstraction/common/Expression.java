@@ -1,19 +1,21 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Expression implements PredicatesVisitable, Cloneable {
-	protected List<AccessPath> paths = new ArrayList<AccessPath>();
+	protected List<AccessExpression> accessExpressions = new ArrayList<AccessExpression>();
 	
-	public abstract List<AccessPath> getPaths();
-	public abstract Expression replace(AccessPath formerPath, Expression expression);
+	public abstract List<AccessExpression> getAccessExpressions();
+	public abstract Expression replace(AccessExpression formerPath, Expression expression);
 	
     public String toString() {
-    	return toString(AccessPath.policy);
+    	return toString(AccessExpression.policy);
     }
-    public String toString(AccessPath.NotationPolicy policy) {
-    	PredicatesStringifier stringifier = AccessPath.getStringifier(policy);
+    public String toString(AccessExpression.NotationPolicy policy) {
+    	PredicatesStringifier stringifier = AccessExpression.getStringifier(policy);
 		
 		accept(stringifier);
 		

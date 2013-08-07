@@ -21,7 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
@@ -52,8 +52,8 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 		
 		Expression expr = attr.getExpression();
 
-		if (expr instanceof ConcretePath) {
-			ConcretePath path = (ConcretePath) expr;
+		if (expr instanceof ConcreteAccessExpression) {
+			ConcreteAccessExpression path = (ConcreteAccessExpression) expr;
 				
 			path.appendSubElement(getFieldName());
 				

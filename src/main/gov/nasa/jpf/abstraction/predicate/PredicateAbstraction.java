@@ -3,11 +3,11 @@ package gov.nasa.jpf.abstraction.predicate;
 import java.util.Set;
 
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ObjectExpression;
 import gov.nasa.jpf.abstraction.common.PrimitiveExpression;
-import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
@@ -31,20 +31,20 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processLoad(ConcretePath from) {
+	public void processLoad(ConcreteAccessExpression from) {
 		symbolTable.processLoad(from);
 	}
 	
 	@Override
-	public void processPrimitiveStore(Expression from, ConcretePath to) {		
-		Set<AccessPath> affected = symbolTable.processPrimitiveStore(to);
+	public void processPrimitiveStore(Expression from, ConcreteAccessExpression to) {		
+		Set<AccessExpression> affected = symbolTable.processPrimitiveStore(to);
 
 		predicateValuation.reevaluate(to, affected, PrimitiveExpression.wrap(from));
 	}
 	
 	@Override
-	public void processObjectStore(Expression from, ConcretePath to) {	
-		Set<AccessPath> affected = symbolTable.processObjectStore(from, to);
+	public void processObjectStore(Expression from, ConcreteAccessExpression to) {	
+		Set<AccessExpression> affected = symbolTable.processObjectStore(from, to);
 		
 		predicateValuation.reevaluate(to, affected, ObjectExpression.wrap(from, symbolTable));
 	}

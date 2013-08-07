@@ -25,7 +25,7 @@ import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
@@ -84,7 +84,7 @@ public abstract class BinaryComparatorExecutor<T> {
 				if (gt != TruthValue.UNDEFINED) {
 					result = new NonEmptyAttribute(SignsAbstraction.getInstance().create(lt != TruthValue.FALSE, eq != TruthValue.FALSE, gt != TruthValue.FALSE), null);
 	
-					System.out.printf("%s> Expressions: %s, %s\n", name, expr1.toString(AccessPath.NotationPolicy.DOT_NOTATION), expr2.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+					System.out.printf("%s> Expressions: %s, %s\n", name, expr1.toString(AccessExpression.NotationPolicy.DOT_NOTATION), expr2.toString(AccessExpression.NotationPolicy.DOT_NOTATION));
 				}
 			}
 			

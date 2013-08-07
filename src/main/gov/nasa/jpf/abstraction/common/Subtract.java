@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
-
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
 public class Subtract extends Operation {
 	protected Subtract(Expression a, Expression b) {
@@ -13,7 +13,7 @@ public class Subtract extends Operation {
 	}
 
 	@Override
-	public Subtract replace(AccessPath formerPath, Expression expression) {
+	public Subtract replace(AccessExpression formerPath, Expression expression) {
 		return new Subtract(a.replace(formerPath, expression), b.replace(formerPath, expression));
 	}
 	

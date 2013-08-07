@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
 import java.util.List;
@@ -17,15 +17,15 @@ import java.util.List;
  */
 public class MethodContext extends Context {
 	
-	private AccessPath method;
+	private AccessExpression method;
 
-	public MethodContext(AccessPath path, List<Predicate> predicates) {
+	public MethodContext(AccessExpression path, List<Predicate> predicates) {
 		super(predicates);
 		
 		method = path;
 	}
 	
-	public AccessPath getMethod() {
+	public AccessExpression getMethod() {
 		return method;
 	}
 

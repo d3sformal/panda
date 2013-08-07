@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+
 
 public class Divide extends Operation {
 	protected Divide(Expression a, Expression b) {
@@ -12,7 +14,7 @@ public class Divide extends Operation {
 	}
 
 	@Override
-	public Divide replace(AccessPath formerPath, Expression expression) {
+	public Divide replace(AccessExpression formerPath, Expression expression) {
 		return new Divide(a.replace(formerPath, expression), b.replace(formerPath, expression));
 	}
 	
