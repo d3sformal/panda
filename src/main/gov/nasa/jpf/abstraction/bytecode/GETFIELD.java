@@ -20,7 +20,9 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -37,6 +39,8 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 		StackFrame sf = ti.getTopFrame();
 		Attribute attr = (Attribute) sf.getOperandAttr(0);
 		
+		if (attr == null) attr = new EmptyAttribute();
+		
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
 		Instruction actualNextInsn = super.execute(ti);
@@ -45,18 +49,19 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 			return actualNextInsn;
 		}
 		
-		if (attr != null) {
-			if (attr.getExpression() instanceof ConcretePath) {
-				ConcretePath path = (ConcretePath) attr.getExpression();
-				
-				path.appendSubElement(getFieldName());
-				
-				GlobalAbstraction.getInstance().processLoad(path);
-			}
+		
+		Expression expr = attr.getExpression();
 
-			sf = ti.getTopFrame();
-			sf.setOperandAttr(new NonEmptyAttribute(null, attr.getExpression()));
+		if (expr instanceof ConcretePath) {
+			ConcretePath path = (ConcretePath) expr;
+				
+			path.appendSubElement(getFieldName());
+				
+			GlobalAbstraction.getInstance().processLoad(path);
 		}
+
+		sf = ti.getTopFrame();
+		sf.setOperandAttr(new NonEmptyAttribute(null, expr));
 		
 		return actualNextInsn;
 	}

@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.impl;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
 
 public class NonEmptyAttribute implements Attribute {
@@ -20,6 +21,10 @@ public class NonEmptyAttribute implements Attribute {
 
 	@Override
 	public Expression getExpression() {
+		if (expression instanceof AccessPath) {
+			return expression.clone();
+		}
+		
 		return expression;
 	}
 
