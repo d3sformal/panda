@@ -31,6 +31,10 @@ public class PredicateAbstractionFactory extends AbstractionFactory {
 			return new PredicateAbstraction(predicates);
 		} catch (IOException e) {
 			System.err.println("Could not read input file '" + filename + "'");
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			throw e;
 		}
 		
 		return null;

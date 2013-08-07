@@ -1,6 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
+import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Implication;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
@@ -128,7 +130,7 @@ public class SMT {
 		return values.toArray(new Boolean[values.size()]);
 	}
 	
-	private String prepareInput(Set<String> vars, Set<String> fields, List<String> formulas, String separator) {
+	private String prepareInput(Set<String> vars, Set<String> fields, Set<AccessPath> objects, List<String> formulas, String separator) {
 		String input = "(set-logic QF_AUFLIA)" + separator;
 		
 		input += "(declare-fun arr () (Array Int (Array Int Int)))" + separator;
@@ -136,16 +138,19 @@ public class SMT {
 		input += "(declare-fun fresh () Int)" + separator;
 		input += separator;
 		
-		//input += "(assert (and (not (= fresh ...)) (and ...))";
-		
 		for (String var : vars) {
 			input += "(declare-fun var_" + var + " () Int)" + separator;
 		}
+		input += separator;
 		
 		for (String field : fields) {
 			input += "(declare-fun field_" + field + " () (Array Int Int))" + separator;
 		}
+		input += separator;
 		
+		for (AccessPath object : objects) {
+			input += "(assert (distinct fresh " + convertToString(object) + "))" + separator;
+		}
 		input += separator;
 
 		for (String formula : formulas) {
@@ -186,11 +191,11 @@ public class SMT {
 				determinant.accept(collector);
 			}
 		}
-		
-		Set<Predicate> additionalPredicates = collector.getAdditionalPredicates();
 				
 		for (Predicate predicate : predicates.keySet()) {
 			PredicateDeterminant det = predicates.get(predicate);
+			
+			Set<Predicate> additionalPredicates = collector.getAdditionalPredicates(predicate);
 			
 			formulas.add(createFormula(det.positiveWeakestPrecondition, det.determinants, additionalPredicates));
 			formulas.add(createFormula(det.negativeWeakestPrecondition, det.determinants, additionalPredicates));
@@ -198,8 +203,9 @@ public class SMT {
 		
 		Set<String> vars = collector.getVars();
 		Set<String> fields = collector.getFields();
+		Set<AccessPath> objects = collector.getObjects();
 		
-		return prepareInput(vars, fields, formulas, separator);
+		return prepareInput(vars, fields, objects, formulas, separator);
 	}
 	
 	private String prepareInput(Set<Predicate> predicates, String separator) {
@@ -213,18 +219,19 @@ public class SMT {
 		for (Predicate predicate : predicates) {
 			predicate.accept(collector);
 		}
-		
-		Set<Predicate> additionalPredicates = collector.getAdditionalPredicates();
 				
-		for (Predicate predicate : predicates) {		
+		for (Predicate predicate : predicates) {
+			Set<Predicate> additionalPredicates = collector.getAdditionalPredicates(predicate);
+			
 			formulas.add(createFormula(predicate, additionalPredicates));
 			formulas.add(createFormula(Negation.create(predicate), additionalPredicates));
 		}
 		
 		Set<String> vars = collector.getVars();
 		Set<String> fields = collector.getFields();
+		Set<AccessPath> objects = collector.getObjects();
 		
-		return prepareInput(vars, fields, formulas, separator);
+		return prepareInput(vars, fields, objects, formulas, separator);
 	}
 	
 	private static String createFormula(Predicate predicate, Set<Predicate> additionalClauses) {
@@ -241,9 +248,15 @@ public class SMT {
 		return stringifier.getString();
 	}
 	
-	private static String createFormula(Predicate weakestPrecondition, Map<Predicate, TruthValue> determinants, Set<Predicate> additionalClauses) {
+	private static String convertToString(PredicatesVisitable visitable) {
 		PredicatesSMTStringifier stringifier = new PredicatesSMTStringifier();
-
+		
+		visitable.accept(stringifier);
+		
+		return stringifier.getString();
+	}
+	
+	private static String createFormula(Predicate weakestPrecondition, Map<Predicate, TruthValue> determinants, Set<Predicate> additionalClauses) {
 		Predicate formula = Tautology.create();
 		
 		for (Predicate clause : additionalClauses) {
@@ -269,9 +282,7 @@ public class SMT {
 		
 		formula = Implication.create(formula, weakestPrecondition);
 		
-		Negation.create(formula).accept(stringifier);
-				
-		return stringifier.getString();
+		return convertToString(Negation.create(formula));
 	}
 	
 	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateDeterminant> predicates) throws SMTException {

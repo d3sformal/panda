@@ -1,6 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
@@ -42,7 +44,11 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	
 	private Set<String> vars = new HashSet<String>();
 	private Set<String> fields = new HashSet<String>();
-	private Set<Predicate> additionalPredicates = new HashSet<Predicate>(); 
+	
+	private Predicate lastPredicate = null;
+	private Map<Predicate, Set<Predicate>> additionalPredicates = new HashMap<Predicate, Set<Predicate>>();
+	
+	private Set<AccessPath> objects = new HashSet<AccessPath>();
 
 	@Override
 	public void visit(Predicates predicates) {
@@ -74,49 +80,65 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 
 	@Override
 	public void visit(Negation predicate) {
+		lastPredicate = predicate;
+		
 		predicate.predicate.accept(this);
 	}
 
 	@Override
 	public void visit(LessThan predicate) {
+		lastPredicate = predicate;
+		
 		predicate.a.accept(this);
 		predicate.b.accept(this);
 	}
 
 	@Override
 	public void visit(Equals predicate) {
+		lastPredicate = predicate;
+		
 		predicate.a.accept(this);
 		predicate.b.accept(this);
 	}
 
 	@Override
 	public void visit(Tautology predicate) {
+		lastPredicate = predicate;
 	}
 
 	@Override
 	public void visit(Contradiction predicate) {
+		lastPredicate = predicate;
 	}
 
 	@Override
 	public void visit(Conjunction predicate) {
+		lastPredicate = predicate;
+		
 		predicate.a.accept(this);
 		predicate.b.accept(this);
 	}
 
 	@Override
 	public void visit(Disjunction predicate) {
+		lastPredicate = predicate;
+		
 		predicate.a.accept(this);
 		predicate.b.accept(this);
 	}
 
 	@Override
 	public void visit(Implication predicate) {
+		lastPredicate = predicate;
+		
 		predicate.a.accept(this);
 		predicate.b.accept(this);
 	}
 
 	@Override
 	public void visit(UpdatedPredicate predicate) {
+		lastPredicate = predicate;
+		
 		updatedPath = predicate.path;
 		newExpression = predicate.expression;
 		
@@ -167,14 +189,36 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 			predicate = UpdatedPredicate.create(predicate, updatedPath, newExpression);
 		}
 		
-		additionalPredicates.add(predicate);
+		addAdditionalPredicate(predicate);
 		
 		expression.path.accept(this);
 	}
 
+	private void addAdditionalPredicate(Predicate predicate) {
+		if (!additionalPredicates.containsKey(lastPredicate)) {
+			additionalPredicates.put(lastPredicate, new HashSet<Predicate>());
+		}
+		
+		additionalPredicates.get(lastPredicate).add(predicate);
+	}
+
 	@Override
 	public void visit(AccessPath expression) {
+		addObjects(expression);
+		
 		expression.getRoot().accept(this);
+	}
+
+	private void addObjects(AccessPath expression) {
+		AccessPath path = expression.clone();
+		
+		while (path.getLength() > 1) {
+			objects.add(path);
+			
+			path = path.cutTail();
+		}
+			
+		objects.add(path);
 	}
 
 	@Override
@@ -197,8 +241,9 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 
 	@Override
 	public void visit(AccessPathIndexElement element) {
+		element.getIndex().accept(this);
+		
 		if (element.getNext() != null) {
-			element.getIndex().accept(this);
 			element.getNext().accept(this);
 		}
 	}
@@ -216,8 +261,12 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 		expression.length.accept(this);
 	}
 	
-	public Set<Predicate> getAdditionalPredicates() {
-		return additionalPredicates;
+	public Set<Predicate> getAdditionalPredicates(Predicate predicate) {
+		if (!additionalPredicates.containsKey(predicate)) {
+			return new HashSet<Predicate>();
+		}
+		
+		return additionalPredicates.get(predicate);
 	}
 	
 	public Set<String> getVars() {
@@ -226,6 +275,10 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	
 	public Set<String> getFields() {
 		return fields;
+	}
+	
+	public Set<AccessPath> getObjects() {
+		return objects;
 	}
 
 }
