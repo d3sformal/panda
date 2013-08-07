@@ -268,6 +268,14 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 			array = "(store arr " + updatePrefixVisitor.getString() + " (store (select arr " + updatePrefixVisitor.getString() + ") " + updateIndexVisitor.getString() + " " + updateExpressionVisitor.getString() + "))";
 		}
 		
+		if (updatedPath != null && newExpression instanceof AnonymousArray) {
+			PredicatesSMTStringifier updatePathVisitor = new PredicatesSMTStringifier();
+			
+			updatedPath.accept(updatePathVisitor);
+			
+			array = "(store arr " + updatePathVisitor.getString() + " (select arr fresh))";
+		}
+		
 		ret = String.format(ret, "(select (select " + array + " %s) " + indexVisitor.getString() + ")");
 	}
 

@@ -9,5 +9,10 @@ public class AnonymousObject {
 		o.i = 10;
 		
 		o = new AnonymousObject();
+		
+		int a[] = new int[1];
+		a[0] = 10;
+		
+		a = new int[2];
 	}
 }
