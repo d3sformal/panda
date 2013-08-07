@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
@@ -149,9 +150,11 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 				predicate.expression = new Fresh();
 			}
 			
-			predicate.predicate.replace(predicate.path, predicate.expression).accept(this);
+			if (!(predicate.expression instanceof AnonymousArray)) {
+				predicate.predicate.replace(predicate.path, predicate.expression).accept(this);
 							
-			return;
+				return;
+			}
 		}
 				
 		updatedPath = predicate.path;

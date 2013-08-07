@@ -22,7 +22,7 @@ public class SMTMonitor extends SMTListener {
 			
 			System.out.println("\tDET:");
 			for (Predicate d : determinants.keySet()) {
-				System.out.println("\t\t" + d.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+				System.out.println("\t\t" + d.toString(AccessPath.NotationPolicy.DOT_NOTATION) + " " + determinants.get(d));
 			}
 		}
 		
