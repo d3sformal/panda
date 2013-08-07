@@ -5,7 +5,6 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathSubElement;
-import gov.nasa.jpf.abstraction.concrete.ObjectReference;
 import gov.nasa.jpf.abstraction.concrete.PartialClassID;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ConcretePathElement;
