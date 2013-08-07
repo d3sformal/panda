@@ -5,14 +5,10 @@ import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathRootElement;
 import gov.nasa.jpf.abstraction.common.impl.DefaultAccessPathSubElement;
 import gov.nasa.jpf.abstraction.common.impl.PredicatesDotStringifier;
 import gov.nasa.jpf.abstraction.common.impl.PredicatesFunctionStringifier;
-import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +50,7 @@ public class AccessPath extends Expression {
 				
 		root = createRootElement(packageLocation[0]);
 		tail = root;
+		length = 1;
 		
 		for (int i = 1; i < packageLocation.length; ++i) {
 			appendSubElement(packageLocation[i]);
@@ -63,11 +60,7 @@ public class AccessPath extends Expression {
 	protected AccessPath() {
 	}
 	
-	public AccessPath(String name) {
-		root = createRootElement(name);
-		tail = root;
-		length = 1;
-		
+	public AccessPath(String name) {		
 		initialise(name);
 	}
 	

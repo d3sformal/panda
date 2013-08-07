@@ -14,11 +14,13 @@ import gov.nasa.jpf.abstraction.common.ArrayLength;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Fresh;
 import gov.nasa.jpf.abstraction.common.Modulo;
 import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.Subtract;
+import gov.nasa.jpf.abstraction.common.impl.FreshRootElement;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
@@ -210,6 +212,8 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	}
 
 	private void addObjects(AccessPath expression) {
+		if (expression.getRoot() instanceof FreshRootElement) return;
+		
 		AccessPath path = expression.clone();
 		
 		while (path.getLength() > 1) {
@@ -217,7 +221,7 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 			
 			path = path.cutTail();
 		}
-			
+		
 		objects.add(path);
 	}
 
@@ -227,7 +231,9 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 			element.getNext().accept(this);
 		}
 		
-		vars.add(element.getName());
+		if (!(element instanceof FreshRootElement)) {
+			vars.add(element.getName());
+		}
 	}
 
 	@Override

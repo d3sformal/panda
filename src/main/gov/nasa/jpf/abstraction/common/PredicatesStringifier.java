@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
@@ -142,19 +143,21 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 	}
 	
 	@Override
-	public void visit(UpdatedPredicate predicate) {
+	public void visit(UpdatedPredicate predicate) {		
+		if (predicate.path.getRoot() == predicate.path.getTail()) {
+			if (predicate.expression instanceof AnonymousObject) {
+				predicate.expression = new Fresh();
+			}
+			
+			predicate.predicate.replace(predicate.path, predicate.expression).accept(this);
+							
+			return;
+		}
+				
 		updatedPath = predicate.path;
 		newExpression = predicate.expression;
-		
-		if (updatedPath.getRoot() == updatedPath.getTail()) {
-			if (newExpression instanceof AnonymousExpression) {
-				predicate.predicate.accept(this);
-			} else {
-				predicate.predicate.replace(updatedPath, newExpression).accept(this);
-			}
-		} else {
-			predicate.predicate.accept(this);
-		}
+			
+		predicate.predicate.accept(this);
 	}
 
 	@Override
