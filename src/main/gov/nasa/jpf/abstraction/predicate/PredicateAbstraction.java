@@ -4,9 +4,9 @@ import java.util.Set;
 
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.impl.ObjectExpressionWrapper;
+import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionWrapper;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.ObjectExpression;
-import gov.nasa.jpf.abstraction.common.PrimitiveExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
@@ -39,14 +39,14 @@ public class PredicateAbstraction extends Abstraction {
 	public void processPrimitiveStore(Expression from, ConcreteAccessExpression to) {		
 		Set<AccessExpression> affected = symbolTable.processPrimitiveStore(to);
 
-		predicateValuation.reevaluate(to, affected, PrimitiveExpression.wrap(from));
+		predicateValuation.reevaluate(to, affected, PrimitiveExpressionWrapper.wrap(from, symbolTable));
 	}
 	
 	@Override
 	public void processObjectStore(Expression from, ConcreteAccessExpression to) {	
 		Set<AccessExpression> affected = symbolTable.processObjectStore(from, to);
 		
-		predicateValuation.reevaluate(to, affected, ObjectExpression.wrap(from, symbolTable));
+		predicateValuation.reevaluate(to, affected, ObjectExpressionWrapper.wrap(from, symbolTable));
 	}
 	
 	@Override

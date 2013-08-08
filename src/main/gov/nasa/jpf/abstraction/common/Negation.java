@@ -45,4 +45,9 @@ public class Negation extends Predicate {
 		
 		return new Negation(predicate);
 	}
+
+	@Override
+	public Predicate update(AccessExpression expression, Expression newExpression) {
+		return create(predicate.update(expression, newExpression));
+	}
 }

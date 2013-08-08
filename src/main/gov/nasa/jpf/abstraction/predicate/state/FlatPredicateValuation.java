@@ -4,10 +4,8 @@ import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
-import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.vm.VM;
@@ -99,7 +97,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		int padding = 0;
 		
 		for (Predicate p : valuations.keySet()) {
-			String predicate = p.toString(AccessExpression.NotationPolicy.DOT_NOTATION);
+			String predicate = p.toString(NotationPolicy.DOT_NOTATION);
 
 			padding = padding < predicate.length() ? predicate.length() : padding;
 		}
@@ -107,7 +105,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		padding += 4;
 		
 		for (Predicate p : valuations.keySet()) {
-			String predicate = p.toString(AccessExpression.NotationPolicy.DOT_NOTATION);
+			String predicate = p.toString(NotationPolicy.DOT_NOTATION);
 			StringBuilder pad = new StringBuilder();
 			
 			for (int i = 0; i < padding - predicate.length(); ++i) {
@@ -154,7 +152,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			 */
 			for (AccessExpression path1 : resolvedAffected) {
 				for (AccessExpression path2 : predicate.getPaths()) {
-					affects = affects || path1.isSimilarToPrefix(path2);
+					affects = affects || path1.isSimilarToPrefixOf(path2);
 				}
 			}
 
@@ -163,8 +161,8 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				Predicate negativeWeakestPrecondition = Negation.create(predicate);
 					
 				if (expression != null) {
-					positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
-					negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
+					positiveWeakestPrecondition = positiveWeakestPrecondition.update(affected, expression);
+					negativeWeakestPrecondition = negativeWeakestPrecondition.update(affected, expression);
 				}
 				
 				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();

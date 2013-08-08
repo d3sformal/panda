@@ -37,5 +37,10 @@ public class Disjunction extends Formula {
 
 		return new Conjunction(a, b);
 	}
+	
+	@Override
+	public Predicate update(AccessExpression expression, Expression newExpression) {
+		return create(a.update(expression, newExpression), b.update(expression, newExpression));
+	}
 
 }

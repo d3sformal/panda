@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
-import gov.nasa.jpf.abstraction.common.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;

@@ -30,5 +30,10 @@ public class Tautology extends Predicate {
 	public static Predicate create() {
 		return new Tautology();
 	}
+	
+	@Override
+	public Predicate update(AccessExpression expression, Expression newExpression) {
+		return create();
+	}
 
 }

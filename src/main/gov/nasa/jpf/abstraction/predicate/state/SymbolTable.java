@@ -17,6 +17,7 @@ public interface SymbolTable {
 	public Set<AccessExpression> processPrimitiveStore(ConcreteAccessExpression to);
 	public Set<AccessExpression> processObjectStore(Expression from, ConcreteAccessExpression to);
 	
+	public boolean isObject(AccessExpression path);
 	public boolean isArray(AccessExpression path);
 	
 }

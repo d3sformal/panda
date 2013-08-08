@@ -1,11 +1,13 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.impl.DefaultPrimitiveExpression;
+import gov.nasa.jpf.abstraction.common.NotationPolicy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Operation extends PrimitiveExpression {
+public abstract class Operation extends DefaultPrimitiveExpression {
 	public Expression a;
 	public Expression b;
 	
@@ -27,4 +29,7 @@ public abstract class Operation extends PrimitiveExpression {
 	protected static boolean argumentsDefined(Expression a, Expression b) {
 		return a != null && b != null;
 	}
+	
+	@Override
+	public abstract Operation clone();
 }

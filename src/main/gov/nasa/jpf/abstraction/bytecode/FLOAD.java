@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
+import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVar;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -40,7 +41,7 @@ public class FLOAD extends gov.nasa.jpf.jvm.bytecode.FLOAD {
 		Instruction actualNextInsn = super.execute(ti);
 		
 		if (var != null) {
-			ConcreteAccessExpression path = ConcreteAccessExpression.createLocalVarPath(var.getName(), ti, var);
+			ConcreteAccessExpression path = LocalVar.create(var.getName(), ti, var);
 			Attribute attribute = new NonEmptyAttribute(null, path);
 						
 			GlobalAbstraction.getInstance().processLoad(path);

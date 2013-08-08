@@ -9,6 +9,8 @@ import gov.nasa.jpf.abstraction.common.access.Fresh;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 
@@ -30,11 +32,13 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 		
 		ret += ".";
 		
-		ret += expression.getName();
+		expression.getField().accept(this);
 	}
 
 	@Override
 	public void visit(ObjectFieldWrite expression) {
+		ret += expression.getName();
+		
 		ret += "| ";
 		
 		expression.getObject().accept(this);
@@ -59,6 +63,8 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 		expression.getIndex().accept(this);
 		
 		ret += "]";
+		
+		expression.getArrays().accept(this);
 	}
 
 	@Override
@@ -84,7 +90,7 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 	public void visit(ArrayLengthRead expression) {
 		ret += "alength(";
 		
-		ret += "arrlen";
+		expression.getArrayLengths().accept(this);
 		
 		ret += ", ";
 		
@@ -97,7 +103,7 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 	public void visit(ArrayLengthWrite expression) {
 		ret += "alengthupdate(";
 		
-		ret += "arrlen";
+		expression.getArrayLengths().accept(this);
 		
 		ret += ", ";
 		
@@ -118,6 +124,15 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 	@Override
 	public void visit(AnonymousArray expression) {
 		ret += "array";
+	}
+
+	@Override
+	public void visit(DefaultField meta) {
+		ret += meta.getName();
+	}
+
+	@Override
+	public void visit(DefaultArrays meta) {
 	}
 
 }

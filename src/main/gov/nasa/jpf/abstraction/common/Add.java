@@ -27,4 +27,9 @@ public class Add extends Operation {
 	public Add clone() {
 		return create(a.clone(), b.clone());
 	}
+
+	@Override
+	public Expression update(AccessExpression expression, Expression newExpression) {
+		return create(a.update(expression, newExpression), b.update(expression, newExpression));
+	}
 }

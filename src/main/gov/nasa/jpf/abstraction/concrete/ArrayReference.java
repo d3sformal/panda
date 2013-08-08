@@ -1,10 +1,11 @@
 package gov.nasa.jpf.abstraction.concrete;
 
-import gov.nasa.jpf.abstraction.common.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.vm.ElementInfo;
 
-public class ArrayReference extends Reference {
+public class ArrayReference extends ObjectReference {
 	private Expression array;
 	
 	public ArrayReference(ElementInfo ei, Expression array) {
@@ -19,6 +20,6 @@ public class ArrayReference extends Reference {
 	
 	@Override
 	public String toString() {	
-		return super.toString() + " " + array.toString(AccessExpression.NotationPolicy.DOT_NOTATION); 
+		return super.toString() + " " + array.toString(NotationPolicy.DOT_NOTATION); 
 	}
 }

@@ -1,4 +1,4 @@
 package gov.nasa.jpf.abstraction.common;
 
-public abstract class PrimitiveExpression extends Expression {
+public interface PrimitiveExpression extends Expression {
 }

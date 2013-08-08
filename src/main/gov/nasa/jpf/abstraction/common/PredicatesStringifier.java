@@ -1,6 +1,9 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
@@ -34,7 +37,7 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 
 	@Override
 	public void visit(ObjectContext context) {
-		ret += "[object " + context.getObject().toString(AccessExpression.NotationPolicy.DOT_NOTATION) + "]\n";
+		ret += "[object " + context.getObject().toString(NotationPolicy.DOT_NOTATION) + "]\n";
 
 		for (Predicate p : context.predicates) {
 			p.accept(this);
@@ -44,7 +47,7 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 
 	@Override
 	public void visit(MethodContext context) {
-		ret += "[method " + context.getMethod().toString(AccessExpression.NotationPolicy.DOT_NOTATION) + "]\n";
+		ret += "[method " + context.getMethod().toString(NotationPolicy.DOT_NOTATION) + "]\n";
 
 		for (Predicate p : context.predicates) {
 			p.accept(this);
@@ -211,6 +214,11 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 	@Override
 	public void visit(Constant expression) {
 		ret += expression.value;
+	}
+	
+	@Override
+	public void visit(DefaultArrayLengths meta) {
+		ret += "arrlen";
 	}
 
 }

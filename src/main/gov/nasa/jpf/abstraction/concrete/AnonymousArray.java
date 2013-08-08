@@ -1,14 +1,14 @@
 package gov.nasa.jpf.abstraction.concrete;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.impl.DefaultObjectExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.ObjectExpression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.vm.ElementInfo;
 
 import java.util.List;
 
-public class AnonymousArray extends ObjectExpression implements AnonymousExpression {
+public class AnonymousArray extends DefaultObjectExpression implements AnonymousExpression {
 	
 	public ElementInfo ei;
 	public Expression length;
@@ -34,7 +34,7 @@ public class AnonymousArray extends ObjectExpression implements AnonymousExpress
 	}
 
 	@Override
-	public Expression clone() {
+	public AnonymousArray clone() {
 		return create(ei, length);
 	}
 	
@@ -49,6 +49,11 @@ public class AnonymousArray extends ObjectExpression implements AnonymousExpress
 	@Override
 	public PartialVariableID generateVariableID() {
 		return new PartialVariableID(new ArrayReference(ei, this));
+	}
+
+	@Override
+	public Expression update(AccessExpression expression, Expression newExpression) {
+		return clone();
 	}
 
 }

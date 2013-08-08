@@ -24,4 +24,9 @@ public class Equals extends Comparison {
 		
 		return new Equals(a, b);
 	}
+	
+	@Override
+	public Predicate update(AccessExpression expression, Expression newExpression) {
+		return create(a.update(expression, newExpression), b.update(expression, newExpression));
+	}
 }

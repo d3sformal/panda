@@ -1,9 +1,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
-import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
+import gov.nasa.jpf.abstraction.concrete.access.impl.DefaultConcreteArrayLengthRead;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
@@ -19,18 +18,17 @@ public class ARRAYLENGTH extends gov.nasa.jpf.jvm.bytecode.ARRAYLENGTH {
 		
 		if (attr == null) attr = new EmptyAttribute();
 		
-		Expression expr = null;
+		ConcreteAccessExpression path = null;
 		
 		if (attr.getExpression() instanceof ConcreteAccessExpression) {
-			ConcreteAccessExpression path = (ConcreteAccessExpression) attr.getExpression();
-			
-			expr = ArrayLengthRead.create(path);
+			path = (ConcreteAccessExpression) attr.getExpression();
+			path = DefaultConcreteArrayLengthRead.create(path);
 		}
 		
 		Instruction ret = super.execute(ti);
 		
 		sf = ti.getModifiableTopFrame();
-		sf.addOperandAttr(new NonEmptyAttribute(null, expr));
+		sf.addOperandAttr(new NonEmptyAttribute(null, path));
 		
 		return ret;
 	}

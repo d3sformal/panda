@@ -1,8 +1,7 @@
 package gov.nasa.jpf.abstraction.common.access;
 
-public abstract class ArrayLengthExpression extends ArrayExpression {
-	
-	protected ArrayLengthExpression(AccessExpression array) {
-		super(array);
-	}
+import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
+
+public interface ArrayLengthExpression extends ArrayAccessExpression {
+	public ArrayLengths getArrayLengths();
 }

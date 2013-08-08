@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
-public class EmptyExpression extends Expression {
+public class EmptyExpression implements Expression {
 	
 	protected EmptyExpression() {
 	}
@@ -34,6 +35,21 @@ public class EmptyExpression extends Expression {
 	@Override
 	public EmptyExpression clone() {
 		return create();
+	}
+	
+	@Override
+	public String toString() {
+		return toString(NotationPolicy.policy);
+	}
+
+	@Override
+	public String toString(NotationPolicy policy) {
+    	return NotationPolicy.convertToString(this, policy);
+	}
+
+	@Override
+	public Expression update(AccessExpression expression, Expression newExpression) {
+		return clone();
 	}
 
 }

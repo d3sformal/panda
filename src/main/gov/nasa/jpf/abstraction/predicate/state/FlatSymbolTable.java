@@ -1,10 +1,16 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.ArrayReference;
 import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.concrete.ObjectReference;
 import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
@@ -41,7 +47,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		
 		for (AccessExpression path : prefixToVariableIDs.keySet()) {
-			if (prefix.isPrefix(path)) {
+			if (prefix.isPrefixOf(path)) {
 				ret.add(path);
 			}
 		}
@@ -214,22 +220,22 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			Set<AccessExpression> affectedObjectPaths = new HashSet<AccessExpression>();
 
 			for (AccessExpression affectedPrefixCandidate : prefixToVariableIDs.keySet()) {
-				if (affectedPrefixCandidate.isProperPrefix(destination) && affectedPrefixCandidate.getLength() >= destination.getLength() - 1) {
+				if (affectedPrefixCandidate.isProperPrefixOf(destination) && affectedPrefixCandidate.getLength() >= destination.getLength() - 1) {
 					AccessExpression affectedPrefix = affectedPrefixCandidate;
 					
-					AccessPathElement element = destination.getElement(affectedPrefix.getLength());
+					AccessExpression element = destination.get(affectedPrefix.getLength());
 
 					for (AccessExpression equivalentObjectPathPrefix : lookupEquivalentAccessPaths(affectedPrefix)) {
 						AccessExpression equivalentObjectPath = equivalentObjectPathPrefix.clone();
 						
-						if (element instanceof AccessPathSubElement) {
-							AccessPathSubElement sub = (AccessPathSubElement) element;
+						if (element instanceof ObjectFieldRead) {
+							ObjectFieldRead sub = (ObjectFieldRead) element;
 							
-							equivalentObjectPath.appendSubElement(sub.getName());
-						} else if (element instanceof AccessPathIndexElement) {
-							AccessPathIndexElement index = (AccessPathIndexElement) element;
+							equivalentObjectPath = DefaultObjectFieldRead.create(equivalentObjectPath, sub.getField().getName());
+						} else if (element instanceof ArrayElementRead) {
+							ArrayElementRead index = (ArrayElementRead) element;
 							
-							equivalentObjectPath.appendIndexElement(index.getIndex());
+							equivalentObjectPath = DefaultArrayElementRead.create(equivalentObjectPath, index.getIndex());
 						}
 						
 						affectedObjectPaths.add(equivalentObjectPath);
@@ -246,7 +252,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 						AccessExpression newPath = source.clone();
 						AccessExpression oldPrefix = sourceCandidate;
 						AccessExpression newPrefix = prefix.clone();
-						AccessExpression.reRoot(newPath, oldPrefix, newPrefix);
+						
+						newPath.reRoot(oldPrefix, newPrefix);
 												
 						if (!rewrites.containsKey(newPath)) {
 							rewrites.put(newPath, new HashSet<VariableID>());
@@ -284,7 +291,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		int padding = 0;
 
 		for (AccessExpression p : prefixToVariableIDs.keySet()) {
-			String path = p.toString(AccessExpression.NotationPolicy.DOT_NOTATION);
+			String path = p.toString(NotationPolicy.DOT_NOTATION);
 			
 			padding = padding < path.length() ? path.length() : padding;
 		}
@@ -294,14 +301,14 @@ public class FlatSymbolTable implements SymbolTable, Scope {
         TreeSet<AccessExpression> paths = new TreeSet<AccessExpression>(new Comparator<AccessExpression>() {
             @Override
             public int compare(AccessExpression p1, AccessExpression p2) {
-                return p1.toString(AccessExpression.NotationPolicy.DOT_NOTATION).compareTo(p2.toString(AccessExpression.NotationPolicy.DOT_NOTATION));
+                return p1.toString(NotationPolicy.DOT_NOTATION).compareTo(p2.toString(NotationPolicy.DOT_NOTATION));
             }
         });
 
         paths.addAll(prefixToVariableIDs.keySet());
 		
 		for (AccessExpression p : paths) {
-			String path = p.toString(AccessExpression.NotationPolicy.DOT_NOTATION);
+			String path = p.toString(NotationPolicy.DOT_NOTATION);
 			StringBuilder pad = new StringBuilder();
 			
 			for (int i = 0; i < padding - path.length(); ++i) {
@@ -324,6 +331,23 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	@Override
 	public int count() {
 		return prefixToVariableIDs.keySet().size();
+	}
+	
+	@Override
+	public boolean isObject(AccessExpression path) {
+		if (prefixToVariableIDs.containsKey(path)) {
+			for (VariableID var : prefixToVariableIDs.get(path)) {
+				if (var instanceof PartialVariableID) {
+					PartialVariableID partial = (PartialVariableID) var;
+					
+					return partial.getRef() instanceof ObjectReference;
+				}
+				
+				return false;
+			}
+		}
+		
+		return false;
 	}
 
 	@Override

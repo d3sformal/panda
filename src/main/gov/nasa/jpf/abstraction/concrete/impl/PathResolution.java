@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.concrete.impl;
 
-import gov.nasa.jpf.abstraction.common.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
 
 import java.util.HashMap;

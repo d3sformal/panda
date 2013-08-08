@@ -1,11 +1,12 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.NotationPolicy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Constant extends PrimitiveExpression {
+public class Constant implements PrimitiveExpression {
 	public Number value;
 	
 	protected Constant(Number value) {
@@ -15,11 +16,6 @@ public class Constant extends PrimitiveExpression {
 	@Override
 	public List<AccessExpression> getAccessExpressions() {
 		return new ArrayList<AccessExpression>();
-	}
-	
-	@Override
-	public String toString() {
-		return value.toString();
 	}
 
 	@Override
@@ -62,5 +58,20 @@ public class Constant extends PrimitiveExpression {
 		}
 		
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return toString(NotationPolicy.policy);
+	}
+
+	@Override
+	public String toString(NotationPolicy policy) {
+    	return NotationPolicy.convertToString(this, policy);
+	}
+
+	@Override
+	public Constant update(AccessExpression expression, Expression newExpression) {
+		return clone();
 	}
 }

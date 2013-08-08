@@ -16,6 +16,8 @@ import gov.nasa.jpf.abstraction.common.access.Fresh;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
@@ -190,7 +192,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	public void visit(ObjectFieldRead expression) {
 		ret += "(select ";
 				
-		ret += "field_" + expression.getName();
+		expression.getField().accept(this);
 		
 		ret += " ";
 		
@@ -203,7 +205,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	public void visit(ObjectFieldWrite expression) {
 		ret += "(store ";
 		
-		ret += "field_" + expression.getName();
+		expression.getField().accept(this);
 		
 		ret += " ";
 		
@@ -220,22 +222,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	public void visit(ArrayElementRead expression) {
 		ret += "(select ";
 		
-		if (expression.getArray() instanceof ArrayElementWrite) {
-			ArrayElementWrite write = (ArrayElementWrite) expression.getArray();
-			
-			expression.getArray().accept(this);
-			
-			ret += " ";
-			
-			write.getArray().accept(this);
-			
-		} else {
-			ret += "arr";
-			
-			ret += " ";
-			
-			expression.getArray().accept(this);
-		}
+		expression.getArrays().accept(this);
 		
 		ret += " ";
 		
@@ -248,7 +235,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	public void visit(ArrayElementWrite expression) {
 		ret += "(store ";
 		
-		ret += "arr";
+		expression.getArrays().accept(this);
 		
 		ret += " ";
 		
@@ -268,23 +255,12 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	@Override
 	public void visit(ArrayLengthRead expression) {
 		ret += "(select ";
+			
+		expression.getArrayLengths().accept(this);
 		
-		if (expression.getArray() instanceof ArrayLengthWrite) {
-			ArrayLengthWrite write = (ArrayLengthWrite) expression.getArray();
-			
-			expression.getArray().accept(this);
-			
-			ret += " ";
-			
-			write.getArray().accept(this);
-			
-		} else {
-			ret += "arrlen";
-			
-			ret += " ";
-			
-			expression.getArray().accept(this);
-		}
+		ret += " ";
+		
+		expression.getArray().accept(this);
 		
 		ret += ")";
 	}
@@ -293,7 +269,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	public void visit(ArrayLengthWrite expression) {
 		ret += "(store ";
 		
-		ret += "arrlen";
+		expression.getArrayLengths().accept(this);
 		
 		ret += " ";
 		
@@ -304,6 +280,16 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 		expression.getNewValue().accept(this);
 		
 		ret += ")";
+	}
+
+	@Override
+	public void visit(DefaultArrays meta) {
+		ret += "arr";
+	}
+
+	@Override
+	public void visit(DefaultField meta) {
+		ret += "field_" + meta.getName();
 	}
 
 }

@@ -30,5 +30,10 @@ public class Contradiction extends Predicate {
 	public static Predicate create() {
 		return new Contradiction();
 	}
+	
+	@Override
+	public Predicate update(AccessExpression expression, Expression newExpression) {
+		return create();
+	}
 
 }

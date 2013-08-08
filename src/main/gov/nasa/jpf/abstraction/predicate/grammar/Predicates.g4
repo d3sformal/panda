@@ -2,6 +2,8 @@ grammar Predicates;
 
 @header {
 	import gov.nasa.jpf.abstraction.common.*;
+	import gov.nasa.jpf.abstraction.common.access.*;
+	import gov.nasa.jpf.abstraction.common.access.impl.*;
 	import gov.nasa.jpf.abstraction.predicate.common.*;
 }
 
@@ -11,7 +13,7 @@ predicates returns [Predicates val]
 	}
 	;
 	
-standalonepath returns [AccessPath val]
+standalonepath returns [DefaultAccessExpression val]
 	: p=path {
 		$ctx.val = $p.val;
 	}
@@ -108,7 +110,7 @@ factor returns [Expression val]
 		$ctx.val = Constant.create(Integer.parseInt($CONSTANT.text));
 	}
 	| 'alength' '(' 'arrlen' ',' p=path ')' {
-		$ctx.val = ArrayLengthRead.create($p.val);
+		$ctx.val = DefaultArrayLengthRead.create($p.val);
 	}
 	| p=path {
 		$ctx.val = $p.val;
@@ -118,35 +120,30 @@ factor returns [Expression val]
 	}
 	;
 	
-contextpath returns [AccessExpression val]
+contextpath returns [DefaultAccessExpression val]
 	: f=ID {
-		$ctx.val = Root.create($f.text);
+		$ctx.val = DefaultRoot.create($f.text);
 	}
 	| p=contextpath '.' f=ID {
-		$ctx.val = $p.val;
-		ObjectFieldRead($ctx.val, $f.text);
+		$ctx.val = DefaultObjectFieldRead.create($p.val, $f.text);
 	}
 	;
 
-path returns [AccessExpression val]
+path returns [DefaultAccessExpression val]
 	: f=ID {
-		$ctx.val = new AccessPath($f.text);
+		$ctx.val = DefaultRoot.create($f.text);
 	}
 	| p=path '.' f=ID {
-		$ctx.val = $p.val;
-		ObjectFieldRead.create($ctx.val, $f.text);
+		$ctx.val = DefaultObjectFieldRead.create($p.val, $f.text);
 	}
 	| p=path '[' e=expression ']' {
-		$ctx.val = $p.val;
-		ArrayElementRead.create($ctx.val, $e.val);
+		$ctx.val = DefaultArrayElementRead.create($p.val, $e.val);
 	}
 	| 'fread' '(' f=ID ',' p=path ')' {
-		$ctx.val = $p.val;
-		ObjectFieldRead.create($ctx.val, $f.text);
+		$ctx.val = DefaultObjectFieldRead.create($p.val, $f.text);
 	}
 	| 'aread' '(' 'arr' ',' p=path ',' e=expression ')' {
-		$ctx.val = $p.val;
-		ArrayElementRead($ctx.val, $e.val);
+		$ctx.val = DefaultArrayElementRead.create($p.val, $e.val);
 	}
 	;
 

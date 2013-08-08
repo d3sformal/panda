@@ -14,10 +14,12 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Divide;
-import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Modulo;
 import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
@@ -227,8 +229,7 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	@Override
 	public void visit(ObjectFieldRead expression) {
 		expression.getObject().accept(this);
-		
-		fields.add(expression.getName());
+		expression.getField().accept(this);
 		
 		addObject(expression);
 	}
@@ -236,8 +237,7 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	@Override
 	public void visit(ObjectFieldWrite expression) {
 		expression.getObject().accept(this);
-		
-		fields.add(expression.getName());
+		expression.getField().accept(this);
 		
 		addObject(expression);
 	}
@@ -272,6 +272,19 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 		expression.getArray().accept(this);
 		
 		addObject(expression);
+	}
+
+	@Override
+	public void visit(DefaultArrays meta) {
+	}
+
+	@Override
+	public void visit(DefaultArrayLengths meta) {
+	}
+
+	@Override
+	public void visit(DefaultField meta) {
+		fields.add(meta.getName());
 	}
 
 }

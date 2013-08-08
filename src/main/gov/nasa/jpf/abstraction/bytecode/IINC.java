@@ -27,6 +27,7 @@ import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
+import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVar;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.ChoiceGenerator;
@@ -58,7 +59,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 		AbstractValue abs_v = attr.getAbstractValue();
 		
 		if (var != null) {
-			ConcreteAccessExpression path = ConcreteAccessExpression.createLocalVarPath(var.getName(), ti, var);
+			ConcreteAccessExpression path = LocalVar.create(var.getName(), ti, var);
 			Expression expression = Add.create(path, Constant.create(increment));
 			
 			if (abs_v == null) {

@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
 import gov.nasa.jpf.abstraction.predicate.common.MethodContext;
 import gov.nasa.jpf.abstraction.predicate.common.ObjectContext;
@@ -65,13 +66,13 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			if (context instanceof MethodContext) {
 				MethodContext methodContext = (MethodContext) context;
 
-				if (!methodContext.getMethod().toString(AccessExpression.NotationPolicy.DOT_NOTATION).equals(method.getBaseName())) {
+				if (!methodContext.getMethod().toString(NotationPolicy.DOT_NOTATION).equals(method.getBaseName())) {
 					continue;
 				}
 			} else if (context instanceof ObjectContext) {
 				ObjectContext objectContext = (ObjectContext) context;
 				
-				if (!objectContext.getObject().toString(AccessExpression.NotationPolicy.DOT_NOTATION).equals(method.getClassName())) {
+				if (!objectContext.getObject().toString(NotationPolicy.DOT_NOTATION).equals(method.getClassName())) {
 					continue;
 				}
 			}

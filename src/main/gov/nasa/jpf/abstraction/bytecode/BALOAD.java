@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
+import gov.nasa.jpf.abstraction.concrete.access.impl.DefaultConcreteArrayElementRead;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
@@ -49,7 +50,7 @@ public class BALOAD extends gov.nasa.jpf.jvm.bytecode.BALOAD {
 		if (arrayAttr.getExpression() instanceof ConcreteAccessExpression) {
 			ConcreteAccessExpression path = (ConcreteAccessExpression) arrayAttr.getExpression();
 				
-			path.appendIndexElement(indexAttr.getExpression());
+			path = DefaultConcreteArrayElementRead.create(path, indexAttr.getExpression());
 			
 			GlobalAbstraction.getInstance().processLoad(path);
 				

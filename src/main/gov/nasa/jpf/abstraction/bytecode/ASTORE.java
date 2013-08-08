@@ -22,6 +22,7 @@ import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
+import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVarRootedHeapObject;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -51,7 +52,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		if (getLocalVarInfo() != null) {
 			ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
 			
-			to = ConcreteAccessExpression.createLocalVarRootedHeapObjectPath(getLocalVariableName(), ti, ei, var);
+			to = LocalVarRootedHeapObject.create(getLocalVariableName(), ti, ei, var);
 		}
 		
 		sf = ti.getModifiableTopFrame();
