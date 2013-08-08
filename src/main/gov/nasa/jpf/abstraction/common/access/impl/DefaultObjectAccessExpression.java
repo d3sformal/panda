@@ -31,12 +31,12 @@ public abstract class DefaultObjectAccessExpression extends DefaultAccessExpress
 	}
 
 	@Override
-	public final void setObject(AccessExpression expression) {
+	public void setObject(AccessExpression expression) {
 		this.expression = expression;
 	}
 	
 	@Override
-	public final AccessExpression getObject() {
+	public AccessExpression getObject() {
 		return expression;
 	}
 	
