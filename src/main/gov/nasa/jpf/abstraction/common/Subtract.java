@@ -17,14 +17,17 @@ public class Subtract extends Operation {
 		return new Subtract(a.replace(formerPath, expression), b.replace(formerPath, expression));
 	}
 	
-	public static Subtract create(Expression a, Expression b) {
+	public static Operation create(Expression a, Expression b) {
 		if (!argumentsDefined(a, b)) return null;
+		
+		if (a instanceof Undefined) return UndefinedOperationResult.create();
+		if (b instanceof Undefined) return UndefinedOperationResult.create();
 		
 		return new Subtract(a, b);
 	}
 	
 	@Override
-	public Subtract clone() {
+	public Operation clone() {
 		return create(a.clone(), b.clone());
 	}
 	

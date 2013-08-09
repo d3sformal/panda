@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.concrete;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.impl.DefaultArrayExpression;
 import gov.nasa.jpf.abstraction.common.impl.DefaultObjectExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
@@ -8,7 +9,7 @@ import gov.nasa.jpf.vm.ElementInfo;
 
 import java.util.List;
 
-public class AnonymousArray extends DefaultObjectExpression implements AnonymousExpression {
+public class AnonymousArray extends DefaultArrayExpression implements AnonymousExpression {
 	
 	public ElementInfo ei;
 	public Expression length;

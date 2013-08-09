@@ -18,14 +18,17 @@ public class Divide extends Operation {
 		return new Divide(a.replace(formerPath, expression), b.replace(formerPath, expression));
 	}
 	
-	public static Divide create(Expression a, Expression b) {
+	public static Operation create(Expression a, Expression b) {
 		if (!argumentsDefined(a, b)) return null;
+		
+		if (a instanceof Undefined) return UndefinedOperationResult.create();
+		if (b instanceof Undefined) return UndefinedOperationResult.create();
 		
 		return new Divide(a, b);
 	}
 	
 	@Override
-	public Divide clone() {
+	public Operation clone() {
 		return create(a.clone(), b.clone());
 	}
 	

@@ -63,5 +63,26 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
 		return create(getObject().replaceSubExpressions(expression, newExpression), getField().clone());
 	}
+	
+	@Override
+	public Expression update(AccessExpression expression, Expression newExpression) {
+		if (expression instanceof ObjectFieldRead) {
+			ObjectFieldRead r = (ObjectFieldRead) expression;
+			
+			if (getField().getName().equals(r.getField().getName())) {
+				Expression updated = getObject().update(expression, newExpression);
+				
+				if (updated instanceof AccessExpression) {
+					AccessExpression updatedAccessExpression = (AccessExpression) updated;
+					
+					return create(updatedAccessExpression, DefaultObjectFieldWrite.create(r.getObject(), r.getField().clone(), newExpression));
+				}
+				
+				return UndefinedAccessExpression.create();
+			}
+		}
+		
+		return clone();
+	}
 
 }

@@ -43,7 +43,7 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 	
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
-		return expression.update(expression, newExpression);
+		return clone();
 	}
 	
 	@Override

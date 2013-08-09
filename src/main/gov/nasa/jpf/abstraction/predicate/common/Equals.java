@@ -3,6 +3,7 @@ package gov.nasa.jpf.abstraction.predicate.common;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.Undefined;
 
 public class Equals extends Comparison {
 	protected Equals(Expression a, Expression b) {
@@ -21,6 +22,9 @@ public class Equals extends Comparison {
 	
 	public static Predicate create(Expression a, Expression b) {
 		if (!argumentsDefined(a, b)) return null;
+		
+		if (a instanceof Undefined) return Contradiction.create();
+		if (b instanceof Undefined) return Contradiction.create();
 		
 		return new Equals(a, b);
 	}

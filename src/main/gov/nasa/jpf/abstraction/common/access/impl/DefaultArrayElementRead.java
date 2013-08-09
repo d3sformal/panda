@@ -1,8 +1,10 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
+import gov.nasa.jpf.abstraction.common.ArrayExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ArrayAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
@@ -62,5 +64,24 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	@Override
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
 		return create(getObject().replaceSubExpressions(expression, newExpression), getArrays().clone(), getIndex().replace(expression, newExpression));
+	}
+	
+	@Override
+	public Expression update(AccessExpression expression, Expression newExpression) {
+		if (newExpression instanceof ArrayExpression) {
+			ArrayAccessExpression a = (ArrayAccessExpression) expression;
+			
+			Expression updated = getObject().update(expression, newExpression);
+				
+			if (updated instanceof AccessExpression) {
+				AccessExpression updatedAccessExpression = (AccessExpression) updated;
+				
+				return create(updatedAccessExpression, DefaultArrayElementWrite.create(a, getArrays().clone(), getIndex().clone(), newExpression), getIndex().clone());
+			}
+				
+			return UndefinedAccessExpression.create();
+		}
+		
+		return clone();
 	}
 }

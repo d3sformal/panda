@@ -59,4 +59,5 @@ public interface PredicatesVisitor {
 	public void visit(Constant expression);
 	public void visit(AnonymousObject expression);
 	public void visit(AnonymousArray expression);
+	public void visit(Undefined expression);
 }

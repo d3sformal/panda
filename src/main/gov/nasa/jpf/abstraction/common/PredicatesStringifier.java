@@ -1,9 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
-import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
-import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
@@ -219,6 +216,11 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 	@Override
 	public void visit(DefaultArrayLengths meta) {
 		ret += "arrlen";
+	}
+	
+	@Override
+	public void visit(Undefined expression) {
+		ret += "<<UNDEFINED>>";
 	}
 
 }

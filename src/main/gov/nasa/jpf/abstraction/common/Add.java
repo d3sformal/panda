@@ -17,14 +17,17 @@ public class Add extends Operation {
 		return new Add(a.replace(formerPath, expression), b.replace(formerPath, expression));
 	}
 	
-	public static Add create(Expression a, Expression b) {
+	public static Operation create(Expression a, Expression b) {
 		if (!argumentsDefined(a, b)) return null;
+		
+		if (a instanceof Undefined) return UndefinedOperationResult.create();
+		if (b instanceof Undefined) return UndefinedOperationResult.create();
 		
 		return new Add(a, b);
 	}
 	
 	@Override
-	public Add clone() {
+	public Operation clone() {
 		return create(a.clone(), b.clone());
 	}
 

@@ -20,5 +20,4 @@ public abstract class DefaultObjectFieldExpression extends DefaultObjectAccessEx
 	
 	@Override
 	public abstract DefaultObjectFieldExpression clone();
-
 }

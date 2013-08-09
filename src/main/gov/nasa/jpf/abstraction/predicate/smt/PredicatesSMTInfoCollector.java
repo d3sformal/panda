@@ -25,6 +25,7 @@ import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.Subtract;
+import gov.nasa.jpf.abstraction.common.Undefined;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
@@ -243,11 +244,7 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	}
 
 	@Override
-	public void visit(ArrayElementRead expression) {
-		Predicate predicate = Negation.create(LessThan.create(expression, Constant.create(0)));
-		
-		addAdditionalPredicate(predicate);
-		
+	public void visit(ArrayElementRead expression) {	
 		expression.getArray().accept(this);
 		
 		addObject(expression);
@@ -262,6 +259,10 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 
 	@Override
 	public void visit(ArrayLengthRead expression) {
+		Predicate predicate = Negation.create(LessThan.create(expression, Constant.create(0)));
+		
+		addAdditionalPredicate(predicate);
+		
 		expression.getArray().accept(this);
 		
 		addObject(expression);
@@ -285,6 +286,11 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	@Override
 	public void visit(DefaultField meta) {
 		fields.add(meta.getName());
+	}
+
+	@Override
+	public void visit(Undefined expression) {
+		throw new SMTException("UNDEFINED IN THE INPUT");
 	}
 
 }

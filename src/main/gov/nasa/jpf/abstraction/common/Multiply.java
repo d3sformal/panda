@@ -17,14 +17,17 @@ public class Multiply extends Operation {
 		return new Multiply(a.replace(formerPath, expression), b.replace(formerPath, expression));
 	}
 	
-	public static Multiply create(Expression a, Expression b) {
+	public static Operation create(Expression a, Expression b) {
 		if (!argumentsDefined(a, b)) return null;
+		
+		if (a instanceof Undefined) return UndefinedOperationResult.create();
+		if (b instanceof Undefined) return UndefinedOperationResult.create();
 		
 		return new Multiply(a, b);
 	}
 	
 	@Override
-	public Multiply clone() {
+	public Operation clone() {
 		return create(a.clone(), b.clone());
 	}
 	
