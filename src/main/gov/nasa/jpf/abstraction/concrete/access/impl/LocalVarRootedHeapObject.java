@@ -1,12 +1,14 @@
 package gov.nasa.jpf.abstraction.concrete.access.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
+import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteRoot;
+import gov.nasa.jpf.abstraction.concrete.impl.PathResolution;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -25,19 +27,27 @@ public class LocalVarRootedHeapObject extends DefaultRoot implements ConcreteRoo
 		this.li = li;
 	}
 	
+	private PathResolution resolveVar() {
+		Map<AccessExpression, VariableID> processed = new HashMap<AccessExpression, VariableID>();
+		
+		processed.put(DefaultRoot.create(getName()), new PartialVariableID(DefaultConcreteAccessExpression.createLocalVarReference(ti, ei, li)));
+		
+		return new PathResolution(ti, processed);
+	}
+	
 	@Override
-	public Map<AccessExpression, VariableID> partialResolve() {
-		throw new RuntimeException("Not Yet Re-Implemented.");
+	public PathResolution partialResolve() {
+		return resolveVar();
 	}
 
 	@Override
-	public Map<AccessExpression, VariableID> partialExhaustiveResolve() {
-		throw new RuntimeException("Not Yet Re-Implemented.");
+	public PathResolution partialExhaustiveResolve() {
+		return resolveVar();
 	}
 
 	@Override
-	public Map<AccessExpression, CompleteVariableID> resolve() {
-		throw new RuntimeException("Not Yet Re-Implemented.");
+	public PathResolution resolve() {
+		return resolveVar();
 	}
 	
 	public static LocalVarRootedHeapObject create(String name, ThreadInfo threadInfo, ElementInfo elementInfo, LocalVarInfo localVarInfo) {

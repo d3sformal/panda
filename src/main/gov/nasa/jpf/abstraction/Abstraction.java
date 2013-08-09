@@ -67,7 +67,7 @@ public abstract class Abstraction {
 	}
 	
 	public final void processStore(Expression from, ConcreteAccessExpression to) {
-		if (from instanceof ConcreteAccessExpression && ((ConcreteAccessExpression)from).resolve().isEmpty()) {
+		if (from instanceof ConcreteAccessExpression && ((ConcreteAccessExpression)from).resolve().processed.isEmpty()) {
 			//Path resolves to objRefs
 			processObjectStore(from, to);
 		} else {

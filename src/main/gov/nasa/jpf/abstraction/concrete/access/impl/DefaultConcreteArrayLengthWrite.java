@@ -1,17 +1,14 @@
 package gov.nasa.jpf.abstraction.concrete.access.impl;
 
-import java.util.Map;
-
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
-import gov.nasa.jpf.abstraction.concrete.VariableID;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteArrayLengthExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteArrayLengthWrite;
+import gov.nasa.jpf.abstraction.concrete.impl.PathResolution;
 
 public class DefaultConcreteArrayLengthWrite extends DefaultArrayLengthWrite implements ConcreteArrayLengthWrite, ConcreteArrayLengthExpression {
 
@@ -40,17 +37,17 @@ public class DefaultConcreteArrayLengthWrite extends DefaultArrayLengthWrite imp
 	}
 	
 	@Override
-	public Map<AccessExpression, VariableID> partialResolve() {
+	public PathResolution partialResolve() {
 		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 
 	@Override
-	public Map<AccessExpression, VariableID> partialExhaustiveResolve() {
+	public PathResolution partialExhaustiveResolve() {
 		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 
 	@Override
-	public Map<AccessExpression, CompleteVariableID> resolve() {
+	public PathResolution resolve() {
 		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 	

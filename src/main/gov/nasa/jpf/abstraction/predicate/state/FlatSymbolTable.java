@@ -144,7 +144,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	@Override
 	public void processLoad(ConcreteAccessExpression from) {
-		Map<AccessExpression, VariableID> vars = from.partialResolve();
+		Map<AccessExpression, VariableID> vars = from.partialResolve().processed;
 		
 		for (AccessExpression source : vars.keySet()) {
 			unsetPath(source);
@@ -160,7 +160,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			return affected;
 		}
 			
-		Map<AccessExpression, CompleteVariableID> destinationCandidates = destination.resolve();
+		Map<AccessExpression, VariableID> destinationCandidates = destination.resolve().processed;
 		
 		for (AccessExpression destinationPath : destinationCandidates.keySet()) {
 			// ASSIGN A PRIMITIVE VALUE - STORES NEW VALUE (REWRITES DATA => NO PATH UNSETTING, VARID STAY THE SAME, ONLY THE VALUES CHANGED)
@@ -189,7 +189,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			return affected;
 		}
 		
-		Set<AccessExpression> destinationCandidates = destinationPrefix.partialExhaustiveResolve().keySet();
+		Set<AccessExpression> destinationCandidates = destinationPrefix.partialExhaustiveResolve().processed.keySet();
 		boolean unambiguous = destinationCandidates.size() == 1;
 		
 		if (sourceExpression instanceof AnonymousExpression) {
@@ -212,7 +212,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			return affected;
 		}
 		
-		Map<AccessExpression, VariableID> sourceCandidates = sourcePrefix.partialResolve();
+		Map<AccessExpression, VariableID> sourceCandidates = sourcePrefix.partialResolve().processed;
 
 		Map<AccessExpression, Set<VariableID>> rewrites = new HashMap<AccessExpression, Set<VariableID>>();
 		

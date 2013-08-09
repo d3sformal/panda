@@ -1,15 +1,12 @@
 package gov.nasa.jpf.abstraction.concrete.access.impl;
 
-import java.util.Map;
-
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
-import gov.nasa.jpf.abstraction.concrete.VariableID;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteArrayElementWrite;
+import gov.nasa.jpf.abstraction.concrete.impl.PathResolution;
 
 public class DefaultConcreteArrayElementWrite extends DefaultArrayElementWrite implements ConcreteArrayElementWrite {
 
@@ -38,17 +35,17 @@ public class DefaultConcreteArrayElementWrite extends DefaultArrayElementWrite i
 	}
 
 	@Override
-	public Map<AccessExpression, VariableID> partialResolve() {
+	public PathResolution partialResolve() {
 		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 
 	@Override
-	public Map<AccessExpression, VariableID> partialExhaustiveResolve() {
+	public PathResolution partialExhaustiveResolve() {
 		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 
 	@Override
-	public Map<AccessExpression, CompleteVariableID> resolve() {
+	public PathResolution resolve() {
 		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 	

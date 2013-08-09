@@ -17,7 +17,7 @@ public class PathResolution {
 	}
 	
 	public PathResolution(ThreadInfo threadInfo, Map<AccessExpression, VariableID> current) {
-		this(threadInfo, new HashMap<AccessExpression, VariableID>(), current);
+		this(threadInfo, current, new HashMap<AccessExpression, VariableID>());
 	}
 	
 	public PathResolution(ThreadInfo threadInfo, Map<AccessExpression, VariableID> processed, Map<AccessExpression, VariableID> current) {
