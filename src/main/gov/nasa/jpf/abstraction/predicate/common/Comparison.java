@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 
 import java.util.ArrayList;
@@ -16,11 +16,11 @@ public abstract class Comparison extends Predicate {
 	}
 	
 	@Override
-	public List<AccessPath> getPaths() {
-		List<AccessPath> ret = new ArrayList<AccessPath>();
+	public List<AccessExpression> getPaths() {
+		List<AccessExpression> ret = new ArrayList<AccessExpression>();
 		
-		ret.addAll(a.getPaths());
-		ret.addAll(b.getPaths());
+		ret.addAll(a.getAccessExpressions());
+		ret.addAll(b.getAccessExpressions());
 		
 		return ret;
 	}

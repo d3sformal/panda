@@ -1,0 +1,97 @@
+package gov.nasa.jpf.abstraction.common.access.impl;
+
+import java.util.List;
+
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.meta.Field;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
+
+public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implements ObjectFieldWrite {
+
+	private Expression newValue;
+
+	protected DefaultObjectFieldWrite(AccessExpression object, String name, Expression newValue) {
+		this(object, DefaultField.create(name), newValue);
+	}
+	
+	protected DefaultObjectFieldWrite(AccessExpression object, Field field, Expression newValue) {
+		super(object, field);
+		
+		this.newValue = newValue;
+	}
+	
+	@Override
+	public Expression getNewValue() {
+		return newValue;
+	}
+	
+	public static DefaultObjectFieldWrite create(AccessExpression object, String name, Expression newValue) {
+		if (object == null || name == null || newValue == null) {
+			return null;
+		}
+		
+		return new DefaultObjectFieldWrite(object, name, newValue);
+	}
+	
+	public static DefaultObjectFieldWrite create(AccessExpression object, Field field, Expression newValue) {
+		if (object == null || field == null || newValue == null) {
+			return null;
+		}
+		
+		return new DefaultObjectFieldWrite(object, field, newValue);
+	}
+	
+	@Override
+	public List<AccessExpression> getSubAccessExpressions() {
+		List<AccessExpression> ret = super.getSubAccessExpressions();
+		
+		ret.addAll(newValue.getAccessExpressions());
+		
+		return ret;
+	}
+	
+	@Override
+	public void accept(PredicatesVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	@Override
+	public DefaultObjectFieldWrite clone() {
+		return create(getObject().clone(), getName(), newValue.clone());
+	}
+	
+	@Override
+	public String getName() {
+		return getField().getName();
+	}
+	
+	@Override
+	public AccessExpression reRoot(AccessExpression newPrefix) {
+		return create(newPrefix, getField().clone(), getNewValue().clone());
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof ObjectFieldWrite) {
+			ObjectFieldWrite w = (ObjectFieldWrite) o;
+			
+			return getObject().equals(w.getObject()) && getField().equals(w.getField()) && getNewValue().equals(w.getNewValue());
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return ("write_field_" + getObject().hashCode() + "_" + getField().getName().hashCode() + "_" + getNewValue().hashCode()).hashCode();
+	}
+	
+	@Override
+	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
+		return create(getObject().replaceSubExpressions(expression, newExpression), getField().clone(), getNewValue().replace(expression, newExpression));
+	}
+
+}

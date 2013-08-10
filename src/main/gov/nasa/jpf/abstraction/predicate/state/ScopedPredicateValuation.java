@@ -1,7 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
 import gov.nasa.jpf.abstraction.predicate.common.MethodContext;
 import gov.nasa.jpf.abstraction.predicate.common.ObjectContext;
@@ -11,6 +12,7 @@ import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.abstraction.predicate.smt.SMTException;
 import gov.nasa.jpf.vm.MethodInfo;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -47,8 +49,12 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				return;
 			} catch (SMTException e) {
 				e.printStackTrace();
+				
+				throw e;
 			}
 		}
+		
+		initialValuation = new HashMap<Predicate, TruthValue>();
 		
 		for (Predicate predicate : predicates) {
 			initialValuation.put(predicate, TruthValue.UNDEFINED);
@@ -65,13 +71,13 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			if (context instanceof MethodContext) {
 				MethodContext methodContext = (MethodContext) context;
 
-				if (!methodContext.getMethod().toString(AccessPath.NotationPolicy.DOT_NOTATION).equals(method.getBaseName())) {
+				if (!methodContext.getMethod().toString(NotationPolicy.DOT_NOTATION).equals(method.getBaseName())) {
 					continue;
 				}
 			} else if (context instanceof ObjectContext) {
 				ObjectContext objectContext = (ObjectContext) context;
 				
-				if (!objectContext.getObject().toString(AccessPath.NotationPolicy.DOT_NOTATION).equals(method.getClassName())) {
+				if (!objectContext.getObject().toString(NotationPolicy.DOT_NOTATION).equals(method.getClassName())) {
 					continue;
 				}
 			}
@@ -138,7 +144,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 
 	@Override
-	public void reevaluate(AccessPath affected, Set<AccessPath> resolvedAffected, Expression expression) {
+	public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
 		scopes.top().reevaluate(affected, resolvedAffected, expression);
 	}
 	

@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
@@ -18,17 +18,22 @@ public class Tautology extends Predicate {
 	}
 
 	@Override
-	public List<AccessPath> getPaths() {
-		return new ArrayList<AccessPath>();
+	public List<AccessExpression> getPaths() {
+		return new ArrayList<AccessExpression>();
 	}
 
 	@Override
-	public Predicate replace(AccessPath formerPath, Expression expression) {
+	public Predicate replace(AccessExpression formerPath, Expression expression) {
 		return this;
 	}
 	
 	public static Predicate create() {
 		return new Tautology();
+	}
+	
+	@Override
+	public Predicate update(AccessExpression expression, Expression newExpression) {
+		return create();
 	}
 
 }

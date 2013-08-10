@@ -3,18 +3,19 @@ package gov.nasa.jpf.abstraction.concrete;
 import java.util.ArrayList;
 import java.util.List;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
-public class EmptyExpression extends Expression {
+public class EmptyExpression implements Expression {
 	
 	protected EmptyExpression() {
 	}
 
 	@Override
-	public List<AccessPath> getPaths() {
-		return new ArrayList<AccessPath>();
+	public List<AccessExpression> getAccessExpressions() {
+		return new ArrayList<AccessExpression>();
 	}
 
 	@Override
@@ -23,7 +24,7 @@ public class EmptyExpression extends Expression {
 	}
 
 	@Override
-	public Expression replace(AccessPath formerPath, Expression expression) {
+	public Expression replace(AccessExpression formerPath, Expression expression) {
 		return this;
 	}
 	
@@ -34,6 +35,21 @@ public class EmptyExpression extends Expression {
 	@Override
 	public EmptyExpression clone() {
 		return create();
+	}
+	
+	@Override
+	public String toString() {
+		return toString(NotationPolicy.policy);
+	}
+
+	@Override
+	public String toString(NotationPolicy policy) {
+    	return NotationPolicy.convertToString(this, policy);
+	}
+
+	@Override
+	public Expression update(AccessExpression expression, Expression newExpression) {
+		return clone();
 	}
 
 }

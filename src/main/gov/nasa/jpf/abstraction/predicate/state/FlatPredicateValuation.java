@@ -1,11 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.Config;
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
@@ -99,7 +98,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		int padding = 0;
 		
 		for (Predicate p : valuations.keySet()) {
-			String predicate = p.toString(AccessPath.NotationPolicy.DOT_NOTATION);
+			String predicate = p.toString(NotationPolicy.DOT_NOTATION);
 
 			padding = padding < predicate.length() ? predicate.length() : padding;
 		}
@@ -107,7 +106,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		padding += 4;
 		
 		for (Predicate p : valuations.keySet()) {
-			String predicate = p.toString(AccessPath.NotationPolicy.DOT_NOTATION);
+			String predicate = p.toString(NotationPolicy.DOT_NOTATION);
 			StringBuilder pad = new StringBuilder();
 			
 			for (int i = 0; i < padding - predicate.length(); ++i) {
@@ -124,7 +123,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	}
 
 	@Override
-	public void reevaluate(AccessPath affected, Set<AccessPath> resolvedAffected, Expression expression) {
+	public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
 		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
 
 		for (Predicate predicate : valuations.keySet()) {
@@ -152,9 +151,9 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			 * 
 			 * are affected predicates
 			 */
-			for (AccessPath path1 : resolvedAffected) {
-				for (AccessPath path2 : predicate.getPaths()) {
-					affects = affects || path1.similarPrefix(path2);
+			for (AccessExpression path1 : resolvedAffected) {
+				for (AccessExpression path2 : predicate.getPaths()) {
+					affects = affects || path1.isSimilarToPrefixOf(path2);
 				}
 			}
 

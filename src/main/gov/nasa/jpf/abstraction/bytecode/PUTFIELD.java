@@ -21,7 +21,8 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
+import gov.nasa.jpf.abstraction.concrete.access.impl.DefaultConcreteObjectFieldRead;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -55,11 +56,11 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		}  
 		
 		Expression from = source.getExpression();
-		ConcretePath to = null;
+		ConcreteAccessExpression to = null;
 
-		if (destination.getExpression() instanceof ConcretePath) {
-			to = (ConcretePath) destination.getExpression();
-			to.appendSubElement(getFieldName());
+		if (destination.getExpression() instanceof ConcreteAccessExpression) {
+			to = (ConcreteAccessExpression) destination.getExpression();
+			to = DefaultConcreteObjectFieldRead.create(to, getFieldName());
 			
 			GlobalAbstraction.getInstance().processStore(from, to);
 		}

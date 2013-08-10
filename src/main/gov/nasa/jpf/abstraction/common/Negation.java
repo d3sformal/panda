@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
@@ -14,7 +15,7 @@ public class Negation extends Predicate {
 	}
 	
 	@Override
-	public List<AccessPath> getPaths() {
+	public List<AccessExpression> getPaths() {
 		return predicate.getPaths();
 	}
 
@@ -24,7 +25,7 @@ public class Negation extends Predicate {
 	}
 
 	@Override
-	public Predicate replace(AccessPath formerPath, Expression expression) {
+	public Predicate replace(AccessExpression formerPath, Expression expression) {
 		return create(predicate.replace(formerPath, expression));
 	}
 	
@@ -43,5 +44,10 @@ public class Negation extends Predicate {
 		}
 		
 		return new Negation(predicate);
+	}
+
+	@Override
+	public Predicate update(AccessExpression expression, Expression newExpression) {
+		return create(predicate.update(expression, newExpression));
 	}
 }

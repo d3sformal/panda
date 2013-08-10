@@ -1,9 +1,12 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.impl.DefaultPrimitiveExpression;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Operation extends PrimitiveExpression {
+public abstract class Operation extends DefaultPrimitiveExpression {
 	public Expression a;
 	public Expression b;
 	
@@ -13,11 +16,11 @@ public abstract class Operation extends PrimitiveExpression {
 	}
 	
 	@Override
-	public List<AccessPath> getPaths() {
-		List<AccessPath> ret = new ArrayList<AccessPath>();
+	public List<AccessExpression> getAccessExpressions() {
+		List<AccessExpression> ret = new ArrayList<AccessExpression>();
 		
-		ret.addAll(a.getPaths());
-		ret.addAll(b.getPaths());
+		ret.addAll(a.getAccessExpressions());
+		ret.addAll(b.getAccessExpressions());
 		
 		return ret;
 	}

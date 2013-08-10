@@ -18,7 +18,7 @@
 package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
@@ -63,11 +63,11 @@ public abstract class Abstraction {
 	public void backtrack(MethodInfo method) {
 	}
 	
-	public void processLoad(ConcretePath from) {
+	public void processLoad(ConcreteAccessExpression from) {
 	}
 	
-	public final void processStore(Expression from, ConcretePath to) {
-		if (from instanceof ConcretePath && ((ConcretePath)from).resolve().isEmpty()) {
+	public final void processStore(Expression from, ConcreteAccessExpression to) {
+		if (from instanceof ConcreteAccessExpression && ((ConcreteAccessExpression)from).resolve().processed.isEmpty()) {
 			//Path resolves to objRefs
 			processObjectStore(from, to);
 		} else {
@@ -77,10 +77,10 @@ public abstract class Abstraction {
 		}
 	}
 	
-	public void processPrimitiveStore(Expression from, ConcretePath to) {
+	public void processPrimitiveStore(Expression from, ConcreteAccessExpression to) {
 	}
 	
-	public void processObjectStore(Expression from, ConcretePath to) {
+	public void processObjectStore(Expression from, ConcreteAccessExpression to) {
 	}
 	
 	public void processMethodCall(MethodInfo method) {

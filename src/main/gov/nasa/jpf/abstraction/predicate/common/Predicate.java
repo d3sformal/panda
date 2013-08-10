@@ -1,8 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
+import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
 
 import java.util.HashSet;
@@ -10,27 +10,23 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class Predicate implements PredicatesVisitable {
-	public abstract List<AccessPath> getPaths();
-	public abstract Predicate replace(AccessPath formerPath, Expression expression);
+	public abstract List<AccessExpression> getPaths();
+	public abstract Predicate replace(AccessExpression formerPath, Expression expression);
 	
     public String toString() {
-    	return toString(AccessPath.policy);
+    	return toString(NotationPolicy.policy);
     }
-    public String toString(AccessPath.NotationPolicy policy) {
-    	PredicatesStringifier stringifier = AccessPath.getStringifier(policy);
-		
-		accept(stringifier);
-		
-		return stringifier.getString();
+    public String toString(NotationPolicy policy) {
+    	return NotationPolicy.convertToString(this, policy);
 	}
     
     public Set<Predicate> selectDeterminants(Set<Predicate> universe) {
     	Set<Predicate> ret = new HashSet<Predicate>();
     	
     	for (Predicate candidate : universe) {
-			List<AccessPath> candidatePaths = candidate.getPaths();
+			List<AccessExpression> candidatePaths = candidate.getPaths();
 
-			for (AccessPath path : getPaths()) {
+			for (AccessExpression path : getPaths()) {
 				if (candidatePaths.contains(path)) {
 					ret.add(candidate);
 				}
@@ -61,9 +57,11 @@ public abstract class Predicate implements PredicatesVisitable {
 		return ret;
 	}
 	
+	public abstract Predicate update(AccessExpression expression, Expression newExpression);
+	
 	@Override
 	public int hashCode() {
-		return toString(AccessPath.NotationPolicy.DOT_NOTATION).hashCode();
+		return toString(NotationPolicy.DOT_NOTATION).hashCode();
 	}
 	
 	@Override
@@ -71,7 +69,7 @@ public abstract class Predicate implements PredicatesVisitable {
 		if (o instanceof Predicate) {
 			Predicate p = (Predicate) o;
 
-			return toString(AccessPath.NotationPolicy.DOT_NOTATION).equals(p.toString(AccessPath.NotationPolicy.DOT_NOTATION));
+			return toString(NotationPolicy.DOT_NOTATION).equals(p.toString(NotationPolicy.DOT_NOTATION));
 		}
 		
 		return false;

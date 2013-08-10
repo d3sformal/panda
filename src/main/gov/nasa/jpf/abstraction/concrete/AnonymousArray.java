@@ -1,13 +1,15 @@
 package gov.nasa.jpf.abstraction.concrete;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.impl.DefaultArrayExpression;
+import gov.nasa.jpf.abstraction.common.impl.DefaultObjectExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.vm.ElementInfo;
 
 import java.util.List;
 
-public class AnonymousArray extends AnonymousExpression {
+public class AnonymousArray extends DefaultArrayExpression implements AnonymousExpression {
 	
 	public ElementInfo ei;
 	public Expression length;
@@ -23,17 +25,17 @@ public class AnonymousArray extends AnonymousExpression {
 	}
 
 	@Override
-	public List<AccessPath> getPaths() {
-		return length.getPaths();
+	public List<AccessExpression> getAccessExpressions() {
+		return length.getAccessExpressions();
 	}
 
 	@Override
-	public Expression replace(AccessPath formerPath, Expression expression) {
+	public Expression replace(AccessExpression formerPath, Expression expression) {
 		return this;
 	}
 
 	@Override
-	public Expression clone() {
+	public AnonymousArray clone() {
 		return create(ei, length);
 	}
 	
@@ -48,6 +50,11 @@ public class AnonymousArray extends AnonymousExpression {
 	@Override
 	public PartialVariableID generateVariableID() {
 		return new PartialVariableID(new ArrayReference(ei, this));
+	}
+
+	@Override
+	public Expression update(AccessExpression expression, Expression newExpression) {
+		return clone();
 	}
 
 }

@@ -3,7 +3,8 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
+import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVar;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -27,10 +28,10 @@ public class LSTORE extends gov.nasa.jpf.jvm.bytecode.LSTORE {
 		Instruction actualNextInsn = super.execute(ti);
         
 		Expression from = source.getExpression();
-		ConcretePath to = null;
+		ConcreteAccessExpression to = null;
 		
 		if (var != null) {
-			to = ConcretePath.createLocalVarPath(getLocalVariableName(), ti, var);
+			to = LocalVar.create(getLocalVariableName(), ti, var);
 		}
 		
 		sf = ti.getModifiableTopFrame();

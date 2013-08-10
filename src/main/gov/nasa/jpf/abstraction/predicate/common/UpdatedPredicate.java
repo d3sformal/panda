@@ -1,23 +1,25 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class UpdatedPredicate extends Predicate {
 	
-	public Predicate predicate;
-	public AccessPath path;
-	public Expression expression;
+	private Predicate predicate;
+	private AccessExpression expression;
+	private Expression newExpression;
 	
-	protected UpdatedPredicate(Predicate predicate, AccessPath path, Expression expression) {
+	protected UpdatedPredicate(Predicate predicate, AccessExpression expression, Expression newExpression) {
 		this.predicate = predicate;
-		this.path = path;
 		this.expression = expression;
+		this.newExpression = newExpression;
+	}
+	
+	public Predicate apply() {
+		return predicate.update(expression, newExpression);
 	}
 
 	@Override
@@ -26,44 +28,38 @@ public class UpdatedPredicate extends Predicate {
 	}
 
 	@Override
-	public List<AccessPath> getPaths() {
-		List<AccessPath> ret = new LinkedList<AccessPath>();
-		
-		ret.addAll(predicate.getPaths());
-		ret.addAll(expression.getPaths());
-		
-		// ONLY variable paths (single element - varname) get replaced, other paths stay in the expressions
-		if (path.getRoot() != path.getTail()) {
-			ret.addAll(path.getPaths());
-		}
-		
-		return ret;
+	public List<AccessExpression> getPaths() {
+		return apply().getPaths();
 	}
 
 	@Override
-	public Predicate replace(AccessPath formerPath, Expression expression) {
-		return create(predicate.replace(formerPath, expression), this.path, this.expression);
+	public Predicate replace(AccessExpression formerPath, Expression expression) {
+		return apply().replace(formerPath, expression);
+	}
+
+	@Override
+	public Predicate update(AccessExpression expression, Expression newExpression) {
+		return apply().update(expression, newExpression);
 	}
 	
-	public static Predicate create(Predicate predicate, AccessPath path, Expression expression) {
-		if (predicate == null) return null;
-		if (path == null || expression == null) return null;
-		
-		if (predicate instanceof Negation) {
-			Negation n = (Negation) predicate;
+	public Predicate getPredicate() {
+		return predicate;
+	}
 
-			return Negation.create(create(n.predicate, path, expression));
-		}
+	public AccessExpression getExpression() {
+		return expression;
+	}
 
-		if (predicate instanceof Tautology) {
-			return predicate;
+	public Expression getNewExpression() {
+		return newExpression;
+	}
+	
+	public static UpdatedPredicate create(Predicate predicate, AccessExpression expression, Expression newExpression) {
+		if (predicate == null || expression == null || newExpression == null) {
+			return null;
 		}
 		
-		if (predicate instanceof Contradiction) {
-			return predicate;
-		}
-		
-		return new UpdatedPredicate(predicate, path, expression);
+		return new UpdatedPredicate(predicate, expression, newExpression);
 	}
 
 }

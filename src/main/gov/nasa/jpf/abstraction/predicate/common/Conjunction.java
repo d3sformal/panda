@@ -1,10 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.abstraction.common.AccessPath;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
-public class Conjunction extends Junction {
+public class Conjunction extends Formula {
 	
 	protected Conjunction(Predicate a, Predicate b) {
 		super(a, b);
@@ -16,7 +16,7 @@ public class Conjunction extends Junction {
 	}
 
 	@Override
-	public Predicate replace(AccessPath formerPath, Expression expression) {
+	public Predicate replace(AccessExpression formerPath, Expression expression) {
 		return create(a.replace(formerPath, expression), b.replace(formerPath, expression));
 	}
 	
@@ -37,6 +37,11 @@ public class Conjunction extends Junction {
 		}
 
 		return new Conjunction(a, b);
+	}
+
+	@Override
+	public Predicate update(AccessExpression expression, Expression newExpression) {
+		return create(a.update(expression, newExpression), b.update(expression, newExpression));
 	}
 
 }

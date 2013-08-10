@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.ConcretePath;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
@@ -69,21 +69,21 @@ public class GlobalAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processLoad(ConcretePath from) {
+	public void processLoad(ConcreteAccessExpression from) {
 		if (!RunDetector.isRunning()) return;
 
 		abs.processLoad(from);
 	}
 	
 	@Override
-	public void processPrimitiveStore(Expression from, ConcretePath to) {
+	public void processPrimitiveStore(Expression from, ConcreteAccessExpression to) {
 		if (!RunDetector.isRunning()) return;
 		
 		abs.processPrimitiveStore(from, to);
 	}
 	
 	@Override
-	public void processObjectStore(Expression from, ConcretePath to) {
+	public void processObjectStore(Expression from, ConcreteAccessExpression to) {
 		if (!RunDetector.isRunning()) return;
 		
 		abs.processObjectStore(from, to);

@@ -1,5 +1,16 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
+import gov.nasa.jpf.abstraction.common.access.Fresh;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
@@ -36,12 +47,19 @@ public interface PredicatesVisitor {
 	public void visit(Multiply expression);
 	public void visit(Divide expression);
 	public void visit(Modulo expression);
-	public void visit(ArrayLength expression);
-	public void visit(AccessPath expression);
-	public void visit(AccessPathRootElement element);
-	public void visit(AccessPathSubElement element);
-	public void visit(AccessPathIndexElement element);
+	public void visit(DefaultArrays meta);
+	public void visit(DefaultArrayLengths meta);
+	public void visit(DefaultField meta);
+	public void visit(Root expression);
+	public void visit(Fresh expression);
+	public void visit(ObjectFieldRead expression);
+	public void visit(ObjectFieldWrite expression);
+	public void visit(ArrayElementRead expression);
+	public void visit(ArrayElementWrite expression);
+	public void visit(ArrayLengthRead expression);
+	public void visit(ArrayLengthWrite expression);
 	public void visit(Constant expression);
 	public void visit(AnonymousObject expression);
 	public void visit(AnonymousArray expression);
+	public void visit(Undefined expression);
 }
