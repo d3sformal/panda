@@ -12,6 +12,7 @@ import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.abstraction.predicate.smt.SMTException;
 import gov.nasa.jpf.vm.MethodInfo;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -48,8 +49,12 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				return;
 			} catch (SMTException e) {
 				e.printStackTrace();
+				
+				throw e;
 			}
 		}
+		
+		initialValuation = new HashMap<Predicate, TruthValue>();
 		
 		for (Predicate predicate : predicates) {
 			initialValuation.put(predicate, TruthValue.UNDEFINED);

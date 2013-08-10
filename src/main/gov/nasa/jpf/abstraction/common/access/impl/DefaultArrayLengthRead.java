@@ -4,7 +4,6 @@ import gov.nasa.jpf.abstraction.common.ArrayExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.ArrayAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
 import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
@@ -63,13 +62,17 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 	}
 	
 	@Override
+	public int hashCode() {
+		return ("read_length_" + getObject().hashCode()).hashCode();
+	}
+	
+	@Override
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
 		return create(getObject().replaceSubExpressions(expression, newExpression), getArrayLengths().clone());
 	}
 	
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
-		System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> YAY! " + newExpression.getClass().getSimpleName());
 		if (newExpression instanceof ArrayExpression) {			
 			Expression updated = getObject().update(expression, newExpression);
 				
@@ -78,17 +81,18 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 				
 				if (newExpression instanceof AnonymousArray) {
 					AnonymousArray aa = (AnonymousArray) expression;
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> YAY! 1");
 					return create(updatedAccessExpression, DefaultArrayLengthWrite.create(getArray().clone(), getArrayLengths().clone(), aa.length));
 				}
-				System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> YAY! 2");
 				return create(updatedAccessExpression, DefaultArrayLengthWrite.create(getArray().clone(), getArrayLengths().clone(), DefaultArrayLengthRead.create(expression, getArrayLengths().clone())));
 			}
-			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> YAY! 3");
+			if (updated instanceof AnonymousArray) {
+				AnonymousArray updatedAnonymousArray = (AnonymousArray) updated;
+				
+				return create(getArray().clone(), DefaultArrayLengthWrite.create(expression, getArrayLengths().clone(), updatedAnonymousArray.length.clone()));
+			}
 			return UndefinedAccessExpression.create();
 		}
 		
-		System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> YAY! 4");
 		return clone();
 	}
 }

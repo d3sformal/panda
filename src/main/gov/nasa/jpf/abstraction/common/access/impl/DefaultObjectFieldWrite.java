@@ -85,6 +85,11 @@ public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implem
 	}
 	
 	@Override
+	public int hashCode() {
+		return ("write_field_" + getObject().hashCode() + "_" + getField().getName().hashCode() + "_" + getNewValue().hashCode()).hashCode();
+	}
+	
+	@Override
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
 		return create(getObject().replaceSubExpressions(expression, newExpression), getField().clone(), getNewValue().replace(expression, newExpression));
 	}

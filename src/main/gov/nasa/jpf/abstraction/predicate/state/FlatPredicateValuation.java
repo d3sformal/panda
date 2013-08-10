@@ -6,6 +6,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.vm.VM;
@@ -161,8 +162,8 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				Predicate negativeWeakestPrecondition = Negation.create(predicate);
 					
 				if (expression != null) {
-					positiveWeakestPrecondition = positiveWeakestPrecondition.update(affected, expression);
-					negativeWeakestPrecondition = negativeWeakestPrecondition.update(affected, expression);
+					positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
+					negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
 				}
 				
 				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();

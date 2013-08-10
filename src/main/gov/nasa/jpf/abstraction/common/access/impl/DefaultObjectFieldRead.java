@@ -60,6 +60,11 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 	}
 	
 	@Override
+	public int hashCode() {
+		return ("read_field_" + getObject().hashCode() + "_" + getField().getName().hashCode()).hashCode();
+	}
+	
+	@Override
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
 		return create(getObject().replaceSubExpressions(expression, newExpression), getField().clone());
 	}

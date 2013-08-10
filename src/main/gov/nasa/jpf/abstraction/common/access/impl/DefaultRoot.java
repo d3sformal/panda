@@ -101,6 +101,11 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 		
 		return false;
 	}
+	
+	@Override
+	public int hashCode() {
+		return ("root_" + getName()).hashCode();
+	}
 
 	@Override
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {

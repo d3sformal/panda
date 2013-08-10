@@ -23,6 +23,8 @@ import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Modulo;
 import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.Subtract;
 import gov.nasa.jpf.abstraction.common.Undefined;
@@ -42,13 +44,14 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.common.StaticContext;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
+import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 
 public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	private Set<String> vars = new HashSet<String>();
 	private Set<String> fields = new HashSet<String>();
 	
-	private Predicate lastPredicate = null;
-	private Map<Predicate, Set<Predicate>> additionalPredicates = new HashMap<Predicate, Set<Predicate>>();
+	private PredicatesVisitable currentCollectable = null;
+	private Map<PredicatesVisitable, Set<Predicate>> additionalPredicates = new HashMap<PredicatesVisitable, Set<Predicate>>();
 	
 	private Set<AccessExpression> objects = new HashSet<AccessExpression>();
 
@@ -81,58 +84,44 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	}
 
 	@Override
-	public void visit(Negation predicate) {
-		lastPredicate = predicate;
-		
+	public void visit(Negation predicate) {		
 		predicate.predicate.accept(this);
 	}
 
 	@Override
-	public void visit(LessThan predicate) {
-		lastPredicate = predicate;
-		
+	public void visit(LessThan predicate) {		
 		predicate.a.accept(this);
 		predicate.b.accept(this);
 	}
 
 	@Override
-	public void visit(Equals predicate) {
-		lastPredicate = predicate;
-		
+	public void visit(Equals predicate) {		
 		predicate.a.accept(this);
 		predicate.b.accept(this);
 	}
 
 	@Override
 	public void visit(Tautology predicate) {
-		lastPredicate = predicate;
 	}
 
 	@Override
 	public void visit(Contradiction predicate) {
-		lastPredicate = predicate;
 	}
 
 	@Override
-	public void visit(Conjunction predicate) {
-		lastPredicate = predicate;
-		
+	public void visit(Conjunction predicate) {		
 		predicate.a.accept(this);
 		predicate.b.accept(this);
 	}
 
 	@Override
-	public void visit(Disjunction predicate) {
-		lastPredicate = predicate;
-		
+	public void visit(Disjunction predicate) {		
 		predicate.a.accept(this);
 		predicate.b.accept(this);
 	}
 
 	@Override
-	public void visit(Implication predicate) {
-		lastPredicate = predicate;
-		
+	public void visit(Implication predicate) {		
 		predicate.a.accept(this);
 		predicate.b.accept(this);
 	}
@@ -171,12 +160,12 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 		expression.b.accept(this);
 	}
 
-	private void addAdditionalPredicate(Predicate predicate) {
-		if (!additionalPredicates.containsKey(lastPredicate)) {
-			additionalPredicates.put(lastPredicate, new HashSet<Predicate>());
+	private void addAdditionalPredicate(Predicate predicate) {		
+		if (!additionalPredicates.containsKey(currentCollectable)) {
+			additionalPredicates.put(currentCollectable, new HashSet<Predicate>());
 		}
 		
-		additionalPredicates.get(lastPredicate).add(predicate);
+		additionalPredicates.get(currentCollectable).add(predicate);
 	}
 
 	private void addObject(AccessExpression expression) {
@@ -198,12 +187,12 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 		expression.length.accept(this);
 	}
 	
-	public Set<Predicate> getAdditionalPredicates(Predicate predicate) {
-		if (!additionalPredicates.containsKey(predicate)) {
+	public Set<Predicate> getAdditionalPredicates(PredicatesVisitable collectable) {
+		if (!additionalPredicates.containsKey(collectable)) {
 			return new HashSet<Predicate>();
 		}
 		
-		return additionalPredicates.get(predicate);
+		return additionalPredicates.get(collectable);
 	}
 	
 	public Set<String> getVars() {
@@ -221,6 +210,8 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	@Override
 	public void visit(Root expression) {
 		vars.add(expression.getName());
+		
+		addObject(expression);
 	}
 
 	@Override
@@ -239,13 +230,14 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	public void visit(ObjectFieldWrite expression) {
 		expression.getObject().accept(this);
 		expression.getField().accept(this);
-		
-		addObject(expression);
+		expression.getNewValue().accept(this);
 	}
 
 	@Override
 	public void visit(ArrayElementRead expression) {	
 		expression.getArray().accept(this);
+		expression.getArrays().accept(this);
+		expression.getIndex().accept(this);
 		
 		addObject(expression);
 	}
@@ -253,8 +245,9 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	@Override
 	public void visit(ArrayElementWrite expression) {
 		expression.getArray().accept(this);
-		
-		addObject(expression);
+		expression.getArrays().accept(this);
+		expression.getIndex().accept(this);
+		expression.getNewValue().accept(this);
 	}
 
 	@Override
@@ -262,8 +255,9 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 		Predicate predicate = Negation.create(LessThan.create(expression, Constant.create(0)));
 		
 		addAdditionalPredicate(predicate);
-		
+				
 		expression.getArray().accept(this);
+		expression.getArrayLengths().accept(this);
 		
 		addObject(expression);
 	}
@@ -271,8 +265,8 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	@Override
 	public void visit(ArrayLengthWrite expression) {
 		expression.getArray().accept(this);
-		
-		addObject(expression);
+		expression.getArrayLengths().accept(this);
+		expression.getNewValue().accept(this);
 	}
 
 	@Override
@@ -291,6 +285,23 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	@Override
 	public void visit(Undefined expression) {
 		throw new SMTException("UNDEFINED IN THE INPUT");
+	}
+
+	@Override
+	public void visit(UpdatedPredicate predicate) {		
+		predicate.apply().accept(this);
+	}
+	
+	public void collect(PredicatesVisitable collectable) {
+		if (collectable instanceof UpdatedPredicate) {
+			UpdatedPredicate updated = (UpdatedPredicate) collectable;
+			
+			currentCollectable = updated.getPredicate();
+		} else {
+			currentCollectable = collectable;
+		}
+		
+		collectable.accept(this);
 	}
 
 }

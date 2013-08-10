@@ -25,6 +25,7 @@ import gov.nasa.jpf.abstraction.predicate.common.ObjectContext;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.common.StaticContext;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
+import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 
 public interface PredicatesVisitor {
 	public void visit(Predicates predicates);
@@ -39,6 +40,7 @@ public interface PredicatesVisitor {
 	public void visit(Conjunction predicate);
 	public void visit(Disjunction predicate);
 	public void visit(Implication predicate);
+	public void visit(UpdatedPredicate predicate);
 	public void visit(EmptyExpression expression);
 	public void visit(Add expression);
 	public void visit(Subtract expression);

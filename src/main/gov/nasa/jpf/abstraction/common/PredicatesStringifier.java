@@ -15,6 +15,7 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.common.StaticContext;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
+import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 
 public abstract class PredicatesStringifier implements PredicatesVisitor {
 	
@@ -221,6 +222,11 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 	@Override
 	public void visit(Undefined expression) {
 		ret += "<<UNDEFINED>>";
+	}
+	
+	@Override
+	public void visit(UpdatedPredicate predicate) {
+		predicate.apply().accept(this);
 	}
 
 }

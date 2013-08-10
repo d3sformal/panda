@@ -80,6 +80,11 @@ public class DefaultArrayLengthWrite extends DefaultArrayLengthExpression implem
 	}
 	
 	@Override
+	public int hashCode() {
+		return ("write_length_" + getObject().hashCode() + "_" + getNewValue().hashCode()).hashCode();
+	}
+	
+	@Override
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
 		return create(getObject().replaceSubExpressions(expression, newExpression), getArrayLengths().clone(), getNewValue().replace(expression, newExpression));
 	}

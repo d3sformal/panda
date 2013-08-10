@@ -62,6 +62,11 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	}
 	
 	@Override
+	public int hashCode() {
+		return ("read_element_" + getArray().hashCode() + "_" + getIndex().hashCode()).hashCode();
+	}
+	
+	@Override
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
 		return create(getObject().replaceSubExpressions(expression, newExpression), getArrays().clone(), getIndex().replace(expression, newExpression));
 	}

@@ -80,6 +80,11 @@ public class DefaultArrayElementWrite extends DefaultArrayElementExpression impl
 	}
 	
 	@Override
+	public int hashCode() {
+		return ("write_element_" + getArray().hashCode() + "_" + getIndex().hashCode() + "_" + getNewValue().hashCode()).hashCode();
+	}
+	
+	@Override
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
 		return create(getObject().replaceSubExpressions(expression, newExpression), getArrays().clone(), getIndex().replace(expression, newExpression), getNewValue().replace(expression, newExpression));
 	}

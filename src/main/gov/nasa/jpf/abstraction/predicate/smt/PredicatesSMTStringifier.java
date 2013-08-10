@@ -222,7 +222,15 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	public void visit(ArrayElementRead expression) {
 		ret += "(select ";
 		
+		ret += "(select ";
+		
 		expression.getArrays().accept(this);
+		
+		ret += " ";
+		
+		expression.getArray().accept(this);
+		
+		ret += ")";
 		
 		ret += " ";
 		
@@ -239,6 +247,8 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 		
 		ret += " ";
 		
+		ret += "(store ";
+		
 		expression.getArray().accept(this);
 		
 		ret += " ";
@@ -248,6 +258,8 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 		ret += " ";
 		
 		expression.getNewValue().accept(this);
+		
+		ret += ")";
 		
 		ret += ")";
 	}
