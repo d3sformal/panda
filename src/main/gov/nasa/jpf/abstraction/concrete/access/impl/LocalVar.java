@@ -29,7 +29,7 @@ public class LocalVar extends DefaultRoot implements ConcreteRoot {
 		
 		processed.put(DefaultRoot.create(getName()), new LocalVariableID(getName(), li.getSlotIndex()));
 		
-		return new PathResolution(ti, processed);
+		return new PathResolution(ti, processed, processed);
 	}
 	
 	@Override

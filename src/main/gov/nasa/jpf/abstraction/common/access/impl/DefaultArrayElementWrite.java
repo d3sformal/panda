@@ -80,6 +80,17 @@ public class DefaultArrayElementWrite extends DefaultArrayElementExpression impl
 	}
 	
 	@Override
+	public boolean isSimilarTo(AccessExpression expression) {
+		if (expression instanceof ArrayElementWrite) {
+			ArrayElementWrite w = (ArrayElementWrite) expression;
+			
+			return getArrays().equals(w.getArrays()) && getArray().isSimilarTo(w.getArray()) && getNewValue().equals(w.getNewValue());
+		}
+		
+		return false;
+	}
+	
+	@Override
 	public int hashCode() {
 		return ("write_element_" + getArray().hashCode() + "_" + getIndex().hashCode() + "_" + getNewValue().hashCode()).hashCode();
 	}

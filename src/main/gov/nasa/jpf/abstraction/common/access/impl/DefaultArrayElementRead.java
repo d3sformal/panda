@@ -8,6 +8,7 @@ import gov.nasa.jpf.abstraction.common.access.ArrayAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 
 public class DefaultArrayElementRead extends DefaultArrayElementExpression implements ArrayElementRead {
 
@@ -62,6 +63,17 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	}
 	
 	@Override
+	public boolean isSimilarTo(AccessExpression expression) {
+		if (expression instanceof ArrayElementRead) {
+			ArrayElementRead r = (ArrayElementRead) expression;
+			
+			return getArrays().equals(r.getArrays()) && getArray().isSimilarTo(r.getArray());
+		}
+		
+		return false;
+	}
+	
+	@Override
 	public int hashCode() {
 		return ("read_element_" + getArray().hashCode() + "_" + getIndex().hashCode()).hashCode();
 	}
@@ -73,20 +85,25 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
-		if (newExpression instanceof ArrayExpression) {
+		Expression updated = getArray().update(expression, newExpression);
+		
+		if (updated instanceof AnonymousExpression) {
+			// Enclosing object replaced by a new object
+			updated = DefaultFresh.create();
+		}
+		
+		if (expression instanceof ArrayExpression) {
 			ArrayAccessExpression a = (ArrayAccessExpression) expression;
-			
-			Expression updated = getObject().update(expression, newExpression);
 				
 			if (updated instanceof AccessExpression) {
 				AccessExpression updatedAccessExpression = (AccessExpression) updated;
 				
-				return create(updatedAccessExpression, DefaultArrayElementWrite.create(a, getArrays().clone(), getIndex().clone(), newExpression), getIndex().clone());
+				return create(updatedAccessExpression, DefaultArrayElementWrite.create(a, getArrays().clone(), getIndex().clone(), newExpression), getIndex().update(expression, newExpression));
 			}
 				
 			return UndefinedAccessExpression.create();
 		}
 		
-		return clone();
+		return create((AccessExpression) updated, getArrays().clone(), getIndex().update(expression, newExpression));
 	}
 }

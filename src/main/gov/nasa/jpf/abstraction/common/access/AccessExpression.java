@@ -24,4 +24,6 @@ public interface AccessExpression extends Expression {
 	
 	@Override
 	public abstract AccessExpression clone();
+	
+	public boolean isSimilarTo(AccessExpression expression);
 }

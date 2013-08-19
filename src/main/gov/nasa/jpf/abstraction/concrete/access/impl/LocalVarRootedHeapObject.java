@@ -32,7 +32,7 @@ public class LocalVarRootedHeapObject extends DefaultRoot implements ConcreteRoo
 		
 		processed.put(DefaultRoot.create(getName()), new PartialVariableID(DefaultConcreteAccessExpression.createLocalVarReference(ti, ei, li)));
 		
-		return new PathResolution(ti, processed);
+		return new PathResolution(ti, processed, processed);
 	}
 	
 	@Override

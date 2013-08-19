@@ -109,10 +109,11 @@ public class DefaultConcreteObjectFieldRead extends DefaultObjectFieldRead imple
 
 	@Override
 	public PathResolution partialExhaustiveResolve() {
-		PathResolution subResolution = getObject().partialResolve();
+		PathResolution subResolution = getObject().partialExhaustiveResolve();
 		PathResolution resolution = resolveField(subResolution);
 		
-		resolution.processed = resolution.current;
+		resolution.processed = new HashMap<AccessExpression, VariableID>();
+		resolution.processed.putAll(resolution.current);
 		
 		return resolution;
 	}
@@ -122,7 +123,9 @@ public class DefaultConcreteObjectFieldRead extends DefaultObjectFieldRead imple
 		PathResolution resolution = partialExhaustiveResolve();
 		Set<AccessExpression> toBeRemoved = new HashSet<AccessExpression>();
 		
+		System.out.println("\tRESOLVE:");
 		for (AccessExpression expr : resolution.processed.keySet()) {
+			System.out.println("\t\t" + expr + " " + expr.getClass().getSimpleName());
 			if (resolution.processed.get(expr) instanceof PartialVariableID) {
 				toBeRemoved.add(expr);
 			}

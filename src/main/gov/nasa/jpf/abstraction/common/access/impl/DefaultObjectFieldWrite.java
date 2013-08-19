@@ -85,6 +85,17 @@ public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implem
 	}
 	
 	@Override
+	public boolean isSimilarTo(AccessExpression expression) {
+		if (expression instanceof ObjectFieldWrite) {
+			ObjectFieldWrite w = (ObjectFieldWrite) expression;
+			
+			return getObject().isSimilarTo(w.getObject()) && getField().equals(w.getField()) && getNewValue().equals(w.getNewValue());
+		}
+		
+		return false;
+	}
+	
+	@Override
 	public int hashCode() {
 		return ("write_field_" + getObject().hashCode() + "_" + getField().getName().hashCode() + "_" + getNewValue().hashCode()).hashCode();
 	}

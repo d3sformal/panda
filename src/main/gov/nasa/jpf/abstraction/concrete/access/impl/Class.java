@@ -30,7 +30,7 @@ public class Class extends DefaultRoot implements ConcreteRoot {
 		
 		processed.put(DefaultRoot.create(getName()), new PartialClassID(new ObjectReference(ei), getName()));
 		
-		return new PathResolution(ti, processed);
+		return new PathResolution(ti, processed, processed);
 	}
 	
 	@Override

@@ -80,6 +80,17 @@ public class DefaultArrayLengthWrite extends DefaultArrayLengthExpression implem
 	}
 	
 	@Override
+	public boolean isSimilarTo(AccessExpression expression) {
+		if (expression instanceof ArrayLengthWrite) {
+			ArrayLengthWrite w = (ArrayLengthWrite) expression;
+			
+			return getArrayLengths().equals(w.getArrayLengths()) && getArray().isSimilarTo(w.getArray()) && getNewValue().equals(w.getNewValue());
+		}
+		
+		return false;
+	}
+	
+	@Override
 	public int hashCode() {
 		return ("write_length_" + getObject().hashCode() + "_" + getNewValue().hashCode()).hashCode();
 	}

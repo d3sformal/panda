@@ -7,6 +7,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 
 public class DefaultRoot extends DefaultAccessExpression implements Root {
 
@@ -100,6 +101,11 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 		}
 		
 		return false;
+	}
+	
+	@Override
+	public boolean isSimilarTo(AccessExpression expression) {
+		return equals(expression);
 	}
 	
 	@Override

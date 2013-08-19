@@ -98,10 +98,11 @@ public class DefaultConcreteArrayElementRead extends DefaultArrayElementRead imp
 
 	@Override
 	public PathResolution partialExhaustiveResolve() {
-		PathResolution subResolution = getObject().partialResolve();
+		PathResolution subResolution = getObject().partialExhaustiveResolve();
 		PathResolution resolution = resolveElement(subResolution);
 		
-		resolution.processed = resolution.current;
+		resolution.processed = new HashMap<AccessExpression, VariableID>();
+		resolution.processed.putAll(resolution.current);
 		
 		return resolution;
 	}

@@ -65,7 +65,11 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 	
 	@Override
 	public boolean isSimilarToPrefixOf(AccessExpression path) {
-		throw new RuntimeException("Not Yet Re-Implemented.");
+		if (getLength() > path.getLength()) {
+			return false;
+		}
+		
+		return isSimilarTo(path.get(getLength()));
 	}
 	
 	@Override

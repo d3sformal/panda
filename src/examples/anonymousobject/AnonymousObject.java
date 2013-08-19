@@ -1,4 +1,4 @@
-package anonymousObject;
+package anonymousobject;
 
 public class AnonymousObject {
 	int i;

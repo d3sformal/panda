@@ -6,6 +6,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.meta.Field;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 
 public class DefaultObjectFieldRead extends DefaultObjectFieldExpression implements ObjectFieldRead {
 
@@ -60,6 +61,17 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 	}
 	
 	@Override
+	public boolean isSimilarTo(AccessExpression expression) {
+		if (expression instanceof ObjectFieldRead) {
+			ObjectFieldRead r = (ObjectFieldRead) expression;
+			
+			return getField().equals(r.getField()) && getObject().isSimilarTo(r.getObject());
+		}
+		
+		return false;
+	}
+	
+	@Override
 	public int hashCode() {
 		return ("read_field_" + getObject().hashCode() + "_" + getField().getName().hashCode()).hashCode();
 	}
@@ -71,12 +83,17 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 	
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
+		Expression updated = getObject().update(expression, newExpression);
+		
+		if (updated instanceof AnonymousExpression) {
+			// Enclosing object replaced by a new object
+			updated = DefaultFresh.create();
+		}
+		
 		if (expression instanceof ObjectFieldRead) {
 			ObjectFieldRead r = (ObjectFieldRead) expression;
 			
-			if (getField().getName().equals(r.getField().getName())) {
-				Expression updated = getObject().update(expression, newExpression);
-				
+			if (getField().getName().equals(r.getField().getName())) {				
 				if (updated instanceof AccessExpression) {
 					AccessExpression updatedAccessExpression = (AccessExpression) updated;
 					
@@ -87,7 +104,7 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 			}
 		}
 		
-		return clone();
+		return create((AccessExpression) updated, getField().clone());
 	}
 
 }

@@ -62,6 +62,28 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 	}
 	
 	@Override
+	public boolean isSimilarTo(AccessExpression expression) {
+		if (expression instanceof ArrayLengthRead) {
+			ArrayLengthRead r = (ArrayLengthRead) expression;
+			
+			return getArrayLengths().equals(r.getArrayLengths()) && getArray().isSimilarTo(r.getArray());
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public boolean isSimilarToPrefixOf(AccessExpression path) {
+		if (path instanceof ArrayLengthRead) {
+			ArrayLengthRead r = (ArrayLengthRead) path;
+			
+			return getObject().isSimilarToPrefixOf(r.getObject()) && getArray().isSimilarToPrefixOf(r.getArray());
+		}
+		
+		return false;
+	}
+	
+	@Override
 	public int hashCode() {
 		return ("read_length_" + getObject().hashCode()).hashCode();
 	}
@@ -80,7 +102,7 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 				AccessExpression updatedAccessExpression = (AccessExpression) updated;
 				
 				if (newExpression instanceof AnonymousArray) {
-					AnonymousArray aa = (AnonymousArray) expression;
+					AnonymousArray aa = (AnonymousArray) newExpression;
 					return create(updatedAccessExpression, DefaultArrayLengthWrite.create(getArray().clone(), getArrayLengths().clone(), aa.length));
 				}
 				return create(updatedAccessExpression, DefaultArrayLengthWrite.create(getArray().clone(), getArrayLengths().clone(), DefaultArrayLengthRead.create(expression, getArrayLengths().clone())));
