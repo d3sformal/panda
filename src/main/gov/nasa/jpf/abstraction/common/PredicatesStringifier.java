@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
@@ -142,6 +143,11 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 	@Override
 	public void visit(EmptyExpression expression) {
 		ret += " ? ";
+	}
+	
+	@Override
+	public void visit(NullExpression expression) {
+		ret += "null";
 	}
 
 	@Override

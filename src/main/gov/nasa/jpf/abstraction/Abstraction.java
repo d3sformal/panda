@@ -18,6 +18,8 @@
 package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
@@ -69,6 +71,8 @@ public abstract class Abstraction {
 	public final void processStore(Expression from, ConcreteAccessExpression to) {
 		if (from instanceof ConcreteAccessExpression && ((ConcreteAccessExpression)from).resolve().processed.isEmpty()) {
 			//Path resolves to objRefs
+			processObjectStore(from, to);
+		} else if (from instanceof AnonymousExpression) {
 			processObjectStore(from, to);
 		} else {
 			//Path resolves to an expression over primitive types

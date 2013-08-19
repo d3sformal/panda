@@ -103,6 +103,11 @@ public class AbstractInstructionFactory extends
 	}
 	
 	@Override
+	public Instruction aconst_null() {
+		return (filter.isPassing(ci) ? new ACONST_NULL() : super.aconst_null());
+	}
+	
+	@Override
 	public Instruction aload(int index) {
 		return (filter.isPassing(ci) ? new ALOAD(index) : super.aload(index));
 	}

@@ -17,6 +17,7 @@ import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Divide;
@@ -124,10 +125,6 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	public void visit(Implication predicate) {		
 		predicate.a.accept(this);
 		predicate.b.accept(this);
-	}
-
-	@Override
-	public void visit(EmptyExpression expression) {
 	}
 
 	@Override
@@ -285,6 +282,16 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	@Override
 	public void visit(Undefined expression) {
 		throw new SMTException("UNDEFINED IN THE INPUT");
+	}
+	
+	@Override
+	public void visit(NullExpression expression) {
+		throw new SMTException("NULL IN THE INPUT");
+	}
+	
+	@Override
+	public void visit(EmptyExpression expression) {
+		throw new SMTException("EMPTY EXPRESSION IN THE INPUT");
 	}
 
 	@Override

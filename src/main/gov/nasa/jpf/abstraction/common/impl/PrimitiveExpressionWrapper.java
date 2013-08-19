@@ -28,7 +28,7 @@ public class PrimitiveExpressionWrapper extends DefaultPrimitiveExpression {
 			}
 		}
 		
-		throw new RuntimeException("Invalid cast to Object Expression " + expression.getClass().getSimpleName());
+		throw new RuntimeException("Invalid cast to Primitive Expression " + expression + " " + expression.getClass().getSimpleName());
 	}
 
 	private static PrimitiveExpressionWrapper create(Expression expression) {

@@ -56,6 +56,8 @@ public class DefaultConcreteObjectFieldRead extends DefaultObjectFieldRead imple
 		
 		for (AccessExpression expr : processed.keySet()) {
 			VariableID var = processed.get(expr);
+			AccessExpression clone = expr.clone();
+			clone = DefaultObjectFieldRead.create(clone, getField());
 			
 			if (var instanceof PartialVariableID) {
 				ElementInfo ei = ((PartialVariableID) var).getRef().getElementInfo();
@@ -68,26 +70,26 @@ public class DefaultConcreteObjectFieldRead extends DefaultObjectFieldRead imple
 						if (object instanceof ElementInfo) {
 							// STATIC OBJECT FIELD
 				
-							current.put(expr, new PartialVariableID(DefaultConcreteAccessExpression.createStaticFieldReference(resolution.threadInfo, getField().getName(), ei)));
+							current.put(clone, new PartialVariableID(DefaultConcreteAccessExpression.createStaticFieldReference(resolution.threadInfo, getField().getName(), ei)));
 						} else {
 							// STATIC PRIMITIVE FIELD
 					
-							current.put(expr, new StaticFieldID(ei.getClassInfo().getName(), getField().getName()));
+							current.put(clone, new StaticFieldID(ei.getClassInfo().getName(), getField().getName()));
 						}
 					} else {
 						// NOT YET COMPLETE PATH package.package.Class
 						classID.extend(getField().getName());
 					
-						current.put(expr, var);
+						current.put(clone, var);
 					}
 				} else if (object instanceof ElementInfo) {
 					// STRUCTURED FIELD (PATH NOT YET COMPLETE)
 					        
-					current.put(expr, new PartialVariableID(DefaultConcreteAccessExpression.createObjectFieldReference(resolution.threadInfo, getField().getName(), ei)));
+					current.put(clone, new PartialVariableID(DefaultConcreteAccessExpression.createObjectFieldReference(resolution.threadInfo, getField().getName(), ei)));
 				} else {
 					// PRIMITIVE FIELD
 					
-					current.put(expr, new ObjectFieldID(ei.getObjectRef(), getField().getName()));
+					current.put(clone, new ObjectFieldID(ei.getObjectRef(), getField().getName()));
 				}
 			}
 		}

@@ -20,7 +20,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.impl.DefaultConcreteObjectFieldRead;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
@@ -50,19 +49,16 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 			return actualNextInsn;
 		}
 		
-		
-		Expression expr = attr.getExpression();
+		ConcreteAccessExpression path = (ConcreteAccessExpression) attr.getExpression();
 
-		if (expr instanceof ConcreteAccessExpression) {
-			ConcreteAccessExpression path = (ConcreteAccessExpression) expr;
-				
+		if (path instanceof ConcreteAccessExpression) {				
 			path = DefaultConcreteObjectFieldRead.create(path, getFieldName());
 				
 			GlobalAbstraction.getInstance().processLoad(path);
 		}
 
 		sf = ti.getTopFrame();
-		sf.setOperandAttr(new NonEmptyAttribute(null, expr));
+		sf.setOperandAttr(new NonEmptyAttribute(null, path));
 		
 		return actualNextInsn;
 	}

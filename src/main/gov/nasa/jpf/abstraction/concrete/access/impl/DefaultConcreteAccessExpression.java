@@ -63,8 +63,7 @@ public abstract class DefaultConcreteAccessExpression extends DefaultAccessExpre
 		ElementInfo ei = ti.getElementInfo(parent.getFields().getReferenceValue(index));
 
 		if (ei.isArray()) {
-			Attribute attr = (Attribute) parent.getArrayFields().getFieldAttr(
-					index);
+			Attribute attr = (Attribute) parent.getArrayFields().getFieldAttr(index);
 
 			if (attr == null)
 				attr = new EmptyAttribute();

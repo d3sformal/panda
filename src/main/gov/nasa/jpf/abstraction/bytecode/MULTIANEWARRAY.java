@@ -7,6 +7,7 @@ import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.vm.ArrayFields;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -50,12 +51,11 @@ public class MULTIANEWARRAY extends gov.nasa.jpf.jvm.bytecode.MULTIANEWARRAY {
 		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousArray.create(array, attr.getExpression())));
 		
 		// ALL ELEMENTS ARE NULL
-		//setArrayAttributes(ti, array, attrs);
+		setArrayAttributes(ti, array, attrs);
 
 		return actualNextInsn;
 	}
 
-	/*
 	private void setArrayAttributes(ThreadInfo ti, ElementInfo array, List<Attribute> subList) {
 		if (subList.isEmpty()) return;
 		
@@ -68,13 +68,12 @@ public class MULTIANEWARRAY extends gov.nasa.jpf.jvm.bytecode.MULTIANEWARRAY {
 			fields.addFieldAttr(size, i, attr);
 			
 			if (array.isReferenceArray()) {
-				ElementInfo subArray = (ElementInfo) ti.getElementInfo(array.getReferenceElement(i));
+				ElementInfo subArray = ti.getElementInfo(array.getReferenceElement(i));
 				
-				setArrayAttributes(ti, subArray, subList);
+				setArrayAttributes(ti, subArray, subList.subList(1, subList.size()));
 			}
-			
-			subList.remove(subList.size() - 1);
 		}
+		
+		//subList.remove(subList.size() - 1);
 	}
-	*/
 }

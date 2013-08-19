@@ -11,6 +11,7 @@ import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
@@ -42,6 +43,7 @@ public interface PredicatesVisitor {
 	public void visit(Implication predicate);
 	public void visit(UpdatedPredicate predicate);
 	public void visit(EmptyExpression expression);
+	public void visit(NullExpression expression);
 	public void visit(Add expression);
 	public void visit(Subtract expression);
 	public void visit(Multiply expression);
