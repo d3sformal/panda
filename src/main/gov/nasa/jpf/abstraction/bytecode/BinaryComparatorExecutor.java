@@ -31,6 +31,7 @@ import gov.nasa.jpf.abstraction.predicate.common.Equals;
 import gov.nasa.jpf.abstraction.predicate.common.LessThan;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -61,7 +62,7 @@ public abstract class BinaryComparatorExecutor<T> {
 		Attribute result = null;
 		
 		if (!ti.isFirstStepInsn()) { // first time around
-			if (expr1 != null && expr2 != null) {	
+			if (expr1 != null && expr2 != null && RunDetector.isRunning()) {	
 				TruthValue lt = GlobalAbstraction.getInstance().evaluatePredicate(LessThan.create(expr1, expr2));
 				TruthValue eq = GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(expr1, expr2));
 				TruthValue gt = null;

@@ -123,9 +123,7 @@ public class DefaultConcreteObjectFieldRead extends DefaultObjectFieldRead imple
 		PathResolution resolution = partialExhaustiveResolve();
 		Set<AccessExpression> toBeRemoved = new HashSet<AccessExpression>();
 		
-		System.out.println("\tRESOLVE:");
 		for (AccessExpression expr : resolution.processed.keySet()) {
-			System.out.println("\t\t" + expr + " " + expr.getClass().getSimpleName());
 			if (resolution.processed.get(expr) instanceof PartialVariableID) {
 				toBeRemoved.add(expr);
 			}
