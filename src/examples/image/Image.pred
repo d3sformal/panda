@@ -5,6 +5,24 @@ image.Image.SIZE >= 0
 this.pixels.length = image.Image.SIZE
 this.pixels[0].length = image.Image.SIZE
 
+this.rectangles[0] = this.rectangles[1]
+
+0 = this.rectangles[0].left
+1 = this.rectangles[0].left
+2 = this.rectangles[0].left
+3 = this.rectangles[0].left
+4 = this.rectangles[0].left
+5 = this.rectangles[0].left
+6 = this.rectangles[0].left
+
+0 = this.rectangles[1].left
+1 = this.rectangles[1].left
+2 = this.rectangles[1].left
+3 = this.rectangles[1].left
+4 = this.rectangles[1].left
+5 = this.rectangles[1].left
+6 = this.rectangles[1].left
+
 [object image.Rectangle]
 this.top < this.bottom
 this.left < this.right
@@ -71,24 +89,6 @@ j = 6
 6 = rec.bottom
 
 rec = this.rectangles[k]
-
-this.rectangles[0] = this.rectangles[1]
-
-0 = this.rectangles[0].left
-1 = this.rectangles[0].left
-2 = this.rectangles[0].left
-3 = this.rectangles[0].left
-4 = this.rectangles[0].left
-5 = this.rectangles[0].left
-6 = this.rectangles[0].left
-
-0 = this.rectangles[1].left
-1 = this.rectangles[1].left
-2 = this.rectangles[1].left
-3 = this.rectangles[1].left
-4 = this.rectangles[1].left
-5 = this.rectangles[1].left
-6 = this.rectangles[1].left
 
 0 = this.rectangles[0].right
 1 = this.rectangles[0].right

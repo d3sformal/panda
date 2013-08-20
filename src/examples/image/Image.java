@@ -41,7 +41,6 @@ public class Image
 	public void render() {
 		/**
 		 * PASS INFO FROM LOAD TO RENDER
-		 */
 		rectangles = new Rectangle[2];
 		rectangles[0] = new Rectangle();
 		rectangles[1] = new Rectangle();
@@ -55,18 +54,17 @@ public class Image
 		rectangles[1].left = 0;
 		rectangles[1].right = 3;
 		rectangles[1].bottom = 3;
-		/*************************/
+		//*************************/
 		
 		Rectangle rec = null;		
-		int i, j;
 
 		// loop over all rectangles and draw them
 		for (int k = 0; k < rectangles.length; ++k) {
 			rec = rectangles[k];
 		
 	    	// change relevant pixels to rectangle color
-			for (i = rec.left; i <= rec.right; i++) {
-				for (j = rec.top; j <= rec.bottom; j++) {
+			for (int i = rec.left; i <= rec.right; i++) {
+				for (int j = rec.top; j <= rec.bottom; j++) {
 					pixels[i][j] = rec.color;
 				}
 			}
