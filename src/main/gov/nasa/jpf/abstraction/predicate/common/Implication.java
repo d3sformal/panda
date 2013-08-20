@@ -31,6 +31,12 @@ public class Implication extends Disjunction {
 		if (a instanceof Contradiction) {
 			return Tautology.create();
 		}
+		if (b instanceof Tautology) {
+			return Tautology.create();
+		}
+		if (b instanceof Contradiction) {
+			return Negation.create(a);
+		}
 		
 		return new Implication(a, b);
 	}

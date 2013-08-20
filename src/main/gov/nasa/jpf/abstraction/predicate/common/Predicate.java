@@ -27,8 +27,10 @@ public abstract class Predicate implements PredicatesVisitable {
 			List<AccessExpression> candidatePaths = candidate.getPaths();
 
 			for (AccessExpression path : getPaths()) {
-				if (candidatePaths.contains(path)) {
-					ret.add(candidate);
+				for (AccessExpression candidatePath : candidatePaths) {
+					if (candidatePath.isSimilarToPrefixOf(path)) {
+						ret.add(candidate);
+					}
 				}
 			}
 		}

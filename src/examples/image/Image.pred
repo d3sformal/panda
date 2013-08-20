@@ -16,10 +16,6 @@ this.rectangles[1].left < this.rectangles[0].left
 this.rectangles[0].right < this.rectangles[1].right
 
 [method image.Image.render]
-this.pixels[i][j] = 2
-i < rec.right
-rec.color = 2
-
 k = 0
 k = 1
 k = 2
@@ -32,6 +28,7 @@ i = 2
 i = 3
 i = 4
 i = 5
+i = 6
 
 j = 0
 j = 1
@@ -39,6 +36,7 @@ j = 2
 j = 3
 j = 4
 j = 5
+j = 6
 
 0 = rec.left
 1 = rec.left
@@ -46,6 +44,7 @@ j = 5
 3 = rec.left
 4 = rec.left
 5 = rec.left
+6 = rec.left
 
 0 = rec.top
 1 = rec.top
@@ -53,6 +52,7 @@ j = 5
 3 = rec.top
 4 = rec.top
 5 = rec.top
+6 = rec.top
 
 0 = rec.right
 1 = rec.right
@@ -60,6 +60,7 @@ j = 5
 3 = rec.right
 4 = rec.right
 5 = rec.right
+6 = rec.right
 
 0 = rec.bottom
 1 = rec.bottom
@@ -67,62 +68,72 @@ j = 5
 3 = rec.bottom
 4 = rec.bottom
 5 = rec.bottom
+6 = rec.bottom
 
-rec = rectangles[0]
-rec = rectangles[1]
+rec = this.rectangles[k]
 
-0 = rectangles[0].left
-1 = rectangles[0].left
-2 = rectangles[0].left
-3 = rectangles[0].left
-4 = rectangles[0].left
-5 = rectangles[0].left
+this.rectangles[0] = this.rectangles[1]
 
-0 = rectangles[1].left
-1 = rectangles[1].left
-2 = rectangles[1].left
-3 = rectangles[1].left
-4 = rectangles[1].left
-5 = rectangles[1].left
+0 = this.rectangles[0].left
+1 = this.rectangles[0].left
+2 = this.rectangles[0].left
+3 = this.rectangles[0].left
+4 = this.rectangles[0].left
+5 = this.rectangles[0].left
+6 = this.rectangles[0].left
 
-0 = rectangles[0].right
-1 = rectangles[0].right
-2 = rectangles[0].right
-3 = rectangles[0].right
-4 = rectangles[0].right
-5 = rectangles[0].right
+0 = this.rectangles[1].left
+1 = this.rectangles[1].left
+2 = this.rectangles[1].left
+3 = this.rectangles[1].left
+4 = this.rectangles[1].left
+5 = this.rectangles[1].left
+6 = this.rectangles[1].left
 
-0 = rectangles[1].right
-1 = rectangles[1].right
-2 = rectangles[1].right
-3 = rectangles[1].right
-4 = rectangles[1].right
-5 = rectangles[1].right
+0 = this.rectangles[0].right
+1 = this.rectangles[0].right
+2 = this.rectangles[0].right
+3 = this.rectangles[0].right
+4 = this.rectangles[0].right
+5 = this.rectangles[0].right
+6 = this.rectangles[0].right
 
-0 = rectangles[0].top
-1 = rectangles[0].top
-2 = rectangles[0].top
-3 = rectangles[0].top
-4 = rectangles[0].top
-5 = rectangles[0].top
+0 = this.rectangles[1].right
+1 = this.rectangles[1].right
+2 = this.rectangles[1].right
+3 = this.rectangles[1].right
+4 = this.rectangles[1].right
+5 = this.rectangles[1].right
+6 = this.rectangles[1].right
 
-0 = rectangles[1].top
-1 = rectangles[1].top
-2 = rectangles[1].top
-3 = rectangles[1].top
-4 = rectangles[1].top
-5 = rectangles[1].top
+0 = this.rectangles[0].top
+1 = this.rectangles[0].top
+2 = this.rectangles[0].top
+3 = this.rectangles[0].top
+4 = this.rectangles[0].top
+5 = this.rectangles[0].top
+6 = this.rectangles[0].top
 
-0 = rectangles[0].bottom
-1 = rectangles[0].bottom
-2 = rectangles[0].bottom
-3 = rectangles[0].bottom
-4 = rectangles[0].bottom
-5 = rectangles[0].bottom
+0 = this.rectangles[1].top
+1 = this.rectangles[1].top
+2 = this.rectangles[1].top
+3 = this.rectangles[1].top
+4 = this.rectangles[1].top
+5 = this.rectangles[1].top
+6 = this.rectangles[1].top
 
-0 = rectangles[1].bottom
-1 = rectangles[1].bottom
-2 = rectangles[1].bottom
-3 = rectangles[1].bottom
-4 = rectangles[1].bottom
-5 = rectangles[1].bottom
+0 = this.rectangles[0].bottom
+1 = this.rectangles[0].bottom
+2 = this.rectangles[0].bottom
+3 = this.rectangles[0].bottom
+4 = this.rectangles[0].bottom
+5 = this.rectangles[0].bottom
+6 = this.rectangles[0].bottom
+
+0 = this.rectangles[1].bottom
+1 = this.rectangles[1].bottom
+2 = this.rectangles[1].bottom
+3 = this.rectangles[1].bottom
+4 = this.rectangles[1].bottom
+5 = this.rectangles[1].bottom
+6 = this.rectangles[1].bottom

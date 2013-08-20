@@ -7,6 +7,8 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 public class EmptyExpression implements Expression {
 	
@@ -50,6 +52,11 @@ public class EmptyExpression implements Expression {
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
 		return clone();
+	}
+
+	@Override
+	public Predicate preconditionForBeingFresh() {
+		return Contradiction.create();
 	}
 
 }

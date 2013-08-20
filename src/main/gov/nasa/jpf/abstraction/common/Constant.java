@@ -2,6 +2,8 @@ package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,5 +75,10 @@ public class Constant implements PrimitiveExpression {
 	@Override
 	public Constant update(AccessExpression expression, Expression newExpression) {
 		return clone();
+	}
+
+	@Override
+	public Predicate preconditionForBeingFresh() {
+		return Contradiction.create();
 	}
 }

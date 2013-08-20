@@ -8,6 +8,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Field;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implements ObjectFieldWrite {
 
@@ -89,7 +90,7 @@ public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implem
 		if (expression instanceof ObjectFieldWrite) {
 			ObjectFieldWrite w = (ObjectFieldWrite) expression;
 			
-			return getObject().isSimilarTo(w.getObject()) && getField().equals(w.getField()) && getNewValue().equals(w.getNewValue());
+			return getObject().isSimilarTo(w.getObject());
 		}
 		
 		return false;
@@ -103,6 +104,11 @@ public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implem
 	@Override
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
 		return create(getObject().replaceSubExpressions(expression, newExpression), getField().clone(), getNewValue().replace(expression, newExpression));
+	}
+
+	@Override
+	public Predicate preconditionForBeingFresh() {		
+		return getNewValue().preconditionForBeingFresh();
 	}
 
 }

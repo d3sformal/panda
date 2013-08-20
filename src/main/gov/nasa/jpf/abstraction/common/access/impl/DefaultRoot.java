@@ -7,7 +7,8 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
-import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 public class DefaultRoot extends DefaultAccessExpression implements Root {
 
@@ -116,6 +117,11 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 	@Override
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
 		return clone();
+	}
+
+	@Override
+	public Predicate preconditionForBeingFresh() {
+		return Contradiction.create();
 	}
 
 }

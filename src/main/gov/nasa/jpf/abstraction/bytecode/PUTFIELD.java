@@ -44,6 +44,8 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		if (source == null) source = new EmptyAttribute();
 		if (destination == null) destination = new EmptyAttribute();
 		
+		//System.out.println(">>>> " + sf.peek(1) + " " + ti.getElementInfo(sf.peek(1))); // IF sf.peek(1) == -1 THEN FOUND ERROR "null object"
+		
 		ElementInfo ei = ti.getElementInfo(sf.peek(1));
 		ei.setFieldAttr(getFieldInfo(), source);
 		

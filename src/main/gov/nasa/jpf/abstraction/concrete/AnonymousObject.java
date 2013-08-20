@@ -4,6 +4,8 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.impl.DefaultObjectExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.common.Tautology;
 import gov.nasa.jpf.vm.ElementInfo;
 
 import java.util.ArrayList;
@@ -50,6 +52,11 @@ public class AnonymousObject extends DefaultObjectExpression implements Anonymou
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
 		return clone();
+	}
+	
+	@Override
+	public Predicate preconditionForBeingFresh() {
+		return Tautology.create();
 	}
 
 }

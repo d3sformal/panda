@@ -4,9 +4,12 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Field;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 public class DefaultObjectFieldRead extends DefaultObjectFieldExpression implements ObjectFieldRead {
 
@@ -65,7 +68,7 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 		if (expression instanceof ObjectFieldRead) {
 			ObjectFieldRead r = (ObjectFieldRead) expression;
 			
-			return getField().equals(r.getField()) && getObject().isSimilarTo(r.getObject());
+			return getField().getName().equals(r.getField().getName()) && getObject().isSimilarTo(r.getObject());
 		}
 		
 		return false;
@@ -105,6 +108,17 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 		}
 		
 		return create((AccessExpression) updated, getField().clone());
+	}
+
+	@Override
+	public Predicate preconditionForBeingFresh() {
+		if (getField() instanceof ObjectFieldWrite) {
+			ObjectFieldWrite w = (ObjectFieldWrite) getField();
+			
+			return w.preconditionForBeingFresh();
+		}
+		
+		return Contradiction.create();
 	}
 
 }

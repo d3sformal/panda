@@ -8,6 +8,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 public class DefaultArrayElementWrite extends DefaultArrayElementExpression implements ArrayElementWrite {
 
@@ -84,7 +85,7 @@ public class DefaultArrayElementWrite extends DefaultArrayElementExpression impl
 		if (expression instanceof ArrayElementWrite) {
 			ArrayElementWrite w = (ArrayElementWrite) expression;
 			
-			return getArrays().equals(w.getArrays()) && getArray().isSimilarTo(w.getArray()) && getNewValue().equals(w.getNewValue());
+			return getArray().isSimilarTo(w.getArray());
 		}
 		
 		return false;
@@ -98,6 +99,11 @@ public class DefaultArrayElementWrite extends DefaultArrayElementExpression impl
 	@Override
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
 		return create(getObject().replaceSubExpressions(expression, newExpression), getArrays().clone(), getIndex().replace(expression, newExpression), getNewValue().replace(expression, newExpression));
+	}
+
+	@Override
+	public Predicate preconditionForBeingFresh() {
+		return getNewValue().preconditionForBeingFresh();
 	}
 
 }

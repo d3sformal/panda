@@ -1,12 +1,15 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
+import gov.nasa.jpf.abstraction.predicate.common.Equals;
 import gov.nasa.jpf.abstraction.predicate.common.Implication;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
+import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
 import java.io.BufferedReader;
@@ -149,7 +152,9 @@ public class SMT {
 		input += separator;
 		
 		for (AccessExpression object : objects) {
-			input += "(assert (distinct fresh " + convertToString(object) + "))" + separator;
+			Predicate distinction = Implication.create(Negation.create(object.preconditionForBeingFresh()), Negation.create(Equals.create(DefaultFresh.create(), object)));
+			
+			input += "(assert " + convertToString(distinction) + ")" + separator;
 		}
 		input += separator;
 
@@ -258,6 +263,10 @@ public class SMT {
 	
 	private static String createFormula(Predicate weakestPrecondition, Map<Predicate, TruthValue> determinants, Set<Predicate> additionalClauses) {
 		Predicate formula = Tautology.create();
+		
+		while (weakestPrecondition instanceof UpdatedPredicate) {
+			weakestPrecondition = ((UpdatedPredicate) weakestPrecondition).apply();
+		}
 		
 		for (Predicate clause : additionalClauses) {
 			formula = Conjunction.create(formula, clause);

@@ -2,6 +2,8 @@ package gov.nasa.jpf.abstraction.common.access.impl;
 
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.Fresh;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.common.Tautology;
 
 public class DefaultFresh extends DefaultRoot implements Fresh {
 	protected DefaultFresh() {
@@ -25,5 +27,10 @@ public class DefaultFresh extends DefaultRoot implements Fresh {
 	@Override
 	public boolean equals(Object o) {
 		return false;
+	}
+	
+	@Override
+	public Predicate preconditionForBeingFresh() {
+		return Tautology.create();
 	}
 }

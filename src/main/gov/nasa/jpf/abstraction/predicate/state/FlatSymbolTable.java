@@ -9,7 +9,6 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.ArrayReference;
-import gov.nasa.jpf.abstraction.concrete.CompleteVariableID;
 import gov.nasa.jpf.abstraction.concrete.ObjectReference;
 import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
@@ -280,6 +279,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
 			setPathToVars(path, rewrites.get(path));
 		}
+		
+		System.out.println(">> >> " + affected);
 		
 		return affected;
 	}

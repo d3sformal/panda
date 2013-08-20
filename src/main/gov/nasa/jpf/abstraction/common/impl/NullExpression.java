@@ -8,6 +8,8 @@ import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.common.ObjectExpression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 public class NullExpression implements ObjectExpression {
 	
@@ -46,5 +48,10 @@ public class NullExpression implements ObjectExpression {
 	
 	public static NullExpression create() {
 		return new NullExpression();
+	}
+
+	@Override
+	public Predicate preconditionForBeingFresh() {
+		return Contradiction.create();
 	}
 }

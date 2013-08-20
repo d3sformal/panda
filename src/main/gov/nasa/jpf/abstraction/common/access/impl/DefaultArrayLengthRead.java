@@ -5,9 +5,14 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
+import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
+import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
+import gov.nasa.jpf.abstraction.predicate.common.Equals;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 public class DefaultArrayLengthRead extends DefaultArrayLengthExpression implements ArrayLengthRead {
 
@@ -66,7 +71,7 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 		if (expression instanceof ArrayLengthRead) {
 			ArrayLengthRead r = (ArrayLengthRead) expression;
 			
-			return getArrayLengths().equals(r.getArrayLengths()) && getArray().isSimilarTo(r.getArray());
+			return getArray().isSimilarTo(r.getArray());
 		}
 		
 		return false;
@@ -103,9 +108,9 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 				
 				if (newExpression instanceof AnonymousArray) {
 					AnonymousArray aa = (AnonymousArray) newExpression;
-					return create(updatedAccessExpression, DefaultArrayLengthWrite.create(getArray().clone(), getArrayLengths().clone(), aa.length));
+					return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths().clone(), aa.length));
 				}
-				return create(updatedAccessExpression, DefaultArrayLengthWrite.create(getArray().clone(), getArrayLengths().clone(), DefaultArrayLengthRead.create(expression, getArrayLengths().clone())));
+				return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths().clone(), DefaultArrayLengthRead.create(expression, getArrayLengths().clone())));
 			}
 			if (updated instanceof AnonymousArray) {
 				AnonymousArray updatedAnonymousArray = (AnonymousArray) updated;
@@ -116,5 +121,16 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 		}
 		
 		return clone();
+	}
+	
+	@Override
+	public Predicate preconditionForBeingFresh() {
+		if (getArrayLengths() instanceof ArrayLengthWrite) {
+			ArrayLengthWrite w = (ArrayLengthWrite) getArrayLengths();
+			
+			return Conjunction.create(Equals.create(getArray(), w.getArray()), w.preconditionForBeingFresh());
+		}
+		
+		return Contradiction.create();
 	}
 }

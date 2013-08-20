@@ -6,6 +6,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ObjectExpression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
 
 public class ObjectExpressionWrapper extends DefaultObjectExpression {
@@ -66,5 +67,10 @@ public class ObjectExpressionWrapper extends DefaultObjectExpression {
 	@Override
 	public DefaultObjectExpression clone() {
 		return create(expression.clone());
+	}
+
+	@Override
+	public Predicate preconditionForBeingFresh() {
+		return expression.preconditionForBeingFresh();
 	}
 }

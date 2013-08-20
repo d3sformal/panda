@@ -6,9 +6,14 @@ import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
+import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
+import gov.nasa.jpf.abstraction.predicate.common.Equals;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 public class DefaultArrayElementRead extends DefaultArrayElementExpression implements ArrayElementRead {
 
@@ -67,7 +72,7 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 		if (expression instanceof ArrayElementRead) {
 			ArrayElementRead r = (ArrayElementRead) expression;
 			
-			return getArrays().equals(r.getArrays()) && getArray().isSimilarTo(r.getArray());
+			return getArray().isSimilarTo(r.getArray());
 		}
 		
 		return false;
@@ -105,5 +110,16 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 		}
 		
 		return create((AccessExpression) updated, getArrays().clone(), getIndex().update(expression, newExpression));
+	}
+
+	@Override
+	public Predicate preconditionForBeingFresh() {
+		if (getArrays() instanceof ArrayElementWrite) {
+			ArrayElementWrite w = (ArrayElementWrite) getArrays();
+			
+			return Conjunction.create(Equals.create(getArray(), w.getArray()), w.preconditionForBeingFresh());
+		}
+		
+		return Contradiction.create();
 	}
 }
