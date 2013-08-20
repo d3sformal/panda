@@ -29,8 +29,10 @@ public enum NotationPolicy {
 	}
 	
 	public static String convertToString(PredicatesVisitable visitable, NotationPolicy policy) {
-		PredicatesStringifier stringifier = getStringifier(policy);
-		
+		return convertToString(visitable, getStringifier(policy));
+	}
+	
+	public static String convertToString(PredicatesVisitable visitable, PredicatesStringifier stringifier) {		
 		visitable.accept(stringifier);
 		
 		return stringifier.getString();

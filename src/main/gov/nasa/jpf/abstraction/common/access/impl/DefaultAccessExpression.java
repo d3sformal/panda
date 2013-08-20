@@ -5,6 +5,7 @@ import java.util.List;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -12,6 +13,7 @@ import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.impl.DefaultObjectExpression;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
+import gov.nasa.jpf.abstraction.predicate.smt.PredicatesSMTStringifier;
 
 public abstract class DefaultAccessExpression extends DefaultObjectExpression implements AccessExpression {
 
@@ -122,6 +124,22 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 		x = x.reRoot(y, z);
 		
 		System.out.println(x + " " + x.getTail().getClass().getSimpleName());
+		
+		AccessExpression e1;
+		AccessExpression e2;
+		
+		e1 = DefaultObjectFieldRead.create(DefaultArrayElementRead.create(DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create())), Constant.create(0)), "bottom");
+		e2 = DefaultObjectFieldRead.create(DefaultArrayElementRead.create(DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create())), Constant.create(0)), "bottom");
+		
+		e1 = DefaultArrayElementRead.create(DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create())), Constant.create(0));
+		e2 = DefaultArrayElementRead.create(DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create())), Constant.create(0));
+		
+		e1 = DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create()));
+		e2 = DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create()));
+		
+		System.out.println(NotationPolicy.convertToString(e1, new PredicatesSMTStringifier()));
+		System.out.println(NotationPolicy.convertToString(e2, new PredicatesSMTStringifier()));
+		System.out.println(e1.equals(e2) + " " + e1.hashCode() + " " + e2.hashCode());
 	}
 
 }

@@ -70,4 +70,14 @@ public class PrimitiveExpressionWrapper extends DefaultPrimitiveExpression {
 		return expression.preconditionForBeingFresh();
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		return expression.equals(o);
+	}
+	
+	@Override
+	public int hashCode() {
+		return expression.hashCode();
+	}
+	
 }

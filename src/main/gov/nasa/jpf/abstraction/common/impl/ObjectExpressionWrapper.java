@@ -73,4 +73,14 @@ public class ObjectExpressionWrapper extends DefaultObjectExpression {
 	public Predicate preconditionForBeingFresh() {
 		return expression.preconditionForBeingFresh();
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		return expression.equals(o);
+	}
+	
+	@Override
+	public int hashCode() {
+		return expression.hashCode();
+	}
 }

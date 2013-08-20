@@ -61,6 +61,11 @@ public class Constant implements PrimitiveExpression {
 		
 		return false;
 	}
+	
+	@Override
+	public int hashCode() {
+		return value.hashCode();
+	}
 
 	@Override
 	public String toString() {
