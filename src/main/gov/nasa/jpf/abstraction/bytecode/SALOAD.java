@@ -56,7 +56,7 @@ public class SALOAD extends gov.nasa.jpf.jvm.bytecode.SALOAD {
 			
 			Attribute attribute = new NonEmptyAttribute(null, path);
 
-			sf = ti.getTopFrame();
+			sf = ti.getModifiableTopFrame();
 			sf.setOperandAttr(attribute);
 		}
 

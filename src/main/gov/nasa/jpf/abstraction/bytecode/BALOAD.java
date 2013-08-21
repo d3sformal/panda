@@ -56,7 +56,7 @@ public class BALOAD extends gov.nasa.jpf.jvm.bytecode.BALOAD {
 				
 			Attribute attribute = new NonEmptyAttribute(null, path);
 
-			sf = ti.getTopFrame();
+			sf = ti.getModifiableTopFrame();
 			sf.setOperandAttr(attribute);
 		}
 

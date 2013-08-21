@@ -46,7 +46,7 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 						
 			GlobalAbstraction.getInstance().processLoad(path);
 
-			StackFrame sf = ti.getTopFrame();
+			StackFrame sf = ti.getModifiableTopFrame();
 			sf.setOperandAttr(attribute);
 		}
 

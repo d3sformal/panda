@@ -56,7 +56,7 @@ public class DALOAD extends gov.nasa.jpf.jvm.bytecode.DALOAD {
 			
 			Attribute attribute = new NonEmptyAttribute(null, path);
 
-			sf = ti.getTopFrame();
+			sf = ti.getModifiableTopFrame();
 			sf.setLongOperandAttr(attribute);
 		}
 

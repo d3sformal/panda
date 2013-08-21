@@ -46,7 +46,7 @@ public class LLOAD extends gov.nasa.jpf.jvm.bytecode.LLOAD {
 						
 			GlobalAbstraction.getInstance().processLoad(path);
 
-			StackFrame sf = ti.getTopFrame();
+			StackFrame sf = ti.getModifiableTopFrame();
 			sf.setLongOperandAttr(attribute);
 		}
 

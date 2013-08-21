@@ -56,7 +56,7 @@ public class CALOAD extends gov.nasa.jpf.jvm.bytecode.CALOAD {
 				
 			Attribute attribute = new NonEmptyAttribute(null, path);
 
-			sf = ti.getTopFrame();
+			sf = ti.getModifiableTopFrame();
 			sf.setOperandAttr(attribute);
 		}
 

@@ -56,7 +56,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 				
 			Attribute attribute = new NonEmptyAttribute(null, path);
 
-			sf = ti.getTopFrame();
+			sf = ti.getModifiableTopFrame();
 			sf.setOperandAttr(attribute);
 		}
 

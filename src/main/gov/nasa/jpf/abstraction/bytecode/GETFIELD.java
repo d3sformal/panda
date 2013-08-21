@@ -57,7 +57,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 			GlobalAbstraction.getInstance().processLoad(path);
 		}
 
-		sf = ti.getTopFrame();
+		sf = ti.getModifiableTopFrame();
 		sf.setOperandAttr(new NonEmptyAttribute(null, path));
 		
 		return actualNextInsn;

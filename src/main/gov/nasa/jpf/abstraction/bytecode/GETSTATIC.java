@@ -52,7 +52,7 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 			GlobalAbstraction.getInstance().processLoad(path);
 		}
 		
-		StackFrame sf = ti.getTopFrame();
+		StackFrame sf = ti.getModifiableTopFrame();
 		sf.setOperandAttr(new NonEmptyAttribute(null, path));
 		
 		return actualNextInsn;

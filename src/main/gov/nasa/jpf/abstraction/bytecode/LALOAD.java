@@ -56,7 +56,7 @@ public class LALOAD extends gov.nasa.jpf.jvm.bytecode.LALOAD {
 			
 			Attribute attribute = new NonEmptyAttribute(null, path);
 
-			sf = ti.getTopFrame();
+			sf = ti.getModifiableTopFrame();
 			sf.setLongOperandAttr(attribute);
 		}
 

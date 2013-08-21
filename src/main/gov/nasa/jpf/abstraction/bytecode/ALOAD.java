@@ -51,6 +51,7 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 	    		
 	    		GlobalAbstraction.getInstance().processLoad(path);
 
+	    		sf = ti.getModifiableTopFrame();
 		    	sf.setOperandAttr(attribute);
     		}
         }
