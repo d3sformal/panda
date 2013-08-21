@@ -37,7 +37,7 @@ public class DRETURN extends gov.nasa.jpf.jvm.bytecode.DRETURN {
 			return actualNextInsn;
 		}
 				
-        GlobalAbstraction.getInstance().processMethodReturn(method);
+        GlobalAbstraction.getInstance().processMethodReturn(ti, method);
 
 		return actualNextInsn;
 	}

@@ -37,7 +37,7 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
 			return actualNextInsn;
 		}
 		
-		GlobalAbstraction.getInstance().processMethodReturn(method);
+		GlobalAbstraction.getInstance().processMethodReturn(ti, method);
 		
 		return actualNextInsn;
 	}

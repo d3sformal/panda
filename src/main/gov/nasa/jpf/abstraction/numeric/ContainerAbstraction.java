@@ -26,6 +26,7 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.util.Pair;
 import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,16 +97,16 @@ public class ContainerAbstraction extends Abstraction {
     }
     
     @Override
-    public void processMethodCall(MethodInfo method) {
+    public void processMethodCall(ThreadInfo threadInfo, MethodInfo method) {
     	for (Abstraction abs : list) {
-    		abs.processMethodCall(method);
+    		abs.processMethodCall(threadInfo, method);
     	}
 	}
 	
     @Override
-	public void processMethodReturn(MethodInfo method) {
+	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
     	for (Abstraction abs : list) {
-    		abs.processMethodReturn(method);
+    		abs.processMethodReturn(threadInfo, method);
     	}
 	}
     

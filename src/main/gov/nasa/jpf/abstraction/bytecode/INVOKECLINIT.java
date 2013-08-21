@@ -43,7 +43,7 @@ public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
 			return actualNextInsn;
 		}
 		
-		GlobalAbstraction.getInstance().processMethodCall(method);
+		GlobalAbstraction.getInstance().processMethodCall(ti, method);
 
 		return actualNextInsn;
 	}

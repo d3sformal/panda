@@ -42,7 +42,7 @@ public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
 			return actualNextInsn;
 		}
 				
-		GlobalAbstraction.getInstance().processMethodCall(method);
+		GlobalAbstraction.getInstance().processMethodCall(ti, method);
 
 		return actualNextInsn;
 	}

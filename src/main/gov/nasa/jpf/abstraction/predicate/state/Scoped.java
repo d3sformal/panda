@@ -4,6 +4,8 @@ import gov.nasa.jpf.vm.MethodInfo;
 
 public interface Scoped {
 	public Scope createDefaultScope(MethodInfo method);
+	public void prepareMethodParamAssignment(MethodInfo method);
+	public void processMethodParamAssignment(MethodInfo method);
 	public void processMethodCall(MethodInfo method);
 	public void processMethodReturn();
 	public void store(Scope scope);

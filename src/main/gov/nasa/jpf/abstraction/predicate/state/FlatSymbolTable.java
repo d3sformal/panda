@@ -16,7 +16,9 @@ import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Comparator;
@@ -105,7 +107,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		variableIDToPrefixes.get(var).add(path);
 	}
 	
-	private void setPathToVars(AccessExpression path, Set<VariableID> vars) {
+	@Override
+	public void setPathToVars(AccessExpression path, Set<VariableID> vars) {
 		for (VariableID var : vars) {
 			setPathToVar(path, var);
 		}
@@ -366,6 +369,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		}
 		
 		return false;
+	}
+
+	@Override
+	public Iterator<Entry<AccessExpression, Set<VariableID>>> iterator() {
+		return prefixToVariableIDs.entrySet().iterator();
 	}
 
 }

@@ -1,0 +1,9 @@
+[object methods.Methods]
+this.b > 1
+
+[method methods.Methods.do1]
+this.a = 1
+
+[method methods.Methods.do2]
+c = 1
+c = 2

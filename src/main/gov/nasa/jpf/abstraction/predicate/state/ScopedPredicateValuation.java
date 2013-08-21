@@ -106,6 +106,33 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
+	public void prepareMethodParamAssignment(MethodInfo method) {
+		scopes.push(createDefaultScope(method));
+		
+		// PRE-CALL PREDICATES
+		for (Map.Entry<Predicate, TruthValue> entry : scopes.top(1)) {
+			scopes.top().put(entry.getKey(), entry.getValue());
+		}
+	}
+	
+	@Override
+	public void processMethodParamAssignment(MethodInfo method) {
+		FlatPredicateValuation scope = scopes.top();
+		
+		scopes.pop();
+		
+		// ONLY THE RELEVANT PREDICATES
+		scopes.push(createDefaultScope(method));
+		
+		// WITH THE CORRECT INITIAL VALUE
+		for (Map.Entry<Predicate, TruthValue> entry : scope) {
+			if (scopes.top().containsKey(entry.getKey())) {
+				scopes.top().put(entry.getKey(), entry.getValue());
+			}
+		}
+	}
+	
+	@Override
 	public void processMethodCall(MethodInfo method) {
 		scopes.push(createDefaultScope(method));
 	}
@@ -156,6 +183,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	@Override
 	public int count() {
 		return scopes.count() > 0 ? scopes.top().count() : 0;
+	}
+
+	@Override
+	public boolean containsKey(Predicate predicate) {
+		return scopes.top().containsKey(predicate);
 	}
 
 }

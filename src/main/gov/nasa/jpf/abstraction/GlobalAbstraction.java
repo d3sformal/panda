@@ -6,6 +6,7 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 public class GlobalAbstraction extends Abstraction {
 	private static GlobalAbstraction instance;
@@ -90,13 +91,21 @@ public class GlobalAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processMethodCall(MethodInfo method) {
-		abs.processMethodCall(method);
+	public void processMethodCall(ThreadInfo threadInfo, MethodInfo method) {
+		if (!RunDetector.isRunning()) {
+			threadInfo = null;
+		}
+		
+		abs.processMethodCall(threadInfo, method);
 	}
 	
 	@Override
-	public void processMethodReturn(MethodInfo method) {
-		abs.processMethodReturn(method);
+	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
+		if (!RunDetector.isRunning()) {
+			threadInfo = null;
+		}
+		
+		abs.processMethodReturn(threadInfo, method);
 	}
 	
 	@Override

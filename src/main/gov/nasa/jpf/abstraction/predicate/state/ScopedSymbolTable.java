@@ -1,11 +1,16 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
+import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class ScopedSymbolTable implements SymbolTable, Scoped {
@@ -44,6 +49,27 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	@Override
 	public Set<AccessExpression> processObjectStore(Expression from, ConcreteAccessExpression to) {
 		return scopes.top().processObjectStore(from, to);
+	}
+	
+	@Override
+	public void prepareMethodParamAssignment(MethodInfo method) {
+		scopes.push(scopes.top().clone());
+	}
+	
+	@Override
+	public void processMethodParamAssignment(MethodInfo method) {
+		FlatSymbolTable scope = scopes.top().clone();
+		LocalVarInfo args[] = method.getArgumentLocalVars();
+		
+		scopes.push(createDefaultScope(method));
+		
+		for (Map.Entry<AccessExpression, Set<VariableID>> entry : scope) {
+			for (LocalVarInfo arg : args) {
+				if (DefaultAccessExpression.createFromString(arg.getName()).isPrefixOf(entry.getKey())) {
+					scopes.top().setPathToVars(entry.getKey(), entry.getValue());
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -97,6 +123,16 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	@Override
 	public boolean isArray(AccessExpression path) {
 		return scopes.top().isArray(path);
+	}
+
+	@Override
+	public Iterator<Entry<AccessExpression, Set<VariableID>>> iterator() {
+		return scopes.top().iterator();
+	}
+
+	@Override
+	public void setPathToVars(AccessExpression path, Set<VariableID> vars) {
+		scopes.top().setPathToVars(path, vars);
 	}
 	
 }

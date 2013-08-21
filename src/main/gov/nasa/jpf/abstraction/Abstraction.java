@@ -18,7 +18,6 @@
 package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
@@ -26,6 +25,7 @@ import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
  * Common root class for numeric abstractions.
@@ -87,10 +87,10 @@ public abstract class Abstraction {
 	public void processObjectStore(Expression from, ConcreteAccessExpression to) {
 	}
 	
-	public void processMethodCall(MethodInfo method) {
+	public void processMethodCall(ThreadInfo threadInfo, MethodInfo method) {
 	}
 	
-	public void processMethodReturn(MethodInfo method) {
+	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
 	}
 	
 	public TruthValue evaluatePredicate(Predicate predicate) {

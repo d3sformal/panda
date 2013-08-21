@@ -9,7 +9,7 @@ public class SymbolTableStack implements Scopes {
 
 	@Override
 	public FlatSymbolTable top() {
-		return scopes.get(scopes.size() - 1);
+		return top(0);
 	}
 
 	@Override
@@ -40,6 +40,11 @@ public class SymbolTableStack implements Scopes {
 		}
 		
 		return clone;
+	}
+
+	@Override
+	public FlatSymbolTable top(int i) {
+		return scopes.get(scopes.size() - i - 1);
 	}
 
 }

@@ -212,5 +212,10 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	public int count() {
 		return valuations.keySet().size();
 	}
+
+	@Override
+	public boolean containsKey(Predicate predicate) {
+		return valuations.containsKey(predicate);
+	}
 	
 }

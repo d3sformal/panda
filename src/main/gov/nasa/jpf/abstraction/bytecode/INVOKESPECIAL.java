@@ -42,7 +42,7 @@ public class INVOKESPECIAL extends gov.nasa.jpf.jvm.bytecode.INVOKESPECIAL {
 			return actualNextInsn;
 		}
 				
-		GlobalAbstraction.getInstance().processMethodCall(method);
+		GlobalAbstraction.getInstance().processMethodCall(ti, method);
 
 		return actualNextInsn;
 	}

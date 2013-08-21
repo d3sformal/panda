@@ -42,7 +42,7 @@ public class INVOKEVIRTUAL extends gov.nasa.jpf.jvm.bytecode.INVOKEVIRTUAL {
 			return actualNextInsn;
 		}
 				
-		GlobalAbstraction.getInstance().processMethodCall(method);
+		GlobalAbstraction.getInstance().processMethodCall(ti, method);
 
 		return actualNextInsn;
 	}
