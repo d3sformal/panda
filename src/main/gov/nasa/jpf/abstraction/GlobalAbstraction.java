@@ -101,6 +101,11 @@ public class GlobalAbstraction extends Abstraction {
 	}
 	
 	@Override
+	public void processVoidMethodReturn(ThreadInfo threadInfo, MethodInfo method) {		
+		abs.processVoidMethodReturn(threadInfo, method);
+	}
+	
+	@Override
 	public TruthValue evaluatePredicate(Predicate predicate) {
 		if (!RunDetector.isRunning()) return TruthValue.UNDEFINED;
 		

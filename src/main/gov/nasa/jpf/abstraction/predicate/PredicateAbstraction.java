@@ -58,12 +58,14 @@ public class PredicateAbstraction extends Abstraction {
 	
 	@Override
 	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
-		if (threadInfo != null && false) {
-		
-		} else {
-			symbolTable.processMethodReturn();
-			predicateValuation.processMethodReturn();
-		}
+		symbolTable.processMethodReturn(threadInfo, method);
+		predicateValuation.processMethodReturn(threadInfo, method);
+	}
+	
+	@Override
+	public void processVoidMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
+		symbolTable.processVoidMethodReturn(threadInfo, method);
+		predicateValuation.processVoidMethodReturn(threadInfo, method);
 	}
 	
 	@Override

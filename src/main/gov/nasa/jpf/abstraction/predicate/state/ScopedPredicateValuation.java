@@ -2,10 +2,16 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.concrete.access.impl.DefaultConcreteReturnValue;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.abstraction.predicate.common.Comparison;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
 import gov.nasa.jpf.abstraction.predicate.common.MethodContext;
 import gov.nasa.jpf.abstraction.predicate.common.ObjectContext;
@@ -144,9 +150,59 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		scopes.push(finalScope);
 	}
-
+	
+	private static boolean predicateOverReturn(Predicate predicate) {
+		if (predicate instanceof Negation) {
+			Negation n = (Negation) predicate;
+			
+			return predicateOverReturn(n.predicate);
+		}
+		
+		if (predicate instanceof Comparison) {
+			Comparison c = (Comparison) predicate;
+			
+			return c.a instanceof ReturnValue || c.b instanceof ReturnValue;
+		}
+		
+		return false;
+	}
+	
 	@Override
-	public void processMethodReturn() {
+	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
+		StackFrame sf = threadInfo.getModifiableTopFrame();
+		Attribute attr = (Attribute) sf.getResultAttr();
+		ReturnValue ret = DefaultConcreteReturnValue.create(threadInfo, sf.getPC());
+		
+		FlatPredicateValuation scope;
+		
+		if (scopes.count() == 1) {
+			scope = createDefaultScope(method);
+		} else {
+			scope = scopes.top(1);
+		}
+		
+		if (attr == null) attr = new EmptyAttribute();
+		
+		for (Map.Entry<Predicate, TruthValue> entry : this) {
+			Predicate predicate = entry.getKey();
+			
+			if (predicateOverReturn(predicate)) {
+				Predicate determinant = predicate.replace(DefaultReturnValue.create(), attr.getExpression());
+				Predicate result = predicate.replace(DefaultReturnValue.create(), ret);
+				
+				scope.put(result, scopes.top().evaluatePredicate(determinant));
+			}
+		}
+				
+		sf.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), ret));
+		
+		processVoidMethodReturn(threadInfo, method);
+	}
+	
+	@Override
+	public void processVoidMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
+		//TODO copy predicates shared between scopes (this. ...)
+		
 		scopes.pop();
 	}
 	

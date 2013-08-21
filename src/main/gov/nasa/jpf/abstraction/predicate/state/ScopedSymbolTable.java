@@ -96,7 +96,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			}
 		
 			// Transfer only the relevant symbols
-			for (Map.Entry<AccessExpression, Set<VariableID>> entry : scopes.top()) {
+			for (Map.Entry<AccessExpression, Set<VariableID>> entry : this) {
 				for (int i = 0; i < args.length; ++i) {
 					if (DefaultAccessExpression.createFromString(args[i].getName()).isPrefixOf(entry.getKey())) {
 						finalScope.setPathToVars(entry.getKey(), entry.getValue());
@@ -110,7 +110,12 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public void processMethodReturn() {
+	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
+		scopes.pop();
+	}
+	
+	@Override
+	public void processVoidMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
 		scopes.pop();
 	}
 	

@@ -28,7 +28,7 @@ public class UpdatedPredicate extends Predicate {
 	}
 
 	@Override
-	public List<AccessExpression> getPaths() {
+	public List<AccessExpression> getPaths() {		
 		return apply().getPaths();
 	}
 

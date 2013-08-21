@@ -61,23 +61,32 @@ predicate returns [Predicate val]
 	| 'not' '(' p=predicate ')' {
 		$ctx.val = Negation.create($p.val);
 	}
-	| a=expression '=' b=expression {
+	| a=expressionorreturn '=' b=expressionorreturn {
 		$ctx.val = Equals.create($a.val, $b.val);
 	}
-	| a=expression '<' b=expression {
+	| a=expressionorreturn '<' b=expressionorreturn {
 		$ctx.val = LessThan.create($a.val, $b.val);
 	}
-	| a=expression '>' b=expression {
+	| a=expressionorreturn '>' b=expressionorreturn {
 		$ctx.val = LessThan.create($b.val, $a.val);
 	}
-	| a=expression '<=' b=expression {
+	| a=expressionorreturn '<=' b=expressionorreturn {
 		$ctx.val = Negation.create(LessThan.create($b.val, $a.val));
 	}
-	| a=expression '>=' b=expression {
+	| a=expressionorreturn '>=' b=expressionorreturn {
 		$ctx.val = Negation.create(LessThan.create($a.val, $b.val));
 	}
-	| a=expression '!=' b=expression {
+	| a=expressionorreturn '!=' b=expressionorreturn {
 		$ctx.val = Negation.create(Equals.create($a.val, $b.val));
+	}
+	;
+	
+expressionorreturn returns [Expression val]
+	: 'return' {
+		$ctx.val = DefaultReturnValue.create();
+	}
+	| e=expression {
+		$ctx.val = $e.val;
 	}
 	;
 

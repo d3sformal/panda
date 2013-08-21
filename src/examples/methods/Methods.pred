@@ -1,9 +1,12 @@
 [object methods.Methods]
-this.b > 1
+this.b >= 6
 
 [method methods.Methods.do1]
 this.a = 1
+c = 2
 
 [method methods.Methods.do2]
-c = 1
-c = 2
+c = 3
+c = 4
+d = 1
+return >= 5

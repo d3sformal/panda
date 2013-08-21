@@ -6,14 +6,16 @@ public class Methods {
 	int b;
 	
 	public void do1() {
+		int c = 2;
+		
 		a = 1;
-		b = do2(a);
+		b = do2(c + 1, a) + 1;
 	}
 	
-	public int do2(int c) {
+	public int do2(int c, int d) {
 		c++;
 		
-		return c;
+		return c + d;
 	}
 
 	public static void main(String[] args) {

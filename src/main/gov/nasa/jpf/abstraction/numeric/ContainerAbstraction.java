@@ -111,6 +111,13 @@ public class ContainerAbstraction extends Abstraction {
 	}
     
     @Override
+	public void processVoidMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
+    	for (Abstraction abs : list) {
+    		abs.processVoidMethodReturn(threadInfo, method);
+    	}
+	}
+    
+    @Override
     public TruthValue evaluatePredicate(Predicate predicate) {
     	TruthValue ret = TruthValue.UNDEFINED;
 

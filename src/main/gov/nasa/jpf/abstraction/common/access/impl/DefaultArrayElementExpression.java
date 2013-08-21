@@ -33,6 +33,7 @@ public abstract class DefaultArrayElementExpression extends DefaultArrayAccessEx
 	public List<AccessExpression> getSubAccessExpressions() {
 		List<AccessExpression> ret = super.getSubAccessExpressions();
 		
+		ret.addAll(arrays.getSubAccessExpressions());
 		ret.addAll(index.getAccessExpressions());
 		
 		return ret;

@@ -93,6 +93,9 @@ public abstract class Abstraction {
 	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
 	}
 	
+	public void processVoidMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
+	}
+	
 	public TruthValue evaluatePredicate(Predicate predicate) {
 		return TruthValue.UNDEFINED;
 	}
