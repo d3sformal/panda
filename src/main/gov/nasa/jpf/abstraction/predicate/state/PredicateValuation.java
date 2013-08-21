@@ -11,6 +11,7 @@ public interface PredicateValuation extends Iterable<Map.Entry<Predicate, TruthV
 	public void put(Predicate predicate, TruthValue value);
 	public boolean containsKey(Predicate predicate);
 	public TruthValue get(Predicate predicate);
+	public Set<Predicate> getPredicates();
 	public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression);
 	public TruthValue evaluatePredicate(Predicate predicate);
 }

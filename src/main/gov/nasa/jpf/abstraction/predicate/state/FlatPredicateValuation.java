@@ -217,5 +217,10 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	public boolean containsKey(Predicate predicate) {
 		return valuations.containsKey(predicate);
 	}
+
+	@Override
+	public Set<Predicate> getPredicates() {
+		return valuations.keySet();
+	}
 	
 }

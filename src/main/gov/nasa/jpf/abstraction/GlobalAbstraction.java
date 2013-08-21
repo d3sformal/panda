@@ -92,19 +92,11 @@ public class GlobalAbstraction extends Abstraction {
 	
 	@Override
 	public void processMethodCall(ThreadInfo threadInfo, MethodInfo method) {
-		if (!RunDetector.isRunning()) {
-			threadInfo = null;
-		}
-		
 		abs.processMethodCall(threadInfo, method);
 	}
 	
 	@Override
-	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
-		if (!RunDetector.isRunning()) {
-			threadInfo = null;
-		}
-		
+	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {		
 		abs.processMethodReturn(threadInfo, method);
 	}
 	

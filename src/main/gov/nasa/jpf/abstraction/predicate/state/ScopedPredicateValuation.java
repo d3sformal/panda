@@ -1,8 +1,11 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
 import gov.nasa.jpf.abstraction.predicate.common.MethodContext;
 import gov.nasa.jpf.abstraction.predicate.common.ObjectContext;
@@ -10,7 +13,10 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.abstraction.predicate.smt.SMTException;
+import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,35 +112,37 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public void prepareMethodParamAssignment(MethodInfo method) {
-		scopes.push(createDefaultScope(method));
+	public void processMethodCall(ThreadInfo threadInfo, MethodInfo method) {
+		FlatPredicateValuation transitionScope;
+		FlatPredicateValuation finalScope = createDefaultScope(method);
 		
-		// PRE-CALL PREDICATES
-		for (Map.Entry<Predicate, TruthValue> entry : scopes.top(1)) {
-			scopes.top().put(entry.getKey(), entry.getValue());
+		if (scopes.count() == 0) {
+			transitionScope = createDefaultScope(method);
+		} else {
+			transitionScope = scopes.top().clone();
 		}
-	}
-	
-	@Override
-	public void processMethodParamAssignment(MethodInfo method) {
-		FlatPredicateValuation scope = scopes.top();
 		
-		scopes.pop();
+		StackFrame sf = threadInfo.getTopFrame();
+		Object attrs[] = sf.getArgumentAttrs(method);
+		LocalVarInfo args[] = method.getArgumentLocalVars();
 		
-		// ONLY THE RELEVANT PREDICATES
-		scopes.push(createDefaultScope(method));
-		
-		// WITH THE CORRECT INITIAL VALUE
-		for (Map.Entry<Predicate, TruthValue> entry : scope) {
-			if (scopes.top().containsKey(entry.getKey())) {
-				scopes.top().put(entry.getKey(), entry.getValue());
+		if (args != null && attrs != null) {
+			for (Map.Entry<Predicate, TruthValue> entry : finalScope) {
+				Predicate replaced = entry.getKey();
+				
+				for (int i = 1; i < args.length; ++i) {
+					Attribute attr = (Attribute) attrs[i];
+					
+					if (attr == null) attr = new EmptyAttribute();
+					
+					replaced = replaced.replace(DefaultAccessExpression.createFromString(args[i].getName()), attr.getExpression());
+				}
+				
+				finalScope.put(entry.getKey(), transitionScope.evaluatePredicate(replaced));
 			}
 		}
-	}
-	
-	@Override
-	public void processMethodCall(MethodInfo method) {
-		scopes.push(createDefaultScope(method));
+		
+		scopes.push(finalScope);
 	}
 
 	@Override
@@ -188,6 +196,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	@Override
 	public boolean containsKey(Predicate predicate) {
 		return scopes.top().containsKey(predicate);
+	}
+
+	@Override
+	public Set<Predicate> getPredicates() {
+		return scopes.top().getPredicates();
 	}
 
 }

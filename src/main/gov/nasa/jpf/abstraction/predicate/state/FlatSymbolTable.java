@@ -282,9 +282,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
 			setPathToVars(path, rewrites.get(path));
 		}
-		
-		System.out.println(">> >> " + affected);
-		
+				
 		return affected;
 	}
 	

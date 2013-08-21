@@ -3,15 +3,11 @@ package gov.nasa.jpf.abstraction.predicate;
 import java.util.Set;
 
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.impl.ObjectExpressionWrapper;
 import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionWrapper;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
-import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVar;
-import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVarRootedHeapObject;
-import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
@@ -21,10 +17,7 @@ import gov.nasa.jpf.abstraction.predicate.state.State;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTableStack;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
-import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public class PredicateAbstraction extends Abstraction {
@@ -59,41 +52,8 @@ public class PredicateAbstraction extends Abstraction {
 	
 	@Override
 	public void processMethodCall(ThreadInfo threadInfo, MethodInfo method) {
-		if (threadInfo != null) {
-			symbolTable.prepareMethodParamAssignment(method);
-			predicateValuation.prepareMethodParamAssignment(method);
-			
-			StackFrame sf = threadInfo.getTopFrame();
-			Object attrs[] = sf.getArgumentAttrs(method);
-			LocalVarInfo args[] = method.getArgumentLocalVars();
-	
-			if (attrs != null) {
-				for (int i = 1; i < args.length; ++i) {
-					Attribute attr = (Attribute) attrs[i];
-					
-					if (attr == null) attr = new EmptyAttribute();
-							
-					ConcreteAccessExpression var;
-					
-					if (args[i].isNumeric()) {
-						var = LocalVar.create(args[i].getName(), threadInfo, args[i]);
-					} else {
-						ElementInfo ei = threadInfo.getElementInfo(sf.peek(args.length - i));
-						
-						var = LocalVarRootedHeapObject.create(args[i].getName(), threadInfo, ei, args[i]);
-					}
-					
-					
-					processStore(attr.getExpression(), var);
-				}
-			}
-			
-			symbolTable.processMethodParamAssignment(method);
-			predicateValuation.processMethodParamAssignment(method);
-		} else {
-			symbolTable.processMethodCall(method);
-			predicateValuation.processMethodCall(method);
-		}
+		symbolTable.processMethodCall(threadInfo, method);
+		predicateValuation.processMethodCall(threadInfo, method);
 	}
 	
 	@Override

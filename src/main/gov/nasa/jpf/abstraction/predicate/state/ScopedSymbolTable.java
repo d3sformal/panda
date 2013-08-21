@@ -1,12 +1,19 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
+import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVar;
+import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVarRootedHeapObject;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
+import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
+import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -52,29 +59,54 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public void prepareMethodParamAssignment(MethodInfo method) {
-		scopes.push(scopes.top().clone());
-	}
-	
-	@Override
-	public void processMethodParamAssignment(MethodInfo method) {
-		FlatSymbolTable scope = scopes.top().clone();
+	public void processMethodCall(ThreadInfo threadInfo, MethodInfo method) {
+		FlatSymbolTable transitionScope;
+		FlatSymbolTable finalScope = createDefaultScope(method);
+		
+		if (scopes.count() == 0) {
+			transitionScope = createDefaultScope(method);
+		} else {
+			transitionScope = scopes.top().clone();
+		}
+		
+		scopes.push(transitionScope);
+		
+		StackFrame sf = threadInfo.getTopFrame();
+		Object attrs[] = sf.getArgumentAttrs(method);
 		LocalVarInfo args[] = method.getArgumentLocalVars();
+
+		if (args != null && attrs != null) {
+			// Skip "this"
+			for (int i = 1; i < args.length; ++i) {
+				Attribute attr = (Attribute) attrs[i];
+				
+				if (attr == null) attr = new EmptyAttribute();
+				
+				if (args[i] != null) {
+					if (args[i].isNumeric()) {
+						// Assign to numeric (primitive) arg
+						processPrimitiveStore(LocalVar.create(args[i].getName(), threadInfo, args[i]));
+					} else {
+						ElementInfo ei = threadInfo.getElementInfo(sf.peek(args.length - i));
+						
+						// Assign to object arg
+						processObjectStore(attr.getExpression(), LocalVarRootedHeapObject.create(args[i].getName(), threadInfo, ei, args[i]));
+					}
+				}
+			}
 		
-		scopes.push(createDefaultScope(method));
-		
-		for (Map.Entry<AccessExpression, Set<VariableID>> entry : scope) {
-			for (LocalVarInfo arg : args) {
-				if (DefaultAccessExpression.createFromString(arg.getName()).isPrefixOf(entry.getKey())) {
-					scopes.top().setPathToVars(entry.getKey(), entry.getValue());
+			// Transfer only the relevant symbols
+			for (Map.Entry<AccessExpression, Set<VariableID>> entry : scopes.top()) {
+				for (int i = 0; i < args.length; ++i) {
+					if (DefaultAccessExpression.createFromString(args[i].getName()).isPrefixOf(entry.getKey())) {
+						finalScope.setPathToVars(entry.getKey(), entry.getValue());
+					}
 				}
 			}
 		}
-	}
-	
-	@Override
-	public void processMethodCall(MethodInfo method) {
-		scopes.push(createDefaultScope(method));
+		
+		scopes.pop();
+		scopes.push(finalScope);
 	}
 	
 	@Override
