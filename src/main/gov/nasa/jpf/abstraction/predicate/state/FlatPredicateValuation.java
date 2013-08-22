@@ -12,6 +12,7 @@ import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.vm.VM;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -79,6 +80,11 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		}
 		
 		valuations.putAll(newValuations);
+	}
+	
+	@Override
+	public void remove(Predicate predicate) {
+		valuations.remove(predicate);
 	}
 
 	@Override
@@ -188,24 +194,36 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	
 	@Override
 	public TruthValue evaluatePredicate(Predicate predicate) {
-		Predicate positiveWeakestPrecondition = predicate;
-		Predicate negativeWeakestPrecondition = Negation.create(predicate);
-
-		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
-		Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+		Set<Predicate> predicates = new HashSet<Predicate>();
+		
+		predicates.add(predicate);
+		
+		return evaluatePredicates(predicates).get(predicate);
+	}
+	
+	@Override
+	public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
+		if (predicates.isEmpty()) return new HashMap<Predicate, TruthValue>();
+		
+		Map<Predicate, PredicateDeterminant> input = new HashMap<Predicate, PredicateDeterminant>();
+		
+		for (Predicate predicate : predicates) {
+			Predicate positiveWeakestPrecondition = predicate;
+			Predicate negativeWeakestPrecondition = Negation.create(predicate);
+	
+			Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+				
+			for (Predicate determinant : positiveWeakestPrecondition.determinantClosure(valuations.keySet())) {
+				determinants.put(determinant, valuations.get(determinant));
+			}
+			for (Predicate determinant : negativeWeakestPrecondition.determinantClosure(valuations.keySet())) {
+				determinants.put(determinant, valuations.get(determinant));
+			}
 			
-		for (Predicate determinant : positiveWeakestPrecondition.determinantClosure(valuations.keySet())) {
-			determinants.put(determinant, valuations.get(determinant));
+			input.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
 		}
-		for (Predicate determinant : negativeWeakestPrecondition.determinantClosure(valuations.keySet())) {
-			determinants.put(determinant, valuations.get(determinant));
-		}
-		
-		predicates.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
 
-		Map<Predicate, TruthValue> valuation = new SMT().valuatePredicates(predicates);
-		
-		return valuation.get(predicate);
+		return new SMT().valuatePredicates(input);
 	}
 	
 	@Override

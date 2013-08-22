@@ -10,6 +10,8 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.impl.DefaultObjectExpression;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
@@ -52,8 +54,24 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 	public abstract DefaultAccessExpression clone();
 
 	@Override
-	public final AccessExpression getTail() {
-		return this;
+	public final boolean isThis() {
+		if (this instanceof Root) {
+			Root r = (Root) this;
+			
+			return r.getName().equals("this");
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public final boolean isStatic() {
+		return getRoot() instanceof PackageAndClass;
+	}
+	
+	@Override
+	public final boolean isLocalVariable() {
+		return this instanceof Root && !isStatic();
 	}
 	
 	@Override
@@ -123,7 +141,7 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 		AccessExpression z = createFromString("y");
 		x = x.reRoot(y, z);
 		
-		System.out.println(x + " " + x.getTail().getClass().getSimpleName());
+		System.out.println(x + " " + x.getClass().getSimpleName());
 		
 		AccessExpression e1;
 		AccessExpression e2;

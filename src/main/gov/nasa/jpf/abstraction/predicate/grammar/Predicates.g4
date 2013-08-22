@@ -1,6 +1,9 @@
 grammar Predicates;
 
 @header {
+	import java.util.List;
+	import java.util.LinkedList;
+	
 	import gov.nasa.jpf.abstraction.common.*;
 	import gov.nasa.jpf.abstraction.common.access.*;
 	import gov.nasa.jpf.abstraction.common.access.impl.*;
@@ -29,15 +32,20 @@ contextlist returns [List<Context> val]
 	}
 	;
 	
-context returns [Context val]
+context returns [Context val] locals [List<String> name = new LinkedList<String>()]
 	: '[' 'static' ']' ps=predicatelist {
 		$ctx.val = new StaticContext($ps.val);
 	}
-	| '[' 'object' c=contextpath ']' ps=predicatelist {
-		$ctx.val = new ObjectContext($c.val, $ps.val);
+	| '[' 'object' ( pkg=ID {$ctx.name.add($pkg.text);} '.' ) * c=ID {$ctx.name.add($c.text);} ']' ps=predicatelist {			
+		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
+		
+		$ctx.val = new ObjectContext(packageAndClass, $ps.val);
 	}
-	| '[' 'method' c=contextpath ']' ps=predicatelist {
-		$ctx.val = new MethodContext($c.val, $ps.val);
+	| '[' 'method' ( pkg=ID {$ctx.name.add($pkg.text);} '.' ) * c=ID {$ctx.name.add($c.text);} '.' m=ID ']' ps=predicatelist {		
+		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
+		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
+		
+		$ctx.val = new MethodContext(method, $ps.val);
 	}
 	;
 
@@ -128,19 +136,16 @@ factor returns [Expression val]
 		$ctx.val = $e.val;
 	}
 	;
-	
-contextpath returns [DefaultAccessExpression val]
-	: f=ID {
-		$ctx.val = DefaultRoot.create($f.text);
-	}
-	| p=contextpath '.' f=ID {
-		$ctx.val = DefaultObjectFieldRead.create($p.val, $f.text);
-	}
-	;
 
-path returns [DefaultAccessExpression val]
+path returns [DefaultAccessExpression val] locals [List<String> name = new LinkedList<String>()]
 	: f=ID {
 		$ctx.val = DefaultRoot.create($f.text);
+	}
+	| 'class' '(' ( pkg=ID {$ctx.name.add($pkg.text);} '.' ) * c=ID {$ctx.name.add($c.text);} ')' '.' f=ID {		
+		$ctx.val = DefaultObjectFieldRead.create(DefaultPackageAndClass.create($ctx.name), $f.text);
+	}
+	| 'sfread' '(' f=ID ',' ( pkg=ID {$ctx.name.add($pkg.text);} '.' ) * c=ID {$ctx.name.add($c.text);} ')' {		
+		$ctx.val = DefaultObjectFieldRead.create(DefaultPackageAndClass.create($ctx.name), $f.text);
 	}
 	| p=path '.' f=ID {
 		$ctx.val = DefaultObjectFieldRead.create($p.val, $f.text);

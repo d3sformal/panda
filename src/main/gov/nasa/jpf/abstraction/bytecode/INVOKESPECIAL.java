@@ -18,6 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -38,6 +39,13 @@ public class INVOKESPECIAL extends gov.nasa.jpf.jvm.bytecode.INVOKESPECIAL {
 		Instruction actualNextInsn = super.execute(ti);
 		
 		StackFrame after = ti.getTopFrame();
+		Object attrs[] = before.getArgumentAttrs(getInvokedMethod());
+		
+		if (attrs != null && attrs.length > 0) {
+			Attribute attr = (Attribute) attrs[0];
+			
+			getInvokedMethod().setAttr(attr);
+		}
 		
 		if (JPFInstructionAdaptor.testInvokeSpecialInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;

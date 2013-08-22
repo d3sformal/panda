@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
 import java.util.List;
@@ -17,16 +17,16 @@ import java.util.List;
  */
 public class ObjectContext extends Context {
 	
-	private AccessExpression object;
+	private PackageAndClass packageAndClass;
 
-	public ObjectContext(AccessExpression path, List<Predicate> predicates) {
+	public ObjectContext(PackageAndClass packageAndClass, List<Predicate> predicates) {
 		super(predicates);
 		
-		object = path;
+		this.packageAndClass = packageAndClass;
 	}
 	
-	public AccessExpression getObject() {
-		return object;
+	public PackageAndClass getPackageAndClass() {
+		return packageAndClass;
 	}
 
 	@Override

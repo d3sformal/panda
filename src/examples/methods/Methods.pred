@@ -1,3 +1,6 @@
+[static]
+class(methods.Methods).C = 2
+
 [object methods.Methods]
 this.b >= 6
 

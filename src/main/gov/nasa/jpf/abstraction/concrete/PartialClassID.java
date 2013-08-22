@@ -2,20 +2,12 @@ package gov.nasa.jpf.abstraction.concrete;
 
 public class PartialClassID extends PartialVariableID {
 	
-	String path;
+	String packageAndClass;
 
-	public PartialClassID(Reference ref, String root) {
+	public PartialClassID(Reference ref, String packageAndClass) {
 		super(ref);
 		
-		path = root;
-	}
-	
-	public boolean complete() {
-		return getRef().getElementInfo().getClassInfo().getName().equals(path);
-	}
-	
-	public void extend(String name) {
-		path += "." + name;
+		this.packageAndClass = packageAndClass;
 	}
 
 }

@@ -8,6 +8,7 @@ import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.Fresh;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
@@ -28,7 +29,9 @@ public class PredicatesFunctionStringifier extends PredicatesStringifier {
 
 	@Override
 	public void visit(ObjectFieldRead expression) {
-		ret += "fread(";
+		boolean isStatic = expression.getObject() instanceof PackageAndClass;
+		
+		ret += (isStatic ? "sfread" : "fread") + "(";
 		
 		expression.getField().accept(this);
 		
@@ -41,7 +44,9 @@ public class PredicatesFunctionStringifier extends PredicatesStringifier {
 
 	@Override
 	public void visit(ObjectFieldWrite expression) {
-		ret += "fwrite(";
+		boolean isStatic = expression.getObject() instanceof PackageAndClass;
+		
+		ret += (isStatic ? "sfwrite" : "fwrite") + "(";
 		
 		ret += expression.getName();
 		

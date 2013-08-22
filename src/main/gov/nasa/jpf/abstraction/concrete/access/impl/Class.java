@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
 import gov.nasa.jpf.abstraction.concrete.ObjectReference;
 import gov.nasa.jpf.abstraction.concrete.PartialClassID;
 import gov.nasa.jpf.abstraction.concrete.VariableID;
@@ -13,7 +13,7 @@ import gov.nasa.jpf.abstraction.concrete.impl.PathResolution;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class Class extends DefaultRoot implements ConcreteRoot {
+public class Class extends DefaultPackageAndClass implements ConcreteRoot {
 	
 	private ThreadInfo ti;
 	private ElementInfo ei;
@@ -28,7 +28,7 @@ public class Class extends DefaultRoot implements ConcreteRoot {
 	private PathResolution resolveClass() {
 		Map<AccessExpression, VariableID> processed = new HashMap<AccessExpression, VariableID>();
 		
-		processed.put(DefaultRoot.create(getName()), new PartialClassID(new ObjectReference(ei), getName()));
+		processed.put(DefaultPackageAndClass.create(getName()), new PartialClassID(new ObjectReference(ei), getName()));
 		
 		return new PathResolution(ti, processed, processed);
 	}

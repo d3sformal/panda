@@ -8,6 +8,7 @@ import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.Fresh;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
@@ -28,7 +29,13 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 
 	@Override
 	public void visit(ObjectFieldRead expression) {
+		boolean isStatic = expression.getObject() instanceof PackageAndClass;
+		
+		if (isStatic) ret += "class(";
+		
 		expression.getObject().accept(this);
+		
+		if (isStatic) ret += ")";
 		
 		ret += ".";
 		
@@ -41,7 +48,13 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 		
 		ret += "| ";
 		
+		boolean isStatic = expression.getObject() instanceof PackageAndClass;
+		
+		if (isStatic) ret += "class(";
+		
 		expression.getObject().accept(this);
+		
+		if (isStatic) ret += ")";
 		
 		ret += ".";
 		

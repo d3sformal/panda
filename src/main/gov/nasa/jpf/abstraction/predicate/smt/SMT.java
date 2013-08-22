@@ -133,12 +133,17 @@ public class SMT {
 		return values.toArray(new Boolean[values.size()]);
 	}
 	
-	private String prepareInput(Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<String> formulas, String separator) {
+	private String prepareInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<String> formulas, String separator) {
 		String input = "(set-logic QF_AUFLIA)" + separator;
 		
 		input += "(declare-fun arr () (Array Int (Array Int Int)))" + separator;
 		input += "(declare-fun arrlen () (Array Int Int))" + separator;
 		input += "(declare-fun fresh () Int)" + separator;
+		input += separator;
+		
+		for (String c : classes) {
+			input += "(declare-fun class_" + c.replace("_", "__").replace('.', '_') + " () Int)" + separator;
+		}
 		input += separator;
 		
 		for (String var : vars) {
@@ -206,11 +211,12 @@ public class SMT {
 			formulas.add(createFormula(det.negativeWeakestPrecondition, det.determinants, additionalPredicates));
 		}
 		
+		Set<String> classes = collector.getClasses();
 		Set<String> vars = collector.getVars();
 		Set<String> fields = collector.getFields();
 		Set<AccessExpression> objects = collector.getObjects();
 		
-		return prepareInput(vars, fields, objects, formulas, separator);
+		return prepareInput(classes, vars, fields, objects, formulas, separator);
 	}
 	
 	private String prepareInput(Set<Predicate> predicates, String separator) {
@@ -232,11 +238,12 @@ public class SMT {
 			formulas.add(createFormula(Negation.create(predicate), additionalPredicates));
 		}
 		
+		Set<String> classes = collector.getClasses();
 		Set<String> vars = collector.getVars();
 		Set<String> fields = collector.getFields();
 		Set<AccessExpression> objects = collector.getObjects();
 		
-		return prepareInput(vars, fields, objects, formulas, separator);
+		return prepareInput(classes, vars, fields, objects, formulas, separator);
 	}
 	
 	private static String createFormula(Predicate predicate, Set<Predicate> additionalClauses) {

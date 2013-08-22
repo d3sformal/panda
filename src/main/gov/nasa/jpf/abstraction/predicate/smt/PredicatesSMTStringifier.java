@@ -15,6 +15,7 @@ import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.Fresh;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
@@ -302,6 +303,11 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	@Override
 	public void visit(DefaultField meta) {
 		ret += "field_" + meta.getName();
+	}
+	
+	@Override
+	public void visit(PackageAndClass packageAndClass) {
+		ret += "class_" + packageAndClass.getName().replace("_", "__").replace('.', '_');
 	}
 
 }

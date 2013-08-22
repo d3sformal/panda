@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
@@ -9,7 +10,6 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.common.NotationPolicy;
 import gov.nasa.jpf.abstraction.concrete.access.impl.DefaultConcreteReturnValue;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
@@ -26,9 +26,11 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -59,7 +61,6 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 						initialValuation.put(predicate, initialValuation.get(predicate));
 					}
 				}
-				
 				return;
 			} catch (SMTException e) {
 				e.printStackTrace();
@@ -85,13 +86,13 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			if (context instanceof MethodContext) {
 				MethodContext methodContext = (MethodContext) context;
 
-				if (!methodContext.getMethod().toString(NotationPolicy.DOT_NOTATION).equals(method.getBaseName())) {
+				if (!methodContext.getMethod().toString().equals(method.getBaseName())) {
 					continue;
 				}
 			} else if (context instanceof ObjectContext) {
 				ObjectContext objectContext = (ObjectContext) context;
 				
-				if (!objectContext.getObject().toString(NotationPolicy.DOT_NOTATION).equals(method.getClassName())) {
+				if (!objectContext.getPackageAndClass().toString().equals(method.getClassName())) {
 					continue;
 				}
 			}
@@ -107,6 +108,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	@Override
 	public void put(Predicate predicate, TruthValue value) {
 		scopes.top().put(predicate, value);
+	}
+	
+	@Override
+	public void remove(Predicate predicate) {
+		scopes.top().remove(predicate);
 	}
 
 	@Override
@@ -135,6 +141,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		Object attrs[] = after.getArgumentAttrs(method);
 		LocalVarInfo args[] = method.getArgumentLocalVars();
 		
+		Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
+		Set<Predicate> replacements = new HashSet<Predicate>();
+		
 		if (args != null && attrs != null) {
 			for (Map.Entry<Predicate, TruthValue> entry : finalScope) {
 				Predicate replaced = entry.getKey();
@@ -144,10 +153,19 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					
 					if (attr == null) attr = new EmptyAttribute();
 					
-					replaced = replaced.replace(DefaultAccessExpression.createFromString(args[i].getName()), attr.getExpression());
+					if (args[i] != null) {
+						replaced = replaced.replace(DefaultAccessExpression.createFromString(args[i].getName()), attr.getExpression());
+					}
 				}
 				
-				finalScope.put(entry.getKey(), transitionScope.evaluatePredicate(replaced));
+				predicates.put(entry.getKey(), replaced);
+				replacements.add(replaced);
+			}
+			
+			Map<Predicate, TruthValue> valuation = transitionScope.evaluatePredicates(replacements);
+			
+			for (Predicate predicate : predicates.keySet()) {				
+				finalScope.put(predicate, valuation.get(predicates.get(predicate)));
 			}
 		}
 		
@@ -171,7 +189,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {		
+	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		Attribute attr = (Attribute) after.getResultAttr();
 		ReturnValue ret = DefaultConcreteReturnValue.create(threadInfo, after.getPC());
 		
@@ -185,6 +203,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		if (attr == null) attr = new EmptyAttribute();
 		
+		Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
+		Set<Predicate> determinants = new HashSet<Predicate>();
+		
 		for (Map.Entry<Predicate, TruthValue> entry : this) {
 			Predicate predicate = entry.getKey();
 			
@@ -192,8 +213,15 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				Predicate determinant = predicate.replace(DefaultReturnValue.create(), attr.getExpression());
 				Predicate result = predicate.replace(DefaultReturnValue.create(), ret);
 				
-				scope.put(result, scopes.top().evaluatePredicate(determinant));
+				predicates.put(result, determinant);
+				determinants.add(determinant);
 			}
+		}
+		
+		Map<Predicate, TruthValue> valuation = evaluatePredicates(determinants);
+		
+		for (Predicate predicate : valuation.keySet()) {
+			scope.put(predicate, valuation.get(predicates.get(predicate)));
 		}
 				
 		after.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), ret));
@@ -213,33 +241,95 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		boolean sameObject = before.getThis() == after.getThis();
 		
+		Iterator<?> attrIt = before.getMethodInfo().attrIterator();
+		List<Attribute> attrs = new ArrayList<Attribute>();
+		
+		while (attrIt.hasNext()) {
+			Attribute attr = (Attribute) attrIt.next();
+			
+			if (attr == null) attr = new EmptyAttribute();
+			
+			attrs.add(attr);
+		}
+		
+		Set<Predicate> toBeRemoved = new HashSet<Predicate>();
+		
+		// Drop predicates depending on local variables (TODO: not parameters)
+		for (Predicate predicate : getPredicates()) {
+			for (AccessExpression path : predicate.getPaths()) {
+				if (path.isLocalVariable() && !path.isThis()) {
+					toBeRemoved.add(predicate);
+				}
+			}
+		}
+		
+		// Replace parameter objects by objects from parent scope
+		/*
+		 * A a;
+		 * 
+		 * a.i == 2
+		 * 
+		 * f(c <- a) {
+		 * 
+		 *   c.i = 3;
+		 * 
+		 * }
+		 * 
+		 * a.i != 2
+		 */
+		
+		for (Predicate predicate : toBeRemoved) {
+			remove(predicate);
+		}
+		
+		FlatPredicateValuation relevant = new FlatPredicateValuation();
+		
+		// Replace Callee This with expression
+		for (Predicate predicate : getPredicates()) {
+			if (!attrs.isEmpty()) {
+				Attribute thisAttr = attrs.get(0);
+				
+				if (thisAttr.getExpression() != null) {
+					relevant.put(predicate.replace(DefaultRoot.create("this"), thisAttr.getExpression()), get(predicate));
+				}
+			}
+		}
+		
+		Set<Predicate> toBeUpdated = new HashSet<Predicate>();
+		
 		for (Map.Entry<Predicate, TruthValue> entry : scope) {
 			Predicate predicate = entry.getKey();
 			
-			boolean canInferValuation = !predicate.determinantClosure(getPredicates()).isEmpty();
-			boolean dependsOnShared = false;
-			boolean hardToDecide = false;
+			boolean canBeAffected = false;
 			
 			for (AccessExpression path : predicate.getPaths()) {
-				dependsOnShared |= /* IS THIS             */ DefaultRoot.create("this").isPrefixOf(path) && sameObject;
-				dependsOnShared |= /* IS STATIC FIELD     */ false;
+				canBeAffected |= path.getRoot().isThis() && sameObject;
+				canBeAffected |= path.isStatic();
 				
-				hardToDecide    |= /* PATH IS A LOCAL VAR */ path instanceof Root;
-			}
-			
-			if (canInferValuation && dependsOnShared) {
-				TruthValue value = evaluatePredicate(predicate);
-				
-				if (hardToDecide) {
-					value = TruthValue.UNKNOWN;
+				for (int i = 0; i < before.getMethodInfo().getArgumentsSize(); ++i) {
+					Expression expr = attrs.get(i).getExpression();
+					
+					if (expr instanceof AccessExpression) {
+						AccessExpression ae = (AccessExpression) expr;
+						
+						if (ae.isPrefixOf(path)) {
+							System.out.println("MAY HAVE BEEN UPDATED");
+						}
+					}
 				}
-				
-				scope.put(predicate, value);
 			}
 			
-			if (!canInferValuation && dependsOnShared) {
-				scope.put(predicate, TruthValue.UNKNOWN);
+			if (canBeAffected) {
+				toBeUpdated.add(predicate);
 			}
+		}
+		
+		Map<Predicate, TruthValue> valuation = relevant.evaluatePredicates(toBeUpdated);
+		
+		for (Predicate predicate : valuation.keySet()) {
+			TruthValue value = valuation.get(predicate);
+			
+			scope.put(predicate, value);
 		}
 		
 		scopes.pop();
@@ -281,6 +371,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	@Override
 	public TruthValue evaluatePredicate(Predicate predicate) {
 		return scopes.top().evaluatePredicate(predicate);
+	}
+	
+	@Override
+	public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
+		return scopes.top().evaluatePredicates(predicates);
 	}
 	
 	@Override

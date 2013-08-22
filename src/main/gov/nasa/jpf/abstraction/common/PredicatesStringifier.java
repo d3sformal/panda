@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
+import gov.nasa.jpf.abstraction.common.access.Method;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
@@ -36,7 +38,11 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 
 	@Override
 	public void visit(ObjectContext context) {
-		ret += "[object " + context.getObject().toString(NotationPolicy.DOT_NOTATION) + "]\n";
+		ret += "[object ";
+		
+		context.getPackageAndClass().accept(this);
+		
+		ret += "]\n";
 
 		for (Predicate p : context.predicates) {
 			p.accept(this);
@@ -46,7 +52,11 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 
 	@Override
 	public void visit(MethodContext context) {
-		ret += "[method " + context.getMethod().toString(NotationPolicy.DOT_NOTATION) + "]\n";
+		ret += "[method ";
+		
+		context.getMethod().accept(this);
+		
+		ret += "]\n";
 
 		for (Predicate p : context.predicates) {
 			p.accept(this);
@@ -233,6 +243,20 @@ public abstract class PredicatesStringifier implements PredicatesVisitor {
 	@Override
 	public void visit(UpdatedPredicate predicate) {
 		predicate.apply().accept(this);
+	}
+	
+	@Override
+	public void visit(PackageAndClass packageAndClass) {
+		ret += packageAndClass.getName();
+	}
+	
+	@Override
+	public void visit(Method method) {
+		method.getPackageAndClass().accept(this);
+		
+		ret += ".";
+		
+		ret += method.getName();
 	}
 
 }

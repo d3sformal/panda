@@ -63,24 +63,15 @@ public class DefaultConcreteObjectFieldRead extends DefaultObjectFieldRead imple
 				ElementInfo ei = ((PartialVariableID) var).getRef().getElementInfo();
 				Object object = ei.getFieldValueObject(getField().getName());
 				
-				if (var instanceof PartialClassID) {
-					PartialClassID classID = (PartialClassID) var;
-					
-					if (classID.complete()) {
-						if (object instanceof ElementInfo) {
-							// STATIC OBJECT FIELD
+				if (var instanceof PartialClassID) {					
+					if (object instanceof ElementInfo) {
+						// STATIC OBJECT FIELD
 				
-							current.put(clone, new PartialVariableID(DefaultConcreteAccessExpression.createStaticFieldReference(resolution.threadInfo, getField().getName(), ei)));
-						} else {
-							// STATIC PRIMITIVE FIELD
-					
-							current.put(clone, new StaticFieldID(ei.getClassInfo().getName(), getField().getName()));
-						}
+						current.put(clone, new PartialVariableID(DefaultConcreteAccessExpression.createStaticFieldReference(resolution.threadInfo, getField().getName(), ei)));
 					} else {
-						// NOT YET COMPLETE PATH package.package.Class
-						classID.extend(getField().getName());
+						// STATIC PRIMITIVE FIELD
 					
-						current.put(clone, var);
+						current.put(clone, new StaticFieldID(ei.getClassInfo().getName(), getField().getName()));
 					}
 				} else if (object instanceof ElementInfo) {
 					// STRUCTURED FIELD (PATH NOT YET COMPLETE)

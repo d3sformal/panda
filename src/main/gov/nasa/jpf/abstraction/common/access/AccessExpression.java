@@ -10,9 +10,11 @@ public interface AccessExpression extends Expression {
 	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression);
 	
 	public Root getRoot();
-	public AccessExpression getTail();
 	public AccessExpression get(int depth);
 	
+	public boolean isThis();
+	public boolean isStatic();
+	public boolean isLocalVariable();
 	public boolean isPrefixOf(AccessExpression expression);
 	public boolean isSimilarToPrefixOf(AccessExpression path);
 	public boolean isProperPrefixOf(AccessExpression expression);

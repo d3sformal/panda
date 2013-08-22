@@ -16,8 +16,8 @@ public class LessThan extends Comparison {
 	}
 
 	@Override
-	public LessThan replace(AccessExpression formerPath, Expression expression) {
-		return new LessThan(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	public Predicate replace(AccessExpression formerPath, Expression expression) {
+		return create(a.replace(formerPath, expression), b.replace(formerPath, expression));
 	}
 	
 	public static Predicate create(Expression a, Expression b) {

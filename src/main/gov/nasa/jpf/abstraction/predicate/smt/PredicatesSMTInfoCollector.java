@@ -11,8 +11,10 @@ import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.Fresh;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.Method;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
@@ -47,6 +49,7 @@ import gov.nasa.jpf.abstraction.predicate.common.Tautology;
 import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 
 public class PredicatesSMTInfoCollector implements PredicatesVisitor {
+	private Set<String> classes = new HashSet<String>();
 	private Set<String> vars = new HashSet<String>();
 	private Set<String> fields = new HashSet<String>();
 	
@@ -199,6 +202,10 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 		return fields;
 	}
 	
+	public Set<String> getClasses() {
+		return classes;
+	}
+	
 	public Set<AccessExpression> getObjects() {
 		return objects;
 	}
@@ -308,6 +315,15 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 		}
 		
 		collectable.accept(this);
+	}
+
+	@Override
+	public void visit(PackageAndClass expression) {
+		classes.add(expression.getName());
+	}
+
+	@Override
+	public void visit(Method expression) {
 	}
 
 }
