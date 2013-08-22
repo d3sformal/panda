@@ -21,7 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
@@ -34,16 +34,17 @@ public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
 	public Instruction execute(ThreadInfo ti) {
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+		StackFrame before = ti.getTopFrame();
 
 		Instruction actualNextInsn = super.execute(ti);
 		
-		MethodInfo method = ti.getTopFrameMethodInfo();
+		StackFrame after = ti.getTopFrame();
 		
 		if (JPFInstructionAdaptor.testInvokeStaticInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}
 		
-		GlobalAbstraction.getInstance().processMethodCall(ti, method);
+		GlobalAbstraction.getInstance().processMethodCall(ti, before, after);
 
 		return actualNextInsn;
 	}

@@ -25,6 +25,7 @@ import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
@@ -87,13 +88,13 @@ public abstract class Abstraction {
 	public void processObjectStore(Expression from, ConcreteAccessExpression to) {
 	}
 	
-	public void processMethodCall(ThreadInfo threadInfo, MethodInfo method) {
+	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 	}
 	
-	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
+	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 	}
 	
-	public void processVoidMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
+	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 	}
 	
 	public TruthValue evaluatePredicate(Predicate predicate) {

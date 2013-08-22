@@ -20,7 +20,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
@@ -29,15 +29,17 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
 	public Instruction execute(ThreadInfo ti) {
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
-		MethodInfo method = ti.getTopFrameMethodInfo();
+		StackFrame before = ti.getTopFrame();
 
 		Instruction actualNextInsn = super.execute(ti);
+		
+		StackFrame after = ti.getTopFrame();
 		
 		if (JPFInstructionAdaptor.testReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}
 		
-		GlobalAbstraction.getInstance().processVoidMethodReturn(ti, method);
+		GlobalAbstraction.getInstance().processVoidMethodReturn(ti, before, after);
 		
 		return actualNextInsn;
 	}

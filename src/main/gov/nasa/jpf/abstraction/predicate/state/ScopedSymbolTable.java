@@ -59,7 +59,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public void processMethodCall(ThreadInfo threadInfo, MethodInfo method) {
+	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+		MethodInfo method = after.getMethodInfo();
+		
 		FlatSymbolTable transitionScope;
 		FlatSymbolTable finalScope = createDefaultScope(method);
 		
@@ -110,12 +112,14 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
-		scopes.pop();
+	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+		processVoidMethodReturn(threadInfo, before, after);
 	}
 	
 	@Override
-	public void processVoidMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
+	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+		//TODO copy shared symbols
+		
 		scopes.pop();
 	}
 	

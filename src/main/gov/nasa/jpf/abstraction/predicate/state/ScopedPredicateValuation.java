@@ -3,8 +3,10 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.NotationPolicy;
@@ -118,7 +120,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public void processMethodCall(ThreadInfo threadInfo, MethodInfo method) {
+	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+		MethodInfo method = after.getMethodInfo();
+		
 		FlatPredicateValuation transitionScope;
 		FlatPredicateValuation finalScope = createDefaultScope(method);
 		
@@ -128,8 +132,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			transitionScope = scopes.top().clone();
 		}
 		
-		StackFrame sf = threadInfo.getTopFrame();
-		Object attrs[] = sf.getArgumentAttrs(method);
+		Object attrs[] = after.getArgumentAttrs(method);
 		LocalVarInfo args[] = method.getArgumentLocalVars();
 		
 		if (args != null && attrs != null) {
@@ -151,11 +154,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		scopes.push(finalScope);
 	}
 	
-	private static boolean predicateOverReturn(Predicate predicate) {
+	private static boolean isPredicateOverReturn(Predicate predicate) {
 		if (predicate instanceof Negation) {
 			Negation n = (Negation) predicate;
 			
-			return predicateOverReturn(n.predicate);
+			return isPredicateOverReturn(n.predicate);
 		}
 		
 		if (predicate instanceof Comparison) {
@@ -168,15 +171,14 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
-		StackFrame sf = threadInfo.getModifiableTopFrame();
-		Attribute attr = (Attribute) sf.getResultAttr();
-		ReturnValue ret = DefaultConcreteReturnValue.create(threadInfo, sf.getPC());
+	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {		
+		Attribute attr = (Attribute) after.getResultAttr();
+		ReturnValue ret = DefaultConcreteReturnValue.create(threadInfo, after.getPC());
 		
 		FlatPredicateValuation scope;
 		
 		if (scopes.count() == 1) {
-			scope = createDefaultScope(method);
+			scope = new FlatPredicateValuation();
 		} else {
 			scope = scopes.top(1);
 		}
@@ -186,7 +188,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		for (Map.Entry<Predicate, TruthValue> entry : this) {
 			Predicate predicate = entry.getKey();
 			
-			if (predicateOverReturn(predicate)) {
+			if (isPredicateOverReturn(predicate)) {
 				Predicate determinant = predicate.replace(DefaultReturnValue.create(), attr.getExpression());
 				Predicate result = predicate.replace(DefaultReturnValue.create(), ret);
 				
@@ -194,14 +196,51 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			}
 		}
 				
-		sf.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), ret));
+		after.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), ret));
 		
-		processVoidMethodReturn(threadInfo, method);
+		processVoidMethodReturn(threadInfo, before, after);
 	}
 	
 	@Override
-	public void processVoidMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
-		//TODO copy predicates shared between scopes (this. ...)
+	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+		FlatPredicateValuation scope;
+		
+		if (scopes.count() == 1) {
+			scope = new FlatPredicateValuation();
+		} else {
+			scope = scopes.top(1);
+		}
+		
+		boolean sameObject = before.getThis() == after.getThis();
+		
+		for (Map.Entry<Predicate, TruthValue> entry : scope) {
+			Predicate predicate = entry.getKey();
+			
+			boolean canInferValuation = !predicate.determinantClosure(getPredicates()).isEmpty();
+			boolean dependsOnShared = false;
+			boolean hardToDecide = false;
+			
+			for (AccessExpression path : predicate.getPaths()) {
+				dependsOnShared |= /* IS THIS             */ DefaultRoot.create("this").isPrefixOf(path) && sameObject;
+				dependsOnShared |= /* IS STATIC FIELD     */ false;
+				
+				hardToDecide    |= /* PATH IS A LOCAL VAR */ path instanceof Root;
+			}
+			
+			if (canInferValuation && dependsOnShared) {
+				TruthValue value = evaluatePredicate(predicate);
+				
+				if (hardToDecide) {
+					value = TruthValue.UNKNOWN;
+				}
+				
+				scope.put(predicate, value);
+			}
+			
+			if (!canInferValuation && dependsOnShared) {
+				scope.put(predicate, TruthValue.UNKNOWN);
+			}
+		}
 		
 		scopes.pop();
 	}

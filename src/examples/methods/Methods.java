@@ -4,6 +4,7 @@ public class Methods {
 	
 	int a;
 	int b;
+	int x;
 	
 	public void do1() {
 		int c = 2;
@@ -13,6 +14,8 @@ public class Methods {
 	}
 	
 	public int do2(int c, int d) {
+		a = -10;
+		x = 2;
 		c++;
 		
 		return c + d;

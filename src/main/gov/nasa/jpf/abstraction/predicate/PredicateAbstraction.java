@@ -18,6 +18,7 @@ import gov.nasa.jpf.abstraction.predicate.state.SymbolTableStack;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 public class PredicateAbstraction extends Abstraction {
@@ -51,21 +52,21 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processMethodCall(ThreadInfo threadInfo, MethodInfo method) {
-		symbolTable.processMethodCall(threadInfo, method);
-		predicateValuation.processMethodCall(threadInfo, method);
+	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+		symbolTable.processMethodCall(threadInfo, before, after);
+		predicateValuation.processMethodCall(threadInfo, before, after);
 	}
 	
 	@Override
-	public void processMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
-		symbolTable.processMethodReturn(threadInfo, method);
-		predicateValuation.processMethodReturn(threadInfo, method);
+	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+		symbolTable.processMethodReturn(threadInfo, before, after);
+		predicateValuation.processMethodReturn(threadInfo, before, after);
 	}
 	
 	@Override
-	public void processVoidMethodReturn(ThreadInfo threadInfo, MethodInfo method) {
-		symbolTable.processVoidMethodReturn(threadInfo, method);
-		predicateValuation.processVoidMethodReturn(threadInfo, method);
+	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+		symbolTable.processVoidMethodReturn(threadInfo, before, after);
+		predicateValuation.processVoidMethodReturn(threadInfo, before, after);
 	}
 	
 	@Override
