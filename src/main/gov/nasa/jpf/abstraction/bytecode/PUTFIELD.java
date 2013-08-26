@@ -64,7 +64,11 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 			to = (ConcreteAccessExpression) destination.getExpression();
 			to = DefaultConcreteObjectFieldRead.create(to, getFieldName());
 			
-			GlobalAbstraction.getInstance().processStore(from, to);
+			if (ei.getFieldValueObject(getFieldName()) instanceof ElementInfo) {
+	        	GlobalAbstraction.getInstance().processObjectStore(from, to);
+	        } else {
+	        	GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
+	        }
 		}
 		
 		return actualNextInsn;

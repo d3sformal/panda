@@ -4,7 +4,7 @@ import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
@@ -93,18 +93,13 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	}
 
 	@Override
-	public Iterator<Entry<Predicate, TruthValue>> iterator() {
-		return valuations.entrySet().iterator();
-	}
-
-	@Override
 	public String toString() {	
 		StringBuilder ret = new StringBuilder();
 
 		int padding = 0;
 		
 		for (Predicate p : valuations.keySet()) {
-			String predicate = p.toString(NotationPolicy.DOT_NOTATION);
+			String predicate = p.toString(Notation.DOT_NOTATION);
 
 			padding = padding < predicate.length() ? predicate.length() : padding;
 		}
@@ -112,7 +107,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		padding += 4;
 		
 		for (Predicate p : valuations.keySet()) {
-			String predicate = p.toString(NotationPolicy.DOT_NOTATION);
+			String predicate = p.toString(Notation.DOT_NOTATION);
 			StringBuilder pad = new StringBuilder();
 			
 			for (int i = 0; i < padding - predicate.length(); ++i) {

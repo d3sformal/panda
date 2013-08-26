@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
@@ -69,12 +69,12 @@ public class Constant implements PrimitiveExpression {
 
 	@Override
 	public String toString() {
-		return toString(NotationPolicy.policy);
+		return toString(Notation.policy);
 	}
 
 	@Override
-	public String toString(NotationPolicy policy) {
-    	return NotationPolicy.convertToString(this, policy);
+	public String toString(Notation policy) {
+    	return Notation.convertToString(this, policy);
 	}
 
 	@Override

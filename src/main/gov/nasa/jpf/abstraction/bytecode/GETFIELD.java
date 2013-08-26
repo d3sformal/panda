@@ -50,12 +50,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 		}
 		
 		ConcreteAccessExpression path = (ConcreteAccessExpression) attr.getExpression();
-
-		if (path instanceof ConcreteAccessExpression) {				
-			path = DefaultConcreteObjectFieldRead.create(path, getFieldName());
-				
-			GlobalAbstraction.getInstance().processLoad(path);
-		}
+		path = DefaultConcreteObjectFieldRead.create(path, getFieldName());
 
 		sf = ti.getModifiableTopFrame();
 		sf.setOperandAttr(new NonEmptyAttribute(null, path));

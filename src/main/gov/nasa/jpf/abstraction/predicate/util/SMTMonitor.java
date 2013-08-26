@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.predicate.util;
 import java.util.Map;
 import java.util.Set;
 
-import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
 import gov.nasa.jpf.abstraction.predicate.smt.SMTListener;
@@ -16,13 +16,13 @@ public class SMTMonitor extends SMTListener {
 		System.out.println("SMT:");
 		
 		for (Predicate p : predicates.keySet()) {
-			System.out.println("\t" + p.toString(NotationPolicy.DOT_NOTATION) + " WP(+): " + predicates.get(p).positiveWeakestPrecondition.toString(NotationPolicy.DOT_NOTATION) + " WP(-): " + predicates.get(p).negativeWeakestPrecondition.toString(NotationPolicy.DOT_NOTATION));
+			System.out.println("\t" + p.toString(Notation.DOT_NOTATION) + " WP(+): " + predicates.get(p).positiveWeakestPrecondition.toString(Notation.DOT_NOTATION) + " WP(-): " + predicates.get(p).negativeWeakestPrecondition.toString(Notation.DOT_NOTATION));
 			
 			Map<Predicate, TruthValue> determinants = predicates.get(p).determinants;
 			
 			System.out.println("\tDET:");
 			for (Predicate d : determinants.keySet()) {
-				System.out.println("\t\t" + d.toString(NotationPolicy.DOT_NOTATION) + " " + determinants.get(d));
+				System.out.println("\t\t" + d.toString(Notation.DOT_NOTATION) + " " + determinants.get(d));
 			}
 		}
 		
@@ -34,7 +34,7 @@ public class SMTMonitor extends SMTListener {
 		System.out.println("SMT:");
 		
 		for (Predicate p : predicates) {
-			System.out.println("\t" + p.toString(NotationPolicy.DOT_NOTATION));
+			System.out.println("\t" + p.toString(Notation.DOT_NOTATION));
 		}
 		
 		System.out.println();
@@ -50,7 +50,7 @@ public class SMTMonitor extends SMTListener {
 		System.out.println("SMT Returned:");
 		
 		for (Predicate p : valuation.keySet()) {
-			System.out.println("\t" + p.toString(NotationPolicy.DOT_NOTATION) + ": " + valuation.get(p));
+			System.out.println("\t" + p.toString(Notation.DOT_NOTATION) + ": " + valuation.get(p));
 		}
 		
 		System.out.println();

@@ -4,11 +4,13 @@ class A {
 	int i;
 	
 	public void do1 () {
-		i = 2;
+		Methods2.X = 2;
 	}
 }
 
 public class Methods2 {
+	
+	static int X = 2;
 
 	public static void main(String[] args) {
 		A a = new A();

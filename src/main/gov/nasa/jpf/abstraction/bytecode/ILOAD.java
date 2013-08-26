@@ -43,9 +43,7 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
 		if (var != null) {
 			ConcreteAccessExpression path = LocalVar.create(var.getName(), ti, var);
 			Attribute attribute = new NonEmptyAttribute(null, path);
-						
-			GlobalAbstraction.getInstance().processLoad(path);
-
+			
 			StackFrame sf = ti.getModifiableTopFrame();
 			sf.setOperandAttr(attribute);
 		}

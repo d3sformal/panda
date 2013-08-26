@@ -2,12 +2,10 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVar;
 import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVarRootedHeapObject;
-import gov.nasa.jpf.abstraction.concrete.VariableID;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -15,37 +13,14 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 public class ScopedSymbolTable implements SymbolTable, Scoped {
 	private SymbolTableStack scopes = new SymbolTableStack();
-	
+
 	@Override
 	public FlatSymbolTable createDefaultScope(MethodInfo method) {
 		return new FlatSymbolTable();
-	}
-
-	@Override
-	public Set<AccessExpression> lookupAccessPaths(AccessExpression prefix) {
-		return scopes.top().lookupAccessPaths(prefix);
-	}
-
-	@Override
-	public Set<AccessExpression> lookupEquivalentAccessPaths(VariableID var) {
-		return scopes.top().lookupEquivalentAccessPaths(var);
-	}
-	
-	@Override
-	public Set<AccessExpression> lookupEquivalentAccessPaths(AccessExpression path) {
-		return scopes.top().lookupEquivalentAccessPaths(path);
-	}
-	
-	@Override
-	public void processLoad(ConcreteAccessExpression from) {
-		scopes.top().processLoad(from);
 	}
 	
 	@Override
@@ -63,7 +38,6 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		MethodInfo method = after.getMethodInfo();
 		
 		FlatSymbolTable transitionScope;
-		FlatSymbolTable finalScope = createDefaultScope(method);
 		
 		if (scopes.count() == 0) {
 			transitionScope = createDefaultScope(method);
@@ -72,6 +46,8 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		}
 		
 		scopes.push(transitionScope);
+		
+		transitionScope.removeLocals();
 		
 		StackFrame sf = threadInfo.getTopFrame();
 		Object attrs[] = sf.getArgumentAttrs(method);
@@ -92,23 +68,11 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 						ElementInfo ei = threadInfo.getElementInfo(sf.peek(args.length - i));
 						
 						// Assign to object arg
-						processObjectStore(attr.getExpression(), LocalVarRootedHeapObject.create(args[i].getName(), threadInfo, ei, args[i]));
-					}
-				}
-			}
-		
-			// Transfer only the relevant symbols
-			for (Map.Entry<AccessExpression, Set<VariableID>> entry : this) {
-				for (int i = 0; i < args.length; ++i) {
-					if (DefaultAccessExpression.createFromString(args[i].getName()).isPrefixOf(entry.getKey())) {
-						finalScope.setPathToVars(entry.getKey(), entry.getValue());
+						processObjectStore(null, LocalVarRootedHeapObject.create(args[i].getName(), threadInfo, ei, args[i]));
 					}
 				}
 			}
 		}
-		
-		scopes.pop();
-		scopes.push(finalScope);
 	}
 	
 	@Override
@@ -118,7 +82,17 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	
 	@Override
 	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		//TODO copy shared symbols
+		MethodInfo method = after.getMethodInfo();
+		
+		FlatSymbolTable transitionScope;
+		
+		if (scopes.count() == 1) {
+			transitionScope = createDefaultScope(method);
+		} else {
+			transitionScope = scopes.top(1);
+		}
+		
+		transitionScope.setStatics(scopes.top().getStatics());
 		
 		scopes.pop();
 	}
@@ -155,25 +129,20 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	public int count() {
 		return scopes.count() > 0 ? scopes.top().count() : 0;
 	}
-	
-	@Override
-	public boolean isObject(AccessExpression path) {
-		return scopes.top().isObject(path);
-	}
 
 	@Override
-	public boolean isArray(AccessExpression path) {
+	public boolean isArray(ConcreteAccessExpression path) {
 		return scopes.top().isArray(path);
 	}
 
 	@Override
-	public Iterator<Entry<AccessExpression, Set<VariableID>>> iterator() {
-		return scopes.top().iterator();
+	public boolean isObject(ConcreteAccessExpression path) {
+		return scopes.top().isObject(path);
 	}
 
 	@Override
-	public void setPathToVars(AccessExpression path, Set<VariableID> vars) {
-		scopes.top().setPathToVars(path, vars);
+	public boolean isPrimitive(ConcreteAccessExpression path) {
+		return scopes.top().isPrimitive(path);
 	}
 	
 }

@@ -6,8 +6,11 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.PrimitiveExpression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.PrimitiveValue;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 
 public class PrimitiveExpressionWrapper extends DefaultPrimitiveExpression {
 	private Expression expression;
@@ -21,10 +24,10 @@ public class PrimitiveExpressionWrapper extends DefaultPrimitiveExpression {
 			return (PrimitiveExpression) expression;
 		}
 		
-		if (expression instanceof AccessExpression) {
-			AccessExpression path = (AccessExpression) expression;
+		if (expression instanceof ConcreteAccessExpression) {
+			ConcreteAccessExpression path = (ConcreteAccessExpression) expression;
 			
-			if (!symbols.isObject(path)) {
+			if (symbols.isPrimitive(path)) {
 				return PrimitiveExpressionWrapper.create(expression);
 			}
 		}

@@ -44,8 +44,6 @@ public class DLOAD extends gov.nasa.jpf.jvm.bytecode.DLOAD {
 			ConcreteAccessExpression path = LocalVar.create(var.getName(), ti, var);
 			Attribute attribute = new NonEmptyAttribute(null, path);
 			
-			GlobalAbstraction.getInstance().processLoad(path);
-
 			StackFrame sf = ti.getModifiableTopFrame();
 			sf.setLongOperandAttr(attribute);
 		}

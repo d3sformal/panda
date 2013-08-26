@@ -6,7 +6,7 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteArrayElementWrite;
-import gov.nasa.jpf.abstraction.concrete.impl.PathResolution;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 
 public class DefaultConcreteArrayElementWrite extends DefaultArrayElementWrite implements ConcreteArrayElementWrite {
 
@@ -35,17 +35,7 @@ public class DefaultConcreteArrayElementWrite extends DefaultArrayElementWrite i
 	}
 
 	@Override
-	public PathResolution partialResolve() {
-		throw new RuntimeException("Not Yet Re-Implemented.");
-	}
-
-	@Override
-	public PathResolution partialExhaustiveResolve() {
-		throw new RuntimeException("Not Yet Re-Implemented.");
-	}
-
-	@Override
-	public PathResolution resolve() {
+	public Value resolve() {
 		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 	

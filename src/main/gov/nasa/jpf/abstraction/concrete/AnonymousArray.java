@@ -47,11 +47,6 @@ public class AnonymousArray extends DefaultArrayExpression implements AnonymousE
 
 		return new AnonymousArray(ei, length);
 	}
-	
-	@Override
-	public PartialVariableID generateVariableID() {
-		return new PartialVariableID(new ArrayReference(ei, this));
-	}
 
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {

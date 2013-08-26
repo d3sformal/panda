@@ -42,12 +42,6 @@ public class AnonymousObject extends DefaultObjectExpression implements Anonymou
 	public static AnonymousObject create(ElementInfo ei) {
 		return new AnonymousObject(ei);
 	}
-	
-	
-	@Override
-	public PartialVariableID generateVariableID() {
-		return new PartialVariableID(new ObjectReference(ei));
-	}
 
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {

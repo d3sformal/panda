@@ -1,15 +1,10 @@
 package gov.nasa.jpf.abstraction.concrete.access.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
-import gov.nasa.jpf.abstraction.concrete.ObjectReference;
-import gov.nasa.jpf.abstraction.concrete.PartialClassID;
-import gov.nasa.jpf.abstraction.concrete.VariableID;
+import gov.nasa.jpf.abstraction.concrete.Reference;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteRoot;
-import gov.nasa.jpf.abstraction.concrete.impl.PathResolution;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassObject;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -24,28 +19,10 @@ public class Class extends DefaultPackageAndClass implements ConcreteRoot {
 		this.ti = ti;
 		this.ei = ei;
 	}
-	
-	private PathResolution resolveClass() {
-		Map<AccessExpression, VariableID> processed = new HashMap<AccessExpression, VariableID>();
-		
-		processed.put(DefaultPackageAndClass.create(getName()), new PartialClassID(new ObjectReference(ei), getName()));
-		
-		return new PathResolution(ti, processed, processed);
-	}
-	
-	@Override
-	public PathResolution partialResolve() {
-		return resolveClass();
-	}
 
 	@Override
-	public PathResolution partialExhaustiveResolve() {
-		return resolveClass();
-	}
-
-	@Override
-	public PathResolution resolve() {
-		return resolveClass();
+	public Value resolve() {
+		return new ClassObject(new Reference(ti, ei));
 	}
 	
 	public static Class create(String name, ThreadInfo threadInfo, ElementInfo elementInfo) {

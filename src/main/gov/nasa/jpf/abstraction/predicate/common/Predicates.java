@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
-import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
@@ -20,6 +20,6 @@ public class Predicates implements PredicatesVisitable {
 	
 	@Override
 	public String toString() {
-		return NotationPolicy.convertToString(this);
+		return Notation.convertToString(this);
 	}
 }

@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
@@ -125,7 +125,7 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 	}
 	
 	public static void main(String[] args) {
-		NotationPolicy.policy = NotationPolicy.DOT_NOTATION;
+		Notation.policy = Notation.DOT_NOTATION;
 		
 		AccessExpression p = createFromString("a[a.length - 1]");
 		
@@ -155,8 +155,8 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 		e1 = DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create()));
 		e2 = DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create()));
 		
-		System.out.println(NotationPolicy.convertToString(e1, new PredicatesSMTStringifier()));
-		System.out.println(NotationPolicy.convertToString(e2, new PredicatesSMTStringifier()));
+		System.out.println(Notation.convertToString(e1, new PredicatesSMTStringifier()));
+		System.out.println(Notation.convertToString(e2, new PredicatesSMTStringifier()));
 		System.out.println(e1.equals(e2) + " " + e1.hashCode() + " " + e2.hashCode());
 	}
 

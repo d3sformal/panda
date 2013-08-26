@@ -2,7 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
 
 import java.util.HashSet;
@@ -14,10 +14,10 @@ public abstract class Predicate implements PredicatesVisitable {
 	public abstract Predicate replace(AccessExpression formerPath, Expression expression);
 	
     public String toString() {
-    	return toString(NotationPolicy.policy);
+    	return toString(Notation.policy);
     }
-    public String toString(NotationPolicy policy) {
-    	return NotationPolicy.convertToString(this, policy);
+    public String toString(Notation policy) {
+    	return Notation.convertToString(this, policy);
 	}
     
     public Set<Predicate> selectDeterminants(Set<Predicate> universe) {
@@ -63,7 +63,7 @@ public abstract class Predicate implements PredicatesVisitable {
 	
 	@Override
 	public int hashCode() {
-		return toString(NotationPolicy.DOT_NOTATION).hashCode();
+		return toString(Notation.DOT_NOTATION).hashCode();
 	}
 	
 	@Override
@@ -71,7 +71,7 @@ public abstract class Predicate implements PredicatesVisitable {
 		if (o instanceof Predicate) {
 			Predicate p = (Predicate) o;
 
-			return toString(NotationPolicy.DOT_NOTATION).equals(p.toString(NotationPolicy.DOT_NOTATION));
+			return toString(Notation.DOT_NOTATION).equals(p.toString(Notation.DOT_NOTATION));
 		}
 		
 		return false;

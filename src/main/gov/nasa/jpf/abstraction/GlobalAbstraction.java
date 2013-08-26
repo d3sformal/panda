@@ -71,13 +71,6 @@ public class GlobalAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processLoad(ConcreteAccessExpression from) {
-		if (!RunDetector.isRunning()) return;
-
-		abs.processLoad(from);
-	}
-	
-	@Override
 	public void processPrimitiveStore(Expression from, ConcreteAccessExpression to) {
 		if (!RunDetector.isRunning()) return;
 		

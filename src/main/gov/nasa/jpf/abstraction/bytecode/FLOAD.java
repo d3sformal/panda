@@ -43,9 +43,7 @@ public class FLOAD extends gov.nasa.jpf.jvm.bytecode.FLOAD {
 		if (var != null) {
 			ConcreteAccessExpression path = LocalVar.create(var.getName(), ti, var);
 			Attribute attribute = new NonEmptyAttribute(null, path);
-						
-			GlobalAbstraction.getInstance().processLoad(path);
-
+			
 			StackFrame sf = ti.getModifiableTopFrame();
 			sf.setOperandAttr(attribute);
 		}

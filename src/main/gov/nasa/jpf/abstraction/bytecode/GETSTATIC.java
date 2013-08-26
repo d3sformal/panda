@@ -45,12 +45,7 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 		} 
 		
         ConcreteAccessExpression path = Class.create(getClassName(), ti, getClassInfo().getStaticElementInfo());
-		
-		if (path != null) {
-			path = DefaultConcreteObjectFieldRead.create(path, getFieldName());
-			
-			GlobalAbstraction.getInstance().processLoad(path);
-		}
+        path = DefaultConcreteObjectFieldRead.create(path, getFieldName());
 		
 		StackFrame sf = ti.getModifiableTopFrame();
 		sf.setOperandAttr(new NonEmptyAttribute(null, path));

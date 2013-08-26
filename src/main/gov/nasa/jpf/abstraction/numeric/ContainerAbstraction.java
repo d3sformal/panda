@@ -91,13 +91,6 @@ public class ContainerAbstraction extends Abstraction {
     }
     
     @Override
-    public void processLoad(ConcreteAccessExpression from) {
-    	for (Abstraction abs : list) {
-    		abs.processLoad(from);
-    	}
-    }
-    
-    @Override
     public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
     	for (Abstraction abs : list) {
     		abs.processMethodCall(threadInfo, before, after);

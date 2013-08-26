@@ -51,9 +51,7 @@ public class IALOAD extends gov.nasa.jpf.jvm.bytecode.IALOAD {
 			ConcreteAccessExpression path = (ConcreteAccessExpression) arrayAttr.getExpression();
 				
 			path = DefaultConcreteArrayElementRead.create(path, indexAttr.getExpression());
-			
-			GlobalAbstraction.getInstance().processLoad(path);
-				
+							
 			Attribute attribute = new NonEmptyAttribute(null, path);
 
 			sf = ti.getModifiableTopFrame();

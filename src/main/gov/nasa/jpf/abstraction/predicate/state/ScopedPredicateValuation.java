@@ -119,11 +119,6 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	public TruthValue get(Predicate predicate) {
 		return scopes.top().get(predicate);
 	}
-
-	@Override
-	public Iterator<Entry<Predicate, TruthValue>> iterator() {
-		return scopes.top().iterator();
-	}
 	
 	@Override
 	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
@@ -145,8 +140,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		Set<Predicate> replacements = new HashSet<Predicate>();
 		
 		if (args != null && attrs != null) {
-			for (Map.Entry<Predicate, TruthValue> entry : finalScope) {
-				Predicate replaced = entry.getKey();
+			for (Predicate predicate : finalScope.getPredicates()) {
+				Predicate replaced = predicate;
 				
 				for (int i = 1; i < args.length; ++i) {
 					Attribute attr = (Attribute) attrs[i];
@@ -158,7 +153,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					}
 				}
 				
-				predicates.put(entry.getKey(), replaced);
+				predicates.put(predicate, replaced);
 				replacements.add(replaced);
 			}
 			
@@ -206,8 +201,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
 		Set<Predicate> determinants = new HashSet<Predicate>();
 		
-		for (Map.Entry<Predicate, TruthValue> entry : this) {
-			Predicate predicate = entry.getKey();
+		for (Predicate predicate : getPredicates()) {
 			
 			if (isPredicateOverReturn(predicate)) {
 				Predicate determinant = predicate.replace(DefaultReturnValue.create(), attr.getExpression());
@@ -297,8 +291,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		Set<Predicate> toBeUpdated = new HashSet<Predicate>();
 		
-		for (Map.Entry<Predicate, TruthValue> entry : scope) {
-			Predicate predicate = entry.getKey();
+		for (Predicate predicate : scope.getPredicates()) {
 			
 			boolean canBeAffected = false;
 			
@@ -306,7 +299,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				canBeAffected |= path.getRoot().isThis() && sameObject;
 				canBeAffected |= path.isStatic();
 				
-				for (int i = 0; i < before.getMethodInfo().getArgumentsSize(); ++i) {
+				for (int i = 0; i < attrs.size(); ++i) {
 					Expression expr = attrs.get(i).getExpression();
 					
 					if (expr instanceof AccessExpression) {

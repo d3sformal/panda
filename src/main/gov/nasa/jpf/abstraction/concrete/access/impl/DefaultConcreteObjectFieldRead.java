@@ -9,15 +9,15 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.meta.Field;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
-import gov.nasa.jpf.abstraction.concrete.ObjectFieldID;
-import gov.nasa.jpf.abstraction.concrete.PartialClassID;
-import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
-import gov.nasa.jpf.abstraction.concrete.StaticFieldID;
-import gov.nasa.jpf.abstraction.concrete.VariableID;
+import gov.nasa.jpf.abstraction.concrete.Reference;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteObjectFieldRead;
-import gov.nasa.jpf.abstraction.concrete.impl.PathResolution;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Array;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Object;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.PrimitiveValue;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 public class DefaultConcreteObjectFieldRead extends DefaultObjectFieldRead implements ConcreteObjectFieldRead {
 
@@ -49,84 +49,33 @@ public class DefaultConcreteObjectFieldRead extends DefaultObjectFieldRead imple
 	public ConcreteAccessExpression getObject() {
 		return (ConcreteAccessExpression) super.getObject();
 	}
-	
-	private PathResolution resolveField(PathResolution resolution) {		
-		Map<AccessExpression, VariableID> processed = resolution.current;
-		Map<AccessExpression, VariableID> current = new HashMap<AccessExpression, VariableID>();
+
+	@Override
+	public Value resolve() {
+		Object resolution = (Object)getObject().resolve();
 		
-		for (AccessExpression expr : processed.keySet()) {
-			VariableID var = processed.get(expr);
-			AccessExpression clone = expr.clone();
-			clone = DefaultObjectFieldRead.create(clone, getField());
+		ThreadInfo ti = resolution.getReference().getThreadInfo();
+		ElementInfo ei = resolution.getReference().getElementInfo();
+		
+		Value value = new Object(new Reference(ti, ei));
+		
+		if (ei != null) {
+			java.lang.Object o = ei.getFieldValueObject(getField().getName());
 			
-			if (var instanceof PartialVariableID) {
-				ElementInfo ei = ((PartialVariableID) var).getRef().getElementInfo();
-				Object object = ei.getFieldValueObject(getField().getName());
+			if (o instanceof ElementInfo) {
+				ElementInfo sei = (ElementInfo) o;
 				
-				if (var instanceof PartialClassID) {					
-					if (object instanceof ElementInfo) {
-						// STATIC OBJECT FIELD
-				
-						current.put(clone, new PartialVariableID(DefaultConcreteAccessExpression.createStaticFieldReference(resolution.threadInfo, getField().getName(), ei)));
-					} else {
-						// STATIC PRIMITIVE FIELD
-					
-						current.put(clone, new StaticFieldID(ei.getClassInfo().getName(), getField().getName()));
-					}
-				} else if (object instanceof ElementInfo) {
-					// STRUCTURED FIELD (PATH NOT YET COMPLETE)
-					        
-					current.put(clone, new PartialVariableID(DefaultConcreteAccessExpression.createObjectFieldReference(resolution.threadInfo, getField().getName(), ei)));
+				if (sei.isArray()) {
+					value = new Array(new Reference(ti, sei));
 				} else {
-					// PRIMITIVE FIELD
-					
-					current.put(clone, new ObjectFieldID(ei.getObjectRef(), getField().getName()));
+					value = new Object(new Reference(ti, sei));
 				}
 			}
 		}
 		
-		return new PathResolution(resolution.threadInfo, processed, current);
-	}
-	
-	@Override
-	public PathResolution partialResolve() {
-		PathResolution subResolution = getObject().partialResolve();
+		resolution.setField(getField().getName(), value);
 		
-		PathResolution resolution = resolveField(subResolution);
-		
-		subResolution.processed.putAll(resolution.processed);
-		subResolution.current = resolution.current;
-		
-		return subResolution;
-	}
-
-	@Override
-	public PathResolution partialExhaustiveResolve() {
-		PathResolution subResolution = getObject().partialExhaustiveResolve();
-		PathResolution resolution = resolveField(subResolution);
-		
-		resolution.processed = new HashMap<AccessExpression, VariableID>();
-		resolution.processed.putAll(resolution.current);
-		
-		return resolution;
-	}
-
-	@Override
-	public PathResolution resolve() {
-		PathResolution resolution = partialExhaustiveResolve();
-		Set<AccessExpression> toBeRemoved = new HashSet<AccessExpression>();
-		
-		for (AccessExpression expr : resolution.processed.keySet()) {
-			if (resolution.processed.get(expr) instanceof PartialVariableID) {
-				toBeRemoved.add(expr);
-			}
-		}
-		
-		for (AccessExpression expr : toBeRemoved) {
-			resolution.processed.remove(expr);
-		}
-		
-		return resolution;
+		return value;
 	}
 	
 	@Override

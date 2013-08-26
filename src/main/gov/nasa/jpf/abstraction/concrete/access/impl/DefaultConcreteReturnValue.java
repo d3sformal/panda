@@ -2,7 +2,7 @@ package gov.nasa.jpf.abstraction.concrete.access.impl;
 
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteRoot;
-import gov.nasa.jpf.abstraction.concrete.impl.PathResolution;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -17,18 +17,8 @@ public class DefaultConcreteReturnValue extends DefaultReturnValue implements Co
 	}
 
 	@Override
-	public PathResolution partialResolve() {
-		return new PathResolution(threadInfo);
-	}
-
-	@Override
-	public PathResolution partialExhaustiveResolve() {
-		return new PathResolution(threadInfo);
-	}
-
-	@Override
-	public PathResolution resolve() {
-		return new PathResolution(threadInfo);
+	public Value resolve() {
+		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 	
 	@Override

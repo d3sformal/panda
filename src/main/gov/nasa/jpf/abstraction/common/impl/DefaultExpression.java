@@ -1,18 +1,18 @@
 package gov.nasa.jpf.abstraction.common.impl;
 
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.common.Notation;
 
 public abstract class DefaultExpression implements Expression {
 
 	@Override
 	public final String toString() {
-		return toString(NotationPolicy.policy);
+		return toString(Notation.policy);
 	}
 
 	@Override
-	public final String toString(NotationPolicy policy) {
-		return NotationPolicy.convertToString(this, policy);
+	public final String toString(Notation policy) {
+		return Notation.convertToString(this, policy);
 	}
 	
 	@Override

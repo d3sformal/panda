@@ -33,11 +33,6 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processLoad(ConcreteAccessExpression from) {
-		symbolTable.processLoad(from);
-	}
-	
-	@Override
 	public void processPrimitiveStore(Expression from, ConcreteAccessExpression to) {
 		Set<AccessExpression> affected = symbolTable.processPrimitiveStore(to);
 		

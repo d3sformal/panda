@@ -1,14 +1,9 @@
 package gov.nasa.jpf.abstraction.concrete.access.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
-import gov.nasa.jpf.abstraction.concrete.LocalVariableID;
-import gov.nasa.jpf.abstraction.concrete.VariableID;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteRoot;
-import gov.nasa.jpf.abstraction.concrete.impl.PathResolution;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.PrimitiveValue;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -22,29 +17,11 @@ public class LocalVar extends DefaultRoot implements ConcreteRoot {
 		
 		this.ti = ti;
 		this.li = li;
-	}
-	
-	private PathResolution resolveVar() {
-		Map<AccessExpression, VariableID> processed = new HashMap<AccessExpression, VariableID>();
-		
-		processed.put(DefaultRoot.create(getName()), new LocalVariableID(getName(), li.getSlotIndex()));
-		
-		return new PathResolution(ti, processed, processed);
-	}
-	
-	@Override
-	public PathResolution partialResolve() {
-		return resolveVar();
-	}
+	}	
 
 	@Override
-	public PathResolution partialExhaustiveResolve() {
-		return resolveVar();
-	}
-
-	@Override
-	public PathResolution resolve() {
-		return resolveVar();
+	public Value resolve() {
+		return new PrimitiveValue();
 	}
 	
 	public static LocalVar create(String name, ThreadInfo threadInfo, LocalVarInfo localVarInfo) {

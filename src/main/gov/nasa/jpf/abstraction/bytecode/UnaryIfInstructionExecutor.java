@@ -8,7 +8,7 @@ import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.NotationPolicy;
+import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.ChoiceGenerator;
@@ -55,7 +55,7 @@ public class UnaryIfInstructionExecutor {
 				}
 							
 				if (pred != TruthValue.UNDEFINED) {
-					System.out.printf("%s> Predicate: %s = 0\n", name, expr.toString(NotationPolicy.DOT_NOTATION));
+					System.out.printf("%s> Predicate: %s = 0\n", name, expr.toString(Notation.DOT_NOTATION));
 				}
 			}		
 	

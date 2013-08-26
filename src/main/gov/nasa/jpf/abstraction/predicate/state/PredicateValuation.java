@@ -7,7 +7,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
-public interface PredicateValuation extends Iterable<Map.Entry<Predicate, TruthValue>> {
+public interface PredicateValuation {
 	public void put(Predicate predicate, TruthValue value);
 	public void remove(Predicate predicate);
 	public boolean containsKey(Predicate predicate);

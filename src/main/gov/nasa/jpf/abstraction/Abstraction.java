@@ -66,22 +66,6 @@ public abstract class Abstraction {
 	public void backtrack(MethodInfo method) {
 	}
 	
-	public void processLoad(ConcreteAccessExpression from) {
-	}
-	
-	public final void processStore(Expression from, ConcreteAccessExpression to) {
-		if (from instanceof ConcreteAccessExpression && ((ConcreteAccessExpression)from).resolve().processed.isEmpty()) {
-			//Path resolves to objRefs
-			processObjectStore(from, to);
-		} else if (from instanceof AnonymousExpression) {
-			processObjectStore(from, to);
-		} else {
-			//Path resolves to an expression over primitive types
-			//There are no expression over objref
-			processPrimitiveStore(from, to);
-		}
-	}
-	
 	public void processPrimitiveStore(Expression from, ConcreteAccessExpression to) {
 	}
 	

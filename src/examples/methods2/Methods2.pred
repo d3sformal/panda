@@ -1,5 +1,5 @@
-[method methods2.Methods2.main]
-a.i = 2
-
 [method methods2.A.do1]
-this.i = 2
+class(methods2.Methods2).X = 2
+
+[static]
+class(methods2.Methods2).X = 2

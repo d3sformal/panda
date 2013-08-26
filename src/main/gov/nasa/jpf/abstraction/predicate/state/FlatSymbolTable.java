@@ -1,377 +1,218 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
-import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.NotationPolicy;
-import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.concrete.ArrayReference;
-import gov.nasa.jpf.abstraction.concrete.ObjectReference;
-import gov.nasa.jpf.abstraction.concrete.PartialVariableID;
-import gov.nasa.jpf.abstraction.concrete.VariableID;
+import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Array;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Object;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Comparator;
 
 public class FlatSymbolTable implements SymbolTable, Scope {
 	
-	/**
-	 *  Maps PATH to all possible VARIABLEIDS
-	 *  
-	 *  a -> local var a
-	 *  b.a -> static field a
-	 *  c.a -> heap field a
-	 *  d[1] -> heap array element number 1
-	 */
-	private HashMap<AccessExpression, Set<VariableID>> prefixToVariableIDs = new HashMap<AccessExpression, Set<VariableID>>();
+	private HashMap<AccessExpression, Set<Value>> previous;
 	
-	/**
-	 * Maps VARIABLEID to all known (from the point of our execution) PATHS
-	 * 
-	 * heap field a -> {x.y.a, z.a, u[1].a}
-	 * ...
-	 */
-	private HashMap<VariableID, Set<AccessExpression>> variableIDToPrefixes = new HashMap<VariableID, Set<AccessExpression>>();
+	private HashMap<Root, Set<Value>> locals;
+	private HashMap<AccessExpression, Set<Value>> statics;
+	
+	private static int MAX = 100; //TODO read the longest path from predicate from current predicate valuation table
 
-	@Override
-	public Set<AccessExpression> lookupAccessPaths(AccessExpression prefix) {
-		Set<AccessExpression> ret = new HashSet<AccessExpression>();
+	public FlatSymbolTable() {
+		this(
+			new HashMap<AccessExpression, Set<Value>>(),
+			new HashMap<Root, Set<Value>>(),
+			new HashMap<AccessExpression, Set<Value>>()
+		);
+	}
+	
+	protected FlatSymbolTable(
+			HashMap<AccessExpression, Set<Value>> previous,
+			HashMap<Root, Set<Value>> locals,
+			HashMap<AccessExpression, Set<Value>> statics) {
+		this.previous = previous;
+		this.locals = locals;
+		this.statics = statics;
+	}
+	
+	private Map<AccessExpression, Set<Value>> localsAndStatics() {
+		Map<AccessExpression, Set<Value>> ret = new HashMap<AccessExpression, Set<Value>>();
 		
-		for (AccessExpression path : prefixToVariableIDs.keySet()) {
-			if (prefix.isPrefixOf(path)) {
-				ret.add(path);
+		ret.putAll(statics);
+		ret.putAll(locals);
+		
+		return ret;
+	}
+	
+	private HashMap<AccessExpression, Set<Value>> current() {
+		HashMap<AccessExpression, Set<Value>> ret = new HashMap<AccessExpression, Set<Value>>();
+		Map<AccessExpression, Set<Value>> localsAndStatics = localsAndStatics();
+		
+		for (AccessExpression path : localsAndStatics.keySet()) {
+			for (Value value : localsAndStatics.get(path)) {
+				value.build(MAX);
+				ret.putAll(value.resolve(path, MAX));
 			}
 		}
 		
 		return ret;
 	}
-
-	@Override
-	public Set<AccessExpression> lookupEquivalentAccessPaths(VariableID var) {
-		Set<AccessExpression> ret = variableIDToPrefixes.get(var);
+	
+	private Set<AccessExpression> affectedLocalsAndStatics(ConcreteAccessExpression to) {
+		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		
-		if (var == null || ret == null) {
-			ret = new HashSet<AccessExpression>(); 
+		if (to.isLocalVariable()) {
+			Set<Value> values = new HashSet<Value>();
+			
+			values.add(to.resolve());
+			
+			locals.put((Root) to, values);
+			
+			ret.add(to);
+		} else if (to.isStatic() && to.getLength() == 2) {
+			Set<Value> values = new HashSet<Value>();
+			
+			values.add(to.resolve());
+			
+			statics.put(to, values);
+			
+			ret.add(to);
 		}
 		
 		return ret;
 	}
 	
 	@Override
-	public Set<AccessExpression> lookupEquivalentAccessPaths(AccessExpression path) {
-		Set<AccessExpression> ret = new HashSet<AccessExpression>();
-		
-		for (VariableID var : resolvePath(path)) {
-			ret.addAll(lookupEquivalentAccessPaths(var));
-		}
-		
-		return ret;
+	public Set<AccessExpression> processPrimitiveStore(ConcreteAccessExpression to) {
+		return affectedLocalsAndStatics(to);
 	}
-
-	private Set<VariableID> resolvePath(AccessExpression path) {
-		Set<VariableID> ret = prefixToVariableIDs.get(path);
+	
+	@Override
+	public Set<AccessExpression> processObjectStore(Expression from, ConcreteAccessExpression to) {
+		Set<AccessExpression> affected = new HashSet<AccessExpression>();
 		
-		if (path == null || ret == null) {
-			return new HashSet<VariableID>();
+		if (to != null) affected.addAll(affectedLocalsAndStatics(to));
+		
+		HashMap<AccessExpression, Set<Value>> current = current();
+		
+		for (AccessExpression expr : current.keySet()) {			
+			if (!previous.containsKey(expr)) {
+				affected.add(expr);
+			} else {
+				Set<Value> values1 = current.get(expr);
+				Set<Value> values2 = previous.get(expr);
+				
+				if (values1.size() != values2.size()) {
+					affected.add(expr);
+				}
+				
+				for (Value value : values1) {
+					if (!values2.contains(value)) {
+						affected.add(expr);
+					}
+				}
+			}
 		}
 		
-		return ret;
+		previous = current;
+				
+		return affected;
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public FlatSymbolTable clone() {
-		FlatSymbolTable clone = new FlatSymbolTable();
-		
-		clone.prefixToVariableIDs = (HashMap<AccessExpression, Set<VariableID>>)prefixToVariableIDs.clone();
-		clone.variableIDToPrefixes = (HashMap<VariableID, Set<AccessExpression>>)variableIDToPrefixes.clone();
-		
-		return clone;
-	}
-	
-	private void setPathToVar(AccessExpression path, VariableID var) {
-		initialisePathToNumbers(path);
-		initialiseNumberToPaths(var);
-
-		prefixToVariableIDs.get(path).add(var);
-		variableIDToPrefixes.get(var).add(path);
-	}
-	
-	@Override
-	public void setPathToVars(AccessExpression path, Set<VariableID> vars) {
-		for (VariableID var : vars) {
-			setPathToVar(path, var);
-		}
-	}
-	
-	private void unsetPath(AccessExpression path) {
-		initialisePathToNumbers(path);
-		
-		Set<VariableID> vars = prefixToVariableIDs.get(path);
-		
-		for (VariableID number : vars) {
-			initialiseNumberToPaths(number);
-
-			Set<AccessExpression> paths = variableIDToPrefixes.get(number);
-		
-			if (paths.isEmpty()) {
-				variableIDToPrefixes.remove(number);
-			}
-		}
-		
-		prefixToVariableIDs.remove(path);
-	}
-	
-	private void initialisePathToNumbers(AccessExpression path) {
-		if (!prefixToVariableIDs.containsKey(path)) {
-			prefixToVariableIDs.put(path, new HashSet<VariableID>());
-		}
-	}
-	
-	private void initialiseNumberToPaths(VariableID var) {
-		if (!variableIDToPrefixes.containsKey(var)) {
-			variableIDToPrefixes.put(var, new HashSet<AccessExpression>());
-		}
-	}
-	
-	@Override
-	public void processLoad(ConcreteAccessExpression from) {
-		Map<AccessExpression, VariableID> vars = from.partialResolve().processed;
-		
-		for (AccessExpression source : vars.keySet()) {
-			unsetPath(source);
-			setPathToVar(source, vars.get(source));
-		}
-	}
-	
-	@Override
-	public Set<AccessExpression> processPrimitiveStore(ConcreteAccessExpression destination) {
-		Set<AccessExpression> affected = new HashSet<AccessExpression>();
-		
-		if (destination == null) {
-			return affected;
-		}
-			
-		Map<AccessExpression, VariableID> destinationCandidates = destination.resolve().processed;
-		
-		for (AccessExpression destinationPath : destinationCandidates.keySet()) {
-			// ASSIGN A PRIMITIVE VALUE - STORES NEW VALUE (REWRITES DATA => NO PATH UNSETTING, VARID STAY THE SAME, ONLY THE VALUES CHANGED)
-			setPathToVar(destinationPath, destinationCandidates.get(destinationPath));
-						
-	    	Set<AccessExpression> equivalentPaths = lookupEquivalentAccessPaths(destinationPath);
-	    	equivalentPaths.add(destinationPath);
-	    			
-	    	affected.addAll(equivalentPaths);
-		}
-		
-		return affected;
-	}
-	
-	@Override
-	public Set<AccessExpression> processObjectStore(Expression sourceExpression, ConcreteAccessExpression destinationPrefix) {
-		Set<AccessExpression> affected = new HashSet<AccessExpression>();
-		
-		ConcreteAccessExpression sourcePrefix = null;
-		
-		if (sourceExpression instanceof ConcreteAccessExpression) {
-			sourcePrefix = (ConcreteAccessExpression) sourceExpression;
-		}
-
-		if (destinationPrefix == null) {
-			return affected;
-		}
-		
-		Set<AccessExpression> destinationCandidates = destinationPrefix.partialExhaustiveResolve().processed.keySet();
-		boolean unambiguous = destinationCandidates.size() == 1;
-		
-		if (sourceExpression instanceof AnonymousExpression) {
-			AnonymousExpression anonymous = (AnonymousExpression) sourceExpression;
-			
-			for (AccessExpression destination : destinationCandidates) {
-				if (unambiguous) {
-					for (AccessExpression subobjects : lookupAccessPaths(destination)) {
-						unsetPath(subobjects);
-					}
-				}
-				
-				setPathToVar(destination, anonymous.generateVariableID());
-				
-				affected.add(destination);
-			}
-		}
-		
-		if (sourcePrefix == null) {
-			return affected;
-		}
-		
-		Map<AccessExpression, VariableID> sourceCandidates = sourcePrefix.partialResolve().processed;
-
-		Map<AccessExpression, Set<VariableID>> rewrites = new HashMap<AccessExpression, Set<VariableID>>();
-		
-		for (AccessExpression destination : destinationCandidates) {			
-			Set<AccessExpression> affectedObjectPaths = new HashSet<AccessExpression>();
-
-			for (AccessExpression affectedPrefixCandidate : prefixToVariableIDs.keySet()) {
-				if (affectedPrefixCandidate.isProperPrefixOf(destination) && affectedPrefixCandidate.getLength() >= destination.getLength() - 1) {
-					AccessExpression affectedPrefix = affectedPrefixCandidate;
-					
-					AccessExpression element = destination.get(affectedPrefix.getLength());
-
-					for (AccessExpression equivalentObjectPathPrefix : lookupEquivalentAccessPaths(affectedPrefix)) {
-						AccessExpression equivalentObjectPath = equivalentObjectPathPrefix.clone();
-						
-						if (element instanceof ObjectFieldRead) {
-							ObjectFieldRead sub = (ObjectFieldRead) element;
-							
-							equivalentObjectPath = DefaultObjectFieldRead.create(equivalentObjectPath, sub.getField().getName());
-						} else if (element instanceof ArrayElementRead) {
-							ArrayElementRead index = (ArrayElementRead) element;
-							
-							equivalentObjectPath = DefaultArrayElementRead.create(equivalentObjectPath, index.getIndex());
-						}
-						
-						affectedObjectPaths.add(equivalentObjectPath);
-					}
-				}
-			}
-			
-			affectedObjectPaths.add(destination);
-			affected.addAll(affectedObjectPaths);
-
-			for (AccessExpression sourceCandidate : sourceCandidates.keySet()) {
-				for (AccessExpression source : lookupAccessPaths(sourceCandidate)) {
-					for (AccessExpression prefix : affectedObjectPaths) {
-						AccessExpression newPath = source.clone();
-						AccessExpression oldPrefix = sourceCandidate;
-						AccessExpression newPrefix = prefix.clone();
-						
-						newPath.reRoot(oldPrefix, newPrefix);
-												
-						if (!rewrites.containsKey(newPath)) {
-							rewrites.put(newPath, new HashSet<VariableID>());
-						}
-						
-						rewrites.get(newPath).addAll(resolvePath(source));
-					}
-				}			
-				
-				if (!rewrites.containsKey(destination)) {
-					rewrites.put(destination, new HashSet<VariableID>());
-				}
-				
-				rewrites.get(destination).addAll(resolvePath(sourceCandidate));
-			}
-		}
-		
-		for (AccessExpression path : rewrites.keySet()) {
-			if (unambiguous) {
-				for (AccessExpression subobjects : lookupAccessPaths(path)) {
-					unsetPath(subobjects);
-				}
-			}
-
-			setPathToVars(path, rewrites.get(path));
-		}
-				
-		return affected;
-	}
-	
-	@Override
-	public String toString() {
-		StringBuilder ret = new StringBuilder();
-		
-		int padding = 0;
-
-		for (AccessExpression p : prefixToVariableIDs.keySet()) {
-			String path = p.toString(NotationPolicy.DOT_NOTATION);
-			
-			padding = padding < path.length() ? path.length() : padding;
-		}
-		
-		padding += 4;
-
-        TreeSet<AccessExpression> paths = new TreeSet<AccessExpression>(new Comparator<AccessExpression>() {
-            @Override
-            public int compare(AccessExpression p1, AccessExpression p2) {
-                return p1.toString(NotationPolicy.DOT_NOTATION).compareTo(p2.toString(NotationPolicy.DOT_NOTATION));
-            }
-        });
-
-        paths.addAll(prefixToVariableIDs.keySet());
-		
-		for (AccessExpression p : paths) {
-			String path = p.toString(NotationPolicy.DOT_NOTATION);
-			StringBuilder pad = new StringBuilder();
-			
-			for (int i = 0; i < padding - path.length(); ++i) {
-				pad.append(" ");
-			}
-			
-			ret.append(path);
-			ret.append(pad);
-			ret.append("{ ");
-			for (VariableID var : prefixToVariableIDs.get(p)) {
-				ret.append(var);
-				ret.append(" ");
-			}
-			ret.append("}\n");
-		}
-
-		return ret.toString();
+		return new FlatSymbolTable(
+			(HashMap<AccessExpression, Set<Value>>) previous.clone(),
+			(HashMap<Root, Set<Value>>) locals.clone(),
+			(HashMap<AccessExpression, Set<Value>>) statics.clone()
+		);
 	}
 	
 	@Override
 	public int count() {
-		return prefixToVariableIDs.keySet().size();
+		return current().keySet().size();
+	}
+	
+	private String createDump(Set<AccessExpression> symbols) {
+		StringBuilder ret = new StringBuilder();
+		
+		Set<AccessExpression> order = new TreeSet<AccessExpression>(new Comparator<AccessExpression>() {
+			public int compare(AccessExpression o1, AccessExpression o2) {
+				if (o1 instanceof Root && !(o2 instanceof Root)) return -1;
+				if (o2 instanceof Root && !(o1 instanceof Root)) return +1;
+				
+				return o1.toString(Notation.DOT_NOTATION).compareTo(o2.toString(Notation.DOT_NOTATION));
+			}
+		});
+		
+		order.addAll(symbols);
+		
+		for (AccessExpression expr : order) {
+			ret.append(expr.toString(Notation.DOT_NOTATION));
+			ret.append("\n");
+		}
+		
+		return ret.toString();
 	}
 	
 	@Override
-	public boolean isObject(AccessExpression path) {
-		if (prefixToVariableIDs.containsKey(path)) {
-			for (VariableID var : prefixToVariableIDs.get(path)) {
-				if (var instanceof PartialVariableID) {
-					PartialVariableID partial = (PartialVariableID) var;
-					
-					return partial.getRef() instanceof ObjectReference;
-				}
-				
-				return false;
-			}
-		}
-		
-		return false;
+	public String toString() {
+		return createDump(current().keySet());
 	}
 
 	@Override
-	public boolean isArray(AccessExpression path) {
-		if (prefixToVariableIDs.containsKey(path)) {
-			for (VariableID var : prefixToVariableIDs.get(path)) {
-				if (var instanceof PartialVariableID) {
-					PartialVariableID partial = (PartialVariableID) var;
-					
-					return partial.getRef() instanceof ArrayReference;
-				}
-				
-				return false;
+	public boolean isArray(ConcreteAccessExpression path) {
+		boolean isArray = false;
+		
+		Map<AccessExpression, Set<Value>> current = current();
+		
+		if (current.containsKey(path)) {
+			for (Value value : current.get(path)) {
+				isArray |= value instanceof Array;
 			}
 		}
 		
-		return false;
+		return isArray;
 	}
 
 	@Override
-	public Iterator<Entry<AccessExpression, Set<VariableID>>> iterator() {
-		return prefixToVariableIDs.entrySet().iterator();
+	public boolean isObject(ConcreteAccessExpression path) {
+		boolean isObject = false;
+		
+		Map<AccessExpression, Set<Value>> current = current();
+		
+		if (current.containsKey(path)) {
+			for (Value value : current.get(path)) {
+				isObject |= value instanceof Object;
+			}
+		}
+		
+		return isObject;
+	}
+
+	@Override
+	public boolean isPrimitive(ConcreteAccessExpression path) {
+		return !isObject(path);
+	}
+	
+	public void removeLocals() {
+		locals = new HashMap<Root, Set<Value>>();
+	}
+	
+	public HashMap<AccessExpression, Set<Value>> getStatics() {
+		return statics;
+	}
+
+	public void setStatics(HashMap<AccessExpression, Set<Value>> statics) {
+		this.statics = statics;
 	}
 
 }
