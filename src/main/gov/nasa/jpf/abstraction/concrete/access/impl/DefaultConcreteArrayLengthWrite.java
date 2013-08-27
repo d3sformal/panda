@@ -8,7 +8,6 @@ import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteArrayLengthExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteArrayLengthWrite;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 
 public class DefaultConcreteArrayLengthWrite extends DefaultArrayLengthWrite implements ConcreteArrayLengthWrite, ConcreteArrayLengthExpression {
 
@@ -34,11 +33,6 @@ public class DefaultConcreteArrayLengthWrite extends DefaultArrayLengthWrite imp
 		}
 		
 		return new DefaultConcreteArrayLengthWrite(array, arrayLengths, newValue);
-	}
-
-	@Override
-	public Value resolve() {
-		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 	
 	@Override

@@ -6,7 +6,6 @@ import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteArrayLengthRead;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 
 public class DefaultConcreteArrayLengthRead extends DefaultArrayLengthRead implements ConcreteArrayLengthRead {
 
@@ -32,11 +31,6 @@ public class DefaultConcreteArrayLengthRead extends DefaultArrayLengthRead imple
 		}
 		
 		return new DefaultConcreteArrayLengthRead(array, arrayLengths);
-	}
-
-	@Override
-	public Value resolve() {
-		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 	
 	@Override

@@ -9,9 +9,6 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Array;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Object;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 
 public class ObjectExpressionWrapper extends DefaultObjectExpression {
 	private Expression expression;

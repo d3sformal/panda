@@ -7,6 +7,7 @@ import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVar;
 import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVarRootedHeapObject;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
@@ -47,7 +48,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		
 		scopes.push(transitionScope);
 		
-		transitionScope.removeLocals();
+		//transitionScope.removeLocals();
 		
 		StackFrame sf = threadInfo.getTopFrame();
 		Object attrs[] = sf.getArgumentAttrs(method);
@@ -84,15 +85,18 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
 		
-		FlatSymbolTable transitionScope;
-		
-		if (scopes.count() == 1) {
-			transitionScope = createDefaultScope(method);
-		} else {
-			transitionScope = scopes.top(1);
+		if (RunDetector.isRunning()) {
+			FlatSymbolTable transitionScope;
+			
+			if (scopes.count() == 1) {
+				transitionScope = createDefaultScope(method);
+			} else {
+				transitionScope = scopes.top(1);
+			}
+			
+			//transitionScope.setStatics(scopes.top().getStatics());
+			//transitionScope.update();
 		}
-		
-		transitionScope.setStatics(scopes.top().getStatics());
 		
 		scopes.pop();
 	}

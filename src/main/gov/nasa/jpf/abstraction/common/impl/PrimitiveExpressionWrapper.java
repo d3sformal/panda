@@ -9,8 +9,6 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.PrimitiveValue;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 
 public class PrimitiveExpressionWrapper extends DefaultPrimitiveExpression {
 	private Expression expression;

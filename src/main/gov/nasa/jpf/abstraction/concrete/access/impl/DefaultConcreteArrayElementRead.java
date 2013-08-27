@@ -6,7 +6,6 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteArrayElementRead;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 
 public class DefaultConcreteArrayElementRead extends DefaultArrayElementRead implements ConcreteArrayElementRead {
 
@@ -37,11 +36,6 @@ public class DefaultConcreteArrayElementRead extends DefaultArrayElementRead imp
 	@Override
 	public ConcreteAccessExpression getArray() {
 		return (ConcreteAccessExpression) super.getArray();
-	}
-
-	@Override
-	public Value resolve() {
-		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 	
 	@Override

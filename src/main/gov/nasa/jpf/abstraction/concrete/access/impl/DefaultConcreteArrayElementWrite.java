@@ -6,7 +6,6 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteArrayElementWrite;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 
 public class DefaultConcreteArrayElementWrite extends DefaultArrayElementWrite implements ConcreteArrayElementWrite {
 
@@ -32,11 +31,6 @@ public class DefaultConcreteArrayElementWrite extends DefaultArrayElementWrite i
 		}
 		
 		return new DefaultConcreteArrayElementWrite(array, arrays, index, newValue);
-	}
-
-	@Override
-	public Value resolve() {
-		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 	
 	@Override

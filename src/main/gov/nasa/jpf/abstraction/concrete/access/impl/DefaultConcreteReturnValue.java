@@ -2,7 +2,6 @@ package gov.nasa.jpf.abstraction.concrete.access.impl;
 
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteRoot;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -14,11 +13,6 @@ public class DefaultConcreteReturnValue extends DefaultReturnValue implements Co
 	protected DefaultConcreteReturnValue(ThreadInfo threadInfo, Instruction pc) {
 		this.threadInfo = threadInfo;
 		this.pc = pc;
-	}
-
-	@Override
-	public Value resolve() {
-		throw new RuntimeException("Not Yet Re-Implemented.");
 	}
 	
 	@Override

@@ -2,8 +2,6 @@ package gov.nasa.jpf.abstraction.concrete.access.impl;
 
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.concrete.access.ConcreteRoot;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.PrimitiveValue;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -17,11 +15,6 @@ public class LocalVar extends DefaultRoot implements ConcreteRoot {
 		
 		this.ti = ti;
 		this.li = li;
-	}	
-
-	@Override
-	public Value resolve() {
-		return new PrimitiveValue();
 	}
 	
 	public static LocalVar create(String name, ThreadInfo threadInfo, LocalVarInfo localVarInfo) {

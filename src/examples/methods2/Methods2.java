@@ -16,6 +16,8 @@ public class Methods2 {
 		A a = new A();
 		
 		a.do1();
+		
+		X = 3;
 	}
 
 }

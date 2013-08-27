@@ -92,6 +92,10 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			} else if (context instanceof ObjectContext) {
 				ObjectContext objectContext = (ObjectContext) context;
 				
+				if (method.isStatic()) {
+					continue;
+				}
+				
 				if (!objectContext.getPackageAndClass().toString().equals(method.getClassName())) {
 					continue;
 				}
@@ -136,8 +140,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		Object attrs[] = after.getArgumentAttrs(method);
 		LocalVarInfo args[] = method.getArgumentLocalVars();
 		
-		Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
-		Set<Predicate> replacements = new HashSet<Predicate>();
+		Map<Predicate, Predicate> replacements = new HashMap<Predicate, Predicate>();
 		
 		if (args != null && attrs != null) {
 			for (Predicate predicate : finalScope.getPredicates()) {
@@ -153,14 +156,13 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					}
 				}
 				
-				predicates.put(predicate, replaced);
-				replacements.add(replaced);
+				replacements.put(replaced, predicate);
 			}
 			
-			Map<Predicate, TruthValue> valuation = transitionScope.evaluatePredicates(replacements);
+			Map<Predicate, TruthValue> valuation = transitionScope.evaluatePredicates(replacements.keySet());
 			
-			for (Predicate predicate : predicates.keySet()) {				
-				finalScope.put(predicate, valuation.get(predicates.get(predicate)));
+			for (Predicate predicate : replacements.keySet()) {
+				finalScope.put(replacements.get(predicate), valuation.get(predicate));
 			}
 		}
 		
@@ -205,9 +207,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			
 			if (isPredicateOverReturn(predicate)) {
 				Predicate determinant = predicate.replace(DefaultReturnValue.create(), attr.getExpression());
-				Predicate result = predicate.replace(DefaultReturnValue.create(), ret);
 				
-				predicates.put(result, determinant);
+				predicates.put(determinant, predicate);
 				determinants.add(determinant);
 			}
 		}
@@ -215,7 +216,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		Map<Predicate, TruthValue> valuation = evaluatePredicates(determinants);
 		
 		for (Predicate predicate : valuation.keySet()) {
-			scope.put(predicate, valuation.get(predicates.get(predicate)));
+			scope.put(predicates.get(predicate).replace(DefaultReturnValue.create(), ret), valuation.get(predicate));
 		}
 				
 		after.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), ret));
