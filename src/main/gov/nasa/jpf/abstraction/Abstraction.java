@@ -19,7 +19,7 @@ package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
@@ -66,10 +66,10 @@ public abstract class Abstraction {
 	public void backtrack(MethodInfo method) {
 	}
 	
-	public void processPrimitiveStore(Expression from, ConcreteAccessExpression to) {
+	public void processPrimitiveStore(Expression from, AccessExpression to) {
 	}
 	
-	public void processObjectStore(Expression from, ConcreteAccessExpression to) {
+	public void processObjectStore(Expression from, AccessExpression to) {
 	}
 	
 	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {

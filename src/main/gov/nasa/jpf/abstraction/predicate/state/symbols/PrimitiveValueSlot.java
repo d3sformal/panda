@@ -1,9 +1,30 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 public class PrimitiveValueSlot extends Slot {
 
-	protected PrimitiveValueSlot(HeapValue parent, Object slotKey) {
+	private Set<PrimitiveValue> possibilities = new HashSet<PrimitiveValue>();
+	
+	public PrimitiveValueSlot(HeapValue parent, Object slotKey, PrimitiveValue... primitives) {
+		this(parent, slotKey, Arrays.asList(primitives));
+	}
+	
+	public PrimitiveValueSlot(HeapValue parent, Object slotKey, Collection<PrimitiveValue> primitives) {
 		super(parent, slotKey);
+		
+		possibilities.addAll(primitives);
+		
+		for (PrimitiveValue primitive : primitives) {
+			primitive.addSlot(this);
+		}
+	}
+	
+	public Set<PrimitiveValue> getPossibilities() {
+		return possibilities;
 	}
 
 }

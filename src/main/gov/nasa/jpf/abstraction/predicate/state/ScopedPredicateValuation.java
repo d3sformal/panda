@@ -10,7 +10,6 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.concrete.access.impl.DefaultConcreteReturnValue;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.common.Comparison;
@@ -188,7 +187,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	@Override
 	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		Attribute attr = (Attribute) after.getResultAttr();
-		ReturnValue ret = DefaultConcreteReturnValue.create(threadInfo, after.getPC());
+		ReturnValue ret = DefaultReturnValue.create(after.getPC());
 		
 		FlatPredicateValuation scope;
 		

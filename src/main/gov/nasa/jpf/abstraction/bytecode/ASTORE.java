@@ -21,8 +21,8 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
-import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVarRootedHeapObject;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -47,12 +47,12 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		Instruction actualNextInsn = super.execute(ti);
 		
 		Expression from = source.getExpression();
-		ConcreteAccessExpression to = null;
+		AccessExpression to = null;
 
 		if (getLocalVarInfo() != null) {
 			ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
 			
-			to = LocalVarRootedHeapObject.create(getLocalVariableName(), ti, ei, var);
+			to = DefaultRoot.create(getLocalVariableName());
 		}
 		
 		sf = ti.getModifiableTopFrame();

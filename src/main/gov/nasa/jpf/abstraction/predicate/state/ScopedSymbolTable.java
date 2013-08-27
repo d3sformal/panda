@@ -2,10 +2,8 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
-import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVar;
-import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVarRootedHeapObject;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ElementInfo;
@@ -25,12 +23,12 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public Set<AccessExpression> processPrimitiveStore(ConcreteAccessExpression to) {
+	public Set<AccessExpression> processPrimitiveStore(AccessExpression to) {
 		return scopes.top().processPrimitiveStore(to);
 	}
 	
 	@Override
-	public Set<AccessExpression> processObjectStore(Expression from, ConcreteAccessExpression to) {
+	public Set<AccessExpression> processObjectStore(Expression from, AccessExpression to) {
 		return scopes.top().processObjectStore(from, to);
 	}
 	
@@ -64,12 +62,12 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 				if (args[i] != null) {
 					if (args[i].isNumeric()) {
 						// Assign to numeric (primitive) arg
-						processPrimitiveStore(LocalVar.create(args[i].getName(), threadInfo, args[i]));
+						processPrimitiveStore(DefaultRoot.create(args[i].getName()));
 					} else {
 						ElementInfo ei = threadInfo.getElementInfo(sf.peek(args.length - i));
 						
 						// Assign to object arg
-						processObjectStore(null, LocalVarRootedHeapObject.create(args[i].getName(), threadInfo, ei, args[i]));
+						processObjectStore(null, DefaultRoot.create(args[i].getName()));
 					}
 				}
 			}
@@ -135,17 +133,17 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 
 	@Override
-	public boolean isArray(ConcreteAccessExpression path) {
+	public boolean isArray(AccessExpression path) {
 		return scopes.top().isArray(path);
 	}
 
 	@Override
-	public boolean isObject(ConcreteAccessExpression path) {
+	public boolean isObject(AccessExpression path) {
 		return scopes.top().isObject(path);
 	}
 
 	@Override
-	public boolean isPrimitive(ConcreteAccessExpression path) {
+	public boolean isPrimitive(AccessExpression path) {
 		return scopes.top().isPrimitive(path);
 	}
 	

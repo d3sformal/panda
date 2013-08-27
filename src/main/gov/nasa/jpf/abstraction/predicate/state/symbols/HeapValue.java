@@ -1,10 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
-import java.util.HashSet;
-import java.util.Set;
-
-public abstract class HeapValue implements Value {
-	private Set<Slot> slots = new HashSet<Slot>();
+public abstract class HeapValue extends Value {
 	private Integer reference;
 	
 	protected HeapValue(Integer reference) {
@@ -13,14 +9,6 @@ public abstract class HeapValue implements Value {
 	
 	public Integer getReference() {
 		return reference;
-	}
-	
-	public void addSlot(Slot slot) {
-		slots.add(slot);
-	}
-	
-	public Set<Slot> getSlots() {
-		return slots;
 	}
 	
 	@Override

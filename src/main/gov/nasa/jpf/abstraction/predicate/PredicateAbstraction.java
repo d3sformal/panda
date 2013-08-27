@@ -7,7 +7,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.impl.ObjectExpressionWrapper;
 import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionWrapper;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
@@ -33,14 +33,14 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processPrimitiveStore(Expression from, ConcreteAccessExpression to) {
+	public void processPrimitiveStore(Expression from, AccessExpression to) {
 		Set<AccessExpression> affected = symbolTable.processPrimitiveStore(to);
 		
 		predicateValuation.reevaluate(to, affected, PrimitiveExpressionWrapper.wrap(from, symbolTable));
 	}
 	
 	@Override
-	public void processObjectStore(Expression from, ConcreteAccessExpression to) {	
+	public void processObjectStore(Expression from, AccessExpression to) {	
 		Set<AccessExpression> affected = symbolTable.processObjectStore(from, to);
 				
 		predicateValuation.reevaluate(to, affected, ObjectExpressionWrapper.wrap(from, symbolTable));

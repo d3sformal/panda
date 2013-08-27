@@ -19,9 +19,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
-import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVar;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -41,7 +40,7 @@ public class LLOAD extends gov.nasa.jpf.jvm.bytecode.LLOAD {
 		Instruction actualNextInsn = super.execute(ti);
 		
 		if (var != null) {
-			ConcreteAccessExpression path = LocalVar.create(var.getName(), ti, var);
+			AccessExpression path = DefaultRoot.create(var.getName());
 			Attribute attribute = new NonEmptyAttribute(null, path);
 			
 			StackFrame sf = ti.getModifiableTopFrame();

@@ -3,8 +3,8 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
-import gov.nasa.jpf.abstraction.concrete.access.impl.LocalVar;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -28,10 +28,10 @@ public class ISTORE extends gov.nasa.jpf.jvm.bytecode.ISTORE {
 		Instruction actualNextInsn = super.execute(ti);
         
 		Expression from = source.getExpression();
-		ConcreteAccessExpression to = null;
+		AccessExpression to = null;
 		
 		if (var != null) {
-			to = LocalVar.create(getLocalVariableName(), ti, var);
+			to = DefaultRoot.create(getLocalVariableName());
 		}
 		
 		sf = ti.getModifiableTopFrame();

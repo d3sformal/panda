@@ -20,8 +20,8 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
-import gov.nasa.jpf.abstraction.concrete.access.impl.DefaultConcreteArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
@@ -47,10 +47,10 @@ public class IALOAD extends gov.nasa.jpf.jvm.bytecode.IALOAD {
 			return actualNextInsn;
 		}     
 		
-		if (arrayAttr.getExpression() instanceof ConcreteAccessExpression) {
-			ConcreteAccessExpression path = (ConcreteAccessExpression) arrayAttr.getExpression();
+		if (arrayAttr.getExpression() instanceof AccessExpression) {
+			AccessExpression path = (AccessExpression) arrayAttr.getExpression();
 				
-			path = DefaultConcreteArrayElementRead.create(path, indexAttr.getExpression());
+			path = DefaultArrayElementRead.create(path, indexAttr.getExpression());
 							
 			Attribute attribute = new NonEmptyAttribute(null, path);
 

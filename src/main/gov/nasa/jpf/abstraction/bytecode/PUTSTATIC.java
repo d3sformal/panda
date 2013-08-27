@@ -21,9 +21,9 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
-import gov.nasa.jpf.abstraction.concrete.access.impl.Class;
-import gov.nasa.jpf.abstraction.concrete.access.impl.DefaultConcreteObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -55,10 +55,10 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 		}   
 
 		Expression from = source.getExpression();
-		ConcreteAccessExpression to = null;
+		AccessExpression to = null;
 		
-		to = Class.create(getClassName(), ti, ei);
-        to = DefaultConcreteObjectFieldRead.create(to, getFieldName());
+		to = DefaultPackageAndClass.create(getClassName());
+        to = DefaultObjectFieldRead.create(to, getFieldName());
 
         if (ei.getFieldValueObject(getFieldName()) instanceof ElementInfo) {
         	GlobalAbstraction.getInstance().processObjectStore(from, to);

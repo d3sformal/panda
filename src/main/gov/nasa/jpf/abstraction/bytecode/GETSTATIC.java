@@ -18,10 +18,9 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
-import gov.nasa.jpf.abstraction.concrete.access.impl.Class;
-import gov.nasa.jpf.abstraction.concrete.access.impl.DefaultConcreteObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -44,8 +43,8 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 			return actualNextInsn;
 		} 
 		
-        ConcreteAccessExpression path = Class.create(getClassName(), ti, getClassInfo().getStaticElementInfo());
-        path = DefaultConcreteObjectFieldRead.create(path, getFieldName());
+        AccessExpression path = DefaultPackageAndClass.create(getClassName());
+        path = DefaultObjectFieldRead.create(path, getFieldName());
 		
 		StackFrame sf = ti.getModifiableTopFrame();
 		sf.setOperandAttr(new NonEmptyAttribute(null, path));

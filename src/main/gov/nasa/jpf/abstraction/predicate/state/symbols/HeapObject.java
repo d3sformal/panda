@@ -16,7 +16,7 @@ public class HeapObject extends HeapValue {
 	}
 	
 	public void setField(String name, PrimitiveValue... values) {
-		fields.put(name, new PrimitiveValueSlot(this, name));
+		fields.put(name, new PrimitiveValueSlot(this, name, values));
 	}
 	
 	public Slot getField(String name) {

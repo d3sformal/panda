@@ -21,8 +21,8 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.access.ConcreteAccessExpression;
-import gov.nasa.jpf.abstraction.concrete.access.impl.DefaultConcreteArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ArrayFields;
 import gov.nasa.jpf.vm.ElementInfo;
@@ -59,11 +59,11 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 		} 
 		
 		Expression from = source.getExpression();
-		ConcreteAccessExpression to = null;
+		AccessExpression to = null;
 		
-		if (destination.getExpression() instanceof ConcreteAccessExpression) {
-			to = (ConcreteAccessExpression) destination.getExpression();
-			to = DefaultConcreteArrayElementRead.create(to, index.getExpression());
+		if (destination.getExpression() instanceof AccessExpression) {
+			to = (AccessExpression) destination.getExpression();
+			to = DefaultArrayElementRead.create(to, index.getExpression());
 
 			GlobalAbstraction.getInstance().processObjectStore(from, to);
 		}

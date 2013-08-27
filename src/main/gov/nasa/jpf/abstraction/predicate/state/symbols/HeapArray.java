@@ -19,7 +19,7 @@ public class HeapArray extends HeapValue {
 	}
 	
 	public void setElement(Integer index, PrimitiveValue... values) {
-		elements.put(index, new PrimitiveValueSlot(this, index));
+		elements.put(index, new PrimitiveValueSlot(this, index, values));
 	}
 	
 	public Slot getElement(Integer index) {

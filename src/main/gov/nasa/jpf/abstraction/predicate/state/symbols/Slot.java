@@ -1,15 +1,15 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
 public abstract class Slot {
-	private HeapValue parent;
+	private Value parent;
 	private Object slotKey;
 	
-	protected Slot(HeapValue parent, Object slotKey) {
+	protected Slot(Value parent, Object slotKey) {
 		this.parent = parent;
 		this.slotKey = slotKey;
 	}
 	
-	public HeapValue getParent() {
+	public Value getParent() {
 		return parent;
 	}
 	
