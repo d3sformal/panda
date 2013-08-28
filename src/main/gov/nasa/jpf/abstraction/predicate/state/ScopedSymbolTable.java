@@ -19,7 +19,21 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 
 	@Override
 	public FlatSymbolTable createDefaultScope(MethodInfo method) {
-		return new FlatSymbolTable();
+		FlatSymbolTable ret = new FlatSymbolTable();
+		
+		LocalVarInfo[] locals = method.getLocalVars();
+		
+		if (locals != null) {
+			for (LocalVarInfo local : locals) {
+				if (local.isNumeric()) {
+					ret.addPrimitiveLocal(local.getName());
+				} else {
+					ret.addHeapValueLocal(local.getName());
+				}
+			}
+		}
+		
+		return ret;
 	}
 	
 	@Override

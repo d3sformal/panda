@@ -1,18 +1,21 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-
-import java.util.HashSet;
-import java.util.Set;
+import gov.nasa.jpf.abstraction.common.access.Root;
 
 public class LocalVariable extends Value {
-	private Set<Slot> slots = new HashSet<Slot>();
+	private Root localVariable;
 	
-	public Set<Slot> getSlots() {
-		return slots;
+	public LocalVariable(Root localVariable) {
+		this.localVariable = localVariable;
 	}
 	
 	public AccessExpression getAccessExpression() {
-		return null;
+		return localVariable;
+	}
+	
+	@Override
+	public String toString() {
+		return localVariable.getName();
 	}
 }

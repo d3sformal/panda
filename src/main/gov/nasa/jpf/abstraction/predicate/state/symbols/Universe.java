@@ -19,7 +19,7 @@ public class Universe implements Cloneable {
 	private ValueFactory factory = new ValueFactory(this);
 	private Map<Integer, HeapValue> objects = new HashMap<Integer, HeapValue>();
 	
-	private static int NULL = -1;
+	public static int NULL = -1;
 	
 	public Universe() {
 		factory.createObject(NULL);
@@ -92,7 +92,7 @@ public class Universe implements Cloneable {
 		for (Slot slot : parents) {
 			HeapValueSlot heapValueSlot = (HeapValueSlot) slot;
 			
-			for (HeapValue parent : heapValueSlot.getPossibilities()) {
+			for (HeapValue parent : heapValueSlot.getPossibleHeapValues()) {
 				Integer ref = parent.getReference();
 				
 				if (read instanceof ObjectFieldRead) {
@@ -148,7 +148,7 @@ public class Universe implements Cloneable {
 						HeapValueSlot heapValueSlot = (HeapValueSlot) slot;
 						ArrayList<HeapValue> values = new ArrayList<HeapValue>();
 						
-						for (HeapValue field : heapValueSlot.getPossibilities()) {
+						for (HeapValue field : heapValueSlot.getPossibleHeapValues()) {
 							values.add(clone.get(field.getReference()));
 						}
 						
@@ -170,7 +170,7 @@ public class Universe implements Cloneable {
 						HeapValueSlot heapValueSlot = (HeapValueSlot) slot;
 						ArrayList<HeapValue> values = new ArrayList<HeapValue>();
 						
-						for (HeapValue field : heapValueSlot.getPossibilities()) {
+						for (HeapValue field : heapValueSlot.getPossibleHeapValues()) {
 							values.add(clone.get(field.getReference()));
 						}
 						

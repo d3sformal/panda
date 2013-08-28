@@ -9,11 +9,11 @@ public class PrimitiveValueSlot extends Slot {
 
 	private Set<PrimitiveValue> possibilities = new HashSet<PrimitiveValue>();
 	
-	public PrimitiveValueSlot(HeapValue parent, Object slotKey, PrimitiveValue... primitives) {
+	public PrimitiveValueSlot(Value parent, Object slotKey, PrimitiveValue... primitives) {
 		this(parent, slotKey, Arrays.asList(primitives));
 	}
 	
-	public PrimitiveValueSlot(HeapValue parent, Object slotKey, Collection<PrimitiveValue> primitives) {
+	public PrimitiveValueSlot(Value parent, Object slotKey, Collection<PrimitiveValue> primitives) {
 		super(parent, slotKey);
 		
 		possibilities.addAll(primitives);
@@ -23,8 +23,17 @@ public class PrimitiveValueSlot extends Slot {
 		}
 	}
 	
-	public Set<PrimitiveValue> getPossibilities() {
+	public Set<PrimitiveValue> getPossiblePrimitiveValues() {
 		return possibilities;
+	}
+
+	@Override
+	public Set<Value> getPossibleValues() {
+		Set<Value> values = new HashSet<Value>();
+		
+		values.addAll(getPossiblePrimitiveValues());
+		
+		return values;
 	}
 
 }

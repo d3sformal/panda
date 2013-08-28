@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
+import java.util.Set;
+
 public abstract class Slot {
 	private Value parent;
 	private Object slotKey;
@@ -30,7 +32,7 @@ public abstract class Slot {
 	
 	@Override
 	public int hashCode() {
-		return parent.hashCode() + slotKey.hashCode();
+		return parent.hashCode() + (slotKey == null ? 0 : slotKey.hashCode());
 	}
 	
 	@Override
@@ -48,4 +50,6 @@ public abstract class Slot {
 		
 		return ret.toString();
 	}
+	
+	public abstract Set<Value> getPossibleValues();
 }
