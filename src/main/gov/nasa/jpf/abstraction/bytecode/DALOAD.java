@@ -19,7 +19,6 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
@@ -47,17 +46,14 @@ public class DALOAD extends gov.nasa.jpf.jvm.bytecode.DALOAD {
 			return actualNextInsn;
 		}   
 		
-		if (arrayAttr.getExpression() instanceof AccessExpression) {
-			AccessExpression path = (AccessExpression) arrayAttr.getExpression();
+		AccessExpression path = (AccessExpression) arrayAttr.getExpression();
 			
-			path = DefaultArrayElementRead.create(path, indexAttr.getExpression());
+		path = DefaultArrayElementRead.create(path, indexAttr.getExpression());
 						
-			Attribute attribute = new NonEmptyAttribute(null, path);
+		Attribute attribute = new NonEmptyAttribute(null, path);
 
-			sf = ti.getModifiableTopFrame();
-			sf.setLongOperandAttr(attribute);
-		}
-
+		sf = ti.getModifiableTopFrame();
+		sf.setLongOperandAttr(attribute);
 
 		return actualNextInsn;
 	}

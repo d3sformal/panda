@@ -183,7 +183,7 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 
 	@Override
 	public void visit(AnonymousArray expression) {
-		expression.length.accept(this);
+		expression.getArrayLength().accept(this);
 	}
 	
 	public Set<Predicate> getAdditionalPredicates(PredicatesVisitable collectable) {

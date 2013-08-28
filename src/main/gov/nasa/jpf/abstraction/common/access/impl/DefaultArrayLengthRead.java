@@ -108,14 +108,14 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 				
 				if (newExpression instanceof AnonymousArray) {
 					AnonymousArray aa = (AnonymousArray) newExpression;
-					return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths().clone(), aa.length));
+					return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths().clone(), aa.getArrayLength()));
 				}
 				return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths().clone(), DefaultArrayLengthRead.create(expression, getArrayLengths().clone())));
 			}
 			if (updated instanceof AnonymousArray) {
 				AnonymousArray updatedAnonymousArray = (AnonymousArray) updated;
 				
-				return create(getArray().clone(), DefaultArrayLengthWrite.create(expression, getArrayLengths().clone(), updatedAnonymousArray.length.clone()));
+				return create(getArray().clone(), DefaultArrayLengthWrite.create(expression, getArrayLengths().clone(), updatedAnonymousArray.getArrayLength().clone()));
 			}
 			return UndefinedAccessExpression.create();
 		}

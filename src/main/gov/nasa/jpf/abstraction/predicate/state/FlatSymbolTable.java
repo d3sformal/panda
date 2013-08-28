@@ -6,7 +6,6 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassObject;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapArray;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapObject;
@@ -86,17 +85,15 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 
 	@Override
-	public Set<AccessExpression> processPrimitiveStore(
-			AccessExpression to) {
+	public Set<AccessExpression> processPrimitiveStore(AccessExpression to) {
 		// TODO Auto-generated method stub
-		return null;
+		return new HashSet<AccessExpression>();
 	}
 
 	@Override
-	public Set<AccessExpression> processObjectStore(Expression from,
-			AccessExpression to) {
+	public Set<AccessExpression> processObjectStore(Expression from, AccessExpression to) {
 		// TODO Auto-generated method stub
-		return null;
+		return new HashSet<AccessExpression>();
 	}
 
 	@Override
