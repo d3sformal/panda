@@ -1,16 +1,20 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.util.RunDetector;
+import gov.nasa.jpf.vm.ClassLoaderInfo;
+import gov.nasa.jpf.vm.ClassLoaderList;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 import java.util.Set;
 
@@ -18,7 +22,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	private SymbolTableStack scopes = new SymbolTableStack();
 
 	@Override
-	public FlatSymbolTable createDefaultScope(MethodInfo method) {
+	public FlatSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
 		FlatSymbolTable ret = new FlatSymbolTable();
 		
 		LocalVarInfo[] locals = method.getLocalVars();
@@ -33,12 +37,19 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			}
 		}
 		
+		VM vm = threadInfo.getVM();
+		ClassLoaderList list = vm.getClassLoaderList();
+		
+		for (ClassLoaderInfo cli : list) {
+			ret.addClass(cli.getClassInfo().getName(), threadInfo, cli.getClassInfo().getClassObject());
+		}
+		
 		return ret;
 	}
 	
 	@Override
-	public Set<AccessExpression> processPrimitiveStore(AccessExpression to) {
-		return scopes.top().processPrimitiveStore(to);
+	public Set<AccessExpression> processPrimitiveStore(Expression from, AccessExpression to) {
+		return scopes.top().processPrimitiveStore(from, to);
 	}
 	
 	@Override
@@ -53,7 +64,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		FlatSymbolTable transitionScope;
 		
 		if (scopes.count() == 0) {
-			transitionScope = createDefaultScope(method);
+			transitionScope = createDefaultScope(threadInfo, method);
 		} else {
 			transitionScope = scopes.top().clone();
 		}
@@ -76,12 +87,12 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 				if (args[i] != null) {
 					if (args[i].isNumeric()) {
 						// Assign to numeric (primitive) arg
-						processPrimitiveStore(DefaultRoot.create(args[i].getName()));
+						processPrimitiveStore(attr.getExpression(), DefaultRoot.create(args[i].getName()));
 					} else {
 						ElementInfo ei = threadInfo.getElementInfo(sf.peek(args.length - i));
 						
 						// Assign to object arg
-						processObjectStore(null, DefaultRoot.create(args[i].getName()));
+						processObjectStore(attr.getExpression(), DefaultRoot.create(args[i].getName()));
 					}
 				}
 			}
@@ -101,7 +112,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			FlatSymbolTable transitionScope;
 			
 			if (scopes.count() == 1) {
-				transitionScope = createDefaultScope(method);
+				transitionScope = createDefaultScope(threadInfo, method);
 			} else {
 				transitionScope = scopes.top(1);
 			}

@@ -5,6 +5,7 @@ import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.concrete.Reference;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -35,6 +36,10 @@ public class Universe implements Cloneable {
 	
 	public void add(HeapValue value) {
 		objects.put(value.getReference(), value);
+	}
+	
+	public HeapValue add(Reference reference) {
+		return add(reference.getThreadInfo(), reference.getElementInfo());
 	}
 	
 	public HeapValue add(ThreadInfo threadInfo, ElementInfo elementInfo) {
@@ -68,7 +73,9 @@ public class Universe implements Cloneable {
 				
 				if (fieldInfo.isNumericField()) {
 					object.setField(fieldInfo.getName(), new PrimitiveValue());
-				} else {
+				}
+				
+				if (fieldInfo.isReference()) {
 					Integer subRef = elementInfo.getReferenceField(fieldInfo);
 					
 					ElementInfo subElementInfo = threadInfo.getElementInfo(subRef);
@@ -81,33 +88,47 @@ public class Universe implements Cloneable {
 		}
 	}
 	
-	public Set<Slot> resolve(Set<Slot> roots, AccessExpression expression) {
-		if (expression instanceof Root) return roots;
+	public Set<Value> resolve(Set<Slot> roots, AccessExpression expression) {
+		Set<Value> ret = new HashSet<Value>();
+		
+		for (Slot rootSlot : roots) {
+			for (Value root : rootSlot.getPossibleValues()) {
+				ret.addAll(resolve(root, expression));
+			}
+		}
+		
+		return ret;
+	}
+	
+	public Set<Value> resolve(Value root, AccessExpression expression) {
+		if (expression instanceof Root) {
+			Set<Value> values = new HashSet<Value>();
+			
+			values.add(root);
+			
+			return values;
+		}
 		
 		ObjectAccessExpression read = (ObjectAccessExpression) expression;
 		
-		Set<Slot> parents = resolve(roots, read.getObject());
-		Set<Slot> children = new HashSet<Slot>();
+		Set<Value> parents = resolve(root, read.getObject());
+		Set<Value> children = new HashSet<Value>();
 		
-		for (Slot slot : parents) {
-			HeapValueSlot heapValueSlot = (HeapValueSlot) slot;
+		for (Value value : parents) {
+			HeapValue parent = (HeapValue) value;
 			
-			for (HeapValue parent : heapValueSlot.getPossibleHeapValues()) {
-				Integer ref = parent.getReference();
+			if (read instanceof ObjectFieldRead) {
+				HeapObject object = (HeapObject) parent;
+				ObjectFieldRead fieldRead = (ObjectFieldRead) read;
 				
-				if (read instanceof ObjectFieldRead) {
-					HeapObject object = (HeapObject) parent;
-					ObjectFieldRead fieldRead = (ObjectFieldRead) read;
-					
-					children.add(object.getField(fieldRead.getField().getName()));
-				}
+				children.addAll(object.getField(fieldRead.getField().getName()).getPossibleValues());
+			}
+			
+			if (read instanceof ArrayElementRead) {
+				HeapArray array = (HeapArray) parent;
 				
-				if (read instanceof ArrayElementRead) {
-					HeapArray array = (HeapArray) parent;
-					
-					for (int i = 0; i < array.getLength(); ++i) {
-						children.add(array.getElement(i));
-					}
+				for (int i = 0; i < array.getLength(); ++i) {
+					children.addAll(array.getElement(i).getPossibleValues());
 				}
 			}
 		}

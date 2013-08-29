@@ -19,6 +19,7 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 		this.reference = reference;
 	}
 	
+	@Override
 	public Reference getReference() {
 		return reference;
 	}

@@ -8,6 +8,8 @@ public class Simple {
 		++i;
 		++i;
 		
+		Simple s = new Simple();
+		
 		System.err.println(i);
 	}
 

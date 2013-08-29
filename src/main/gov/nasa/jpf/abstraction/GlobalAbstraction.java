@@ -78,7 +78,7 @@ public class GlobalAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void processObjectStore(Expression from, AccessExpression to) {
+	public void processObjectStore(AccessExpression from, AccessExpression to) {
 		if (!RunDetector.isRunning()) return;
 		
 		abs.processObjectStore(from, to);

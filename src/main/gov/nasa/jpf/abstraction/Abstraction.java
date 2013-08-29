@@ -69,7 +69,7 @@ public abstract class Abstraction {
 	public void processPrimitiveStore(Expression from, AccessExpression to) {
 	}
 	
-	public void processObjectStore(Expression from, AccessExpression to) {
+	public void processObjectStore(AccessExpression from, AccessExpression to) {
 	}
 	
 	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {

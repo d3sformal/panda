@@ -34,13 +34,13 @@ public class PredicateAbstraction extends Abstraction {
 	
 	@Override
 	public void processPrimitiveStore(Expression from, AccessExpression to) {
-		Set<AccessExpression> affected = symbolTable.processPrimitiveStore(to);
+		Set<AccessExpression> affected = symbolTable.processPrimitiveStore(from, to);
 		
 		predicateValuation.reevaluate(to, affected, PrimitiveExpressionWrapper.wrap(from, symbolTable));
 	}
 	
 	@Override
-	public void processObjectStore(Expression from, AccessExpression to) {	
+	public void processObjectStore(AccessExpression from, AccessExpression to) {	
 		Set<AccessExpression> affected = symbolTable.processObjectStore(from, to);
 				
 		predicateValuation.reevaluate(to, affected, ObjectExpressionWrapper.wrap(from, symbolTable));

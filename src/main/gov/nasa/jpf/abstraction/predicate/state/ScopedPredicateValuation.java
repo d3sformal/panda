@@ -76,7 +76,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public FlatPredicateValuation createDefaultScope(MethodInfo method) {
+	public FlatPredicateValuation createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
 		FlatPredicateValuation valuation = new FlatPredicateValuation();
 		
 		if (method == null) return valuation;
@@ -128,10 +128,10 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		MethodInfo method = after.getMethodInfo();
 		
 		FlatPredicateValuation transitionScope;
-		FlatPredicateValuation finalScope = createDefaultScope(method);
+		FlatPredicateValuation finalScope = createDefaultScope(threadInfo, method);
 		
 		if (scopes.count() == 0) {
-			transitionScope = createDefaultScope(method);
+			transitionScope = createDefaultScope(threadInfo, method);
 		} else {
 			transitionScope = scopes.top().clone();
 		}

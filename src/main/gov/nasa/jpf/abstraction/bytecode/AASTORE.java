@@ -59,14 +59,9 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 		} 
 		
 		Expression from = source.getExpression();
-		AccessExpression to = null;
-		
-		if (destination.getExpression() instanceof AccessExpression) {
-			to = (AccessExpression) destination.getExpression();
-			to = DefaultArrayElementRead.create(to, index.getExpression());
-
-			GlobalAbstraction.getInstance().processObjectStore(from, to);
-		}
+		AccessExpression to = (AccessExpression) destination.getExpression();
+		to = DefaultArrayElementRead.create(to, index.getExpression());
+		GlobalAbstraction.getInstance().processObjectStore((AccessExpression) from, to);
 		
 		return actualNextInsn;
 	}
