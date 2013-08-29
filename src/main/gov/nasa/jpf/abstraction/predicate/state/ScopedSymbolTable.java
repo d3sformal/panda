@@ -5,6 +5,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ClassLoaderInfo;
@@ -20,10 +21,15 @@ import java.util.Set;
 
 public class ScopedSymbolTable implements SymbolTable, Scoped {
 	private SymbolTableStack scopes = new SymbolTableStack();
+	private PredicateAbstraction abstraction;
+	
+	public ScopedSymbolTable(PredicateAbstraction abstraction) {
+		this.abstraction = abstraction;
+	}
 
 	@Override
 	public FlatSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-		FlatSymbolTable ret = new FlatSymbolTable();
+		FlatSymbolTable ret = new FlatSymbolTable(abstraction);
 		
 		LocalVarInfo[] locals = method.getLocalVars();
 		

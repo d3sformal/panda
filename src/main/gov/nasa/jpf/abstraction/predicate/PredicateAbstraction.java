@@ -7,7 +7,6 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.impl.ObjectExpressionWrapper;
 import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionWrapper;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
@@ -27,8 +26,8 @@ public class PredicateAbstraction extends Abstraction {
 	private Trace trace;
 	
 	public PredicateAbstraction(Predicates predicateSet) {
-		symbolTable = new ScopedSymbolTable();
-		predicateValuation = new ScopedPredicateValuation(predicateSet);
+		symbolTable = new ScopedSymbolTable(this);
+		predicateValuation = new ScopedPredicateValuation(this, predicateSet);
 		trace = new Trace();
 	}
 	

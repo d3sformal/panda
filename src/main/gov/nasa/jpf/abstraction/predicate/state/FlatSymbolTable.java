@@ -13,6 +13,8 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassObject;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapArray;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapObject;
@@ -46,6 +48,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	private Universe universe = new Universe();	
 	private Map<Root, LocalVariable> locals = new HashMap<Root, LocalVariable>();
 	private Map<PackageAndClass, ClassObject> classes = new HashMap<PackageAndClass, ClassObject>();
+	private PredicateAbstraction abstraction;
+	
+	public FlatSymbolTable(PredicateAbstraction abstraction) {
+		this.abstraction = abstraction;
+	}
 	
 	public Set<Root> getLocalVariables() {
 		return locals.keySet();
@@ -306,7 +313,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	@Override
 	public FlatSymbolTable clone() {
-		FlatSymbolTable clone = new FlatSymbolTable();
+		FlatSymbolTable clone = new FlatSymbolTable(abstraction);
 		
 		clone.universe = universe.clone();
 		clone.locals = new HashMap<Root, LocalVariable>();
@@ -451,7 +458,15 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 
 	private int getMaximalAccessExpressionLength() {
-		return 10;
+		int ret = 0;
+		
+		for (Predicate predicate : abstraction.getPredicateValuation().getPredicates()) {
+			for (AccessExpression expr : predicate.getPaths()) {
+				ret = Math.max(ret, expr.getLength());
+			}
+		}
+		
+		return ret;
 	}
 
 	public void stealClasses(FlatSymbolTable table) {

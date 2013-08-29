@@ -12,6 +12,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.common.Comparison;
 import gov.nasa.jpf.abstraction.predicate.common.Context;
 import gov.nasa.jpf.abstraction.predicate.common.MethodContext;
@@ -38,8 +39,10 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	private PredicateValuationStack scopes = new PredicateValuationStack();
 	private Predicates predicateSet;
 	private Map<Predicate, TruthValue> initialValuation;
+	private PredicateAbstraction abstraction;
 	
-	public ScopedPredicateValuation(Predicates predicateSet) {
+	public ScopedPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
+		this.abstraction = abstraction;
 		this.predicateSet = predicateSet;
 		
 		Set<Predicate> predicates = new HashSet<Predicate>();
