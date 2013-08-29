@@ -34,5 +34,33 @@ public class HeapValueSlot extends Slot {
 		
 		return values;
 	}
+
+	@Override
+	public HeapValueSlot cloneInto(Universe universe, Value parent) {
+		HeapValueSlot clone = new HeapValueSlot(parent, getSlotKey());
+		
+		for (HeapValue value : possibilities) {
+			clone.possibilities.add(value.cloneInto(universe, this));
+		}
+		
+		return clone;
+	}
+	
+	@Override
+	public void clear() {
+		for (HeapValue value : possibilities) {
+			value.removeSlot(this);
+		}
+		
+		possibilities.clear();
+	}
+
+	@Override
+	public void add(Set<Value> sources) {
+		for (Value value : sources) {
+			value.addSlot(this);
+			possibilities.add((HeapValue) value);
+		}
+	}
 	
 }

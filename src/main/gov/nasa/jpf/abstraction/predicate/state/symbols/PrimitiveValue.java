@@ -11,4 +11,20 @@ public class PrimitiveValue extends Value {
 	public String toString() {
 		return "primitive";
 	}
+
+	@Override
+	public PrimitiveValue cloneInto(Universe universe, Slot slot) {
+		PrimitiveValue clone = cloneInto(universe);
+		
+		clone.addSlot(slot);
+		
+		return clone;
+	}
+
+	@Override
+	public PrimitiveValue cloneInto(Universe universe) {
+		PrimitiveValue clone = new PrimitiveValue();
+				
+		return clone;
+	}
 }

@@ -10,7 +10,6 @@ import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,6 +23,10 @@ public class Universe implements Cloneable {
 	
 	public Universe() {
 		factory.createObject(NULL);
+	}
+	
+	public ValueFactory getFactory() {
+		return factory;
 	}
 	
 	public boolean contains(Integer reference) {
@@ -88,19 +91,17 @@ public class Universe implements Cloneable {
 		}
 	}
 	
-	public Set<Value> resolve(Set<Slot> roots, AccessExpression expression) {
+	public Set<Value> resolve(Set<Value> roots, AccessExpression expression) {
 		Set<Value> ret = new HashSet<Value>();
 		
-		for (Slot rootSlot : roots) {
-			for (Value root : rootSlot.getPossibleValues()) {
-				ret.addAll(resolve(root, expression));
-			}
+		for (Value root : roots) {
+			ret.addAll(resolve(root, expression));
 		}
 		
 		return ret;
 	}
 	
-	public Set<Value> resolve(Value root, AccessExpression expression) {
+	public Set<Value> resolve(Value root, AccessExpression expression) {		
 		if (expression instanceof Root) {
 			Set<Value> values = new HashSet<Value>();
 			
@@ -143,64 +144,7 @@ public class Universe implements Cloneable {
 		for (Integer reference : objects.keySet()) {
 			HeapValue value = objects.get(reference);
 			
-			if (value instanceof HeapObject) {
-				clone.factory.createObject(reference);
-			}
-			
-			if (value instanceof HeapArray) {
-				HeapArray array = (HeapArray) value;
-				
-				clone.factory.createArray(reference, array.getLength());
-			}
-		}
-		
-		for (Integer reference : objects.keySet()) {
-			HeapValue value = get(reference);
-			HeapValue cloneValue = clone.get(reference);
-			
-			if (value instanceof HeapObject) {
-				HeapObject object = (HeapObject) value;
-				HeapObject cloneObject = (HeapObject) cloneValue;
-				
-				for (String name : object.getFields().keySet()) {
-					Slot slot = object.getField(name);
-					
-					if (slot instanceof HeapValueSlot) {
-						HeapValueSlot heapValueSlot = (HeapValueSlot) slot;
-						ArrayList<HeapValue> values = new ArrayList<HeapValue>();
-						
-						for (HeapValue field : heapValueSlot.getPossibleHeapValues()) {
-							values.add(clone.get(field.getReference()));
-						}
-						
-						cloneObject.setField(name, values.toArray(new HeapValue[values.size()]));
-					} else {
-						cloneObject.setField(name, new PrimitiveValue());
-					}
-				}
-			}
-			
-			if (value instanceof HeapArray) {
-				HeapArray array = (HeapArray) value;
-				HeapArray cloneArray = (HeapArray) cloneValue;
-				
-				for (Integer index : array.getElements().keySet()) {
-					Slot slot = array.getElement(index);
-					
-					if (slot instanceof HeapValueSlot) {
-						HeapValueSlot heapValueSlot = (HeapValueSlot) slot;
-						ArrayList<HeapValue> values = new ArrayList<HeapValue>();
-						
-						for (HeapValue field : heapValueSlot.getPossibleHeapValues()) {
-							values.add(clone.get(field.getReference()));
-						}
-						
-						cloneArray.setElement(index, values.toArray(new HeapValue[values.size()]));
-					} else {
-						cloneArray.setElement(index, new PrimitiveValue());
-					}
-				}
-			}
+			value.cloneInto(clone);
 		}
 		
 		return clone;

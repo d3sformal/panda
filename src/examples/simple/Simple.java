@@ -1,6 +1,8 @@
 package simple;
 
 public class Simple {
+	
+	Simple x;
 
 	public static void main(String[] args) {
 		int i = 0;
@@ -9,6 +11,7 @@ public class Simple {
 		++i;
 		
 		Simple s = new Simple();
+		s.x = new Simple();
 		
 		System.err.println(i);
 	}

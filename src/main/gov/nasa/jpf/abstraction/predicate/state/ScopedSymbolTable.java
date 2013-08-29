@@ -1,12 +1,12 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
-import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.util.RunDetector;
+import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ClassLoaderInfo;
 import gov.nasa.jpf.vm.ClassLoaderList;
 import gov.nasa.jpf.vm.ElementInfo;
@@ -71,6 +71,14 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		
 		scopes.push(transitionScope);
 		
+		// Inform about a new static object
+		if (method.isClinit()) {
+			ClassInfo classInfo = method.getClassInfo();
+			ElementInfo classObject = classInfo.getClassObject();
+					
+			scopes.top().addClass(classInfo.getName(), threadInfo, classObject);
+		}
+		
 		//transitionScope.removeLocals();
 		
 		StackFrame sf = threadInfo.getTopFrame();
@@ -117,8 +125,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 				transitionScope = scopes.top(1);
 			}
 			
-			//transitionScope.setStatics(scopes.top().getStatics());
-			//transitionScope.update();
+			transitionScope.stealClasses(scopes.top());
 		}
 		
 		scopes.pop();

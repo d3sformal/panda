@@ -52,4 +52,7 @@ public abstract class Slot {
 	}
 	
 	public abstract Set<Value> getPossibleValues();
+	public abstract Slot cloneInto(Universe universe, Value parent);
+	public abstract void clear();
+	public abstract void add(Set<Value> sources);
 }

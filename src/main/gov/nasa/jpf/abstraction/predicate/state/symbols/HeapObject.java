@@ -27,4 +27,30 @@ public class HeapObject extends HeapValue {
 		return fields;
 	}
 
+	@Override
+	public HeapObject cloneInto(Universe universe, Slot slot) {		
+		HeapObject clone = cloneInto(universe);
+		
+		clone.addSlot(slot);
+		
+		return clone;
+	}
+	
+	@Override
+	public HeapObject cloneInto(Universe universe) {
+		boolean existed = universe.contains(getReference());
+		
+		HeapObject clone = universe.getFactory().createObject(getReference());
+		
+		if (!existed) {
+			for (String field : fields.keySet()) {
+				Slot slotClone = fields.get(field).cloneInto(universe, clone);
+				
+				clone.fields.put(field, slotClone);
+			}
+		}
+		
+		return clone;
+	}
+
 }

@@ -33,5 +33,31 @@ public class HeapArray extends HeapValue {
 	public Integer getLength() {
 		return length;
 	}
+	
+	@Override
+	public HeapArray cloneInto(Universe universe, Slot slot) {
+		HeapArray clone = cloneInto(universe);
+		
+		clone.addSlot(slot);
+		
+		return clone;
+	}
+	
+	@Override
+	public HeapArray cloneInto(Universe universe) {
+		boolean existed = universe.contains(getReference());
+		
+		HeapArray clone = universe.getFactory().createArray(getReference(), getLength());
+				
+		if (!existed) {
+			for (Integer index : elements.keySet()) {
+				Slot slotClone = elements.get(index).cloneInto(universe, clone);
+				
+				clone.elements.put(index, slotClone);
+			}
+		}
+		
+		return clone;
+	}
 
 }

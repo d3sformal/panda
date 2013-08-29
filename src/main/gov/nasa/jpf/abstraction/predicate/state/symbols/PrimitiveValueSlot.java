@@ -36,4 +36,32 @@ public class PrimitiveValueSlot extends Slot {
 		return values;
 	}
 
+	@Override
+	public PrimitiveValueSlot cloneInto(Universe universe, Value parent) {
+		PrimitiveValueSlot clone = new PrimitiveValueSlot(parent, getSlotKey());
+		
+		for (PrimitiveValue value : possibilities) {
+			clone.possibilities.add(value.cloneInto(universe, clone));
+		}
+		
+		return clone;
+	}
+
+	@Override
+	public void clear() {
+		for (PrimitiveValue value : possibilities) {
+			value.removeSlot(this);
+		}
+		
+		possibilities.clear();
+	}
+
+	@Override
+	public void add(Set<Value> sources) {
+		for (Value value : sources) {
+			value.addSlot(this);
+			possibilities.add((PrimitiveValue) value);
+		}
+	}
+
 }

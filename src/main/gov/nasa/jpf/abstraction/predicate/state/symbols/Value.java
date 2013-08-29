@@ -13,4 +13,11 @@ public abstract class Value {
 	public Set<Slot> getSlots() {
 		return slots;
 	}
+	
+	public void removeSlot(Slot slot) {
+		slots.remove(slot);
+	}
+	
+	public abstract Value cloneInto(Universe universe);
+	public abstract Value cloneInto(Universe universe, Slot slot);
 }

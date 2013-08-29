@@ -31,4 +31,10 @@ public abstract class HeapValue extends Value {
 	public String toString() {
 		return "ref(" + reference + ")";
 	}
+	
+	@Override
+	public abstract HeapValue cloneInto(Universe universe, Slot slot);
+	
+	@Override
+	public abstract HeapValue cloneInto(Universe universe);
 }
