@@ -25,6 +25,7 @@ import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +40,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		VERBOSE
 	}
 	
-	private static Verbosity verbosity = Verbosity.VERBOSE;
+	private static Verbosity verbosity = Verbosity.NORMAL;
 	private static String[] NormalVerbosityExludedPackageNames = new String[] {"java", "javax"};
 	
 	private Universe universe = new Universe();	
@@ -83,19 +84,19 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		classes.put(c, v);
 	}
 	
-	private Set<Value> resolve(AccessExpression expression) {
+	private Set<Value> lookupValues(AccessExpression expression) {
 		if (expression.getRoot() instanceof AnonymousExpression) {
 			AnonymousExpression anonymous = (AnonymousExpression) expression.getRoot();
 			Integer reference = anonymous.getReference().getObjectRef();
 			
 			if (universe.contains(reference)) {
-				return universe.resolve(universe.get(reference), expression);
+				return universe.lookupValues(universe.get(reference), expression);
 			}
 		}
 		
 		if (expression.getRoot().isLocalVariable()) {
 			if (locals.containsKey(expression.getRoot())) {
-				return universe.resolve(locals.get(expression.getRoot()).getSlot().getPossibleValues(), expression);
+				return universe.lookupValues(locals.get(expression.getRoot()).getSlot().getPossibleValues(), expression);
 			} else {
 				return new HashSet<Value>(); // Not found
 			}
@@ -103,7 +104,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		
 		if (expression.getRoot().isStatic()) {
 			if (classes.containsKey(expression.getRoot())) {
-				return universe.resolve(classes.get(expression.getRoot()).getSlot().getPossibleValues(), expression);
+				return universe.lookupValues(classes.get(expression.getRoot()).getSlot().getPossibleValues(), expression);
 			} else {
 				return new HashSet<Value>(); // Not found
 			}
@@ -112,7 +113,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		throw new RuntimeException("Attempting to resolve access expression not rooted in a local variable nor a static field: " + expression);
 	}
 	
-	private Set<AccessExpression> resolve(Value value, int maxLength) {
+	private Set<AccessExpression> valueToAccessExpressions(Value value, int maxLength) {
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		
 		if (maxLength == 0) return ret;		
@@ -122,7 +123,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		for (Slot slot : value.getSlots()) {
 			Value parent = slot.getParent();
 			
-			Set<AccessExpression> resolution = resolve(parent,  maxLength - 1);
+			Set<AccessExpression> resolution = valueToAccessExpressions(parent,  maxLength - 1);
+			System.out.print("RESOLVE: " + value);
 			
 			if (parent instanceof HeapValue) {
 				for (AccessExpression prefix : resolution) {
@@ -147,6 +149,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				
 				ret.add(c.getAccessExpression());
 			}
+			
+			System.out.println(" " + ret);
 		}
 		
 		return ret;
@@ -154,7 +158,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
 	@Override
 	public int count() {
-		return getAllRelevantAccessExpressions().size();
+		return getFilteredRelevantAccessExpressions().size();
 	}
 
 	@Override
@@ -163,12 +167,12 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		ensureAnonymousObjectExistance(to);
 		
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
-		Set<Value> destinations = resolve(to);
+		Set<Value> destinations = lookupValues(to);
 		
 		for (Value destination : destinations) {
 			//update destination
 			
-			ret.addAll(resolve(destination, getMaximalAccessExpressionLength()));
+			ret.addAll(valueToAccessExpressions(destination, getMaximalAccessExpressionLength()));
 		}
 		
 		System.out.println(ret + " := PRIMITIVE");
@@ -182,11 +186,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		ensureAnonymousObjectExistance(to);
 		
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
-		Set<Value> destinations = resolve(to.cutTail());
+		Set<Value> destinations = lookupValues(to.cutTail());
 		Set<Value> sources = new HashSet<Value>(); // FALLBACK
 		
 		if (from instanceof AccessExpression) {
-			sources = resolve((AccessExpression) from);
+			sources = lookupValues((AccessExpression) from);
 		}
 		
 		if (from instanceof Constant) {
@@ -210,7 +214,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				
 				String field = read.getField().getName();
 				
-				for (AccessExpression prefix : resolve(parent, getMaximalAccessExpressionLength())) {
+				for (AccessExpression prefix : valueToAccessExpressions(parent, getMaximalAccessExpressionLength())) {
 					ret.add(DefaultObjectFieldRead.create(prefix, field));
 				}
 				
@@ -225,7 +229,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				HeapArray parent = (HeapArray) destination;
 				
 				for (int i = 0; i < parent.getLength(); ++i) {
-					for (AccessExpression prefix : resolve(parent, getMaximalAccessExpressionLength())) {
+					for (AccessExpression prefix : valueToAccessExpressions(parent, getMaximalAccessExpressionLength())) {
 						ret.add(DefaultArrayElementRead.create(prefix, Constant.create(i)));
 					}
 					
@@ -265,7 +269,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public boolean isArray(AccessExpression path) {
 		boolean isArray = false;
 		
-		for (Value value : resolve(path)) {
+		for (Value value : lookupValues(path)) {
 			if (value instanceof PrimitiveValue) return false;
 			
 			isArray |= value instanceof HeapArray;
@@ -278,7 +282,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public boolean isObject(AccessExpression path) {
 		boolean isObject = false;
 		
-		for (Value value : resolve(path)) {
+		for (Value value : lookupValues(path)) {
 			if (value instanceof PrimitiveValue) return false;
 			
 			isObject |= value instanceof HeapObject;
@@ -291,7 +295,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public boolean isPrimitive(AccessExpression path) {
 		boolean isPrimitive = false;
 		
-		for (Value value : resolve(path)) {
+		for (Value value : lookupValues(path)) {
 			if (value instanceof HeapValue) return false;
 			
 			isPrimitive |= value instanceof PrimitiveValue;
@@ -338,37 +342,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			}
 		});
 		
-		Set<AccessExpression> filtered;
-		
-		switch (verbosity) {
-		case NORMAL:
-			filtered = new HashSet<AccessExpression>();
-		
-			for (AccessExpression expr : getAllRelevantAccessExpressions()) {
-				if (expr.getRoot() instanceof PackageAndClass) {
-					boolean excluded = false;
-					
-					for (String e : NormalVerbosityExludedPackageNames) {
-						excluded |= expr.getRoot().getName().startsWith(e);
-					}
-					
-					if (!excluded) {
-						filtered.add(expr);
-					}
-				}
-			}
-		
-			break;
-		
-		case VERBOSE:
-			filtered = getAllRelevantAccessExpressions();
-			break;
-
-		default:
-			throw new RuntimeException("Unsupported system table verbosity level.");
-		}
-		
-		order.addAll(filtered);
+		order.addAll(getFilteredRelevantAccessExpressions());
 				
 		int maxLength = 0;
 		int padding = 4;
@@ -384,12 +358,42 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				ret.append(' ');
 			}
 			
-			ret.append(resolve(expr));
+			ret.append(lookupValues(expr));
 			
 			ret.append('\n');
 		}
 		
 		return ret.toString();
+	}
+	
+	private Set<AccessExpression> getFilteredRelevantAccessExpressions() {		
+		switch (verbosity) {
+		case NORMAL:
+			Set<AccessExpression> filtered = new HashSet<AccessExpression>();
+		
+			for (AccessExpression expr : getAllRelevantAccessExpressions()) {
+				if (expr.getRoot() instanceof PackageAndClass) {
+					boolean excluded = false;
+					
+					for (String e : NormalVerbosityExludedPackageNames) {
+						excluded |= expr.getRoot().getName().startsWith(e);
+					}
+					
+					if (excluded) {
+						continue;
+					}
+				}
+				
+				filtered.add(expr);
+			}
+			return filtered;
+		
+		case VERBOSE:
+			return getAllRelevantAccessExpressions();
+
+		default:
+			throw new RuntimeException("Unsupported system table verbosity level.");
+		}
 	}
 
 	private Set<AccessExpression> getAllRelevantAccessExpressions() {
@@ -397,14 +401,50 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		
 		for (Root l : locals.keySet()) {			
 			for (Value value : locals.get(l).getSlot().getPossibleValues()) {
-				ret.addAll(resolve(value, getMaximalAccessExpressionLength()));
+				ret.addAll(subValueAccessExpressions(value, l, getMaximalAccessExpressionLength()));
 			}
 		}
 		
-		for (Root c : classes.keySet()) {			
+		for (PackageAndClass c : classes.keySet()) {			
 			for (Value value : classes.get(c).getSlot().getPossibleValues()) {
-				ret.addAll(resolve(value, getMaximalAccessExpressionLength()));
+				ret.addAll(subValueAccessExpressions(value, c, getMaximalAccessExpressionLength()));
 			}
+		}
+		
+		return ret;
+	}
+
+	private Set<AccessExpression> subValueAccessExpressions(Value value, AccessExpression prefix, int maximalAccessExpressionLength) {
+		Set<AccessExpression> ret = new HashSet<AccessExpression>();
+		
+		if (maximalAccessExpressionLength == 0) return ret;
+		
+		if (value instanceof HeapObject) {
+			HeapObject object = (HeapObject) value;
+			
+			for (String fieldName : object.getFields().keySet()) {
+				for (Value field : object.getField(fieldName).getPossibleValues()) {
+					ret.addAll(subValueAccessExpressions(field, DefaultObjectFieldRead.create(prefix, fieldName), maximalAccessExpressionLength));
+				}
+			}
+			
+			ret.add(prefix);
+		}
+		
+		if (value instanceof HeapArray) {
+			HeapArray array = (HeapArray) value;
+			
+			for (Integer index : array.getElements().keySet()) {
+				for (Value element : array.getElement(index).getPossibleValues()) {
+					ret.addAll(subValueAccessExpressions(element, DefaultArrayElementRead.create(prefix, Constant.create(index)), maximalAccessExpressionLength));
+				}
+			}
+			
+			ret.add(prefix);
+		}
+		
+		if (value instanceof PrimitiveValue) {
+			ret.add(prefix);
 		}
 		
 		return ret;

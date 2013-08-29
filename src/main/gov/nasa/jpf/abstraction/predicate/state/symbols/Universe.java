@@ -91,17 +91,17 @@ public class Universe implements Cloneable {
 		}
 	}
 	
-	public Set<Value> resolve(Set<Value> roots, AccessExpression expression) {
+	public Set<Value> lookupValues(Set<Value> roots, AccessExpression expression) {
 		Set<Value> ret = new HashSet<Value>();
 		
 		for (Value root : roots) {
-			ret.addAll(resolve(root, expression));
+			ret.addAll(lookupValues(root, expression));
 		}
 		
 		return ret;
 	}
 	
-	public Set<Value> resolve(Value root, AccessExpression expression) {		
+	public Set<Value> lookupValues(Value root, AccessExpression expression) {		
 		if (expression instanceof Root) {
 			Set<Value> values = new HashSet<Value>();
 			
@@ -112,7 +112,7 @@ public class Universe implements Cloneable {
 		
 		ObjectAccessExpression read = (ObjectAccessExpression) expression;
 		
-		Set<Value> parents = resolve(root, read.getObject());
+		Set<Value> parents = lookupValues(root, read.getObject());
 		Set<Value> children = new HashSet<Value>();
 		
 		for (Value value : parents) {
