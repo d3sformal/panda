@@ -11,7 +11,7 @@ public class Simple {
 		++i;
 		
 		Simple s = new Simple();
-		s.x = new Simple();
+		s.x = s;//new Simple();
 		
 		System.err.println(i);
 	}

@@ -335,8 +335,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		Set<AccessExpression> order = new TreeSet<AccessExpression>(new Comparator<AccessExpression>() {
 
 			public int compare(AccessExpression expr1, AccessExpression expr2) {
-				if (expr1.toString(Notation.DOT_NOTATION).length() < expr2.toString(Notation.DOT_NOTATION).length()) return -1;
-				if (expr2.toString(Notation.DOT_NOTATION).length() < expr1.toString(Notation.DOT_NOTATION).length()) return +1;
+				if (expr1.getLength() < expr2.getLength()) return -1;
+				if (expr2.getLength() < expr1.getLength()) return +1;
 				
 				return expr1.toString(Notation.DOT_NOTATION).compareTo(expr2.toString(Notation.DOT_NOTATION));
 			}
@@ -424,7 +424,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			
 			for (String fieldName : object.getFields().keySet()) {
 				for (Value field : object.getField(fieldName).getPossibleValues()) {
-					ret.addAll(subValueAccessExpressions(field, DefaultObjectFieldRead.create(prefix, fieldName), maximalAccessExpressionLength));
+					ret.addAll(subValueAccessExpressions(field, DefaultObjectFieldRead.create(prefix, fieldName), maximalAccessExpressionLength - 1));
 				}
 			}
 			
@@ -436,7 +436,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			
 			for (Integer index : array.getElements().keySet()) {
 				for (Value element : array.getElement(index).getPossibleValues()) {
-					ret.addAll(subValueAccessExpressions(element, DefaultArrayElementRead.create(prefix, Constant.create(index)), maximalAccessExpressionLength));
+					ret.addAll(subValueAccessExpressions(element, DefaultArrayElementRead.create(prefix, Constant.create(index)), maximalAccessExpressionLength - 1));
 				}
 			}
 			
