@@ -49,11 +49,16 @@ public class Universe implements Cloneable {
 		if (elementInfo == null) return get(NULL);
 		
 		Integer ref = elementInfo.getObjectRef();
+		boolean existed = contains(ref);
 		
-		if (contains(ref)) return get(ref);
+		if (existed) {
+			System.out.println("EXISTED");
+		}
 		
-		if (elementInfo.isArray()) {
+		if (elementInfo.isArray()) {			
 			HeapArray array = factory.createArray(ref, elementInfo.arrayLength());
+			
+			if (existed) return array;
 			
 			for (int i = 0; i < elementInfo.arrayLength(); ++i) {
 				if (elementInfo.isReferenceArray()) {
@@ -61,15 +66,19 @@ public class Universe implements Cloneable {
 					
 					ElementInfo subElementInfo = threadInfo.getElementInfo(subRef);
 					
+					System.out.print("New element " + i + " ");
 					array.setElement(i, add(threadInfo, subElementInfo));
 				} else {
 					array.setElement(i, new PrimitiveValue());
 				}
 			}
 			
+			System.out.println("ARRAY " + ref + " " + elementInfo.getClass().getName());
 			return array;
 		} else {
 			HeapObject object = factory.createObject(ref);
+			
+			if (existed) return object;
 			
 			for (int i = 0; i < elementInfo.getNumberOfFields(); ++i) {
 				FieldInfo fieldInfo = elementInfo.getFieldInfo(i);
@@ -83,10 +92,12 @@ public class Universe implements Cloneable {
 					
 					ElementInfo subElementInfo = threadInfo.getElementInfo(subRef);
 					
+					System.out.print("New field " + fieldInfo.getName() + " ");
 					object.setField(fieldInfo.getName(), add(threadInfo, subElementInfo));
 				}
 			}
 			
+			System.out.println("OBJECT " + ref);
 			return object;
 		}
 	}
@@ -119,6 +130,7 @@ public class Universe implements Cloneable {
 			HeapValue parent = (HeapValue) value;
 			
 			if (read instanceof ObjectFieldRead) {
+				System.out.println(read);
 				HeapObject object = (HeapObject) parent;
 				ObjectFieldRead fieldRead = (ObjectFieldRead) read;
 				
@@ -135,6 +147,69 @@ public class Universe implements Cloneable {
 		}
 		
 		return children;
+	}
+	
+	public Set<HeapValue> getModifiedObjects(Universe universe) {
+		Set<HeapValue> ret = new HashSet<HeapValue>();
+		
+		for (Integer reference : objects.keySet()) {
+			HeapValue originalValue = objects.get(reference);
+			HeapValue modifiedValue = universe.objects.get(reference);
+			
+			if (originalValue instanceof HeapObject) {
+				if (modifiedValue instanceof HeapObject) {
+					HeapObject originalObject = (HeapObject) originalValue;
+					HeapObject modifiedObject = (HeapObject) modifiedValue;
+					
+					for (String field : originalObject.getFields().keySet()) {
+						Slot originalField = originalObject.getField(field);
+						Slot modifiedField = modifiedObject.getField(field);
+						
+						if (originalField.getSize() == modifiedField.getSize()) {
+							for (Value originalSubValue : originalField.getPossibleValues()) {
+								if (!modifiedField.getPossibleValues().contains(originalSubValue)) {
+									ret.add(originalValue);
+								}
+							}
+						} else {
+							ret.add(originalValue);
+						}
+					}
+				} else {
+					ret.add(originalValue);
+				}
+			}
+			
+			if (originalValue instanceof HeapArray) {
+				if (modifiedValue instanceof HeapArray) {
+					HeapArray originalArray = (HeapArray) originalValue;
+					HeapArray modifiedArray = (HeapArray) modifiedValue;
+					
+					for (Integer i : originalArray.getElements().keySet()) {
+						Slot originalElement = originalArray.getElement(i);
+						Slot modifiedElement = modifiedArray.getElement(i);
+						
+						if (originalElement.getSize() == modifiedElement.getSize()) {
+							for (Value originalSubValue : originalElement.getPossibleValues()) {
+								if (!modifiedElement.getPossibleValues().contains(originalSubValue)) {
+									ret.add(originalValue);
+								}
+							}
+						} else {
+							ret.add(originalValue);
+						}
+					}
+				} else {
+					ret.add(originalValue);
+				}
+			}
+		}
+		
+		System.out.println("<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + ret);
+		System.out.println("<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + ((HeapObject) objects.get(55)).getField("X"));
+		System.out.println("<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + ((HeapObject) universe.objects.get(55)).getField("X"));
+		
+		return ret;
 	}
 	
 	@Override

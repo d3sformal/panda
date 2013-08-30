@@ -1,5 +1,6 @@
 [method methods2.A.do1]
 class(methods2.Methods2).X = 2
+a.b.c.d.e.f = 0
 
 [static]
 class(methods2.Methods2).X = 2

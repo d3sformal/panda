@@ -51,6 +51,10 @@ public abstract class Slot {
 		return ret.toString();
 	}
 	
+	public int getSize() {
+		return getPossibleValues().size();
+	}
+	
 	public abstract Set<Value> getPossibleValues();
 	public abstract Slot cloneInto(Universe universe, Value parent);
 	public abstract void clear();

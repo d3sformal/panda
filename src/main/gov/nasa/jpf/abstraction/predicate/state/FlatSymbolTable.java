@@ -43,7 +43,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 	
 	private static Verbosity verbosity = Verbosity.NORMAL;
-	private static String[] NormalVerbosityExludedPackageNames = new String[] {"java", "javax"};
+	private static String[] NormalVerbosityExludedPackageNames = new String[] {"java", "javax", "sun", "[", "gov.nasa.jpf"};
 	
 	private Universe universe = new Universe();	
 	private Map<Root, LocalVariable> locals = new HashMap<Root, LocalVariable>();
@@ -177,9 +177,17 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		Set<Value> destinations = lookupValues(to);
 		
 		for (Value destination : destinations) {
-			//update destination
+			Value newValue = new PrimitiveValue();
 			
-			ret.addAll(valueToAccessExpressions(destination, getMaximalAccessExpressionLength()));
+			for (Slot slot : destination.getSlots()) {
+				slot.getPossibleValues().remove(destination);
+				destination.removeSlot(slot);
+				
+				slot.getPossibleValues().add(newValue);
+				newValue.addSlot(slot);
+			}
+			
+			ret.addAll(valueToAccessExpressions(newValue, getMaximalAccessExpressionLength()));
 		}
 		
 		System.out.println(ret + " := PRIMITIVE");
@@ -468,10 +476,14 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		
 		return ret;
 	}
+	
+	public Set<AccessExpression> getModifiedObjectAccessExpressions(FlatSymbolTable table) {
+		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 
-	public void stealClasses(FlatSymbolTable table) {
-		classes.clear();
-		classes.putAll(table.classes);
+		for (Value value : universe.getModifiedObjects(table.universe)) {
+			ret.addAll(valueToAccessExpressions(value, Math.max(getMaximalAccessExpressionLength(), table.getMaximalAccessExpressionLength())));
+		}
+		
+		return ret;
 	}
-
 }
