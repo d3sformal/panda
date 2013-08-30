@@ -2,13 +2,11 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.util.RunDetector;
-import gov.nasa.jpf.vm.ArrayFields;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ClassLoaderInfo;
 import gov.nasa.jpf.vm.ClassLoaderList;
@@ -48,19 +46,11 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		VM vm = threadInfo.getVM();
 		ClassLoaderList list = vm.getClassLoaderList();
 		
-		System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		for (ClassLoaderInfo cli : list) {
 			for(ElementInfo c : cli.getStatics()) {
-				System.out.println("Adding class static object " + c.getObjectRef() + " " + c.getClassInfo().getName());
 				ret.addClass(c.getClassInfo().getName(), threadInfo, c);
-				if (ret.isArray(DefaultPackageAndClass.create(c.getClassInfo().getName()))) {
-					System.out.println("Damn it!!!!!!!!!!!!!!!!!!!!!!!!!!");
-					System.exit(-1);
-				}
-				System.out.println("Added " + c.getObjectRef());
 			}
 		}
-		System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 		
 		return ret;
 	}
@@ -95,10 +85,6 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			ElementInfo classObject = classInfo.getStaticElementInfo();
 			
 			scopes.top().addClass(classInfo.getName(), threadInfo, classObject);
-			if (scopes.top().isArray(DefaultPackageAndClass.create(classInfo.getName()))) {
-				System.out.println("GOD DAMN IT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-				System.exit(-1);
-			}
 		}
 		
 		//transitionScope.removeLocals();

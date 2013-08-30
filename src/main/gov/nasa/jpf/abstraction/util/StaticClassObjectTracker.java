@@ -20,18 +20,22 @@ public class StaticClassObjectTracker extends ListenerAdapter {
 		if (execInsn instanceof INVOKECLINIT) {
 			INVOKECLINIT clinit = (INVOKECLINIT) execInsn;
 			
-			StaticElementInfo ei = clinit.getStaticElementInfo();
-			
-			String head = ">>>>>>>>>>>>>>>>>>>>>>>>>>" + ei.getClassInfo().getName() + "<<<<<<<<<<<<<<<<<<<<<<<<<<";
-			String foot = head.replaceAll(".", "#");
-			
-			System.out.println(head);
-			traverse(curTh, ei, "", new HashSet<ElementInfo>());
-			System.out.println(foot);
+			dumpStaticElementInfo(curTh, clinit.getStaticElementInfo());
 		}
 	}
+	
+	public static void dumpStaticElementInfo(ThreadInfo ti, StaticElementInfo ei) {		
+		String head = ">>>>>>>>>>>>>>>>>>>>>>>>>>" + ei.getClassInfo().getName() + "<<<<<<<<<<<<<<<<<<<<<<<<<<";
+		String foot = head.replaceAll(".", "^");
+		
+		System.out.println();
+		System.out.println(head);
+		traverse(ti, ei, "", new HashSet<ElementInfo>());
+		System.out.println(foot);
+		System.out.println();
+	}
 
-	private void traverse(ThreadInfo ti, ElementInfo ei, String indentation, HashSet<ElementInfo> visited) {
+	private static void traverse(ThreadInfo ti, ElementInfo ei, String indentation, HashSet<ElementInfo> visited) {
 		if (ei == null) {
 			System.out.println(ei);
 			return;

@@ -51,10 +51,6 @@ public class Universe implements Cloneable {
 		Integer ref = elementInfo.getObjectRef();
 		boolean existed = contains(ref);
 		
-		if (existed) {
-			System.out.println("EXISTED");
-		}
-		
 		if (elementInfo.isArray()) {			
 			HeapArray array = factory.createArray(ref, elementInfo.arrayLength());
 			
@@ -66,14 +62,12 @@ public class Universe implements Cloneable {
 					
 					ElementInfo subElementInfo = threadInfo.getElementInfo(subRef);
 					
-					System.out.print("New element " + i + " ");
 					array.setElement(i, add(threadInfo, subElementInfo));
 				} else {
 					array.setElement(i, new PrimitiveValue());
 				}
 			}
 			
-			System.out.println("ARRAY " + ref + " " + elementInfo.getClass().getName());
 			return array;
 		} else {
 			HeapObject object = factory.createObject(ref);
@@ -83,21 +77,17 @@ public class Universe implements Cloneable {
 			for (int i = 0; i < elementInfo.getNumberOfFields(); ++i) {
 				FieldInfo fieldInfo = elementInfo.getFieldInfo(i);
 				
-				if (fieldInfo.isNumericField()) {
-					object.setField(fieldInfo.getName(), new PrimitiveValue());
-				}
-				
 				if (fieldInfo.isReference()) {
 					Integer subRef = elementInfo.getReferenceField(fieldInfo);
 					
 					ElementInfo subElementInfo = threadInfo.getElementInfo(subRef);
 					
-					System.out.print("New field " + fieldInfo.getName() + " ");
 					object.setField(fieldInfo.getName(), add(threadInfo, subElementInfo));
+				} else {
+					object.setField(fieldInfo.getName(), new PrimitiveValue());
 				}
 			}
 			
-			System.out.println("OBJECT " + ref);
 			return object;
 		}
 	}
@@ -204,10 +194,6 @@ public class Universe implements Cloneable {
 				}
 			}
 		}
-		
-		System.out.println("<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + ret);
-		System.out.println("<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + ((HeapObject) objects.get(55)).getField("X"));
-		System.out.println("<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + ((HeapObject) universe.objects.get(55)).getField("X"));
 		
 		return ret;
 	}

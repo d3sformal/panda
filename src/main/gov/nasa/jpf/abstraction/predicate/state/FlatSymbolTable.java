@@ -131,7 +131,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			Value parent = slot.getParent();
 			
 			Set<AccessExpression> resolution = valueToAccessExpressions(parent,  maxLength - 1);
-			System.out.print("RESOLVE: " + value);
 			
 			if (parent instanceof HeapValue) {
 				for (AccessExpression prefix : resolution) {
@@ -156,8 +155,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				
 				ret.add(c.getAccessExpression());
 			}
-			
-			System.out.println(" " + ret);
 		}
 		
 		return ret;
@@ -189,9 +186,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			
 			ret.addAll(valueToAccessExpressions(newValue, getMaximalAccessExpressionLength()));
 		}
-		
-		System.out.println(ret + " := PRIMITIVE");
-		
+				
 		return ret;
 	}
 	
@@ -268,9 +263,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				parent.getSlot().add(sources);
 			}
 		}
-		
-		System.out.println(ret + " := " + sources);
-		
+				
 		return ret;
 	}
 
