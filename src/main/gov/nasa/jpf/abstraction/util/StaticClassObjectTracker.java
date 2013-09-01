@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.util;
 import java.util.HashSet;
 
 import gov.nasa.jpf.ListenerAdapter;
-import gov.nasa.jpf.jvm.bytecode.INVOKECLINIT;
+import gov.nasa.jpf.jvm.bytecode.ReturnInstruction;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -17,10 +17,9 @@ public class StaticClassObjectTracker extends ListenerAdapter {
 
 	@Override
 	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {		
-		if (execInsn instanceof INVOKECLINIT) {
-			INVOKECLINIT clinit = (INVOKECLINIT) execInsn;
+		if (execInsn instanceof ReturnInstruction && execInsn.getMethodInfo().isClinit()) {
 			
-			dumpStaticElementInfo(curTh, clinit.getStaticElementInfo());
+			dumpStaticElementInfo(curTh, execInsn.getMethodInfo().getClassInfo().getStaticElementInfo());
 		}
 	}
 	

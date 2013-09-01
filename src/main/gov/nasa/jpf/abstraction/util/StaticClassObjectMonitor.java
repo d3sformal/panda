@@ -14,15 +14,16 @@ public class StaticClassObjectMonitor extends ListenerAdapter {
 	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {		
 		ClassLoaderList clis = vm.getClassLoaderList();
 		
-		for (ClassLoaderInfo cli : clis) {
+		String head = ">>> " + execInsn.getMnemonic() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+		String foot = head.replaceAll(".", "=");
+		
+		System.out.println(head);
+		for (ClassLoaderInfo cli : clis) {			
 			for (ElementInfo ei : cli.getStatics()) {
-				String head = ">>> " + ei.getObjectRef() + " " + ei.getClassInfo().getName() + " (" + ei.getClass().getSimpleName() + ") <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-				String foot = head.replaceAll(".", "=");
-				
-				System.out.println(head);
 				StaticClassObjectTracker.dumpStaticElementInfo(curTh, (StaticElementInfo) ei);
-				System.out.println(foot);
 			}
 		}
+		
+		System.out.println(foot);
 	}
 }
