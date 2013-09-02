@@ -240,4 +240,52 @@ public class Universe implements Cloneable {
 		
 		return clone;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder ret = new StringBuilder();
+		
+		for (UniverseIdentifier i : objects.keySet()) {
+			traverse(objects.get(i), new HashSet<Value>(), "", ret);
+		}
+		
+		return ret.toString();
+	}
+
+	private void traverse(Value value, Set<Value> visited, String indentation, StringBuilder builder) {
+		boolean isVisited = visited.contains(value);
+		
+		visited.add(value);
+		
+		builder.append(value + "\n");
+		
+		if (isVisited) return;
+		if (value instanceof PrimitiveValue) return;
+		
+		indentation += "  ";
+		
+		if (value instanceof StructuredObject) {
+			StructuredObject o = (StructuredObject) value;
+			
+			for (String f : o.getFields().keySet()) {
+				for (Value v : o.getField(f).getPossibleValues()) {
+					builder.append(indentation + f + ": ");
+					
+					traverse(v, visited, indentation, builder);
+				}
+			}
+		}
+		
+		if (value instanceof StructuredArray) {
+			StructuredArray o = (StructuredArray) value;
+			
+			for (Integer i : o.getElements().keySet()) {
+				for (Value v : o.getElement(i).getPossibleValues()) {
+					builder.append(indentation + i + ": ");
+					
+					traverse(v, visited, indentation, builder);
+				}
+			}
+		}
+	}
 }

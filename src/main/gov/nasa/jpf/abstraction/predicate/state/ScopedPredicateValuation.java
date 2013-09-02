@@ -2,9 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
-import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
@@ -32,7 +30,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 public class ScopedPredicateValuation implements PredicateValuation, Scoped {
@@ -44,6 +41,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	public ScopedPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
 		this.abstraction = abstraction;
 		this.predicateSet = predicateSet;
+		
+		scopes.push(new FlatPredicateValuation());
 		
 		Set<Predicate> predicates = new HashSet<Predicate>();
 

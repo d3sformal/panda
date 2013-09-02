@@ -11,7 +11,7 @@ public class PrimitiveValue extends Value {
 	private UUID id;
 	
 	public PrimitiveValue() {
-		id = new UUID(0, 0);
+		id = UUID.randomUUID();
 	}
 	
 	@Override
@@ -26,8 +26,13 @@ public class PrimitiveValue extends Value {
 	}
 	
 	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
+	
+	@Override
 	public String toString() {
-		return "primitive";
+		return "primitive_" + id;
 	}
 
 	@Override

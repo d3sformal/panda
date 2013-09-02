@@ -39,14 +39,25 @@ import java.util.TreeSet;
 
 public class FlatSymbolTable implements SymbolTable, Scope {
 	
-	private enum Policy {
-		NORMAL,
-		MINIMAL,
-		VERBOSE
-	}
-	
-	private static Policy policy = Policy.MINIMAL;
-	private static String[] NormalVerbosityExludedPackageNames = new String[] {"java", "javax", "sun", "[", "gov.nasa.jpf"};
+	private static String[] doNotMonitor = new String[] {
+		"java",
+		"javax",
+		"sun",
+		"[", // Statics of arrays
+		"gov.nasa.jpf" // JPF
+	};
+	private static String[] doNotPrint = new String[] {
+		"boolean",
+		"byte",
+		"char",
+		"double",
+		"float",
+		"int",
+		"long",
+		"short",
+		"void"
+	};
+	private static int GUARANTEED_LENGTH = 8;
 	
 	private Universe universe = new Universe();	
 	private Map<Root, LocalVariable> locals = new HashMap<Root, LocalVariable>();
@@ -73,6 +84,10 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return classes.get(c);
 	}
 	
+	public Universe getUniverse() {
+		return universe;
+	}
+	
 	public void addPrimitiveLocal(String name) {
 		Root l = DefaultRoot.create(name);
 		LocalVariable v = new LocalVariable(l, new PrimitiveValue());
@@ -90,11 +105,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public void addClass(String name, ThreadInfo threadInfo, ElementInfo elementInfo) {
 		boolean excluded = false;
 			
-		for (String e : NormalVerbosityExludedPackageNames) {
+		for (String e : doNotMonitor) {
 			excluded |= name.startsWith(e);
 		}
 			
-		if (policy != Policy.MINIMAL || !excluded) {
+		if (!excluded) {
 			PackageAndClass c = DefaultPackageAndClass.create(name);
 			ClassObject v = new ClassObject(c, (ClassStatics) universe.add(threadInfo, elementInfo));
 			
@@ -183,14 +198,20 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		Set<Value> destinations = lookupValues(to);
 		
+		boolean ambiguous = destinations.size() > 1;
+		
 		for (Value destination : destinations) {
 			Value newValue = new PrimitiveValue();
 			
-			for (Slot slot : destination.getSlots()) {
-				slot.getPossibleValues().remove(destination);
-				destination.removeSlot(slot);
+			for (Slot slot : destination.getSlots()) {			
+				if (!ambiguous) {
+					slot.clear();
+					destination.removeSlot(slot);
+				}
 				
-				slot.getPossibleValues().add(newValue);
+				Set<Value> values = new HashSet<Value>();
+				values.add(newValue);
+				slot.add(values);
 				newValue.addSlot(slot);
 			}
 			
@@ -384,35 +405,26 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return ret.toString();
 	}
 	
-	private Set<AccessExpression> getFilteredRelevantAccessExpressions() {		
-		switch (policy) {
-		case MINIMAL:
-		case NORMAL:
-			Set<AccessExpression> filtered = new HashSet<AccessExpression>();
-		
-			for (AccessExpression expr : getAllRelevantAccessExpressions()) {
-				if (expr.getRoot() instanceof PackageAndClass) {
-					boolean excluded = false;
-					
-					for (String e : NormalVerbosityExludedPackageNames) {
-						excluded |= expr.getRoot().getName().startsWith(e);
-					}
-					
-					if (excluded) {
-						continue;
-					}
+	private Set<AccessExpression> getFilteredRelevantAccessExpressions() {
+		Set<AccessExpression> filtered = new HashSet<AccessExpression>();
+	
+		for (AccessExpression expr : getAllRelevantAccessExpressions()) {
+			if (expr.getRoot() instanceof PackageAndClass) {
+				boolean excluded = false;
+				
+				for (String e : doNotPrint) {
+					excluded |= expr.getRoot().getName().startsWith(e);
 				}
 				
-				filtered.add(expr);
+				if (excluded) {
+					continue;
+				}
 			}
-			return filtered;
-		
-		case VERBOSE:
-			return getAllRelevantAccessExpressions();
-
-		default:
-			throw new RuntimeException("Unsupported system table verbosity level.");
+			
+			filtered.add(expr);
 		}
+		
+		return filtered;
 	}
 
 	private Set<AccessExpression> getAllRelevantAccessExpressions() {
@@ -470,7 +482,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 
 	private int getMaximalAccessExpressionLength() {
-		int ret = 0;
+		int ret = GUARANTEED_LENGTH;
 		
 		for (Predicate predicate : abstraction.getPredicateValuation().getPredicates()) {
 			for (AccessExpression expr : predicate.getPaths()) {

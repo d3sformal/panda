@@ -7,14 +7,10 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.util.RunDetector;
-import gov.nasa.jpf.vm.ClassLoaderInfo;
-import gov.nasa.jpf.vm.ClassLoaderList;
-import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.VM;
 
 import java.util.Set;
 
@@ -24,6 +20,10 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	
 	public ScopedSymbolTable(PredicateAbstraction abstraction) {
 		this.abstraction = abstraction;
+		
+		// Scope for passing what has been statically initialised
+		// without this all static initialisations return and remove their scope without writing it anywhere else
+		scopes.push(new FlatSymbolTable(abstraction));
 	}
 
 	@Override
@@ -39,17 +39,6 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 				} else {
 					ret.addHeapValueLocal(local.getName());
 				}
-			}
-		}
-		
-		VM vm = threadInfo.getVM();
-		ClassLoaderList list = vm.getClassLoaderList();
-		
-		for (ClassLoaderInfo cli : list) {
-			for(ElementInfo c : cli.getStatics()) {
-				//if (c.getClassInfo().isInitialized()) {
-					ret.addClass(c.getClassInfo().getName(), threadInfo, c);
-				//}
 			}
 		}
 		
@@ -78,12 +67,16 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		
 		scopes.push(transitionScope);
 		
+		if (method.isClinit()) {
+			scopes.top().addClass(method.getClassName(), threadInfo, method.getClassInfo().getStaticElementInfo());
+		}
+		
 		StackFrame sf = threadInfo.getTopFrame();
 		Object attrs[] = sf.getArgumentAttrs(method);
 		LocalVarInfo args[] = method.getArgumentLocalVars();
 
 		if (args != null && attrs != null) {
-			for (int i = 1; i < args.length; ++i) {
+			for (int i = 0; i < args.length; ++i) {
 				Attribute attr = (Attribute) attrs[i];
 				
 				if (attr == null) attr = new EmptyAttribute();
@@ -92,9 +85,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 					if (args[i].isNumeric()) {
 						// Assign to numeric (primitive) arg
 						processPrimitiveStore(attr.getExpression(), DefaultRoot.create(args[i].getName()));
-					} else {
-						ElementInfo ei = threadInfo.getElementInfo(sf.peek(args.length - i));
-						
+					} else {						
 						// Assign to object arg
 						processObjectStore(attr.getExpression(), DefaultRoot.create(args[i].getName()));
 					}
@@ -112,19 +103,21 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
 		
-		if (RunDetector.isRunning()) {
-			FlatSymbolTable transitionScope;
-			
-			if (scopes.count() == 1) {
-				transitionScope = createDefaultScope(threadInfo, method);
-			} else {
-				transitionScope = scopes.top(1);
-			}
-			
+		FlatSymbolTable transitionScope;
+		
+		if (scopes.count() == 1) {
+			transitionScope = createDefaultScope(threadInfo, method);
+		} else {
+			transitionScope = scopes.top(1);
+		}
+		
+		if (RunDetector.isRunning()) {			
 			Set<AccessExpression> modifications = transitionScope.getModifiedObjectAccessExpressions(scopes.top());
 			
-			System.out.println("Objects modified in child scope: " + modifications);
+			System.out.println("Objects modified in child scope after return from " + before.getMethodName() + ": " + modifications);
 		}
+		
+		transitionScope.updateUniverse(scopes.top());
 		
 		scopes.pop();
 	}
