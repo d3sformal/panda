@@ -6,7 +6,6 @@ import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.concrete.Reference;
-import gov.nasa.jpf.abstraction.util.StaticClassObjectTracker;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.StaticElementInfo;
@@ -19,7 +18,7 @@ import java.util.Set;
 
 public class Universe implements Cloneable {
 	private ValueFactory factory = new ValueFactory(this);
-	private Map<Integer, HeapValue> objects = new HashMap<Integer, HeapValue>();
+	private Map<UniverseIdentifier, StructuredValue> objects = new HashMap<UniverseIdentifier, StructuredValue>();
 	
 	public static int NULL = -1;
 	
@@ -31,35 +30,56 @@ public class Universe implements Cloneable {
 		return factory;
 	}
 	
-	public boolean contains(Integer reference) {
-		return objects.containsKey(reference);
+	public boolean contains(UniverseIdentifier identifier) {
+		return objects.containsKey(identifier);
 	}
 	
-	public HeapValue get(Integer reference) {
-		return objects.get(reference);
+	public boolean contains(int reference) {
+		return contains(new HeapObjectReference(reference));
 	}
 	
-	public void add(HeapValue value) {
+	public boolean contains(String className) {
+		return contains(new ClassStaticsReference(className));
+	}
+	
+	public StructuredValue get(UniverseIdentifier identifier) {
+		return objects.get(identifier);
+	}
+	
+	public HeapValue get(int reference) {
+		return (HeapValue) objects.get(new HeapObjectReference(reference));
+	}
+	
+	public ClassStatics get(String className) {
+		return (ClassStatics) objects.get(new ClassStaticsReference(className));
+	}
+	
+	public void add(StructuredValue value) {
 		objects.put(value.getReference(), value);
 	}
 	
-	public HeapValue add(Reference reference) {
+	public StructuredValue add(Reference reference) {
 		return add(reference.getThreadInfo(), reference.getElementInfo());
 	}
 	
-	public HeapValue add(ThreadInfo threadInfo, ElementInfo elementInfo) {
-		
-		StaticClassObjectTracker.dumpElementInfo(threadInfo, elementInfo);
-		
+	public StructuredValue add(ThreadInfo threadInfo, ElementInfo elementInfo) {		
 		if (elementInfo == null) return get(NULL);
 		
+		String className = elementInfo.getClassInfo().getName(); // TODO
 		Integer ref = elementInfo.getObjectRef();
-		boolean existed = contains(ref);
+		
+		boolean existed;
+		
+		if (elementInfo instanceof StaticElementInfo) {
+			existed = contains(className);
+		} else {
+			existed = contains(ref);
+		}
 		
 		if (elementInfo.isArray()) {			
-			HeapArray array = factory.createArray(ref, elementInfo.arrayLength());
+			StructuredArray array = factory.createArray(ref, elementInfo.arrayLength());
 			
-			if (existed) return array;
+			if (existed) return (StructuredValue) array;
 			
 			for (int i = 0; i < elementInfo.arrayLength(); ++i) {
 				if (elementInfo.isReferenceArray()) {
@@ -67,17 +87,23 @@ public class Universe implements Cloneable {
 					
 					ElementInfo subElementInfo = threadInfo.getElementInfo(subRef);
 					
-					array.setElement(i, add(threadInfo, subElementInfo));
+					array.setElement(i, (HeapValue) add(threadInfo, subElementInfo));
 				} else {
 					array.setElement(i, new PrimitiveValue());
 				}
 			}
 			
-			return array;
+			return (StructuredValue) array;
 		} else {
-			HeapObject object = factory.createObject(ref);
+			StructuredObject object;
 			
-			if (existed) return object;
+			if (elementInfo instanceof StaticElementInfo) {
+				object = factory.createClass(className);
+			} else  {
+				object = factory.createObject(ref);
+			}
+			
+			if (existed) return (StructuredValue) object;
 			
 			for (int i = 0; i < elementInfo.getNumberOfFields(); ++i) {
 				FieldInfo fieldInfo = elementInfo.getFieldInfo(i);
@@ -87,13 +113,13 @@ public class Universe implements Cloneable {
 					
 					ElementInfo subElementInfo = threadInfo.getElementInfo(subRef);
 					
-					object.setField(fieldInfo.getName(), add(threadInfo, subElementInfo));
+					object.setField(fieldInfo.getName(), (HeapValue) add(threadInfo, subElementInfo));
 				} else {
 					object.setField(fieldInfo.getName(), new PrimitiveValue());
 				}
 			}
 			
-			return object;
+			return (StructuredValue) object;
 		}
 	}
 	
@@ -122,18 +148,17 @@ public class Universe implements Cloneable {
 		Set<Value> children = new HashSet<Value>();
 		
 		for (Value value : parents) {
-			HeapValue parent = (HeapValue) value;
+			StructuredValue parent = (StructuredValue) value;
 			
 			if (read instanceof ObjectFieldRead) {
-				System.out.println(read);
-				HeapObject object = (HeapObject) parent;
+				StructuredObject object = (StructuredObject) parent;
 				ObjectFieldRead fieldRead = (ObjectFieldRead) read;
 				
 				children.addAll(object.getField(fieldRead.getField().getName()).getPossibleValues());
 			}
 			
 			if (read instanceof ArrayElementRead) {
-				HeapArray array = (HeapArray) parent;
+				StructuredArray array = (StructuredArray) parent;
 				
 				for (int i = 0; i < array.getLength(); ++i) {
 					children.addAll(array.getElement(i).getPossibleValues());
@@ -144,17 +169,17 @@ public class Universe implements Cloneable {
 		return children;
 	}
 	
-	public Set<HeapValue> getModifiedObjects(Universe universe) {
-		Set<HeapValue> ret = new HashSet<HeapValue>();
+	public Set<StructuredValue> getModifiedObjects(Universe universe) {
+		Set<StructuredValue> ret = new HashSet<StructuredValue>();
 		
-		for (Integer reference : objects.keySet()) {
-			HeapValue originalValue = objects.get(reference);
-			HeapValue modifiedValue = universe.objects.get(reference);
+		for (UniverseIdentifier identifier : objects.keySet()) {
+			StructuredValue originalValue = objects.get(identifier);
+			StructuredValue modifiedValue = universe.objects.get(identifier);
 			
-			if (originalValue instanceof HeapObject) {
-				if (modifiedValue instanceof HeapObject) {
-					HeapObject originalObject = (HeapObject) originalValue;
-					HeapObject modifiedObject = (HeapObject) modifiedValue;
+			if (originalValue instanceof StructuredObject) {
+				if (modifiedValue instanceof StructuredObject) {
+					StructuredObject originalObject = (StructuredObject) originalValue;
+					StructuredObject modifiedObject = (StructuredObject) modifiedValue;
 					
 					for (String field : originalObject.getFields().keySet()) {
 						Slot originalField = originalObject.getField(field);
@@ -175,10 +200,10 @@ public class Universe implements Cloneable {
 				}
 			}
 			
-			if (originalValue instanceof HeapArray) {
-				if (modifiedValue instanceof HeapArray) {
-					HeapArray originalArray = (HeapArray) originalValue;
-					HeapArray modifiedArray = (HeapArray) modifiedValue;
+			if (originalValue instanceof StructuredArray) {
+				if (modifiedValue instanceof StructuredArray) {
+					StructuredArray originalArray = (StructuredArray) originalValue;
+					StructuredArray modifiedArray = (StructuredArray) modifiedValue;
 					
 					for (Integer i : originalArray.getElements().keySet()) {
 						Slot originalElement = originalArray.getElement(i);
@@ -207,8 +232,8 @@ public class Universe implements Cloneable {
 	public Universe clone() {
 		Universe clone = new Universe();
 		
-		for (Integer reference : objects.keySet()) {
-			HeapValue value = objects.get(reference);
+		for (UniverseIdentifier identifier : objects.keySet()) {
+			StructuredValue value = objects.get(identifier);
 			
 			value.cloneInto(clone);
 		}

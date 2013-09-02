@@ -51,7 +51,11 @@ public class StaticClassObjectTracker extends ListenerAdapter {
 		if (ei.isArray()) {
 			System.out.println("array(" + ei.getObjectRef() + ")");
 		} else {
-			System.out.println("object(" + ei.getObjectRef() + ")");
+			if (ei instanceof StaticElementInfo) {
+				System.out.println("class(" + ei.getClassInfo().getName() + ")");
+			} else {
+				System.out.println("object(" + ei.getObjectRef() + ")");
+			}
 		}
 		
 		if (isVisited) return;

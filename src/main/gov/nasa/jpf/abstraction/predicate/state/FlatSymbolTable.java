@@ -16,6 +16,7 @@ import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassObject;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassStatics;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapArray;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapObject;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapValue;
@@ -27,7 +28,6 @@ import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,7 +86,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	public void addClass(String name, ThreadInfo threadInfo, ElementInfo elementInfo) {
 		PackageAndClass c = DefaultPackageAndClass.create(name);
-		ClassObject v = new ClassObject(c, universe.add(threadInfo, elementInfo));
+		ClassObject v = new ClassObject(c, (ClassStatics) universe.add(threadInfo, elementInfo));
 		
 		classes.put(c, v);
 	}

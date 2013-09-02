@@ -5,22 +5,22 @@ import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 
 public class ClassObject extends Value {
 	private PackageAndClass classObject;
-	private HeapValueSlot slot;
+	private ClassStaticsSlot slot;
 	
 	protected ClassObject() {
 	}
 	
-	public ClassObject(PackageAndClass classObject, HeapValue value) {
+	public ClassObject(PackageAndClass classObject, ClassStatics value) {
 		this.classObject = classObject;
 		
-		slot = new HeapValueSlot(this, classObject.getName(), value);
+		slot = new ClassStaticsSlot(this, classObject.getName(), value);
 	}
 	
 	public AccessExpression getAccessExpression() {
 		return classObject;
 	}
 	
-	public HeapValueSlot getSlot() {
+	public ClassStaticsSlot getSlot() {
 		return slot;
 	}
 	

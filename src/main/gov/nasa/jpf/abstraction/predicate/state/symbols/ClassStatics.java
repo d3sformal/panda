@@ -3,12 +3,12 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HeapObject extends HeapValue implements StructuredObject {
-	
+public class ClassStatics extends StructuredValue implements StructuredObject {
+
 	private Map<String, Slot> fields = new HashMap<String, Slot>();
 
-	public HeapObject(Integer reference) {
-		super(new HeapObjectReference(reference));
+	public ClassStatics(String className) {
+		super(new ClassStaticsReference(className));
 	}
 	
 	@Override
@@ -32,8 +32,8 @@ public class HeapObject extends HeapValue implements StructuredObject {
 	}
 
 	@Override
-	public HeapObject cloneInto(Universe universe, Slot slot) {		
-		HeapObject clone = cloneInto(universe);
+	public ClassStatics cloneInto(Universe universe, Slot slot) {		
+		ClassStatics clone = cloneInto(universe);
 		
 		clone.addSlot(slot);
 		
@@ -41,12 +41,12 @@ public class HeapObject extends HeapValue implements StructuredObject {
 	}
 	
 	@Override
-	public HeapObject cloneInto(Universe universe) {
+	public ClassStatics cloneInto(Universe universe) {
 		boolean existed = universe.contains(getReference());
 		
-		HeapObjectReference reference = (HeapObjectReference) getReference();
+		ClassStaticsReference reference = (ClassStaticsReference) getReference();
 		
-		HeapObject clone = universe.getFactory().createObject(reference.getReference());
+		ClassStatics clone = universe.getFactory().createClass(reference.getClassName());
 		
 		if (!existed) {
 			for (String field : fields.keySet()) {
@@ -58,5 +58,4 @@ public class HeapObject extends HeapValue implements StructuredObject {
 		
 		return clone;
 	}
-
 }

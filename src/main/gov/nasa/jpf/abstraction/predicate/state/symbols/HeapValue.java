@@ -1,14 +1,9 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
-public abstract class HeapValue extends Value {
-	private Integer reference;
+public abstract class HeapValue extends StructuredValue {
 	
-	protected HeapValue(Integer reference) {
-		this.reference = reference;
-	}
-	
-	public Integer getReference() {
-		return reference;
+	protected HeapValue(HeapObjectReference reference) {
+		super(reference);
 	}
 	
 	@Override
@@ -16,7 +11,7 @@ public abstract class HeapValue extends Value {
 		if (o instanceof HeapValue) {
 			HeapValue value = (HeapValue) o;
 			
-			return reference == value.reference;
+			return getReference().equals(value.getReference());
 		}
 		
 		return false;
@@ -24,12 +19,12 @@ public abstract class HeapValue extends Value {
 	
 	@Override
 	public int hashCode() {
-		return reference;
+		return getReference().hashCode();
 	}
 	
 	@Override
 	public String toString() {
-		return "ref(" + reference + ")";
+		return "ref(" + getReference() + ")";
 	}
 	
 	@Override

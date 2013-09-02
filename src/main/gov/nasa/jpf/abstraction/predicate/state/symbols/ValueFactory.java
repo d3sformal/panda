@@ -22,4 +22,12 @@ public class ValueFactory {
 		
 		return (HeapArray) universe.get(reference);
 	}
+
+	public ClassStatics createClass(String className) {
+		if (!universe.contains(className)) {
+			universe.add(new ClassStatics(className));
+		}
+		
+		return universe.get(className);
+	}
 }
