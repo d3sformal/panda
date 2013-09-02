@@ -6,8 +6,10 @@ import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.concrete.Reference;
+import gov.nasa.jpf.abstraction.util.StaticClassObjectTracker;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 import java.util.HashMap;
@@ -46,6 +48,9 @@ public class Universe implements Cloneable {
 	}
 	
 	public HeapValue add(ThreadInfo threadInfo, ElementInfo elementInfo) {
+		
+		StaticClassObjectTracker.dumpElementInfo(threadInfo, elementInfo);
+		
 		if (elementInfo == null) return get(NULL);
 		
 		Integer ref = elementInfo.getObjectRef();

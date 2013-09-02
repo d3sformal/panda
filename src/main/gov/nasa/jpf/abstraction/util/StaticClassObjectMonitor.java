@@ -5,7 +5,6 @@ import gov.nasa.jpf.vm.ClassLoaderInfo;
 import gov.nasa.jpf.vm.ClassLoaderList;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
@@ -20,7 +19,9 @@ public class StaticClassObjectMonitor extends ListenerAdapter {
 		System.out.println(head);
 		for (ClassLoaderInfo cli : clis) {			
 			for (ElementInfo ei : cli.getStatics()) {
-				StaticClassObjectTracker.dumpStaticElementInfo(curTh, (StaticElementInfo) ei);
+				if (ei.getClassInfo().isInitialized()) {
+					StaticClassObjectTracker.dumpElementInfo(curTh, ei);
+				}
 			}
 		}
 		

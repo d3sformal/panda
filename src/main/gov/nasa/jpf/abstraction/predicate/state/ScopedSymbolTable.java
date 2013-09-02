@@ -48,7 +48,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		
 		for (ClassLoaderInfo cli : list) {
 			for(ElementInfo c : cli.getStatics()) {
-				ret.addClass(c.getClassInfo().getName(), threadInfo, c);
+				if (c.getClassInfo().isInitialized()) {
+					ret.addClass(c.getClassInfo().getName(), threadInfo, c);
+				}
 			}
 		}
 		
@@ -78,14 +80,6 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		}
 		
 		scopes.push(transitionScope);
-		
-		// Inform about a new static object
-		if (method.isClinit()) {
-			ClassInfo classInfo = method.getClassInfo();
-			ElementInfo classObject = classInfo.getStaticElementInfo();
-			
-			scopes.top().addClass(classInfo.getName(), threadInfo, classObject);
-		}
 		
 		//transitionScope.removeLocals();
 		
@@ -123,6 +117,14 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	@Override
 	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
+		
+		// Inform about a new static object
+		if (method.isClinit()) {
+			ClassInfo classInfo = method.getClassInfo();
+			ElementInfo classObject = classInfo.getStaticElementInfo();
+			
+			scopes.top().addClass(classInfo.getName(), threadInfo, classObject);
+		}
 		
 		if (RunDetector.isRunning()) {
 			FlatSymbolTable transitionScope;

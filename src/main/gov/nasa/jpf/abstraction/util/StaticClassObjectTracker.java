@@ -19,11 +19,15 @@ public class StaticClassObjectTracker extends ListenerAdapter {
 	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {		
 		if (execInsn instanceof ReturnInstruction && execInsn.getMethodInfo().isClinit()) {
 			
-			dumpStaticElementInfo(curTh, execInsn.getMethodInfo().getClassInfo().getStaticElementInfo());
+			dumpElementInfo(curTh, execInsn.getMethodInfo().getClassInfo().getStaticElementInfo());
 		}
 	}
 	
-	public static void dumpStaticElementInfo(ThreadInfo ti, StaticElementInfo ei) {		
+	public static void dumpElementInfo(ThreadInfo ti, ElementInfo ei) {
+		if (ei == null || ei.getClassInfo() == null) {
+			return;
+		}
+		
 		String head = ">>>>>>>>>>>>>>>>>>>>>>>>>>" + ei.getClassInfo().getName() + "<<<<<<<<<<<<<<<<<<<<<<<<<<";
 		String foot = head.replaceAll(".", "^");
 		
