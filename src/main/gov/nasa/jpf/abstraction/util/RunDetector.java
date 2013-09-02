@@ -31,14 +31,14 @@ public class RunDetector {
 
 		if (execInsn instanceof InvokeInstruction) {
 			if (detectRunningMethod(targetClass, nextInsn.getMethodInfo())) {
-				running.running();
+				running.enter();
 				return;
 			}
 		}
 		
 		if (execInsn instanceof ReturnInstruction) {
 			if (detectRunningMethod(targetClass, execInsn.getMethodInfo())) {
-				running.notRunning();
+				running.leave();
 				return;
 			}
 		}

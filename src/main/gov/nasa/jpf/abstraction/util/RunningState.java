@@ -8,17 +8,19 @@ public class RunningState implements Cloneable {
 		JUST_CEASED_RUNNING
 	}
 	
+	private int entered;
 	private State state;
 	
-	protected RunningState(State state) {
+	protected RunningState(int entered, State state) {
+		this.entered = entered;
 		this.state = state;
 	}
 	
 	public RunningState() {
-		this(State.NOT_RUNNING);
+		this(0, State.NOT_RUNNING);
 	}
 	
-	public void running() {
+	public void enter() {
 		switch (state) {
 		case NOT_RUNNING:
 		case JUST_CEASED_RUNNING:
@@ -27,13 +29,19 @@ public class RunningState implements Cloneable {
 		default:
 			state = State.RUNNING;
 		}
+		
+		++entered;
 	}
 	
-	public void notRunning() {
+	public void leave() {
+		--entered;
+		
 		switch (state) {
 		case JUST_BEGAN_RUNNING:
 		case RUNNING:
-			state = State.JUST_CEASED_RUNNING;
+			if (entered == 0) {
+				state = State.JUST_CEASED_RUNNING;
+			}
 			break;
 		default:
 			state = State.NOT_RUNNING;
@@ -74,7 +82,7 @@ public class RunningState implements Cloneable {
 	
 	@Override
 	public RunningState clone() {
-		return new RunningState(state);
+		return new RunningState(entered, state);
 	}
 
 	public void touch() {
