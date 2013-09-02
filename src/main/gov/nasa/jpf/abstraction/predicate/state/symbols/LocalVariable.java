@@ -17,8 +17,8 @@ public class LocalVariable extends Value {
 			slot = new PrimitiveValueSlot(this, localVariable.getName(), (PrimitiveValue)value);
 		}
 		
-		if (value instanceof HeapValue) {
-			slot = new HeapValueSlot(this, localVariable.getName(), (HeapValue)value);
+		if (value instanceof StructuredValue) {
+			slot = new StructuredValueSlot(this, localVariable.getName(), (StructuredValue)value);
 		}
 	}
 	

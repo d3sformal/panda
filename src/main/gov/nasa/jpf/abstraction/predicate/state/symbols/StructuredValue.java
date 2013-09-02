@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
 public abstract class StructuredValue extends Value {
+	
 	private UniverseIdentifier reference;
 	
 	protected StructuredValue(UniverseIdentifier reference) {

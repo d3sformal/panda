@@ -41,12 +41,12 @@ public abstract class Slot {
 		
 		ret.append(parent);
 		
-		if (parent instanceof HeapObject) ret.append(".");
-		if (parent instanceof HeapArray) ret.append("[");
+		if (parent instanceof StructuredObject) ret.append(".");
+		if (parent instanceof StructuredArray) ret.append("[");
 		
 		ret.append(slotKey);
 		
-		if (parent instanceof HeapArray) ret.append("]");
+		if (parent instanceof StructuredArray) ret.append("]");
 		
 		return ret.toString();
 	}

@@ -28,6 +28,6 @@ public class ValueFactory {
 			universe.add(new ClassStatics(className));
 		}
 		
-		return universe.get(className);
+		return (ClassStatics) universe.get(className);
 	}
 }

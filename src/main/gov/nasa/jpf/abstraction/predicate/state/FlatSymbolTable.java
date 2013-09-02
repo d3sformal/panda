@@ -19,7 +19,9 @@ import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassObject;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassStatics;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapArray;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapObject;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapValue;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.StructuredArray;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.StructuredObject;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.StructuredValue;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.LocalVariable;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.PrimitiveValue;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.Slot;
@@ -37,12 +39,13 @@ import java.util.TreeSet;
 
 public class FlatSymbolTable implements SymbolTable, Scope {
 	
-	private enum Verbosity {
+	private enum Policy {
 		NORMAL,
+		MINIMAL,
 		VERBOSE
 	}
 	
-	private static Verbosity verbosity = Verbosity.NORMAL;
+	private static Policy policy = Policy.MINIMAL;
 	private static String[] NormalVerbosityExludedPackageNames = new String[] {"java", "javax", "sun", "[", "gov.nasa.jpf"};
 	
 	private Universe universe = new Universe();	
@@ -85,10 +88,18 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 	
 	public void addClass(String name, ThreadInfo threadInfo, ElementInfo elementInfo) {
-		PackageAndClass c = DefaultPackageAndClass.create(name);
-		ClassObject v = new ClassObject(c, (ClassStatics) universe.add(threadInfo, elementInfo));
-		
-		classes.put(c, v);
+		boolean excluded = false;
+			
+		for (String e : NormalVerbosityExludedPackageNames) {
+			excluded |= name.startsWith(e);
+		}
+			
+		if (policy != Policy.MINIMAL || !excluded) {
+			PackageAndClass c = DefaultPackageAndClass.create(name);
+			ClassObject v = new ClassObject(c, (ClassStatics) universe.add(threadInfo, elementInfo));
+			
+			classes.put(c, v);
+		}
 	}
 	
 	private Set<Value> lookupValues(AccessExpression expression) {
@@ -126,21 +137,20 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		if (maxLength == 0) return ret;		
 		if (value instanceof LocalVariable || value instanceof ClassObject) return ret;
 		
-		
 		for (Slot slot : value.getSlots()) {
 			Value parent = slot.getParent();
 			
 			Set<AccessExpression> resolution = valueToAccessExpressions(parent,  maxLength - 1);
 			
-			if (parent instanceof HeapValue) {
+			if (parent instanceof StructuredValue) {
 				for (AccessExpression prefix : resolution) {
 					AccessExpression path = null;
 					
-					if (parent instanceof HeapObject) {						
+					if (parent instanceof StructuredObject) {						
 						path = DefaultObjectFieldRead.create(prefix, (String) slot.getSlotKey());
 					}
 					
-					if (parent instanceof HeapArray) {
+					if (parent instanceof StructuredArray) {
 						path = DefaultArrayElementRead.create(prefix, Constant.create((Integer) slot.getSlotKey()));
 					}
 					
@@ -304,7 +314,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		boolean isPrimitive = false;
 		
 		for (Value value : lookupValues(path)) {
-			if (value instanceof HeapValue) return false;
+			if (value instanceof StructuredValue) return false;
 			
 			isPrimitive |= value instanceof PrimitiveValue;
 		}
@@ -375,7 +385,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 	
 	private Set<AccessExpression> getFilteredRelevantAccessExpressions() {		
-		switch (verbosity) {
+		switch (policy) {
+		case MINIMAL:
 		case NORMAL:
 			Set<AccessExpression> filtered = new HashSet<AccessExpression>();
 		
@@ -427,8 +438,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		
 		if (maximalAccessExpressionLength == 0) return ret;
 		
-		if (value instanceof HeapObject) {
-			HeapObject object = (HeapObject) value;
+		if (value instanceof StructuredObject) {
+			StructuredObject object = (StructuredObject) value;
 			
 			for (String fieldName : object.getFields().keySet()) {
 				for (Value field : object.getField(fieldName).getPossibleValues()) {
@@ -439,8 +450,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			ret.add(prefix);
 		}
 		
-		if (value instanceof HeapArray) {
-			HeapArray array = (HeapArray) value;
+		if (value instanceof StructuredArray) {
+			StructuredArray array = (StructuredArray) value;
 			
 			for (Integer index : array.getElements().keySet()) {
 				for (Value element : array.getElement(index).getPossibleValues()) {
@@ -478,5 +489,32 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		}
 		
 		return ret;
+	}
+
+	public void removeLocals() {
+		for (Root l : locals.keySet()) {
+			LocalVariable local = locals.get(l);
+			
+			local.getSlot().clear();
+		}
+		
+		locals.clear();
+	}
+
+	public void updateUniverse(FlatSymbolTable top) {
+		FlatSymbolTable clone = top.clone();
+		
+		clone.removeLocals();
+		
+		for (Root l : locals.keySet()) {
+			Root lClone = l.clone();
+			LocalVariable lValue = locals.get(l).cloneInto(clone.universe);
+			
+			clone.locals.put(lClone, lValue);
+		}
+		 
+		locals = clone.locals;
+		classes = clone.classes;
+		universe = clone.universe;
 	}
 }

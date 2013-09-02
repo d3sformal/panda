@@ -7,7 +7,6 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.util.RunDetector;
-import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ClassLoaderInfo;
 import gov.nasa.jpf.vm.ClassLoaderList;
 import gov.nasa.jpf.vm.ElementInfo;
@@ -48,9 +47,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		
 		for (ClassLoaderInfo cli : list) {
 			for(ElementInfo c : cli.getStatics()) {
-				if (c.getClassInfo().isInitialized()) {
+				//if (c.getClassInfo().isInitialized()) {
 					ret.addClass(c.getClassInfo().getName(), threadInfo, c);
-				}
+				//}
 			}
 		}
 		
@@ -71,24 +70,19 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
 		
-		FlatSymbolTable transitionScope;
+		FlatSymbolTable transitionScope = createDefaultScope(threadInfo, method);
 		
-		if (scopes.count() == 0) {
-			transitionScope = createDefaultScope(threadInfo, method);
-		} else {
-			transitionScope = scopes.top().clone();
+		if (scopes.count() > 0) {
+			transitionScope.updateUniverse(scopes.top());
 		}
 		
 		scopes.push(transitionScope);
-		
-		//transitionScope.removeLocals();
 		
 		StackFrame sf = threadInfo.getTopFrame();
 		Object attrs[] = sf.getArgumentAttrs(method);
 		LocalVarInfo args[] = method.getArgumentLocalVars();
 
 		if (args != null && attrs != null) {
-			// Skip "this"
 			for (int i = 1; i < args.length; ++i) {
 				Attribute attr = (Attribute) attrs[i];
 				
@@ -117,14 +111,6 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	@Override
 	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
-		
-		// Inform about a new static object
-		if (method.isClinit()) {
-			ClassInfo classInfo = method.getClassInfo();
-			ElementInfo classObject = classInfo.getStaticElementInfo();
-			
-			scopes.top().addClass(classInfo.getName(), threadInfo, classObject);
-		}
 		
 		if (RunDetector.isRunning()) {
 			FlatSymbolTable transitionScope;

@@ -5,7 +5,7 @@ import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 
 public class ClassObject extends Value {
 	private PackageAndClass classObject;
-	private ClassStaticsSlot slot;
+	private StructuredValueSlot slot;
 	
 	protected ClassObject() {
 	}
@@ -13,14 +13,14 @@ public class ClassObject extends Value {
 	public ClassObject(PackageAndClass classObject, ClassStatics value) {
 		this.classObject = classObject;
 		
-		slot = new ClassStaticsSlot(this, classObject.getName(), value);
+		slot = new StructuredValueSlot(this, classObject.getName(), value);
 	}
 	
 	public AccessExpression getAccessExpression() {
 		return classObject;
 	}
 	
-	public ClassStaticsSlot getSlot() {
+	public StructuredValueSlot getSlot() {
 		return slot;
 	}
 	
@@ -34,7 +34,7 @@ public class ClassObject extends Value {
 		ClassObject clone = new ClassObject();
 		
 		clone.classObject = classObject.clone();
-		clone.slot = slot.cloneInto(universe, this);
+		clone.slot = slot.cloneInto(universe, this);		
 		
 		return clone;
 	}

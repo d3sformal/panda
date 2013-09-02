@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HeapObject extends HeapValue implements StructuredObject {
+public class HeapObject extends StructuredValue implements StructuredObject {
 	
 	private Map<String, Slot> fields = new HashMap<String, Slot>();
 
@@ -12,8 +12,8 @@ public class HeapObject extends HeapValue implements StructuredObject {
 	}
 	
 	@Override
-	public void setField(String name, HeapValue... values) {
-		fields.put(name, new HeapValueSlot(this, name, values));
+	public void setField(String name, StructuredValue... values) {
+		fields.put(name, new StructuredValueSlot(this, name, values));
 	}
 	
 	@Override

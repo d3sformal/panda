@@ -12,8 +12,8 @@ public class ClassStatics extends StructuredValue implements StructuredObject {
 	}
 	
 	@Override
-	public void setField(String name, HeapValue... values) {
-		fields.put(name, new HeapValueSlot(this, name, values));
+	public void setField(String name, StructuredValue... values) {
+		fields.put(name, new StructuredValueSlot(this, name, values));
 	}
 	
 	@Override
@@ -57,5 +57,10 @@ public class ClassStatics extends StructuredValue implements StructuredObject {
 		}
 		
 		return clone;
+	}
+	
+	@Override
+	public String toString() {
+		return getReference().toString();
 	}
 }

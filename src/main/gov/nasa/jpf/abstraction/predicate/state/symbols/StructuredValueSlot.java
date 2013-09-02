@@ -5,24 +5,24 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class HeapValueSlot extends Slot {
-	private Set<HeapValue> possibilities = new HashSet<HeapValue>();
+public class StructuredValueSlot extends Slot {
+	private Set<StructuredValue> possibilities = new HashSet<StructuredValue>();
 	
-	public HeapValueSlot(Value parent, Object slotKey, HeapValue... objects) {
+	public StructuredValueSlot(Value parent, Object slotKey, StructuredValue... objects) {
 		this(parent, slotKey, Arrays.asList(objects));
 	}
 	
-	public HeapValueSlot(Value parent, Object slotKey, Collection<HeapValue> objects) {
+	public StructuredValueSlot(Value parent, Object slotKey, Collection<StructuredValue> objects) {
 		super(parent, slotKey);
 		
 		possibilities.addAll(objects);
 		
-		for (HeapValue object : objects) {
+		for (StructuredValue object : objects) {
 			object.addSlot(this);
 		}
 	}
 	
-	public Set<HeapValue> getPossibleHeapValues() {
+	public Set<StructuredValue> getPossibleHeapValues() {
 		return possibilities;
 	}
 	
@@ -36,10 +36,10 @@ public class HeapValueSlot extends Slot {
 	}
 
 	@Override
-	public HeapValueSlot cloneInto(Universe universe, Value parent) {
-		HeapValueSlot clone = new HeapValueSlot(parent, getSlotKey());
+	public StructuredValueSlot cloneInto(Universe universe, Value parent) {
+		StructuredValueSlot clone = new StructuredValueSlot(parent, getSlotKey());
 		
-		for (HeapValue value : possibilities) {
+		for (StructuredValue value : possibilities) {
 			clone.possibilities.add(value.cloneInto(universe, this));
 		}
 		
@@ -48,7 +48,7 @@ public class HeapValueSlot extends Slot {
 	
 	@Override
 	public void clear() {
-		for (HeapValue value : possibilities) {
+		for (StructuredValue value : possibilities) {
 			value.removeSlot(this);
 		}
 		
@@ -59,7 +59,7 @@ public class HeapValueSlot extends Slot {
 	public void add(Set<Value> sources) {
 		for (Value value : sources) {
 			value.addSlot(this);
-			possibilities.add((HeapValue) value);
+			possibilities.add((StructuredValue) value);
 		}
 	}
 	

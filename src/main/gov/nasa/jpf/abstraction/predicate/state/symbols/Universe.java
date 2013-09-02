@@ -46,12 +46,12 @@ public class Universe implements Cloneable {
 		return objects.get(identifier);
 	}
 	
-	public HeapValue get(int reference) {
-		return (HeapValue) objects.get(new HeapObjectReference(reference));
+	public StructuredValue get(int reference) {
+		return objects.get(new HeapObjectReference(reference));
 	}
 	
-	public ClassStatics get(String className) {
-		return (ClassStatics) objects.get(new ClassStaticsReference(className));
+	public StructuredValue get(String className) {
+		return objects.get(new ClassStaticsReference(className));
 	}
 	
 	public void add(StructuredValue value) {
@@ -87,7 +87,7 @@ public class Universe implements Cloneable {
 					
 					ElementInfo subElementInfo = threadInfo.getElementInfo(subRef);
 					
-					array.setElement(i, (HeapValue) add(threadInfo, subElementInfo));
+					array.setElement(i, add(threadInfo, subElementInfo));
 				} else {
 					array.setElement(i, new PrimitiveValue());
 				}
@@ -113,7 +113,7 @@ public class Universe implements Cloneable {
 					
 					ElementInfo subElementInfo = threadInfo.getElementInfo(subRef);
 					
-					object.setField(fieldInfo.getName(), (HeapValue) add(threadInfo, subElementInfo));
+					object.setField(fieldInfo.getName(), add(threadInfo, subElementInfo));
 				} else {
 					object.setField(fieldInfo.getName(), new PrimitiveValue());
 				}
