@@ -24,8 +24,10 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -223,22 +225,22 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		boolean sameObject = before.getThis() == after.getThis();
 		
-		Object[] rawAttrs = before.getArgumentAttrs(before.getMethodInfo());
-		Attribute[] attrs = new Attribute[rawAttrs == null ? 0 : rawAttrs.length];
+		ArrayList<Attribute> attrsList = new ArrayList<Attribute>();
+		
+		Iterator<Object> it = before.getMethodInfo().attrIterator();
+		
+		System.out.print(before.getMethodInfo().getBaseName() + "[" + before.getMethodInfo().getNumberOfStackArguments() + "]: ");
+		while (it.hasNext()) {
+			Attribute attr = (Attribute) it.next();
+			
+			attrsList.add(attr);
+			System.out.print(attr.getExpression() + " ");
+		}
+		System.out.println();
+		
+		Attribute[] attrs = attrsList.toArray(new Attribute[attrsList.size()]);
 		LocalVarInfo[] args = before.getMethodInfo().getArgumentLocalVars() == null ? new LocalVarInfo[0] : before.getMethodInfo().getArgumentLocalVars();
 		LocalVarInfo[] locals = before.getLocalVars() == null ? new LocalVarInfo[0] : before.getLocalVars();
-		
-		//System.out.print("Arguments: ");
-		for (int i = 0; i < attrs.length; ++i) {
-			Attribute attr = (Attribute) rawAttrs[i];
-			
-			if (attr == null) attr = new EmptyAttribute();
-			
-			attrs[i] = attr;
-			
-			//System.out.print(attr.getExpression() + " ");
-		}
-		//System.out.println();
 		
 		Set<LocalVarInfo> referenceArgs = new HashSet<LocalVarInfo>();
 		Set<LocalVarInfo> notWantedLocalVariables = new HashSet<LocalVarInfo>();
@@ -281,7 +283,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			}
 		}
 		
-		/*
+		//*
 		System.out.println();
 		System.out.println();
 		System.out.println();
@@ -291,7 +293,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		System.out.println();
 		System.out.println();
 		System.out.println();
-		*/
+		//*/
 		
 		Set<Predicate> toBeUpdated = new HashSet<Predicate>();
 		

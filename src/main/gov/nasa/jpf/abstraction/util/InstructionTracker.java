@@ -8,9 +8,9 @@ import gov.nasa.jpf.vm.VM;
 public class InstructionTracker extends ListenerAdapter {	
 	@Override
 	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {		
-		if (RunDetector.isRunning()) {
+		//if (RunDetector.isRunning()) {
 			String source = execInsn.getSourceLine() == null ? "" : "'" + execInsn.getSourceLine().trim() + "'";
 			System.out.println(execInsn.getClass().getSimpleName() + "\t" + source);
-		}
+		//}
 	}
 }
