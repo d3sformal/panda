@@ -110,9 +110,11 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			
 			ret.addAll(modifications);
 			
+			/*
 			System.out.println("Objects modified in child scope after return from " + before.getClassName() + "." + before.getMethodName() + ": " + modifications);
 			System.out.println(transitionScope);
 			System.out.println("================================================================");
+			*/
 		}
 		
 		transitionScope.updateUniverse(scopes.top());

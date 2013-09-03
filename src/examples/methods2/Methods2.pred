@@ -1,6 +1,11 @@
-[method methods2.A.do1]
-class(methods2.Methods2).X = 2
-a.b.c.d.e.f = 0
+[method methods2.Methods2.main]
+m1.i = 2
+m2.i = 3
+
+[method methods2.Methods2.do1]
+class(methods2.Methods2).X = 4
+this.i = 2
+x.i = 3
 
 [static]
-class(methods2.Methods2).X = 2
+class(methods2.Methods2).X = 4

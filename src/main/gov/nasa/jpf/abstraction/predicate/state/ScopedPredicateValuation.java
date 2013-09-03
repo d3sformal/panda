@@ -221,65 +221,82 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	
 	@Override
 	public SideEffect processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
+		AffectedAccessExpressions affected = (AffectedAccessExpressions) sideEffect; // MAY BE USED OR NOT ... OVERAPPROXIMATING THIS MAY SAVE A LOT WHEN DETERMINING THE sideEffect SET
 		FlatPredicateValuation scope;
 		
 		scope = scopes.top(1);
 		
 		boolean sameObject = before.getThis() == after.getThis();
 		
-		Iterator<?> attrIt = before.getMethodInfo().attrIterator();
-		List<Attribute> attrs = new ArrayList<Attribute>();
+		Object[] rawAttrs = before.getArgumentAttrs(before.getMethodInfo());
+		Attribute[] attrs = new Attribute[rawAttrs == null ? 0 : rawAttrs.length];
+		LocalVarInfo[] args = before.getMethodInfo().getArgumentLocalVars() == null ? new LocalVarInfo[0] : before.getMethodInfo().getArgumentLocalVars();
+		LocalVarInfo[] locals = before.getLocalVars() == null ? new LocalVarInfo[0] : before.getLocalVars();
 		
-		while (attrIt.hasNext()) {
-			Attribute attr = (Attribute) attrIt.next();
+		//System.out.print("Arguments: ");
+		for (int i = 0; i < attrs.length; ++i) {
+			Attribute attr = (Attribute) rawAttrs[i];
 			
 			if (attr == null) attr = new EmptyAttribute();
 			
-			attrs.add(attr);
+			attrs[i] = attr;
+			
+			//System.out.print(attr.getExpression() + " ");
 		}
+		//System.out.println();
 		
-		Set<Predicate> toBeRemoved = new HashSet<Predicate>();
+		Set<LocalVarInfo> referenceArgs = new HashSet<LocalVarInfo>();
+		Set<LocalVarInfo> notWantedLocalVariables = new HashSet<LocalVarInfo>();
 		
-		// Drop predicates depending on local variables (TODO: not parameters)
-		for (Predicate predicate : getPredicates()) {
-			for (AccessExpression path : predicate.getPaths()) {
-				if (path.isLocalVariable() && !path.isThis()) {
-					toBeRemoved.add(predicate);
-				}
+		for (LocalVarInfo l : args) {
+			if (l != null && !l.isNumeric()) {
+				referenceArgs.add(l);
 			}
 		}
 		
-		// Replace parameter objects by objects from parent scope
-		/*
-		 * A a;
-		 * 
-		 * a.i == 2
-		 * 
-		 * f(c <- a) {
-		 * 
-		 *   c.i = 3;
-		 * 
-		 * }
-		 * 
-		 * a.i != 2
-		 */
-		
-		for (Predicate predicate : toBeRemoved) {
-			remove(predicate);
+		for (LocalVarInfo l : locals) {
+			if (l != null) {
+				notWantedLocalVariables.add(l);
+			}
 		}
+		
+		notWantedLocalVariables.removeAll(referenceArgs);
 		
 		FlatPredicateValuation relevant = new FlatPredicateValuation();
 		
-		// Replace Callee This with expression
 		for (Predicate predicate : getPredicates()) {
-			if (!attrs.isEmpty()) {
-				Attribute thisAttr = attrs.get(0);
-				
-				if (thisAttr.getExpression() != null) {
-					relevant.put(predicate.replace(DefaultRoot.create("this"), thisAttr.getExpression()), get(predicate));
+			TruthValue value = get(predicate);
+			
+			for (int i = 0; i < args.length; ++i) {
+				if (args[i] != null && !args[i].isNumeric()) {
+					predicate = predicate.replace(DefaultRoot.create(args[i].getName()), attrs[i].getExpression());
 				}
 			}
+			
+			boolean isUnwanted = false;
+			
+			for (LocalVarInfo l : notWantedLocalVariables) {
+				for (AccessExpression path : predicate.getPaths()) {
+					isUnwanted |= path.isLocalVariable() && path.getRoot().getName().equals(l.getName());
+				}
+			}
+			
+			if (!isUnwanted) {
+				relevant.put(predicate, value);
+			}
 		}
+		
+		/*
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		
+		System.out.println(relevant.toString());
+		
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		*/
 		
 		Set<Predicate> toBeUpdated = new HashSet<Predicate>();
 		
@@ -291,16 +308,12 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				canBeAffected |= path.getRoot().isThis() && sameObject;
 				canBeAffected |= path.isStatic();
 				
-				for (int i = 0; i < attrs.size(); ++i) {
-					Expression expr = attrs.get(i).getExpression();
+				for (AccessExpression affectedPath : affected) {
+					canBeAffected |= affectedPath.isPrefixOf(path);
 					
-					if (expr instanceof AccessExpression) {
-						AccessExpression ae = (AccessExpression) expr;
-						
-						if (ae.isPrefixOf(path)) {
-							System.out.println("MAY HAVE BEEN UPDATED");
-						}
-					}
+					//if (affectedPath.isPrefixOf(path)) {
+					//	System.out.println("POSSIBLY AFFECTED " + path + " BY POSSIBLE WRITE TO " + affectedPath);
+					//}
 				}
 			}
 			
