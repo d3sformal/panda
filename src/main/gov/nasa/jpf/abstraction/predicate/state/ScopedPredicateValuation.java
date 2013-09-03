@@ -266,7 +266,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			
 			for (int i = 0; i < args.length; ++i) {
 				if (args[i] != null && !args[i].isNumeric()) {
-					predicate = predicate.replace(DefaultRoot.create(args[i].getName()), attrs[i].getExpression());
+					predicate = predicate.replace(DefaultRoot.create(args[i].getName()), attrs[i].getExpression()); //TODO: this does not respect when the parameter variable is overwritten and the predicates at the end do not hold for the original content but something else...
 				}
 			}
 			
@@ -283,7 +283,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			}
 		}
 		
-		//*
+		/*
 		System.out.println();
 		System.out.println();
 		System.out.println();

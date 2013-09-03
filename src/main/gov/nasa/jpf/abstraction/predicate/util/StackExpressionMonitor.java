@@ -22,7 +22,7 @@ public class StackExpressionMonitor extends ListenerAdapter {
 		}
 	}
 
-	private void inspect(StackFrame sf) {
+	public static void inspect(StackFrame sf) {
 		System.out.println("--EXPRESSIONS --");
 		for (int i = 0; i <= (sf.getTopPos() - sf.getLocalVariableCount()); i++)
 		{

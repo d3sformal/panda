@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
+import gov.nasa.jpf.abstraction.predicate.util.StackExpressionMonitor;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -45,8 +46,10 @@ public class INVOKEVIRTUAL extends gov.nasa.jpf.jvm.bytecode.INVOKEVIRTUAL {
 			return actualNextInsn;
 		}
 		
+		after.getMethodInfo().setAttr(null);
+		
 		for (int i = 0; i < after.getMethodInfo().getNumberOfStackArguments(); ++i) {
-			Attribute attr = (Attribute) after.getOperandAttr(i);
+			Attribute attr = (Attribute) before.getOperandAttr(i);
 			
 			if (attr == null) attr = new EmptyAttribute();
 			
