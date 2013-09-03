@@ -43,7 +43,7 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
         
         if (source == null) source = new EmptyAttribute();
         
-        ElementInfo ei = getClassInfo().getStaticElementInfo();
+        ElementInfo ei = getClassInfo().getModifiableStaticElementInfo();
 		ei.setFieldAttr(getFieldInfo(), source);
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
