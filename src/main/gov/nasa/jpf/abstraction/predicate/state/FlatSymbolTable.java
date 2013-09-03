@@ -221,7 +221,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			
 			ret.addAll(valueToAccessExpressions(newValue, getMaximalAccessExpressionLength()));
 		}
-				
+		
 		return ret;
 	}
 	
@@ -233,7 +233,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	// FromTable has to be a subset (ideally equivalent) of this Table
 	// The universes may differ instance-wise (different objects representing the same universe)
 	// FromTable may have a different Locals/Statics sets
-	public Set<AccessExpression> processObjectStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
+	public Set<AccessExpression> processObjectStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {		
 		fromTable.ensureAnonymousObjectExistance(from);
 		
 		ensureAnonymousObjectExistance(from);
@@ -244,9 +244,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		Set<Value> sources = new HashSet<Value>();
 		
 		if (from instanceof AccessExpression) {
-			Set<Value> rawSources = new HashSet<Value>();
-			
-			rawSources = fromTable.lookupValues((AccessExpression) from);
+			Set<Value> rawSources = fromTable.lookupValues((AccessExpression) from);
 			
 			// ASSUME:
 			// 1) Primitive values are never stored directly

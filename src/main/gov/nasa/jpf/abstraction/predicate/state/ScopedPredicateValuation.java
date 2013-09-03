@@ -24,11 +24,8 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,10 +33,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	private PredicateValuationStack scopes = new PredicateValuationStack();
 	private Predicates predicateSet;
 	private Map<Predicate, TruthValue> initialValuation;
-	private PredicateAbstraction abstraction;
 	
 	public ScopedPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
-		this.abstraction = abstraction;
 		this.predicateSet = predicateSet;
 		
 		scopes.push(new FlatPredicateValuation());

@@ -30,15 +30,13 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	public FlatSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
 		FlatSymbolTable ret = new FlatSymbolTable(abstraction);
 		
-		LocalVarInfo[] locals = method.getLocalVars();
+		LocalVarInfo[] locals = method.getLocalVars() == null ? new LocalVarInfo[0] : method.getLocalVars();
 		
-		if (locals != null) {
-			for (LocalVarInfo local : locals) {
-				if (local.isNumeric()) {
-					ret.addPrimitiveLocal(local.getName());
-				} else {
-					ret.addHeapValueLocal(local.getName());
-				}
+		for (LocalVarInfo local : locals) {
+			if (local.isNumeric()) {
+				ret.addPrimitiveLocal(local.getName());
+			} else {
+				ret.addHeapValueLocal(local.getName());
 			}
 		}
 		
@@ -68,8 +66,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		
 		transitionScope.addClass(method.getClassName(), threadInfo, method.getClassInfo().getStaticElementInfo());
 		
-		StackFrame sf = threadInfo.getTopFrame();
-		Object attrs[] = sf.getArgumentAttrs(method);
+		Object attrs[] = before.getArgumentAttrs(method);
 		LocalVarInfo args[] = method.getArgumentLocalVars();
 
 		if (args != null && attrs != null) {
