@@ -3,6 +3,7 @@ package gov.nasa.jpf.abstraction.common.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.ObjectExpression;
@@ -11,9 +12,10 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
-public class NullExpression implements ObjectExpression {
+public class NullExpression extends Constant implements ObjectExpression {
 	
 	protected NullExpression() {
+		super(-1);
 	}
 
 	@Override
@@ -22,7 +24,7 @@ public class NullExpression implements ObjectExpression {
 	}
 
 	@Override
-	public Expression replace(AccessExpression expression, Expression newExpression) {
+	public NullExpression replace(AccessExpression expression, Expression newExpression) {
 		return clone();
 	}
 
@@ -32,7 +34,7 @@ public class NullExpression implements ObjectExpression {
 	}
 
 	@Override
-	public Expression update(AccessExpression expression, Expression newExpression) {
+	public NullExpression update(AccessExpression expression, Expression newExpression) {
 		return clone();
 	}
 

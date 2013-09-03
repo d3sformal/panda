@@ -126,17 +126,13 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+	public SideEffect processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
 		MethodInfo method = after.getMethodInfo();
 		
 		FlatPredicateValuation transitionScope;
 		FlatPredicateValuation finalScope = createDefaultScope(threadInfo, method);
 		
-		if (scopes.count() == 0) {
-			transitionScope = createDefaultScope(threadInfo, method);
-		} else {
-			transitionScope = scopes.top().clone();
-		}
+		transitionScope = scopes.top().clone();
 		
 		Object attrs[] = after.getArgumentAttrs(method);
 		LocalVarInfo args[] = method.getArgumentLocalVars();
@@ -168,6 +164,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		}
 		
 		scopes.push(finalScope);
+		
+		return null;
 	}
 	
 	private static boolean isPredicateOverReturn(Predicate predicate) {
@@ -187,17 +185,13 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+	public SideEffect processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
 		Attribute attr = (Attribute) after.getResultAttr();
 		ReturnValue ret = DefaultReturnValue.create(after.getPC());
 		
 		FlatPredicateValuation scope;
 		
-		if (scopes.count() == 1) {
-			scope = new FlatPredicateValuation();
-		} else {
-			scope = scopes.top(1);
-		}
+		scope = scopes.top(1);
 		
 		if (attr == null) attr = new EmptyAttribute();
 		
@@ -222,18 +216,14 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				
 		after.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), ret));
 		
-		processVoidMethodReturn(threadInfo, before, after);
+		return processVoidMethodReturn(threadInfo, before, after, sideEffect);
 	}
 	
 	@Override
-	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+	public SideEffect processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
 		FlatPredicateValuation scope;
 		
-		if (scopes.count() == 1) {
-			scope = new FlatPredicateValuation();
-		} else {
-			scope = scopes.top(1);
-		}
+		scope = scopes.top(1);
 		
 		boolean sameObject = before.getThis() == after.getThis();
 		
@@ -328,6 +318,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		}
 		
 		scopes.pop();
+		
+		return null;
 	}
 	
 	@Override

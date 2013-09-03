@@ -30,4 +30,12 @@ public class ValueFactory {
 		
 		return (ClassStatics) universe.get(className);
 	}
+
+	public Null createNull() {
+		if (!universe.contains(Universe.NULL)) {
+			universe.add(new Null());
+		}
+		
+		return (Null) universe.get(Universe.NULL);
+	}
 }

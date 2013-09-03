@@ -27,6 +27,22 @@ public class StructuredValueSlot extends Slot {
 	}
 	
 	@Override
+	public boolean equals(Object o) {
+		if (o instanceof StructuredValueSlot) {
+			StructuredValueSlot slot = (StructuredValueSlot) o;
+			
+			return getParent().equals(slot.getParent()) && getSlotKey().equals(slot.getSlotKey());
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return getParent().hashCode() + getSlotKey().hashCode();
+	}
+	
+	@Override
 	public Set<Value> getPossibleValues() {
 		Set<Value> values = new HashSet<Value>();
 		

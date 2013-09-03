@@ -31,6 +31,22 @@ public class LocalVariable extends Value {
 	}
 	
 	@Override
+	public boolean equals(Object o) {
+		if (o instanceof LocalVariable) {
+			LocalVariable l = (LocalVariable) o;
+			
+			return localVariable.equals(l.localVariable);
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return localVariable.hashCode();
+	}
+	
+	@Override
 	public String toString() {
 		return localVariable.getName();
 	}

@@ -189,9 +189,13 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public int count() {
 		return getFilteredRelevantAccessExpressions().size();
 	}
-
+	
 	@Override
 	public Set<AccessExpression> processPrimitiveStore(Expression from, AccessExpression to) {
+		return processPrimitiveStore(from, this, to);
+	}
+
+	public Set<AccessExpression> processPrimitiveStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
 		ensureAnonymousObjectExistance(from);
 		ensureAnonymousObjectExistance(to);
 		
@@ -223,15 +227,43 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	@Override
 	public Set<AccessExpression> processObjectStore(Expression from, AccessExpression to) {
+		return processObjectStore(from, this, to);
+	}
+	
+	// FromTable has to be a subset (ideally equivalent) of this Table
+	// The universes may differ instance-wise (different objects representing the same universe)
+	// FromTable may have a different Locals/Statics sets
+	public Set<AccessExpression> processObjectStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
+		fromTable.ensureAnonymousObjectExistance(from);
+		
 		ensureAnonymousObjectExistance(from);
 		ensureAnonymousObjectExistance(to);
 		
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		Set<Value> destinations = lookupValues(to.cutTail());
-		Set<Value> sources = new HashSet<Value>(); // FALLBACK
+		Set<Value> sources = new HashSet<Value>();
 		
 		if (from instanceof AccessExpression) {
-			sources = lookupValues((AccessExpression) from);
+			Set<Value> rawSources = new HashSet<Value>();
+			
+			rawSources = fromTable.lookupValues((AccessExpression) from);
+			
+			// ASSUME:
+			// 1) Primitive values are never stored directly
+			//    Rather a new incarnation is created
+			// 2) All 'from' objects exist in the source as well as in the destination table
+			//
+			// THE MEANING IS TO ALLOW WRITE FROM ONE SCOPE TO THE OTHER
+			//   -> INVOKE_METHOD(PARAM (scope2) := LOCAL VAR (scope1))
+			for (Value foreign : rawSources) {
+				if (foreign instanceof PrimitiveValue) {
+					sources.add(foreign);
+				} else {
+					StructuredValue structuredForeign = (StructuredValue) foreign;
+
+					sources.add(universe.get(structuredForeign.getReference()));
+				}
+			}
 		}
 		
 		if (from instanceof Constant) {
@@ -239,10 +271,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			Integer reference = referenceConstant.value.intValue();
 			
 			if (universe.contains(reference)) {
-				sources = new HashSet<Value>();
 				sources.add(universe.get(reference));
-			} else {
-				sources = new HashSet<Value>();
 			}
 		}
 		
@@ -515,7 +544,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
 	public void updateUniverse(FlatSymbolTable top) {
 		FlatSymbolTable clone = top.clone();
-		
+				
 		clone.removeLocals();
 		
 		for (Root l : locals.keySet()) {

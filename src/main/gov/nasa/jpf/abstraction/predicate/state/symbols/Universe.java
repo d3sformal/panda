@@ -23,7 +23,7 @@ public class Universe implements Cloneable {
 	public static int NULL = -1;
 	
 	public Universe() {
-		factory.createObject(NULL);
+		factory.createNull();
 	}
 	
 	public ValueFactory getFactory() {

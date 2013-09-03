@@ -25,6 +25,22 @@ public class ClassObject extends Value {
 	}
 	
 	@Override
+	public boolean equals(Object o) {
+		if (o instanceof ClassObject) {
+			ClassObject c = (ClassObject) o;
+			
+			return classObject.equals(c.classObject);
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return classObject.hashCode();
+	}
+	
+	@Override
 	public String toString() {
 		return classObject.getName();
 	}

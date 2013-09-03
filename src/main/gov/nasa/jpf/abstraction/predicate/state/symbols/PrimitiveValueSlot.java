@@ -26,6 +26,22 @@ public class PrimitiveValueSlot extends Slot {
 	public Set<PrimitiveValue> getPossiblePrimitiveValues() {
 		return possibilities;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof PrimitiveValueSlot) {
+			PrimitiveValueSlot slot = (PrimitiveValueSlot) o;
+			
+			return getParent().equals(slot.getParent()) && getSlotKey().equals(slot.getSlotKey());
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return getParent().hashCode() + getSlotKey().hashCode();
+	}
 
 	@Override
 	public Set<Value> getPossibleValues() {

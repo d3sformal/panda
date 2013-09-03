@@ -9,6 +9,7 @@ import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionWrapper;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
+import gov.nasa.jpf.abstraction.predicate.state.AffectedAccessExpressions;
 import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
@@ -47,20 +48,21 @@ public class PredicateAbstraction extends Abstraction {
 	
 	@Override
 	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		symbolTable.processMethodCall(threadInfo, before, after);
-		predicateValuation.processMethodCall(threadInfo, before, after);
+		AffectedAccessExpressions affected = symbolTable.processMethodCall(threadInfo, before, after, null);
+		
+		predicateValuation.processMethodCall(threadInfo, before, after, affected);
 	}
 	
 	@Override
 	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		symbolTable.processMethodReturn(threadInfo, before, after);
-		predicateValuation.processMethodReturn(threadInfo, before, after);
+		AffectedAccessExpressions affected = symbolTable.processMethodReturn(threadInfo, before, after, null);
+		predicateValuation.processMethodReturn(threadInfo, before, after, affected);
 	}
 	
 	@Override
 	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		symbolTable.processVoidMethodReturn(threadInfo, before, after);
-		predicateValuation.processVoidMethodReturn(threadInfo, before, after);
+		AffectedAccessExpressions affected = symbolTable.processVoidMethodReturn(threadInfo, before, after, null);
+		predicateValuation.processVoidMethodReturn(threadInfo, before, after, affected);
 	}
 	
 	@Override

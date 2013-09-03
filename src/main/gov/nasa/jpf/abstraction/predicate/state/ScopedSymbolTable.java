@@ -56,20 +56,17 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 	
 	@Override
-	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+	public AffectedAccessExpressions processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
 		MethodInfo method = after.getMethodInfo();
 		
+		FlatSymbolTable originalScope = scopes.top();
 		FlatSymbolTable transitionScope = createDefaultScope(threadInfo, method);
 		
-		if (scopes.count() > 0) {
-			transitionScope.updateUniverse(scopes.top());
-		}
+		transitionScope.updateUniverse(scopes.top());
 		
 		scopes.push(transitionScope);
 		
-		if (method.isClinit()) {
-			scopes.top().addClass(method.getClassName(), threadInfo, method.getClassInfo().getStaticElementInfo());
-		}
+		transitionScope.addClass(method.getClassName(), threadInfo, method.getClassInfo().getStaticElementInfo());
 		
 		StackFrame sf = threadInfo.getTopFrame();
 		Object attrs[] = sf.getArgumentAttrs(method);
@@ -81,45 +78,48 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 				
 				if (attr == null) attr = new EmptyAttribute();
 				
-				if (args[i] != null) {
+				if (args[i] != null) {					
 					if (args[i].isNumeric()) {
 						// Assign to numeric (primitive) arg
-						processPrimitiveStore(attr.getExpression(), DefaultRoot.create(args[i].getName()));
+						transitionScope.processPrimitiveStore(attr.getExpression(), originalScope, DefaultRoot.create(args[i].getName()));
 					} else {						
 						// Assign to object arg
-						processObjectStore(attr.getExpression(), DefaultRoot.create(args[i].getName()));
+						transitionScope.processObjectStore(attr.getExpression(), originalScope, DefaultRoot.create(args[i].getName()));
 					}
 				}
 			}
 		}
+		
+		return null;
 	}
 	
 	@Override
-	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		processVoidMethodReturn(threadInfo, before, after);
+	public AffectedAccessExpressions processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
+		return processVoidMethodReturn(threadInfo, before, after, sideEffect);
 	}
 	
 	@Override
-	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+	public AffectedAccessExpressions processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
+		AffectedAccessExpressions ret = new AffectedAccessExpressions();
 		MethodInfo method = after.getMethodInfo();
 		
-		FlatSymbolTable transitionScope;
-		
-		if (scopes.count() == 1) {
-			transitionScope = createDefaultScope(threadInfo, method);
-		} else {
-			transitionScope = scopes.top(1);
-		}
+		FlatSymbolTable transitionScope = scopes.top(1);
 		
 		if (RunDetector.isRunning()) {			
 			Set<AccessExpression> modifications = transitionScope.getModifiedObjectAccessExpressions(scopes.top());
 			
-			System.out.println("Objects modified in child scope after return from " + before.getMethodName() + ": " + modifications);
+			ret.addAll(modifications);
+			
+			System.out.println("Objects modified in child scope after return from " + before.getClassName() + "." + before.getMethodName() + ": " + modifications);
+			System.out.println(transitionScope);
+			System.out.println("================================================================");
 		}
 		
 		transitionScope.updateUniverse(scopes.top());
 		
 		scopes.pop();
+		
+		return ret;
 	}
 	
 	@Override
