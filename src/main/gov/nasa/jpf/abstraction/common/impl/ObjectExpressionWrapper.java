@@ -6,7 +6,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ObjectExpression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
 
@@ -25,6 +25,13 @@ public class ObjectExpressionWrapper extends DefaultObjectExpression {
 		if (expression instanceof AccessExpression) {
 			AccessExpression path = (AccessExpression) expression;
 			
+			if (path instanceof ReturnValue) {
+				ReturnValue r = (ReturnValue) path;
+				
+				if (r.isReference()) {
+					return ObjectExpressionWrapper.create(path);
+				}
+			}
 			if (symbols.isObject(path)) {
 				if (symbols.isArray(path)) {
 					return ArrayExpressionWrapper.create(path);

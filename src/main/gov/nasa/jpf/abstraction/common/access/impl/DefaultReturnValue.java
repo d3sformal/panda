@@ -5,20 +5,29 @@ import gov.nasa.jpf.vm.Instruction;
 
 public class DefaultReturnValue extends DefaultRoot implements ReturnValue {
 	
+	private boolean isReference = false;
+	
 	protected DefaultReturnValue() {
 		super("return");
 	}
 	
-	protected DefaultReturnValue(Instruction pc) {
+	protected DefaultReturnValue(Instruction pc, boolean isReference) {
 		super("return_pc" + pc.getInstructionIndex());
+		
+		this.isReference = isReference;
 	}
 	
 	public static DefaultReturnValue create() {
 		return new DefaultReturnValue();
 	}
 	
-	public static DefaultReturnValue create(Instruction pc) {
-		return new DefaultReturnValue(pc);
+	public static DefaultReturnValue create(Instruction pc, boolean isReference) {
+		return new DefaultReturnValue(pc, isReference);
+	}
+	
+	@Override
+	public boolean isReference() {
+		return isReference;
 	}
 	
 	@Override
