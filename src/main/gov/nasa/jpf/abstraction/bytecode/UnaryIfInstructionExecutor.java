@@ -10,6 +10,7 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
+import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
@@ -87,6 +88,12 @@ public class UnaryIfInstructionExecutor {
 			assert (cg instanceof AbstractChoiceGenerator) : "expected AbstractChoiceGenerator, got: " + cg;
 			
 			conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
+			
+			if (expr != null) {
+				Predicate predicate = br.createPredicate(expr, Constant.create(0));
+			
+				GlobalAbstraction.getInstance().forceValuation(predicate, TruthValue.create(conditionValue));
+			}
 		}
 
 		System.out.println(name + "> Result: " + conditionValue);
