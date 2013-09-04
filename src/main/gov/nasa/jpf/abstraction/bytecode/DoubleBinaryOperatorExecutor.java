@@ -35,22 +35,22 @@ public class DoubleBinaryOperatorExecutor extends BinaryOperatorExecutor<Double>
 
 	@Override
 	protected Attribute getLeftAttribute(StackFrame sf) {
-		return getAttribute(sf, 1);
-	}
-
-	@Override
-	protected Attribute getRightAttribute(StackFrame sf) {
 		return getAttribute(sf, 3);
 	}
 
 	@Override
+	protected Attribute getRightAttribute(StackFrame sf) {
+		return getAttribute(sf, 1);
+	}
+
+	@Override
 	final protected Double getLeftOperand(StackFrame sf) {
-		return sf.peekDouble(0);
+		return sf.peekDouble(2);
 	}
 
 	@Override
 	final protected Double getRightOperand(StackFrame sf) {
-		return sf.peekDouble(2);
+		return sf.peekDouble(0);
 	}
 	
 	@Override

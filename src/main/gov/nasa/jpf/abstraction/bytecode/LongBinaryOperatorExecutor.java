@@ -35,22 +35,22 @@ public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
 	
 	@Override
 	protected Attribute getLeftAttribute(StackFrame sf) {
-		return getAttribute(sf, 1);
-	}
-
-	@Override
-	protected Attribute getRightAttribute(StackFrame sf) {
 		return getAttribute(sf, 3);
 	}
 
 	@Override
+	protected Attribute getRightAttribute(StackFrame sf) {
+		return getAttribute(sf, 1);
+	}
+
+	@Override
 	protected Long getLeftOperand(StackFrame sf) {
-		return sf.peekLong(0);
+		return sf.peekLong(2);
 	}
 
 	@Override
 	protected Long getRightOperand(StackFrame sf) {
-		return sf.peekLong(2);
+		return sf.peekLong(0);
 	}
 	
 	@Override

@@ -35,22 +35,22 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
 	
 	@Override
 	protected Attribute getLeftAttribute(StackFrame sf) {
-		return getAttribute(sf, 0);
-	}
-
-	@Override
-	protected Attribute getRightAttribute(StackFrame sf) {
 		return getAttribute(sf, 1);
 	}
 
 	@Override
+	protected Attribute getRightAttribute(StackFrame sf) {
+		return getAttribute(sf, 0);
+	}
+
+	@Override
 	protected Integer getLeftOperand(StackFrame sf) {
-		return sf.peek(0);
+		return sf.peek(1);
 	}
 
 	@Override
 	protected Integer getRightOperand(StackFrame sf) {
-		return sf.peek(1);
+		return sf.peek(0);
 	}
 	
 	@Override

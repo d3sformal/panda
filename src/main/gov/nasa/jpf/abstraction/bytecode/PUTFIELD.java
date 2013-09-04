@@ -46,7 +46,7 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		
 		//System.out.println(">>>> " + sf.peek(1) + " " + ti.getElementInfo(sf.peek(1))); // IF sf.peek(1) == -1 THEN FOUND ERROR "null object"
 		
-		ElementInfo ei = ti.getElementInfo(sf.peek(1));
+		ElementInfo ei = ti.getModifiableElementInfo(sf.peek(1));
 		ei.setFieldAttr(getFieldInfo(), source);
 		
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
