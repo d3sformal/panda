@@ -1,0 +1,11 @@
+@using=jpf-abstraction
+
+target=paper.Paper
+
+classpath=${jpf-abstraction}/build/examples
+sourcepath=${jpf-abstraction}/src/examples
+
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/paper/Paper.pred
+abstract.branch.reevaluate_predicates=true
+
+listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor

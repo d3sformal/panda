@@ -1,0 +1,7 @@
+[method paper.X.<init>]
+this.x = 42
+
+[method paper.Paper.main]
+x.x > 0
+i = x.x
+x.x < i
