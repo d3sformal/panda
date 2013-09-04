@@ -138,7 +138,17 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		transitionScope = scopes.top().clone();
 		
-		Object attrs[] = after.getArgumentAttrs(method);
+		ArrayList<Attribute> attrsList = new ArrayList<Attribute>();
+		
+		Iterator<Object> it = after.getMethodInfo().attrIterator();
+		
+		while (it.hasNext()) {
+			Attribute attr = (Attribute) it.next();
+			
+			attrsList.add(attr);
+		}
+		
+		Attribute[] attrs = attrsList.toArray(new Attribute[attrsList.size()]);
 		LocalVarInfo args[] = method.getArgumentLocalVars();
 		
 		Map<Predicate, Predicate> replacements = new HashMap<Predicate, Predicate>();
@@ -148,11 +158,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				Predicate replaced = predicate;
 				
 				for (int i = 1; i < args.length; ++i) {
-					Attribute attr = (Attribute) attrs[i];
-					
-					if (attr == null) attr = new EmptyAttribute();
-					
-					if (args[i] != null) {
+					Attribute attr = attrs[i];
+										
+					if (args[i] != null && attr.getExpression() != null) {
 						replaced = replaced.replace(DefaultAccessExpression.createFromString(args[i].getName()), attr.getExpression());
 					}
 				}
@@ -191,7 +199,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	@Override
 	public SideEffect processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
 		Attribute attr = (Attribute) after.getResultAttr();
-		ReturnValue ret = DefaultReturnValue.create(after.getPC());
+		ReturnValue ret = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
 		
 		FlatPredicateValuation scope;
 		
@@ -236,14 +244,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		Iterator<Object> it = before.getMethodInfo().attrIterator();
 		
-		System.out.print(before.getMethodInfo().getBaseName() + "[" + before.getMethodInfo().getNumberOfStackArguments() + "]: ");
 		while (it.hasNext()) {
 			Attribute attr = (Attribute) it.next();
 			
 			attrsList.add(attr);
-			System.out.print(attr.getExpression() + " ");
 		}
-		System.out.println();
 		
 		Attribute[] attrs = attrsList.toArray(new Attribute[attrsList.size()]);
 		LocalVarInfo[] args = before.getMethodInfo().getArgumentLocalVars() == null ? new LocalVarInfo[0] : before.getMethodInfo().getArgumentLocalVars();
