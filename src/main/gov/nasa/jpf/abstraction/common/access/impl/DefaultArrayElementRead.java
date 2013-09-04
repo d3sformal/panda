@@ -92,10 +92,12 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	public Expression update(AccessExpression expression, Expression newExpression) {
 		Expression updated = getArray().update(expression, newExpression);
 		
+		/*
 		if (updated instanceof AnonymousExpression) {
 			// Enclosing object replaced by a new object
 			updated = DefaultFresh.create();
 		}
+		*/
 		
 		if (expression instanceof ArrayExpression) {
 			ArrayAccessExpression a = (ArrayAccessExpression) expression;

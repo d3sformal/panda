@@ -8,6 +8,7 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
@@ -110,6 +111,12 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	@Override
 	public void put(Predicate predicate, TruthValue value) {
 		scopes.top().put(predicate, value);
+	}
+	
+
+	@Override
+	public void putAll(Map<Predicate, TruthValue> values) {
+		scopes.top().putAll(values);
 	}
 	
 	@Override
@@ -264,9 +271,13 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		for (Predicate predicate : getPredicates()) {
 			TruthValue value = get(predicate);
 			
+			boolean isAnonymous = false;
+			
 			for (int i = 0; i < args.length; ++i) {
 				if (args[i] != null && !args[i].isNumeric()) {
 					predicate = predicate.replace(DefaultRoot.create(args[i].getName()), attrs[i].getExpression()); //TODO: this does not respect when the parameter variable is overwritten and the predicates at the end do not hold for the original content but something else...
+					
+					isAnonymous |= attrs[i].getExpression() instanceof AnonymousExpression;
 				}
 			}
 			
@@ -280,9 +291,13 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			
 			if (!isUnwanted) {
 				relevant.put(predicate, value);
+				
+				if (isAnonymous) {
+					scope.put(predicate, value);
+				}
 			}
 		}
-		
+				
 		/*
 		System.out.println();
 		System.out.println();

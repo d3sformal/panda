@@ -9,6 +9,7 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 public interface PredicateValuation {
 	public void put(Predicate predicate, TruthValue value);
+	public void putAll(Map<Predicate, TruthValue> values);
 	public void remove(Predicate predicate);
 	public boolean containsKey(Predicate predicate);
 	public TruthValue get(Predicate predicate);

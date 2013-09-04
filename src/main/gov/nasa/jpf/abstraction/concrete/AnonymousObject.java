@@ -93,6 +93,12 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 
 	@Override
 	public boolean isSimilarTo(AccessExpression expression) {
+		if (expression instanceof AnonymousObject) {
+			AnonymousObject o = (AnonymousObject) expression;
+			
+			return getReference().equals(o.getReference());
+		}
+		
 		return false;
 	}
 

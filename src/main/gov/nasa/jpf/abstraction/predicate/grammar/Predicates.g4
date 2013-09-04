@@ -47,6 +47,12 @@ context returns [Context val] locals [List<String> name = new LinkedList<String>
 		
 		$ctx.val = new MethodContext(method, $ps.val);
 	}
+	| '[' 'method' ( pkg=ID {$ctx.name.add($pkg.text);} '.' ) * c=ID {$ctx.name.add($c.text);} '.' m=INIT ']' ps=predicatelist {		
+		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
+		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
+		
+		$ctx.val = new MethodContext(method, $ps.val);
+	}
 	;
 
 predicatelist returns [List<Predicate> val]
@@ -169,7 +175,11 @@ CONSTANT
 ID
 	: [a-zA-Z_][a-zA-Z0-9_]*
 	;
-
+	
+INIT
+	: '<init>'
+	;
+	
 WS
 	: ([ \t\n])+ { skip(); }
 	;

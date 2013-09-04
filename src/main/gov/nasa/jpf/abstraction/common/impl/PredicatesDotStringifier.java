@@ -131,12 +131,12 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 
 	@Override
 	public void visit(AnonymousObject expression) {
-		ret += "object";
+		ret += "object(" + expression.getReference() + ")";
 	}
 
 	@Override
 	public void visit(AnonymousArray expression) {
-		ret += "array";
+		ret += "array(" + expression.getReference() + ")";
 	}
 
 	@Override

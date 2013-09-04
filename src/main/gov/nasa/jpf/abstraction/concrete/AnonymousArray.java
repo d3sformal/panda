@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.concrete;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
 public class AnonymousArray extends AnonymousObject {
 	
@@ -25,6 +26,17 @@ public class AnonymousArray extends AnonymousObject {
 	@Override
 	public AnonymousArray clone() {
 		return create(getReference(), length);
+	}
+	
+	@Override
+	public boolean isSimilarTo(AccessExpression expression) {
+		if (expression instanceof AnonymousArray) {
+			AnonymousArray o = (AnonymousArray) expression;
+			
+			return getReference().equals(o.getReference());
+		}
+		
+		return false;
 	}
 	
 	public static AnonymousArray create(Reference reference, Expression length) {

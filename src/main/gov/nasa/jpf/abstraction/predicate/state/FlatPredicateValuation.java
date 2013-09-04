@@ -83,6 +83,13 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	}
 	
 	@Override
+	public void putAll(Map<Predicate, TruthValue> values) {
+		for (Predicate predicate : values.keySet()) {
+			put(predicate, values.get(predicate));
+		}
+	}
+	
+	@Override
 	public void remove(Predicate predicate) {
 		valuations.remove(predicate);
 	}

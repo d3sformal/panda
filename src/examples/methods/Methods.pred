@@ -4,8 +4,12 @@ class(methods.Methods).C = 2
 [object methods.Methods]
 this.b >= 6
 
+[method methods.Methods.<init>]
+this.a = 7
+
 [method methods.Methods.main]
 m.a = 1
+m.a = 7
 
 [method methods.Methods.do1]
 this.a = 1

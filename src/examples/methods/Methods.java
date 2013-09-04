@@ -7,6 +7,10 @@ public class Methods {
 	int x;
 	static int C = 2; //WONT WORK ... static <init> returns -> drops all info
 	
+	public Methods() {
+		a = 7;
+	}
+	
 	public void do1() {
 		int c = 2;
 		
@@ -25,7 +29,9 @@ public class Methods {
 	public static void main(String[] args) {
 		C = 2; //SHOULD WORK INSTEAD OF STATIC INIT
 		
-		Methods m = new Methods();
+		Methods m = new Methods(); // {a = 1;}
+		
+		// m.a = 1;
 		
 		m.do1();
 	}
