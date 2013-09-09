@@ -32,6 +32,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import sun.org.mozilla.javascript.ast.EmptyExpression;
+
 public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	private PredicateValuationStack scopes = new PredicateValuationStack();
 	private Predicates predicateSet;
@@ -257,12 +259,36 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		Set<LocalVarInfo> referenceArgs = new HashSet<LocalVarInfo>();
 		Set<LocalVarInfo> notWantedLocalVariables = new HashSet<LocalVarInfo>();
 		
-		for (LocalVarInfo l : args) {
-			if (l != null && !l.isNumeric()) {
-				referenceArgs.add(l);
+		for (int i = 0; i < args.length; ++i) {
+			LocalVarInfo l = args[i];
+			
+			if (l != null) {
+				
+				if (!l.isNumeric()) {
+					referenceArgs.add(l);
+				}
+			
+				Attribute actualAttribute = (Attribute) before.getLocalAttr(l.getSlotIndex());
+				
+				if (actualAttribute == null) actualAttribute = new EmptyAttribute();
+				
+				Expression originalExpr = attrs[i].getExpression();
+				Expression actuaExpr = actualAttribute.getExpression();
+				
+				boolean different = false;
+				
+				different |= originalExpr == null && actuaExpr != null;
+				different |= originalExpr != null && actuaExpr == null;
+				different |= originalExpr != null && actuaExpr != null && !originalExpr.equals(actuaExpr);
+				
+				// Someone has changed the argument, we cannot use predicates about it to infer information about the original value supplied by the caller
+				if (different) {
+					notWantedLocalVariables.add(l);
+				}
 			}
 		}
 		
+		// Local variables are out of scope
 		for (LocalVarInfo l : locals) {
 			if (l != null) {
 				notWantedLocalVariables.add(l);
@@ -273,6 +299,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		FlatPredicateValuation relevant = new FlatPredicateValuation();
 		
+		// Filter out predicates from the callee that cannot be used for propagation to the caller 
 		for (Predicate predicate : getPredicates()) {
 			TruthValue value = get(predicate);
 			
@@ -297,6 +324,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			if (!isUnwanted) {
 				relevant.put(predicate, value);
 				
+				// Handling mainly constructor (object still anonymous) 
 				if (isAnonymous) {
 					scope.put(predicate, value);
 				}
