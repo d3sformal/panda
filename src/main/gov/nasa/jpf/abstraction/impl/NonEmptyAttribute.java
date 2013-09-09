@@ -4,7 +4,7 @@ import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.Expression;
 
-public class NonEmptyAttribute implements Attribute {
+public class NonEmptyAttribute extends Attribute {
 	public AbstractValue abstractValue;
 	public Expression expression;
 	

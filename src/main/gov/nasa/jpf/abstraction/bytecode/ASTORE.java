@@ -42,7 +42,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		LocalVarInfo var = getLocalVarInfo();
         Attribute source = (Attribute) sf.getOperandAttr(0);
         
-        if (source == null) source = new EmptyAttribute();
+        source = Attribute.ensureNotNull(source);
 
 		Instruction actualNextInsn = super.execute(ti);
 		

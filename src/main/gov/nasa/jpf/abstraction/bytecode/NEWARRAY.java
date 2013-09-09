@@ -21,7 +21,7 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
 		StackFrame sf = ti.getTopFrame();
 		Attribute attr = (Attribute) sf.getOperandAttr();
 		
-		if (attr == null) attr = new EmptyAttribute();
+		attr = Attribute.ensureNotNull(attr);
 		
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 

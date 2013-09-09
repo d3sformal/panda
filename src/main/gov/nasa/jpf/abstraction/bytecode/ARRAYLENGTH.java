@@ -16,7 +16,7 @@ public class ARRAYLENGTH extends gov.nasa.jpf.jvm.bytecode.ARRAYLENGTH {
 		
 		Attribute attr = (Attribute) sf.getOperandAttr();
 		
-		if (attr == null) attr = new EmptyAttribute();
+		attr = Attribute.ensureNotNull(attr);
 		
 		AccessExpression path = null;
 		

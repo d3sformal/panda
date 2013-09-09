@@ -41,7 +41,7 @@ public abstract class UnaryOperatorExecutor<T> {
 
 		AbstractValue abs_v = null;
 		
-		if (attr == null) attr = new EmptyAttribute();
+		attr = Attribute.ensureNotNull(attr);
 		
 		abs_v = attr.getAbstractValue();
 		

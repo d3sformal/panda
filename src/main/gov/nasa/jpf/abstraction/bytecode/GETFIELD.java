@@ -38,7 +38,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 		StackFrame sf = ti.getTopFrame();
 		Attribute attr = (Attribute) sf.getOperandAttr(0);
 		
-		if (attr == null) attr = new EmptyAttribute();
+		attr = Attribute.ensureNotNull(attr);
 		
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 

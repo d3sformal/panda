@@ -207,7 +207,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		scope = scopes.top(1);
 		
-		if (attr == null) attr = new EmptyAttribute();
+		attr = Attribute.ensureNotNull(attr);
 		
 		Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
 		Set<Predicate> determinants = new HashSet<Predicate>();
@@ -270,7 +270,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			
 				Attribute actualAttribute = (Attribute) before.getLocalAttr(l.getSlotIndex());
 				
-				if (actualAttribute == null) actualAttribute = new EmptyAttribute();
+				actualAttribute = Attribute.ensureNotNull(actualAttribute);
 				
 				Expression originalExpr = attrs[i].getExpression();
 				Expression actuaExpr = actualAttribute.getExpression();

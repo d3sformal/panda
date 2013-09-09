@@ -23,7 +23,7 @@ public class ISTORE extends gov.nasa.jpf.jvm.bytecode.ISTORE {
 		LocalVarInfo var = getLocalVarInfo();		
         Attribute source = (Attribute) sf.getOperandAttr(0);
         
-        if (source == null) source = new EmptyAttribute();
+        source = Attribute.ensureNotNull(source);
 
 		Instruction actualNextInsn = super.execute(ti);
         

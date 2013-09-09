@@ -73,7 +73,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			for (int i = 0; i < args.length; ++i) {
 				Attribute attr = (Attribute) attrs[i];
 				
-				if (attr == null) attr = new EmptyAttribute();
+				attr = Attribute.ensureNotNull(attr);
 				
 				if (args[i] != null) {					
 					if (args[i].isNumeric()) {

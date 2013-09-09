@@ -37,9 +37,9 @@ public class CASTORE extends gov.nasa.jpf.jvm.bytecode.CASTORE {
 		Attribute index = (Attribute) sf.getOperandAttr(1);
 		Attribute destination = (Attribute) sf.getOperandAttr(2);
 		
-		if (source == null) source = new EmptyAttribute();
-		if (index == null) index = new EmptyAttribute();
-		if (destination == null) destination = new EmptyAttribute();
+		source = Attribute.ensureNotNull(source);
+		index = Attribute.ensureNotNull(index);
+		destination = Attribute.ensureNotNull(destination);
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 

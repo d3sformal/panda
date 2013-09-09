@@ -35,8 +35,8 @@ public class LALOAD extends gov.nasa.jpf.jvm.bytecode.LALOAD {
 		Attribute arrayAttr = (Attribute) sf.getOperandAttr(1);
 		Attribute indexAttr = (Attribute) sf.getOperandAttr(0);
 		
-		if (arrayAttr == null) arrayAttr = new EmptyAttribute();
-		if (indexAttr == null) arrayAttr = new EmptyAttribute();
+		arrayAttr = Attribute.ensureNotNull(arrayAttr);
+		indexAttr = Attribute.ensureNotNull(indexAttr);
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 

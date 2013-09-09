@@ -55,7 +55,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 		StackFrame sf = ti.getModifiableTopFrame();
 		Attribute attr = (Attribute) sf.getOperandAttr(0);
 		
-		if (attr == null) attr = new EmptyAttribute();
+		attr = Attribute.ensureNotNull(attr);
 		
 		AbstractValue abs_v = attr.getAbstractValue();
 		Expression expr = attr.getExpression();

@@ -23,7 +23,7 @@ public class LSTORE extends gov.nasa.jpf.jvm.bytecode.LSTORE {
 		LocalVarInfo var = getLocalVarInfo();		
         Attribute source = (Attribute) sf.getOperandAttr(1);
         
-        if (source == null) source = new EmptyAttribute();
+        source = Attribute.ensureNotNull(source);
 
 		Instruction actualNextInsn = super.execute(ti);
         

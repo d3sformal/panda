@@ -4,7 +4,7 @@ import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.Expression;
 
-public class EmptyAttribute implements Attribute {
+public class EmptyAttribute extends Attribute {
 
 	@Override
 	public AbstractValue getAbstractValue() {

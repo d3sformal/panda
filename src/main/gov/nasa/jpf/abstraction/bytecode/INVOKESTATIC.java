@@ -50,7 +50,7 @@ public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
 		for (int i = 0; i < after.getMethodInfo().getNumberOfStackArguments(); ++i) {
 			Attribute attr = (Attribute) before.getOperandAttr(i);
 			
-			if (attr == null) attr = new EmptyAttribute();
+			attr = Attribute.ensureNotNull(attr);
 			
 			after.getMethodInfo().addAttr(attr);
 		}

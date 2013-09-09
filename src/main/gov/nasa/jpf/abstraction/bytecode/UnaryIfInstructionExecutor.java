@@ -28,7 +28,7 @@ public class UnaryIfInstructionExecutor {
 		StackFrame sf = ti.getModifiableTopFrame();
 		Attribute attr = (Attribute) sf.getOperandAttr();
 		
-		if (attr == null) attr = new EmptyAttribute();
+		attr = Attribute.ensureNotNull(attr);
 
 		AbstractValue abs_v = attr.getAbstractValue();
 		Expression expr = attr.getExpression();

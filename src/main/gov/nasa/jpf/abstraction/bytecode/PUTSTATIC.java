@@ -41,7 +41,7 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 		StackFrame sf = ti.getTopFrame();
         Attribute source = (Attribute) sf.getOperandAttr(0);
         
-        if (source == null) source = new EmptyAttribute();
+        source = Attribute.ensureNotNull(source);
         
         ElementInfo ei = getClassInfo().getModifiableStaticElementInfo();
 		ei.setFieldAttr(getFieldInfo(), source);

@@ -51,8 +51,8 @@ public abstract class BinaryComparatorExecutor<T> {
 		Attribute attr1 = getLeftAttribute(sf);
 		Attribute attr2 = getRightAttribute(sf);
 		
-		if (attr1 == null) attr1 = new EmptyAttribute();
-		if (attr2 == null) attr2 = new EmptyAttribute();
+		attr1 = Attribute.ensureNotNull(attr1);
+		attr2 = Attribute.ensureNotNull(attr2);
 		
 		AbstractValue abs_v1 = attr1.getAbstractValue();
 		AbstractValue abs_v2 = attr2.getAbstractValue();
