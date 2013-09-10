@@ -31,6 +31,9 @@ import gov.nasa.jpf.vm.Instruction;
  */
 public class FCMPG extends gov.nasa.jpf.jvm.bytecode.FCMPG implements AbstractBinaryOperator<Float> {
 
+    /**
+     * Common implementation of choice generation etc.
+     */
 	FloatComparatorExecutor executor = FloatComparatorExecutor.getInstance();
 	
 	@Override

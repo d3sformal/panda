@@ -28,6 +28,9 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Implementation of binary operations regardless their concrete type.
+ */
 public abstract class BinaryOperatorExecutor<T> {
 
 	final public Instruction execute(AbstractBinaryOperator<T> op, ThreadInfo ti) {

@@ -3,6 +3,9 @@ package gov.nasa.jpf.abstraction.common;
 import gov.nasa.jpf.abstraction.common.impl.PredicatesDotStringifier;
 import gov.nasa.jpf.abstraction.common.impl.PredicatesFunctionStringifier;
 
+/**
+ * Notation types for printing predicates.
+ */
 public enum Notation {
 	DOT_NOTATION,
 	FUNCTION_NOTATION;

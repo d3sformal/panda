@@ -9,6 +9,9 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Retrieves the lenght of an array
+ */
 public class ARRAYLENGTH extends gov.nasa.jpf.jvm.bytecode.ARRAYLENGTH {
 	@Override
 	public Instruction execute(ThreadInfo ti) {
@@ -27,6 +30,9 @@ public class ARRAYLENGTH extends gov.nasa.jpf.jvm.bytecode.ARRAYLENGTH {
 		
 		Instruction ret = super.execute(ti);
 		
+        /**
+         * Store the symbolic value for predicate abstraction purposes
+         */
 		sf = ti.getModifiableTopFrame();
 		sf.addOperandAttr(new NonEmptyAttribute(null, path));
 		

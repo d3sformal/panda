@@ -27,6 +27,10 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Loads a value of a field of an object (identified by objRef) onto the stack
+ * A common instruction for all types of fields (primitive, reference)
+ */
 public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 	
 	public GETFIELD(String fieldName, String classType, String fieldDescriptor) {
@@ -44,6 +48,9 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 
 		Instruction actualNextInsn = super.execute(ti);
 		
+        /**
+         * In case the instruction did not finish correctly do not add any symbols to the stack value
+         */
 		if (JPFInstructionAdaptor.testFieldInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}

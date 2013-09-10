@@ -7,6 +7,9 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * AbstractBranching defines an interface for all IF instructions
+ */
 public interface AbstractBranching {
 
 	public Instruction executeConcrete(ThreadInfo ti);

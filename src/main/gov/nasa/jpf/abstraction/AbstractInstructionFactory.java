@@ -36,8 +36,12 @@ import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstractionFactory;
 import gov.nasa.jpf.util.ClassInfoFilter;
 
-public class AbstractInstructionFactory extends
-		gov.nasa.jpf.jvm.bytecode.InstructionFactory {
+/**
+ * Ensures interpretations of non-standard instructions respecting the selected abstractions.
+ *
+ * Also ensures construction of the appropriate abstractions at the start of JPF according .jpf file.
+ */
+public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.InstructionFactory {
 
 	ClassInfo ci;
 

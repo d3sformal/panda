@@ -23,6 +23,9 @@ import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Interface for all the CMP instructions
+ */
 public interface AbstractBinaryOperator<T> {
 	public Instruction executeConcrete(ThreadInfo ti);
 	

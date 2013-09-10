@@ -11,6 +11,11 @@ import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
 
+/**
+ * Represents a freshly allocated object (freshly allocated = not loaded from a variable)
+ *
+ * A copy of the object reference (created by DUP instruction) may have been stored.
+ */
 public class AnonymousObject extends DefaultAccessExpression implements Root, AnonymousExpression {
 	
 	private Reference reference;

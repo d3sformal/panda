@@ -4,6 +4,9 @@ import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.Expression;
 
+/**
+ * Special implementation of an attribute. For those circumstances when there is no better alternative.
+ */
 public class EmptyAttribute extends Attribute {
 
 	@Override

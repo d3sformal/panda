@@ -17,6 +17,9 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Implementation of all binary IF instructions regardless their precise type.
+ */
 public class BinaryIfInstructionExecutor {
 
 	final public Instruction execute(AbstractBranching br, ThreadInfo ti) {

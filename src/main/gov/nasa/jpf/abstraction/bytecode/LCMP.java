@@ -31,6 +31,9 @@ import gov.nasa.jpf.vm.Instruction;
  */
 public class LCMP extends gov.nasa.jpf.jvm.bytecode.LCMP implements AbstractBinaryOperator<Long> {
 
+    /**
+     * The handling of choice generation on ambiguous comparison results and other common code for all similar instructions
+     */
 	LongComparatorExecutor executor = LongComparatorExecutor.getInstance();
 	
 	@Override

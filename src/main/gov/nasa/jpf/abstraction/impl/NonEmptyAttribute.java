@@ -4,6 +4,12 @@ import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.Expression;
 
+/**
+ * An attribute that should define abstractValue and expression.
+ *
+ * anstractValue ... used by numeric abstractions
+ * expression ... used by predicate abstraction (symbolic execution)
+ */
 public class NonEmptyAttribute extends Attribute {
 	public AbstractValue abstractValue;
 	public Expression expression;

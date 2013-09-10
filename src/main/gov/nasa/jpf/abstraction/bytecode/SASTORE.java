@@ -28,6 +28,9 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Stores a short value into an array
+ */
 public class SASTORE extends gov.nasa.jpf.jvm.bytecode.SASTORE {
 	
 	@Override
@@ -45,6 +48,9 @@ public class SASTORE extends gov.nasa.jpf.jvm.bytecode.SASTORE {
 
 		Instruction actualNextInsn = super.execute(ti);
 		
+        /**
+         * Do not inform abstractions about this event if the instruction did not execute successfully
+         */
 		if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		} 
@@ -55,9 +61,12 @@ public class SASTORE extends gov.nasa.jpf.jvm.bytecode.SASTORE {
 		if (destination.getExpression() instanceof AccessExpression) {
 			to = (AccessExpression) destination.getExpression();
 			to = DefaultArrayElementRead.create(to, index.getExpression());
-
-			GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
 		}
+
+        /**
+         * Inform abstractions about the write to the array
+         */
+		GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
 		
 		return actualNextInsn;
 	}

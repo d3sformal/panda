@@ -19,6 +19,9 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Implementation of all unary IF instructions.
+ */
 public class UnaryIfInstructionExecutor {
 
 	final public Instruction execute(AbstractBranching br, ThreadInfo ti) {

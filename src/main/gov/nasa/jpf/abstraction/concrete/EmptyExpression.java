@@ -10,6 +10,9 @@ import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
+/**
+ * A dummy expression (may be used when the there would be no expression = null)
+ */
 public class EmptyExpression implements Expression {
 	
 	protected EmptyExpression() {

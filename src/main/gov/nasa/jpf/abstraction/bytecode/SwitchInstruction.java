@@ -31,6 +31,7 @@ import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.common.Equals;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
@@ -64,9 +65,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 
 			ArrayList<Integer> choices = null;
 			
-			System.out.println("EXPR: " + expr);
-			
-			if (expr != null) {				
+			if (expr != null && RunDetector.isRunning()) {				
 				ArrayList<Integer> choiceCandidates = new ArrayList<Integer>();
 				boolean predicateAbstractionFailed = false;
 

@@ -4,6 +4,9 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
+/**
+ * A freshly allocated array (or a duplicate) --- not loaded from a variable.
+ */
 public class AnonymousArray extends AnonymousObject {
 	
 	private Expression length;
