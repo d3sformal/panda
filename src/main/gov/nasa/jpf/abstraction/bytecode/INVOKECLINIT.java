@@ -26,6 +26,9 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Invocation of a class initialisation
+ */
 public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
 
 	public INVOKECLINIT(ClassInfo info) {
@@ -35,6 +38,9 @@ public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
 	@Override
 	public Instruction execute(ThreadInfo ti) {
 
+        /**
+         * Find out what should come next
+         */
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 		StackFrame before = ti.getTopFrame();
 
@@ -42,12 +48,19 @@ public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
 		
 		StackFrame after = ti.getTopFrame();
 		
+        /**
+         * If the instruction did not finish successfully do not inform abstractions about anything
+         */
 		if (JPFInstructionAdaptor.testInvokeStaticInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}
 		
 		after.getMethodInfo().setAttr(null);
 		
+        /**
+         * Collect current symbolic arguments and store them as attributes of the method
+         * this allows predicate abstraction to reason about argument assignment
+         */
 		for (int i = 0; i < after.getMethodInfo().getNumberOfStackArguments(); ++i) {
 			Attribute attr = (Attribute) before.getOperandAttr(i);
 			
@@ -56,6 +69,9 @@ public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
 			after.getMethodInfo().addAttr(attr);
 		}
 		
+        /**
+         * Inform abstractions about a method call
+         */
 		GlobalAbstraction.getInstance().processMethodCall(ti, before, after);
 
 		return actualNextInsn;

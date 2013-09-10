@@ -11,6 +11,9 @@ import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Stores a value from a stack to a local variable and informs abstractions about such an event
+ */
 public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
 
 	public DSTORE(int index) {
@@ -35,8 +38,15 @@ public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
 		}
 		
 		sf = ti.getModifiableTopFrame();
+
+        /**
+         * Remember what has been stored here
+         */
 		sf.setLocalAttr(getLocalVariableIndex(), source);
 
+        /**
+         * Inform the abstractions that a primitive value of a local variable may have changed
+         */
 		GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
 		
 		return actualNextInsn;

@@ -23,11 +23,18 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Bytecode instruction DRETURN
+ * ... => double
+ */
 public class DRETURN extends gov.nasa.jpf.jvm.bytecode.DRETURN {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
 
+        /**
+         * Find out what is expected to follow
+         */
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 		StackFrame before = ti.getTopFrame();
 
@@ -35,10 +42,16 @@ public class DRETURN extends gov.nasa.jpf.jvm.bytecode.DRETURN {
 		
 		StackFrame after = ti.getTopFrame();
 		
+        /**
+         * Test whether the instruction was successfully executed (a choice may have been generated)
+         */
 		if (JPFInstructionAdaptor.testReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}
-				
+		
+        /**
+         * Inform abstractions about this event
+         */
         GlobalAbstraction.getInstance().processMethodReturn(ti, before, after);
 
 		return actualNextInsn;

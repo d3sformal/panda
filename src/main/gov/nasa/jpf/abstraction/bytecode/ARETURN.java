@@ -23,6 +23,9 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Return from a method with a reference return value
+ */
 public class ARETURN extends gov.nasa.jpf.jvm.bytecode.ARETURN {
 	
 	@Override
@@ -35,6 +38,9 @@ public class ARETURN extends gov.nasa.jpf.jvm.bytecode.ARETURN {
 		
 		StackFrame after = ti.getTopFrame();
 		
+        /**
+         * Do not inform the abstractions about this event if it did not finish successfully
+         */
 		if (JPFInstructionAdaptor.testReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}

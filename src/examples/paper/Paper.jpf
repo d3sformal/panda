@@ -8,4 +8,5 @@ sourcepath=${jpf-abstraction}/src/examples
 abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/paper/Paper.pred
 abstract.branch.reevaluate_predicates=true
 
-listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor
+listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.listener.ExecTracker,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.predicate.util.StackExpressionMonitor
+et.skip_init=false

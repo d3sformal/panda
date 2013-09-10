@@ -20,9 +20,9 @@ public class PredicateValuationMonitor extends ListenerAdapter {
 	
 	@Override
 	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {		
-		if (RunDetector.isRunning()) {
+		//if (RunDetector.isRunning()) {
 			inspect(GlobalAbstraction.getInstance().get());
-		}
+		//}
 	}
 
 	private void inspect(Abstraction abs) {

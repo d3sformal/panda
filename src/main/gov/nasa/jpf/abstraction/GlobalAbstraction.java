@@ -9,6 +9,10 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * GlobalAbstraction wraps all the abstractions (any arbitrary / container abstraction) instantiated by our InstructionFactory
+ * It uses RunDetector to decide what notifications should be passed to the singleton instance
+ */
 public class GlobalAbstraction extends Abstraction {
 	private static GlobalAbstraction instance;
 	

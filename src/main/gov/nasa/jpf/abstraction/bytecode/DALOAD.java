@@ -27,6 +27,9 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Reads an element of an array
+ */
 public class DALOAD extends gov.nasa.jpf.jvm.bytecode.DALOAD {
 	
 	@Override
@@ -42,6 +45,9 @@ public class DALOAD extends gov.nasa.jpf.jvm.bytecode.DALOAD {
 
 		Instruction actualNextInsn = super.execute(ti);
 		
+        /**
+         * In case this instruction did not finish successfully, do not compute (store) the symbolic value
+         */
 		if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}   

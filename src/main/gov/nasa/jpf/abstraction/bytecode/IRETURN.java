@@ -23,6 +23,10 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Returns from a method
+ * ... => int
+ */
 public class IRETURN extends gov.nasa.jpf.jvm.bytecode.IRETURN {
 	
 	@Override
@@ -35,6 +39,9 @@ public class IRETURN extends gov.nasa.jpf.jvm.bytecode.IRETURN {
 		
 		StackFrame after = ti.getTopFrame();
 		
+        /**
+         * If the instruction was not finished successfully do not inform abstractions about this event
+         */
 		if (JPFInstructionAdaptor.testReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}

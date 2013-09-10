@@ -6,6 +6,10 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Loads a constant from a const pool onto the stack
+ * ... => ..., long
+ */
 public class LCONST extends gov.nasa.jpf.jvm.bytecode.LCONST {
 
 	public LCONST(int value) {
@@ -17,6 +21,10 @@ public class LCONST extends gov.nasa.jpf.jvm.bytecode.LCONST {
 		Instruction ret = super.execute(ti);
 		
 		StackFrame sf = ti.getModifiableTopFrame();
+
+        /**
+         * Symbolic execution
+         */
 		sf.setOperandAttr(new NonEmptyAttribute(null, Constant.create(getValue())));
 		
 		return ret;

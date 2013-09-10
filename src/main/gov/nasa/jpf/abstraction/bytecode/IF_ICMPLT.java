@@ -33,6 +33,9 @@ import gov.nasa.jpf.vm.Instruction;
  */
 public class IF_ICMPLT extends gov.nasa.jpf.jvm.bytecode.IF_ICMPLT implements AbstractBranching {
 	
+    /**
+     * Share implementation with all the other binary if instructions.
+     */
 	BinaryIfInstructionExecutor executor = new BinaryIfInstructionExecutor();
 
 	public IF_ICMPLT(int targetPc) {

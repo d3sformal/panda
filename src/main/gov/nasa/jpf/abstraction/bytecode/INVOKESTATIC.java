@@ -25,6 +25,9 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Invocation of a static method
+ */
 public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
 
 	public INVOKESTATIC(String clsName, String methodName, String methodSignature) {
@@ -47,6 +50,9 @@ public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
 		
 		after.getMethodInfo().setAttr(null);
 		
+        /**
+         * Collect symbolic arguments for further use by abstractions during the processing of the method call event
+         */
 		for (int i = 0; i < after.getMethodInfo().getNumberOfStackArguments(); ++i) {
 			Attribute attr = (Attribute) before.getOperandAttr(i);
 			
@@ -54,7 +60,10 @@ public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
 			
 			after.getMethodInfo().addAttr(attr);
 		}
-				
+		
+        /**
+         * Inform abstractions about the method call
+         */
 		GlobalAbstraction.getInstance().processMethodCall(ti, before, after);
 
 		return actualNextInsn;

@@ -25,6 +25,11 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
+/**
+ * AbstractListener monitors the state space traversal and individual instruction executions
+ *
+ * It informs the global abstraction about all the above mentioned events.
+ */
 public class AbstractListener extends PropertyListenerAdapter {
 
 	@Override
