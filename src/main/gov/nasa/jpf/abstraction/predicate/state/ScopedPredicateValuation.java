@@ -20,6 +20,7 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.abstraction.predicate.smt.SMTException;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
@@ -31,8 +32,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import sun.org.mozilla.javascript.ast.EmptyExpression;
 
 public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	private PredicateValuationStack scopes = new PredicateValuationStack();
@@ -135,45 +134,47 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	public SideEffect processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
 		MethodInfo method = after.getMethodInfo();
 		
-		FlatPredicateValuation transitionScope;
 		FlatPredicateValuation finalScope = createDefaultScope(threadInfo, method);
 		
-		transitionScope = scopes.top().clone();
-		
-		ArrayList<Attribute> attrsList = new ArrayList<Attribute>();
-		
-		Iterator<Object> it = after.getMethodInfo().attrIterator();
-		
-		while (it.hasNext()) {
-			Attribute attr = (Attribute) it.next();
+		if (RunDetector.isRunning()) {
+			FlatPredicateValuation transitionScope;
+			transitionScope = scopes.top().clone();
 			
-			attrsList.add(attr);
-		}
-		
-		Attribute[] attrs = attrsList.toArray(new Attribute[attrsList.size()]);
-		LocalVarInfo args[] = method.getArgumentLocalVars();
-		
-		Map<Predicate, Predicate> replacements = new HashMap<Predicate, Predicate>();
-		
-		if (args != null && attrs != null) {
-			for (Predicate predicate : finalScope.getPredicates()) {
-				Predicate replaced = predicate;
+			ArrayList<Attribute> attrsList = new ArrayList<Attribute>();
+			
+			Iterator<Object> it = after.getMethodInfo().attrIterator();
+			
+			while (it.hasNext()) {
+				Attribute attr = (Attribute) it.next();
 				
-				for (int i = 1; i < args.length; ++i) {
-					Attribute attr = attrs[i];
-										
-					if (args[i] != null && attr.getExpression() != null) {
-						replaced = replaced.replace(DefaultAccessExpression.createFromString(args[i].getName()), attr.getExpression());
-					}
-				}
-				
-				replacements.put(replaced, predicate);
+				attrsList.add(attr);
 			}
 			
-			Map<Predicate, TruthValue> valuation = transitionScope.evaluatePredicates(replacements.keySet());
+			Attribute[] attrs = attrsList.toArray(new Attribute[attrsList.size()]);
+			LocalVarInfo args[] = method.getArgumentLocalVars();
 			
-			for (Predicate predicate : replacements.keySet()) {
-				finalScope.put(replacements.get(predicate), valuation.get(predicate));
+			Map<Predicate, Predicate> replacements = new HashMap<Predicate, Predicate>();
+			
+			if (args != null && attrs != null) {
+				for (Predicate predicate : finalScope.getPredicates()) {
+					Predicate replaced = predicate;
+					
+					for (int i = 1; i < args.length; ++i) {
+						Attribute attr = attrs[i];
+											
+						if (args[i] != null && attr.getExpression() != null) {
+							replaced = replaced.replace(DefaultAccessExpression.createFromString(args[i].getName()), attr.getExpression());
+						}
+					}
+					
+					replacements.put(replaced, predicate);
+				}
+				
+				Map<Predicate, TruthValue> valuation = transitionScope.evaluatePredicates(replacements.keySet());
+				
+				for (Predicate predicate : replacements.keySet()) {
+					finalScope.put(replacements.get(predicate), valuation.get(predicate));
+				}
 			}
 		}
 		
@@ -200,180 +201,172 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	
 	@Override
 	public SideEffect processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
-		Attribute attr = (Attribute) after.getResultAttr();
-		ReturnValue ret = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
-		
-		FlatPredicateValuation scope;
-		
-		scope = scopes.top(1);
-		
-		attr = Attribute.ensureNotNull(attr);
-		
-		Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
-		Set<Predicate> determinants = new HashSet<Predicate>();
-		
-		for (Predicate predicate : getPredicates()) {
+        if (RunDetector.isRunning()) {
+			Attribute attr = (Attribute) after.getResultAttr();
+			ReturnValue ret = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
 			
-			if (isPredicateOverReturn(predicate)) {
-				Predicate determinant = predicate.replace(DefaultReturnValue.create(), attr.getExpression());
+			FlatPredicateValuation scope;
+			
+			scope = scopes.top(1);
+			
+			attr = Attribute.ensureNotNull(attr);
+			
+			Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
+			Set<Predicate> determinants = new HashSet<Predicate>();
+			
+			for (Predicate predicate : getPredicates()) {
 				
-				predicates.put(determinant, predicate);
-				determinants.add(determinant);
+				if (isPredicateOverReturn(predicate)) {
+					Predicate determinant = predicate.replace(DefaultReturnValue.create(), attr.getExpression());
+					
+					predicates.put(determinant, predicate);
+					determinants.add(determinant);
+				}
 			}
-		}
-		
-		Map<Predicate, TruthValue> valuation = evaluatePredicates(determinants);
-		
-		for (Predicate predicate : valuation.keySet()) {
-			scope.put(predicates.get(predicate).replace(DefaultReturnValue.create(), ret), valuation.get(predicate));
-		}
-				
-		after.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), ret));
+			
+			Map<Predicate, TruthValue> valuation = evaluatePredicates(determinants);
+			
+			for (Predicate predicate : valuation.keySet()) {
+				scope.put(predicates.get(predicate).replace(DefaultReturnValue.create(), ret), valuation.get(predicate));
+			}
+					
+			after.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), ret));
+        }
 		
 		return processVoidMethodReturn(threadInfo, before, after, sideEffect);
 	}
 	
 	@Override
 	public SideEffect processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
-		AffectedAccessExpressions affected = (AffectedAccessExpressions) sideEffect; // MAY BE USED OR NOT ... OVERAPPROXIMATING THIS MAY SAVE A LOT WHEN DETERMINING THE sideEffect SET
-		FlatPredicateValuation scope;
-		
-		scope = scopes.top(1);
-		
-		boolean sameObject = before.getThis() == after.getThis();
-		
-		ArrayList<Attribute> attrsList = new ArrayList<Attribute>();
-		
-		Iterator<Object> it = before.getMethodInfo().attrIterator();
-		
-		while (it.hasNext()) {
-			Attribute attr = (Attribute) it.next();
+        if (RunDetector.isRunning()) {
+			AffectedAccessExpressions affected = (AffectedAccessExpressions) sideEffect; // MAY BE USED OR NOT ... OVERAPPROXIMATING THIS MAY SAVE A LOT WHEN DETERMINING THE sideEffect SET
+			FlatPredicateValuation scope;
 			
-			attrsList.add(attr);
-		}
-		
-		Attribute[] attrs = attrsList.toArray(new Attribute[attrsList.size()]);
-		LocalVarInfo[] args = before.getMethodInfo().getArgumentLocalVars() == null ? new LocalVarInfo[0] : before.getMethodInfo().getArgumentLocalVars();
-		LocalVarInfo[] locals = before.getLocalVars() == null ? new LocalVarInfo[0] : before.getLocalVars();
-		
-		Set<LocalVarInfo> referenceArgs = new HashSet<LocalVarInfo>();
-		Set<LocalVarInfo> notWantedLocalVariables = new HashSet<LocalVarInfo>();
-		
-		for (int i = 0; i < args.length; ++i) {
-			LocalVarInfo l = args[i];
+			scope = scopes.top(1);
 			
-			if (l != null) {
+			boolean sameObject = before.getThis() == after.getThis();
+			
+			ArrayList<Attribute> attrsList = new ArrayList<Attribute>();
+			
+			Iterator<Object> it = before.getMethodInfo().attrIterator();
+			
+			while (it.hasNext()) {
+				Attribute attr = (Attribute) it.next();
 				
-				if (!l.isNumeric()) {
-					referenceArgs.add(l);
+				attrsList.add(attr);
+			}
+			
+			Attribute[] attrs = attrsList.toArray(new Attribute[attrsList.size()]);
+			LocalVarInfo[] args = before.getMethodInfo().getArgumentLocalVars() == null ? new LocalVarInfo[0] : before.getMethodInfo().getArgumentLocalVars();
+			LocalVarInfo[] locals = before.getLocalVars() == null ? new LocalVarInfo[0] : before.getLocalVars();
+			
+			Set<LocalVarInfo> referenceArgs = new HashSet<LocalVarInfo>();
+			Set<LocalVarInfo> notWantedLocalVariables = new HashSet<LocalVarInfo>();
+			
+			for (int i = 0; i < args.length; ++i) {
+				LocalVarInfo l = args[i];
+				
+				if (l != null) {
+					
+					if (!l.isNumeric()) {
+						referenceArgs.add(l);
+					}
+				
+					Attribute actualAttribute = (Attribute) before.getLocalAttr(l.getSlotIndex());
+					
+					actualAttribute = Attribute.ensureNotNull(actualAttribute);
+					
+					Expression originalExpr = attrs[i].getExpression();
+					Expression actuaExpr = actualAttribute.getExpression();
+					
+					boolean different = false;
+					
+					different |= originalExpr == null && actuaExpr != null;
+					different |= originalExpr != null && actuaExpr == null;
+					different |= originalExpr != null && actuaExpr != null && !originalExpr.equals(actuaExpr);
+					
+					// Someone has changed the argument, we cannot use predicates about it to infer information about the original value supplied by the caller
+					if (different) {
+						notWantedLocalVariables.add(l);
+					}
 				}
+			}
 			
-				Attribute actualAttribute = (Attribute) before.getLocalAttr(l.getSlotIndex());
-				
-				actualAttribute = Attribute.ensureNotNull(actualAttribute);
-				
-				Expression originalExpr = attrs[i].getExpression();
-				Expression actuaExpr = actualAttribute.getExpression();
-				
-				boolean different = false;
-				
-				different |= originalExpr == null && actuaExpr != null;
-				different |= originalExpr != null && actuaExpr == null;
-				different |= originalExpr != null && actuaExpr != null && !originalExpr.equals(actuaExpr);
-				
-				// Someone has changed the argument, we cannot use predicates about it to infer information about the original value supplied by the caller
-				if (different) {
+			// Local variables are out of scope
+			for (LocalVarInfo l : locals) {
+				if (l != null) {
 					notWantedLocalVariables.add(l);
 				}
 			}
-		}
-		
-		// Local variables are out of scope
-		for (LocalVarInfo l : locals) {
-			if (l != null) {
-				notWantedLocalVariables.add(l);
-			}
-		}
-		
-		notWantedLocalVariables.removeAll(referenceArgs);
-		
-		FlatPredicateValuation relevant = new FlatPredicateValuation();
-		
-		// Filter out predicates from the callee that cannot be used for propagation to the caller 
-		for (Predicate predicate : getPredicates()) {
-			TruthValue value = get(predicate);
 			
-			boolean isAnonymous = false;
+			notWantedLocalVariables.removeAll(referenceArgs);
 			
-			for (int i = 0; i < args.length; ++i) {
-				if (args[i] != null && !args[i].isNumeric()) {
-					predicate = predicate.replace(DefaultRoot.create(args[i].getName()), attrs[i].getExpression()); //TODO: this does not respect when the parameter variable is overwritten and the predicates at the end do not hold for the original content but something else...
+			FlatPredicateValuation relevant = new FlatPredicateValuation();
+			
+			// Filter out predicates from the callee that cannot be used for propagation to the caller 
+			for (Predicate predicate : getPredicates()) {
+				TruthValue value = get(predicate);
+				
+				boolean isAnonymous = false;
+				
+				for (int i = 0; i < args.length; ++i) {
+					if (args[i] != null && !args[i].isNumeric()) {
+						predicate = predicate.replace(DefaultRoot.create(args[i].getName()), attrs[i].getExpression()); //TODO: this does not respect when the parameter variable is overwritten and the predicates at the end do not hold for the original content but something else...
+						
+						isAnonymous |= attrs[i].getExpression() instanceof AnonymousExpression;
+					}
+				}
+				
+				boolean isUnwanted = false;
+				
+				for (LocalVarInfo l : notWantedLocalVariables) {
+					for (AccessExpression path : predicate.getPaths()) {
+						isUnwanted |= path.isLocalVariable() && path.getRoot().getName().equals(l.getName());
+					}
+				}
+				
+				if (!isUnwanted) {
+					relevant.put(predicate, value);
 					
-					isAnonymous |= attrs[i].getExpression() instanceof AnonymousExpression;
+					// Handling mainly constructor (object still anonymous) 
+					if (isAnonymous) {
+						scope.put(predicate, value);
+					}
 				}
 			}
+					
+			Set<Predicate> toBeUpdated = new HashSet<Predicate>();
 			
-			boolean isUnwanted = false;
-			
-			for (LocalVarInfo l : notWantedLocalVariables) {
+			for (Predicate predicate : scope.getPredicates()) {
+				
+				boolean canBeAffected = false;
+				
 				for (AccessExpression path : predicate.getPaths()) {
-					isUnwanted |= path.isLocalVariable() && path.getRoot().getName().equals(l.getName());
-				}
-			}
-			
-			if (!isUnwanted) {
-				relevant.put(predicate, value);
-				
-				// Handling mainly constructor (object still anonymous) 
-				if (isAnonymous) {
-					scope.put(predicate, value);
-				}
-			}
-		}
-				
-		/*
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		
-		System.out.println(relevant.toString());
-		
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		//*/
-		
-		Set<Predicate> toBeUpdated = new HashSet<Predicate>();
-		
-		for (Predicate predicate : scope.getPredicates()) {
-			
-			boolean canBeAffected = false;
-			
-			for (AccessExpression path : predicate.getPaths()) {
-				canBeAffected |= path.getRoot().isThis() && sameObject;
-				canBeAffected |= path.isStatic();
-				
-				for (AccessExpression affectedPath : affected) {
-					canBeAffected |= affectedPath.isPrefixOf(path);
+					canBeAffected |= path.getRoot().isThis() && sameObject;
+					canBeAffected |= path.isStatic();
 					
-					//if (affectedPath.isPrefixOf(path)) {
-					//	System.out.println("POSSIBLY AFFECTED " + path + " BY POSSIBLE WRITE TO " + affectedPath);
-					//}
+					for (AccessExpression affectedPath : affected) {
+						canBeAffected |= affectedPath.isPrefixOf(path);
+						
+						//if (affectedPath.isPrefixOf(path)) {
+						//	System.out.println("POSSIBLY AFFECTED " + path + " BY POSSIBLE WRITE TO " + affectedPath);
+						//}
+					}
+				}
+				
+				if (canBeAffected) {
+					toBeUpdated.add(predicate);
 				}
 			}
 			
-			if (canBeAffected) {
-				toBeUpdated.add(predicate);
-			}
-		}
-		
-		Map<Predicate, TruthValue> valuation = relevant.evaluatePredicates(toBeUpdated);
-		
-		for (Predicate predicate : valuation.keySet()) {
-			TruthValue value = valuation.get(predicate);
+			Map<Predicate, TruthValue> valuation = relevant.evaluatePredicates(toBeUpdated);
 			
-			scope.put(predicate, value);
-		}
+			for (Predicate predicate : valuation.keySet()) {
+				TruthValue value = valuation.get(predicate);
+				
+				scope.put(predicate, value);
+			}
+        }
 		
 		scopes.pop();
 		

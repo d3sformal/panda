@@ -12,6 +12,7 @@ import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -40,7 +41,7 @@ public class UnaryIfInstructionExecutor {
 		if (!ti.isFirstStepInsn()) { // first time around
 		
 			// PREDICATE ABSTRACTION
-			if (expr != null) {				
+			if (expr != null && RunDetector.isRunning()) {
 				TruthValue pred = GlobalAbstraction.getInstance().evaluatePredicate(br.createPredicate(expr, Constant.create(0)));
 	
 				switch (pred) {
