@@ -58,46 +58,49 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 		
 		AbstractValue abs_v = attr.getAbstractValue();
 		
+		AccessExpression path = null;
+		Expression expression = null;
+		
 		if (var != null) {
-			AccessExpression path = DefaultRoot.create(var.getName());
-			Expression expression = Add.create(path, Constant.create(increment));
+			path = DefaultRoot.create(var.getName());
+			expression = Add.create(path, Constant.create(increment));
+		}
 			
-			if (abs_v == null) {
-				Attribute result = new NonEmptyAttribute(null, expression);
+		if (abs_v == null) {
+			Attribute result = new NonEmptyAttribute(null, expression);
 	
-				sf.setLocalAttr(index, result);
-				sf.setLocalVariable(index, sf.getLocalVariable(index) + increment, false);
-			} else {
-				Attribute result = new NonEmptyAttribute(Abstraction._add(0, abs_v, increment, null), expression);
-	
-				System.out.printf("IINC> Value:  %d (%s)\n", sf.getLocalVariable(index), abs_v);
-	
-				if (result.getAbstractValue().isComposite()) {	
-					if (!ti.isFirstStepInsn()) { // first time around
-						int size = result.getAbstractValue().getTokensNumber();
-											
-						ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
-						ss.setNextChoiceGenerator(cg);
-						
-						return this;
-					} else { // this is what really returns results
-						ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-						
-						assert (cg instanceof FocusAbstractChoiceGenerator);
-						
-						int key = (Integer) cg.getNextChoice();
-						result.setAbstractValue(result.getAbstractValue().getToken(key));
-					}
+			sf.setLocalAttr(index, result);
+			sf.setLocalVariable(index, sf.getLocalVariable(index) + increment, false);
+		} else {
+			Attribute result = new NonEmptyAttribute(Abstraction._add(0, abs_v, increment, null), expression);
+
+			System.out.printf("IINC> Value:  %d (%s)\n", sf.getLocalVariable(index), abs_v);
+
+			if (result.getAbstractValue().isComposite()) {	
+				if (!ti.isFirstStepInsn()) { // first time around
+					int size = result.getAbstractValue().getTokensNumber();
+										
+					ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
+					ss.setNextChoiceGenerator(cg);
+					
+					return this;
+				} else { // this is what really returns results
+					ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+					
+					assert (cg instanceof FocusAbstractChoiceGenerator);
+					
+					int key = (Integer) cg.getNextChoice();
+					result.setAbstractValue(result.getAbstractValue().getToken(key));
 				}
-				
-				System.out.printf("IINC> Result: %s\n", result);
-				
-				sf.setLocalAttr(index, result);
-				sf.setLocalVariable(index, 0, false);
 			}
 			
-			GlobalAbstraction.getInstance().processPrimitiveStore(expression, path);
+			System.out.printf("IINC> Result: %s\n", result);
+			
+			sf.setLocalAttr(index, result);
+			sf.setLocalVariable(index, 0, false);
 		}
+			
+		GlobalAbstraction.getInstance().processPrimitiveStore(expression, path);
 
 		return getNext(ti);
 	}
