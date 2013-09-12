@@ -4,6 +4,12 @@ import java.util.List;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 
+/**
+ * Access expressions:
+ *  a.b.c
+ *  a[i]
+ *  p.q.C.d[e].f
+ */
 public interface AccessExpression extends Expression {	
 	public List<AccessExpression> getSubAccessExpressions();
 	public List<AccessExpression> getAccessExpressions();

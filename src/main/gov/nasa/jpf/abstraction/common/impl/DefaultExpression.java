@@ -3,6 +3,9 @@ package gov.nasa.jpf.abstraction.common.impl;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 
+/**
+ * Implementation of stringification common to all expressions
+ */
 public abstract class DefaultExpression implements Expression {
 
 	@Override

@@ -17,6 +17,9 @@ import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicatesSMTStringifier;
 
+/**
+ * Implements common behaviour of most of the access expression elements
+ */
 public abstract class DefaultAccessExpression extends DefaultObjectExpression implements AccessExpression {
 
 	@Override

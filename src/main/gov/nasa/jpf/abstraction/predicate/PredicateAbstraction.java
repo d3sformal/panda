@@ -21,6 +21,17 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Predicate abstraction class
+ * 
+ * Predicate abstraction is defined by a global
+ * (in respect to individual runtime elements (objects))
+ * container of all predicate valuations
+ * 
+ * Apart from that it uses an auxiliary symbol table -
+ * a structure responsible for identification of aliases between
+ * different access expressions (used in predicates or updated by instructions)
+ */
 public class PredicateAbstraction extends Abstraction {
 	private ScopedSymbolTable symbolTable;
 	private ScopedPredicateValuation predicateValuation;
