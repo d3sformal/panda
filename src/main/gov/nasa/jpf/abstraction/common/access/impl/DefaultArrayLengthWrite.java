@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
@@ -97,8 +98,8 @@ public class DefaultArrayLengthWrite extends DefaultArrayLengthExpression implem
 	}
 	
 	@Override
-	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
-		return create(getObject().replaceSubExpressions(expression, newExpression), getArrayLengths().clone(), getNewValue().replace(expression, newExpression));
+	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
+		return create(getObject().replaceSubExpressions(replacements), getArrayLengths().clone(), getNewValue().replace(replacements));
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
 import java.util.List;
+import java.util.Map;
 
 public class UpdatedPredicate extends Predicate {
 	
@@ -33,8 +34,8 @@ public class UpdatedPredicate extends Predicate {
 	}
 
 	@Override
-	public Predicate replace(AccessExpression formerPath, Expression expression) {
-		return apply().replace(formerPath, expression);
+	public Predicate replace(Map<AccessExpression, Expression> replacements) {
+		return apply().replace(replacements);
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Tautology;
 
 import java.util.List;
+import java.util.Map;
 
 public class Negation extends Predicate {
 	public Predicate predicate;
@@ -25,8 +26,8 @@ public class Negation extends Predicate {
 	}
 
 	@Override
-	public Predicate replace(AccessExpression formerPath, Expression expression) {
-		return create(predicate.replace(formerPath, expression));
+	public Predicate replace(Map<AccessExpression, Expression> replacements) {
+		return create(predicate.replace(replacements));
 	}
 	
 	public static Predicate create(Predicate predicate) {

@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.common.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ObjectExpression;
@@ -58,8 +59,8 @@ public class ObjectExpressionWrapper extends DefaultObjectExpression {
 	}
 	
 	@Override
-	public Expression replace(AccessExpression expression, Expression newExpression) {
-		return create(this.expression.update(expression, newExpression));
+	public Expression replace(Map<AccessExpression, Expression> replacements) {
+		return create(this.expression.replace(replacements));
 	}
 
 	@Override

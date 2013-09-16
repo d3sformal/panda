@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
@@ -39,6 +41,11 @@ public class Implication extends Disjunction {
 		}
 		
 		return new Implication(a, b);
+	}
+
+	@Override
+	public Predicate replace(Map<AccessExpression, Expression> replacements) {
+		return create(a.replace(replacements), b.replace(replacements));
 	}
 	
 	@Override

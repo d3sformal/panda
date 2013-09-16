@@ -4,6 +4,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Common interface of all symbolic expressions
@@ -19,7 +20,7 @@ public interface Expression extends PredicatesVisitable, Cloneable {
 	/**
 	 * Performs substitution of an access expression
 	 */
-	public Expression replace(AccessExpression expression, Expression newExpression);
+	public Expression replace(Map<AccessExpression, Expression> replacements);
     public String toString(Notation policy);
     public Expression clone();
     

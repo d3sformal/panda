@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
 public class Add extends Operation {
@@ -13,8 +15,8 @@ public class Add extends Operation {
 	}
 
 	@Override
-	public Add replace(AccessExpression formerPath, Expression expression) {
-		return new Add(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	public Add replace(Map<AccessExpression, Expression> replacements) {
+		return new Add(a.replace(replacements), b.replace(replacements));
 	}
 	
 	public static Operation create(Expression a, Expression b) {

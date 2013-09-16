@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
 
@@ -14,8 +16,8 @@ public class Divide extends Operation {
 	}
 
 	@Override
-	public Divide replace(AccessExpression formerPath, Expression expression) {
-		return new Divide(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	public Divide replace(Map<AccessExpression, Expression> replacements) {
+		return new Divide(a.replace(replacements), b.replace(replacements));
 	}
 	
 	public static Operation create(Expression a, Expression b) {

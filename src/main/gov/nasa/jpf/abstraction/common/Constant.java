@@ -7,6 +7,7 @@ import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Constant implements PrimitiveExpression {
 	public Number value;
@@ -26,7 +27,7 @@ public class Constant implements PrimitiveExpression {
 	}
 
 	@Override
-	public Constant replace(AccessExpression formerPath, Expression expression) {
+	public Constant replace(Map<AccessExpression, Expression> replacements) {
 		return this;
 	}
 	

@@ -6,6 +6,7 @@ import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Contradiction extends Predicate {
 	
@@ -23,7 +24,7 @@ public class Contradiction extends Predicate {
 	}
 
 	@Override
-	public Predicate replace(AccessExpression formerPath, Expression expression) {
+	public Predicate replace(Map<AccessExpression, Expression> replacements) {
 		return this;
 	}
 	

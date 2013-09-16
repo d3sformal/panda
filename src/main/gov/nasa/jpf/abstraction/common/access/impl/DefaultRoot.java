@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.common.access.impl;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
@@ -115,7 +116,7 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 	}
 
 	@Override
-	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
+	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
 		return clone();
 	}
 

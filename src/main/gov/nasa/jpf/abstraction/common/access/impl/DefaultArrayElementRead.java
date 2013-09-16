@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.common.ArrayExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
@@ -84,8 +86,8 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	}
 	
 	@Override
-	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
-		return create(getObject().replaceSubExpressions(expression, newExpression), getArrays().clone(), getIndex().replace(expression, newExpression));
+	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
+		return create(getObject().replaceSubExpressions(replacements), getArrays().clone(), getIndex().replace(replacements));
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.common.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -24,7 +25,7 @@ public class NullExpression extends Constant implements ObjectExpression {
 	}
 
 	@Override
-	public NullExpression replace(AccessExpression expression, Expression newExpression) {
+	public NullExpression replace(Map<AccessExpression, Expression> replacements) {
 		return clone();
 	}
 

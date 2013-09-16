@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
@@ -17,8 +19,8 @@ public class Equals extends Comparison {
 	}
 
 	@Override
-	public Predicate replace(AccessExpression formerPath, Expression expression) {
-		return create(a.replace(formerPath, expression), b.replace(formerPath, expression));
+	public Predicate replace(Map<AccessExpression, Expression> replacements) {
+		return create(a.replace(replacements), b.replace(replacements));
 	}
 	
 	public static Predicate create(Expression a, Expression b) {

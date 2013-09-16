@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
@@ -34,7 +35,7 @@ public class UndefinedAccessExpression extends DefaultRoot implements Undefined 
 	}
 
 	@Override
-	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
+	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
 		return clone();
 	}
 

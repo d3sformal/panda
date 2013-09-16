@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
@@ -102,8 +103,8 @@ public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implem
 	}
 	
 	@Override
-	public AccessExpression replaceSubExpressions(AccessExpression expression, Expression newExpression) {
-		return create(getObject().replaceSubExpressions(expression, newExpression), getField().clone(), getNewValue().replace(expression, newExpression));
+	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
+		return create(getObject().replaceSubExpressions(replacements), getField().clone(), getNewValue().replace(replacements));
 	}
 
 	@Override

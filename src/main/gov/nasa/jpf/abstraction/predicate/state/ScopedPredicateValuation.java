@@ -153,27 +153,28 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			Attribute[] attrs = attrsList.toArray(new Attribute[attrsList.size()]);
 			LocalVarInfo args[] = method.getArgumentLocalVars();
 			
-			Map<Predicate, Predicate> replacements = new HashMap<Predicate, Predicate>();
+			Map<Predicate, Predicate> replaced = new HashMap<Predicate, Predicate>();
 			
 			if (args != null && attrs != null) {
 				for (Predicate predicate : finalScope.getPredicates()) {
-					Predicate replaced = predicate;
+
+					Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
 					
 					for (int i = 1; i < args.length; ++i) {
 						Attribute attr = attrs[i];
 											
 						if (args[i] != null && attr.getExpression() != null) {
-							replaced = replaced.replace(DefaultAccessExpression.createFromString(args[i].getName()), attr.getExpression());
+							replacements.put(DefaultAccessExpression.createFromString(args[i].getName()), attr.getExpression());
 						}
 					}
 					
-					replacements.put(replaced, predicate);
+					replaced.put(predicate.replace(replacements), predicate);
 				}
 				
-				Map<Predicate, TruthValue> valuation = transitionScope.evaluatePredicates(replacements.keySet());
+				Map<Predicate, TruthValue> valuation = transitionScope.evaluatePredicates(replaced.keySet());
 				
-				for (Predicate predicate : replacements.keySet()) {
-					finalScope.put(replacements.get(predicate), valuation.get(predicate));
+				for (Predicate predicate : replaced.keySet()) {
+					finalScope.put(replaced.get(predicate), valuation.get(predicate));
 				}
 			}
 		}
@@ -217,8 +218,12 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			for (Predicate predicate : getPredicates()) {
 				
 				if (isPredicateOverReturn(predicate)) {
-					Predicate determinant = predicate.replace(DefaultReturnValue.create(), attr.getExpression());
+					Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
 					
+					replacements.put(DefaultReturnValue.create(), attr.getExpression());
+
+					Predicate determinant = predicate.replace(replacements);
+
 					predicates.put(determinant, predicate);
 					determinants.add(determinant);
 				}
@@ -227,7 +232,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			Map<Predicate, TruthValue> valuation = evaluatePredicates(determinants);
 			
 			for (Predicate predicate : valuation.keySet()) {
-				scope.put(predicates.get(predicate).replace(DefaultReturnValue.create(), ret), valuation.get(predicate));
+				Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+
+				replacements.put(DefaultReturnValue.create(), ret);
+
+				scope.put(predicates.get(predicate).replace(replacements), valuation.get(predicate));
 			}
 					
 			after.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), ret));
@@ -309,14 +318,18 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				
 				boolean isAnonymous = false;
 				
+				Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+
 				for (int i = 0; i < args.length; ++i) {
 					if (args[i] != null && !args[i].isNumeric()) {
-						predicate = predicate.replace(DefaultRoot.create(args[i].getName()), attrs[i].getExpression()); //TODO: this does not respect when the parameter variable is overwritten and the predicates at the end do not hold for the original content but something else...
+						replacements.put(DefaultRoot.create(args[i].getName()), attrs[i].getExpression());
 						
 						isAnonymous |= attrs[i].getExpression() instanceof AnonymousExpression;
 					}
 				}
 				
+				predicate = predicate.replace(replacements);
+
 				boolean isUnwanted = false;
 				
 				for (LocalVarInfo l : notWantedLocalVariables) {

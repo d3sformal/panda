@@ -1,17 +1,26 @@
 package gov.nasa.jpf.abstraction.predicate.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
+import gov.nasa.jpf.abstraction.common.impl.DefaultExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
+import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
+import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 
 public abstract class Predicate implements PredicatesVisitable {
 	public abstract List<AccessExpression> getPaths();
-	public abstract Predicate replace(AccessExpression formerPath, Expression expression);
+	public abstract Predicate replace(Map<AccessExpression, Expression> replacements);
 	
     public String toString() {
     	return toString(Notation.policy);
@@ -61,6 +70,15 @@ public abstract class Predicate implements PredicatesVisitable {
 	
 	public abstract Predicate update(AccessExpression expression, Expression newExpression);
 	
+	public static Predicate createFromString(String definition) {
+		ANTLRInputStream chars = new ANTLRInputStream(definition);
+		PredicatesLexer lexer = new PredicatesLexer(chars);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		PredicatesParser parser = new PredicatesParser(tokens);
+
+		return parser.predicate().val;
+	}
+
 	@Override
 	public int hashCode() {
 		return toString(Notation.DOT_NOTATION).hashCode();
@@ -75,5 +93,24 @@ public abstract class Predicate implements PredicatesVisitable {
 		}
 		
 		return false;
+	}
+
+	public static void main(String[] args) {
+		Notation.policy = Notation.DOT_NOTATION;
+
+		Predicate p = createFromString("a + b = 2");
+
+		AccessExpression a = DefaultAccessExpression.createFromString("a");
+		Expression aplusb = DefaultExpression.createFromString("a + b");
+		AccessExpression b = DefaultAccessExpression.createFromString("b");
+		AccessExpression c = DefaultAccessExpression.createFromString("c");
+
+		Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+		replacements.put(a, aplusb);
+		replacements.put(b, c);
+
+		Predicate q = p.replace(replacements);
+
+		System.out.println(q);
 	}
 }

@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
 public class UndefinedOperationResult extends Operation implements Undefined {
@@ -23,7 +25,7 @@ public class UndefinedOperationResult extends Operation implements Undefined {
 	}
 
 	@Override
-	public Expression replace(AccessExpression expression, Expression newExpression) {
+	public Expression replace(Map<AccessExpression, Expression> replacements) {
 		return clone();
 	}
 

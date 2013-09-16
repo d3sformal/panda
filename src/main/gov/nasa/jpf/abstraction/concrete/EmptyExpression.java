@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.concrete;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Notation;
@@ -26,11 +27,6 @@ public class EmptyExpression implements Expression {
 	@Override
 	public void accept(PredicatesVisitor visitor) {
 		visitor.visit(this);
-	}
-
-	@Override
-	public Expression replace(AccessExpression formerPath, Expression expression) {
-		return this;
 	}
 	
 	public static EmptyExpression create() {
@@ -60,6 +56,11 @@ public class EmptyExpression implements Expression {
 	@Override
 	public Predicate preconditionForBeingFresh() {
 		return Contradiction.create();
+	}
+
+	@Override
+	public Expression replace(Map<AccessExpression, Expression> replacements) {
+		return this;
 	}
 
 }

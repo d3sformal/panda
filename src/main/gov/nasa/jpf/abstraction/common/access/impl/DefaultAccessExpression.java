@@ -1,10 +1,13 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
@@ -32,20 +35,30 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 	}
 
 	@Override
-	public final Expression replace(AccessExpression expression, Expression newExpression) {
-		if (equals(expression)) {
-			return newExpression;
+	public final Expression replace(Map<AccessExpression, Expression> replacements) {
+		for (AccessExpression expression : replacements.keySet()) {
+			Expression newExpression = replacements.get(expression);
+
+			if (equals(expression)) {
+				return newExpression;
+			}
 		}
 		
 		AccessExpression path = this;
 		
-		if (expression.isPrefixOf(this) && newExpression instanceof AccessExpression) {
-			AccessExpression newPrefix = ((AccessExpression)newExpression).clone();
-			
-			path = path.reRoot(expression, newPrefix);
+		for (AccessExpression expression : replacements.keySet()) {
+			Expression newExpression = replacements.get(expression);
+
+			if (expression.isPrefixOf(path) && newExpression instanceof AccessExpression) {
+				AccessExpression newPrefix = ((AccessExpression)newExpression).clone();
+
+				path = path.reRoot(expression, newPrefix);
+
+				break; // Do not chain the replacements
+			}
 		}
 		
-		return path.replaceSubExpressions(expression, newExpression);
+		return path.replaceSubExpressions(replacements);
 	}
 	
 	@Override
@@ -135,7 +148,10 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 		AccessExpression a = createFromString("a");
 		AccessExpression c = createFromString("c");
 		
-		Expression e = p.replace(a, c);
+		Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+		replacements.put(a, c);
+
+		Expression e = p.replace(replacements);
 		
 		System.out.println(e /*+ " " + e.getPaths()*/);
 		
