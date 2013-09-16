@@ -278,7 +278,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		for (Value destination : destinations) {
 			if (to instanceof ObjectFieldRead) {
 				ObjectFieldRead read = (ObjectFieldRead) to;
-				HeapObject parent = (HeapObject) destination;
+				StructuredValue parent = (StructuredValue) destination;
 				
 				String field = read.getField().getName();
 				
@@ -287,10 +287,10 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				}
 				
 				if (!ambiguous) {
-					parent.getField(field).clear();
+					((StructuredObject)parent).getField(field).clear();
 				}
 				
-				parent.getField(field).add(sources);
+				((StructuredObject)parent).getField(field).add(sources);
 			}
 			
 			if (to instanceof ArrayElementRead) {
