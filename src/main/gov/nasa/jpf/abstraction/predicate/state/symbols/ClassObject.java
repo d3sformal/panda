@@ -7,10 +7,13 @@ public class ClassObject extends Value {
 	private PackageAndClass classObject;
 	private StructuredValueSlot slot;
 	
-	protected ClassObject() {
+	protected ClassObject(Universe universe) {
+		super(universe);
 	}
 	
-	public ClassObject(PackageAndClass classObject, ClassStatics value) {
+	public ClassObject(Universe universe, PackageAndClass classObject, ClassStatics value) {
+		super(universe);
+
 		this.classObject = classObject;
 		
 		slot = new StructuredValueSlot(this, classObject.getName(), value);
@@ -47,10 +50,10 @@ public class ClassObject extends Value {
 
 	@Override
 	public ClassObject cloneInto(Universe universe) {
-		ClassObject clone = new ClassObject();
+		ClassObject clone = new ClassObject(universe);
 		
 		clone.classObject = classObject.clone();
-		clone.slot = slot.cloneInto(universe, this);		
+		clone.slot = slot.cloneInto(universe, clone);
 		
 		return clone;
 	}

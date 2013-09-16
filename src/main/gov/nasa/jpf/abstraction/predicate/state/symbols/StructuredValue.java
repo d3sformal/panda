@@ -4,7 +4,9 @@ public abstract class StructuredValue extends Value {
 	
 	private UniverseIdentifier reference;
 	
-	protected StructuredValue(UniverseIdentifier reference) {
+	protected StructuredValue(Universe universe, UniverseIdentifier reference) {
+		super(universe);
+
 		this.reference = reference;
 	}
 	

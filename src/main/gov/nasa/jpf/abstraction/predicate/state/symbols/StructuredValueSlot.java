@@ -56,7 +56,7 @@ public class StructuredValueSlot extends Slot {
 		StructuredValueSlot clone = new StructuredValueSlot(parent, getSlotKey());
 		
 		for (StructuredValue value : possibilities) {
-			clone.possibilities.add(value.cloneInto(universe, this));
+			clone.possibilities.add(value.cloneInto(universe, clone));
 		}
 		
 		return clone;

@@ -43,9 +43,7 @@ public abstract class Slot {
 		
 		if (parent instanceof StructuredObject) ret.append(".");
 		if (parent instanceof StructuredArray) ret.append("[");
-		
-		ret.append(slotKey);
-		
+		if (parent instanceof StructuredValue) ret.append(slotKey);
 		if (parent instanceof StructuredArray) ret.append("]");
 		
 		return ret.toString();

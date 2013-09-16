@@ -9,7 +9,7 @@ public class ValueFactory {
 	
 	public HeapObject createObject(Integer reference) {
 		if (!universe.contains(reference)) {
-			universe.add(new HeapObject(reference));
+			universe.add(new HeapObject(universe, reference));
 		}
 		
 		return (HeapObject) universe.get(reference);
@@ -17,7 +17,7 @@ public class ValueFactory {
 	
 	public HeapArray createArray(Integer reference, Integer length) {
 		if (!universe.contains(reference)) {
-			universe.add(new HeapArray(reference, length));
+			universe.add(new HeapArray(universe, reference, length));
 		}
 		
 		return (HeapArray) universe.get(reference);
@@ -25,7 +25,7 @@ public class ValueFactory {
 
 	public ClassStatics createClass(String className) {
 		if (!universe.contains(className)) {
-			universe.add(new ClassStatics(className));
+			universe.add(new ClassStatics(universe, className));
 		}
 		
 		return (ClassStatics) universe.get(className);
@@ -33,7 +33,7 @@ public class ValueFactory {
 
 	public Null createNull() {
 		if (!universe.contains(Universe.NULL)) {
-			universe.add(new Null());
+			universe.add(new Null(universe));
 		}
 		
 		return (Null) universe.get(Universe.NULL);

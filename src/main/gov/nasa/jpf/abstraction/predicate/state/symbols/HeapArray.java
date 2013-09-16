@@ -8,8 +8,8 @@ public class HeapArray extends StructuredValue implements StructuredArray {
 	private Map<Integer, Slot> elements = new HashMap<Integer, Slot>();
 	private Integer length;
 
-	public HeapArray(Integer reference, Integer length) {
-		super(new HeapObjectReference(reference));
+	public HeapArray(Universe universe, Integer reference, Integer length) {
+		super(universe, new HeapObjectReference(reference));
 		
 		this.length = length;
 	}

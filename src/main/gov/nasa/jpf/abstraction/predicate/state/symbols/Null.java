@@ -5,8 +5,8 @@ import java.util.Map;
 
 public class Null extends StructuredValue implements StructuredObject, StructuredArray {
 
-	protected Null() {
-		super(new HeapObjectReference(Universe.NULL));
+	protected Null(Universe universe) {
+		super(universe, new HeapObjectReference(Universe.NULL));
 	}
 
 	@Override

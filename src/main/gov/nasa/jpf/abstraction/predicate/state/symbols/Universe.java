@@ -20,12 +20,20 @@ public class Universe implements Cloneable {
 	private ValueFactory factory = new ValueFactory(this);
 	private Map<UniverseIdentifier, StructuredValue> objects = new HashMap<UniverseIdentifier, StructuredValue>();
 	
+	private static int ID = 0;
 	public static int NULL = -1;
 	
+	private int id;
+
 	public Universe() {
+		id = ID++;
 		factory.createNull();
 	}
 	
+	public int getID() {
+		return id;
+	}
+
 	public ValueFactory getFactory() {
 		return factory;
 	}
@@ -89,7 +97,7 @@ public class Universe implements Cloneable {
 					
 					array.setElement(i, add(threadInfo, subElementInfo));
 				} else {
-					array.setElement(i, new PrimitiveValue());
+					array.setElement(i, new PrimitiveValue(this));
 				}
 			}
 			
@@ -115,7 +123,7 @@ public class Universe implements Cloneable {
 					
 					object.setField(fieldInfo.getName(), add(threadInfo, subElementInfo));
 				} else {
-					object.setField(fieldInfo.getName(), new PrimitiveValue());
+					object.setField(fieldInfo.getName(), new PrimitiveValue(this));
 				}
 			}
 			
@@ -241,6 +249,39 @@ public class Universe implements Cloneable {
 		return clone;
 	}
 	
+	public void check() {
+		// CHECK
+		for (UniverseIdentifier identifier : objects.keySet()) {
+			StructuredValue value = objects.get(identifier);
+
+			for (Slot s : value.getSlots()) {
+				Value parent = s.getParent();
+
+				if (parent.getUniverseID() != value.getUniverseID()) throw new RuntimeException(value + " (univ: " + value.getUniverseID() + ") with parent " + parent + " (univ: " + parent.getUniverseID() + ")");
+			}
+
+			if (value instanceof StructuredObject) {
+				StructuredObject o = (StructuredObject) value;
+
+				for (String field : o.getFields().keySet()) {
+					for (Value f : o.getField(field).getPossibleValues()) {
+						if (f.getUniverseID() != value.getUniverseID()) throw new RuntimeException(value + " (univ: " + value.getUniverseID() + ") with field " + f + " (univ: " + f.getUniverseID() + ")");
+					}
+				}
+			}
+
+			if (value instanceof StructuredArray) {
+				StructuredArray o = (StructuredArray) value;
+
+				for (Integer index : o.getElements().keySet()) {
+					for (Value e : o.getElement(index).getPossibleValues()) {
+						if (e.getUniverseID() != value.getUniverseID()) throw new RuntimeException(value + " (univ: " + value.getUniverseID() + ") with element " + e + " (univ: " + e.getUniverseID() + ")");
+					}
+				}
+			}
+		}
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder ret = new StringBuilder();

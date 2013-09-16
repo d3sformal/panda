@@ -7,8 +7,8 @@ public class HeapObject extends StructuredValue implements StructuredObject {
 	
 	private Map<String, Slot> fields = new HashMap<String, Slot>();
 
-	public HeapObject(Integer reference) {
-		super(new HeapObjectReference(reference));
+	public HeapObject(Universe universe, Integer reference) {
+		super(universe, new HeapObjectReference(reference));
 	}
 	
 	@Override

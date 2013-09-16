@@ -7,8 +7,8 @@ public class ClassStatics extends StructuredValue implements StructuredObject {
 
 	private Map<String, Slot> fields = new HashMap<String, Slot>();
 
-	public ClassStatics(String className) {
-		super(new ClassStaticsReference(className));
+	public ClassStatics(Universe universe, String className) {
+		super(universe, new ClassStaticsReference(className));
 	}
 	
 	@Override

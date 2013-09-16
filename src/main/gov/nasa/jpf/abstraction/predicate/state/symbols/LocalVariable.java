@@ -7,10 +7,13 @@ public class LocalVariable extends Value {
 	private Root localVariable;
 	private Slot slot;
 	
-	protected LocalVariable() {
+	protected LocalVariable(Universe universe) {
+		super(universe);
 	}
 	
-	public LocalVariable(Root localVariable, Value value) {
+	public LocalVariable(Universe universe, Root localVariable, Value value) {
+		this(universe);
+
 		this.localVariable = localVariable;
 		
 		if (value instanceof PrimitiveValue) {
@@ -53,10 +56,10 @@ public class LocalVariable extends Value {
 
 	@Override
 	public LocalVariable cloneInto(Universe universe) {
-		LocalVariable clone = new LocalVariable();
+		LocalVariable clone = new LocalVariable(universe);
 		
 		clone.localVariable = localVariable.clone();
-		clone.slot = slot.cloneInto(universe, this);
+		clone.slot = slot.cloneInto(universe, clone);
 		
 		return clone;
 	}

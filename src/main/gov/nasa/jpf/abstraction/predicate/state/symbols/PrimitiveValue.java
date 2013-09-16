@@ -10,7 +10,9 @@ public class PrimitiveValue extends Value {
 	// 3) need to detect the modification - comparison of the universes - need to distinguish the primitive values
 	private UUID id;
 	
-	public PrimitiveValue() {
+	public PrimitiveValue(Universe universe) {
+		super(universe);
+
 		id = UUID.randomUUID();
 	}
 	
@@ -46,7 +48,7 @@ public class PrimitiveValue extends Value {
 
 	@Override
 	public PrimitiveValue cloneInto(Universe universe) {
-		PrimitiveValue clone = new PrimitiveValue();
+		PrimitiveValue clone = new PrimitiveValue(universe);
 		
 		clone.id = id;
 				

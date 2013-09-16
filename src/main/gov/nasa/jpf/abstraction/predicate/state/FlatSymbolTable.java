@@ -5,6 +5,7 @@ import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
@@ -90,14 +91,14 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	public void addPrimitiveLocal(String name) {
 		Root l = DefaultRoot.create(name);
-		LocalVariable v = new LocalVariable(l, new PrimitiveValue());
+		LocalVariable v = new LocalVariable(universe, l, new PrimitiveValue(universe));
 				
 		locals.put(l, v);
 	}
 	
 	public void addHeapValueLocal(String name) {
 		Root l = DefaultRoot.create(name);
-		LocalVariable v = new LocalVariable(l, universe.get(Universe.NULL));
+		LocalVariable v = new LocalVariable(universe, l, universe.get(Universe.NULL));
 				
 		locals.put(l, v);
 	}
@@ -111,7 +112,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			
 		if (!excluded) {
 			PackageAndClass c = DefaultPackageAndClass.create(name);
-			ClassObject v = new ClassObject(c, (ClassStatics) universe.add(threadInfo, elementInfo));
+			ClassObject v = new ClassObject(universe, c, (ClassStatics) universe.add(threadInfo, elementInfo));
 			
 			classes.put(c, v);
 		}
@@ -149,15 +150,16 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	private Set<AccessExpression> valueToAccessExpressions(Value value, int maxLength) {
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		
-		if (maxLength == 0) return ret;		
-		if (value instanceof LocalVariable || value instanceof ClassObject) return ret;
+		if (maxLength == 0) {
+			return ret;
+		}
 		
 		for (Slot slot : value.getSlots()) {
 			Value parent = slot.getParent();
 			
-			Set<AccessExpression> resolution = valueToAccessExpressions(parent,  maxLength - 1);
-			
 			if (parent instanceof StructuredValue) {
+				Set<AccessExpression> resolution = valueToAccessExpressions(parent,  maxLength - 1);
+
 				for (AccessExpression prefix : resolution) {
 					AccessExpression path = null;
 					
@@ -205,7 +207,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		boolean ambiguous = destinations.size() > 1;
 		
 		for (Value destination : destinations) {
-			Value newValue = new PrimitiveValue();
+			Value newValue = new PrimitiveValue(universe);
 			
 			for (Slot slot : destination.getSlots()) {			
 				if (!ambiguous) {
@@ -233,7 +235,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	// FromTable has to be a subset (ideally equivalent) of this Table
 	// The universes may differ instance-wise (different objects representing the same universe)
 	// FromTable may have a different Locals/Statics sets
-	public Set<AccessExpression> processObjectStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {		
+	public Set<AccessExpression> processObjectStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
 		fromTable.ensureAnonymousObjectExistance(from);
 		
 		ensureAnonymousObjectExistance(from);
@@ -265,7 +267,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		}
 		
 		if (from instanceof Constant) {
-			Constant referenceConstant = (Constant) from;
+			Constant referenceConstant = (Constant) from; // null, -1
 			Integer reference = referenceConstant.value.intValue();
 			
 			if (universe.contains(reference)) {
@@ -321,7 +323,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				parent.getSlot().add(sources);
 			}
 		}
-				
+
 		return ret;
 	}
 
