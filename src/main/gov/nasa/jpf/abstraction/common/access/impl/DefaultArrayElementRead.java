@@ -107,7 +107,7 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 			if (updated instanceof AccessExpression) {
 				AccessExpression updatedAccessExpression = (AccessExpression) updated;
 				
-				return create(updatedAccessExpression, DefaultArrayElementWrite.create(a, getArrays().clone(), getIndex().clone(), newExpression), getIndex().update(expression, newExpression));
+				return create(updatedAccessExpression, DefaultArrayElementWrite.create(a.getArray(), getArrays().clone(), getIndex().clone(), newExpression), getIndex().update(expression, newExpression));
 			}
 				
 			return UndefinedAccessExpression.create();

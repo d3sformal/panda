@@ -1,10 +1,10 @@
 @using=jpf-abstraction
 
-target=anonymousObject.AnonymousObject
+target=anonymousobject.AnonymousObject
 
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/anonymousObject/AnonymousObject.pred
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/anonymousobject/AnonymousObject.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.SMTMonitor

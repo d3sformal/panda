@@ -242,15 +242,27 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 
 	@Override
 	public void visit(ArrayElementWrite expression) {
-		ret += "(store ";
+		ret += "(store "; // Store the updated array into arrays
 		
 		expression.getArrays().accept(this);
 		
 		ret += " ";
 		
-		ret += "(store ";
+		expression.getArray().accept(this);
+
+		ret += " ";
+
+		ret += "(store "; // Update the array
+
+		ret += "(select "; // Select the concrete array
+
+		expression.getArrays().accept(this);
+
+		ret += " ";
 		
 		expression.getArray().accept(this);
+
+		ret += ")";
 		
 		ret += " ";
 		

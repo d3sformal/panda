@@ -1,6 +1,8 @@
 package gov.nasa.jpf.abstraction.common.access;
 
-public interface ArrayAccessExpression extends ObjectAccessExpression {
+import gov.nasa.jpf.abstraction.common.ArrayExpression;
+
+public interface ArrayAccessExpression extends ObjectAccessExpression, ArrayExpression {
 	public AccessExpression getArray();
 	
 	@Override
