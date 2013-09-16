@@ -3,14 +3,19 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
+import gov.nasa.jpf.abstraction.concrete.Reference;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.util.RunDetector;
+import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 import java.util.Set;
 
@@ -38,6 +43,18 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			} else {
 				ret.addHeapValueLocal(local.getName());
 			}
+		}
+		
+		VM vm = threadInfo.getVM();
+		String target = vm.getConfig().getTarget();
+		
+		if (method.getFullName().equals(target + ".main([Ljava/lang/String;)V")) {
+			StackFrame sf = threadInfo.getTopFrame();
+			
+			ElementInfo ei = threadInfo.getElementInfo(sf.getLocalVariable(0));
+			int length = ei.arrayLength();
+			
+			ret.processObjectStore(AnonymousArray.create(new Reference(threadInfo, ei), Constant.create(length)), DefaultRoot.create(locals[0].getName()));
 		}
 		
 		return ret;
