@@ -3,15 +3,16 @@ package compare;
 public class Compare {
 
 	public static void main(String[] args) {
-		float a, b;
+		int a, b;
+		int x, y = 0;
 		
-		a = 3.2f;
-		b = 2.4f;
+		a = 3;
+		b = 2;
 		
-		if (a * b < 12.0f) {
-			int x = 0;
+		if (a * b < 12) {
+			x = 0;
 		} else {
-			int y = 1;
+			y = 1;
 		}
 		
 		int i, j, k;
@@ -21,10 +22,12 @@ public class Compare {
 		k = 10;
 		
 		if (i < j) {
-			int x = 2;
+			x = 2;
 		} else {
-			int y = 3;
+			y = 3;
 		}
+
+		x = y; // force the compiler to keep the variable 'y'
 	}
 
 }
