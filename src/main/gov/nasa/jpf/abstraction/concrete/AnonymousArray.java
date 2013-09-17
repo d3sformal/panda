@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.concrete;
 
+import gov.nasa.jpf.abstraction.common.ArrayExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -7,7 +8,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 /**
  * A freshly allocated array (or a duplicate) --- not loaded from a variable.
  */
-public class AnonymousArray extends AnonymousObject {
+public class AnonymousArray extends AnonymousObject implements ArrayExpression {
 	
 	private Expression length;
 	

@@ -1,2 +1,5 @@
 [method arraylength.ALength.main]
 alength(arrlen, a) = -1
+alength(arrlen, a) = i
+alength(arrlen, a) = 3
+i = 3
