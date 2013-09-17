@@ -23,7 +23,12 @@ public abstract class DefaultArrayLengthExpression extends DefaultArrayAccessExp
 	
 	@Override
 	public List<AccessExpression> getSubAccessExpressions() {
-		return getArray().getAccessExpressions();
+		List<AccessExpression> subAccessExpressions = super.getSubAccessExpressions();
+
+		subAccessExpressions.addAll(getArrayLengths().getSubAccessExpressions());
+		subAccessExpressions.addAll(getArray().getAccessExpressions());
+
+		return subAccessExpressions;
 	}
 
 }
