@@ -44,8 +44,6 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		source = Attribute.ensureNotNull(source);
 		destination = Attribute.ensureNotNull(destination);
 		
-		//System.out.println(">>>> " + sf.peek(1) + " " + ti.getElementInfo(sf.peek(1))); // IF sf.peek(1) == -1 THEN FOUND ERROR "null object"
-		
 		ElementInfo ei = ti.getModifiableElementInfo(sf.peek(1));
 		ei.setFieldAttr(getFieldInfo(), source);
 		
@@ -55,7 +53,7 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		
 		if (JPFInstructionAdaptor.testFieldInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
-		}  
+		}
 		
 		Expression from = source.getExpression();
 		AccessExpression to = null;
@@ -65,7 +63,7 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 			to = DefaultObjectFieldRead.create(to, getFieldName());
 			
 			if (ei.getFieldValueObject(getFieldName()) instanceof ElementInfo) {
-	        	GlobalAbstraction.getInstance().processObjectStore((AccessExpression) from, to);
+	        	GlobalAbstraction.getInstance().processObjectStore(from, to);
 	        } else {
 	        	GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
 	        }

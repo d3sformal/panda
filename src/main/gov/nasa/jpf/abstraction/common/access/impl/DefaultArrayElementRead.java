@@ -11,6 +11,7 @@ import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
 import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
 import gov.nasa.jpf.abstraction.predicate.common.Equals;
@@ -112,7 +113,15 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 			return UndefinedAccessExpression.create();
 		}
 		
-		return create((AccessExpression) updated, getArrays().clone(), getIndex().update(expression, newExpression));
+		if (updated instanceof AccessExpression) {
+			return create((AccessExpression) updated, getArrays().clone(), getIndex().update(expression, newExpression));
+		}
+
+		if (updated instanceof NullExpression) {
+			return NullExpression.create();
+		}
+
+		throw new RuntimeException("Unrecognized expression " + updated + "(" + updated.getClass().getName() + ")");
 	}
 
 	@Override

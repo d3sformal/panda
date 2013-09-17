@@ -84,7 +84,7 @@ public class ContainerAbstraction extends Abstraction {
     }
     
     @Override
-    public void processObjectStore(AccessExpression from, AccessExpression to) {
+    public void processObjectStore(Expression from, AccessExpression to) {
     	for (Abstraction abs : list) {
     		abs.processObjectStore(from, to);
     	}

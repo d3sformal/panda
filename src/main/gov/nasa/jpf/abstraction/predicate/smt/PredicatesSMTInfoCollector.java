@@ -300,7 +300,6 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	
 	@Override
 	public void visit(NullExpression expression) {
-		throw new SMTException("NULL IN THE INPUT");
 	}
 	
 	@Override

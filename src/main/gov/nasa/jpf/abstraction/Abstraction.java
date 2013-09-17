@@ -86,7 +86,7 @@ public abstract class Abstraction {
      * Informs the abstraction about a symbolic assignment
      * @param to An access expression referring to an object on heap
      */
-	public void processObjectStore(AccessExpression from, AccessExpression to) {
+	public void processObjectStore(Expression from, AccessExpression to) {
 	}
 	
     /**

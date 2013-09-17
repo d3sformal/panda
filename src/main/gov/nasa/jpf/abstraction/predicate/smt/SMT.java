@@ -139,6 +139,7 @@ public class SMT {
 		input += "(declare-fun arr () (Array Int (Array Int Int)))" + separator;
 		input += "(declare-fun arrlen () (Array Int Int))" + separator;
 		input += "(declare-fun fresh () Int)" + separator;
+		input += "(declare-fun null () Int)" + separator;
 		input += separator;
 		
 		for (String c : classes) {

@@ -9,6 +9,7 @@ import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Field;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 
@@ -110,7 +111,15 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 			}
 		}
 		
-		return create((AccessExpression) updated, getField().clone());
+		if (updated instanceof AccessExpression) {
+			return create((AccessExpression) updated, getField().clone());
+		}
+		
+		if (updated instanceof NullExpression) {
+			return NullExpression.create();
+		}
+		
+		throw new RuntimeException("Unrecognized expression " + updated + "(" + updated.getClass().getName() + ")");
 	}
 
 	@Override
