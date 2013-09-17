@@ -7,7 +7,6 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.Reference;
-import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ElementInfo;
@@ -54,7 +53,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			ElementInfo ei = threadInfo.getElementInfo(sf.getLocalVariable(0));
 			int length = ei.arrayLength();
 			
-			ret.processObjectStore(AnonymousArray.create(new Reference(threadInfo, ei), Constant.create(length)), DefaultRoot.create(locals[0].getName()));
+			LocalVarInfo args = method.getArgumentLocalVars()[0];
+
+			ret.processObjectStore(AnonymousArray.create(new Reference(threadInfo, ei), Constant.create(length)), DefaultRoot.create(args.getName()));
 		}
 		
 		return ret;
