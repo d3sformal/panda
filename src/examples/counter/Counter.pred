@@ -1,2 +1,2 @@
-[object counter.Counter]
+[method counter.Counter.main]
 i >= 1
