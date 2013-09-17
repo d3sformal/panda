@@ -11,8 +11,8 @@ public class DefaultReturnValue extends DefaultRoot implements ReturnValue {
 		super("return");
 	}
 	
-	protected DefaultReturnValue(Instruction pc, boolean isReference) {
-		super("return_pc" + pc.getInstructionIndex());
+	protected DefaultReturnValue(String name, boolean isReference) {
+		super(name);
 		
 		this.isReference = isReference;
 	}
@@ -21,8 +21,12 @@ public class DefaultReturnValue extends DefaultRoot implements ReturnValue {
 		return new DefaultReturnValue();
 	}
 	
+	public static DefaultReturnValue create(String name, boolean isReference) {
+		return new DefaultReturnValue(name, isReference);
+	}
+
 	public static DefaultReturnValue create(Instruction pc, boolean isReference) {
-		return new DefaultReturnValue(pc, isReference);
+		return create("return_pc" + pc.getInstructionIndex(), isReference);
 	}
 	
 	@Override
@@ -39,5 +43,10 @@ public class DefaultReturnValue extends DefaultRoot implements ReturnValue {
 		}
 		
 		return false;
+	}
+
+	@Override
+	public DefaultReturnValue clone() {
+		return create(getName(), isReference);
 	}
 }

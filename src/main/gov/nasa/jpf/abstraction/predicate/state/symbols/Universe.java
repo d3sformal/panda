@@ -329,4 +329,12 @@ public class Universe implements Cloneable {
 			}
 		}
 	}
+	
+	public Set<StructuredValue> getStructuredValues() {
+		Set<StructuredValue> ret = new HashSet<StructuredValue>();
+		
+		ret.addAll(objects.values());
+		
+		return ret;
+	}
 }

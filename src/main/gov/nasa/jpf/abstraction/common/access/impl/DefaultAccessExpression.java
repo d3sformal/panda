@@ -7,13 +7,13 @@ import java.util.Map;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
+import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.impl.DefaultObjectExpression;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
@@ -87,7 +87,12 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 	
 	@Override
 	public final boolean isLocalVariable() {
-		return this instanceof Root && !isStatic();
+		return this instanceof Root && !isStatic() && !isReturnValue();
+	}
+
+	@Override
+	public final boolean isReturnValue() {
+		return this instanceof ReturnValue && !isStatic();
 	}
 	
 	@Override

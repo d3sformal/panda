@@ -18,11 +18,15 @@ public class LocalVariable extends Value {
 		
 		if (value instanceof PrimitiveValue) {
 			slot = new PrimitiveValueSlot(this, localVariable.getName(), (PrimitiveValue)value);
+			return;
 		}
 		
 		if (value instanceof StructuredValue) {
 			slot = new StructuredValueSlot(this, localVariable.getName(), (StructuredValue)value);
+			return;
 		}
+		
+		throw new RuntimeException("Unknown type of value: " + value);
 	}
 	
 	public AccessExpression getAccessExpression() {

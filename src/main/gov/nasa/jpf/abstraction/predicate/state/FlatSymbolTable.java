@@ -4,6 +4,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
+import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
@@ -61,6 +62,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	private Universe universe = new Universe();	
 	private Map<Root, LocalVariable> locals = new HashMap<Root, LocalVariable>();
+	private Map<ReturnValue, LocalVariable> returns = new HashMap<ReturnValue, LocalVariable>();
 	private Map<PackageAndClass, ClassObject> classes = new HashMap<PackageAndClass, ClassObject>();
 	private PredicateAbstraction abstraction;
 	
@@ -72,6 +74,10 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return locals.keySet();
 	}
 	
+	public Set<ReturnValue> getReturnValues() {
+		return returns.keySet();
+	}
+
 	public Set<PackageAndClass> getClasses() {
 		return classes.keySet();
 	}
@@ -80,10 +86,15 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return locals.get(l);
 	}
 	
+	public LocalVariable getReturnValue(ReturnValue r) {
+		return returns.get(r);
+	}
+
 	public ClassObject getClass(Root c) {
 		return classes.get(c);
 	}
 	
+	@Override
 	public Universe getUniverse() {
 		return universe;
 	}
@@ -102,6 +113,20 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		locals.put(l, v);
 	}
 	
+	public void addPrimitiveReturn(ReturnValue r) {
+		LocalVariable v = new LocalVariable(universe, r, new PrimitiveValue(universe));
+
+		returns.put(r, v);
+	}
+
+	public void addHeapValueReturn(ReturnValue r, StructuredValue value) {
+		StructuredValue clone = value.cloneInto(universe);
+
+		LocalVariable ret = new LocalVariable(universe, r, clone);
+
+		returns.put(r, ret);
+	}
+
 	public void addClass(String name, ThreadInfo threadInfo, ElementInfo elementInfo) {
 		boolean excluded = false;
 			
@@ -135,6 +160,14 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			}
 		}
 		
+		if (expression.getRoot().isReturnValue()) {
+			if (returns.containsKey(expression.getRoot())) {
+				return universe.lookupValues(returns.get(expression.getRoot()).getSlot().getPossibleValues(), expression);
+			} else {
+				return new HashSet<Value>(); // Not found
+			}
+		}
+
 		if (expression.getRoot().isStatic()) {
 			if (classes.containsKey(expression.getRoot())) {
 				return universe.lookupValues(classes.get(expression.getRoot()).getSlot().getPossibleValues(), expression);
@@ -377,6 +410,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		
 		clone.universe = universe.clone();
 		clone.locals = new HashMap<Root, LocalVariable>();
+		clone.returns = new HashMap<ReturnValue, LocalVariable>();
 		clone.classes = new HashMap<PackageAndClass, ClassObject>();
 		
 		for (Root l : locals.keySet()) {
@@ -386,6 +420,13 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			clone.locals.put(lClone, lValue);
 		}
 		
+		for (ReturnValue r : returns.keySet()) {
+			ReturnValue rClone = r.clone();
+			LocalVariable lValue = returns.get(r).cloneInto(clone.universe);
+
+			clone.returns.put(rClone, lValue);
+		}
+
 		for (PackageAndClass c : classes.keySet()) {
 			PackageAndClass cClone = c.clone();
 			ClassObject cValue = classes.get(c).cloneInto(clone.universe);
@@ -464,6 +505,12 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			}
 		}
 		
+		for (ReturnValue r : returns.keySet()) {
+			for (Value value : returns.get(r).getSlot().getPossibleValues()) {
+				ret.addAll(subValueAccessExpressions(value, r, getMaximalAccessExpressionLength()));
+			}
+		}
+
 		for (PackageAndClass c : classes.keySet()) {			
 			for (Value value : classes.get(c).getSlot().getPossibleValues()) {
 				ret.addAll(subValueAccessExpressions(value, c, getMaximalAccessExpressionLength()));
@@ -538,7 +585,14 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			local.getSlot().clear();
 		}
 		
+		for (ReturnValue r : returns.keySet()) {
+			LocalVariable ret = returns.get(r);
+
+			ret.getSlot().clear();
+		}
+
 		locals.clear();
+		returns.clear();
 	}
 
 	public void updateUniverse(FlatSymbolTable top) {
@@ -552,9 +606,17 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			
 			clone.locals.put(lClone, lValue);
 		}
-		 
+		
+		for (ReturnValue r : returns.keySet()) {
+			ReturnValue rClone = r.clone();
+			LocalVariable rValue = returns.get(r).cloneInto(clone.universe);
+
+			clone.returns.put(rClone, rValue);
+		}
+
 		locals = clone.locals;
 		classes = clone.classes;
 		universe = clone.universe;
 	}
+
 }

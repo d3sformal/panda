@@ -2,12 +2,16 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ReturnValue;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.Reference;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Universe;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -110,6 +114,18 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	
 	@Override
 	public AffectedAccessExpressions processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
+		StackFrame sf = threadInfo.getModifiableTopFrame();
+
+		ReturnValue r = DefaultReturnValue.create(threadInfo.getPC(), before.getMethodInfo().isReferenceReturnType());
+
+		sf.setOperandAttr(new NonEmptyAttribute(null, r));
+
+		if (before.getMethodInfo().isReferenceReturnType()) {
+			scopes.top(1).addHeapValueReturn(r, scopes.top().getUniverse().get(sf.peek()));
+		} else {
+			scopes.top(1).addPrimitiveReturn(r);
+		}
+
 		return processVoidMethodReturn(threadInfo, before, after, sideEffect);
 	}
 	
@@ -185,6 +201,11 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	@Override
 	public boolean isPrimitive(AccessExpression path) {
 		return scopes.top().isPrimitive(path);
+	}
+
+	@Override
+	public Universe getUniverse() {
+		return scopes.top().getUniverse();
 	}
 	
 }
