@@ -159,6 +159,8 @@ public class Universe implements Cloneable {
 			StructuredValue parent = (StructuredValue) value;
 			
 			if (read instanceof ObjectFieldRead) {
+				if (parent instanceof Null) continue;
+
 				StructuredObject object = (StructuredObject) parent;
 				ObjectFieldRead fieldRead = (ObjectFieldRead) read;
 				
@@ -166,6 +168,8 @@ public class Universe implements Cloneable {
 			}
 			
 			if (read instanceof ArrayElementRead) {
+				if (parent instanceof Null) continue;
+
 				StructuredArray array = (StructuredArray) parent;
 				
 				for (int i = 0; i < array.getLength(); ++i) {
