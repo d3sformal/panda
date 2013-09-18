@@ -39,23 +39,6 @@ public class Image
 	}
 
 	public void render() {
-		/**
-		 * PASS INFO FROM LOAD TO RENDER
-		rectangles = new Rectangle[2];
-		rectangles[0] = new Rectangle();
-		rectangles[1] = new Rectangle();
-		
-		rectangles[0].top = 1;
-		rectangles[0].left = 1;
-		rectangles[0].right = 4;
-		rectangles[0].bottom = 2;
-		
-		rectangles[1].top = 0;
-		rectangles[1].left = 0;
-		rectangles[1].right = 3;
-		rectangles[1].bottom = 3;
-		//*************************/
-		
 		Rectangle rec = null;		
 
 		// loop over all rectangles and draw them
