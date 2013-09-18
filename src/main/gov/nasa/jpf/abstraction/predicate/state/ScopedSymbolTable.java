@@ -119,7 +119,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 
 		Attribute attr = Attribute.ensureNotNull((Attribute) after.getOperandAttr());
 		Expression returnExpression = attr.getExpression();
-		after.setOperandAttr(new NonEmptyAttribute(null, callerReturnValue));
+		//after.setOperandAttr(new NonEmptyAttribute(null, callerReturnValue)); // This is performed by the predicate valuation after it uses the original expression
 
 		if (before.getMethodInfo().isReferenceReturnType()) {
 			scopes.top().addHeapValueReturn(calleeReturnValue);
@@ -143,16 +143,12 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		
 		FlatSymbolTable transitionScope = scopes.top(1);
 		
+		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
+
 		if (RunDetector.isRunning()) {			
 			Set<AccessExpression> modifications = transitionScope.getModifiedObjectAccessExpressions(scopes.top());
 			
 			ret.addAll(modifications);
-			
-			/*
-			System.out.println("Objects modified in child scope after return from " + before.getClassName() + "." + before.getMethodName() + ": " + modifications);
-			System.out.println(transitionScope);
-			System.out.println("================================================================");
-			*/
 		}
 		
 		transitionScope.updateUniverse(scopes.top());

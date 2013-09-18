@@ -17,6 +17,7 @@ import gov.nasa.jpf.abstraction.predicate.common.MethodContext;
 import gov.nasa.jpf.abstraction.predicate.common.ObjectContext;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.common.Predicates;
+import gov.nasa.jpf.abstraction.predicate.common.StaticContext;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.abstraction.predicate.smt.SMTException;
 import gov.nasa.jpf.abstraction.util.RunDetector;
@@ -24,6 +25,7 @@ import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +50,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			predicates.addAll(context.predicates);
 		}
 		
+		initialValuation = new HashMap<Predicate, TruthValue>();
+
 		if (!predicates.isEmpty()) {
 			try {
 				initialValuation = new SMT().valuatePredicates(predicates);
@@ -60,7 +64,6 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 						initialValuation.put(predicate, initialValuation.get(predicate));
 					}
 				}
-				return;
 			} catch (SMTException e) {
 				e.printStackTrace();
 				
@@ -68,10 +71,20 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			}
 		}
 		
-		initialValuation = new HashMap<Predicate, TruthValue>();
+		if (initialValuation.isEmpty()) {
+			for (Predicate predicate : predicates) {
+				initialValuation.put(predicate, TruthValue.UNDEFINED);
+			}
+		}
 		
-		for (Predicate predicate : predicates) {
-			initialValuation.put(predicate, TruthValue.UNDEFINED);
+		// Monitor static predicates in the special starting scope
+		// This allows to pass static predicates throw clinit/main...
+		for (Context context : predicateSet.contexts) {
+			if (context instanceof StaticContext) {
+				for (Predicate predicate : context.predicates) {
+					scopes.top().put(predicate, initialValuation.get(predicate));
+				}
+			}
 		}
 	}
 	
@@ -135,6 +148,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		FlatPredicateValuation finalScope = createDefaultScope(threadInfo, method);
 		
+		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
+
 		if (RunDetector.isRunning()) {
 			FlatPredicateValuation transitionScope;
 			transitionScope = scopes.top().clone();
@@ -159,11 +174,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 
 					Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
 					
-					for (int i = 1; i < args.length; ++i) {
+					for (int i = 0; i < args.length; ++i) {
 						Attribute attr = attrs[i];
 											
 						if (args[i] != null && attr.getExpression() != null) {
-							replacements.put(DefaultAccessExpression.createFromString(args[i].getName()), attr.getExpression());
+							replacements.put(DefaultRoot.create(args[i].getName()), attr.getExpression());
 						}
 					}
 					
@@ -201,6 +216,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	
 	@Override
 	public SideEffect processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
+		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
+
         if (RunDetector.isRunning()) {
 			Attribute attr = (Attribute) after.getResultAttr();
 			ReturnValue ret = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
@@ -359,10 +376,6 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					
 					for (AccessExpression affectedPath : affected) {
 						canBeAffected |= affectedPath.isPrefixOf(path);
-						
-						//if (affectedPath.isPrefixOf(path)) {
-						//	System.out.println("POSSIBLY AFFECTED " + path + " BY POSSIBLE WRITE TO " + affectedPath);
-						//}
 					}
 				}
 				
