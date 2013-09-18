@@ -114,16 +114,23 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	
 	@Override
 	public AffectedAccessExpressions processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
-		StackFrame sf = threadInfo.getModifiableTopFrame();
+		ReturnValue calleeReturnValue = DefaultReturnValue.create();
+		ReturnValue callerReturnValue = DefaultReturnValue.create(threadInfo.getPC(), before.getMethodInfo().isReferenceReturnType());
 
-		ReturnValue r = DefaultReturnValue.create(threadInfo.getPC(), before.getMethodInfo().isReferenceReturnType());
-
-		sf.setOperandAttr(new NonEmptyAttribute(null, r));
+		Attribute attr = Attribute.ensureNotNull((Attribute) after.getOperandAttr());
+		Expression returnExpression = attr.getExpression();
+		after.setOperandAttr(new NonEmptyAttribute(null, callerReturnValue));
 
 		if (before.getMethodInfo().isReferenceReturnType()) {
-			scopes.top(1).addHeapValueReturn(r, scopes.top().getUniverse().get(sf.peek()));
+			scopes.top().addHeapValueReturn(calleeReturnValue);
+			scopes.top().processObjectStore(returnExpression, calleeReturnValue);
+			scopes.top(1).addHeapValueReturn(callerReturnValue);
+			scopes.top(1).processObjectStore(calleeReturnValue, scopes.top(), callerReturnValue);
 		} else {
-			scopes.top(1).addPrimitiveReturn(r);
+			scopes.top().addPrimitiveReturn(calleeReturnValue);
+			scopes.top().processPrimitiveStore(returnExpression, calleeReturnValue);
+			scopes.top(1).addPrimitiveReturn(callerReturnValue);
+			scopes.top(1).processPrimitiveStore(calleeReturnValue, scopes.top(), callerReturnValue);
 		}
 
 		return processVoidMethodReturn(threadInfo, before, after, sideEffect);

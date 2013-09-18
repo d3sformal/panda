@@ -119,10 +119,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		returns.put(r, v);
 	}
 
-	public void addHeapValueReturn(ReturnValue r, StructuredValue value) {
-		StructuredValue clone = value.cloneInto(universe);
-
-		LocalVariable ret = new LocalVariable(universe, r, clone);
+	public void addHeapValueReturn(ReturnValue r) {
+		LocalVariable ret = new LocalVariable(universe, r, universe.get(Universe.NULL));
 
 		returns.put(r, ret);
 	}
@@ -264,7 +262,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return processObjectStore(from, this, to);
 	}
 	
-	// FromTable has to be a subset (ideally equivalent) of this Table
 	// The universes may differ instance-wise (different objects representing the same universe)
 	// FromTable may have a different Locals/Statics sets
 	public Set<AccessExpression> processObjectStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
@@ -280,21 +277,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		if (from instanceof AccessExpression) {
 			Set<Value> rawSources = fromTable.lookupValues((AccessExpression) from);
 			
-			// ASSUME:
-			// 1) Primitive values are never stored directly
-			//    Rather a new incarnation is created
-			// 2) All 'from' objects exist in the source as well as in the destination table
-			//
-			// THE MEANING IS TO ALLOW WRITE FROM ONE SCOPE TO THE OTHER
-			//   -> INVOKE_METHOD(PARAM (scope2) := LOCAL VAR (scope1))
+			// ENSURE ALL SOURCE OBJECTS EXIST IN THE TARGET UNIVERSE
 			for (Value foreign : rawSources) {
-				if (foreign instanceof PrimitiveValue) {
-					sources.add(foreign);
-				} else {
-					StructuredValue structuredForeign = (StructuredValue) foreign;
-
-					sources.add(universe.get(structuredForeign.getReference()));
-				}
+				sources.add(foreign.cloneInto(universe));
 			}
 		}
 		
@@ -344,7 +329,13 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			}
 			
 			if (to instanceof Root) {
-				LocalVariable parent = locals.get(to);
+				LocalVariable parent;
+
+				if (to instanceof ReturnValue) {
+					parent = returns.get(to);
+				} else {
+					parent = locals.get(to);
+				}
 				
 				ret.add(parent.getAccessExpression());
 					
