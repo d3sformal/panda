@@ -1,7 +1,7 @@
 package statics;
 
 class A {
-	int x;
+	int x = 10;
 }
 
 public class Statics {

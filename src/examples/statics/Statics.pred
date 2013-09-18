@@ -1,9 +1,9 @@
 [method statics.Statics.main]
-statics.Statics.x < 2
-statics.Statics.x >= 0
+class(statics.Statics).x < 2
+class(statics.Statics).x >= 0
 
 [static]
-statics.Statics.x = 0
+class(statics.Statics).x = 0
 
-[object statics.Statics.A.A]
+[object statics.A]
 this.x = 10
