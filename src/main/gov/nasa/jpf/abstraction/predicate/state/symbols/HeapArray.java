@@ -15,6 +15,11 @@ public class HeapArray extends StructuredValue implements StructuredArray {
 	}
 	
 	@Override
+	public HeapObjectReference getReference() {
+		return (HeapObjectReference) super.getReference();
+	}
+
+	@Override
 	public void setElement(Integer index, StructuredValue... values) {
 		elements.put(index, new StructuredValueSlot(this, index, values));
 	}
@@ -52,7 +57,7 @@ public class HeapArray extends StructuredValue implements StructuredArray {
 	public HeapArray cloneInto(Universe universe) {
 		boolean existed = universe.contains(getReference());
 		
-		HeapObjectReference reference = (HeapObjectReference) getReference();
+		HeapObjectReference reference = getReference();
 		
 		HeapArray clone = universe.getFactory().createArray(reference.getReference(), getLength());
 				

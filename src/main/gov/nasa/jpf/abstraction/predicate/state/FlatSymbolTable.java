@@ -13,7 +13,10 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.concrete.Reference;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassObject;
@@ -30,6 +33,7 @@ import gov.nasa.jpf.abstraction.predicate.state.symbols.Universe;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.Value;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -184,6 +188,24 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			return ret;
 		}
 		
+		if (value instanceof HeapObject) {
+			HeapObject ho = (HeapObject) value;
+			VM vm = VM.getVM();
+			ThreadInfo ti = vm.getCurrentThread();
+			ElementInfo ei = ti.getElementInfo(ho.getReference().getReference());
+
+			ret.add(AnonymousObject.create(new Reference(ti, ei)));
+		}
+
+		if (value instanceof HeapArray) {
+			HeapArray ha = (HeapArray) value;
+			VM vm = VM.getVM();
+			ThreadInfo ti = vm.getCurrentThread();
+			ElementInfo ei = ti.getElementInfo(ha.getReference().getReference());
+
+			ret.add(AnonymousArray.create(new Reference(ti, ei), Constant.create(ha.getLength())));
+		}
+
 		for (Slot slot : value.getSlots()) {
 			Value parent = slot.getParent();
 			

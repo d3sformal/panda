@@ -113,4 +113,19 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 		return "ref(" + reference + ")";
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof AnonymousObject) {
+			AnonymousObject ao = (AnonymousObject) o;
+
+			return getReference().getObjectRef() == ao.getReference().getObjectRef();
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return getReference().getObjectRef();
+	}
+
 }

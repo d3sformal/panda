@@ -12,6 +12,11 @@ public class HeapObject extends StructuredValue implements StructuredObject {
 	}
 	
 	@Override
+	public HeapObjectReference getReference() {
+		return (HeapObjectReference) super.getReference();
+	}
+
+	@Override
 	public void setField(String name, StructuredValue... values) {
 		fields.put(name, new StructuredValueSlot(this, name, values));
 	}
@@ -44,7 +49,7 @@ public class HeapObject extends StructuredValue implements StructuredObject {
 	public HeapObject cloneInto(Universe universe) {
 		boolean existed = universe.contains(getReference());
 		
-		HeapObjectReference reference = (HeapObjectReference) getReference();
+		HeapObjectReference reference = getReference();
 		
 		HeapObject clone = universe.getFactory().createObject(reference.getReference());
 		

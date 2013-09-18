@@ -13,9 +13,7 @@ import gov.nasa.jpf.vm.VM;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 public class FlatPredicateValuation implements PredicateValuation, Scope {

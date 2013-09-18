@@ -9,7 +9,6 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.Reference;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.Universe;
 import gov.nasa.jpf.abstraction.util.RunDetector;
@@ -139,7 +138,6 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	@Override
 	public AffectedAccessExpressions processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
 		AffectedAccessExpressions ret = new AffectedAccessExpressions();
-		MethodInfo method = after.getMethodInfo();
 		
 		FlatSymbolTable transitionScope = scopes.top(1);
 		
