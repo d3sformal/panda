@@ -23,6 +23,118 @@ this.rectangles[0] = this.rectangles[1]
 5 = this.rectangles[1].left
 6 = this.rectangles[1].left
 
+0 = this.rectangles[0].right
+1 = this.rectangles[0].right
+2 = this.rectangles[0].right
+3 = this.rectangles[0].right
+4 = this.rectangles[0].right
+5 = this.rectangles[0].right
+6 = this.rectangles[0].right
+
+0 = this.rectangles[1].right
+1 = this.rectangles[1].right
+2 = this.rectangles[1].right
+3 = this.rectangles[1].right
+4 = this.rectangles[1].right
+5 = this.rectangles[1].right
+6 = this.rectangles[1].right
+
+0 = this.rectangles[0].top
+1 = this.rectangles[0].top
+2 = this.rectangles[0].top
+3 = this.rectangles[0].top
+4 = this.rectangles[0].top
+5 = this.rectangles[0].top
+6 = this.rectangles[0].top
+
+0 = this.rectangles[1].top
+1 = this.rectangles[1].top
+2 = this.rectangles[1].top
+3 = this.rectangles[1].top
+4 = this.rectangles[1].top
+5 = this.rectangles[1].top
+6 = this.rectangles[1].top
+
+0 = this.rectangles[0].bottom
+1 = this.rectangles[0].bottom
+2 = this.rectangles[0].bottom
+3 = this.rectangles[0].bottom
+4 = this.rectangles[0].bottom
+5 = this.rectangles[0].bottom
+6 = this.rectangles[0].bottom
+
+0 = this.rectangles[1].bottom
+1 = this.rectangles[1].bottom
+2 = this.rectangles[1].bottom
+3 = this.rectangles[1].bottom
+4 = this.rectangles[1].bottom
+5 = this.rectangles[1].bottom
+6 = this.rectangles[1].bottom
+
+0 = r1.left
+1 = r1.left
+2 = r1.left
+3 = r1.left
+4 = r1.left
+5 = r1.left
+6 = r1.left
+
+0 = r1.top
+1 = r1.top
+2 = r1.top
+3 = r1.top
+4 = r1.top
+5 = r1.top
+6 = r1.top
+
+0 = r1.right
+1 = r1.right
+2 = r1.right
+3 = r1.right
+4 = r1.right
+5 = r1.right
+6 = r1.right
+
+0 = r1.bottom
+1 = r1.bottom
+2 = r1.bottom
+3 = r1.bottom
+4 = r1.bottom
+5 = r1.bottom
+6 = r1.bottom
+
+0 = r2.left
+1 = r2.left
+2 = r2.left
+3 = r2.left
+4 = r2.left
+5 = r2.left
+6 = r2.left
+
+0 = r2.top
+1 = r2.top
+2 = r2.top
+3 = r2.top
+4 = r2.top
+5 = r2.top
+6 = r2.top
+
+0 = r2.right
+1 = r2.right
+2 = r2.right
+3 = r2.right
+4 = r2.right
+5 = r2.right
+6 = r2.right
+
+0 = r2.bottom
+1 = r2.bottom
+2 = r2.bottom
+3 = r2.bottom
+4 = r2.bottom
+5 = r2.bottom
+6 = r2.bottom
+
 [object image.Rectangle]
 this.top < this.bottom
 this.left < this.right
@@ -89,51 +201,3 @@ j = 6
 6 = rec.bottom
 
 rec = this.rectangles[k]
-
-0 = this.rectangles[0].right
-1 = this.rectangles[0].right
-2 = this.rectangles[0].right
-3 = this.rectangles[0].right
-4 = this.rectangles[0].right
-5 = this.rectangles[0].right
-6 = this.rectangles[0].right
-
-0 = this.rectangles[1].right
-1 = this.rectangles[1].right
-2 = this.rectangles[1].right
-3 = this.rectangles[1].right
-4 = this.rectangles[1].right
-5 = this.rectangles[1].right
-6 = this.rectangles[1].right
-
-0 = this.rectangles[0].top
-1 = this.rectangles[0].top
-2 = this.rectangles[0].top
-3 = this.rectangles[0].top
-4 = this.rectangles[0].top
-5 = this.rectangles[0].top
-6 = this.rectangles[0].top
-
-0 = this.rectangles[1].top
-1 = this.rectangles[1].top
-2 = this.rectangles[1].top
-3 = this.rectangles[1].top
-4 = this.rectangles[1].top
-5 = this.rectangles[1].top
-6 = this.rectangles[1].top
-
-0 = this.rectangles[0].bottom
-1 = this.rectangles[0].bottom
-2 = this.rectangles[0].bottom
-3 = this.rectangles[0].bottom
-4 = this.rectangles[0].bottom
-5 = this.rectangles[0].bottom
-6 = this.rectangles[0].bottom
-
-0 = this.rectangles[1].bottom
-1 = this.rectangles[1].bottom
-2 = this.rectangles[1].bottom
-3 = this.rectangles[1].bottom
-4 = this.rectangles[1].bottom
-5 = this.rectangles[1].bottom
-6 = this.rectangles[1].bottom
