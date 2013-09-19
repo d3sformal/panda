@@ -3,6 +3,12 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stack keeping Predicate Valuation scopes
+ * 
+ * method call = push
+ * method return = pop
+ */
 public class PredicateValuationStack implements Scopes {
 	
 	private List<FlatPredicateValuation> scopes = new ArrayList<FlatPredicateValuation>();

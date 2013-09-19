@@ -3,6 +3,12 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stack keeping Symbol Table scopes
+ * 
+ * method call = push
+ * method return = pop
+ */
 public class SymbolTableStack implements Scopes {
 	
 	private List<FlatSymbolTable> scopes = new ArrayList<FlatSymbolTable>();

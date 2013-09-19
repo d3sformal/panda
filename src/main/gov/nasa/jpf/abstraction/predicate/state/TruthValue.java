@@ -1,5 +1,13 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+/**
+ * Possible valuations of a predicate
+ * 
+ * UNDEFINED ... the initial value (not valuated yet)
+ * UNKNOWN   ... cannot rule out neither true nor false
+ * TRUE      ... true
+ * FALSE     ... false
+ */
 public enum TruthValue {
 	UNDEFINED,
 	TRUE,

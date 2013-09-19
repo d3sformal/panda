@@ -4,6 +4,9 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * An interface for all structures whose behaviour or data change depending on the current runtime method scope.
+ */
 public interface Scoped {
 	public Scope createDefaultScope(ThreadInfo threadInfo, MethodInfo method);
 	public SideEffect processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect);

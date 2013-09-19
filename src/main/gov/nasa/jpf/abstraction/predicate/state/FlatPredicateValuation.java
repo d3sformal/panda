@@ -16,6 +16,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A predicate valuation for a single scope
+ */
 public class FlatPredicateValuation implements PredicateValuation, Scope {
 	private HashMap<Predicate, TruthValue> valuations = new HashMap<Predicate, TruthValue>();
 	
@@ -29,6 +32,11 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		return clone;
 	}
 	
+	/**
+	 * Suppose valuation of given predicates change, update all affected predicates, too
+	 * 
+	 * Keep doing so until a fixpoint is reached
+	 */
 	private void cascadeReevaluation(Map<Predicate, TruthValue> updated) {
 		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
 		
@@ -64,6 +72,9 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		}
 	}
 
+	/**
+	 * Force (create/overwrite) valuation of the given predicate to the given value
+	 */
 	@Override
 	public void put(Predicate predicate, TruthValue value) {
 		Map<Predicate, TruthValue> newValuations = new HashMap<Predicate, TruthValue>();
@@ -80,6 +91,9 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		valuations.putAll(newValuations);
 	}
 	
+	/**
+	 * Same as the above (for more predicates at once)
+	 */
 	@Override
 	public void putAll(Map<Predicate, TruthValue> values) {
 		for (Predicate predicate : values.keySet()) {

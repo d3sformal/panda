@@ -42,6 +42,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * A symbol table for a single scope
+ */
 public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	private static String[] doNotMonitor = new String[] {
@@ -64,9 +67,26 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	};
 	private static int GUARANTEED_LENGTH = 8;
 	
-	private Universe universe = new Universe();	
+	/**
+	 * Memory model
+	 */
+	private Universe universe = new Universe();
+	
+	/**
+	 * Entry points to the memory model
+	 * 
+	 * Local Variables:
+	 */
 	private Map<Root, LocalVariable> locals = new HashMap<Root, LocalVariable>();
+	
+	/**
+	 * Return values (special "variables" with no backup in the program itself):
+	 */
 	private Map<ReturnValue, LocalVariable> returns = new HashMap<ReturnValue, LocalVariable>();
+	
+	/**
+	 * Classes (holders for static fields)
+	 */
 	private Map<PackageAndClass, ClassObject> classes = new HashMap<PackageAndClass, ClassObject>();
 	private PredicateAbstraction abstraction;
 	
@@ -144,6 +164,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		}
 	}
 	
+	/**
+	 * Resolve a path to all values it may be pointing to (primitive/objects)
+	 */
 	private Set<Value> lookupValues(AccessExpression expression) {
 		if (expression.getRoot() instanceof AnonymousExpression) {
 			AnonymousExpression anonymous = (AnonymousExpression) expression.getRoot();
@@ -181,6 +204,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		throw new RuntimeException("Attempting to resolve access expression not rooted in a local variable nor a static field: " + expression);
 	}
 	
+	/**
+	 * Find all paths (up to a certain length) that can describe the given value (primitive/object)
+	 */
 	private Set<AccessExpression> valueToAccessExpressions(Value value, int maxLength) {
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		
@@ -244,11 +270,17 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return getFilteredRelevantAccessExpressions().size();
 	}
 	
+	/**
+	 * Store values pointed to by one expression into the other
+	 */
 	@Override
 	public Set<AccessExpression> processPrimitiveStore(Expression from, AccessExpression to) {
 		return processPrimitiveStore(from, this, to);
 	}
 
+	/**
+	 * Same as the other variant except it allows cross-universe writes (Necessary for method call boundaries)
+	 */
 	public Set<AccessExpression> processPrimitiveStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
 		ensureAnonymousObjectExistance(from);
 		ensureAnonymousObjectExistance(to);
@@ -279,11 +311,17 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return ret;
 	}
 	
+	/**
+	 * Store values pointed to by one expression into the other
+	 */
 	@Override
 	public Set<AccessExpression> processObjectStore(Expression from, AccessExpression to) {
 		return processObjectStore(from, this, to);
 	}
 	
+	/**
+	 * Same as the other variant except it allows cross-universe writes (Necessary for method call boundaries)
+	 */
 	// The universes may differ instance-wise (different objects representing the same universe)
 	// FromTable may have a different Locals/Statics sets
 	public Set<AccessExpression> processObjectStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
@@ -372,6 +410,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return ret;
 	}
 
+	/**
+	 * Creates (if not already existent) object in the universe to match an anonymous expression
+	 */
 	private void ensureAnonymousObjectExistance(Expression expr) {
 		if (expr instanceof AnonymousExpression) {
 			universe.add(((AnonymousExpression) expr).getReference());
@@ -487,6 +528,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return ret.toString();
 	}
 	
+	/**
+	 * All symbolic expressions pointing to some values in the universe (up to the length of the longest path in a predicate currently being used in the abstraction) that are not filtered out by their name (some system objects are omitted from the output to increase the readability)
+	 */
 	private Set<AccessExpression> getFilteredRelevantAccessExpressions() {
 		Set<AccessExpression> filtered = new HashSet<AccessExpression>();
 	
@@ -509,6 +553,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return filtered;
 	}
 
+	/**
+	 * All symbolic expressions pointing to some values in the universe (up to the length of the longest path in a predicate currently being used in the abstraction)
+	 */
 	private Set<AccessExpression> getAllRelevantAccessExpressions() {
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		
@@ -533,6 +580,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return ret;
 	}
 
+	/**
+	 * Create symbolic expressions accessing subvalues (fields, elements, or deeper) of a given value starting with the prefix (stop after a threshold is reached)
+	 */
 	private Set<AccessExpression> subValueAccessExpressions(Value value, AccessExpression prefix, int maximalAccessExpressionLength) {
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		
@@ -581,6 +631,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		return ret;
 	}
 	
+	/**
+	 * Compare two symbol tables and find differences
+	 */
 	public Set<AccessExpression> getModifiedObjectAccessExpressions(FlatSymbolTable table) {
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 
@@ -608,6 +661,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		returns.clear();
 	}
 
+	/**
+	 * Copy the memory model from the given table here, keep locals/returns valid in this scope
+	 */
 	public void updateUniverse(FlatSymbolTable top) {
 		FlatSymbolTable clone = top.clone();
 				

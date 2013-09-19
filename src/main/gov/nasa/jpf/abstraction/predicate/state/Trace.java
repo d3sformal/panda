@@ -3,6 +3,9 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import java.util.Stack;
 
+/**
+ * Overall history of states visited on a particular path.
+ */
 public class Trace {
 	private Stack<State> states = new Stack<State>();
 	
