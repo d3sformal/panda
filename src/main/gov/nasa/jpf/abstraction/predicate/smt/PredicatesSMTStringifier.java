@@ -21,11 +21,11 @@ import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
-import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
-import gov.nasa.jpf.abstraction.predicate.common.Disjunction;
-import gov.nasa.jpf.abstraction.predicate.common.Equals;
-import gov.nasa.jpf.abstraction.predicate.common.Implication;
-import gov.nasa.jpf.abstraction.predicate.common.LessThan;
+import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Disjunction;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Implication;
+import gov.nasa.jpf.abstraction.common.LessThan;
 
 public class PredicatesSMTStringifier extends PredicatesStringifier {
 	

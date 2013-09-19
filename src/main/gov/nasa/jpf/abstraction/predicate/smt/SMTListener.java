@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
 import gov.nasa.jpf.ListenerAdapter;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
 import java.util.Map;

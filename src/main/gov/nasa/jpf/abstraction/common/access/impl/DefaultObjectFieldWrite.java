@@ -9,7 +9,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Field;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Predicate;
 
 public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implements ObjectFieldWrite {
 

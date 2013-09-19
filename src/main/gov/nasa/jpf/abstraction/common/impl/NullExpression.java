@@ -10,8 +10,8 @@ import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.ObjectExpression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Predicate;
 
 public class NullExpression extends Constant implements ObjectExpression {
 	

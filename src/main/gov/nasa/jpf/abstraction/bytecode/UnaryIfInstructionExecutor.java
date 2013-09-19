@@ -10,7 +10,7 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;

@@ -11,10 +11,10 @@ import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
-import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
-import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
-import gov.nasa.jpf.abstraction.predicate.common.Equals;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Predicate;
 
 public class DefaultArrayLengthRead extends DefaultArrayLengthExpression implements ArrayLengthRead {
 

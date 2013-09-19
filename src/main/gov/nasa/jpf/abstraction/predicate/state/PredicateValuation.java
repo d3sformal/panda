@@ -5,7 +5,7 @@ import java.util.Set;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Predicate;
 
 public interface PredicateValuation {
 	public void put(Predicate predicate, TruthValue value);

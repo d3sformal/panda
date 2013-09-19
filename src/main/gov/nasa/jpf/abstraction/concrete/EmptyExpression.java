@@ -8,8 +8,8 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
-import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Predicate;
 
 /**
  * A dummy expression (may be used when the there would be no expression = null)

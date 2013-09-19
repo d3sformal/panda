@@ -9,7 +9,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Predicate;
 
 public class DefaultArrayLengthWrite extends DefaultArrayLengthExpression implements ArrayLengthWrite {
 

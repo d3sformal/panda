@@ -12,10 +12,10 @@ import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
-import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
-import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
-import gov.nasa.jpf.abstraction.predicate.common.Equals;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Predicate;
 
 public class DefaultArrayElementRead extends DefaultArrayElementExpression implements ArrayElementRead {
 

@@ -9,7 +9,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Predicate;
 
 public class DefaultArrayElementWrite extends DefaultArrayElementExpression implements ArrayElementWrite {
 

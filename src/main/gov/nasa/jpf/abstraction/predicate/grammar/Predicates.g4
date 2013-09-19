@@ -7,7 +7,6 @@ grammar Predicates;
 	import gov.nasa.jpf.abstraction.common.*;
 	import gov.nasa.jpf.abstraction.common.access.*;
 	import gov.nasa.jpf.abstraction.common.access.impl.*;
-	import gov.nasa.jpf.abstraction.predicate.common.*;
 }
 
 predicates returns [Predicates val]

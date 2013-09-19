@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction.predicate.common;
+package gov.nasa.jpf.abstraction.common;
 
 import java.util.Map;
 

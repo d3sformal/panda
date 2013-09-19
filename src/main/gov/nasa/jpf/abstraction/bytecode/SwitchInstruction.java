@@ -29,7 +29,7 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
-import gov.nasa.jpf.abstraction.predicate.common.Equals;
+import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;

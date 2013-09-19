@@ -4,12 +4,12 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
-import gov.nasa.jpf.abstraction.predicate.common.Conjunction;
-import gov.nasa.jpf.abstraction.predicate.common.Equals;
-import gov.nasa.jpf.abstraction.predicate.common.Implication;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
-import gov.nasa.jpf.abstraction.predicate.common.Tautology;
-import gov.nasa.jpf.abstraction.predicate.common.UpdatedPredicate;
+import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Implication;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Tautology;
+import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
 import java.io.BufferedReader;

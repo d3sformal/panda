@@ -2,8 +2,8 @@ package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Notation;
-import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Predicate;
 
 import java.util.ArrayList;
 import java.util.List;

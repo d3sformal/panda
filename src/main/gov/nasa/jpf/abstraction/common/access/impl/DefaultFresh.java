@@ -2,8 +2,8 @@ package gov.nasa.jpf.abstraction.common.access.impl;
 
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.Fresh;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
-import gov.nasa.jpf.abstraction.predicate.common.Tautology;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Tautology;
 
 public class DefaultFresh extends DefaultRoot implements Fresh {
 	protected DefaultFresh() {

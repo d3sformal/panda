@@ -9,8 +9,8 @@ import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
-import gov.nasa.jpf.abstraction.predicate.common.Tautology;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Tautology;
 
 /**
  * Represents a freshly allocated object (freshly allocated = not loaded from a variable)

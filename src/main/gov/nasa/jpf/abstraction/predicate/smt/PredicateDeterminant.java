@@ -2,7 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.smt;
 
 import java.util.Map;
 
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
 public class PredicateDeterminant {

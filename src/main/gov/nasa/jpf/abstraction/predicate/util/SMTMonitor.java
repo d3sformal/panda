@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import gov.nasa.jpf.abstraction.common.Notation;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
 import gov.nasa.jpf.abstraction.predicate.smt.SMTListener;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;

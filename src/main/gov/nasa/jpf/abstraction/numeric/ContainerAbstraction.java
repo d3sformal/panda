@@ -22,7 +22,7 @@ import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.util.Pair;
 import gov.nasa.jpf.vm.MethodInfo;

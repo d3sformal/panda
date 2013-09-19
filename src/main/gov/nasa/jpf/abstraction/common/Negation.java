@@ -1,9 +1,9 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.predicate.common.Contradiction;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
-import gov.nasa.jpf.abstraction.predicate.common.Tautology;
+import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Tautology;
 
 import java.util.List;
 import java.util.Map;

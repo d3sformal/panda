@@ -2,7 +2,7 @@ package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.MethodInfo;

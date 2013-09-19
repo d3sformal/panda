@@ -18,7 +18,7 @@ import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.Reference;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.predicate.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassObject;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassStatics;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapArray;

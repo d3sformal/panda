@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction.predicate.common;
+package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
