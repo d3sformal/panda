@@ -11,6 +11,11 @@ import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 
+/**
+ * A common ancestor of all symbolic expressions that can stand alone (variables, package-class expression)
+ * 
+ * this contrasts with expressions such as object field read (@see gov.nasa.jpf.abstraction.common.access.ObjectFieldRead) that are not atomic enough in this sense
+ */
 public class DefaultRoot extends DefaultAccessExpression implements Root {
 
 	private String name;

@@ -9,6 +9,9 @@ import gov.nasa.jpf.abstraction.common.Undefined;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
 
+/**
+ * An access expression produces in circumstances where there is no other valid result 
+ */
 public class UndefinedAccessExpression extends DefaultRoot implements Undefined {
 	
 	protected UndefinedAccessExpression() {

@@ -6,6 +6,11 @@ import java.util.List;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 
+/**
+ * A grammar element used to specify a target of a [object ...] context
+ * 
+ * @see gov.nasa.jpf.abstraction.common.ObjectContext
+ */
 public class DefaultPackageAndClass extends DefaultRoot implements PackageAndClass {
 	
 	protected DefaultPackageAndClass(List<String> name) {

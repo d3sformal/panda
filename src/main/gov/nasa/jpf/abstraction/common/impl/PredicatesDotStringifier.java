@@ -15,6 +15,11 @@ import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 
+/**
+ * Used to transform predicates into string representation in Java-like notation (dot-notation)
+ * 
+ * @see gov.nasa.jpf.abstraction.common.Notation
+ */
 public class PredicatesDotStringifier extends PredicatesStringifier {
 
 	@Override

@@ -16,6 +16,9 @@ import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Predicate;
 
+/**
+ * Read of an array length: alength(arrlen, a) ~ a.length
+ */
 public class DefaultArrayLengthRead extends DefaultArrayLengthExpression implements ArrayLengthRead {
 
 	protected DefaultArrayLengthRead(AccessExpression array) {

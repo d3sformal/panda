@@ -12,6 +12,9 @@ import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
 
+/**
+ * A factory used to produce predicate abstraction instances from definition in an input file whose name is the first element of the @param args parameter
+ */
 public class PredicateAbstractionFactory extends AbstractionFactory {
 
 	@Override

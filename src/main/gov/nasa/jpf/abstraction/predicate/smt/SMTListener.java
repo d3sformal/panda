@@ -7,6 +7,9 @@ import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A special listener that JPF can instantiate as a common listener which also listens to SMT events
+ */
 public abstract class SMTListener extends ListenerAdapter {
 	
 	public SMTListener() {

@@ -11,6 +11,9 @@ import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.Predicate;
 
+/**
+ * Write to an array element awrite(arr, a, i, e) ~ a[i] := e
+ */
 public class DefaultArrayElementWrite extends DefaultArrayElementExpression implements ArrayElementWrite {
 
 	private Expression newValue;

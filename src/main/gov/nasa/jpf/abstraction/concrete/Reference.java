@@ -3,6 +3,9 @@ package gov.nasa.jpf.abstraction.concrete;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * An identifier of an object in the JPF memory model
+ */
 public class Reference {
 	private ThreadInfo ti;
 	private ElementInfo ei;

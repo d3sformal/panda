@@ -17,6 +17,9 @@ import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Predicate;
 
+/**
+ * Read of an array element aread(arr, a, i) ~ a[i]
+ */
 public class DefaultArrayElementRead extends DefaultArrayElementExpression implements ArrayElementRead {
 
 	protected DefaultArrayElementRead(AccessExpression array, Expression index) {
@@ -94,13 +97,7 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	public Expression update(AccessExpression expression, Expression newExpression) {
 		Expression updated = getArray().update(expression, newExpression);
 		
-		/*
-		if (updated instanceof AnonymousExpression) {
-			// Enclosing object replaced by a new object
-			updated = DefaultFresh.create();
-		}
-		*/
-		
+		// An array has been changed -> aread(awrite(...), ..., ...)
 		if (expression instanceof ArrayExpression) {
 			ArrayAccessExpression a = (ArrayAccessExpression) expression;
 				
@@ -113,10 +110,12 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 			return UndefinedAccessExpression.create();
 		}
 		
+		// This element is not affected by the update (a := b) so update recursively
 		if (updated instanceof AccessExpression) {
 			return create((AccessExpression) updated, getArrays().clone(), getIndex().update(expression, newExpression));
 		}
 
+		// If the update causes that this expression accesses element of null
 		if (updated instanceof NullExpression) {
 			return NullExpression.create();
 		}

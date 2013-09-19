@@ -4,6 +4,11 @@ import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.Method;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 
+/**
+ * A grammar element used to specify a target of a [method ...] context
+ * 
+ * @see gov.nasa.jpf.abstraction.common.MethodContext
+ */
 public class DefaultMethod implements Method {
 	
 	private PackageAndClass packageAndClass;

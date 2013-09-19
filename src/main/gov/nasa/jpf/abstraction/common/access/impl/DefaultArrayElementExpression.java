@@ -7,6 +7,9 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementExpression;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 
+/**
+ * Read/Write to an array element aread(arr, a, i); awrite(arr, a, i, e); 
+ */
 public abstract class DefaultArrayElementExpression extends DefaultArrayAccessExpression implements ArrayElementExpression {
 	
 	private Expression index;

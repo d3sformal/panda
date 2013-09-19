@@ -7,6 +7,9 @@ import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
 
+/**
+ * The unmodified symbol "arrlen"
+ */
 public class DefaultArrayLengths implements ArrayLengths {
 	public static DefaultArrayLengths create() {
 		return new DefaultArrayLengths();

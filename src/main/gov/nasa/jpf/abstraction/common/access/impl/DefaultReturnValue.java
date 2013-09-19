@@ -3,6 +3,9 @@ package gov.nasa.jpf.abstraction.common.access.impl;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.vm.Instruction;
 
+/**
+ * A grammar element representing a keyword 'return' used in predicates over return values of methods
+ */
 public class DefaultReturnValue extends DefaultRoot implements ReturnValue {
 	
 	private boolean isReference = false;

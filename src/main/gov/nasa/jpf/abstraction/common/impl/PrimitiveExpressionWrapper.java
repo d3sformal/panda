@@ -11,6 +11,9 @@ import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
 
+/**
+ * Wrapper used for marking expressions as primitive
+ */
 public class PrimitiveExpressionWrapper extends DefaultPrimitiveExpression {
 	private Expression expression;
 	

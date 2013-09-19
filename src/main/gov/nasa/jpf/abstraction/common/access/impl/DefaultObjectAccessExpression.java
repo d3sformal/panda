@@ -7,6 +7,13 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
 
+/**
+ * Expressions accessing objects (fields, array elements, array length):
+ * 
+ * o.f
+ * a[i]
+ * a.length
+ */
 public abstract class DefaultObjectAccessExpression extends DefaultAccessExpression implements ObjectAccessExpression {
 
 	private AccessExpression expression;

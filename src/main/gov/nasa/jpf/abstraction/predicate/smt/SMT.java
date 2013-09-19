@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Class responsible for invocations of SMT, transformation of predicates into input that the SMT can solve
+ */
 public class SMT {
 	
 	private static List<SMTListener> listeners = new LinkedList<SMTListener>();

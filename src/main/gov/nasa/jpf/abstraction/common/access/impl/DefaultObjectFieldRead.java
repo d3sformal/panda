@@ -13,6 +13,9 @@ import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 
+/**
+ * Expressions fread(f, o) ~ o.f
+ */
 public class DefaultObjectFieldRead extends DefaultObjectFieldExpression implements ObjectFieldRead {
 
 	protected DefaultObjectFieldRead(AccessExpression object, String name) {

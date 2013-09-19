@@ -6,6 +6,9 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldExpression;
 import gov.nasa.jpf.abstraction.common.access.meta.Field;
 
+/**
+ * Expressions accessing object fields: fread(f, o); fwrite(f, o, e);
+ */
 public abstract class DefaultObjectFieldExpression extends DefaultObjectAccessExpression implements ObjectFieldExpression {
 
 	private Field field;

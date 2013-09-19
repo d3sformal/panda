@@ -48,6 +48,15 @@ import gov.nasa.jpf.abstraction.common.StaticContext;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 
+/**
+ * A visitor used to traverse predicates and collect information for the SMT
+ * 
+ * - set of all used variables (to be able to define them before they appear in the input)
+ * - set of classes whose names need to be valid symbols
+ * - set of field names (the same reason as above)
+ * - set of fresh objects (object references)
+ * - also a set of additional predicates that need to be added to the query to SMT ... array lengths are always >= 0
+ */
 public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 	private Set<String> classes = new HashSet<String>();
 	private Set<String> vars = new HashSet<String>();

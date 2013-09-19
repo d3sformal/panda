@@ -11,8 +11,11 @@ import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
 
+/**
+ * Wrapper which marks expressions as Object Expressions @see gov.nasa.jpf.abstraction.common.ObjectExpression
+ */
 public class ObjectExpressionWrapper extends DefaultObjectExpression {
-	private Expression expression;
+	protected Expression expression;
 	
 	protected ObjectExpressionWrapper(Expression expression) {
 		this.expression = expression;

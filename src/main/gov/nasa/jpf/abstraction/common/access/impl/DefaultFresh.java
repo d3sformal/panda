@@ -5,6 +5,9 @@ import gov.nasa.jpf.abstraction.common.access.Fresh;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Tautology;
 
+/**
+ * A special value representing a completely new object
+ */
 public class DefaultFresh extends DefaultRoot implements Fresh {
 	protected DefaultFresh() {
 		super("fresh");

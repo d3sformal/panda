@@ -11,6 +11,9 @@ import gov.nasa.jpf.abstraction.common.access.meta.Field;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.common.Predicate;
 
+/**
+ * Expressions fwrite(f, o, e) ~ o.f := e
+ */
 public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implements ObjectFieldWrite {
 
 	private Expression newValue;

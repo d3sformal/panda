@@ -11,6 +11,9 @@ import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.common.Predicate;
 
+/**
+ * Write to an array length: alengthupdate(arrlen, a, l) ~ a := new int[l]
+ */
 public class DefaultArrayLengthWrite extends DefaultArrayLengthExpression implements ArrayLengthWrite {
 
 	private Expression newValue;

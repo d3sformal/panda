@@ -27,6 +27,9 @@ import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Implication;
 import gov.nasa.jpf.abstraction.common.LessThan;
 
+/**
+ * Transforms predicates into syntax that the SMT understands (SMTLIB)
+ */
 public class PredicatesSMTStringifier extends PredicatesStringifier {
 	
 	@Override

@@ -7,6 +7,9 @@ import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 
+/**
+ * The unmodified symbol "arr"
+ */
 public class DefaultArrays implements Arrays {
 	public static DefaultArrays create() {
 		return new DefaultArrays();
