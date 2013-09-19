@@ -8,6 +8,11 @@ import gov.nasa.jpf.abstraction.common.Tautology;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Negation of a predicate.
+ * 
+ * Can be used to express !=, >= from = and <, and other.
+ */
 public class Negation extends Predicate {
 	public Predicate predicate;
 	

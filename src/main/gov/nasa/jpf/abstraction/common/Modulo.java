@@ -4,7 +4,11 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
-
+/**
+ * Modulo represents remainder operation for two variables (e.g. a % b)
+ *
+ * Note: Needs a different implementation. a - (a div b) * b
+ */
 public class Modulo extends Subtract {
 	public Expression a;
 	public Expression b;
@@ -26,6 +30,15 @@ public class Modulo extends Subtract {
 		return new Modulo(a.replace(replacements), b.replace(replacements));
 	}
 	
+	/**
+	 * Checked creation of the symbolic expression.
+	 * 
+	 * No matter the validity of the arguments (e.g. being null) this method is responsible for coping with it
+	 * 
+	 * @param a left hand side operand
+	 * @param b right hand side operand
+	 * @return symbolic expression representing the remainder operation / undefined expression / null
+	 */
 	public static Operation create(Expression a, Expression b) {
 		if (!argumentsDefined(a, b)) return null;
 		

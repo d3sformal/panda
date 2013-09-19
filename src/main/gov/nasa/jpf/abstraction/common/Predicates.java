@@ -6,6 +6,11 @@ import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
 import java.util.List;
 
+/**
+ * A container of all input predicates (read from a file) divided into individual contexts
+ * 
+ * @see gov.nasa.jpf.abstraction.common.Context
+ */
 public class Predicates implements PredicatesVisitable {
 	public List<Context> contexts;
 	

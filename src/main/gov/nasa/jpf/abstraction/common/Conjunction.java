@@ -6,6 +6,9 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
+/**
+ * Conjunction represents a logical AND of two predicates. (e.g. x > 0 AND x < 10)
+ */
 public class Conjunction extends Formula {
 	
 	protected Conjunction(Predicate a, Predicate b) {
@@ -22,6 +25,12 @@ public class Conjunction extends Formula {
 		return create(a.replace(replacements), b.replace(replacements));
 	}
 	
+	/**
+	 * Method used to create conjunctions of predicates.
+	 * The method checks its arguments and produces a conjunction of the two predicates or an equivalent simplification with the aim to shorten SMT input and make it more readable too.
+	 * 
+	 * @return Simplified formula / predicate according to (a AND true ~ a, a AND false ~ false, and other logical rules)
+	 */
 	public static Predicate create(Predicate a, Predicate b) {
 		if (!argumentsDefined(a, b)) return null;
 		

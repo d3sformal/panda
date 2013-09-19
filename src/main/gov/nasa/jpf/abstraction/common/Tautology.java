@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A predicate with a constant truth value ~ true
+ */
 public class Tautology extends Predicate {
 	
 	protected Tautology() {

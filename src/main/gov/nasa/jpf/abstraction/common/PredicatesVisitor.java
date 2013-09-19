@@ -30,6 +30,16 @@ import gov.nasa.jpf.abstraction.common.StaticContext;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 
+/**
+ * An interface for visitors of the hierarchy:
+ * 
+ * predicates
+ *   -> context
+ *     -> predicate
+ *       -> expression
+ * 
+ * @see gov.nasa.jpf.abstraction.common.PredicatesStringifier, gov.nasa.jpf.abstraction.common.impl.PredicatesDotStringifier
+ */
 public interface PredicatesVisitor {
 	public void visit(Predicates predicates);
 	public void visit(ObjectContext context);

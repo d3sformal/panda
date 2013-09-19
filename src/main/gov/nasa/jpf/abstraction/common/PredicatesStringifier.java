@@ -20,6 +20,16 @@ import gov.nasa.jpf.abstraction.common.StaticContext;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 
+/**
+ * A special visitor of the hierarchy:
+ * 
+ * predicates
+ *   -> context
+ *     -> predicate
+ *       -> expression
+ *       
+ * to be used to produce a string representation of the captured hierarchy.
+ */
 public abstract class PredicatesStringifier implements PredicatesVisitor {
 	
 	protected String ret = "";

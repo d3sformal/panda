@@ -8,6 +8,9 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A common ancestor for +, -, *, /, % ... (all binary operations over symbolic expressions)
+ */
 public abstract class Operation extends DefaultPrimitiveExpression {
 	public Expression a;
 	public Expression b;

@@ -5,6 +5,11 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A common ancestor to Conjunction and Disjunction (and Implication)
+ * 
+ * @see gov.nasa.jpf.abstraction.common.Conjunction, gov.nasa.jpf.abstraction.common.Disjunction, gov.nasa.jpf.abstraction.common.Implication
+ */
 public abstract class Formula extends Predicate {
 	public Predicate a;
 	public Predicate b;

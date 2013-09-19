@@ -7,6 +7,9 @@ import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
+/**
+ * Implication between two predicates / formulas over symbolic expressions. (e.g. (x = 0 AND y = x) IMPLIES y = 0)
+ */
 public class Implication extends Disjunction {
 	
 	public Predicate a;

@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A common class for symbolic expressions of all the numerical constants present in the execution
+ */
 public class Constant implements PrimitiveExpression {
 	public Number value;
 	

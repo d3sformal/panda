@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A predicate with a constant truth value ~ false
+ */
 public class Contradiction extends Predicate {
 	
 	protected Contradiction() {

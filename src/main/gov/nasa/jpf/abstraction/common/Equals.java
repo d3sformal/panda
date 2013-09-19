@@ -8,6 +8,9 @@ import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.Undefined;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 
+/**
+ * Predicate on equality of two symbolic expressions 
+ */
 public class Equals extends Comparison {
 	protected Equals(Expression a, Expression b) {
 		super(a, b);

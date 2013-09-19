@@ -7,6 +7,11 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A wrapper of a predicate whose truth value may depend on a symbolic expression modified by an instruction
+ * 
+ * It holds the original predicate, the original symbolic expression (field, array element, variable ...) and the new value (constant, arithmetic expression ...)
+ */
 public class UpdatedPredicate extends Predicate {
 	
 	private Predicate predicate;

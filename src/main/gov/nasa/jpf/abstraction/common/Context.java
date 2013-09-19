@@ -4,6 +4,13 @@ import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
 
 import java.util.List;
 
+/**
+ * Context is a container holding predicates that are targeted at a specific runtime scope (static, object, method)
+ * 
+ * @see gov.nasa.jpf.abstraction.common.StaticContext for a container of predicates over static fields
+ * @see gov.nasa.jpf.abstraction.common.ObjectContext for a container of predicates over static fields, instance fields
+ * @see gov.nasa.jpf.abstraction.common.MethodContext for a container of predicates over static fields, instance fields, local variables (including method parameters)
+ */
 public abstract class Context implements PredicatesVisitable {
 	public List<Predicate> predicates;
 	

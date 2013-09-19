@@ -4,6 +4,9 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
+/**
+ * Multiply represents symbolic expression for multiplication of two variables (e.g. a * b)
+ */
 public class Multiply extends Operation {
 	protected Multiply(Expression a, Expression b) {
 		super(a, b);
@@ -19,6 +22,15 @@ public class Multiply extends Operation {
 		return new Multiply(a.replace(replacements), b.replace(replacements));
 	}
 	
+	/**
+	 * Checked creation of the symbolic expression.
+	 * 
+	 * No matter the validity of the arguments (e.g. being null) this method is responsible for coping with it
+	 * 
+	 * @param a left hand side operand
+	 * @param b right hand side operand
+	 * @return symbolic expression representing the multiplication / undefined expression / null
+	 */
 	public static Operation create(Expression a, Expression b) {
 		if (!argumentsDefined(a, b)) return null;
 		

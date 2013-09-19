@@ -6,6 +6,9 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 
+/**
+ * Disjunction represents a logical OR of two predicates. (e.g. x = 1 OR x = 2)
+ */
 public class Disjunction extends Formula {
 	protected Disjunction(Predicate a, Predicate b) {
 		super(a, b);
@@ -21,6 +24,12 @@ public class Disjunction extends Formula {
 		return create(a.replace(replacements), b.replace(replacements));
 	}
 	
+	/**
+	 * Method used to create disjunctions of predicates.
+	 * The method checks its arguments and produces a disjunction of the two predicates or an equivalent simplification with the aim to shorten SMT input and make it more readable too.
+	 * 
+	 * @return Simplified formula / predicate according to (a OR true ~ true, a OR false ~ a, and other logical rules)
+	 */
 	public static Predicate create(Predicate a, Predicate b) {
 		if (!argumentsDefined(a, b)) return null;
 		

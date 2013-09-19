@@ -4,6 +4,9 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
+/**
+ * A concrete instance of an undefined result
+ */
 public class UndefinedOperationResult extends Operation implements Undefined {
 	
 	protected UndefinedOperationResult() {

@@ -5,6 +5,16 @@ import gov.nasa.jpf.abstraction.common.impl.PredicatesFunctionStringifier;
 
 /**
  * Notation types for printing predicates.
+ * 
+ * dot-notation:
+ * 
+ * a.b ... field accesses
+ * a[0] ... array element accesses
+ * 
+ * function notation:
+ * 
+ * fread(b, a) ... field accesses
+ * aread(arr, a, 0) ... array element accesses
  */
 public enum Notation {
 	DOT_NOTATION,

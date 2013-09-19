@@ -12,7 +12,9 @@ import java.util.List;
  * a * b = 6
  * ...
  * 
- * <<< SOME OTHER SECTION OR EOF
+ * <<< SOME OTHER SECTION OR EOF (End of File)
+ * 
+ * @see gov.nasa.jpf.abstraction.predicate.grammar (grammar file Predicates.g4)
  */
 public class StaticContext extends Context {
 

@@ -18,6 +18,9 @@ import java.util.Set;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+/**
+ * A common ancestor to all predicates used in the abstraction
+ */
 public abstract class Predicate implements PredicatesVisitable {
 	public abstract List<AccessExpression> getPaths();
 	public abstract Predicate replace(Map<AccessExpression, Expression> replacements);
@@ -29,6 +32,10 @@ public abstract class Predicate implements PredicatesVisitable {
     	return Notation.convertToString(this, policy);
 	}
     
+    /**
+     * @param universe Universe of all predicates that may or may not determine the value of this predicate
+     * @return A selection of those predicates from the universe that may directly determine the value of this predicate
+     */
     public Set<Predicate> selectDeterminants(Set<Predicate> universe) {
     	Set<Predicate> ret = new HashSet<Predicate>();
     	
@@ -47,6 +54,12 @@ public abstract class Predicate implements PredicatesVisitable {
     	return ret;
     }
     
+    /**
+     * Finds a transitive closure of all predicates that may infer the value of this one.
+     * 
+     * @param universe Universe of all predicates that may or may not determine the value of this predicate
+     * @return A selection of those predicates from the universe that may determine the value of this predicate
+     */
 	public Set<Predicate> determinantClosure(Set<Predicate> universe) {
 		Set<Predicate> cur;
 		Set<Predicate> ret = selectDeterminants(universe);
@@ -95,6 +108,9 @@ public abstract class Predicate implements PredicatesVisitable {
 		return false;
 	}
 
+	/**
+	 * Test of basic operations
+	 */
 	public static void main(String[] args) {
 		Notation.policy = Notation.DOT_NOTATION;
 

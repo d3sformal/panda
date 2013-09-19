@@ -7,6 +7,9 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.Undefined;
 
+/**
+ * Predicate on inequality of two symbolic expressions. (e.g. x < y)
+ */
 public class LessThan extends Comparison {
 	protected LessThan(Expression a, Expression b) {
 		super(a, b);
