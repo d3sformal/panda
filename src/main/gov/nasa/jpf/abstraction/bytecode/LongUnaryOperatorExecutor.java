@@ -21,6 +21,10 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.vm.StackFrame;
 
+/**
+ * Implements type specific parts of the operation ( @see gov.nasa.jpf.abstraction.bytecode.UnaryOperatorExecutor )
+ *   - layout of the stack (type size comes into play)
+ */
 public class LongUnaryOperatorExecutor extends UnaryOperatorExecutor<Long> {
 
 	private static LongUnaryOperatorExecutor instance;

@@ -43,8 +43,17 @@ public class BinaryIfInstructionExecutor {
 		
 		boolean conditionValue;
 		
+		/**
+		 * First we check whether there is no choice generator present
+		 * If not we evaluate the branching condition
+		 * Otherwise we inspect all the choices
+		 */
 		if (!ti.isFirstStepInsn()) { // first time around
-			// PREDICATE ABSTRACTION
+			/**
+			 * If there is enough information (symbolic expressions) to decide the condition we ask abstractions to provide the truth value
+			 * Only predicate abstraction is designed to respond with a valid value (TRUE, FALSE, UNKNOWN).
+			 * No other abstraction can do that, the rest of them returns UNDEFINED.
+			 */
 			if (expr1 != null && expr2 != null && RunDetector.isRunning()) {
 				Predicate predicate = br.createPredicate(expr1, expr2);
 				TruthValue truth = GlobalAbstraction.getInstance().evaluatePredicate(predicate);

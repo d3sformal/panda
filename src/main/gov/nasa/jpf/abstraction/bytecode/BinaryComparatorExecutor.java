@@ -39,6 +39,9 @@ import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 
+/**
+ * An implementation of common behaviour of all the comparison expressions
+ */
 public abstract class BinaryComparatorExecutor<T> {
 
 	final public Instruction execute(AbstractBinaryOperator<T> cmp, ThreadInfo ti) {
@@ -61,7 +64,17 @@ public abstract class BinaryComparatorExecutor<T> {
 		
 		Attribute result = null;
 		
+		/**
+		 * First we check whether there is no choice generator present
+		 * If not we perform the comparison
+		 * Otherwise we inspect all the choices
+		 */
 		if (!ti.isFirstStepInsn()) { // first time around
+			/**
+			 * If there is enough information (symbolic expressions) to decide the condition we ask abstractions to provide the truth value
+			 * Only predicate abstraction is designed to respond with a valid value (TRUE, FALSE, UNKNOWN).
+			 * No other abstraction can do that, the rest of them returns UNDEFINED.
+			 */
 			if (expr1 != null && expr2 != null && RunDetector.isRunning()) {	
 				TruthValue lt = GlobalAbstraction.getInstance().evaluatePredicate(LessThan.create(expr1, expr2));
 				TruthValue eq = GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(expr1, expr2));
@@ -85,6 +98,9 @@ public abstract class BinaryComparatorExecutor<T> {
 				}
 			}
 			
+			/**
+			 * When there was no predicate abstraction we try to follow other abstractions or default to concrete execution when the operands are non abstract values 
+			 */
 			if (result == null) {		
 				T v1 = getLeftOperand(sf);
 				T v2 = getRightOperand(sf);
@@ -97,7 +113,10 @@ public abstract class BinaryComparatorExecutor<T> {
 				
 				System.out.printf("%s> Values: %s (%s), %s (%s)\n", name, v2.toString(), abs_v2, v1.toString(), abs_v1);
 			}
-	
+			
+			/**
+			 * If the result of the comparison is not deterministic we create a choice generator and let JPF to reexecute this instruction	
+			 */
 			if (result.getAbstractValue().isComposite()) {
 				int size = result.getAbstractValue().getTokensNumber();
 				int i = 0;
@@ -115,6 +134,9 @@ public abstract class BinaryComparatorExecutor<T> {
 				return cmp.getSelf();
 			}
 		} else { // this is what really returns results
+			/**
+			 * Exploration of all possible outcomes of the comparison
+			 */
 			ChoiceGenerator<?> cg = ss.getChoiceGenerator();
 
 			assert (cg instanceof IntChoiceFromList);

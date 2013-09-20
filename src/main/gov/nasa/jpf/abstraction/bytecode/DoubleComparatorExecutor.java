@@ -25,6 +25,10 @@ import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.vm.StackFrame;
 
+/**
+ * Implements type specific parts of the comparison ( @see gov.nasa.jpf.abstraction.bytecode.BinaryComparatorExecutor )
+ *   - layout of operands (and their attributes) on the stack (type size comes into play)
+ */
 public class DoubleComparatorExecutor extends BinaryComparatorExecutor<Double> {
 
 	private static DoubleComparatorExecutor instance;

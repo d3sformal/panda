@@ -21,7 +21,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -52,8 +51,10 @@ public abstract class BinaryOperatorExecutor<T> {
 		T v1 = getLeftOperand(sf);
 		T v2 = getRightOperand(sf);
 
+		// Create symbolic value (predicate abstraction), abstract value (numeric abstraction)
 		Attribute result = op.getResult(v1, attr1, v2, attr2);
 
+		// Concrete execution
 		if (abs_v1 == null && abs_v2 == null) {
 			Instruction ret = op.executeConcrete(ti);
 			
