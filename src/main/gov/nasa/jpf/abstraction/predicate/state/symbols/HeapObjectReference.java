@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
+/**
+ * Identifier of a Java object residing in the heap
+ */
 public class HeapObjectReference implements UniverseIdentifier {
 	private int reference;
 	

@@ -177,6 +177,9 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				}
 			}
 
+			/**
+			 * If the predicate may be affected, compute preconditions and determinants and schedule the predicate for reevaluation
+			 */
 			if (affects) {
 				Predicate positiveWeakestPrecondition = predicate;
 				Predicate negativeWeakestPrecondition = Negation.create(predicate);
@@ -199,8 +202,14 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			}
 		}
 		
+		/**
+		 * Save a void call to SMT
+		 */
 		if (predicates.isEmpty()) return;
 		
+		/**
+		 * Collective reevaluation
+		 */
 		Map<Predicate, TruthValue> newValuations = new SMT().valuatePredicates(predicates);
 			
 		valuations.putAll(newValuations);
@@ -215,6 +224,9 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		return evaluatePredicates(predicates).get(predicate);
 	}
 	
+	/**
+	 * Evaluate a predicate regardless of a statement
+	 */
 	@Override
 	public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
 		if (predicates.isEmpty()) return new HashMap<Predicate, TruthValue>();

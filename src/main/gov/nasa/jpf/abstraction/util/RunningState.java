@@ -1,11 +1,14 @@
 package gov.nasa.jpf.abstraction.util;
 
+/**
+ * Distinguished states of the target execution
+ */
 public class RunningState implements Cloneable {
 	private enum State {
-		JUST_BEGAN_RUNNING,
-		RUNNING,
-		NOT_RUNNING,
-		JUST_CEASED_RUNNING
+		JUST_BEGAN_RUNNING, // ~ static init of the target or main method invoked
+		RUNNING, // ~ we entered the target part of the execution already and we still did not leave it 
+		NOT_RUNNING, // ~ we are out of the target scope
+		JUST_CEASED_RUNNING // ~ we just left (return)
 	}
 	
 	private int entered;

@@ -3,6 +3,9 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 
+/**
+ * Models Classes and their binding to static fields
+ */
 public class ClassObject extends Value {
 	private PackageAndClass classObject;
 	private StructuredValueSlot slot;

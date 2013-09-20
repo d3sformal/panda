@@ -22,6 +22,9 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
+/**
+ * Prints the current memory model after each instruction in the target program
+ */
 public class UniverseMonitor extends ListenerAdapter {
 	
 	@Override

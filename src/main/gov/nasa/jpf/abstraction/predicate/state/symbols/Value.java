@@ -3,6 +3,9 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Common ancestor of all the values stored in the model
+ */
 public abstract class Value {
 	private Set<Slot> slots = new HashSet<Slot>();
 	private Universe universe;

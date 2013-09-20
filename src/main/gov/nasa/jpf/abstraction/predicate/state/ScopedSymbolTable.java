@@ -21,7 +21,13 @@ import gov.nasa.jpf.vm.VM;
 
 import java.util.Set;
 
+/**
+ * Symbol table aware of method call scope changes
+ */
 public class ScopedSymbolTable implements SymbolTable, Scoped {
+	/**
+	 * Stack of scopes (pushed by invoke, poped by return)
+	 */
 	private SymbolTableStack scopes = new SymbolTableStack();
 	private PredicateAbstraction abstraction;
 	
@@ -33,12 +39,18 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		scopes.push(new FlatSymbolTable(abstraction));
 	}
 
+	/**
+	 * Create a scope for a given method
+	 */
 	@Override
 	public FlatSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
 		FlatSymbolTable ret = new FlatSymbolTable(abstraction);
 		
 		LocalVarInfo[] locals = method.getLocalVars() == null ? new LocalVarInfo[0] : method.getLocalVars();
 		
+		/**
+		 * Register new local variables
+		 */
 		for (LocalVarInfo local : locals) {
 			if (local.isNumeric()) {
 				ret.addPrimitiveLocal(local.getName());
@@ -47,6 +59,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			}
 		}
 		
+		/**
+		 * Handle main(String[] args)
+		 */
 		VM vm = threadInfo.getVM();
 		String target = vm.getConfig().getTarget();
 		
@@ -74,6 +89,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		return scopes.top().processObjectStore(from, to);
 	}
 	
+	/**
+	 * At a method call it is necessary to change the scope correspondingly
+	 */
 	@Override
 	public AffectedAccessExpressions processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
 		MethodInfo method = after.getMethodInfo();
@@ -84,12 +102,20 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		transitionScope.updateUniverse(scopes.top());
 		
 		scopes.push(transitionScope);
-		
+
+		/**
+		 * Ensure that all statics are present for the current class (class in which the method is defined)
+		 * 
+		 * This will not take long if it already exists
+		 */
 		transitionScope.addClass(method.getClassName(), threadInfo, method.getClassInfo().getStaticElementInfo());
 		
 		Object attrs[] = before.getArgumentAttrs(method);
 		LocalVarInfo args[] = method.getArgumentLocalVars();
 
+		/**
+		 * Assign values to the formal parameters according to the actual parameters
+		 */
 		if (args != null && attrs != null) {
 			for (int i = 0; i < args.length; ++i) {
 				Attribute attr = (Attribute) attrs[i];
@@ -120,6 +146,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		Expression returnExpression = attr.getExpression();
 		//after.setOperandAttr(new NonEmptyAttribute(null, callerReturnValue)); // This is performed by the predicate valuation after it uses the original expression
 
+		/**
+		 * Register the return value
+		 */
 		if (before.getMethodInfo().isReferenceReturnType()) {
 			scopes.top().addHeapValueReturn(calleeReturnValue);
 			scopes.top().processObjectStore(returnExpression, calleeReturnValue);
@@ -143,6 +172,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		
 		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
 
+		/**
+		 * Detect what objects accessible in the caller scope were modified in the callee
+		 */
 		if (RunDetector.isRunning()) {			
 			Set<AccessExpression> modifications = transitionScope.getModifiedObjectAccessExpressions(scopes.top());
 			

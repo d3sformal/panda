@@ -3,6 +3,9 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Collection of static fields of a given class
+ */
 public class ClassStatics extends StructuredValue implements StructuredObject {
 
 	private Map<String, Slot> fields = new HashMap<String, Slot>();

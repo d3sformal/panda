@@ -33,6 +33,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A predicate valuation aware of method scope changes
+ */
 public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	private PredicateValuationStack scopes = new PredicateValuationStack();
 	private Predicates predicateSet;
@@ -51,6 +54,12 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		initialValuation = new HashMap<Predicate, TruthValue>();
 
+		/**
+		 * Detect initial valuations of Tautologies and Contradictions
+		 * 
+		 * This is called once and increases comprehensibility of the valuation
+		 * It could confuse the user to see that a=a is UNKNOWN
+		 */
 		if (!predicates.isEmpty()) {
 			try {
 				initialValuation = new SMT().valuatePredicates(predicates);
@@ -87,6 +96,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		}
 	}
 	
+	/**
+	 * Collect predicates targeted at the given method and store them in the upcoming scope
+	 */
 	@Override
 	public FlatPredicateValuation createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
 		FlatPredicateValuation valuation = new FlatPredicateValuation();
@@ -153,6 +165,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			FlatPredicateValuation transitionScope;
 			transitionScope = scopes.top().clone();
 			
+			/**
+			 * Collect actual arguments
+			 */
 			ArrayList<Attribute> attrsList = new ArrayList<Attribute>();
 			
 			Iterator<Object> it = after.getMethodInfo().attrIterator();
@@ -168,6 +183,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			
 			Map<Predicate, Predicate> replaced = new HashMap<Predicate, Predicate>();
 			
+			/**
+			 * Take predicates from the callee that describe formal parameters
+			 * Replace formal parameters with the concrete assignment
+			 * Reason about the value of the predicates using known values of predicates in the caller
+			 */
 			if (args != null && attrs != null) {
 				for (Predicate predicate : finalScope.getPredicates()) {
 
@@ -230,6 +250,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
 			Set<Predicate> determinants = new HashSet<Predicate>();
 			
+			/**
+			 * Determine values of predicates over the return value based on the concrete symbolic expression being returned
+			 */
 			for (Predicate predicate : getPredicates()) {
 				
 				if (isPredicateOverReturn(predicate)) {
@@ -287,6 +310,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			Set<LocalVarInfo> referenceArgs = new HashSet<LocalVarInfo>();
 			Set<LocalVarInfo> notWantedLocalVariables = new HashSet<LocalVarInfo>();
 			
+			/**
+			 * Determine what reference arguments were written to (they contain a different reference from the initial one)
+			 * 
+			 * those parameters and predicates over them cannot be used to argue the value of predicates over the initial value back in the caller
+			 */
 			for (int i = 0; i < args.length; ++i) {
 				LocalVarInfo l = args[i];
 				
@@ -316,6 +344,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				}
 			}
 			
+			/**
+			 * No predicate containing a callee's local variable (not a parameter) can be used to infer value of predicates in the caller
+			 */
 			// Local variables are out of scope
 			for (LocalVarInfo l : locals) {
 				if (l != null) {

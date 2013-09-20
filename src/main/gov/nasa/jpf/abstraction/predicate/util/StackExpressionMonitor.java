@@ -12,6 +12,9 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.VM;
 
+/**
+ * Prints the current state of the symbolic stack after each instruction in the target program
+ */
 public class StackExpressionMonitor extends ListenerAdapter {
 	
 	@Override

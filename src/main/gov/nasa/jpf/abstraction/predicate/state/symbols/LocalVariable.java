@@ -3,6 +3,9 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
 
+/**
+ * Models local variables
+ */
 public class LocalVariable extends Value {
 	private Root localVariable;
 	private Slot slot;

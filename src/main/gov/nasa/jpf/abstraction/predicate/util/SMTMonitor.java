@@ -9,6 +9,9 @@ import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
 import gov.nasa.jpf.abstraction.predicate.smt.SMTListener;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
+/**
+ * Prints calls to the SMT
+ */
 public class SMTMonitor extends SMTListener {
 
 	@Override

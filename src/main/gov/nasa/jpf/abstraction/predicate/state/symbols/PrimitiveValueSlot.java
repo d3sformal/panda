@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * A slot (field/element) that holds all possible values assigned to that slot (ensures consistency by allowing only primitive values)
+ */
 public class PrimitiveValueSlot extends Slot {
 
 	private Set<PrimitiveValue> possibilities = new HashSet<PrimitiveValue>();

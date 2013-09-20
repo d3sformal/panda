@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
+/**
+ * Identifier of a collection of static fields of a given class
+ */
 public class ClassStaticsReference implements UniverseIdentifier {
 	private String className;
 	

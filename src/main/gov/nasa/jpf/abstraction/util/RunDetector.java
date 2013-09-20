@@ -8,6 +8,9 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ReturnInstruction;
 import gov.nasa.jpf.vm.VM;
 
+/**
+ * Is responsible for determining whether the currently executed code is part of the targeted execution or not
+ */
 public class RunDetector {
 	private static Stack<RunningState> runningHistory = new Stack<RunningState>();
 	private static RunningState running = new RunningState();

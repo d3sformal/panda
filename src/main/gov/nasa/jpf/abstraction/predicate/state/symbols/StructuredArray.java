@@ -2,6 +2,9 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
 import java.util.Map;
 
+/**
+ * Models Java array
+ */
 public interface StructuredArray {
 	public void setElement(Integer index, StructuredValue... values);
 	public void setElement(Integer index, PrimitiveValue... values);

@@ -2,12 +2,11 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
 import java.util.UUID;
 
+/**
+ * Represents numerical memory slots in the memory model
+ */
 public class PrimitiveValue extends Value {
 	
-	//TODO identifier of the current value
-	// 1) method m modifies a primitive value reachable from parent scope
-	// 2) return
-	// 3) need to detect the modification - comparison of the universes - need to distinguish the primitive values
 	private UUID id;
 	
 	public PrimitiveValue(Universe universe) {

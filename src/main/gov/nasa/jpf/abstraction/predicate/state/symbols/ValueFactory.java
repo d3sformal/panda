@@ -1,5 +1,14 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
+/**
+ * A factory which ensures that no object is create twice in the universe and that the most recent view of it is always returned
+ * 
+ * if obj1 does not exist:
+ *   return new obj1
+ *   
+ * if obj1 exists and has its fields defined (obj1.f = {obj2, obj3})
+ *   return obj1 in its current state
+ */
 public class ValueFactory {
 	private Universe universe;
 	

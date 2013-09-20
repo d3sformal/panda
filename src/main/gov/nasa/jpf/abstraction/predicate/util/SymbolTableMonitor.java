@@ -10,6 +10,9 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
+/**
+ * Prints the current symbol table after each instruction in the target program
+ */
 public class SymbolTableMonitor extends ListenerAdapter {
 	
 	@Override

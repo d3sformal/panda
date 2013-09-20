@@ -3,6 +3,9 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Java array residing in the heap
+ */
 public class HeapArray extends StructuredValue implements StructuredArray {
 	
 	private Map<Integer, Slot> elements = new HashMap<Integer, Slot>();

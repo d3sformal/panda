@@ -3,6 +3,9 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents a null object whose elements/fields are not accessible
+ */
 public class Null extends StructuredValue implements StructuredObject, StructuredArray {
 
 	protected Null(Universe universe) {

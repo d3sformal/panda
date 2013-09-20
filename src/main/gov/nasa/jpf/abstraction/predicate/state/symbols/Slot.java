@@ -2,6 +2,16 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
 import java.util.Set;
 
+/**
+ * Slots are used to model fields/elements/local variables etc.
+ * 
+ * They allow a non-deterministic assignment of a subvalue to a parent value.
+ * It models situations like:
+ * 
+ * o.f = {}
+ * o.f = {o1}
+ * o.f = {o1, o2, ...}
+ */
 public abstract class Slot {
 	private Value parent;
 	private Object slotKey;

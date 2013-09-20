@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * A slot (field/element) that holds all possible values assigned to that slot (ensures consistency by allowing only structured values)
+ */
 public class StructuredValueSlot extends Slot {
 	private Set<StructuredValue> possibilities = new HashSet<StructuredValue>();
 	

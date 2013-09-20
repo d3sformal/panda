@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
+/**
+ * Any value in the memory model that is not primitive (has fields/elements)
+ */
 public abstract class StructuredValue extends Value {
 	
 	private UniverseIdentifier reference;

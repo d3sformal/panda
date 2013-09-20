@@ -16,6 +16,9 @@ import gov.nasa.jpf.vm.ReturnInstruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
+/**
+ * Prints the current predicate valuation after each instruction in the target program
+ */
 public class PredicateValuationMonitor extends ListenerAdapter {
 	
 	@Override

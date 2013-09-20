@@ -16,7 +16,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Memory model - stores objects (arrays) that are currently allocated, primitive values are remembered only for fields and array elements
+ * 
+ * For local variables @see gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable
+ */
 public class Universe implements Cloneable {
+	
+	/**
+	 * Factory creating underlying objects for all allocated memory slots (objects/primitive)
+	 * 
+	 * deals with already existent representations
+	 */
 	private ValueFactory factory = new ValueFactory(this);
 	private Map<UniverseIdentifier, StructuredValue> objects = new HashMap<UniverseIdentifier, StructuredValue>();
 	
@@ -70,6 +81,9 @@ public class Universe implements Cloneable {
 		return add(reference.getThreadInfo(), reference.getElementInfo());
 	}
 	
+	/**
+	 * Traverses fields/elements of the given object and adds it and all subvalues to the hierarchy (universe) 
+	 */
 	public StructuredValue add(ThreadInfo threadInfo, ElementInfo elementInfo) {		
 		if (elementInfo == null) return get(NULL);
 		
@@ -131,6 +145,20 @@ public class Universe implements Cloneable {
 		}
 	}
 	
+	/**
+	 * Finds all subvalues of all the given values respecting a concrete path
+	 * 
+	 * e.g.
+	 * 
+	 * Model:
+	 * 
+	 * obj1.f: obj2
+	 * obj1.g: obj1
+	 * obj2.f: obj1
+	 * obj2.g: obj3
+	 * 
+	 * lookup({obj1, obj2}, a.f.g) = {obj1, obj3}
+	 */
 	public Set<Value> lookupValues(Set<Value> roots, AccessExpression expression) {
 		Set<Value> ret = new HashSet<Value>();
 		
@@ -141,6 +169,20 @@ public class Universe implements Cloneable {
 		return ret;
 	}
 	
+	/**
+	 * Finds all subvalues of the given value respecting a concrete path
+	 * 
+	 * e.g.
+	 * 
+	 * Model:
+	 * 
+	 * obj1.f: obj2
+	 * obj1.g: obj1
+	 * obj2.f: obj1
+	 * obj2.g: obj3
+	 * 
+	 * lookup({obj1, obj2}, a.f.g) = {obj1, obj3}
+	 */
 	public Set<Value> lookupValues(Value root, AccessExpression expression) {		
 		if (expression instanceof Root) {
 			Set<Value> values = new HashSet<Value>();
@@ -181,6 +223,14 @@ public class Universe implements Cloneable {
 		return children;
 	}
 	
+	/**
+	 * Compares two universes (traverses all objects and compares its immediate fields/elements registered in the two universes)
+	 * 
+	 * Universe1: obj1.f = {obj2}
+	 * Universe2: obj1.f = {obj3}
+	 * 
+	 * obj1 was modified in the Universe2
+	 */
 	public Set<StructuredValue> getModifiedObjects(Universe universe) {
 		Set<StructuredValue> ret = new HashSet<StructuredValue>();
 		
@@ -253,6 +303,9 @@ public class Universe implements Cloneable {
 		return clone;
 	}
 	
+	/**
+	 * Performs check of all the values being registered with the same universe (an auxiliary method for detecting bugs in cloning etc.)
+	 */
 	public void check() {
 		// CHECK
 		for (UniverseIdentifier identifier : objects.keySet()) {
@@ -297,6 +350,9 @@ public class Universe implements Cloneable {
 		return ret.toString();
 	}
 
+	/**
+	 * Traverses the hierarchy and accumulates the string representation
+	 */
 	private void traverse(Value value, Set<Value> visited, String indentation, StringBuilder builder) {
 		boolean isVisited = visited.contains(value);
 		
