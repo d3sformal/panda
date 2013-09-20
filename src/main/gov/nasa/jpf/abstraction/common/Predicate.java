@@ -81,6 +81,24 @@ public abstract class Predicate implements PredicatesVisitable {
 		return ret;
 	}
 	
+	/**
+	 * Changes all access expression present in the predicate to a form which reflects an assignment "expression := newExpression"
+	 * 
+	 * Let p = (a = 3):
+	 *   update(p, a, b + 3) returns b + 3 = 3
+	 *   
+	 * Let q = (aread(arr, a, 1) = 0):
+	 *   update(q, a[0], 3) returns aread(awrite(arr, a, 0, 3), 1) = 0
+	 *   
+	 * Let r = (fread(f, o) = 10)
+	 *   update(r, s.f, x) returns fread(fwrite(f, s, x), o) = 10
+	 *   
+	 * Used to determine weakest preconditions.
+	 * 
+	 * @param expression an access expression being written to (e.g. local variable "a")
+	 * @param newExpression any arbitrary expression being written (e.g. "b + 3")
+	 * @return a predicate reflecting the updates
+	 */
 	public abstract Predicate update(AccessExpression expression, Expression newExpression);
 	
 	public static Predicate createFromString(String definition) {

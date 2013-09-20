@@ -21,13 +21,15 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
-import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+/**
+ * Implementation of unary operations regardless their concrete type.
+ */
 public abstract class UnaryOperatorExecutor<T> {
 
 	final public Instruction execute(AbstractUnaryOperator<T> op, ThreadInfo ti) {

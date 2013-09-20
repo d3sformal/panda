@@ -19,6 +19,16 @@ package gov.nasa.jpf.abstraction;
 
 import java.util.Set;
 
+/**
+ * An abstract value is an element of an abstract domain (depending on abstraction in question)
+ * 
+ * e.g. abstract value associated with a concrete value -1 may be:
+ * 
+ * 1) NEGATIVE ... in case of signs abstraction
+ * 2) ODD      ... in case of evenness abstraction
+ * 
+ * @see gov.nasa.jpf.abstraction.numeric for individual implementations
+ */
 public abstract class AbstractValue {
 	protected int key;
 	public Abstraction abs;

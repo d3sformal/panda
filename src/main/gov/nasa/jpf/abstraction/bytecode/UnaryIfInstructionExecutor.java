@@ -20,7 +20,7 @@ import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
- * Implementation of all unary IF instructions.
+ * Implementation of all unary IF instructions regardless their precise type.
  */
 public class UnaryIfInstructionExecutor {
 
@@ -41,9 +41,17 @@ public class UnaryIfInstructionExecutor {
 		
 		boolean conditionValue;
 		
+		/**
+		 * First we check whether there is no choice generator present
+		 * If not we evaluate the branching condition
+		 * Otherwise we inspect all the choices
+		 */
 		if (!ti.isFirstStepInsn()) { // first time around
-		
-			// PREDICATE ABSTRACTION
+			/**
+			 * If there is enough information (symbolic expression) to decide the condition we ask abstractions to provide the truth value
+			 * Only predicate abstraction is designed to respond with a valid value (TRUE, FALSE, UNKNOWN).
+			 * No other abstraction can do that, the rest of them returns UNDEFINED.
+			 */
 			if (expr != null && RunDetector.isRunning()) {
 				TruthValue pred = GlobalAbstraction.getInstance().evaluatePredicate(br.createPredicate(expr, Constant.create(0)));
 	
@@ -64,7 +72,9 @@ public class UnaryIfInstructionExecutor {
 				}
 			}		
 	
+			// In case there was no predicate abstraction / no symbolic expression (or the execution did not yet reach the target program or we already left it)
 			if (abs_condition == null) {
+				// In case there is no abstract value fallback to a concrete execution
 				if (abs_v == null) { // the condition is concrete
 					return br.executeConcrete(ti);
 				}
