@@ -41,7 +41,7 @@ public class LOOKUPSWITCH extends SwitchInstruction implements
 
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		/*
+		/**
 		 * Implementation is in SwitchInstruction, because now LOOKUPSWITCH's
 		 * implementation is used for TABLESWITCH as well
 		 */

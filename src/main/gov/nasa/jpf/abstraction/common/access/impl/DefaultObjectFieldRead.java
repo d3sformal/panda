@@ -93,13 +93,6 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 	public Expression update(AccessExpression expression, Expression newExpression) {
 		Expression updated = getObject().update(expression, newExpression);
 		
-		/*
-		if (updated instanceof AnonymousExpression) {
-			// Enclosing object replaced by a new object
-			updated = DefaultFresh.create();
-		}
-		*/
-		
 		if (expression instanceof ObjectFieldRead) {
 			ObjectFieldRead r = (ObjectFieldRead) expression;
 			

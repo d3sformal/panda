@@ -62,17 +62,11 @@ public class ContainerAbstraction extends Abstraction {
     @Override
 	public int getDomainSize() {
 		int num = 1;
-		for (int i = 0; i < list.size(); ++i)
-			if (list.get(i) != null)
+		for (int i = 0; i < list.size(); ++i) {
+			if (list.get(i) != null) {
 				num *= list.get(i).getDomainSize();
-/*
-			else {
-				// get size of domain from global setup
-				Abstraction abs = ((Container) AbstractInstructionFactory.abs)
-						.getAbstractionsList().get(i);
-				key *= abs.getDomainSize();
 			}
-*/
+		}
 		return num;
 	}
     

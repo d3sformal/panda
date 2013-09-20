@@ -148,7 +148,7 @@ public class RangeAbstraction extends Abstraction {
 		Integer leftArr[] = left_value.getValues().toArray(new Integer[left_value.getValues().size()]);
 		Integer rightArr[] = right_value.getValues().toArray(new Integer[right_value.getValues().size()]);
 
-		/*
+		/**
 		 * the idea is to iterate through all possible pairs of operands,
 		 * bound them by intervals [lv1, lv2] and [rv1, rv2] and perform
 		 * the operation on inequality lv1 <= lv <= lv2 and rv1 <= rv <= rv2;
@@ -296,7 +296,7 @@ public class RangeAbstraction extends Abstraction {
 		Integer leftArr[] = left_value.getValues().toArray(new Integer[left_value.getValues().size()]);
 		Integer rightArr[] = right_value.getValues().toArray(new Integer[right_value.getValues().size()]);
 
-		/*
+		/**
 		 * the idea is to iterate through all possible pairs of operands,
 		 * bound them by intervals [lv1, lv2] and [rv1, rv2] and perform
 		 * the operation on inequality lv1 <= lv <= lv2 and rv1 <= rv <= rv2;
@@ -348,7 +348,7 @@ public class RangeAbstraction extends Abstraction {
 		Integer leftArr[] = left_value.getValues().toArray(new Integer[left_value.getValues().size()]);
 		Integer rightArr[] = right_value.getValues().toArray(new Integer[right_value.getValues().size()]);
 		
-		/*
+		/**
 		 * the idea is to iterate through all possible pairs of operands,
 		 * bound them by intervals [lv1, lv2] and [rv1, rv2] and perform
 		 * the operation on inequality lv1 <= lv <= lv2 and rv1 <= rv <= rv2
@@ -426,7 +426,7 @@ public class RangeAbstraction extends Abstraction {
 		Integer leftArr[] = left_value.getValues().toArray(new Integer[left_value.getValues().size()]);
 		Integer rightArr[] = right_value.getValues().toArray(new Integer[right_value.getValues().size()]);
 		
-		/*
+		/**
 		 * the idea is to iterate through all possible pairs of operands,
 		 * bound them by intervals [lv1, lv2] and [rv1, rv2] and perform
 		 * the operation on inequality lv1 <= lv <= lv2 and rv1 <= rv <= rv2
@@ -510,7 +510,7 @@ public class RangeAbstraction extends Abstraction {
 		Integer leftArr[] = left_value.getValues().toArray(new Integer[left_value.getValues().size()]);
 		Integer rightArr[] = right_value.getValues().toArray(new Integer[right_value.getValues().size()]);
 		
-		/*
+		/**
 		 * the idea is to iterate through all possible pairs of operands,
 		 * bound them by intervals [lv1, lv2] and [rv1, rv2] and perform
 		 * the operation on inequality lv1 <= lv <= lv2 and rv1 <= rv <= rv2
