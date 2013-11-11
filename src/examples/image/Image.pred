@@ -1,156 +1,158 @@
 [static]
 image.Image.SIZE >= 0
+image.Image.SIZE = 6
 
 [object image.Image]
 alength(arrlen, this.pixels) = image.Image.SIZE
 alength(arrlen, this.pixels[0]) = image.Image.SIZE
+alength(arrlen, this.pixels[1]) = image.Image.SIZE
+
+alength(arrlen, this.rectangles) = 2
 
 this.rectangles[0] = this.rectangles[1]
 
-0 = this.rectangles[0].left
-1 = this.rectangles[0].left
-2 = this.rectangles[0].left
-3 = this.rectangles[0].left
-4 = this.rectangles[0].left
-5 = this.rectangles[0].left
-6 = this.rectangles[0].left
+this.rectangles[0].left = 0
+this.rectangles[0].left = 1
+this.rectangles[0].left = 2
+this.rectangles[0].left = 3
+this.rectangles[0].left = 4
+this.rectangles[0].left = 5
+this.rectangles[0].left = 6
 
-0 = this.rectangles[1].left
-1 = this.rectangles[1].left
-2 = this.rectangles[1].left
-3 = this.rectangles[1].left
-4 = this.rectangles[1].left
-5 = this.rectangles[1].left
-6 = this.rectangles[1].left
+this.rectangles[1].left = 0
+this.rectangles[1].left = 1
+this.rectangles[1].left = 2
+this.rectangles[1].left = 3
+this.rectangles[1].left = 4
+this.rectangles[1].left = 5
+this.rectangles[1].left = 6
 
-0 = this.rectangles[0].right
-1 = this.rectangles[0].right
-2 = this.rectangles[0].right
-3 = this.rectangles[0].right
-4 = this.rectangles[0].right
-5 = this.rectangles[0].right
-6 = this.rectangles[0].right
+this.rectangles[0].right = 0
+this.rectangles[0].right = 1
+this.rectangles[0].right = 2
+this.rectangles[0].right = 3
+this.rectangles[0].right = 4
+this.rectangles[0].right = 5
+this.rectangles[0].right = 6
 
-0 = this.rectangles[1].right
-1 = this.rectangles[1].right
-2 = this.rectangles[1].right
-3 = this.rectangles[1].right
-4 = this.rectangles[1].right
-5 = this.rectangles[1].right
-6 = this.rectangles[1].right
+this.rectangles[1].right = 0
+this.rectangles[1].right = 1
+this.rectangles[1].right = 2
+this.rectangles[1].right = 3
+this.rectangles[1].right = 4
+this.rectangles[1].right = 5
+this.rectangles[1].right = 6
 
-0 = this.rectangles[0].top
-1 = this.rectangles[0].top
-2 = this.rectangles[0].top
-3 = this.rectangles[0].top
-4 = this.rectangles[0].top
-5 = this.rectangles[0].top
-6 = this.rectangles[0].top
+this.rectangles[0].top = 0
+this.rectangles[0].top = 1
+this.rectangles[0].top = 2
+this.rectangles[0].top = 3
+this.rectangles[0].top = 4
+this.rectangles[0].top = 5
+this.rectangles[0].top = 6
 
-0 = this.rectangles[1].top
-1 = this.rectangles[1].top
-2 = this.rectangles[1].top
-3 = this.rectangles[1].top
-4 = this.rectangles[1].top
-5 = this.rectangles[1].top
-6 = this.rectangles[1].top
+this.rectangles[1].top = 0
+this.rectangles[1].top = 1
+this.rectangles[1].top = 2
+this.rectangles[1].top = 3
+this.rectangles[1].top = 4
+this.rectangles[1].top = 5
+this.rectangles[1].top = 6
 
-0 = this.rectangles[0].bottom
-1 = this.rectangles[0].bottom
-2 = this.rectangles[0].bottom
-3 = this.rectangles[0].bottom
-4 = this.rectangles[0].bottom
-5 = this.rectangles[0].bottom
-6 = this.rectangles[0].bottom
+this.rectangles[0].bottom = 0
+this.rectangles[0].bottom = 1
+this.rectangles[0].bottom = 2
+this.rectangles[0].bottom = 3
+this.rectangles[0].bottom = 4
+this.rectangles[0].bottom = 5
+this.rectangles[0].bottom = 6
 
-0 = this.rectangles[1].bottom
-1 = this.rectangles[1].bottom
-2 = this.rectangles[1].bottom
-3 = this.rectangles[1].bottom
-4 = this.rectangles[1].bottom
-5 = this.rectangles[1].bottom
-6 = this.rectangles[1].bottom
+this.rectangles[1].bottom = 0
+this.rectangles[1].bottom = 1
+this.rectangles[1].bottom = 2
+this.rectangles[1].bottom = 3
+this.rectangles[1].bottom = 4
+this.rectangles[1].bottom = 5
+this.rectangles[1].bottom = 6
 
-0 = r1.left
-1 = r1.left
-2 = r1.left
-3 = r1.left
-4 = r1.left
-5 = r1.left
-6 = r1.left
-
-0 = r1.top
-1 = r1.top
-2 = r1.top
-3 = r1.top
-4 = r1.top
-5 = r1.top
-6 = r1.top
-
-0 = r1.right
-1 = r1.right
-2 = r1.right
-3 = r1.right
-4 = r1.right
-5 = r1.right
-6 = r1.right
-
-0 = r1.bottom
-1 = r1.bottom
-2 = r1.bottom
-3 = r1.bottom
-4 = r1.bottom
-5 = r1.bottom
-6 = r1.bottom
-
-0 = r2.left
-1 = r2.left
-2 = r2.left
-3 = r2.left
-4 = r2.left
-5 = r2.left
-6 = r2.left
-
-0 = r2.top
-1 = r2.top
-2 = r2.top
-3 = r2.top
-4 = r2.top
-5 = r2.top
-6 = r2.top
-
-0 = r2.right
-1 = r2.right
-2 = r2.right
-3 = r2.right
-4 = r2.right
-5 = r2.right
-6 = r2.right
-
-0 = r2.bottom
-1 = r2.bottom
-2 = r2.bottom
-3 = r2.bottom
-4 = r2.bottom
-5 = r2.bottom
-6 = r2.bottom
+this.rectangles[1].top < this.rectangles[0].top
+this.rectangles[0].bottom < this.rectangles[1].bottom
+this.rectangles[1].left < this.rectangles[0].left
+this.rectangles[0].right < this.rectangles[1].right
 
 [object image.Rectangle]
 this.top < this.bottom
 this.left < this.right
 
 [method image.Image.load]
-this.rectangles[1].top < this.rectangles[0].top
-this.rectangles[0].bottom < this.rectangles[1].bottom
-this.rectangles[1].left < this.rectangles[0].left
-this.rectangles[0].right < this.rectangles[1].right
+r1.left = 0
+r1.left = 1
+r1.left = 2
+r1.left = 3
+r1.left = 4
+r1.left = 5
+r1.left = 6
+
+r1.top = 0
+r1.top = 1
+r1.top = 2
+r1.top = 3
+r1.top = 4
+r1.top = 5
+r1.top = 6
+
+r1.right = 0
+r1.right = 1
+r1.right = 2
+r1.right = 3
+r1.right = 4
+r1.right = 5
+r1.right = 6
+
+r1.bottom = 0
+r1.bottom = 1
+r1.bottom = 2
+r1.bottom = 3
+r1.bottom = 4
+r1.bottom = 5
+r1.bottom = 6
+
+r2.left = 0
+r2.left = 1
+r2.left = 2
+r2.left = 3
+r2.left = 4
+r2.left = 5
+r2.left = 6
+
+r2.top = 0
+r2.top = 1
+r2.top = 2
+r2.top = 3
+r2.top = 4
+r2.top = 5
+r2.top = 6
+
+r2.right = 0
+r2.right = 1
+r2.right = 2
+r2.right = 3
+r2.right = 4
+r2.right = 5
+r2.right = 6
+
+r2.bottom = 0
+r2.bottom = 1
+r2.bottom = 2
+r2.bottom = 3
+r2.bottom = 4
+r2.bottom = 5
+r2.bottom = 6
 
 [method image.Image.render]
 k = 0
 k = 1
 k = 2
-
-alength(arrlen, this.rectangles) = 2
 
 i = 0
 i = 1
@@ -168,36 +170,38 @@ j = 4
 j = 5
 j = 6
 
-0 = rec.left
-1 = rec.left
-2 = rec.left
-3 = rec.left
-4 = rec.left
-5 = rec.left
-6 = rec.left
+rec.left = 0
+rec.left = 1
+rec.left = 2
+rec.left = 3
+rec.left = 4
+rec.left = 5
+rec.left = 6
 
-0 = rec.top
-1 = rec.top
-2 = rec.top
-3 = rec.top
-4 = rec.top
-5 = rec.top
-6 = rec.top
+rec.top = 0
+rec.top = 1
+rec.top = 2
+rec.top = 3
+rec.top = 4
+rec.top = 5
+rec.top = 6
 
-0 = rec.right
-1 = rec.right
-2 = rec.right
-3 = rec.right
-4 = rec.right
-5 = rec.right
-6 = rec.right
+rec.right = 0
+rec.right = 1
+rec.right = 2
+rec.right = 3
+rec.right = 4
+rec.right = 5
+rec.right = 6
 
-0 = rec.bottom
-1 = rec.bottom
-2 = rec.bottom
-3 = rec.bottom
-4 = rec.bottom
-5 = rec.bottom
-6 = rec.bottom
+rec.bottom = 0
+rec.bottom = 1
+rec.bottom = 2
+rec.bottom = 3
+rec.bottom = 4
+rec.bottom = 5
+rec.bottom = 6
 
-rec = this.rectangles[k]
+rec = this.rectangles[0]
+rec = this.rectangles[1]
+
