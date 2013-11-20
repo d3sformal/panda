@@ -39,17 +39,19 @@ public abstract class Predicate implements PredicatesVisitable {
     public Set<Predicate> selectDeterminants(Set<Predicate> universe) {
     	Set<Predicate> ret = new HashSet<Predicate>();
     	
-    	for (Predicate candidate : universe) {
+	for (AccessExpression path : getPaths()) {
+    		for (Predicate candidate : universe) {
 			List<AccessExpression> candidatePaths = candidate.getPaths();
-			
-			for (AccessExpression path : getPaths()) {
-				for (AccessExpression candidatePath : candidatePaths) {
-					if (candidatePath.isSimilarToPrefixOf(path)) {
+
+			for (AccessExpression candidatePath : candidatePaths) {
+				for (AccessExpression candidateSubPath : candidatePath.getAllPrefixes()) {
+					if (candidateSubPath.isSimilarToPrefixOf(path)) {
 						ret.add(candidate);
 					}
 				}
 			}
 		}
+	}
     	
     	return ret;
     }

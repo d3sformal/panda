@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.common.access.impl;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -39,6 +40,22 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 		
 		ret.add(this);
 		
+		return ret;
+	}
+
+	@Override
+	public final List<AccessExpression> getAllPrefixes() {
+		List<AccessExpression> ret = new LinkedList<AccessExpression>();
+
+		AccessExpression prefix = this;
+
+		while (!(prefix instanceof Root)) {
+			ret.add(prefix);
+			prefix = prefix.cutTail();
+		}
+
+		ret.add(prefix);
+
 		return ret;
 	}
 

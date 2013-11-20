@@ -15,6 +15,7 @@ public interface AccessExpression extends Expression {
 	public List<AccessExpression> getSubAccessExpressions();
 	public List<AccessExpression> getAccessExpressions();
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements);
+	public List<AccessExpression> getAllPrefixes();
 	
 	public Root getRoot();
 	public AccessExpression get(int depth);
