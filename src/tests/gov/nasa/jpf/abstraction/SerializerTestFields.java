@@ -47,7 +47,7 @@ public class SerializerTestFields
 
 	public void display()
 	{
-		Verify.breakTransition();
+		Verify.breakTransition("");
 
 		// default serializer will handle this incorrectly (premature state matching)
 			// field "fv" has the same concrete value (0) in both branches

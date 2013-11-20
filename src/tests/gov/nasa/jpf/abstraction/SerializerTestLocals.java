@@ -28,7 +28,7 @@ public class SerializerTestLocals
 			v = y + z;
 		}
 
-		Verify.breakTransition();
+		Verify.breakTransition("");
 
 		// default serializer will handle this incorrectly (premature state matching)
 			// local variable "v" has the same concrete value (0) in both branches
