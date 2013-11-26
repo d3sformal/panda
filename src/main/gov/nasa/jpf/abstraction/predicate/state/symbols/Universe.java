@@ -10,6 +10,7 @@ import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.MJIEnv;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +33,7 @@ public class Universe implements Cloneable {
 	private Map<UniverseIdentifier, StructuredValue> objects = new HashMap<UniverseIdentifier, StructuredValue>();
 	
 	private static int ID = 0;
-	public static int NULL = -1;
+	public static int NULL = MJIEnv.NULL;
 	
 	private int id;
 

@@ -3,13 +3,14 @@ package gov.nasa.jpf.abstraction.concrete;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Universe;
+
 /**
  * An identifier of an object in the JPF memory model
  */
 public class Reference {
 	private ThreadInfo ti;
 	private ElementInfo ei;
-	private static int NULL = -1;
 	
 	public Reference(ThreadInfo ti, ElementInfo ei) {
 		this.ti = ti;
@@ -25,7 +26,7 @@ public class Reference {
 	}
 	
 	public int getObjectRef() {
-		return ei == null ? NULL : ei.getObjectRef();
+		return ei == null ? Universe.NULL : ei.getObjectRef();
 	}
 	
 	@Override
@@ -36,7 +37,7 @@ public class Reference {
 	@Override
 	public final boolean equals(Object o) {
 		if (o instanceof Reference) {
-			return getObjectRef() == ((Reference) o).getObjectRef() && getObjectRef() != NULL;
+			return getObjectRef() == ((Reference) o).getObjectRef() && getObjectRef() != Universe.NULL;
 		}
 		
 		return false;
