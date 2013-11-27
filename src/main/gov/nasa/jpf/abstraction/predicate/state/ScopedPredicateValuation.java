@@ -483,7 +483,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 
 	@Override
 	public Set<Predicate> getPredicates() {
-		return scopes.top().getPredicates();
+		return getPredicates(0);
+	}
+	
+	public Set<Predicate> getPredicates(int i) {
+		return scopes.top(i).getPredicates();
 	}
 
 }

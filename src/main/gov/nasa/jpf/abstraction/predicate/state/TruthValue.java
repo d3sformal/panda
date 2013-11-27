@@ -12,7 +12,7 @@ public enum TruthValue {
 	UNDEFINED,
 	TRUE,
 	FALSE,
-	UNKNOWN;	
+	UNKNOWN;
 	
 	private static TruthValue create(int i) {
 		switch (i) {
@@ -49,4 +49,16 @@ public enum TruthValue {
 	public static TruthValue or(TruthValue a, TruthValue b) {
 		return create(a.ordinal() | b.ordinal());
 	}
+
+    public int toInteger() {
+        switch (this) {
+        case TRUE:
+        	return 1;
+        case FALSE:
+        	return 0;
+        case UNKNOWN:
+        	return 2;
+        }
+        return -1;
+    }
 }

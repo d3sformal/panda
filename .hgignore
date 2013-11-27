@@ -16,5 +16,6 @@ activity*.png
 *.pdf
 .*.swp
 *.orig
+tags
 src/main/gov/nasa/jpf/abstraction/predicate/parser/*.java
 src/main/gov/nasa/jpf/abstraction/predicate/parser/*.tokens
