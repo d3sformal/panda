@@ -24,7 +24,9 @@ import org.antlr.v4.runtime.CommonTokenStream;
 public abstract class Predicate implements PredicatesVisitable {
 	public abstract List<AccessExpression> getPaths();
 	public abstract Predicate replace(Map<AccessExpression, Expression> replacements);
-	
+
+    protected int hashCodeValue;
+
     public String toString() {
     	return toString(Notation.policy);
     }
@@ -113,8 +115,8 @@ public abstract class Predicate implements PredicatesVisitable {
 	}
 
 	@Override
-	public int hashCode() {
-		return toString(Notation.DOT_NOTATION).hashCode();
+	public final int hashCode() {
+		return hashCodeValue;
 	}
 	
 	@Override

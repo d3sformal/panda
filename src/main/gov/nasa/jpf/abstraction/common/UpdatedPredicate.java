@@ -22,6 +22,7 @@ public class UpdatedPredicate extends Predicate {
 		this.predicate = predicate;
 		this.expression = expression;
 		this.newExpression = newExpression;
+		this.hashCodeValue = toString(Notation.DOT_NOTATION).hashCode();
 	}
 	
 	public Predicate apply() {

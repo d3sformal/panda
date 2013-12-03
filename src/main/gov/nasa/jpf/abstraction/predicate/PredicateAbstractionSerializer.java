@@ -38,7 +38,20 @@ import gov.nasa.jpf.util.JPFLogger;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Universe;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.LocalVariable;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.StructuredValue;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Slot;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.StructuredValueSlot;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapObject;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapArray;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapObjectReference;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassStatics;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassStaticsReference;
 
 /**
  * a serializer that uses Abstract values stored in attributes 
@@ -47,15 +60,102 @@ import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 public class PredicateAbstractionSerializer extends FilteringSerializer {
 
 	static JPFLogger logger = JPF.getLogger("gov.nasa.jpf.abstraction.PredicateAbstractionSerializer");
+    private int depth = 0;
+    private PredicateAbstraction pabs;
+    private Universe universe;
 
 	public PredicateAbstractionSerializer(Config conf) {
 	}
 
-    static int depth = 0;
+    protected Set<StructuredValue> sortStructuredValues(Set<StructuredValue> values) {
+    	Set<StructuredValue> order = new TreeSet<StructuredValue>(new Comparator<StructuredValue>() {
+        	public int compare(StructuredValue v1, StructuredValue v2) {
+                if (v1 instanceof ClassStatics && v2 instanceof HeapObject  ) return -1;
+                if (v1 instanceof HeapObject   && v2 instanceof ClassStatics) return +1;
+                
+                if (v1 instanceof HeapObject && v2 instanceof HeapObject) {
+    	        	int r1 = ((HeapObjectReference)v1.getReference()).getReference();
+                	int r2 = ((HeapObjectReference)v2.getReference()).getReference();
+
+                    return r1 - r2;
+                }
+
+                if (v1 instanceof ClassStatics && v2 instanceof ClassStatics) {
+    	        	String c1 = ((ClassStaticsReference)v1.getReference()).getClassName();
+                	String c2 = ((ClassStaticsReference)v2.getReference()).getClassName();
+
+                    return c1.compareTo(c2);
+                }
+
+            	return 0;
+            }
+        });
+
+        order.addAll(values);
+
+        return order;
+    }
+
+    protected void serializeHeap(Set<StructuredValue> heap) {
+        buf.add(heap.size());
+
+        for (StructuredValue value : sortStructuredValues(heap)) {
+            serializeStructuredValue(value);
+        }
+    }
+
+    protected void serializeSlot(Slot slot) {
+        if (slot instanceof StructuredValueSlot) {
+            StructuredValueSlot svs = (StructuredValueSlot) slot;
+
+            buf.add(svs.getPossibleHeapValues().size());
+
+            for (StructuredValue p : sortStructuredValues(svs.getPossibleHeapValues())) {
+                int r = ((HeapObjectReference)p.getReference()).getReference();
+
+                buf.add(r);
+            }
+        }
+    }
+
+    protected void serializeStructuredValue(StructuredValue value) {
+        if (value instanceof HeapArray) {
+            HeapArray a = (HeapArray) value;
+            buf.add(HeapArray.class.hashCode());
+            buf.add(a.getLength());
+
+            for (Integer index : new TreeSet<Integer>(a.getElements().keySet())) {
+                serializeSlot(a.getElement(index));
+            }
+        } else if (value instanceof HeapObject) {
+            HeapObject o = (HeapObject) value;
+            buf.add(HeapObject.class.hashCode());
+            buf.add(o.getFields().size());
+
+            for (String field : new TreeSet<String>(o.getFields().keySet())) {
+            	serializeSlot(o.getField(field));
+            }
+        } else if (value instanceof ClassStatics) {
+            ClassStatics s = (ClassStatics) value;
+            buf.add(ClassStatics.class.hashCode());
+            buf.add(((ClassStaticsReference)s.getReference()).getClassName().hashCode());
+
+            for (String field : new TreeSet<String>(s.getFields().keySet())) {
+            	serializeSlot(s.getField(field));
+            }
+        }
+    }
 
     @Override
     protected int[] computeStoringData() {
+        //System.out.println("-------------------------------------------- SERIALIZING --------------------------------------------"); 
         buf.clear();
+
+        pabs = (PredicateAbstraction) GlobalAbstraction.getInstance().get();
+        universe = pabs.getSymbolTable().getUniverse();
+
+        serializeHeap(universe.getStructuredValues());
+
         //heap = ks.getHeap();
         //initReferenceQueue();
 
@@ -68,6 +168,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         // (locked objects etc) that should NOT set the canonical reference serialization
         // values (if they are encountered before their first explicit heap reference)
         //serializeThreadStates();
+        //System.out.println("-------------------------------------------- SERIALIZED  --------------------------------------------"); 
 
         return buf.toArray();
     }
@@ -83,7 +184,10 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
     @Override
 	protected void serializeFrame(StackFrame frame){
+        //System.out.println("--- FRAME ---");
 		buf.add(frame.getMethodInfo().getGlobalId());
+
+        FlatSymbolTable currentScope = pabs.getSymbolTable().get(depth);
 
 		// there can be (rare) cases where a listener sets a null nextPc in
 		// a frame that is still on the stack
@@ -97,25 +201,45 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 		int len = frame.getTopPos()+1;
 		buf.add(len);
 
-        Abstraction abs = GlobalAbstraction.getInstance().get();
+        Set<Predicate> order = new TreeSet<Predicate>(new Comparator<Predicate>() {
+            public int compare(Predicate p1, Predicate p2) {
+                int h1 = p1.hashCode();
+                int h2 = p2.hashCode();
 
-        if (abs instanceof PredicateAbstraction) {
-            PredicateAbstraction pabs = (PredicateAbstraction) abs;
+                return h1 - h2;
+            }
+        });
 
-            Set<Predicate> order = new TreeSet<Predicate>(new Comparator<Predicate>() {
-                public int compare(Predicate p1, Predicate p2) {
-                    int h1 = p1.hashCode();
-                    int h2 = p2.hashCode();
+        order.addAll(pabs.getPredicateValuation().getPredicates(depth));
 
-                    return h1 - h2;
+        for (Predicate p : order) {
+            //System.out.println("Predicate " + p + " " + p.hashCode() + " = " + pabs.getPredicateValuation().get(p).toInteger());
+            buf.add(p.hashCode());
+            buf.add(pabs.getPredicateValuation().get(p).toInteger());
+        }
+
+        for (Root local : currentScope.getLocalVariables()) {
+            LocalVariable v = currentScope.getLocal(local);
+
+            if (v.getSlot() instanceof StructuredValueSlot) {
+                //System.out.println("Reference type: " + v);
+                StructuredValueSlot svs = (StructuredValueSlot)v.getSlot();
+                Set<StructuredValue> possibilities = svs.getPossibleHeapValues();
+
+                //System.out.print("\t" + possibilities.size() + ": ");
+                buf.add(possibilities.size());
+
+                Set<StructuredValue> possibilitiesOrder = sortStructuredValues(possibilities);
+
+                for (StructuredValue p : possibilitiesOrder) {
+                    int r = ((HeapObjectReference)p.getReference()).getReference(); 
+
+                	//System.out.print("\t" + r);
+                    buf.add(r);
                 }
-            });
-
-            order.addAll(pabs.getPredicateValuation().getPredicates(depth));
-
-            for (Predicate p : order) {
-                buf.add(p.hashCode());
-                buf.add(pabs.getPredicateValuation().get(p).toInteger());
+               	//System.out.println();
+            } else {
+                //System.out.println("Primitive type: " + v);
             }
         }
 

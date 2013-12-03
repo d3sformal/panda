@@ -20,6 +20,7 @@ public abstract class Comparison extends Predicate {
 	protected Comparison(Expression a, Expression b) {
 		this.a = a;
 		this.b = b;
+		this.hashCodeValue = toString(Notation.DOT_NOTATION).hashCode();
 	}
 	
 	@Override

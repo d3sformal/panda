@@ -14,6 +14,7 @@ import java.util.Map;
 public class Contradiction extends Predicate {
 	
 	protected Contradiction() {
+		this.hashCodeValue = toString(Notation.DOT_NOTATION).hashCode();
 	}
 
 	@Override

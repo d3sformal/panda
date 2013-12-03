@@ -14,6 +14,7 @@ import java.util.Map;
 public class Tautology extends Predicate {
 	
 	protected Tautology() {
+		this.hashCodeValue = toString(Notation.DOT_NOTATION).hashCode();
 	}
 
 	@Override

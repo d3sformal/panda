@@ -490,4 +490,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		return scopes.top(i).getPredicates();
 	}
 
+    @Override
+    public FlatPredicateValuation get(int depth) {
+        return scopes.top(depth);
+    }
+
 }

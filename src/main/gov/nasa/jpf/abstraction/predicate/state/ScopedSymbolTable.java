@@ -240,5 +240,10 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	public Universe getUniverse() {
 		return scopes.top().getUniverse();
 	}
+
+    @Override
+    public FlatSymbolTable get(int depth) {
+        return scopes.top(depth);
+    }
 	
 }

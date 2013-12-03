@@ -16,4 +16,5 @@ public interface Scoped {
 	public void restore(Scopes scopes);
 	public Scopes memorize();
 	public int count();
+    public Scope get(int depth);
 }
