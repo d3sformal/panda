@@ -40,6 +40,13 @@ public class AbstractListener extends PropertyListenerAdapter {
 	
 	@Override
 	public void stateAdvanced(Search search) {
+        if (search.isVisitedState()) {
+            System.out.println("VISITED STATE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+            VM vm = search.getVM();
+            	ThreadInfo ti = vm.getCurrentThread();
+                    ti.printStackTrace();
+        }
+
 		RunDetector.advance();
 		GlobalAbstraction.getInstance().forward(search.getVM().getCurrentThread().getTopFrameMethodInfo());
 	}
