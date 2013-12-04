@@ -93,8 +93,10 @@ public class BinaryIfInstructionExecutor {
 			}
 			
 			if (abs_condition == AbstractBoolean.TRUE) {
+                ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
 				conditionValue = true;
 			} else if (abs_condition == AbstractBoolean.FALSE) {
+                ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
 				conditionValue = false;
 			} else { // TOP
 					ChoiceGenerator<?> cg = new AbstractChoiceGenerator();

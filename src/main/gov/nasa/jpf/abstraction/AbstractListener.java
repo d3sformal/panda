@@ -45,6 +45,8 @@ public class AbstractListener extends PropertyListenerAdapter {
             VM vm = search.getVM();
             	ThreadInfo ti = vm.getCurrentThread();
                     ti.printStackTrace();
+        } else {
+            System.out.println("NEW STATE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
 
 		RunDetector.advance();
