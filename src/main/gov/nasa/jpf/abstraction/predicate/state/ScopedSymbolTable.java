@@ -52,7 +52,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		 * Register new local variables
 		 */
 		for (LocalVarInfo local : locals) {
-			if (local.isNumeric()) {
+			if (local.isNumeric() || local.isBoolean()) {
 				ret.addPrimitiveLocal(local.getName());
 			} else {
 				ret.addHeapValueLocal(local.getName());
@@ -123,7 +123,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 				attr = Attribute.ensureNotNull(attr);
 				
 				if (args[i] != null) {					
-					if (args[i].isNumeric()) {
+					if (args[i].isNumeric() || args[i].isBoolean()) {
 						// Assign to numeric (primitive) arg
 						transitionScope.processPrimitiveStore(attr.getExpression(), originalScope, DefaultRoot.create(args[i].getName()));
 					} else {						

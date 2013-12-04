@@ -320,7 +320,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				
 				if (l != null) {
 					
-					if (!l.isNumeric()) {
+					if (!l.isNumeric() && !l.isBoolean()) {
 						referenceArgs.add(l);
 					}
 				
@@ -367,7 +367,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
 
 				for (int i = 0; i < args.length; ++i) {
-					if (args[i] != null && !args[i].isNumeric()) {
+					if (args[i] != null && !args[i].isNumeric() && !args[i].isBoolean()) {
 						replacements.put(DefaultRoot.create(args[i].getName()), attrs[i].getExpression());
 						
 						isAnonymous |= attrs[i].getExpression() instanceof AnonymousExpression;

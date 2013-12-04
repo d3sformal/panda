@@ -1,11 +1,11 @@
 @using=jpf-abstraction
 
-target=scheduler.Scheduler
+target=branch.Branch
 
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/scheduler/Scheduler.pred
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/branch/Branch.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.listener.ExecTracker
 #,gov.nasa.jpf.listener.ExecTracker,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.SMTMonitor,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor

@@ -287,13 +287,13 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		Set<Value> destinations = lookupValues(to);
-		
+
 		boolean ambiguous = destinations.size() > 1;
 		
 		for (Value destination : destinations) {
 			Value newValue = new PrimitiveValue(universe);
 			
-			for (Slot slot : destination.getSlots()) {			
+			for (Slot slot : destination.getSlots()) {
 				if (!ambiguous) {
 					slot.clear();
 					destination.removeSlot(slot);
