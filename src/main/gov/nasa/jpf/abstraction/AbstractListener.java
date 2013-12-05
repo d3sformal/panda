@@ -25,6 +25,8 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+
 /**
  * AbstractListener monitors the state space traversal and individual instruction executions
  *
@@ -41,12 +43,12 @@ public class AbstractListener extends PropertyListenerAdapter {
 	@Override
 	public void stateAdvanced(Search search) {
         if (search.isVisitedState()) {
-            System.out.println("VISITED STATE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+            System.out.println("VISITED STATE " + ((PredicateAbstraction)GlobalAbstraction.getInstance().get()).getPredicateValuation().getPredicates() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
             VM vm = search.getVM();
             	ThreadInfo ti = vm.getCurrentThread();
                     ti.printStackTrace();
         } else {
-            System.out.println("NEW STATE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+            System.out.println("NEW STATE " + ((PredicateAbstraction)GlobalAbstraction.getInstance().get()).getPredicateValuation().getPredicates() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
 
 		RunDetector.advance();

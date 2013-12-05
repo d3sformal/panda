@@ -97,7 +97,9 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     }
 
     protected void serializeHeap(Set<StructuredValue> heap) {
-        buf.add(heap.size());
+        //buf.add(0x00000000);
+        //buf.add(heap.size());
+        //buf.add(0x00000000);
 
         for (StructuredValue value : sortStructuredValues(heap)) {
             serializeStructuredValue(value);
@@ -156,6 +158,10 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
         serializeHeap(universe.getStructuredValues());
 
+        //buf.add(0x00000000);
+        //buf.add(0xDEADBEEF);
+        //buf.add(0x00000000);
+
         //heap = ks.getHeap();
         //initReferenceQueue();
 
@@ -169,6 +175,13 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         // values (if they are encountered before their first explicit heap reference)
         //serializeThreadStates();
         //System.out.println("-------------------------------------------- SERIALIZED  --------------------------------------------"); 
+
+        //System.out.print("Serialization: ");
+        //for (int i = 0; i < buf.size() && i < 16; ++i) {
+        //    System.out.printf("%08X", buf.get(i));
+        //}
+        //System.out.println("...");
+        //System.out.println();
 
         return buf.toArray();
     }
