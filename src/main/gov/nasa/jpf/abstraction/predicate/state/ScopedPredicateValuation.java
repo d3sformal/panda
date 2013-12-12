@@ -40,11 +40,12 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	private PredicateValuationStack scopes = new PredicateValuationStack();
 	private Predicates predicateSet;
 	private Map<Predicate, TruthValue> initialValuation;
+    private SMT smt = new SMT();
 	
 	public ScopedPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
 		this.predicateSet = predicateSet;
 		
-		scopes.push(new FlatPredicateValuation());
+		scopes.push(new FlatPredicateValuation(smt));
 		
 		Set<Predicate> predicates = new HashSet<Predicate>();
 
@@ -62,7 +63,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		 */
 		if (!predicates.isEmpty()) {
 			try {
-				initialValuation = new SMT().valuatePredicates(predicates);
+				initialValuation = smt.valuatePredicates(predicates);
 			
 				for (Predicate predicate : predicates) {
 					// IF NOT A TAUTOLOGY OR CONTRADICTION
@@ -95,13 +96,17 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			}
 		}
 	}
+
+    public void close() {
+        smt.close();
+    }
 	
 	/**
 	 * Collect predicates targeted at the given method and store them in the upcoming scope
 	 */
 	@Override
 	public FlatPredicateValuation createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-		FlatPredicateValuation valuation = new FlatPredicateValuation();
+		FlatPredicateValuation valuation = new FlatPredicateValuation(smt);
 		
 		if (method == null) return valuation;
 		
@@ -356,7 +361,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			
 			notWantedLocalVariables.removeAll(referenceArgs);
 			
-			FlatPredicateValuation relevant = new FlatPredicateValuation();
+			FlatPredicateValuation relevant = new FlatPredicateValuation(smt);
 			
 			// Filter out predicates from the callee that cannot be used for propagation to the caller 
 			for (Predicate predicate : getPredicates()) {

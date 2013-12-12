@@ -78,6 +78,15 @@ public class SMT {
 			OutputStreamWriter inwriter = new OutputStreamWriter(instream);
 
 			in = new BufferedWriter(inwriter);
+            in.write(
+                "(set-logic QF_AUFLIA)" + SEPARATOR +
+		        "(declare-fun arr () (Array Int (Array Int Int)))" + SEPARATOR +
+    		    "(declare-fun arrlen () (Array Int Int))" + SEPARATOR +
+	    	    "(declare-fun fresh () Int)" + SEPARATOR +
+		        "(declare-fun null () Int)" + SEPARATOR +
+    		    SEPARATOR
+            );
+            in.flush();
 
 			InputStream outstream = mathsat.getInputStream();
 			InputStreamReader outreader = new InputStreamReader(outstream);
@@ -89,8 +98,27 @@ public class SMT {
 			throw new SMTException(e);
 		}
 	}
+    
+    public void close() {
+        try {
+            in.write("(exit)");
+            in.flush();
+            in.close();
+        } catch (IOException e) {
+            System.err.println("SMT would not terminate");
+
+            throw new SMTException(e);
+        }
+        try {
+            out.close();
+        } catch (IOException e) {
+            System.err.println("SMT would not terminate");
+
+            throw new SMTException(e);
+        }
+    }
 	
-	private Boolean[] isValid(String input) throws SMTException {
+	private Boolean[] isValid(int count, String input) throws SMTException {
 		List<Boolean> values = new ArrayList<Boolean>();
 			
 		String output = "";
@@ -102,19 +130,12 @@ public class SMT {
 			System.err.println("SMT refuses input.");
 			
 			throw new SMTException(e);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					throw new SMTException(e);
-				}
-			}
 		}
 
 		try {
-			while ((output = out.readLine()) != null) {
-				if (!output.matches("^(un)?sat$")) {
+            for (int i = 0; i < 2 * count; ++i) {
+                output = out.readLine();
+				if (output == null || !output.matches("^(un)?sat$")) {
 					throw new SMTException("SMT replied with '" + output + "'");
 				}
 				values.add(output.matches("^unsat$"));
@@ -123,28 +144,14 @@ public class SMT {
 			System.err.println("SMT refuses to provide output.");
 			
 			throw new SMTException(e);
-		} finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					throw new SMTException(e);
-				}
-			}
 		}
-		
+
 		return values.toArray(new Boolean[values.size()]);
 	}
 	
 	private String prepareInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<String> formulas, String separator) {
-		String input = "(set-logic QF_AUFLIA)" + separator;
-		
-		input += "(declare-fun arr () (Array Int (Array Int Int)))" + separator;
-		input += "(declare-fun arrlen () (Array Int Int))" + separator;
-		input += "(declare-fun fresh () Int)" + separator;
-		input += "(declare-fun null () Int)" + separator;
-		input += separator;
-		
+		String input = "(push 1)";
+
 		for (String c : classes) {
 			input += "(declare-fun class_" + c.replace("_", "__").replace('.', '_') + " () Int)" + separator;
 		}
@@ -176,7 +183,7 @@ public class SMT {
 				separator;
 		}
 		
-		input += "(exit)" + separator;
+        input += "(pop 1)";
 		
 		return input;
 	}
@@ -307,28 +314,28 @@ public class SMT {
 	
 	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateDeterminant> predicates) throws SMTException {
 		valuatePredicatesInvoked(predicates);
-		
-		return evaluate(predicates.keySet(), prepareInput(predicates, SEPARATOR), prepareInput(predicates, DEBUG_SEPARATOR));
+
+    	return evaluate(predicates.keySet(), prepareInput(predicates, SEPARATOR), prepareInput(predicates, DEBUG_SEPARATOR));
 	}
 	
 	public Map<Predicate, TruthValue> valuatePredicates(Set<Predicate> predicates) throws SMTException {
 		valuatePredicatesInvoked(predicates);
-		
-		return evaluate(predicates, prepareInput(predicates, SEPARATOR), prepareInput(predicates, DEBUG_SEPARATOR));
+
+   		return evaluate(predicates, prepareInput(predicates, SEPARATOR), prepareInput(predicates, DEBUG_SEPARATOR));
 	}
 
-	private Map<Predicate, TruthValue> evaluate(Set<Predicate> predicates, String input, String debugInput) {
+	private Map<Predicate, TruthValue> evaluate(Set<Predicate> predicates, String input, String debugInput) throws SMTException {
 		valuatePredicatesInputGenerated(debugInput);
 		
 		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 		
 		Boolean[] valid;
 		
-		try {
-			valid = isValid(input);
-		} catch (SMTException e) {
-			throw new SMTException("SMT failed on:\n" + debugInput + "\n" + e.getMessage());
-		}
+        try {
+    		valid = isValid(predicates.size(), input);
+        } catch (SMTException e) {
+    	    throw new SMTException("SMT failed on:\n" + debugInput + "\n" + e.getMessage());
+        }
 
 		int i = 0;
 		

@@ -117,5 +117,9 @@ public class PredicateAbstraction extends Abstraction {
 		
 		symbolTable.restore(trace.top().symbolTableStack);
 		predicateValuation.restore(trace.top().predicateValuationStack);
+
+        if (trace.isEmpty()) {
+            predicateValuation.close();
+        }
 	}
 }

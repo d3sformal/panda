@@ -21,11 +21,16 @@ import java.util.Set;
  */
 public class FlatPredicateValuation implements PredicateValuation, Scope {
 	private HashMap<Predicate, TruthValue> valuations = new HashMap<Predicate, TruthValue>();
-	
+    private SMT smt;
+
+    public FlatPredicateValuation(SMT smt) {
+        this.smt = smt;
+    }
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public FlatPredicateValuation clone() {
-		FlatPredicateValuation clone = new FlatPredicateValuation();
+		FlatPredicateValuation clone = new FlatPredicateValuation(smt);
 		
 		clone.valuations = (HashMap<Predicate, TruthValue>)valuations.clone();
 		
@@ -65,7 +70,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			}
 		}
 		
-		updated.putAll(new SMT().valuatePredicates(predicates));
+		updated.putAll(smt.valuatePredicates(predicates));
 		
 		if (size != updated.size()) {
 			cascadeReevaluation(updated);
@@ -210,7 +215,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		/**
 		 * Collective reevaluation
 		 */
-		Map<Predicate, TruthValue> newValuations = new SMT().valuatePredicates(predicates);
+		Map<Predicate, TruthValue> newValuations = smt.valuatePredicates(predicates);
 			
 		valuations.putAll(newValuations);
 	}
@@ -249,7 +254,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			input.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
 		}
 
-		return new SMT().valuatePredicates(input);
+		return smt.valuatePredicates(input);
 	}
 	
 	@Override

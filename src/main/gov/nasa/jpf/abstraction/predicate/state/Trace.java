@@ -20,4 +20,12 @@ public class Trace {
 	public void push(State state) {
 		states.push(state);
 	}
+
+    public int size() {
+        return states.size();
+    }
+
+    public boolean isEmpty() {
+        return states.isEmpty();
+    }
 }
