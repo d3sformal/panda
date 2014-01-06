@@ -37,6 +37,10 @@ public class Equals extends Comparison {
 	
 	@Override
 	public Predicate update(AccessExpression expression, Expression newExpression) {
+        /**
+         * a := new Object
+         * a = b ... false
+         */
 		if (a instanceof AccessExpression) {
 			AccessExpression ae = (AccessExpression) a;
 			
@@ -45,6 +49,10 @@ public class Equals extends Comparison {
 			}
 		}
 		
+        /**
+         * a := new Object
+         * b = a ... false
+         */
 		if (b instanceof AccessExpression) {
 			AccessExpression ae = (AccessExpression) b;
 			

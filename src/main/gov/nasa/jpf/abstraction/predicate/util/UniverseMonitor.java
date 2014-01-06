@@ -23,7 +23,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 /**
- * Prints the current memory model after each instruction in the target program
+ * Prints the current abstract heap after each instruction in the target program
  */
 public class UniverseMonitor extends ListenerAdapter {
 	
@@ -53,7 +53,7 @@ public class UniverseMonitor extends ListenerAdapter {
 						ClassStaticsReference r1 = (ClassStaticsReference) o1.getReference();
 						ClassStaticsReference r2 = (ClassStaticsReference) o2.getReference();
 						
-						r1.getClassName().compareTo(r2.getClassName());
+						return r1.getClassName().compareTo(r2.getClassName());
 					}
 					
 					if (o1 instanceof ClassStatics) return -1;

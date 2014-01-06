@@ -33,7 +33,7 @@ public class DefaultFresh extends DefaultRoot implements Fresh {
 	}
 	
 	@Override
-	public Predicate preconditionForBeingFresh() {
+	public Predicate getPreconditionForBeingFresh() {
 		return Tautology.create();
 	}
 }

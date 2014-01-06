@@ -28,13 +28,13 @@ public interface SymbolTable {
 	
 	/**
 	 * @param path access expression of the interest
-	 * @return true in case that the path points to an object, false otherwise.
+	 * @return true in case that the path points to an array, false otherwise.
 	 */
 	public boolean isArray(AccessExpression path);
 	
 	/**
 	 * @param path access expression of the interest
-	 * @return true in case that the path points to an array, false otherwise.
+	 * @return true in case that the path points to an object, false otherwise.
 	 */
 	public boolean isObject(AccessExpression path);
 	
@@ -45,7 +45,7 @@ public interface SymbolTable {
 	public boolean isPrimitive(AccessExpression path);
 	
 	/**
-	 * @return the underlying structure holding all the objects (memory model)
+	 * @return the underlying structure holding all the objects (abstract heap)
 	 */
 	public Universe getUniverse();
 }

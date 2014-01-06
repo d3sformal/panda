@@ -35,7 +35,7 @@ public class DefaultArrays implements Arrays {
 	}
 	
 	@Override
-	public List<AccessExpression> getSubAccessExpressions() {
+	public List<AccessExpression> getAccessSubExpressions() {
 		return new LinkedList<AccessExpression>();
 	}
 }

@@ -93,7 +93,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	 * At a method call it is necessary to change the scope correspondingly
 	 */
 	@Override
-	public AffectedAccessExpressions processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
+	public AffectedAccessExpressions processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
 		
 		FlatSymbolTable originalScope = scopes.top();
@@ -148,6 +148,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 
 		/**
 		 * Register the return value
+         *
+         * top()  ... before return
+         * top(1) ... after return (previous stack frame)
 		 */
 		if (before.getMethodInfo().isReferenceReturnType()) {
 			scopes.top().addHeapValueReturn(calleeReturnValue);

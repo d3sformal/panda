@@ -1,12 +1,12 @@
 [method dataflow.DataFlowAnalysis.main]
-newFacts.length >= oldFacts.length
+arrlength(arrlen, newFacts) >= arrlength(arrlen, oldFacts)
 i = 0
 i >= 0
 j >= 0
-i < queue.length
-j < queue.length
+i < arrlength(arrlen, queue)
+j < arrlength(arrlen, queue)
 i = j
-newFacts.length = 0
+arrlength(arrlen, newFacts) = 0
 queue[i] = 0
 queue[i] = 1
 queue[i] = 2

@@ -63,8 +63,8 @@ public abstract class DefaultObjectAccessExpression extends DefaultAccessExpress
 	public abstract DefaultObjectAccessExpression clone();
 
 	@Override
-	public List<AccessExpression> getSubAccessExpressions() {
-		return getObject().getSubAccessExpressions();
+	public List<AccessExpression> getAccessSubExpressions() {
+		return getObject().getAccessSubExpressions();
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 [method symbols.Symbols.main]
-k.length = l.length
-l.length = 1
-o[0].length = 0
+arrlength(arrlen, K) = arrlength(arrlen, l)
+arrlength(arrlen, l) = 1
+arrlength(arrlen, o[0]) = 0
 true
 false

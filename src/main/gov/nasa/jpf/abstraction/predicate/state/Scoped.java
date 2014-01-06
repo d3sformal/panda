@@ -9,7 +9,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
  */
 public interface Scoped {
 	public Scope createDefaultScope(ThreadInfo threadInfo, MethodInfo method);
-	public SideEffect processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect);
+	public SideEffect processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after);
 	public SideEffect processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect);
 	public SideEffect processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect);
 	public void store(Scope scope);

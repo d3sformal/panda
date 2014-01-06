@@ -33,10 +33,10 @@ public abstract class DefaultArrayElementExpression extends DefaultArrayAccessEx
 	}
 	
 	@Override
-	public List<AccessExpression> getSubAccessExpressions() {
-		List<AccessExpression> ret = super.getSubAccessExpressions();
+	public List<AccessExpression> getAccessSubExpressions() {
+		List<AccessExpression> ret = super.getAccessSubExpressions();
 		
-		ret.addAll(arrays.getSubAccessExpressions());
+		ret.addAll(arrays.getAccessSubExpressions());
 		ret.addAll(index.getAccessExpressions());
 		
 		return ret;

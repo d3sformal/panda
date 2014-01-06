@@ -27,10 +27,10 @@ public abstract class DefaultObjectFieldExpression extends DefaultObjectAccessEx
 	public abstract DefaultObjectFieldExpression clone();
 	
 	@Override
-	public List<AccessExpression> getSubAccessExpressions() {
-		List<AccessExpression> ret = super.getSubAccessExpressions();
+	public List<AccessExpression> getAccessSubExpressions() {
+		List<AccessExpression> ret = super.getAccessSubExpressions();
 		
-		ret.addAll(field.getSubAccessExpressions());
+		ret.addAll(field.getAccessSubExpressions());
 		
 		return ret;
 	}

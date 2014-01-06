@@ -16,7 +16,7 @@ public abstract class SMTListener extends ListenerAdapter {
 		SMT.registerListener(this);
 	}
 	
-	public void valuatePredicatesInvoked(Map<Predicate, PredicateDeterminant> predicates) {}
+	public void valuatePredicatesInvoked(Map<Predicate, PredicateValueDeterminingInfo> predicates) {}
 	public void valuatePredicatesInvoked(Set<Predicate> predicates) {}
 	public void valuatePredicatesInputGenerated(String input) {}
 	public void valuatePredicatesExecuted(Map<Predicate, TruthValue> valuation) {}

@@ -6,7 +6,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.Universe;
 
 /**
- * An identifier of an object in the JPF memory model
+ * An identifier of an object in the JPF abstract heap
  */
 public class Reference {
 	private ThreadInfo ti;

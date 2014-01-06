@@ -50,8 +50,8 @@ public class DefaultArrayElementWrite extends DefaultArrayElementExpression impl
 	}
 	
 	@Override
-	public List<AccessExpression> getSubAccessExpressions() {
-		List<AccessExpression> ret = super.getSubAccessExpressions();
+	public List<AccessExpression> getAccessSubExpressions() {
+		List<AccessExpression> ret = super.getAccessSubExpressions();
 		
 		ret.addAll(newValue.getAccessExpressions());
 		
@@ -106,8 +106,8 @@ public class DefaultArrayElementWrite extends DefaultArrayElementExpression impl
 	}
 
 	@Override
-	public Predicate preconditionForBeingFresh() {
-		return getNewValue().preconditionForBeingFresh();
+	public Predicate getPreconditionForBeingFresh() {
+		return getNewValue().getPreconditionForBeingFresh();
 	}
 
 }

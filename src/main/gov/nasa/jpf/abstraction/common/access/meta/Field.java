@@ -13,5 +13,5 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 public interface Field extends PredicatesVisitable, Cloneable {
 	public String getName();
 	public Field clone();
-	public List<AccessExpression> getSubAccessExpressions();
+	public List<AccessExpression> getAccessSubExpressions();
 }

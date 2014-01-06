@@ -12,7 +12,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  *  p.q.C.d[e].f
  */
 public interface AccessExpression extends Expression {	
-	public List<AccessExpression> getSubAccessExpressions();
+	public List<AccessExpression> getAccessSubExpressions();
 	public List<AccessExpression> getAccessExpressions();
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements);
 	public List<AccessExpression> getAllPrefixes();
@@ -35,6 +35,9 @@ public interface AccessExpression extends Expression {
 	
 	@Override
 	public abstract AccessExpression clone();
-	
+
+    /**
+     * Comparison of two access expressions ignoring indices, arrays
+     */
 	public boolean isSimilarTo(AccessExpression expression);
 }

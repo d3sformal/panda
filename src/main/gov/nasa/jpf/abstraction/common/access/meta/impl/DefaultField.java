@@ -52,7 +52,7 @@ public class DefaultField implements Field {
 	}
 	
 	@Override
-	public List<AccessExpression> getSubAccessExpressions() {
+	public List<AccessExpression> getAccessSubExpressions() {
 		return new LinkedList<AccessExpression>();
 	}
 }

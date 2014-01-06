@@ -7,7 +7,7 @@ public class SerializerTestLocals
 {
 	public static void main (String[] args) 
 	{
-		System.out.println("\n=== AbstractionSerializer testing : locals ===\n");
+		System.out.println("\n=== NumericAbstractionSerializer testing : locals ===\n");
 	
 		int x = Debug.makeAbstractInteger(1);
 		int y = Debug.makeAbstractInteger(-1);

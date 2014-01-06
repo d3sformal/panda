@@ -3,28 +3,26 @@ package gov.nasa.jpf.abstraction.predicate.state;
 /**
  * Possible valuations of a predicate
  * 
- * UNDEFINED ... the initial value (not valuated yet)
+ * UNDEFINED ... the initial value (not valuated yet, cannot be valuated)
  * UNKNOWN   ... cannot rule out neither true nor false
  * TRUE      ... true
  * FALSE     ... false
  */
 public enum TruthValue {
-	UNDEFINED,
-	TRUE,
-	FALSE,
-	UNKNOWN;
+	UNDEFINED, // 0 .. 00
+	TRUE,      // 1 .. 01
+	FALSE,     // 2 .. 10
+	UNKNOWN;   // 3 .. 11
 	
 	private static TruthValue create(int i) {
-		switch (i) {
-		case 0:
-			return UNDEFINED;
-		case 1:
-			return TRUE;
-		case 2:
-			return FALSE;
-		}
-		
-		return UNKNOWN;
+        if (i == UNDEFINED.ordinal()) return UNDEFINED;
+        if (i == TRUE.ordinal()) return TRUE;
+        if (i == FALSE.ordinal()) return FALSE;
+        if (i == UNKNOWN.ordinal()) return UNKNOWN;
+
+        assert false : "Unknown truth value ordinal";
+
+        return UNDEFINED;
 	}
 	
 	public static TruthValue create(boolean isTrue, boolean isFalse) {
@@ -41,24 +39,34 @@ public enum TruthValue {
 	public static TruthValue create(boolean isTrue) {
 		return create(isTrue, !isTrue);
 	}
-	
+
+    /**
+     * Returns the greatest common predecesor of both the elements of the lattice over {0, 1}
+     *
+     * 00 and ?? ... UNDEFINED and ??       ... UNDEFINED
+     * 01 and 01 ... TRUE      and TRUE     ... TRUE
+     * 01 and 10 ... TRUE      and FALSE    ... UNDEFINED
+     * 01 and 11 ... TRUE      and UNKNOWN  ... TRUE
+     * 10 and 10 ... FALSE     and FALSE    ... FALSE
+     * 10 and 11 ... FALSE     and UNKNOWN  ... FALSE
+     * 11 and 11 ... UNKNOWN   and UNKNOWN  ... UNKNOWN
+     */
 	public static TruthValue and(TruthValue a, TruthValue b) {
 		return create(a.ordinal() & b.ordinal());
 	}
 	
+    /**
+     * Returns the least common successor of both the elements of the lattice over {0, 1}
+     *
+     * 00 or 00 ... UNDEFINED or UNDEFINED ... UNDEFINED
+     * 00 or 01 ... UNDEFINED or TRUE      ... TRUE
+     * 00 or 10 ... UNDEFINED or FALSE     ... FALSE
+     * 01 or 01 ... TRUE      or TRUE      ... TRUE
+     * 01 or 10 ... TRUE      or FALSE     ... UNKNOWN
+     * 10 or 10 ... FALSE     or FALSE     ... FALSE
+     * 11 or ?? ... UNKNOWN   or ??        ... UNKNOWN
+     */
 	public static TruthValue or(TruthValue a, TruthValue b) {
 		return create(a.ordinal() | b.ordinal());
 	}
-
-    public int toInteger() {
-        switch (this) {
-        case TRUE:
-        	return 1;
-        case FALSE:
-        	return 0;
-        case UNKNOWN:
-        	return 2;
-        }
-        return -1;
-    }
 }

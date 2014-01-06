@@ -7,7 +7,7 @@ import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
-import gov.nasa.jpf.abstraction.predicate.smt.PredicateDeterminant;
+import gov.nasa.jpf.abstraction.predicate.smt.PredicateValueDeterminingInfo;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.vm.VM;
 
@@ -43,7 +43,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	 * Keep doing so until a fixpoint is reached
 	 */
 	private void cascadeReevaluation(Map<Predicate, TruthValue> updated) {
-		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
+		Map<Predicate, PredicateValueDeterminingInfo> predicates = new HashMap<Predicate, PredicateValueDeterminingInfo>();
 		
 		int size = updated.size();
 		
@@ -66,7 +66,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 					determinants.put(determinant, updated.get(determinant));
 				}
 				
-				predicates.put(affectedCandidate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
+				predicates.put(affectedCandidate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
 			}
 		}
 		
@@ -149,7 +149,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
 	@Override
 	public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
-		Map<Predicate, PredicateDeterminant> predicates = new HashMap<Predicate, PredicateDeterminant>();
+		Map<Predicate, PredicateValueDeterminingInfo> predicates = new HashMap<Predicate, PredicateValueDeterminingInfo>();
 
 		for (Predicate predicate : valuations.keySet()) {
 			boolean affects = false;
@@ -203,7 +203,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 					determinants.put(determinant, valuations.get(determinant));
 				}
 				
-				predicates.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
+				predicates.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
 			}
 		}
 		
@@ -220,6 +220,12 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		valuations.putAll(newValuations);
 	}
 	
+    /**
+     * Evaluate a single predicate regardless of a statement
+     *
+     * Used to detect tautologies in the initial phase.
+     * Used to valuate branching conditions - a (possibly) new predicate whose value depends solely on current predicate valuation.
+     */
 	@Override
 	public TruthValue evaluatePredicate(Predicate predicate) {
 		Set<Predicate> predicates = new HashSet<Predicate>();
@@ -230,13 +236,15 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	}
 	
 	/**
-	 * Evaluate a predicate regardless of a statement
+	 * Evaluate predicates regardless of a statement
+     *
+     * Batch variant of evaluatePredicate
 	 */
 	@Override
 	public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
 		if (predicates.isEmpty()) return new HashMap<Predicate, TruthValue>();
 		
-		Map<Predicate, PredicateDeterminant> input = new HashMap<Predicate, PredicateDeterminant>();
+		Map<Predicate, PredicateValueDeterminingInfo> input = new HashMap<Predicate, PredicateValueDeterminingInfo>();
 		
 		for (Predicate predicate : predicates) {
 			Predicate positiveWeakestPrecondition = predicate;
@@ -251,7 +259,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				determinants.put(determinant, valuations.get(determinant));
 			}
 			
-			input.put(predicate, new PredicateDeterminant(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
+			input.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
 		}
 
 		return smt.valuatePredicates(input);

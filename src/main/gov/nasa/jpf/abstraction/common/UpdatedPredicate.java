@@ -46,7 +46,9 @@ public class UpdatedPredicate extends Predicate {
 
 	@Override
 	public Predicate update(AccessExpression expression, Expression newExpression) {
-		return apply().update(expression, newExpression);
+        //If it were necessary to apply two subsequent updates - not expected
+        throw new RuntimeException("Double update");
+		//return apply().update(expression, newExpression);
 	}
 	
 	public Predicate getPredicate() {

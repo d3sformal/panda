@@ -10,5 +10,5 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
  */
 public interface Arrays extends PredicatesVisitable, Cloneable {
 	public Arrays clone();
-	public List<AccessExpression> getSubAccessExpressions();
+	public List<AccessExpression> getAccessSubExpressions();
 }

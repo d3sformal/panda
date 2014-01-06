@@ -91,26 +91,39 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 	
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
+        // perform updates in the prefix
+        //   statement: a.f = b
+        //   access expression: c[a.f].f
+        //   expected result: fread(f, aread(c, fread(f, a)))
 		Expression updated = getObject().update(expression, newExpression);
-		
+
+        // this is some path `... .f`
 		if (expression instanceof ObjectFieldRead) {
 			ObjectFieldRead r = (ObjectFieldRead) expression;
 			
+            // some other `... .f` has been updated
 			if (getField().getName().equals(r.getField().getName())) {				
 				if (updated instanceof AccessExpression) {
 					AccessExpression updatedAccessExpression = (AccessExpression) updated;
-					
+		
 					return create(updatedAccessExpression, DefaultObjectFieldWrite.create(r.getObject(), r.getField().clone(), newExpression));
 				}
 				
+                // propagate failure
 				return UndefinedAccessExpression.create();
 			}
 		}
+
+        // Something else (not a field `f`) has changed
 		
+        // updated prefix is a path and can be extended
+        // a.b.c.d.e ... return a.b.c.d.e.f
 		if (updated instanceof AccessExpression) {
 			return create((AccessExpression) updated, getField().clone());
 		}
 		
+        // updated prefix is null
+        // null.f ... return null
 		if (updated instanceof NullExpression) {
 			return NullExpression.create();
 		}
@@ -119,11 +132,11 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 	}
 
 	@Override
-	public Predicate preconditionForBeingFresh() {
+	public Predicate getPreconditionForBeingFresh() {
 		if (getField() instanceof ObjectFieldWrite) {
 			ObjectFieldWrite w = (ObjectFieldWrite) getField();
 			
-			return w.preconditionForBeingFresh();
+			return w.getPreconditionForBeingFresh();
 		}
 		
 		return Contradiction.create();

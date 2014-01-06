@@ -54,12 +54,12 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 	}
 	
 	@Override
-	public Predicate preconditionForBeingFresh() {
+	public Predicate getPreconditionForBeingFresh() {
 		return Tautology.create();
 	}
 
 	@Override
-	public List<AccessExpression> getSubAccessExpressions() {
+	public List<AccessExpression> getAccessSubExpressions() {
 		return new ArrayList<AccessExpression>();
 	}
 

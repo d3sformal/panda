@@ -36,7 +36,7 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 	 */
 	@Override
 	public final List<AccessExpression> getAccessExpressions() {
-		List<AccessExpression> ret = getSubAccessExpressions();
+		List<AccessExpression> ret = getAccessSubExpressions();
 		
 		ret.add(this);
 		

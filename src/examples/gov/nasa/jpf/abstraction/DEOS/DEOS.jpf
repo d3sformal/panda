@@ -10,4 +10,4 @@ abstract.domain=RANGE -128 128
 
 listener = gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.DebugMonitor
 
-vm.serializer.class = gov.nasa.jpf.abstraction.AbstractionSerializer
+vm.serializer.class = gov.nasa.jpf.abstraction.NumericAbstractionSerializer

@@ -124,11 +124,11 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	}
 
 	@Override
-	public Predicate preconditionForBeingFresh() {
+	public Predicate getPreconditionForBeingFresh() {
 		if (getArrays() instanceof ArrayElementWrite) {
 			ArrayElementWrite w = (ArrayElementWrite) getArrays();
 			
-			return Conjunction.create(Equals.create(getArray(), w.getArray()), w.preconditionForBeingFresh());
+			return Conjunction.create(Equals.create(getArray(), w.getArray()), w.getPreconditionForBeingFresh());
 		}
 		
 		return Contradiction.create();

@@ -159,7 +159,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public SideEffect processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
+	public SideEffect processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
 		
 		FlatPredicateValuation finalScope = createDefaultScope(threadInfo, method);

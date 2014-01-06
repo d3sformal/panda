@@ -33,7 +33,7 @@ public class UndefinedAccessExpression extends DefaultRoot implements Undefined 
 	}
 
 	@Override
-	public List<AccessExpression> getSubAccessExpressions() {
+	public List<AccessExpression> getAccessSubExpressions() {
 		return null;
 	}
 

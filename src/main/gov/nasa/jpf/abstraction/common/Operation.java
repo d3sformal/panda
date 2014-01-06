@@ -35,7 +35,7 @@ public abstract class Operation extends DefaultPrimitiveExpression {
 	}
 	
 	@Override
-	public Predicate preconditionForBeingFresh() {
-		return Disjunction.create(a.preconditionForBeingFresh(), b.preconditionForBeingFresh());
+	public Predicate getPreconditionForBeingFresh() {
+		return Disjunction.create(a.getPreconditionForBeingFresh(), b.getPreconditionForBeingFresh());
 	}
 }

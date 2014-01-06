@@ -226,9 +226,9 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         order.addAll(pabs.getPredicateValuation().getPredicates(depth));
 
         for (Predicate p : order) {
-            //System.out.println("Predicate " + p + " " + p.hashCode() + " = " + pabs.getPredicateValuation().get(p).toInteger());
+            //System.out.println("Predicate " + p + " " + p.hashCode() + " = " + pabs.getPredicateValuation().get(p).ordinal());
             buf.add(p.hashCode());
-            buf.add(pabs.getPredicateValuation().get(p).toInteger());
+            buf.add(pabs.getPredicateValuation().get(p).ordinal());
         }
 
         for (Root local : currentScope.getLocalVariables()) {

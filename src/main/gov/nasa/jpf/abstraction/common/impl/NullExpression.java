@@ -54,7 +54,7 @@ public class NullExpression extends Constant implements ObjectExpression {
 	}
 
 	@Override
-	public Predicate preconditionForBeingFresh() {
+	public Predicate getPreconditionForBeingFresh() {
 		return Contradiction.create();
 	}
 }

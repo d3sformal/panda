@@ -10,5 +10,5 @@ abstract.domain=SIGNS
 
 listener = gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.DebugMonitor
 
-vm.serializer.class = gov.nasa.jpf.abstraction.AbstractionSerializer
+vm.serializer.class = gov.nasa.jpf.abstraction.NumericAbstractionSerializer
 vm.por.sync_detection=false

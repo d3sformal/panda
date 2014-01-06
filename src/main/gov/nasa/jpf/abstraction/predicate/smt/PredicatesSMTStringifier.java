@@ -160,6 +160,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	
 	@Override
 	public void visit(Modulo expression) {
+		// see gov.nasa.jpf.abstraction.common.Modulo for its implementation
 		visit((Subtract)expression);
 	}
 	

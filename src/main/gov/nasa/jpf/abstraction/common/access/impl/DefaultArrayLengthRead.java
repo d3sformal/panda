@@ -105,35 +105,52 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 	
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
-		if (newExpression instanceof ArrayExpression) {			
-			Expression updated = getObject().update(expression, newExpression);
-				
-			if (updated instanceof AccessExpression) {
-				AccessExpression updatedAccessExpression = (AccessExpression) updated;
-				
-				if (newExpression instanceof AnonymousArray) {
-					AnonymousArray aa = (AnonymousArray) newExpression;
-					return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths().clone(), aa.getArrayLength()));
-				}
-				return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths().clone(), DefaultArrayLengthRead.create(expression, getArrayLengths().clone())));
-			}
-			if (updated instanceof AnonymousArray) {
-				AnonymousArray updatedAnonymousArray = (AnonymousArray) updated;
-				
-				return create(getArray().clone(), DefaultArrayLengthWrite.create(expression, getArrayLengths().clone(), updatedAnonymousArray.getArrayLength().clone()));
-			}
-			return UndefinedAccessExpression.create();
-		}
+		Expression updated = getObject().update(expression, newExpression);
+
+        // there is no direct assignment to length, therefore the update must have happend in the prefix (if it affects this expression at all)
+
+        // the prefix is an access expression, e.g. `alength(arrlen, y.z)`
+		if (updated instanceof AccessExpression) {
+			AccessExpression updatedAccessExpression = (AccessExpression) updated;
 		
-		return clone();
+			if (newExpression instanceof AnonymousArray) {
+				AnonymousArray aa = (AnonymousArray) newExpression;
+
+                // x := new Integer[10]
+                // alength(alengthwrite(arrlen, x, 10), y.z)
+				return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths().clone(), aa.getArrayLength()));
+			}
+
+            // x := a
+            // alength(alengthwrite(arrlen, x, alength(arrlen, a)), y.z)
+			return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths().clone(), DefaultArrayLengthRead.create(expression, getArrayLengths().clone())));
+		}
+
+        // the prefix is a new array
+        // e.g.
+        //   original expression: alength(arrlen, x)
+        //   statement: x := new Integer[10]
+        //
+        // could probably return just the constant
+		if (updated instanceof AnonymousArray) {
+			AnonymousArray updatedAnonymousArray = (AnonymousArray) updated;
+			
+            return updatedAnonymousArray.getArrayLength();
+			//return create(getArray().clone(), DefaultArrayLengthWrite.create(expression, getArrayLengths().clone(), updatedAnonymousArray.getArrayLength().clone()));
+		}
+
+        /**
+         * Updated object cannot be an array, something went wrong, propagate
+         */
+		return UndefinedAccessExpression.create();
 	}
 	
 	@Override
-	public Predicate preconditionForBeingFresh() {
+	public Predicate getPreconditionForBeingFresh() {
 		if (getArrayLengths() instanceof ArrayLengthWrite) {
 			ArrayLengthWrite w = (ArrayLengthWrite) getArrayLengths();
 			
-			return Conjunction.create(Equals.create(getArray(), w.getArray()), w.preconditionForBeingFresh());
+			return Conjunction.create(Equals.create(getArray(), w.getArray()), w.getPreconditionForBeingFresh());
 		}
 		
 		return Contradiction.create();

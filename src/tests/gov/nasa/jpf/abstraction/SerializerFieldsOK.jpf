@@ -10,5 +10,5 @@ abstract.domain=SIGNS
 
 listener = gov.nasa.jpf.abstraction.AbstractListener
 
-vm.serializer.class = gov.nasa.jpf.abstraction.AbstractionSerializer
+vm.serializer.class = gov.nasa.jpf.abstraction.NumericAbstractionSerializer
 

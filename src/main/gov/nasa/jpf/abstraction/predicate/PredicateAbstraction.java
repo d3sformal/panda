@@ -4,8 +4,8 @@ import java.util.Set;
 
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.impl.ObjectExpressionWrapper;
-import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionWrapper;
+import gov.nasa.jpf.abstraction.common.impl.ObjectExpressionDecorator;
+import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionDecorator;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Predicates;
@@ -47,21 +47,21 @@ public class PredicateAbstraction extends Abstraction {
 	public void processPrimitiveStore(Expression from, AccessExpression to) {
 		Set<AccessExpression> affected = symbolTable.processPrimitiveStore(from, to);
 		
-		predicateValuation.reevaluate(to, affected, PrimitiveExpressionWrapper.wrap(from, symbolTable));
+		predicateValuation.reevaluate(to, affected, PrimitiveExpressionDecorator.wrap(from, symbolTable));
 	}
 	
 	@Override
 	public void processObjectStore(Expression from, AccessExpression to) {
 		Set<AccessExpression> affected = symbolTable.processObjectStore(from, to);
 				
-		predicateValuation.reevaluate(to, affected, ObjectExpressionWrapper.wrap(from, symbolTable));
+		predicateValuation.reevaluate(to, affected, ObjectExpressionDecorator.wrap(from, symbolTable));
 	}
 	
 	@Override
 	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		AffectedAccessExpressions affected = symbolTable.processMethodCall(threadInfo, before, after, null);
+		symbolTable.processMethodCall(threadInfo, before, after);
 		
-		predicateValuation.processMethodCall(threadInfo, before, after, affected);
+		predicateValuation.processMethodCall(threadInfo, before, after);
 	}
 	
 	@Override

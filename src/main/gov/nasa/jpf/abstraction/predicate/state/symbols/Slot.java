@@ -13,7 +13,16 @@ import java.util.Set;
  * o.f = {o1, o2, ...}
  */
 public abstract class Slot {
+    /**
+     * Each slot is contained in a value (object, array, local variable)
+     */
 	private Value parent;
+
+    /**
+     * Identifier of this slot within the object that contains it
+     *
+     * field name, array index, variable identifier (just for the sake of common interface)
+     */
 	private Object slotKey;
 	
 	protected Slot(Value parent, Object slotKey) {
@@ -25,6 +34,9 @@ public abstract class Slot {
 		return parent;
 	}
 	
+    /**
+     * Return the identifier of this particular slot: field name etc.
+     */
 	public Object getSlotKey() {
 		return slotKey;
 	}

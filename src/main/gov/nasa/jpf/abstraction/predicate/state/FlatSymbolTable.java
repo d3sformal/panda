@@ -68,12 +68,12 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	private static int GUARANTEED_LENGTH = 8;
 	
 	/**
-	 * Memory model
+	 * Abstract heap
 	 */
 	private Universe universe = new Universe();
 	
 	/**
-	 * Entry points to the memory model
+	 * Entry points to the abstract heap
 	 * 
 	 * Local Variables:
 	 */
@@ -662,7 +662,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 
 	/**
-	 * Copy the memory model from the given table here, keep locals/returns valid in this scope
+	 * Copy the abstract heap from the given table here, keep locals/returns valid in this scope
 	 */
 	public void updateUniverse(FlatSymbolTable top) {
 		FlatSymbolTable clone = top.clone();

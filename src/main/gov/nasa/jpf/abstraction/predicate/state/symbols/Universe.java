@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Memory model - stores objects (arrays) that are currently allocated, primitive values are remembered only for fields and array elements
+ * Abstract heap - stores objects (arrays) that are currently allocated, primitive values are remembered only for fields and array elements
  * 
  * For local variables @see gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable
  */

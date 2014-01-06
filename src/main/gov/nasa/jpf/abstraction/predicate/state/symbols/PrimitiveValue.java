@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 import java.util.UUID;
 
 /**
- * Represents numerical memory slots in the memory model
+ * Represents numerical memory slots in the abstract heap
  */
 public class PrimitiveValue extends Value {
 	

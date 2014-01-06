@@ -37,7 +37,7 @@ public class SMT {
 		listeners.add(listener);
 	}
 	
-	private static void valuatePredicatesInvoked(Map<Predicate, PredicateDeterminant> predicates) {
+	private static void valuatePredicatesInvoked(Map<Predicate, PredicateValueDeterminingInfo> predicates) {
 		for (SMTListener listener : listeners) {
 			listener.valuatePredicatesInvoked(predicates);
 		}
@@ -168,7 +168,7 @@ public class SMT {
 		input += separator;
 		
 		for (AccessExpression object : objects) {
-			Predicate distinction = Implication.create(Negation.create(object.preconditionForBeingFresh()), Negation.create(Equals.create(DefaultFresh.create(), object)));
+			Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.create(DefaultFresh.create(), object)));
 			
 			input += "(assert " + convertToString(distinction) + ")" + separator;
 		}
@@ -188,7 +188,7 @@ public class SMT {
 		return input;
 	}
 
-	private String prepareInput(Map<Predicate, PredicateDeterminant> predicates, String separator) {
+	private String prepareInput(Map<Predicate, PredicateValueDeterminingInfo> predicates, String separator) {
 		List<String> formulas = new LinkedList<String>();
 		
 		PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
@@ -214,7 +214,7 @@ public class SMT {
 		}
 				
 		for (Predicate predicate : predicates.keySet()) {
-			PredicateDeterminant det = predicates.get(predicate);
+			PredicateValueDeterminingInfo det = predicates.get(predicate);
 			
 			Set<Predicate> additionalPredicates = collector.getAdditionalPredicates(predicate);
 			
@@ -312,7 +312,7 @@ public class SMT {
 		return convertToString(Negation.create(formula));
 	}
 	
-	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateDeterminant> predicates) throws SMTException {
+	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateValueDeterminingInfo> predicates) throws SMTException {
 		valuatePredicatesInvoked(predicates);
 
     	return evaluate(predicates.keySet(), prepareInput(predicates, SEPARATOR), prepareInput(predicates, DEBUG_SEPARATOR));

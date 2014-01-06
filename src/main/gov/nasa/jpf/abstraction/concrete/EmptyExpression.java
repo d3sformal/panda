@@ -54,7 +54,7 @@ public class EmptyExpression implements Expression {
 	}
 
 	@Override
-	public Predicate preconditionForBeingFresh() {
+	public Predicate getPreconditionForBeingFresh() {
 		return Contradiction.create();
 	}
 

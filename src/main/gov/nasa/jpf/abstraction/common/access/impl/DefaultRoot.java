@@ -71,7 +71,7 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 	}
 
 	@Override
-	public List<AccessExpression> getSubAccessExpressions() {
+	public List<AccessExpression> getAccessSubExpressions() {
 		return new LinkedList<AccessExpression>();
 	}
 
@@ -126,7 +126,7 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 	}
 
 	@Override
-	public Predicate preconditionForBeingFresh() {
+	public Predicate getPreconditionForBeingFresh() {
 		return Contradiction.create();
 	}
 

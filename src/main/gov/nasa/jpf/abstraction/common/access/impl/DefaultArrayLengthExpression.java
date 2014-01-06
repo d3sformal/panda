@@ -25,10 +25,10 @@ public abstract class DefaultArrayLengthExpression extends DefaultArrayAccessExp
 	}
 	
 	@Override
-	public List<AccessExpression> getSubAccessExpressions() {
-		List<AccessExpression> subAccessExpressions = super.getSubAccessExpressions();
+	public List<AccessExpression> getAccessSubExpressions() {
+		List<AccessExpression> subAccessExpressions = super.getAccessSubExpressions();
 
-		subAccessExpressions.addAll(getArrayLengths().getSubAccessExpressions());
+		subAccessExpressions.addAll(getArrayLengths().getAccessSubExpressions());
 		subAccessExpressions.addAll(getArray().getAccessExpressions());
 
 		return subAccessExpressions;

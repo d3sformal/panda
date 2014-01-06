@@ -7,7 +7,7 @@ public class SerializerTestFields
 {
 	public static void main (String[] args) 
 	{
-		System.out.println("\n=== AbstractionSerializer testing : fields ===\n");
+		System.out.println("\n=== NumericAbstractionSerializer testing : fields ===\n");
 	
 		SerializerTestFields st = new SerializerTestFields();
 		st.compute();

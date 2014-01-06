@@ -87,7 +87,7 @@ public class Constant implements PrimitiveExpression {
 	}
 
 	@Override
-	public Predicate preconditionForBeingFresh() {
+	public Predicate getPreconditionForBeingFresh() {
 		return Contradiction.create();
 	}
 }

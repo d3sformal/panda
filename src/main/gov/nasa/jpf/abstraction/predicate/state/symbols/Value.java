@@ -4,9 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Common ancestor of all the values stored in the model
+ * Common ancestor of all the values stored in the memory representation
+ *
+ * Objects / Arrays ...
  */
 public abstract class Value {
+    /**
+     * Slots (fields, array elements) that this value may be member of
+     */
 	private Set<Slot> slots = new HashSet<Slot>();
 	private Universe universe;
 	

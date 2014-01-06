@@ -32,5 +32,5 @@ public interface Expression extends PredicatesVisitable, Cloneable {
     /**
      * Decide whether this expression can be a fresh value (newly allocated object)
      */
-	public Predicate preconditionForBeingFresh();
+	public Predicate getPreconditionForBeingFresh();
 }
