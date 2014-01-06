@@ -27,33 +27,21 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert double to long
+ * Convert double to int
  * ..., value => ..., result
  */
-public class D2L extends gov.nasa.jpf.jvm.bytecode.D2L {
+public class D2L extends gov.nasa.jpf.jvm.bytecode.D2L implements TypeConvertor {
 
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo ti) {
+    private TypeConversionExecutor exec = new TypeConversionExecutor(new DoubleManipulator(), new LongManipulator());
 
-		StackFrame sf = ti.getModifiableTopFrame();
-		Attribute attr = (Attribute) sf.getLongOperandAttr();
-		AbstractValue abs_val = null;
-		
-		if (attr != null) {
-			abs_val = attr.getAbstractValue();
-		}
+	@Override
+	public Instruction execute(ThreadInfo ti) {
+		return exec.execute(ti, this);
+    }
 
-		if (abs_val == null) {
-			return super.execute(ti);
-		}
-
-		double val = sf.popDouble(); // just to pop it
-		sf.pushLong(0);
-		sf.setLongOperandAttr(abs_val);
-
-		System.out.printf("D2L> Values: %f (%s)\n", val, abs_val);
-		System.out.println("D2L> Result: " + sf.getLongOperandAttr());
-
-		return getNext(ti);
-	}
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
+        return super.execute(ti);
+    }
 
 }

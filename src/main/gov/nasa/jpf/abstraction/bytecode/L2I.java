@@ -20,39 +20,28 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert long to int
+ * Convert double to int
  * ..., value => ..., result
  */
-public class L2I extends gov.nasa.jpf.jvm.bytecode.L2I {
+public class L2I extends gov.nasa.jpf.jvm.bytecode.L2I implements TypeConvertor {
 
+    private TypeConversionExecutor exec = new TypeConversionExecutor(new LongManipulator(), new IntegerManipulator());
+
+	@Override
 	public Instruction execute(ThreadInfo ti) {
+		return exec.execute(ti, this);
+    }
 
-		StackFrame sf = ti.getModifiableTopFrame();
-		Attribute attr = (Attribute) sf.getLongOperandAttr();
-		AbstractValue abs_val = null;
-		
-		if (attr != null) {
-			abs_val = attr.getAbstractValue();
-		}
-
-		if (abs_val == null) {
-			return super.execute(ti);
-		}
-
-		long val = sf.popLong(); // just to pop it
-		
-		sf.push(0);
-		sf.setOperandAttr(abs_val);
-
-		System.out.printf("L2I> Values: %d (%s)\n", val, abs_val);
-		System.out.printf("L2I> Result: %s\n", sf.getOperandAttr());
-
-		return getNext(ti);
-	}
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
+        return super.execute(ti);
+    }
 
 }

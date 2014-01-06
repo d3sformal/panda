@@ -60,6 +60,8 @@ public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
         /**
          * Collect current symbolic arguments and store them as attributes of the method
          * this allows predicate abstraction to reason about argument assignment
+         *
+         * These copies of attributes are preserved during the execution of the method and may be used after return.
          */
 		for (int i = 0; i < after.getMethodInfo().getNumberOfStackArguments(); ++i) {
 			Attribute attr = (Attribute) before.getOperandAttr(i);

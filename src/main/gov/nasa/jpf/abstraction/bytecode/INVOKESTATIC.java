@@ -51,7 +51,10 @@ public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
 		after.getMethodInfo().setAttr(null);
 		
         /**
-         * Collect symbolic arguments for further use by abstractions during the processing of the method call event
+         * Collect current symbolic arguments and store them as attributes of the method
+         * this allows predicate abstraction to reason about argument assignment
+         *
+         * These copies of attributes are preserved during the execution of the method and may be used after return.
          */
 		for (int i = 0; i < after.getMethodInfo().getNumberOfStackArguments(); ++i) {
 			Attribute attr = (Attribute) before.getOperandAttr(i);

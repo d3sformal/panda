@@ -20,39 +20,28 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert float to int
+ * Convert double to int
  * ..., value => ..., result
  */
-public class F2I extends gov.nasa.jpf.jvm.bytecode.F2I {
+public class F2I extends gov.nasa.jpf.jvm.bytecode.F2I implements TypeConvertor {
+
+    private TypeConversionExecutor exec = new TypeConversionExecutor(new FloatManipulator(), new IntegerManipulator());
 
 	@Override
 	public Instruction execute(ThreadInfo ti) {
+		return exec.execute(ti, this);
+    }
 
-		StackFrame sf = ti.getModifiableTopFrame();
-		Attribute attr = (Attribute) sf.getOperandAttr();
-		AbstractValue abs_val = null;
-		
-		if (attr != null) {
-			abs_val = attr.getAbstractValue();
-		}
-
-		if (abs_val == null) {
-			return super.execute(ti);
-		}
-
-		float val = sf.popFloat(); // just to pop it
-		sf.push(0);
-		sf.setOperandAttr(abs_val);
-
-		System.out.printf("F2I> Values: %f (%s)\n", val, abs_val);
-		System.out.println("F2I> Result: " + sf.getOperandAttr());
-
-		return getNext(ti);
-	}
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
+        return super.execute(ti);
+    }
 
 }

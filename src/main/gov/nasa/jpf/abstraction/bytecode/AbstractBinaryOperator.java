@@ -24,7 +24,7 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
- * Interface for all the CMP instructions
+ * Interface for all binary arithmetic operations, comparisons
  */
 public interface AbstractBinaryOperator<T> {
 	public Instruction executeConcrete(ThreadInfo ti);

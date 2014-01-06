@@ -30,30 +30,18 @@ import gov.nasa.jpf.vm.Instruction;
  * Convert double to int
  * ..., value => ..., result
  */
-public class D2I extends gov.nasa.jpf.jvm.bytecode.D2I {
+public class D2I extends gov.nasa.jpf.jvm.bytecode.D2I implements TypeConvertor {
 
-	public Instruction execute(SystemState ss, KernelState ks, ThreadInfo ti) {
+    private TypeConversionExecutor exec = new TypeConversionExecutor(new DoubleManipulator(), new IntegerManipulator());
 
-		StackFrame sf = ti.getModifiableTopFrame();
-		Attribute attr = (Attribute) sf.getLongOperandAttr();
-		AbstractValue abs_val = null;
-		
-		if (attr != null) {
-			abs_val = attr.getAbstractValue();
-		}
+	@Override
+	public Instruction execute(ThreadInfo ti) {
+		return exec.execute(ti, this);
+    }
 
-		if (abs_val == null) {
-			return super.execute(ti);
-		}
-
-		double val = sf.popDouble(); // just to pop it
-		sf.push(0);
-		sf.setOperandAttr(abs_val);
-
-		System.out.printf("D2I> Values: %f (%s)\n", val, abs_val);
-		System.out.println("D2I> Result: " + sf.getOperandAttr());
-
-		return getNext(ti);
-	}
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
+        return super.execute(ti);
+    }
 
 }
