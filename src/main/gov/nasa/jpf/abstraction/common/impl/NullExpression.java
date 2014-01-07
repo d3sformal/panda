@@ -12,11 +12,12 @@ import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.state.symbols.Universe;
 
 public class NullExpression extends Constant implements ObjectExpression {
 	
 	protected NullExpression() {
-		super(-1);
+		super(Universe.NULL);
 	}
 
 	@Override

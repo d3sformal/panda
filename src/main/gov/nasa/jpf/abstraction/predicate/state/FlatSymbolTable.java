@@ -360,11 +360,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			}
 		}
 		
-        // Special case is, when we store a constant -1 which stands for NULL (by type of the target we know whether it is primitive -1 or NULL)
+        // Special case is, when we store a constant MJIEnv.NULL which stands for NULL (by type of the target we know whether it is primitive MJIEnv.NULL or NULL)
 
 		if (from instanceof Constant) {
-			Constant referenceConstant = (Constant) from; // null, -1
-			Integer reference = referenceConstant.value.intValue();
+			Constant referenceConstant = (Constant) from; // null, MJIEnv.NULL
+			int reference = referenceConstant.value.intValue();
 			
 			if (universe.contains(reference)) {
 				sources.add(universe.get(reference));
@@ -427,7 +427,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				parent.getSlot().add(sources);
 			}
 		}
-
+		
 		return ret;
 	}
 
