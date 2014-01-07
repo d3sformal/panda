@@ -214,6 +214,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			return ret;
 		}
 		
+        /**
+         * Each object/array can be described by an anonymous object/array access expression
+         */
+
+        // Objects
 		if (value instanceof HeapObject) {
 			HeapObject ho = (HeapObject) value;
 			VM vm = VM.getVM();
@@ -223,6 +228,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			ret.add(AnonymousObject.create(new Reference(ti, ei)));
 		}
 
+        // Arrays
 		if (value instanceof HeapArray) {
 			HeapArray ha = (HeapArray) value;
 			VM vm = VM.getVM();
@@ -232,6 +238,10 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			ret.add(AnonymousArray.create(new Reference(ti, ei), Constant.create(ha.getLength())));
 		}
 
+        /**
+         * It can as well be described as object field/array element of its parental object/array
+         * or a local variable that contains it
+         */
 		for (Slot slot : value.getSlots()) {
 			Value parent = slot.getParent();
 			
@@ -280,6 +290,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
 	/**
 	 * Same as the other variant except it allows cross-universe writes (Necessary for method call boundaries)
+     *
+     * @return access path to all the affected objects
 	 */
 	public Set<AccessExpression> processPrimitiveStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
 		ensureAnonymousObjectExistance(from);
@@ -294,6 +306,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			Value newValue = new PrimitiveValue(universe);
 			
 			for (Slot slot : destination.getSlots()) {
+                /**
+                 * If we know where we are storing things, we may overwrite the destination completely, otherwise we need to overapproximate and keep the original aliasing as well
+                 */
 				if (!ambiguous) {
 					slot.clear();
 					destination.removeSlot(slot);
@@ -334,6 +349,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		Set<Value> destinations = lookupValues(to.cutTail());
 		Set<Value> sources = new HashSet<Value>();
 		
+        // First collect objects which may be referred to by the `from` access expression
+
 		if (from instanceof AccessExpression) {
 			Set<Value> rawSources = fromTable.lookupValues((AccessExpression) from);
 			
@@ -343,6 +360,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			}
 		}
 		
+        // Special case is, when we store a constant -1 which stands for NULL (by type of the target we know whether it is primitive -1 or NULL)
+
 		if (from instanceof Constant) {
 			Constant referenceConstant = (Constant) from; // null, -1
 			Integer reference = referenceConstant.value.intValue();
@@ -354,6 +373,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		
 		boolean ambiguous = destinations.size() > 1;
 		
+        // For each new parent (object whose field/element is being set, or a local var ...)
+        // Add the objects into the field/element or rewrite a local variable
 		for (Value destination : destinations) {
 			if (to instanceof ObjectFieldRead) {
 				ObjectFieldRead read = (ObjectFieldRead) to;

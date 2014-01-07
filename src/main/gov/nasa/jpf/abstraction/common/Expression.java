@@ -21,6 +21,7 @@ public interface Expression extends PredicatesVisitable, Cloneable {
 	 * Performs substitution of an access expression
 	 */
 	public Expression replace(Map<AccessExpression, Expression> replacements);
+	public Expression replace(AccessExpression original, Expression replacement);
     public String toString(Notation policy);
     public Expression clone();
     

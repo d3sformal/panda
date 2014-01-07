@@ -10,11 +10,12 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.impl.DefaultExpression;
 
 /**
- * A dummy expression (may be used when the there would be no expression = null)
+ * A dummy expression (may be used when there would be no expression = null)
  */
-public class EmptyExpression implements Expression {
+public class EmptyExpression extends DefaultExpression {
 	
 	protected EmptyExpression() {
 	}
@@ -38,16 +39,6 @@ public class EmptyExpression implements Expression {
 		return create();
 	}
 	
-	@Override
-	public String toString() {
-		return toString(Notation.policy);
-	}
-
-	@Override
-	public String toString(Notation policy) {
-    	return Notation.convertToString(this, policy);
-	}
-
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
 		return clone();

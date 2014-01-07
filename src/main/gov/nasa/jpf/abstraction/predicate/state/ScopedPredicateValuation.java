@@ -110,6 +110,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		
 		if (method == null) return valuation;
 		
+        // Collect relevant contexts and predicates stored in them
+        // Match context method with actual method
+        // Match context object with actual object
 		for (Context context : predicateSet.contexts) {
 			if (context instanceof MethodContext) {
 				MethodContext methodContext = (MethodContext) context;
@@ -162,11 +165,13 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	public SideEffect processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
 		
+        // Scope to be added as the callee scope
 		FlatPredicateValuation finalScope = createDefaultScope(threadInfo, method);
 		
 		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
 
 		if (RunDetector.isRunning()) {
+            // Copy of the current caller scope - to avoid modifications - may not be needed now, it is not different from .top() and it is not modified here
 			FlatPredicateValuation transitionScope;
 			transitionScope = scopes.top().clone();
 			
@@ -194,10 +199,12 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			 * Reason about the value of the predicates using known values of predicates in the caller
 			 */
 			if (args != null && attrs != null) {
+                // Each predicate to be initialised for the callee
 				for (Predicate predicate : finalScope.getPredicates()) {
 
 					Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
 					
+                    // Replace formal parameters with actual parameters
 					for (int i = 0; i < args.length; ++i) {
 						Attribute attr = attrs[i];
 											
@@ -209,6 +216,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					replaced.put(predicate.replace(replacements), predicate);
 				}
 				
+                // Valuate predicates in the caller scope, and adopt the valuation for the callee predicates
 				Map<Predicate, TruthValue> valuation = transitionScope.evaluatePredicates(replaced.keySet());
 				
 				for (Predicate predicate : replaced.keySet()) {
@@ -261,30 +269,28 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			for (Predicate predicate : getPredicates()) {
 				
 				if (isPredicateOverReturn(predicate)) {
-					Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
-					
-					replacements.put(DefaultReturnValue.create(), attr.getExpression());
-
-					Predicate determinant = predicate.replace(replacements);
+					Predicate determinant = predicate.replace(DefaultReturnValue.create(), attr.getExpression());
 
 					predicates.put(determinant, predicate);
 					determinants.add(determinant);
 				}
 			}
 			
+            // Valuate predicates over `return` access expression using the return expression
+            // Predicate: return < 3
+            // Statement: return 2
+            //
+            // return < 3 is determined by 2 < 3
 			Map<Predicate, TruthValue> valuation = evaluatePredicates(determinants);
 			
 			for (Predicate predicate : valuation.keySet()) {
-				Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
-
-				replacements.put(DefaultReturnValue.create(), ret);
-
-				scope.put(predicates.get(predicate).replace(replacements), valuation.get(predicate));
+				scope.put(predicates.get(predicate).replace(DefaultReturnValue.create(), ret), valuation.get(predicate));
 			}
 					
 			after.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), ret));
         }
 		
+        // The rest is the same as if no return happend
 		return processVoidMethodReturn(threadInfo, before, after, sideEffect);
 	}
 	
@@ -297,7 +303,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			scope = scopes.top(1);
 			
 			boolean sameObject = before.getThis() == after.getThis();
-			
+		
+            // Collect original symbolic arguments of the method
 			ArrayList<Attribute> attrsList = new ArrayList<Attribute>();
 			
 			Iterator<Object> it = before.getMethodInfo().attrIterator();
@@ -318,13 +325,14 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			/**
 			 * Determine what reference arguments were written to (they contain a different reference from the initial one)
 			 * 
-			 * those parameters and predicates over them cannot be used to argue the value of predicates over the initial value back in the caller
+			 * those parameters and predicates over them cannot be used to argue about the value of predicates over the initial value back in the caller
 			 */
 			for (int i = 0; i < args.length; ++i) {
 				LocalVarInfo l = args[i];
 				
 				if (l != null) {
 					
+                    // Determine type of the arguments
 					if (!l.isNumeric() && !l.isBoolean()) {
 						referenceArgs.add(l);
 					}
@@ -359,8 +367,10 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				}
 			}
 			
+            // Arguments that are of a reference type are not bound to the callee scope and may be used to determine truth value of a predicate refering to it
 			notWantedLocalVariables.removeAll(referenceArgs);
 			
+            // Collection of predicates in callee that have additional value for update of the caller
 			FlatPredicateValuation relevant = new FlatPredicateValuation(smt);
 			
 			// Filter out predicates from the callee that cannot be used for propagation to the caller 
@@ -371,6 +381,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				
 				Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
 
+                // Replace formal parameters present in the predicate with actual expressions
 				for (int i = 0; i < args.length; ++i) {
 					if (args[i] != null && !args[i].isNumeric() && !args[i].isBoolean()) {
 						replacements.put(DefaultRoot.create(args[i].getName()), attrs[i].getExpression());
@@ -383,12 +394,14 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 
 				boolean isUnwanted = false;
 				
+                // If any of the symbols used in the predicate has changed 
 				for (LocalVarInfo l : notWantedLocalVariables) {
 					for (AccessExpression path : predicate.getPaths()) {
 						isUnwanted |= path.isLocalVariable() && path.getRoot().getName().equals(l.getName());
 					}
 				}
 				
+                // If the predicate uses only allowed symbols (those that do not lose their meaning by changing scope)
 				if (!isUnwanted) {
 					relevant.put(predicate, value);
 					
@@ -398,6 +411,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					}
 				}
 			}
+
+            // Usable predicates from callee with replaced occurences of formal parameters were collected
+            // Select predicates that need to be updated (refer to an object that may have been modified by the callee: static, o.field, modified heap)
 					
 			Set<Predicate> toBeUpdated = new HashSet<Predicate>();
 			
@@ -409,6 +425,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					canBeAffected |= path.getRoot().isThis() && sameObject;
 					canBeAffected |= path.isStatic();
 					
+                    // objects modified in the heap
 					for (AccessExpression affectedPath : affected) {
 						canBeAffected |= affectedPath.isPrefixOf(path);
 					}
@@ -419,6 +436,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				}
 			}
 			
+            // Use the relevant predicates to valuate predicates that need to be updated
 			Map<Predicate, TruthValue> valuation = relevant.evaluatePredicates(toBeUpdated);
 			
 			for (Predicate predicate : valuation.keySet()) {

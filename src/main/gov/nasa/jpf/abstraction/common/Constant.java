@@ -4,6 +4,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.impl.DefaultExpression;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.Map;
 /**
  * A common class for symbolic expressions of all the numerical constants present in the execution
  */
-public class Constant implements PrimitiveExpression {
+public class Constant extends DefaultExpression implements PrimitiveExpression {
 	public Number value;
 	
 	protected Constant(Number value) {
@@ -69,16 +70,6 @@ public class Constant implements PrimitiveExpression {
 	@Override
 	public int hashCode() {
 		return value.hashCode();
-	}
-
-	@Override
-	public String toString() {
-		return toString(Notation.policy);
-	}
-
-	@Override
-	public String toString(Notation policy) {
-    	return Notation.convertToString(this, policy);
 	}
 
 	@Override

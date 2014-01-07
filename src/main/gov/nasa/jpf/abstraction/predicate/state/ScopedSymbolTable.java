@@ -61,6 +61,8 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		
 		/**
 		 * Handle main(String[] args)
+         *
+         * it is necessary to initialize the arguments
 		 */
 		VM vm = threadInfo.getVM();
 		String target = vm.getConfig().getTarget();
@@ -151,6 +153,11 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
          *
          * top()  ... before return
          * top(1) ... after return (previous stack frame)
+         *
+         * 1) create a new return container in callee
+         * 2) write the actual return value into the container (still in callee)
+         * 3) create a specific unique return container in the caller
+         * 4) write callee return into caller return
 		 */
 		if (before.getMethodInfo().isReferenceReturnType()) {
 			scopes.top().addHeapValueReturn(calleeReturnValue);
@@ -164,6 +171,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			scopes.top(1).processPrimitiveStore(calleeReturnValue, scopes.top(), callerReturnValue);
 		}
 
+        /**
+         * Handle the rest as if there were no return values
+         */
 		return processVoidMethodReturn(threadInfo, before, after, sideEffect);
 	}
 	
@@ -184,8 +194,14 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			ret.addAll(modifications);
 		}
 		
+        /**
+         * Propagate heap modifications from callee to the caller
+         */
 		transitionScope.updateUniverse(scopes.top());
 		
+        /**
+         * Drop callee scope
+         */
 		scopes.pop();
 		
 		return ret;

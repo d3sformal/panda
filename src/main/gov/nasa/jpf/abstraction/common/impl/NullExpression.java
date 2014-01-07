@@ -30,11 +30,6 @@ public class NullExpression extends Constant implements ObjectExpression {
 	}
 
 	@Override
-	public String toString(Notation policy) {
-		return Notation.convertToString(this);
-	}
-
-	@Override
 	public NullExpression update(AccessExpression expression, Expression newExpression) {
 		return clone();
 	}

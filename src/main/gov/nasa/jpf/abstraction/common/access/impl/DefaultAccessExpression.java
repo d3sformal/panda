@@ -222,10 +222,7 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 		AccessExpression a = createFromString("a");
 		AccessExpression c = createFromString("c");
 		
-		Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
-		replacements.put(a, c);
-
-		Expression e = p.replace(replacements);
+		Expression e = p.replace(a, c);
 		
 		System.out.println(e /*+ " " + e.getPaths()*/);
 		

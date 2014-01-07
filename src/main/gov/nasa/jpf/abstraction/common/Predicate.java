@@ -25,6 +25,14 @@ public abstract class Predicate implements PredicatesVisitable {
 	public abstract List<AccessExpression> getPaths();
 	public abstract Predicate replace(Map<AccessExpression, Expression> replacements);
 
+    public final Predicate replace(AccessExpression original, Expression replacement) {
+        Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+
+        replacements.put(original, replacement);
+
+        return replace(replacements);
+    }
+
     protected int hashCodeValue;
 
     public String toString() {
