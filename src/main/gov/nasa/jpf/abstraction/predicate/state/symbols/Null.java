@@ -9,8 +9,22 @@ import java.util.Map;
 public class Null extends StructuredValue implements StructuredObject, StructuredArray {
 
 	protected Null(Universe universe) {
-		super(universe, new HeapObjectReference(Universe.NULL));
+		super(universe, new HeapObjectReference(Universe.NULL), null);
 	}
+
+    @Override
+    protected final int compareSignatureTo(StructuredValue value) {
+        if (value instanceof Null) {
+            return 0;
+        }
+
+        return compareClasses(value);
+    }
+
+    @Override
+    protected final int compareSlots(StructuredValue value) {
+        return 0;
+    }
 
 	@Override
 	public void setElement(Integer index, StructuredValue... values) {

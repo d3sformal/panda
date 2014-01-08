@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.StaticElementInfo;
+
 /**
  * A factory which ensures that no object is create twice in the universe and that the most recent view of it is always returned
  * 
@@ -16,28 +19,28 @@ public class ValueFactory {
 		this.universe = universe;
 	}
 	
-	public HeapObject createObject(Integer reference) {
+	public HeapObject createObject(Integer reference, ElementInfo elementInfo) {
 		if (!universe.contains(reference)) {
-			universe.add(new HeapObject(universe, reference));
+			universe.add(new HeapObject(universe, reference, elementInfo));
 		}
 		
 		return (HeapObject) universe.get(reference);
 	}
 	
-	public HeapArray createArray(Integer reference, Integer length) {
+	public HeapArray createArray(Integer reference, ElementInfo elementInfo) {
 		if (!universe.contains(reference)) {
-			universe.add(new HeapArray(universe, reference, length));
+			universe.add(new HeapArray(universe, reference, elementInfo));
 		}
 		
 		return (HeapArray) universe.get(reference);
 	}
 
-	public ClassStatics createClass(String className) {
-		if (!universe.contains(className)) {
-			universe.add(new ClassStatics(universe, className));
+	public ClassStatics createClass(StaticElementInfo elementInfo) {
+		if (!universe.contains(elementInfo.getClassInfo().getName())) {
+			universe.add(new ClassStatics(universe, elementInfo));
 		}
 		
-		return (ClassStatics) universe.get(className);
+		return (ClassStatics) universe.get(elementInfo.getClassInfo().getName());
 	}
 
 	public Null createNull() {

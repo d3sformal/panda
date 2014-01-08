@@ -7,6 +7,9 @@ sourcepath=${jpf-abstraction}/src/examples
 
 abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/image/Image.pred
 
-listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker
+listener=gov.nasa.jpf.abstraction.AbstractListener
+#,gov.nasa.jpf.abstraction.util.InstructionTracker
 #,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.predicate.util.SMTMonitor
 #,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor
+
+vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer

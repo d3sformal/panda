@@ -3,6 +3,8 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 import java.util.HashMap;
 import java.util.Map;
 
+import gov.nasa.jpf.vm.StaticElementInfo;
+
 /**
  * Collection of static fields of a given class
  */
@@ -10,9 +12,36 @@ public class ClassStatics extends StructuredValue implements StructuredObject {
 
 	private Map<String, Slot> fields = new HashMap<String, Slot>();
 
-	public ClassStatics(Universe universe, String className) {
-		super(universe, new ClassStaticsReference(className));
+	public ClassStatics(Universe universe, StaticElementInfo elementInfo) {
+		super(universe, new ClassStaticsReference(elementInfo.getClassInfo().getName()), elementInfo);
 	}
+
+    public String getClassName() {
+        return getElementInfo().getClassInfo().getName();
+    }
+	
+    @Override
+    public StaticElementInfo getElementInfo() {
+		return (StaticElementInfo) super.getElementInfo();
+    }
+
+    @Override
+    public final int compareSignatureTo(StructuredValue value) {
+        if (value instanceof ClassStatics) {
+            ClassStatics statics = (ClassStatics) value;
+
+            return getClassName().compareTo(statics.getClassName());
+        }
+
+        return compareClasses(value);
+    }
+
+    @Override
+    public final int compareSlots(StructuredValue value) {
+        //ClassStatics statics = (ClassStatics) value;
+
+        return 0;
+    }
 	
 	@Override
 	public void setField(String name, StructuredValue... values) {
@@ -49,7 +78,7 @@ public class ClassStatics extends StructuredValue implements StructuredObject {
 		
 		ClassStaticsReference reference = (ClassStaticsReference) getReference();
 		
-		ClassStatics clone = universe.getFactory().createClass(reference.getClassName());
+		ClassStatics clone = universe.getFactory().createClass(getElementInfo());
 		
 		if (!existed) {
 			for (String field : fields.keySet()) {

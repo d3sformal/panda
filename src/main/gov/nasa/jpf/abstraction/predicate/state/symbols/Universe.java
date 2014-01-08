@@ -100,7 +100,7 @@ public class Universe implements Cloneable {
 		}
 		
 		if (elementInfo.isArray()) {			
-			StructuredArray array = factory.createArray(ref, elementInfo.arrayLength());
+			StructuredArray array = factory.createArray(ref, elementInfo);
 			
 			if (existed) return (StructuredValue) array;
 			
@@ -121,9 +121,9 @@ public class Universe implements Cloneable {
 			StructuredObject object;
 			
 			if (elementInfo instanceof StaticElementInfo) {
-				object = factory.createClass(className);
-			} else  {
-				object = factory.createObject(ref);
+				object = factory.createClass((StaticElementInfo) elementInfo);
+			} else {
+				object = factory.createObject(ref, elementInfo);
 			}
 			
 			if (existed) return (StructuredValue) object;

@@ -42,14 +42,14 @@ public class AbstractListener extends PropertyListenerAdapter {
 	
 	@Override
 	public void stateAdvanced(Search search) {
-        if (search.isVisitedState()) {
-            System.out.println("VISITED STATE " + ((PredicateAbstraction)GlobalAbstraction.getInstance().get()).getPredicateValuation().getPredicates() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-            VM vm = search.getVM();
-            	ThreadInfo ti = vm.getCurrentThread();
-                    ti.printStackTrace();
-        } else {
-            System.out.println("NEW STATE " + ((PredicateAbstraction)GlobalAbstraction.getInstance().get()).getPredicateValuation().getPredicates() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-        }
+        //if (search.isVisitedState()) {
+            //System.out.println("VISITED STATE " + ((PredicateAbstraction)GlobalAbstraction.getInstance().get()).getPredicateValuation().getPredicates() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+            //VM vm = search.getVM();
+            //	ThreadInfo ti = vm.getCurrentThread();
+            //        ti.printStackTrace();
+        //} else {
+            //System.out.println("NEW STATE " + ((PredicateAbstraction)GlobalAbstraction.getInstance().get()).getPredicateValuation().getPredicates() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        //}
 
 		RunDetector.advance();
 		GlobalAbstraction.getInstance().forward(search.getVM().getCurrentThread().getTopFrameMethodInfo());

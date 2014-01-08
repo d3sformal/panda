@@ -18,9 +18,12 @@
 //
 package gov.nasa.jpf.abstraction.predicate;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.Collection;
 import java.util.Comparator;
 
 import gov.nasa.jpf.Config;
@@ -28,10 +31,14 @@ import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Fields;
 import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.ClassLoaderInfo;
 import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.serialize.FilteringSerializer;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadList;
+import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.util.FinalBitSet;
 import gov.nasa.jpf.util.JPFLogger;
 
@@ -68,6 +75,8 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 	}
 
     protected Set<StructuredValue> sortStructuredValues(Set<StructuredValue> values) {
+    	Set<StructuredValue> order = new TreeSet<StructuredValue>();
+        /*
     	Set<StructuredValue> order = new TreeSet<StructuredValue>(new Comparator<StructuredValue>() {
         	public int compare(StructuredValue v1, StructuredValue v2) {
                 if (v1 instanceof ClassStatics && v2 instanceof HeapObject  ) return -1;
@@ -90,6 +99,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
             	return 0;
             }
         });
+        */
 
         order.addAll(values);
 
@@ -100,6 +110,9 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         //buf.add(0x00000000);
         //buf.add(heap.size());
         //buf.add(0x00000000);
+        
+        //System.err.println("HEAP (R): " + heap);
+        //System.err.println("HEAP (A): " + universe.getStructuredValues());
 
         for (StructuredValue value : sortStructuredValues(heap)) {
             serializeStructuredValue(value);
@@ -148,6 +161,109 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         }
     }
 
+    protected SortedSet<StructuredValue> collectReachableHeap() {
+        TreeSet<StructuredValue> heap = new TreeSet<StructuredValue>();
+
+        ThreadList tl = ks.getThreadList();
+
+        // Collect all objects stored in live variable
+
+        for (ThreadInfo ti : tl) {
+            if (ti.isAlive()) {
+                for (StackFrame frame = ti.getTopFrame(); frame != null; frame = frame.getPrevious()) {
+                    for (int i = 0; i < frame.getLocalVariableCount(); ++i) {
+                        LocalVarInfo var = frame.getLocalVars()[i];
+
+                        if (frame.isLocalVariableRef(var.getSlotIndex())) {
+                            int ref = frame.getLocalVariable(var.getSlotIndex());
+
+                            if (universe.contains(ref)) {
+                                StructuredValue object = universe.get(ref);
+
+                                heap.add(object);
+                            /*
+                            } else {
+                                System.err.println("MISSING EXPECTED OBJECTS `" + ref + "` IN:\n" + universe.toString());
+                                System.exit(0);
+                            */
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Collect all statics (modelled within abstract heap as distinguished objects)
+
+        for (ClassLoaderInfo cl : ks.classLoaders) {
+            if(cl.isAlive()) {
+                for (StaticElementInfo sei : cl.getStatics().liveStatics()) {
+                    String ref = sei.getClassInfo().getName();
+
+                    if (universe.contains(ref)) {
+                        StructuredValue object = universe.get(ref);
+
+                        heap.add(object);
+                    /*
+                    } else {
+                        System.err.println("MISSING EXPECTED OBJECT `" + ref +  "` IN:\n" + universe.toString());
+                        System.exit(0);
+                    */
+                    }
+                }
+            }
+        }
+
+        // Construct reachable closure
+
+        Set<StructuredValue> closed = new HashSet<StructuredValue>();
+        Set<StructuredValue> open = new HashSet<StructuredValue>();
+
+        open.addAll(heap);
+
+        while (!open.isEmpty()) {
+            Set<StructuredValue> nextGen = new HashSet<StructuredValue>();
+
+            for (StructuredValue object : open) {
+                Collection<Slot> slots = new HashSet<Slot>();
+
+                if (object instanceof HeapObject) {
+                    HeapObject ho = (HeapObject) object;
+
+                    slots = ho.getFields().values();
+                }
+
+                if (object instanceof HeapArray) {
+                    HeapArray ha = (HeapArray) object;
+
+                    slots = ha.getElements().values();
+                }
+
+                if (object instanceof ClassStatics) {
+                    ClassStatics cs = (ClassStatics) object;
+
+                    slots = cs.getFields().values();
+                }
+
+                for (Slot slot : slots) {
+                    if (slot instanceof StructuredValueSlot) {
+                        StructuredValueSlot s = (StructuredValueSlot) slot;
+
+                        for (StructuredValue child : s.getPossibleHeapValues()) {
+                            nextGen.add(child);
+                        }
+                    }
+                }
+            }
+
+            closed.addAll(open);
+            open = nextGen;
+            heap.addAll(open);
+        }
+
+        return heap;
+    }
+
     @Override
     protected int[] computeStoringData() {
         //System.out.println("-------------------------------------------- SERIALIZING --------------------------------------------"); 
@@ -156,7 +272,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         pabs = (PredicateAbstraction) GlobalAbstraction.getInstance().get();
         universe = pabs.getSymbolTable().getUniverse();
 
-        serializeHeap(universe.getStructuredValues());
+        serializeHeap(collectReachableHeap());
 
         //buf.add(0x00000000);
         //buf.add(0xDEADBEEF);
@@ -187,12 +303,14 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     }
 
     @Override
+    public void processReference(int objRef) {
+    }
+
+    @Override
 	protected void serializeStackFrames(ThreadInfo ti){
         depth = 0;
 
-		for (StackFrame frame = ti.getTopFrame(); frame != null; frame = frame.getPrevious()){
-			serializeFrame(frame);
-		}
+        super.serializeStackFrames(ti);
 	}
 
     @Override
@@ -226,9 +344,10 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         order.addAll(pabs.getPredicateValuation().getPredicates(depth));
 
         for (Predicate p : order) {
-            //System.out.println("Predicate " + p + " " + p.hashCode() + " = " + pabs.getPredicateValuation().get(p).ordinal());
+            //System.out.print("Predicate " + p + " " + p.hashCode() + " = ");
             buf.add(p.hashCode());
-            buf.add(pabs.getPredicateValuation().get(p).ordinal());
+            buf.add(pabs.getPredicateValuation().get(depth).get(p).ordinal());
+            //System.out.println(pabs.getPredicateValuation().get(depth).get(p).ordinal());
         }
 
         for (Root local : currentScope.getLocalVariables()) {

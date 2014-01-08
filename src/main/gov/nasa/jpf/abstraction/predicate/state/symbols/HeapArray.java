@@ -1,7 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate.state.symbols;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+
+import gov.nasa.jpf.vm.ElementInfo;
 
 /**
  * Java array residing in the heap
@@ -9,13 +12,35 @@ import java.util.Map;
 public class HeapArray extends StructuredValue implements StructuredArray {
 	
 	private Map<Integer, Slot> elements = new HashMap<Integer, Slot>();
-	private Integer length;
 
-	public HeapArray(Universe universe, Integer reference, Integer length) {
-		super(universe, new HeapObjectReference(reference));
-		
-		this.length = length;
+	public HeapArray(Universe universe, Integer reference, ElementInfo elementInfo) {
+		super(universe, new HeapObjectReference(reference), elementInfo);
 	}
+
+    @Override
+    protected final int compareSignatureTo(StructuredValue value) {
+        if (value instanceof HeapArray) {
+            HeapArray array = (HeapArray) value;
+
+            String name1 = getElementInfo().getClassInfo().getName();
+            String name2 = array.getElementInfo().getClassInfo().getName();
+
+            int typeDifference = name1.compareTo(name2);
+
+            if (typeDifference == 0) return getLength().compareTo(array.getLength());
+
+            return typeDifference;
+        }
+
+        return compareClasses(value);
+    }
+
+    @Override
+    protected final int compareSlots(StructuredValue value) {
+        //HeapArray array = (HeapArray) value;
+
+        return 0;
+    }
 	
 	@Override
 	public HeapObjectReference getReference() {
@@ -44,7 +69,7 @@ public class HeapArray extends StructuredValue implements StructuredArray {
 	
 	@Override
 	public Integer getLength() {
-		return length;
+		return getElementInfo().arrayLength();
 	}
 	
 	@Override
@@ -62,7 +87,7 @@ public class HeapArray extends StructuredValue implements StructuredArray {
 		
 		HeapObjectReference reference = getReference();
 		
-		HeapArray clone = universe.getFactory().createArray(reference.getReference(), getLength());
+		HeapArray clone = universe.getFactory().createArray(reference.getReference(), getElementInfo());
 				
 		if (!existed) {
 			for (Integer index : elements.keySet()) {
