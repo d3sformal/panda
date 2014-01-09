@@ -236,11 +236,6 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	}
 
 	@Override
-	public int count() {
-		return scopes.count() > 0 ? scopes.top().count() : 0;
-	}
-
-	@Override
 	public boolean isArray(AccessExpression path) {
 		return scopes.top().isArray(path);
 	}
@@ -258,6 +253,16 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	@Override
 	public Universe getUniverse() {
 		return scopes.top().getUniverse();
+	}
+
+	@Override
+	public int count() {
+		return scopes.count() > 0 ? scopes.top().count() : 0;
+	}
+
+	@Override
+	public int depth() {
+        return scopes.count();
 	}
 
     @Override

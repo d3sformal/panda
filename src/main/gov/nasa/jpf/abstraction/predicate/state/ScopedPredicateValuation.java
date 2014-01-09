@@ -500,6 +500,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 
 	@Override
+	public int depth() {
+        return scopes.count();
+	}
+
+	@Override
 	public boolean containsKey(Predicate predicate) {
 		return scopes.top().containsKey(predicate);
 	}
