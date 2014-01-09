@@ -12,4 +12,5 @@ listener=gov.nasa.jpf.abstraction.AbstractListener
 #,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.predicate.util.SMTMonitor
 #,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor
 
-vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer
+#vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer
+search.multiple_errors=true

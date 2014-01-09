@@ -18,6 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.predicate;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -70,53 +71,35 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     private int depth = 0;
     private PredicateAbstraction pabs;
     private Universe universe;
+    private Map<StructuredValue, Integer> canonical = new HashMap<StructuredValue, Integer>();
 
 	public PredicateAbstractionSerializer(Config conf) {
 	}
 
     protected Set<StructuredValue> sortStructuredValues(Set<StructuredValue> values) {
     	Set<StructuredValue> order = new TreeSet<StructuredValue>();
-        /*
-    	Set<StructuredValue> order = new TreeSet<StructuredValue>(new Comparator<StructuredValue>() {
-        	public int compare(StructuredValue v1, StructuredValue v2) {
-                if (v1 instanceof ClassStatics && v2 instanceof HeapObject  ) return -1;
-                if (v1 instanceof HeapObject   && v2 instanceof ClassStatics) return +1;
-                
-                if (v1 instanceof HeapObject && v2 instanceof HeapObject) {
-    	        	int r1 = ((HeapObjectReference)v1.getReference()).getReference();
-                	int r2 = ((HeapObjectReference)v2.getReference()).getReference();
-
-                    return r1 - r2;
-                }
-
-                if (v1 instanceof ClassStatics && v2 instanceof ClassStatics) {
-    	        	String c1 = ((ClassStaticsReference)v1.getReference()).getClassName();
-                	String c2 = ((ClassStaticsReference)v2.getReference()).getClassName();
-
-                    return c1.compareTo(c2);
-                }
-
-            	return 0;
-            }
-        });
-        */
 
         order.addAll(values);
 
         return order;
     }
 
-    protected void serializeHeap(Set<StructuredValue> heap) {
-        //buf.add(0x00000000);
-        //buf.add(heap.size());
-        //buf.add(0x00000000);
-        
-        //System.err.println("HEAP (R): " + heap);
-        //System.err.println("HEAP (A): " + universe.getStructuredValues());
-
-        for (StructuredValue value : sortStructuredValues(heap)) {
+    protected void serializeHeap() {    
+	System.err.print("PredicateAbstractionSerializer: Canonical Order: ");
+	
+	Set<StructuredValue> sorted = sortStructuredValues(collectReachableHeap());
+	int i = 0;
+	
+	canonical.clear();
+	
+	for (StructuredValue value : sorted) {
+	    canonical.put(value, i);
+	    ++i;
+	}
+        for (StructuredValue value : sorted) {
             serializeStructuredValue(value);
         }
+        System.err.println();
     }
 
     protected void serializeSlot(Slot slot) {
@@ -126,14 +109,14 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
             buf.add(svs.getPossibleHeapValues().size());
 
             for (StructuredValue p : sortStructuredValues(svs.getPossibleHeapValues())) {
-                int r = ((HeapObjectReference)p.getReference()).getReference();
-
-                buf.add(r);
+                buf.add(canonical.get(p));
             }
         }
     }
 
     protected void serializeStructuredValue(StructuredValue value) {
+	System.err.print(canonical.get(value) + " ");
+	
         if (value instanceof HeapArray) {
             HeapArray a = (HeapArray) value;
             buf.add(HeapArray.class.hashCode());
@@ -173,19 +156,17 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
                 for (StackFrame frame = ti.getTopFrame(); frame != null; frame = frame.getPrevious()) {
                     for (int i = 0; i < frame.getLocalVariableCount(); ++i) {
                         LocalVarInfo var = frame.getLocalVars()[i];
+                        
+                        System.err.println(var.getName());
 
                         if (frame.isLocalVariableRef(var.getSlotIndex())) {
+			    //DONT LOAD THE EXACT REF, USE SYMBOLIC INFO
                             int ref = frame.getLocalVariable(var.getSlotIndex());
 
                             if (universe.contains(ref)) {
                                 StructuredValue object = universe.get(ref);
 
                                 heap.add(object);
-                            /*
-                            } else {
-                                System.err.println("MISSING EXPECTED OBJECTS `" + ref + "` IN:\n" + universe.toString());
-                                System.exit(0);
-                            */
                             }
                         }
                     }
@@ -204,11 +185,6 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
                         StructuredValue object = universe.get(ref);
 
                         heap.add(object);
-                    /*
-                    } else {
-                        System.err.println("MISSING EXPECTED OBJECT `" + ref +  "` IN:\n" + universe.toString());
-                        System.exit(0);
-                    */
                     }
                 }
             }
@@ -266,38 +242,13 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
     @Override
     protected int[] computeStoringData() {
-        //System.out.println("-------------------------------------------- SERIALIZING --------------------------------------------"); 
         buf.clear();
 
         pabs = (PredicateAbstraction) GlobalAbstraction.getInstance().get();
         universe = pabs.getSymbolTable().getUniverse();
 
-        serializeHeap(collectReachableHeap());
-
-        //buf.add(0x00000000);
-        //buf.add(0xDEADBEEF);
-        //buf.add(0x00000000);
-
-        //heap = ks.getHeap();
-        //initReferenceQueue();
-
-        //--- serialize all live objects and loaded classes
+        serializeHeap();
         serializeStackFrames();
-        //serializeClassLoaders();
-
-        //--- now serialize the thread states (which might refer to live objects)
-        // we do this last because threads contain some internal references
-        // (locked objects etc) that should NOT set the canonical reference serialization
-        // values (if they are encountered before their first explicit heap reference)
-        //serializeThreadStates();
-        //System.out.println("-------------------------------------------- SERIALIZED  --------------------------------------------"); 
-
-        //System.out.print("Serialization: ");
-        //for (int i = 0; i < buf.size() && i < 16; ++i) {
-        //    System.out.printf("%08X", buf.get(i));
-        //}
-        //System.out.println("...");
-        //System.out.println();
 
         return buf.toArray();
     }
@@ -315,7 +266,6 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
     @Override
 	protected void serializeFrame(StackFrame frame){
-        //System.out.println("--- FRAME ---");
 		buf.add(frame.getMethodInfo().getGlobalId());
 
         FlatSymbolTable currentScope = pabs.getSymbolTable().get(depth);
@@ -344,34 +294,25 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         order.addAll(pabs.getPredicateValuation().getPredicates(depth));
 
         for (Predicate p : order) {
-            //System.out.print("Predicate " + p + " " + p.hashCode() + " = ");
             buf.add(p.hashCode());
             buf.add(pabs.getPredicateValuation().get(depth).get(p).ordinal());
-            //System.out.println(pabs.getPredicateValuation().get(depth).get(p).ordinal());
         }
 
         for (Root local : currentScope.getLocalVariables()) {
             LocalVariable v = currentScope.getLocal(local);
 
             if (v.getSlot() instanceof StructuredValueSlot) {
-                //System.out.println("Reference type: " + v);
                 StructuredValueSlot svs = (StructuredValueSlot)v.getSlot();
                 Set<StructuredValue> possibilities = svs.getPossibleHeapValues();
 
-                //System.out.print("\t" + possibilities.size() + ": ");
                 buf.add(possibilities.size());
 
                 Set<StructuredValue> possibilitiesOrder = sortStructuredValues(possibilities);
 
                 for (StructuredValue p : possibilitiesOrder) {
-                    int r = ((HeapObjectReference)p.getReference()).getReference(); 
-
-                	//System.out.print("\t" + r);
-                    buf.add(r);
+		    System.err.println(v + ": " + p);
+                    buf.add(canonical.get(p));
                 }
-               	//System.out.println();
-            } else {
-                //System.out.println("Primitive type: " + v);
             }
         }
 

@@ -2,7 +2,7 @@ package matching;
 
 public class Matching {
 
-    static int counter = 1000;
+    static int counter = 3;
 
     private static Object getX() {
         boolean b = true; // UNTRACKED
