@@ -27,7 +27,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert double to int
+ * Convert double to long
  * ..., value => ..., result
  */
 public class D2L extends gov.nasa.jpf.jvm.bytecode.D2L implements TypeConvertor {

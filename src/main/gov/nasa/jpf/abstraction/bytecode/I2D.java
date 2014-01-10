@@ -27,7 +27,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert double to int
+ * Convert int to double
  * ..., value => ..., result
  */
 public class I2D extends gov.nasa.jpf.jvm.bytecode.I2D implements TypeConvertor {

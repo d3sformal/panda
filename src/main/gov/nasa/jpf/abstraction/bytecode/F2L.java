@@ -27,7 +27,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
 /**
- * Convert double to int
+ * Convert float to long
  * ..., value => ..., result
  */
 public class F2L extends gov.nasa.jpf.jvm.bytecode.F2L implements TypeConvertor {
