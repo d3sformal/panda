@@ -18,6 +18,7 @@ public class Negation extends Predicate {
 	
 	protected Negation(Predicate predicate) {
 		this.predicate = predicate;
+		this.hashCodeValue = toString(Notation.DOT_NOTATION).hashCode();
 	}
 	
 	@Override

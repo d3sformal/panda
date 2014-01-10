@@ -17,6 +17,7 @@ public abstract class Formula extends Predicate {
 	protected Formula(Predicate a, Predicate b) {
 		this.a = a;
 		this.b = b;
+		this.hashCodeValue = toString(Notation.DOT_NOTATION).hashCode();
 	}
 
 	@Override
