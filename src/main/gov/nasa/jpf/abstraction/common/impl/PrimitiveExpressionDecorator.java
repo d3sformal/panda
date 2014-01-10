@@ -39,9 +39,6 @@ public class PrimitiveExpressionDecorator extends DefaultPrimitiveExpression {
 			if (symbols.isPrimitive(path)) {
 				return PrimitiveExpressionDecorator.create(expression);
 			}
-            System.out.println("NOT PRIMITIVE 1<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-		} else {
-		System.out.println("NOT PRIMITIVE 2<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 		}
 		
 		throw new RuntimeException("Invalid cast to Primitive Expression " + expression + " " + expression.getClass().getSimpleName());
