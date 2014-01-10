@@ -37,15 +37,15 @@ public enum Notation {
 		return getStringifier(policy);
 	}
 	
-	public static String convertToString(PredicatesVisitable visitable) {
+	public static String convertToString(PredicatesComponentVisitable visitable) {
 		return convertToString(visitable, policy);
 	}
 	
-	public static String convertToString(PredicatesVisitable visitable, Notation policy) {
+	public static String convertToString(PredicatesComponentVisitable visitable, Notation policy) {
 		return convertToString(visitable, getStringifier(policy));
 	}
 	
-	public static String convertToString(PredicatesVisitable visitable, PredicatesStringifier stringifier) {		
+	public static String convertToString(PredicatesComponentVisitable visitable, PredicatesStringifier stringifier) {		
 		visitable.accept(stringifier);
 		
 		return stringifier.getString();

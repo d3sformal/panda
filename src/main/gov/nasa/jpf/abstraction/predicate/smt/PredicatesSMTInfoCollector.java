@@ -26,8 +26,8 @@ import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Modulo;
 import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
-import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.Subtract;
 import gov.nasa.jpf.abstraction.common.Undefined;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
@@ -57,14 +57,14 @@ import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
  * - set of fresh objects (object references)
  * - also a set of additional predicates that need to be added to the query to SMT ... array lengths are always >= 0
  */
-public class PredicatesSMTInfoCollector implements PredicatesVisitor {
+public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 	private Set<String> classes = new HashSet<String>();
 	private Set<String> vars = new HashSet<String>();
 	private Set<String> fields = new HashSet<String>();
 	private Set<Integer> fresh = new HashSet<Integer>();
 	
-	private PredicatesVisitable currentCollectable = null;
-	private Map<PredicatesVisitable, Set<Predicate>> additionalPredicates = new HashMap<PredicatesVisitable, Set<Predicate>>();
+	private PredicatesComponentVisitable currentCollectable = null;
+	private Map<PredicatesComponentVisitable, Set<Predicate>> additionalPredicates = new HashMap<PredicatesComponentVisitable, Set<Predicate>>();
 	
 	private Set<AccessExpression> objects = new HashSet<AccessExpression>();
 
@@ -199,7 +199,7 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 		expression.getArrayLength().accept(this);
 	}
 	
-	public Set<Predicate> getAdditionalPredicates(PredicatesVisitable collectable) {
+	public Set<Predicate> getAdditionalPredicates(PredicatesComponentVisitable collectable) {
 		if (!additionalPredicates.containsKey(collectable)) {
 			return new HashSet<Predicate>();
 		}
@@ -321,7 +321,7 @@ public class PredicatesSMTInfoCollector implements PredicatesVisitor {
 		predicate.apply().accept(this);
 	}
 	
-	public void collect(PredicatesVisitable collectable) {
+	public void collect(PredicatesComponentVisitable collectable) {
 		if (collectable instanceof UpdatedPredicate) {
 			UpdatedPredicate updated = (UpdatedPredicate) collectable;
 			

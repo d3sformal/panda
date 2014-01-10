@@ -26,7 +26,7 @@ public class Constant extends DefaultExpression implements PrimitiveExpression {
 	}
 
 	@Override
-	public void accept(PredicatesVisitor visitor) {
+	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit(this);
 	}
 

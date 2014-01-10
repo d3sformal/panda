@@ -18,7 +18,6 @@ public class Negation extends Predicate {
 	
 	protected Negation(Predicate predicate) {
 		this.predicate = predicate;
-		this.hashCodeValue = toString(Notation.DOT_NOTATION).hashCode();
 	}
 	
 	@Override
@@ -27,7 +26,7 @@ public class Negation extends Predicate {
 	}
 
 	@Override
-	public void accept(PredicatesVisitor visitor) {
+	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit(this);
 	}
 

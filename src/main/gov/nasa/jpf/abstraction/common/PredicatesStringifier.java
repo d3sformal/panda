@@ -30,7 +30,7 @@ import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
  *       
  * to be used to produce a string representation of the captured hierarchy.
  */
-public abstract class PredicatesStringifier implements PredicatesVisitor {
+public abstract class PredicatesStringifier implements PredicatesComponentVisitor {
 	
 	protected String ret = "";
 	

@@ -10,6 +10,6 @@ package gov.nasa.jpf.abstraction.common;
  *       
  * to allow a traversal by a visitor.
  */
-public interface PredicatesVisitable {
-	public void accept(PredicatesVisitor visitor);
+public interface PredicatesComponentVisitable {
+	public void accept(PredicatesComponentVisitor visitor);
 }

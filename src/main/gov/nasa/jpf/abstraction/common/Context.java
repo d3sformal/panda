@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * @see gov.nasa.jpf.abstraction.common.ObjectContext for a container of predicates over static fields, instance fields
  * @see gov.nasa.jpf.abstraction.common.MethodContext for a container of predicates over static fields, instance fields, local variables (including method parameters)
  */
-public abstract class Context implements PredicatesVisitable {
+public abstract class Context implements PredicatesComponentVisitable {
 	public List<Predicate> predicates;
 	
 	public Context(List<Predicate> predicates) {

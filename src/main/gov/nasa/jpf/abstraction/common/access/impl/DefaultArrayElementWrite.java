@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
@@ -59,7 +59,7 @@ public class DefaultArrayElementWrite extends DefaultArrayElementExpression impl
 	}
 
 	@Override
-	public void accept(PredicatesVisitor visitor) {
+	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit(this);
 	}
 

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
@@ -59,7 +59,7 @@ public class DefaultArrayLengthWrite extends DefaultArrayLengthExpression implem
 	}
 	
 	@Override
-	public void accept(PredicatesVisitor visitor) {
+	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit(this);
 	}
 

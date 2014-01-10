@@ -40,7 +40,7 @@ import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
  * 
  * @see gov.nasa.jpf.abstraction.common.PredicatesStringifier, gov.nasa.jpf.abstraction.common.impl.PredicatesDotStringifier
  */
-public interface PredicatesVisitor {
+public interface PredicatesComponentVisitor {
 	public void visit(Predicates predicates);
 	public void visit(ObjectContext context);
 	public void visit(MethodContext context);

@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.predicate.smt;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
 import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Implication;
@@ -271,7 +271,7 @@ public class SMT {
 		return stringifier.getString();
 	}
 	
-	private static String convertToString(PredicatesVisitable visitable) {
+	private static String convertToString(PredicatesComponentVisitable visitable) {
 		PredicatesSMTStringifier stringifier = new PredicatesSMTStringifier();
 		
 		visitable.accept(stringifier);

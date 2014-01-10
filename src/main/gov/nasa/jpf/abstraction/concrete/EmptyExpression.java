@@ -7,7 +7,7 @@ import java.util.Map;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.impl.DefaultExpression;
@@ -26,7 +26,7 @@ public class EmptyExpression extends DefaultExpression {
 	}
 
 	@Override
-	public void accept(PredicatesVisitor visitor) {
+	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit(this);
 	}
 	

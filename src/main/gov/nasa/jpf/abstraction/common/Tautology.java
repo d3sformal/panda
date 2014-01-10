@@ -2,7 +2,7 @@ package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +14,10 @@ import java.util.Map;
 public class Tautology extends Predicate {
 	
 	protected Tautology() {
-		this.hashCodeValue = toString(Notation.DOT_NOTATION).hashCode();
 	}
 
 	@Override
-	public void accept(PredicatesVisitor visitor) {
+	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit(this);
 	}
 

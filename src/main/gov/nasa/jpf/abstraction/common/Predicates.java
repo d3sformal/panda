@@ -1,8 +1,8 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.Notation;
-import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
-import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * 
  * @see gov.nasa.jpf.abstraction.common.Context
  */
-public class Predicates implements PredicatesVisitable {
+public class Predicates implements PredicatesComponentVisitable {
 	public List<Context> contexts;
 	
 	public Predicates(List<Context> contexts) {
@@ -19,7 +19,7 @@ public class Predicates implements PredicatesVisitable {
 	}
 	
 	@Override
-	public void accept(PredicatesVisitor visitor) {
+	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit(this);
 	}
 	

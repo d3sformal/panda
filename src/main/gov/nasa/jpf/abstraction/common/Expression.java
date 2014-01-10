@@ -11,7 +11,7 @@ import java.util.Map;
  * 
  * Notably: constants, access expressions, arithmetic operations
  */
-public interface Expression extends PredicatesVisitable, Cloneable {
+public interface Expression extends PredicatesComponentVisitable, Cloneable {
 	/**
 	 * Collects all complete access expressions present in this one
 	 */

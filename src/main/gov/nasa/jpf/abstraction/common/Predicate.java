@@ -5,7 +5,7 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
 import gov.nasa.jpf.abstraction.common.impl.DefaultExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
-import gov.nasa.jpf.abstraction.common.PredicatesVisitable;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * A common ancestor to all predicates used in the abstraction
  */
-public abstract class Predicate implements PredicatesVisitable {
+public abstract class Predicate implements PredicatesComponentVisitable {
 	public abstract List<AccessExpression> getPaths();
 	public abstract Predicate replace(Map<AccessExpression, Expression> replacements);
 
@@ -28,7 +28,7 @@ public abstract class Predicate implements PredicatesVisitable {
         return replace(replacements);
     }
 
-    protected int hashCodeValue;
+    private Integer hashCodeValue = null;
 
     public String toString() {
     	return toString(Notation.policy);
@@ -110,6 +110,9 @@ public abstract class Predicate implements PredicatesVisitable {
 	
 	@Override
 	public final int hashCode() {
+        if (hashCodeValue == null) {
+		    hashCodeValue = toString(Notation.DOT_NOTATION).hashCode();
+        }
 		return hashCodeValue;
 	}
 	

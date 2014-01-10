@@ -14,7 +14,7 @@ public class UndefinedOperationResult extends Operation implements Undefined {
 	}
 
 	@Override
-	public void accept(PredicatesVisitor visitor) {
+	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit(this);
 	}
 	

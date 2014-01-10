@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.common.access.impl;
 import java.util.LinkedList;
 import java.util.List;
 
-import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 
 /**
@@ -35,7 +35,7 @@ public class DefaultPackageAndClass extends DefaultRoot implements PackageAndCla
 	}
 	
 	@Override
-	public void accept(PredicatesVisitor visitor) {
+	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit(this);
 	}
 	

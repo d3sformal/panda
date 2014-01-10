@@ -4,7 +4,7 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 
 /**
  * Conjunction represents a logical AND of two predicates. (e.g. x > 0 AND x < 10)
@@ -16,7 +16,7 @@ public class Conjunction extends Formula {
 	}
 	
 	@Override
-	public void accept(PredicatesVisitor visitor) {
+	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit(this);
 	}
 

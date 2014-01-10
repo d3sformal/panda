@@ -4,7 +4,7 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 
 /**
  * Disjunction represents a logical OR of two predicates. (e.g. x = 1 OR x = 2)
@@ -15,7 +15,7 @@ public class Disjunction extends Formula {
 	}
 
 	@Override
-	public void accept(PredicatesVisitor visitor) {
+	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit(this);
 	}
 

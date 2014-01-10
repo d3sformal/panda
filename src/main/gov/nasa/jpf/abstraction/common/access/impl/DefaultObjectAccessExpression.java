@@ -2,7 +2,7 @@ package gov.nasa.jpf.abstraction.common.access.impl;
 
 import java.util.List;
 
-import gov.nasa.jpf.abstraction.common.PredicatesVisitor;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
@@ -23,7 +23,7 @@ public abstract class DefaultObjectAccessExpression extends DefaultAccessExpress
 	}
 
 	@Override
-	public void accept(PredicatesVisitor visitor) {
+	public void accept(PredicatesComponentVisitor visitor) {
 		expression.accept(visitor);
 	}
 
