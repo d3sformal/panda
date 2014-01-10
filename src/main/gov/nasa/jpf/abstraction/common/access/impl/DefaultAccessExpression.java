@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
@@ -17,8 +14,6 @@ import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.impl.DefaultObjectExpression;
-import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
-import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicatesSMTStringifier;
 
 /**
@@ -182,15 +177,6 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 		return getLength() < expression.getLength() && isPrefixOf(expression);
 	}
 	
-	public static DefaultAccessExpression createFromString(String definition) {
-		ANTLRInputStream chars = new ANTLRInputStream(definition);
-		PredicatesLexer lexer = new PredicatesLexer(chars);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		PredicatesParser parser = new PredicatesParser(tokens);
-		
-		return parser.standalonepath().val;
-	}
-	
 	/**
 	 * Changes the prefix of this expression from oldPrefix to newPrefix
 	 * 
@@ -214,40 +200,4 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 		return null;
 	}
 	
-	public static void main(String[] args) {
-		Notation.policy = Notation.DOT_NOTATION;
-		
-		AccessExpression p = createFromString("a[a.length - 1]");
-		
-		AccessExpression a = createFromString("a");
-		AccessExpression c = createFromString("c");
-		
-		Expression e = p.replace(a, c);
-		
-		System.out.println(e /*+ " " + e.getPaths()*/);
-		
-		AccessExpression x = createFromString("x.x");		
-		AccessExpression y = createFromString("x");
-		AccessExpression z = createFromString("y");
-		x = x.reRoot(y, z);
-		
-		System.out.println(x + " " + x.getClass().getSimpleName());
-		
-		AccessExpression e1;
-		AccessExpression e2;
-		
-		e1 = DefaultObjectFieldRead.create(DefaultArrayElementRead.create(DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create())), Constant.create(0)), "bottom");
-		e2 = DefaultObjectFieldRead.create(DefaultArrayElementRead.create(DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create())), Constant.create(0)), "bottom");
-		
-		e1 = DefaultArrayElementRead.create(DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create())), Constant.create(0));
-		e2 = DefaultArrayElementRead.create(DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create())), Constant.create(0));
-		
-		e1 = DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create()));
-		e2 = DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create()));
-		
-		System.out.println(Notation.convertToString(e1, new PredicatesSMTStringifier()));
-		System.out.println(Notation.convertToString(e2, new PredicatesSMTStringifier()));
-		System.out.println(e1.equals(e2) + " " + e1.hashCode() + " " + e2.hashCode());
-	}
-
 }
