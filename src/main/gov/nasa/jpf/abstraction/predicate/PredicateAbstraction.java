@@ -9,6 +9,10 @@ import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionDecorator;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Predicates;
+import gov.nasa.jpf.abstraction.common.BranchingCondition;
+import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
+import gov.nasa.jpf.abstraction.common.BranchingDecision;
+import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.predicate.state.AffectedAccessExpressions;
 import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
@@ -77,13 +81,17 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public TruthValue evaluatePredicate(Predicate predicate) {
+	public BranchingConditionInfo processBranchingCondition(BranchingCondition condition) {
+        Predicate predicate = (Predicate) condition;
+
 		return predicateValuation.evaluatePredicate(predicate);
 	}
 	
 	@Override
-	public void forceValuation(Predicate predicate, TruthValue valuation) {
-		predicateValuation.put(predicate, valuation);
+	public void informAboutBranchingDecision(BranchingDecision decision) {
+        BranchingConditionValuation bcv = (BranchingConditionValuation) decision;
+
+		predicateValuation.put(bcv.getCondition(), bcv.getValuation());
 	}
 	
 	public ScopedSymbolTable getSymbolTable() {		

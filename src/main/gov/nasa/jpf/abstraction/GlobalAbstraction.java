@@ -3,6 +3,9 @@ package gov.nasa.jpf.abstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.BranchingCondition;
+import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
+import gov.nasa.jpf.abstraction.common.BranchingDecision;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.MethodInfo;
@@ -104,16 +107,16 @@ public class GlobalAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public TruthValue evaluatePredicate(Predicate predicate) {
-		if (!RunDetector.isRunning()) return TruthValue.UNDEFINED;
+	public BranchingConditionInfo processBranchingCondition(BranchingCondition condition) {
+		if (!RunDetector.isRunning()) return BranchingConditionInfo.NONE;
 		
-		return abs.evaluatePredicate(predicate);
+		return abs.processBranchingCondition(condition);
 	}
 	
 	@Override
-	public void forceValuation(Predicate predicate, TruthValue valuation) {
+	public void informAboutBranchingDecision(BranchingDecision decision) {
 		if (!RunDetector.isRunning()) return;
 		
-		abs.forceValuation(predicate, valuation);
+		abs.informAboutBranchingDecision(decision);
 	}
 }

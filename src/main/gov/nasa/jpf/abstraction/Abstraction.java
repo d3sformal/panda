@@ -27,6 +27,10 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.common.BranchingCondition;
+import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
+import gov.nasa.jpf.abstraction.common.BranchingDecision;
+
 /**
  * Common root class for numeric abstractions.
  */
@@ -117,11 +121,11 @@ public abstract class Abstraction {
     /**
      * Most abstractions do not provide this behaviour, but branching instructions need this method to be present.
      */
-	public TruthValue evaluatePredicate(Predicate predicate) {
-		return TruthValue.UNDEFINED;
+	public BranchingConditionInfo processBranchingCondition(BranchingCondition condition) {
+		return BranchingConditionInfo.NONE;
 	}
 	
-	public void forceValuation(Predicate predicate, TruthValue valuation) {
+	public void informAboutBranchingDecision(BranchingDecision decision) {
 	}
 
 	/**

@@ -30,6 +30,7 @@ import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
@@ -76,8 +77,8 @@ public abstract class BinaryComparatorExecutor<T> {
 			 * No other abstraction can do that, the rest of them returns UNDEFINED.
 			 */
 			if (expr1 != null && expr2 != null && RunDetector.isRunning()) {	
-				TruthValue lt = GlobalAbstraction.getInstance().evaluatePredicate(LessThan.create(expr1, expr2));
-				TruthValue eq = GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(expr1, expr2));
+				TruthValue lt = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(LessThan.create(expr1, expr2));
+				TruthValue eq = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(Equals.create(expr1, expr2));
 				TruthValue gt = null;
 							
 				if (TruthValue.and(lt, eq) == TruthValue.UNDEFINED) {
@@ -157,7 +158,7 @@ public abstract class BinaryComparatorExecutor<T> {
 					predicate = LessThan.create(expr2, expr1);
 				}
 				
-				GlobalAbstraction.getInstance().forceValuation(predicate, TruthValue.TRUE);
+				GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.TRUE));
 			}
 		}
 		

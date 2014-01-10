@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
+
 /**
  * Possible valuations of a predicate
  * 
@@ -8,7 +10,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
  * TRUE      ... true
  * FALSE     ... false
  */
-public enum TruthValue {
+public enum TruthValue implements BranchingConditionInfo {
 	UNDEFINED, // 0 .. 00
 	TRUE,      // 1 .. 01
 	FALSE,     // 2 .. 10
@@ -69,4 +71,18 @@ public enum TruthValue {
 	public static TruthValue or(TruthValue a, TruthValue b) {
 		return create(a.ordinal() | b.ordinal());
 	}
+
+    @Override
+    public BranchingConditionInfo combine(BranchingConditionInfo info) {
+        if (info == BranchingConditionInfo.NONE) {
+            return this;
+        }
+        if (info instanceof TruthValue) {
+            return or(this, (TruthValue) info);
+        }
+
+        // TODO cope with compound info for container abs
+
+        return BranchingConditionInfo.NONE;
+    }
 }

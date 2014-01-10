@@ -11,6 +11,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
@@ -53,7 +54,7 @@ public class UnaryIfInstructionExecutor {
 			 * No other abstraction can do that, the rest of them returns UNDEFINED.
 			 */
 			if (expr != null && RunDetector.isRunning()) {
-				TruthValue pred = GlobalAbstraction.getInstance().evaluatePredicate(br.createPredicate(expr, Constant.create(0)));
+				TruthValue pred = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(br.createPredicate(expr, Constant.create(0)));
 	
 				switch (pred) {
 				case TRUE:
@@ -108,7 +109,7 @@ public class UnaryIfInstructionExecutor {
 			if (expr != null) {
 				Predicate predicate = br.createPredicate(expr, Constant.create(0));
 			
-				GlobalAbstraction.getInstance().forceValuation(predicate, TruthValue.create(conditionValue));
+				GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)));
 			}
 		}
 

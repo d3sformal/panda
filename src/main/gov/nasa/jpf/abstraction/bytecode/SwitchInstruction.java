@@ -30,6 +30,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
@@ -70,7 +71,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 				boolean predicateAbstractionFailed = false;
 
 				for (int match : getMatches()) {
-					TruthValue pred = GlobalAbstraction.getInstance().evaluatePredicate(Equals.create(expr, Constant.create(match)));
+					TruthValue pred = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(Equals.create(expr, Constant.create(match)));
 					
 					if (pred == TruthValue.UNDEFINED) {
 						predicateAbstractionFailed = true;
@@ -133,6 +134,8 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 			}
 
 			lastIdx = idx;
+            
+            GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(Equals.create(expr, Constant.create(matches[idx])), TruthValue.TRUE));
 			
 			return mi.getInstructionAt(targets[idx]);
 		}

@@ -23,6 +23,9 @@ import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.BranchingCondition;
+import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
+import gov.nasa.jpf.abstraction.common.BranchingDecision;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.util.Pair;
 import gov.nasa.jpf.vm.MethodInfo;
@@ -106,22 +109,22 @@ public class ContainerAbstraction extends Abstraction {
 	}
     
     @Override
-    public TruthValue evaluatePredicate(Predicate predicate) {
-    	TruthValue ret = TruthValue.UNDEFINED;
+    public BranchingConditionInfo processBranchingCondition(BranchingCondition condition) {
+    	BranchingConditionInfo ret = BranchingConditionInfo.NONE;
 
     	for (Abstraction abs : list) {
-    		TruthValue sub = abs.evaluatePredicate(predicate);
+    		BranchingConditionInfo sub = abs.processBranchingCondition(condition);
     		
-   			ret = TruthValue.or(ret, sub);
+   			ret = ret.combine(sub);
     	}
     	
     	return ret;
     }
     
     @Override
-    public void forceValuation(Predicate predicate, TruthValue valuation) {
+    public void informAboutBranchingDecision(BranchingDecision decision) {
     	for (Abstraction abs : list) {
-    		abs.forceValuation(predicate, valuation);
+    		abs.informAboutBranchingDecision(decision);
     	}
 	}
     

@@ -9,6 +9,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
@@ -56,7 +57,7 @@ public class BinaryIfInstructionExecutor {
 			 */
 			if (expr1 != null && expr2 != null && RunDetector.isRunning()) {
 				Predicate predicate = br.createPredicate(expr1, expr2);
-				TruthValue truth = GlobalAbstraction.getInstance().evaluatePredicate(predicate);
+				TruthValue truth = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(predicate);
 	
 				switch (truth) {
 				case TRUE:
@@ -114,7 +115,7 @@ public class BinaryIfInstructionExecutor {
 			if (expr1 != null && expr2 != null) {
 				Predicate predicate = br.createPredicate(expr1, expr2);
 			
-				GlobalAbstraction.getInstance().forceValuation(predicate, TruthValue.create(conditionValue));
+				GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)));
 			}
 		}
 
