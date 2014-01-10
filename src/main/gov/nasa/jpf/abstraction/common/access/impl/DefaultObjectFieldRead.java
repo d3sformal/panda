@@ -89,6 +89,9 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 		return create(getObject().replaceSubExpressions(replacements), getField().clone());
 	}
 	
+    /**
+     * @see gov.nasa.jpf.abstraction.common.Predicate.update for an overall view
+     */
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
         // perform updates in the prefix

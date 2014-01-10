@@ -93,6 +93,10 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 		return create(getObject().replaceSubExpressions(replacements), getArrays().clone(), getIndex().replace(replacements));
 	}
 	
+
+    /**
+     * @see gov.nasa.jpf.abstraction.common.Predicate.update for an overall view
+     */
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
 		Expression updated = getArray().update(expression, newExpression);
