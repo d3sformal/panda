@@ -3,13 +3,79 @@ package gov.nasa.jpf.abstraction.predicate.state.symbols;
 import java.util.HashMap;
 import java.util.Map;
 
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.ThreadInfoSet;
+
 /**
  * Represents a null object whose elements/fields are not accessible
  */
 public class Null extends StructuredValue implements StructuredObject, StructuredArray {
 
+    private static class NullClassInfo extends ClassInfo {
+        @Override
+        public String getName() {
+            return "null";
+        }
+    }
+
+    private static class NullElementInfo extends ElementInfo {
+        public NullElementInfo() {
+            super(Universe.NULL, new NullClassInfo(), null, null, null);
+        }
+
+        @Override
+        public ElementInfo getModifiableInstance() {
+            return this;
+        }
+        @Override
+        public ThreadInfoSet createThreadInfoSet(ThreadInfo ti) {
+            return null;
+        }
+        @Override
+        public boolean isObject() {
+            return true;
+        }
+        @Override
+        public boolean hasFinalizer() {
+            return false;
+        }
+        @Override
+        public FieldInfo getDeclaredFieldInfo(String clsBase, String fname) {
+            return null;
+        }
+        @Override
+        public FieldInfo getFieldInfo(String fname) {
+            return null;
+        }
+        @Override
+        public FieldInfo getFieldInfo(int index) {
+            return null;
+        }
+        @Override
+        public int getNumberOfFieldsOrElements() {
+            return 0;
+        }
+        @Override
+        public int getNumberOfFields() {
+            return 0;
+        }
+    }
+
+    private static ElementInfo nullElementInfo;
+    
+    static {
+        try {
+            nullElementInfo = new NullElementInfo();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
 	protected Null(Universe universe) {
-		super(universe, new HeapObjectReference(Universe.NULL), null);
+		super(universe, new HeapObjectReference(Universe.NULL), nullElementInfo);
 	}
 
     @Override

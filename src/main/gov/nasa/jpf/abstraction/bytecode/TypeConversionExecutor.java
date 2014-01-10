@@ -19,7 +19,7 @@ public class TypeConversionExecutor {
 	public Instruction execute(ThreadInfo ti, TypeConvertor ins) {
 		StackFrame sf = ti.getModifiableTopFrame();
 		Attribute attr = Attribute.ensureNotNull(source.getAttribute(sf));
-		AbstractValue abs_val = null;
+		AbstractValue abs_val = attr.getAbstractValue();
         Instruction ret;
 		
 		if (abs_val == null) {

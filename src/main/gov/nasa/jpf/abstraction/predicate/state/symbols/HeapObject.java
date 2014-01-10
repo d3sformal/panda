@@ -36,7 +36,7 @@ public class HeapObject extends StructuredValue implements StructuredObject {
     protected final int compareSlots(StructuredValue value) {
         //HeapObject object = (HeapObject) value;
 
-        return 0;
+        return Integer.valueOf(hashCode()).compareTo(value.hashCode());
     }
 	
 	@Override

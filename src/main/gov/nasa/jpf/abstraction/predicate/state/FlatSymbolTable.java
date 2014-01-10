@@ -88,6 +88,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	 * Classes (holders for static fields)
 	 */
 	private Map<PackageAndClass, ClassObject> classes = new HashMap<PackageAndClass, ClassObject>();
+
 	private PredicateAbstraction abstraction;
 	
 	public FlatSymbolTable(PredicateAbstraction abstraction) {
@@ -105,7 +106,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public Set<PackageAndClass> getClasses() {
 		return classes.keySet();
 	}
-	
+
 	public LocalVariable getLocal(Root l) {
 		return locals.get(l);
 	}
@@ -163,6 +164,10 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			classes.put(c, v);
 		}
 	}
+
+    public void addThread(ThreadInfo threadInfo) {
+        universe.add(threadInfo, threadInfo.getThreadObject());
+    }
 	
 	/**
 	 * Resolve a path to all values it may be pointing to (primitive/objects)
@@ -508,7 +513,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			
 			clone.classes.put(cClone, cValue);
 		}
-		
+
 		return clone;
 	}
 	

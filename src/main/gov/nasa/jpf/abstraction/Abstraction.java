@@ -59,7 +59,7 @@ public abstract class Abstraction {
     /**
      * Informs the abstraction about the start of a search (called once at the beginning)
      */
-	public void start(MethodInfo method) {
+	public void start(ThreadInfo thread) {
 	}
 	
     /**

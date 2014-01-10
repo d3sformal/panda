@@ -53,6 +53,7 @@ public class INVOKEVIRTUAL extends gov.nasa.jpf.jvm.bytecode.INVOKEVIRTUAL {
          * this allows predicate abstraction to reason about argument assignment
          *
          * These copies of attributes are preserved during the execution of the method and may be used after return.
+         * We cannot rely solely on argument attributes for this reason.
          */
 		for (int i = 0; i < after.getMethodInfo().getNumberOfStackArguments(); ++i) {
 			Attribute attr = (Attribute) before.getOperandAttr(i);

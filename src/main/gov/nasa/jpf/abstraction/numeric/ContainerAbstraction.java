@@ -202,9 +202,9 @@ public class ContainerAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void start(MethodInfo method) {
+	public void start(ThreadInfo threadInfo) {
 		for (Abstraction abs : list) {
-			abs.start(method);
+			abs.start(threadInfo);
 		}
 	}
 	

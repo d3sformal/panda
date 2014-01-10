@@ -45,7 +45,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	@Override
 	public FlatSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
 		FlatSymbolTable ret = new FlatSymbolTable(abstraction);
-		
+
 		LocalVarInfo[] locals = method.getLocalVars() == null ? new LocalVarInfo[0] : method.getLocalVars();
 		
 		/**

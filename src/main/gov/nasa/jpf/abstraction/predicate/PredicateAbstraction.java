@@ -95,13 +95,20 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void start(MethodInfo method) {	
+	public void start(ThreadInfo mainThread) {
+        MethodInfo method = mainThread.getTopFrameMethodInfo();
+
 		SymbolTableStack symbols = new SymbolTableStack();
 		PredicateValuationStack predicates = new PredicateValuationStack();
-		
+
 		State state = new State(symbols, predicates);
 		
 		trace.push(state);
+
+        /**
+         * Register the main thread as it is not explicitely created elsewhere
+         */
+        symbolTable.get(0).addThread(mainThread);
 	}
 
 	@Override

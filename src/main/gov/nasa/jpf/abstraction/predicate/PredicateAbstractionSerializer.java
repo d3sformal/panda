@@ -81,6 +81,10 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         return canonical.get(value.getReference());
     }
 
+    private int currentType (StructuredValue value) {
+        return universe.get(value.getReference()).getElementInfo().getClassInfo().getName().hashCode();
+    }
+
     protected Set<StructuredValue> sortStructuredValues(Set<StructuredValue> values) {
     	Set<StructuredValue> order = new TreeSet<StructuredValue>();
 
@@ -90,15 +94,16 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     }
 
     protected void serializeHeap() {    
-	Set<StructuredValue> sorted = sortStructuredValues(collectReachableHeap());
-	int i = 0;
+    	Set<StructuredValue> sorted = sortStructuredValues(collectReachableHeap());
+	    int i = 0;
 	
-	canonical.clear();
+    	canonical.clear();
 	
-	for (StructuredValue value : sorted) {
-	    canonical.put(value.getReference(), i);
-	    ++i;
-	}
+	    for (StructuredValue value : sorted) {
+	        canonical.put(value.getReference(), i);
+    	    ++i;
+	    }
+
         for (StructuredValue value : sorted) {
             serializeStructuredValue(value);
         }
@@ -151,6 +156,8 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         // Collect all objects stored in live variable
 
         for (ThreadInfo ti : tl) {
+            heap.add(universe.get(ti.getThreadObjectRef()));
+
             if (ti.isAlive()) {
                 for (int depth = 0; depth < pabs.getSymbolTable().depth(); ++depth) {
                     FlatSymbolTable sym = pabs.getSymbolTable().get(depth);
@@ -190,7 +197,6 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
         // Construct reachable closure
 
-        Set<StructuredValue> closed = new HashSet<StructuredValue>();
         Set<StructuredValue> open = new HashSet<StructuredValue>();
 
         open.addAll(heap);
@@ -224,15 +230,17 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
                         StructuredValueSlot s = (StructuredValueSlot) slot;
 
                         for (StructuredValue child : s.getPossibleHeapValues()) {
-                            nextGen.add(child);
+                            if (!heap.contains(child)) {
+                                nextGen.add(child);
+                            }
                         }
                     }
                 }
             }
 
-            closed.addAll(open);
-            open = nextGen;
             heap.addAll(open);
+            open.clear();
+            open.addAll(nextGen);
         }
 
         return heap;
@@ -247,12 +255,14 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
         serializeHeap();
         serializeStackFrames();
+        serializeThreadStates();
 
         return buf.toArray();
     }
 
     @Override
     public void processReference(int objRef) {
+        buf.add(canonicalId(universe.get(objRef)));
     }
 
     @Override
@@ -308,6 +318,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
                 Set<StructuredValue> possibilitiesOrder = sortStructuredValues(possibilities);
 
                 for (StructuredValue p : possibilitiesOrder) {
+                    buf.add(currentType(p));
                     buf.add(canonicalId(p));
                 }
             }

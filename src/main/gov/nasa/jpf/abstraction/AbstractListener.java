@@ -35,9 +35,9 @@ import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 public class AbstractListener extends PropertyListenerAdapter {
 
 	@Override
-	public void searchStarted(Search search) {
+	public void vmInitialized(VM vm) {
 		RunDetector.initialiseNotRunning();
-		GlobalAbstraction.getInstance().start(search.getVM().getCurrentThread().getTopFrameMethodInfo());
+		GlobalAbstraction.getInstance().start(vm.getCurrentThread());
 	}
 	
 	@Override

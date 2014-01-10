@@ -2,8 +2,6 @@ package matching;
 
 public class Matching {
 
-    static int counter = 3;
-
     private static Object getX() {
         boolean b = true; // UNTRACKED
 
@@ -66,12 +64,8 @@ public class Matching {
     }
 
     //////////////////////////////// HELPER FUNCTIONS ////////////////////////////////
-    private static boolean ever() {
-        return --counter == 0;
-    }
-
     private static void wasteTime() {
-        for (; ever() ;) {}
+        for (int ever = 10; ever > 0 ; --ever) {}
     }
 
 }

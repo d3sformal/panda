@@ -39,7 +39,7 @@ public class HeapArray extends StructuredValue implements StructuredArray {
     protected final int compareSlots(StructuredValue value) {
         //HeapArray array = (HeapArray) value;
 
-        return 0;
+        return Integer.valueOf(hashCode()).compareTo(value.hashCode());
     }
 	
 	@Override

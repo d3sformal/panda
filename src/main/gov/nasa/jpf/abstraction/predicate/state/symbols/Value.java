@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public abstract class Value {
     /**
-     * Slots (fields, array elements) that this value may be member of
+     * Slots (fields, array elements) that this value may belong to
      */
 	private Set<Slot> slots = new HashSet<Slot>();
 	private Universe universe;

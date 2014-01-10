@@ -60,8 +60,8 @@ public class GlobalAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public void start(MethodInfo method) {
-		abs.start(method);
+	public void start(ThreadInfo threadInfo) {
+		abs.start(threadInfo);
 	}
 	
 	@Override

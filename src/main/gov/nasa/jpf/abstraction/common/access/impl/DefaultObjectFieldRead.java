@@ -94,7 +94,7 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
         // perform updates in the prefix
         //   statement: a.f = b
         //   access expression: c[a.f].f
-        //   expected result: fread(f, aread(c, fread(f, a)))
+        //   expected result: fread(f, aread(c, b))
 		Expression updated = getObject().update(expression, newExpression);
 
         // this is some path `... .f`

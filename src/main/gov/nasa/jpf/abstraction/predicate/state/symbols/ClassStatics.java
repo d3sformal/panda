@@ -40,7 +40,7 @@ public class ClassStatics extends StructuredValue implements StructuredObject {
     public final int compareSlots(StructuredValue value) {
         //ClassStatics statics = (ClassStatics) value;
 
-        return 0;
+        return Integer.valueOf(hashCode()).compareTo(value.hashCode());
     }
 	
 	@Override

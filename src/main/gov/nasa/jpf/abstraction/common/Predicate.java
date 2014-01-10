@@ -76,10 +76,10 @@ public abstract class Predicate implements PredicatesVisitable {
 		Set<Predicate> cur;
 		Set<Predicate> ret = selectDeterminants(universe);
 		
-		int formerSize = 0;
+		int prevSize = 0;
 		
-		while (formerSize != ret.size()) {
-			formerSize = ret.size();
+		while (prevSize != ret.size()) {
+			prevSize = ret.size();
 
 			cur = new HashSet<Predicate>();
 
