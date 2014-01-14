@@ -5,6 +5,7 @@ public class Matching {
     private static Object getX() {
         boolean b = true; // UNTRACKED
 
+		// non-deterministic choice because there is no predicate about variable 'b'
         if (b) {
             return new Object(); // ADDS 1 TRACE
         } else {
@@ -15,6 +16,7 @@ public class Matching {
     private static Object getY() {
         boolean b = true; // UNTRACKED
 
+		// non-deterministic choice because there is no predicate about variable 'b'
         if (b) {
             new Object(); // NO SIDE EFFECTS
         }
@@ -34,6 +36,7 @@ public class Matching {
         Object x = getX();
 
         // <--- MATCHED
+		// equivalent objects allocated on both execution paths
         
         wasteTime();
     }
@@ -42,6 +45,8 @@ public class Matching {
         Object y = getY();
 
         // <--- MATCHED
+		// equivalent objects returned on both execution paths
+		// ignored unreachable objects (see the code of getY)
         
         wasteTime();
     }
@@ -53,6 +58,8 @@ public class Matching {
             o = new Object(); // NO SIDE EFFECTS
 
             // <--- MATCHED
+			// a single reachable heap object at the end of loop iteration that matches object reachable from 'o' in the previous loop iteration
+			// each assignment to 'o' makes the previous value (object) unreachable
         }
     }
 
