@@ -29,6 +29,7 @@ import java.util.Comparator;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
+import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Fields;
 import gov.nasa.jpf.vm.ClassInfo;
@@ -171,6 +172,8 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
                                     StructuredValue object = universe.get(possibility.getReference());
 
                                     heap.add(object);
+                                } else {
+                                    throw new RuntimeException();
                                 }
                             }
                         }
@@ -190,6 +193,8 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
                         StructuredValue object = universe.get(ref);
 
                         heap.add(object);
+                    } else {
+                        throw new RuntimeException();
                     }
                 }
             }
@@ -232,6 +237,8 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
                         for (StructuredValue child : s.getPossibleHeapValues()) {
                             if (!heap.contains(child)) {
                                 nextGen.add(child);
+                            } else {
+                                throw new RuntimeException();
                             }
                         }
                     }
@@ -263,6 +270,11 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     @Override
     public void processReference(int objRef) {
         buf.add(canonicalId(universe.get(objRef)));
+    }
+
+    @Override
+    protected int getSerializedReferenceValue (ElementInfo ei){
+        return canonicalId(universe.get(ei.getObjectRef()));
     }
 
     @Override
