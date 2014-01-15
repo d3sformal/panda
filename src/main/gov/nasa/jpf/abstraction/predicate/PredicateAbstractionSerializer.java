@@ -187,14 +187,17 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         for (ClassLoaderInfo cl : ks.classLoaders) {
             if(cl.isAlive()) {
                 for (StaticElementInfo sei : cl.getStatics().liveStatics()) {
-                    String ref = sei.getClassInfo().getName();
+                    ClassInfo cls = sei.getClassInfo();
+                    String ref = cls.getName();
 
-                    if (universe.contains(ref)) {
-                        StructuredValue object = universe.get(ref);
+                    if (cls.isInitialized() && !cls.isInterface() && !cls.isAbstract() && !cls.isBuiltin() && !ref.startsWith("gov.nasa.jpf")) {
+                        if (universe.contains(ref)) {
+                            StructuredValue object = universe.get(ref);
 
-                        heap.add(object);
-                    } else {
-                        throw new RuntimeException("Reached an unknown class " + ref);
+                            heap.add(object);
+                        } else {
+                            throw new RuntimeException("Reached an unknown class " + ref);
+                        }
                     }
                 }
             }
