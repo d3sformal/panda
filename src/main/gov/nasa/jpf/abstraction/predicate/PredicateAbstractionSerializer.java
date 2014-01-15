@@ -237,8 +237,6 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
                         for (StructuredValue child : s.getPossibleHeapValues()) {
                             if (!heap.contains(child)) {
                                 nextGen.add(child);
-                            } else {
-                                throw new RuntimeException();
                             }
                         }
                     }
