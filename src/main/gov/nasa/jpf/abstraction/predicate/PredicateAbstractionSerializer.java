@@ -173,7 +173,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
                                     heap.add(object);
                                 } else {
-                                    throw new RuntimeException();
+                                    throw new RuntimeException("Reached an unknown object " + possibility.getReference());
                                 }
                             }
                         }
@@ -194,7 +194,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
                         heap.add(object);
                     } else {
-                        throw new RuntimeException();
+                        throw new RuntimeException("Reached an unknown class " + ref);
                     }
                 }
             }

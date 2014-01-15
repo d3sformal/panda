@@ -1,0 +1,15 @@
+@using=jpf-abstraction
+
+target=serialize.Serialize
+
+classpath=${jpf-abstraction}/build/examples
+sourcepath=${jpf-abstraction}/src/examples
+
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/serialize/Serialize.pred
+
+listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.listener.ExecTracker
+#,gov.nasa.jpf.abstraction.util.InstructionTracker
+#,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.predicate.util.SMTMonitor
+#,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor
+
+vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer

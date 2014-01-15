@@ -22,6 +22,7 @@ import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Types;
 
 public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
 	
@@ -39,7 +40,11 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
 			return actualNextInsn;
 		}
 		
-		GlobalAbstraction.getInstance().processVoidMethodReturn(ti, before, after);
+        if (before.getMethodInfo().getReturnTypeCode() == Types.T_VOID) {
+    		GlobalAbstraction.getInstance().processVoidMethodReturn(ti, before, after);
+        } else {
+    		GlobalAbstraction.getInstance().processMethodReturn(ti, before, after);
+        }
 		
 		return actualNextInsn;
 	}

@@ -45,7 +45,7 @@ public class ObjectExpressionDecorator extends DefaultObjectExpression {
 			}
 		}
 		
-		throw new RuntimeException("Invalid cast to Object Expression " + expression.getClass().getSimpleName());
+		throw new RuntimeException("Invalid cast to Object Expression " + expression + " " + (expression == null ? "null" : expression.getClass().getSimpleName()));
 	}
 	
 	public static ObjectExpressionDecorator create(Expression expression) {

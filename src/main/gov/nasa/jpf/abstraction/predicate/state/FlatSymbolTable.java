@@ -48,13 +48,9 @@ import java.util.TreeSet;
 public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	private static String[] doNotMonitor = new String[] {
-		"java",
-		"javax",
-		"sun",
-		"[", // Statics of arrays
-		"gov.nasa.jpf" // JPF
 	};
 	private static String[] doNotPrint = new String[] {
+		"java",
 		"boolean",
 		"byte",
 		"char",
@@ -63,7 +59,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		"int",
 		"long",
 		"short",
-		"void"
+		"void",
+		"[", // Statics of arrays
+		"javax",
+		"sun",
+		"gov.nasa.jpf" // JPF
 	};
 	private static int GUARANTEED_LENGTH = 8;
 	

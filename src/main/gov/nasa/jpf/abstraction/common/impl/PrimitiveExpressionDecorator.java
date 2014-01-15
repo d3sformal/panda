@@ -41,7 +41,7 @@ public class PrimitiveExpressionDecorator extends DefaultPrimitiveExpression {
 			}
 		}
 		
-		throw new RuntimeException("Invalid cast to Primitive Expression " + expression + " " + expression.getClass().getSimpleName());
+		throw new RuntimeException("Invalid cast to Primitive Expression " + expression + " " + (expression == null ? "null" : expression.getClass().getSimpleName()));
 	}
 
 	private static PrimitiveExpressionDecorator create(Expression expression) {
