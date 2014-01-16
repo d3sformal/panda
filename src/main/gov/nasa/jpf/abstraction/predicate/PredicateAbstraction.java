@@ -21,6 +21,7 @@ import gov.nasa.jpf.abstraction.predicate.state.State;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTableStack;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -88,6 +89,11 @@ public class PredicateAbstraction extends Abstraction {
 
 		return predicateValuation.evaluatePredicate(predicate);
 	}
+
+    @Override
+    public void processNewClass(ThreadInfo thread, ClassInfo classInfo) {
+        symbolTable.get(0).addClass(classInfo.getName(), thread, classInfo.getStaticElementInfo());
+    }
 	
 	@Override
 	public void informAboutBranchingDecision(BranchingDecision decision) {
@@ -122,6 +128,14 @@ public class PredicateAbstraction extends Abstraction {
 
         for (ClassInfo classInfo : VM.getVM().getCurrentApplicationContext().getSystemClassLoader()) {
             symbolTable.get(0).addClass(classInfo.getName(), mainThread, classInfo.getStaticElementInfo());
+        }
+
+        for (ElementInfo ei : VM.getVM().getHeap()) {
+            if (ei.isReferenceArray()) {
+                ClassInfo arrayClassInfo = ei.getClassInfo();
+
+                symbolTable.get(0).addClass(arrayClassInfo.getName(), mainThread, arrayClassInfo.getStaticElementInfo());
+            }
         }
 	}
 

@@ -10,6 +10,8 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
+
 public class ANEWARRAY extends gov.nasa.jpf.jvm.bytecode.ANEWARRAY {
 	
 	public ANEWARRAY(String typeDescriptor) {
@@ -32,6 +34,8 @@ public class ANEWARRAY extends gov.nasa.jpf.jvm.bytecode.ANEWARRAY {
 		}
 		
 		ElementInfo array = ti.getElementInfo(sf.peek());
+        
+        GlobalAbstraction.getInstance().processNewClass(ti, array.getClassInfo());
 		
 		sf = ti.getModifiableTopFrame();
 		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousArray.create(new Reference(ti, array), attr.getExpression())));
