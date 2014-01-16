@@ -24,6 +24,8 @@ import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.VM;
 
 /**
  * Predicate abstraction class
@@ -117,6 +119,10 @@ public class PredicateAbstraction extends Abstraction {
          * Register the main thread as it is not explicitely created elsewhere
          */
         symbolTable.get(0).addThread(mainThread);
+
+        for (ClassInfo classInfo : VM.getVM().getCurrentApplicationContext().getSystemClassLoader()) {
+            symbolTable.get(0).addClass(classInfo.getName(), mainThread, classInfo.getStaticElementInfo());
+        }
 	}
 
 	@Override

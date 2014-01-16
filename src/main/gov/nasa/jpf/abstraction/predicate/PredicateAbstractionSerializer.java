@@ -190,7 +190,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
                     ClassInfo cls = sei.getClassInfo();
                     String ref = cls.getName();
 
-                    if (cls.isInitialized() && !cls.isInterface() && !cls.isAbstract() && !cls.isBuiltin() && !ref.startsWith("gov.nasa.jpf")) {
+                    if (cls.isInitialized() && !cls.isInterface()) {
                         if (universe.contains(ref)) {
                             StructuredValue object = universe.get(ref);
 
