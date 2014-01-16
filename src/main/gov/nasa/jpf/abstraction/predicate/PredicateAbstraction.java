@@ -92,6 +92,7 @@ public class PredicateAbstraction extends Abstraction {
 
     @Override
     public void processNewClass(ThreadInfo thread, ClassInfo classInfo) {
+		// register class into the symbol table (universe)
         symbolTable.get(0).addClass(classInfo.getName(), thread, classInfo.getStaticElementInfo());
     }
 	
@@ -126,10 +127,12 @@ public class PredicateAbstraction extends Abstraction {
          */
         symbolTable.get(0).addThread(mainThread);
 
+		// register startup classes into the symbol table (universe)
         for (ClassInfo classInfo : VM.getVM().getCurrentApplicationContext().getSystemClassLoader()) {
             symbolTable.get(0).addClass(classInfo.getName(), mainThread, classInfo.getStaticElementInfo());
         }
 
+		// register classes for objects loaded during initialization
         for (ElementInfo ei : VM.getVM().getHeap()) {
             if (ei.isReferenceArray()) {
                 ClassInfo arrayClassInfo = ei.getClassInfo();
