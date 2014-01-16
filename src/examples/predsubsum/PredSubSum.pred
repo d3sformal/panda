@@ -1,0 +1,10 @@
+[method predsubsum.PredSubSum.doIt]
+v = 0
+v = 1
+v = 4
+v = 8
+v > 1
+v > 2
+v > 5
+v < 7
+v < 10
