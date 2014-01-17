@@ -126,6 +126,7 @@ public class PredicateAbstraction extends Abstraction {
          */
         symbolTable.get(0).addThread(mainThread);
 
+        /*
         for (ClassInfo classInfo : VM.getVM().getCurrentApplicationContext().getSystemClassLoader()) {
             symbolTable.get(0).addClass(classInfo.getName(), mainThread, classInfo.getStaticElementInfo());
         }
@@ -137,6 +138,7 @@ public class PredicateAbstraction extends Abstraction {
                 symbolTable.get(0).addClass(arrayClassInfo.getName(), mainThread, arrayClassInfo.getStaticElementInfo());
             }
         }
+        */
 	}
 
 	@Override

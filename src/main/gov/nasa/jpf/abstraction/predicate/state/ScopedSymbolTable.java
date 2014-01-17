@@ -110,7 +110,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		 * 
 		 * This will not take long if it already exists
 		 */
-		transitionScope.addClass(method.getClassName(), threadInfo, method.getClassInfo().getStaticElementInfo());
+		//transitionScope.addClass(method.getClassName(), threadInfo, method.getClassInfo().getStaticElementInfo());
 		
 		Object attrs[] = before.getArgumentAttrs(method);
 		LocalVarInfo args[] = method.getArgumentLocalVars();

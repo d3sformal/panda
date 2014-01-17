@@ -23,6 +23,7 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
@@ -56,5 +57,10 @@ public class AbstractListener extends PropertyListenerAdapter {
 	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
 		RunDetector.detectRunning(vm, nextInsn, execInsn);
 	}
+
+    @Override
+    public void classLoaded(VM vm, ClassInfo classInfo) {
+        GlobalAbstraction.getInstance().processNewClass(ThreadInfo.getCurrentThread(), classInfo);
+    }
 	
 }
