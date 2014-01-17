@@ -37,57 +37,6 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
     	return Notation.convertToString(this, policy);
 	}
     
-    /**
-     * @param universe Universe of all predicates that may or may not determine the value of this predicate
-     * @return A selection of those predicates from the universe that may directly determine the value of this predicate
-     */
-    public Set<Predicate> selectDeterminants(Set<Predicate> universe) {
-    	Set<Predicate> ret = new HashSet<Predicate>();
-    	
-	for (AccessExpression path : getPaths()) {
-    		for (Predicate candidate : universe) {
-			List<AccessExpression> candidatePaths = candidate.getPaths();
-
-			for (AccessExpression candidatePath : candidatePaths) {
-				for (AccessExpression candidateSubPath : candidatePath.getAllPrefixes()) {
-					if (candidateSubPath.isSimilarToPrefixOf(path)) {
-						ret.add(candidate);
-					}
-				}
-			}
-		}
-	}
-    	
-    	return ret;
-    }
-    
-    /**
-     * Finds a transitive closure of all predicates that may infer the value of this one.
-     * 
-     * @param universe Universe of all predicates that may or may not determine the value of this predicate
-     * @return A selection of those predicates from the universe that may determine the value of this predicate
-     */
-	public Set<Predicate> determinantClosure(Set<Predicate> universe) {
-		Set<Predicate> cur;
-		Set<Predicate> ret = selectDeterminants(universe);
-		
-		int prevSize = 0;
-		
-		while (prevSize != ret.size()) {
-			prevSize = ret.size();
-
-			cur = new HashSet<Predicate>();
-
-			for (Predicate predicate : ret) {
-				cur.addAll(predicate.selectDeterminants(universe));
-			}
-			
-			ret = cur;
-		}
-		
-		return ret;
-	}
-	
 	/**
 	 * Changes all access expression present in the predicate to a form which reflects an assignment "expression := newExpression"
 	 * 

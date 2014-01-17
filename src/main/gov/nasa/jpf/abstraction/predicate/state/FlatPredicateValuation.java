@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 
 /**
  * A predicate valuation for a single scope
@@ -37,6 +38,57 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		return clone;
 	}
 	
+    /**
+     * @param universe Universe of all predicates that may or may not determine the value of this predicate
+     * @return A selection of those predicates from the universe that may directly determine the value of this predicate
+     */
+    public static Set<Predicate> selectDeterminants(Predicate predicate, Set<Predicate> universe) {
+    	Set<Predicate> ret = new HashSet<Predicate>();
+    	
+	    for (AccessExpression path : predicate.getPaths()) {
+    		for (Predicate candidate : universe) {
+			    List<AccessExpression> candidatePaths = candidate.getPaths();
+
+			    for (AccessExpression candidatePath : candidatePaths) {
+				    for (AccessExpression candidateSubPath : candidatePath.getAllPrefixes()) {
+					    if (candidateSubPath.isSimilarToPrefixOf(path)) {
+						    ret.add(candidate);
+					    }
+				    }
+			    }
+		    }
+	    }
+    	
+    	return ret;
+    }
+    
+    /**
+     * Finds a transitive closure of all predicates that may infer the value of this one.
+     * 
+     * @param universe Universe of all predicates that may or may not determine the value of this predicate
+     * @return A selection of those predicates from the universe that may determine the value of this predicate
+     */
+	public static Set<Predicate> determinantClosure(Predicate predicate, Set<Predicate> universe) {
+		Set<Predicate> cur;
+		Set<Predicate> ret = selectDeterminants(predicate, universe);
+		
+		int prevSize = 0;
+		
+		while (prevSize != ret.size()) {
+			prevSize = ret.size();
+
+			cur = new HashSet<Predicate>();
+
+			for (Predicate p : ret) {
+				cur.addAll(selectDeterminants(p, universe));
+			}
+			
+			ret = cur;
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 * Suppose valuation of given predicates change, update all affected predicates, too
 	 * 
@@ -48,7 +100,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		int size = updated.size();
 		
 		for (Predicate affectedCandidate : valuations.keySet()) {
-			Set<Predicate> updatedDeterminants = affectedCandidate.selectDeterminants(updated.keySet());
+			Set<Predicate> updatedDeterminants = selectDeterminants(affectedCandidate, updated.keySet());
 			
 			if (!updatedDeterminants.isEmpty()) {
 				Predicate positiveWeakestPrecondition = affectedCandidate;
@@ -56,10 +108,10 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				
 				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 					
-				for (Predicate determinant : positiveWeakestPrecondition.determinantClosure(valuations.keySet())) {
+				for (Predicate determinant : determinantClosure(positiveWeakestPrecondition, valuations.keySet())) {
 					determinants.put(determinant, valuations.get(determinant));
 				}
-				for (Predicate determinant : negativeWeakestPrecondition.determinantClosure(valuations.keySet())) {
+				for (Predicate determinant : determinantClosure(negativeWeakestPrecondition, valuations.keySet())) {
 					determinants.put(determinant, valuations.get(determinant));
 				}
 				for (Predicate determinant : updatedDeterminants) {
@@ -196,10 +248,10 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				
 				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 				
-				for (Predicate determinant : positiveWeakestPrecondition.determinantClosure(valuations.keySet())) {
+				for (Predicate determinant : determinantClosure(positiveWeakestPrecondition, valuations.keySet())) {
 					determinants.put(determinant, valuations.get(determinant));
 				}
-				for (Predicate determinant : negativeWeakestPrecondition.determinantClosure(valuations.keySet())) {
+				for (Predicate determinant : determinantClosure(negativeWeakestPrecondition, valuations.keySet())) {
 					determinants.put(determinant, valuations.get(determinant));
 				}
 				
@@ -252,10 +304,10 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	
 			Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 				
-			for (Predicate determinant : positiveWeakestPrecondition.determinantClosure(valuations.keySet())) {
+			for (Predicate determinant : determinantClosure(positiveWeakestPrecondition, valuations.keySet())) {
 				determinants.put(determinant, valuations.get(determinant));
 			}
-			for (Predicate determinant : negativeWeakestPrecondition.determinantClosure(valuations.keySet())) {
+			for (Predicate determinant : determinantClosure(negativeWeakestPrecondition, valuations.keySet())) {
 				determinants.put(determinant, valuations.get(determinant));
 			}
 			
