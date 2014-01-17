@@ -100,6 +100,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 	
     	canonical.clear();
 	
+        // define canonical ids for all heap objects
 	    for (StructuredValue value : sorted) {
 	        canonical.put(value.getReference(), i);
     	    ++i;
@@ -154,7 +155,8 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         TreeSet<StructuredValue> heap = new TreeSet<StructuredValue>();
 
         ThreadList tl = ks.getThreadList();
-        // Collect all objects stored in live variable
+
+        // Collect all objects stored in live variables
 
         for (ThreadInfo ti : tl) {
             heap.add(universe.get(ti.getThreadObjectRef()));
@@ -303,6 +305,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 		int len = frame.getTopPos()+1;
 		buf.add(len);
 
+        // sort predicates
         Set<Predicate> order = new TreeSet<Predicate>(new Comparator<Predicate>() {
             public int compare(Predicate p1, Predicate p2) {
                 int h1 = p1.hashCode();
@@ -314,11 +317,14 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
         order.addAll(pabs.getPredicateValuation().getPredicates(depth));
 
+        // store all predicate valuations in the current scope in a predefined order
         for (Predicate p : order) {
             buf.add(p.hashCode());
             buf.add(pabs.getPredicateValuation().get(depth).get(p).ordinal());
         }
 
+        // store all local variables of a reference type
+        // use canonical ids of referred objects
         for (Root local : currentScope.getLocalVariables()) {
             LocalVariable v = currentScope.getLocal(local);
 
