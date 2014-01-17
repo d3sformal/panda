@@ -10,7 +10,7 @@ public class InstructionTracker extends ListenerAdapter {
 	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {		
 		if (RunDetector.isRunning()) {
 			String source = execInsn.getSourceLine() == null ? "" : "'" + execInsn.getSourceLine().trim() + "'";
-			System.out.println(execInsn.getClass().getSimpleName() + "\t" + source);
+			System.out.println("Current instruction: " + execInsn.getClass().getSimpleName() + "\t" + source);
 		}
 	}
 }

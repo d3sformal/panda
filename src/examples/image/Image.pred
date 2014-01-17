@@ -205,3 +205,68 @@ rec.bottom = 6
 rec = this.rectangles[0]
 rec = this.rectangles[1]
 
+[method image.Image.main]
+img.rectangles[0].left = 0
+img.rectangles[0].left = 1
+img.rectangles[0].left = 2
+img.rectangles[0].left = 3
+img.rectangles[0].left = 4
+img.rectangles[0].left = 5
+img.rectangles[0].left = 6
+
+img.rectangles[1].left = 0
+img.rectangles[1].left = 1
+img.rectangles[1].left = 2
+img.rectangles[1].left = 3
+img.rectangles[1].left = 4
+img.rectangles[1].left = 5
+img.rectangles[1].left = 6
+
+img.rectangles[0].right = 0
+img.rectangles[0].right = 1
+img.rectangles[0].right = 2
+img.rectangles[0].right = 3
+img.rectangles[0].right = 4
+img.rectangles[0].right = 5
+img.rectangles[0].right = 6
+
+img.rectangles[1].right = 0
+img.rectangles[1].right = 1
+img.rectangles[1].right = 2
+img.rectangles[1].right = 3
+img.rectangles[1].right = 4
+img.rectangles[1].right = 5
+img.rectangles[1].right = 6
+
+img.rectangles[0].top = 0
+img.rectangles[0].top = 1
+img.rectangles[0].top = 2
+img.rectangles[0].top = 3
+img.rectangles[0].top = 4
+img.rectangles[0].top = 5
+img.rectangles[0].top = 6
+
+img.rectangles[1].top = 0
+img.rectangles[1].top = 1
+img.rectangles[1].top = 2
+img.rectangles[1].top = 3
+img.rectangles[1].top = 4
+img.rectangles[1].top = 5
+img.rectangles[1].top = 6
+
+img.rectangles[0].bottom = 0
+img.rectangles[0].bottom = 1
+img.rectangles[0].bottom = 2
+img.rectangles[0].bottom = 3
+img.rectangles[0].bottom = 4
+img.rectangles[0].bottom = 5
+img.rectangles[0].bottom = 6
+
+img.rectangles[1].bottom = 0
+img.rectangles[1].bottom = 1
+img.rectangles[1].bottom = 2
+img.rectangles[1].bottom = 3
+img.rectangles[1].bottom = 4
+img.rectangles[1].bottom = 5
+img.rectangles[1].bottom = 6
+
