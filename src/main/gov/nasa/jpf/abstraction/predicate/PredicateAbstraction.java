@@ -127,6 +127,8 @@ public class PredicateAbstraction extends Abstraction {
          */
         symbolTable.get(0).addThread(mainThread);
 
+		// this is not needed anymore
+		// registration for all classes done through "processNewClass" (called from the AbstractListener)
         /*
 		// register startup classes into the symbol table (universe)
         for (ClassInfo classInfo : VM.getVM().getCurrentApplicationContext().getSystemClassLoader()) {

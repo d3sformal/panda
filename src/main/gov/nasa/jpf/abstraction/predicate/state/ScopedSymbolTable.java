@@ -105,10 +105,10 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		
 		scopes.push(transitionScope);
 
+		// this is not needed anymore
+		// registration for all classes done through "PredicateAbstraction.processNewClass" (called from the AbstractListener)
 		/**
 		 * Ensure that all statics are present for the current class (class in which the method is defined)
-		 * 
-		 * This will not take long if it already exists
 		 */
 		//transitionScope.addClass(method.getClassName(), threadInfo, method.getClassInfo().getStaticElementInfo());
 		
