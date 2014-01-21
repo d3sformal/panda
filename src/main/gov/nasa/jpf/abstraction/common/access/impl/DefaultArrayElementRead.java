@@ -100,20 +100,20 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
 		Expression updated = getArray().update(expression, newExpression);
-		
+
 		// An array has been changed -> aread(awrite(...), ..., ...)
 		if (expression instanceof ArrayExpression) {
-			ArrayAccessExpression a = (ArrayAccessExpression) expression;
+			ArrayElementRead a = (ArrayElementRead) expression;
 				
 			if (updated instanceof AccessExpression) {
 				AccessExpression updatedAccessExpression = (AccessExpression) updated;
 				
-				return create(updatedAccessExpression, DefaultArrayElementWrite.create(a.getArray(), getArrays().clone(), getIndex().clone(), newExpression), getIndex().update(expression, newExpression));
+				return create(updatedAccessExpression, DefaultArrayElementWrite.create(a.getArray(), a.getArrays().clone(), a.getIndex().clone(), newExpression), getIndex().update(expression, newExpression));
 			}
 				
 			return UndefinedAccessExpression.create();
 		}
-		
+
 		// This element is not affected by the update (a := b) so update recursively
 		if (updated instanceof AccessExpression) {
 			return create((AccessExpression) updated, getArrays().clone(), getIndex().update(expression, newExpression));

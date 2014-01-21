@@ -7,10 +7,10 @@ import gov.nasa.jpf.vm.VM;
 
 public class InstructionTracker extends ListenerAdapter {	
 	@Override
-	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {		
+	public void executeInstruction(VM vm, ThreadInfo curTh, Instruction execInsn) {		
 		if (RunDetector.isRunning()) {
 			String source = execInsn.getSourceLine() == null ? "" : "'" + execInsn.getSourceLine().trim() + "'";
-			System.out.println("Current instruction: " + execInsn.getClass().getSimpleName() + "\t" + source);
+			System.out.println("Current instruction [first step = " + curTh.isFirstStepInsn() +  "]: " + execInsn.getClass().getSimpleName() + "\t" + source);
 		}
 	}
 }

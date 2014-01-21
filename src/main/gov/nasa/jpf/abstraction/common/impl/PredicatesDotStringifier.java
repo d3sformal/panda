@@ -51,7 +51,7 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 	public void visit(ObjectFieldWrite expression) {
 		ret += expression.getName();
 		
-		ret += "| ";
+		ret += "{";
 		
 		boolean isStatic = expression.getObject() instanceof PackageAndClass;
 		
@@ -69,7 +69,7 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 		
 		expression.getNewValue().accept(this);
 		
-		ret += " |";
+		ret += "}";
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 
 	@Override
 	public void visit(ArrayElementWrite expression) {
-		ret += "| ";
+		ret += "{";
 		
 		expression.getArray().accept(this);
 		
@@ -101,7 +101,7 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
 		
 		expression.getNewValue().accept(this);
 		
-		ret += " |";
+		ret += "}";
 	}
 
 	@Override

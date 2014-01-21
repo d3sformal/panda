@@ -47,9 +47,9 @@ public class SMT {
 			listener.valuatePredicatesInvoked(predicates);
 		}
 	}
-	private static void valuatePredicatesInputGenerated(String input) {
+	private static void valuatePredicatesInputGenerated(Set<Predicate> predicates, String input) {
 		for (SMTListener listener : listeners) {
-			listener.valuatePredicatesInputGenerated(input);
+			listener.valuatePredicatesInputGenerated(predicates, input);
 		}
 	}
 	private static void valuatePredicatesExecuted(Map<Predicate, TruthValue> valuation) {
@@ -325,7 +325,7 @@ public class SMT {
 	}
 
 	private Map<Predicate, TruthValue> evaluate(Set<Predicate> predicates, String input, String debugInput) throws SMTException {
-		valuatePredicatesInputGenerated(debugInput);
+		valuatePredicatesInputGenerated(predicates, debugInput);
 		
 		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 		
