@@ -15,7 +15,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.List;
+import java.util.Comparator;
 
 /**
  * A predicate valuation for a single scope
@@ -179,10 +181,19 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
 			padding = padding < predicate.length() ? predicate.length() : padding;
 		}
+
+        Set<Predicate> sorted = new TreeSet<Predicate>(new Comparator<Predicate>() {
+            @Override
+            public int compare(Predicate p1, Predicate p2) {
+                return p1.toString(Notation.DOT_NOTATION).compareTo(p2.toString(Notation.DOT_NOTATION));
+            }
+        });
+
+        sorted.addAll(valuations.keySet());
 		
 		padding += 4;
 		
-		for (Predicate p : valuations.keySet()) {
+		for (Predicate p : sorted) {
 			String predicate = p.toString(Notation.DOT_NOTATION);
 			StringBuilder pad = new StringBuilder();
 			
