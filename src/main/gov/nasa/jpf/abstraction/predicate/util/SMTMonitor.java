@@ -51,7 +51,11 @@ public class SMTMonitor extends SMTListener {
             System.out.println("\t" + predicate.toString(Notation.DOT_NOTATION));
         }
 
+		System.out.println();
+
 		System.out.println(input);
+
+		System.out.println();
 	}
 	
 	@Override

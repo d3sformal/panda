@@ -37,22 +37,22 @@ public class SMT {
 		listeners.add(listener);
 	}
 	
-	private static void valuatePredicatesInvoked(Map<Predicate, PredicateValueDeterminingInfo> predicates) {
+	private static void notifyValuatePredicatesInvoked(Map<Predicate, PredicateValueDeterminingInfo> predicates) {
 		for (SMTListener listener : listeners) {
 			listener.valuatePredicatesInvoked(predicates);
 		}
 	}
-	private static void valuatePredicatesInvoked(Set<Predicate> predicates) {
+	private static void notifyValuatePredicatesInvoked(Set<Predicate> predicates) {
 		for (SMTListener listener : listeners) {
 			listener.valuatePredicatesInvoked(predicates);
 		}
 	}
-	private static void valuatePredicatesInputGenerated(Set<Predicate> predicates, String input) {
+	private static void notifyValuatePredicatesInputGenerated(Set<Predicate> predicates, String input) {
 		for (SMTListener listener : listeners) {
 			listener.valuatePredicatesInputGenerated(predicates, input);
 		}
 	}
-	private static void valuatePredicatesExecuted(Map<Predicate, TruthValue> valuation) {
+	private static void notifyValuatePredicatesExecuted(Map<Predicate, TruthValue> valuation) {
 		for (SMTListener listener : listeners) {
 			listener.valuatePredicatesExecuted(valuation);
 		}
@@ -313,19 +313,19 @@ public class SMT {
 	}
 	
 	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateValueDeterminingInfo> predicates) throws SMTException {
-		valuatePredicatesInvoked(predicates);
+		notifyValuatePredicatesInvoked(predicates);
 
     	return evaluate(predicates.keySet(), prepareInput(predicates, SEPARATOR), prepareInput(predicates, DEBUG_SEPARATOR));
 	}
 	
 	public Map<Predicate, TruthValue> valuatePredicates(Set<Predicate> predicates) throws SMTException {
-		valuatePredicatesInvoked(predicates);
+		notifyValuatePredicatesInvoked(predicates);
 
    		return evaluate(predicates, prepareInput(predicates, SEPARATOR), prepareInput(predicates, DEBUG_SEPARATOR));
 	}
 
 	private Map<Predicate, TruthValue> evaluate(Set<Predicate> predicates, String input, String debugInput) throws SMTException {
-		valuatePredicatesInputGenerated(predicates, debugInput);
+		notifyValuatePredicatesInputGenerated(predicates, debugInput);
 		
 		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 		
@@ -353,7 +353,7 @@ public class SMT {
 			i += 2;
 		}
 		
-		valuatePredicatesExecuted(valuation);
+		notifyValuatePredicatesExecuted(valuation);
 		
 		return valuation;
 	}
