@@ -33,7 +33,7 @@ import java.util.Iterator;
  */
 public class SMT {
 	
-    private static boolean USE_CACHE = true;
+    private static boolean USE_CACHE = false;
 	private static List<SMTListener> listeners = new LinkedList<SMTListener>();
 	
 	public static void registerListener(SMTListener listener) {
@@ -310,54 +310,15 @@ public class SMT {
 	}
 	
 	public Map<Predicate, TruthValue> valuatePredicates(Set<Predicate> predicates) throws SMTException {
-		notifyValuatePredicatesInvoked(predicates);
+        Map<Predicate, PredicateValueDeterminingInfo> predicateDeterminingInfos = new HashMap<Predicate, PredicateValueDeterminingInfo>();
 
-        List<Predicate> predicatesList = new LinkedList<Predicate>();
-		List<String> formulasList = new LinkedList<String>();
-		
-		PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
+        for (Predicate predicate : predicates) {
+            PredicateValueDeterminingInfo determiningInfo = new PredicateValueDeterminingInfo(predicate, Negation.create(predicate), new HashMap<Predicate, TruthValue>());
 
-		/**
-		 * Collect all variable and field names from all weakest preconditions
-		 */
-		for (Predicate predicate : predicates) {
-			collector.collect(predicate);
-		}
-				
-		for (Predicate predicate : predicates) {
-			Set<Predicate> additionalPredicates = collector.getAdditionalPredicates(predicate);
-            
-            predicatesList.add(predicate);
-			
-			formulasList.add(createFormula(predicate, additionalPredicates));
-			formulasList.add(createFormula(Negation.create(predicate), additionalPredicates));
-		}
-		
-		Set<String> classes = collector.getClasses();
-		Set<String> vars = collector.getVars();
-		Set<String> fields = collector.getFields();
-		Set<AccessExpression> objects = collector.getObjects();
-		
-		String input = prepareInput(classes, vars, fields, objects, predicatesList, formulasList, InputType.NORMAL);
-		String debugInput = prepareInput(classes, vars, fields, objects, predicatesList, formulasList, InputType.DEBUG);
+            predicateDeterminingInfos.put(predicate, determiningInfo);
+        }
 
-		notifyValuatePredicatesInputGenerated(debugInput);
-		
-        return evaluate(input, debugInput, predicatesList, formulasList);
-	}
-	
-	private static String createFormula(Predicate predicate, Set<Predicate> additionalClauses) {
-		PredicatesSMTStringifier stringifier = new PredicatesSMTStringifier();
-		
-		Predicate formula = Negation.create(predicate);
-		
-		for (Predicate clause : additionalClauses) {
-			formula = Conjunction.create(formula, clause);
-		}
-		
-		formula.accept(stringifier);
-		
-		return stringifier.getString();
+        return valuatePredicates(predicateDeterminingInfos);
 	}
 	
 	private static String convertToString(PredicatesComponentVisitable visitable) {

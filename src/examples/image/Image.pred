@@ -271,4 +271,6 @@ img.rectangles[1].bottom = 5
 img.rectangles[1].bottom = 6
 
 alength(arrlen, img.rectangles) = 2
-
+alength(arrlen, img.pixels) = class(image.Image).SIZE
+alength(arrlen, img.pixels[0]) = class(image.Image).SIZE
+alength(arrlen, img.pixels[1]) = class(image.Image).SIZE
