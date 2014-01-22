@@ -1,11 +1,11 @@
 [static]
-image.Image.SIZE >= 0
-image.Image.SIZE = 6
+class(image.Image).SIZE >= 0
+class(image.Image).SIZE = 6
 
 [object image.Image]
-alength(arrlen, this.pixels) = image.Image.SIZE
-alength(arrlen, this.pixels[0]) = image.Image.SIZE
-alength(arrlen, this.pixels[1]) = image.Image.SIZE
+alength(arrlen, this.pixels) = class(image.Image).SIZE
+alength(arrlen, this.pixels[0]) = class(image.Image).SIZE
+alength(arrlen, this.pixels[1]) = class(image.Image).SIZE
 
 alength(arrlen, this.rectangles) = 2
 
