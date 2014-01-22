@@ -11,6 +11,7 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.common.Notation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -25,12 +26,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Iterator;
 
 /**
  * Class responsible for invocations of SMT, transformation of predicates into input that the SMT can solve
  */
 public class SMT {
 	
+    private static boolean USE_CACHE = true;
 	private static List<SMTListener> listeners = new LinkedList<SMTListener>();
 	
 	public static void registerListener(SMTListener listener) {
@@ -47,9 +50,9 @@ public class SMT {
 			listener.valuatePredicatesInvoked(predicates);
 		}
 	}
-	private static void notifyValuatePredicatesInputGenerated(Set<Predicate> predicates, String input) {
+	private static void notifyValuatePredicatesInputGenerated(String input) {
 		for (SMTListener listener : listeners) {
-			listener.valuatePredicatesInputGenerated(predicates, input);
+			listener.valuatePredicatesInputGenerated(input);
 		}
 	}
 	private static void notifyValuatePredicatesExecuted(Map<Predicate, TruthValue> valuation) {
@@ -57,12 +60,36 @@ public class SMT {
 			listener.valuatePredicatesExecuted(valuation);
 		}
 	}
-	
-	private static String SEPARATOR = "";
-	private static String DEBUG_SEPARATOR = "\n";
+
+    private static enum InputType {
+        NORMAL,
+        DEBUG;
+
+        public String getSeparator() {
+            switch (this) {
+                case NORMAL: return "";
+                case DEBUG:  return "\n";
+                default:     return null;
+            }
+        }
+    }
+    private static enum FormulaType {
+        POSITIVE_WEAKEST_PRECONDITION_CHECK,
+        NEGATIVE_WEAKEST_PRECONDITION_CHECK;
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case POSITIVE_WEAKEST_PRECONDITION_CHECK: return "positive weakest precondition check";
+                case NEGATIVE_WEAKEST_PRECONDITION_CHECK: return "negative weakest precondition check";
+                default:                                  return null;
+            }
+        }
+    }
 	
 	private BufferedWriter in = null;
 	private BufferedReader out = null;
+    private SMTCache cache = new SMTCache();
 	
 	public SMT() throws SMTException {
 		try {
@@ -77,14 +104,16 @@ public class SMT {
 			OutputStream instream = mathsat.getOutputStream();
 			OutputStreamWriter inwriter = new OutputStreamWriter(instream);
 
+            String separator = InputType.NORMAL.getSeparator();
+
 			in = new BufferedWriter(inwriter);
             in.write(
-                "(set-logic QF_AUFLIA)" + SEPARATOR +
-		        "(declare-fun arr () (Array Int (Array Int Int)))" + SEPARATOR +
-    		    "(declare-fun arrlen () (Array Int Int))" + SEPARATOR +
-	    	    "(declare-fun fresh () Int)" + SEPARATOR +
-		        "(declare-fun null () Int)" + SEPARATOR +
-    		    SEPARATOR
+                "(set-logic QF_AUFLIA)" + separator +
+		        "(declare-fun arr () (Array Int (Array Int Int)))" + separator +
+    		    "(declare-fun arrlen () (Array Int Int))" + separator +
+	    	    "(declare-fun fresh () Int)" + separator +
+		        "(declare-fun null () Int)" + separator +
+    		    separator
             );
             in.flush();
 
@@ -148,9 +177,42 @@ public class SMT {
 
 		return values.toArray(new Boolean[values.size()]);
 	}
+
+    private String prepareFormula(Predicate predicate, String formula, FormulaType formulaType, InputType inputType, Boolean cachedValue) {
+        String separator = inputType.getSeparator();
+        String beginning = cachedValue == null ? "" : "; ";
+        String ret = "";
+
+        if (inputType == InputType.DEBUG) {
+            ret = "; Predicate: " + predicate.toString(Notation.DOT_NOTATION) + " (" + formulaType + ")\n";
+        }
+
+        if (inputType == InputType.DEBUG || cachedValue == null) {
+            ret +=  beginning + "(push 1)" + separator +
+	    			beginning + "(assert " + formula + ")" + separator +
+		    		beginning + "(check-sat)" + separator +
+			    	beginning + "(pop 1)" + separator;
+        }
+        if (inputType == InputType.NORMAL && cachedValue != null) {
+            ret +=  "(push 1)" + separator +
+                    "(assert " + cachedValue + ")" + separator +
+                    "(check-sat)" + separator +
+                    "(pop 1)" + separator;
+        }
+
+        if (inputType == InputType.DEBUG && cachedValue != null) {
+            ret += "; cached " + (cachedValue ? "sat" : "unsat") + "\n";
+        }
+
+        ret += separator;
+
+        return ret;
+    }
 	
-	private String prepareInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<String> formulas, String separator) {
-		String input = "(push 1)";
+	private String prepareInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<Predicate> predicates, List<String> formulas, InputType inputType) {
+        String separator = inputType.getSeparator();
+
+		String input = "(push 1)" + separator;
 
 		for (String c : classes) {
 			input += "(declare-fun class_" + c.replace("_", "__").replace('.', '_') + " () Int)" + separator;
@@ -174,13 +236,20 @@ public class SMT {
 		}
 		input += separator;
 
-		for (String formula : formulas) {
-			input +=
-				"(push 1)" + separator +
-				"(assert " + formula + ")" + separator +
-				"(check-sat)" + separator +
-				"(pop 1)" + separator +
-				separator;
+        Iterator<Predicate> predicatesIterator = predicates.iterator();
+        Iterator<String> formulasIterator = formulas.iterator();
+
+		while (predicatesIterator.hasNext()) {
+            Predicate predicate = predicatesIterator.next();
+
+            String positiveWeakestPreconditionFormula = formulasIterator.next();
+            String negativeWeakestPreconditionFormula = formulasIterator.next();
+
+            Boolean cachedPositiveValue = cache.get(positiveWeakestPreconditionFormula);
+            Boolean cachedNegativeValue = cache.get(negativeWeakestPreconditionFormula);
+
+			input += prepareFormula(predicate, positiveWeakestPreconditionFormula, FormulaType.POSITIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedPositiveValue);
+			input += prepareFormula(predicate, negativeWeakestPreconditionFormula, FormulaType.NEGATIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedNegativeValue);
 		}
 		
         input += "(pop 1)";
@@ -188,8 +257,11 @@ public class SMT {
 		return input;
 	}
 
-	private String prepareInput(Map<Predicate, PredicateValueDeterminingInfo> predicates, String separator) {
-		List<String> formulas = new LinkedList<String>();
+	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateValueDeterminingInfo> predicates) throws SMTException {
+		notifyValuatePredicatesInvoked(predicates);
+
+        List<Predicate> predicatesList = new LinkedList<Predicate>();
+		List<String> formulasList = new LinkedList<String>();
 		
 		PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
 
@@ -218,8 +290,10 @@ public class SMT {
 			
 			Set<Predicate> additionalPredicates = collector.getAdditionalPredicates(predicate);
 			
-			formulas.add(createFormula(det.positiveWeakestPrecondition, det.determinants, additionalPredicates));
-			formulas.add(createFormula(det.negativeWeakestPrecondition, det.determinants, additionalPredicates));
+            predicatesList.add(predicate);
+
+			formulasList.add(createFormula(det.positiveWeakestPrecondition, det.determinants, additionalPredicates));
+			formulasList.add(createFormula(det.negativeWeakestPrecondition, det.determinants, additionalPredicates));
 		}
 		
 		Set<String> classes = collector.getClasses();
@@ -227,11 +301,19 @@ public class SMT {
 		Set<String> fields = collector.getFields();
 		Set<AccessExpression> objects = collector.getObjects();
 		
-		return prepareInput(classes, vars, fields, objects, formulas, separator);
+		String input = prepareInput(classes, vars, fields, objects, predicatesList, formulasList, InputType.NORMAL);
+		String debugInput = prepareInput(classes, vars, fields, objects, predicatesList, formulasList, InputType.DEBUG);
+
+		notifyValuatePredicatesInputGenerated(debugInput);
+		
+        return evaluate(input, debugInput, predicatesList, formulasList);
 	}
 	
-	private String prepareInput(Set<Predicate> predicates, String separator) {
-		List<String> formulas = new LinkedList<String>();
+	public Map<Predicate, TruthValue> valuatePredicates(Set<Predicate> predicates) throws SMTException {
+		notifyValuatePredicatesInvoked(predicates);
+
+        List<Predicate> predicatesList = new LinkedList<Predicate>();
+		List<String> formulasList = new LinkedList<String>();
 		
 		PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
 
@@ -244,9 +326,11 @@ public class SMT {
 				
 		for (Predicate predicate : predicates) {
 			Set<Predicate> additionalPredicates = collector.getAdditionalPredicates(predicate);
+            
+            predicatesList.add(predicate);
 			
-			formulas.add(createFormula(predicate, additionalPredicates));
-			formulas.add(createFormula(Negation.create(predicate), additionalPredicates));
+			formulasList.add(createFormula(predicate, additionalPredicates));
+			formulasList.add(createFormula(Negation.create(predicate), additionalPredicates));
 		}
 		
 		Set<String> classes = collector.getClasses();
@@ -254,7 +338,12 @@ public class SMT {
 		Set<String> fields = collector.getFields();
 		Set<AccessExpression> objects = collector.getObjects();
 		
-		return prepareInput(classes, vars, fields, objects, formulas, separator);
+		String input = prepareInput(classes, vars, fields, objects, predicatesList, formulasList, InputType.NORMAL);
+		String debugInput = prepareInput(classes, vars, fields, objects, predicatesList, formulasList, InputType.DEBUG);
+
+		notifyValuatePredicatesInputGenerated(debugInput);
+		
+        return evaluate(input, debugInput, predicatesList, formulasList);
 	}
 	
 	private static String createFormula(Predicate predicate, Set<Predicate> additionalClauses) {
@@ -312,21 +401,7 @@ public class SMT {
 		return convertToString(Negation.create(formula));
 	}
 	
-	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateValueDeterminingInfo> predicates) throws SMTException {
-		notifyValuatePredicatesInvoked(predicates);
-
-    	return evaluate(predicates.keySet(), prepareInput(predicates, SEPARATOR), prepareInput(predicates, DEBUG_SEPARATOR));
-	}
-	
-	public Map<Predicate, TruthValue> valuatePredicates(Set<Predicate> predicates) throws SMTException {
-		notifyValuatePredicatesInvoked(predicates);
-
-   		return evaluate(predicates, prepareInput(predicates, SEPARATOR), prepareInput(predicates, DEBUG_SEPARATOR));
-	}
-
-	private Map<Predicate, TruthValue> evaluate(Set<Predicate> predicates, String input, String debugInput) throws SMTException {
-		notifyValuatePredicatesInputGenerated(predicates, debugInput);
-		
+	private Map<Predicate, TruthValue> evaluate(String input, String debugInput, List<Predicate> predicates, List<String> formulas) throws SMTException {
 		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 		
 		Boolean[] valid;
@@ -338,8 +413,15 @@ public class SMT {
         }
 
 		int i = 0;
+
+        Iterator<Predicate> predicatesIterator = predicates.iterator();
+        Iterator<String> formulasIterator = formulas.iterator();
 		
-		for (Predicate predicate : predicates) {
+		while (predicatesIterator.hasNext()) {
+            Predicate predicate = predicatesIterator.next();
+            String positiveWeakestPrecondition = formulasIterator.next();
+            String negativeWeakestPrecondition = formulasIterator.next();
+
 			if (valid[i] && valid[i + 1]) {
 				valuation.put(predicate, TruthValue.UNKNOWN);
 			} else if (valid[i]) {
@@ -349,6 +431,11 @@ public class SMT {
 			} else {
 				valuation.put(predicate, TruthValue.UNKNOWN);
 			}
+
+            if (USE_CACHE) {
+                cache.put(positiveWeakestPrecondition, valid[i]);
+                cache.put(negativeWeakestPrecondition, valid[i + 1]);
+            }
 			
 			i += 2;
 		}

@@ -44,14 +44,8 @@ public class SMTMonitor extends SMTListener {
 	}
 	
 	@Override
-	public void valuatePredicatesInputGenerated(Set<Predicate> predicates, String input) {
-        System.out.println("SMT Input for predicates: ");
-
-        for (Predicate predicate : predicates) {
-            System.out.println("\t" + predicate.toString(Notation.DOT_NOTATION));
-        }
-
-		System.out.println();
+	public void valuatePredicatesInputGenerated(String input) {
+        System.out.println("SMT Input: ");
 
 		System.out.println(input);
 
