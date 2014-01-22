@@ -180,7 +180,7 @@ public class SMT {
 
     private String prepareFormula(Predicate predicate, String formula, FormulaType formulaType, InputType inputType, Boolean cachedValue) {
         String separator = inputType.getSeparator();
-        String beginning = cachedValue == null ? "" : "; ";
+        String linePrefix = cachedValue == null ? "" : "; ";
         String ret = "";
 
         if (inputType == InputType.DEBUG) {
@@ -188,10 +188,10 @@ public class SMT {
         }
 
         if (inputType == InputType.DEBUG || cachedValue == null) {
-            ret +=  beginning + "(push 1)" + separator +
-	    			beginning + "(assert " + formula + ")" + separator +
-		    		beginning + "(check-sat)" + separator +
-			    	beginning + "(pop 1)" + separator;
+            ret +=  linePrefix + "(push 1)" + separator +
+	    			linePrefix + "(assert " + formula + ")" + separator +
+		    		linePrefix + "(check-sat)" + separator +
+			    	linePrefix + "(pop 1)" + separator;
         }
         if (inputType == InputType.NORMAL && cachedValue != null) {
             ret +=  "(push 1)" + separator +
