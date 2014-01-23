@@ -33,7 +33,7 @@ import java.util.Iterator;
  */
 public class SMT {
 	
-    private static boolean USE_CACHE = false;
+    private static boolean USE_CACHE = true;
 	private static List<SMTListener> listeners = new LinkedList<SMTListener>();
 	
 	public static void registerListener(SMTListener listener) {
@@ -178,30 +178,34 @@ public class SMT {
 		return values.toArray(new Boolean[values.size()]);
 	}
 
-    private String prepareFormula(Predicate predicate, String formula, FormulaType formulaType, InputType inputType, Boolean cachedValue) {
+    private String prepareFormula(Predicate predicate, String formula, FormulaType formulaType, InputType inputType, Boolean cachedIsValid) {
         String separator = inputType.getSeparator();
-        String linePrefix = cachedValue == null ? "" : "; ";
+        String linePrefix = cachedIsValid == null ? "" : "; ";
         String ret = "";
 
         if (inputType == InputType.DEBUG) {
             ret = "; Predicate: " + predicate.toString(Notation.DOT_NOTATION) + " (" + formulaType + ")\n";
         }
 
-        if (inputType == InputType.DEBUG || cachedValue == null) {
+        if (inputType == InputType.DEBUG || cachedIsValid == null) {
             ret +=  linePrefix + "(push 1)" + separator +
 	    			linePrefix + "(assert " + formula + ")" + separator +
 		    		linePrefix + "(check-sat)" + separator +
 			    	linePrefix + "(pop 1)" + separator;
         }
-        if (inputType == InputType.NORMAL && cachedValue != null) {
+
+		// when the cached value says "is valid" (boolean value of the corresponding parameter is 'true'),
+		// the SMT solver must answer "unsat" and therefore input must be "assert false"
+
+        if (inputType == InputType.NORMAL && cachedIsValid != null) {
             ret +=  "(push 1)" + separator +
-                    "(assert " + cachedValue + ")" + separator +
+                    "(assert " + (cachedIsValid ? "false" : "true") + ")" + separator +
                     "(check-sat)" + separator +
                     "(pop 1)" + separator;
         }
 
-        if (inputType == InputType.DEBUG && cachedValue != null) {
-            ret += "; cached " + (cachedValue ? "sat" : "unsat") + "\n";
+        if (inputType == InputType.DEBUG && cachedIsValid != null) {
+            ret += "; cached " + (cachedIsValid ? "unsat" : "sat") + "\n";
         }
 
         ret += separator;
@@ -366,7 +370,7 @@ public class SMT {
 		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 		
 		Boolean[] valid;
-		
+
         try {
     		valid = isValid(predicates.size(), input);
         } catch (SMTException e) {
