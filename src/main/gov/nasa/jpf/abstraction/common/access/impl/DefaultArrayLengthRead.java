@@ -112,7 +112,18 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 
         // there is no direct assignment to length, therefore the update must have happend in the prefix (if it affects this expression at all)
 
-        // the prefix is an access expression, e.g. `alength(arrlen, y.z)`
+        // the prefix is a new array
+        // e.g.
+        //   original expression: alength(arrlen, x)
+        //   statement: x := new Integer[10]
+		if (updated instanceof AnonymousArray) {
+			AnonymousArray updatedAnonymousArray = (AnonymousArray) updated;
+			
+            return updatedAnonymousArray.getArrayLength();
+			//return create(getArray().clone(), DefaultArrayLengthWrite.create(expression, getArrayLengths().clone(), updatedAnonymousArray.getArrayLength().clone()));
+		}
+
+        // the prefix is an access expression, as is the case with `alength(arrlen, y.z)` where the access expression is `y.z`
 		if (updated instanceof AccessExpression) {
 			AccessExpression updatedAccessExpression = (AccessExpression) updated;
 		
@@ -125,21 +136,8 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 			}
 
             // x := a
-            // alength(alengthwrite(arrlen, x, alength(arrlen, a)), y.z)
-			return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths().clone(), DefaultArrayLengthRead.create(expression, getArrayLengths().clone())));
-		}
-
-        // the prefix is a new array
-        // e.g.
-        //   original expression: alength(arrlen, x)
-        //   statement: x := new Integer[10]
-        //
-        // could probably return just the constant
-		if (updated instanceof AnonymousArray) {
-			AnonymousArray updatedAnonymousArray = (AnonymousArray) updated;
-			
-            return updatedAnonymousArray.getArrayLength();
-			//return create(getArray().clone(), DefaultArrayLengthWrite.create(expression, getArrayLengths().clone(), updatedAnonymousArray.getArrayLength().clone()));
+            // alength(arrlen, update(y.z, x, a)) ... possibly broken
+    	    return create(updatedAccessExpression, getArrayLengths().clone());
 		}
 
         /**
