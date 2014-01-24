@@ -136,7 +136,7 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 			}
 
             // x := a
-            // alength(arrlen, update(y.z, x, a)) ... possibly broken
+            // alength(arrlen, update(y.z, x, a))
     	    return create(updatedAccessExpression, getArrayLengths().clone());
 		}
 
