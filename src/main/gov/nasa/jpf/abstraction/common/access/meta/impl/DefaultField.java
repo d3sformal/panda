@@ -2,6 +2,8 @@ package gov.nasa.jpf.abstraction.common.access.meta.impl;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -11,6 +13,8 @@ import gov.nasa.jpf.abstraction.common.access.meta.Field;
  * An unmodified field
  */
 public class DefaultField implements Field {
+    private static Map<String, DefaultField> instances = new HashMap<String, DefaultField>();
+
 	public String name;
 	
 	protected DefaultField(String name) {
@@ -26,8 +30,13 @@ public class DefaultField implements Field {
 		if (name == null) {
 			return null;
 		}
+
+		//return new DefaultField(name);
+        if (!instances.containsKey(name)) {
+            instances.put(name, new DefaultField(name));
+        }
 		
-		return new DefaultField(name);
+        return instances.get(name);
 	}
 
 	@Override
@@ -37,7 +46,8 @@ public class DefaultField implements Field {
 	
 	@Override
 	public DefaultField clone() {
-		return create(getName());
+		//return create(getName());
+        return this;
 	}
 	
 	@Override

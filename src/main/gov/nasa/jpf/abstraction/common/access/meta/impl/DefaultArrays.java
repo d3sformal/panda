@@ -11,8 +11,15 @@ import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
  * The unmodified symbol "arr"
  */
 public class DefaultArrays implements Arrays {
+    private static DefaultArrays instance;
+
 	public static DefaultArrays create() {
-		return new DefaultArrays();
+		//return new DefaultArrays();
+        if (instance == null) {
+            instance = new DefaultArrays();
+        }
+
+        return instance;
 	}
 
 	@Override
@@ -31,7 +38,8 @@ public class DefaultArrays implements Arrays {
 	
 	@Override
 	public DefaultArrays clone() {
-		return create();
+		//return create();
+        return this;
 	}
 	
 	@Override

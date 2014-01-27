@@ -77,7 +77,8 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 
 	@Override
 	public DefaultRoot clone() {
-		return create(getName());
+		//return create(getName());
+        return this;
 	}
 
 	@Override

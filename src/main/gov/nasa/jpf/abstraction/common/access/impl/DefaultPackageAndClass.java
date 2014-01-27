@@ -2,6 +2,8 @@ package gov.nasa.jpf.abstraction.common.access.impl;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
@@ -12,6 +14,7 @@ import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
  * @see gov.nasa.jpf.abstraction.common.ObjectContext
  */
 public class DefaultPackageAndClass extends DefaultRoot implements PackageAndClass {
+    private static Map<String, DefaultPackageAndClass> instances = new HashMap<String, DefaultPackageAndClass>();
 	
 	protected DefaultPackageAndClass(List<String> name) {
 		this(createName(name));
@@ -57,15 +60,23 @@ public class DefaultPackageAndClass extends DefaultRoot implements PackageAndCla
 	
 	@Override
 	public DefaultPackageAndClass clone() {
-		return create(getName());
+		//return create(getName());
+        return this;
 	}
 	
 	public static DefaultPackageAndClass create(List<String> name) {
 		if (name == null || name.size() == 0) {
 			return null;
 		}
+
+        String nameStr = createName(name);
 		
-		return new DefaultPackageAndClass(name);
+		//return new DefaultPackageAndClass(name);
+        if (!instances.containsKey(nameStr)) {
+            instances.put(nameStr, new DefaultPackageAndClass(nameStr));
+        }
+
+        return instances.get(nameStr);
 	}
 	
 	public static DefaultPackageAndClass create(String name) {

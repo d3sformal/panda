@@ -9,12 +9,20 @@ import gov.nasa.jpf.abstraction.common.Tautology;
  * A special value representing a completely new object
  */
 public class DefaultFresh extends DefaultRoot implements Fresh {
+
+    private static DefaultFresh instance;
+
 	protected DefaultFresh() {
 		super("fresh");
 	}
 	
 	public static DefaultFresh create() {
-		return new DefaultFresh();
+		//return new DefaultFresh();
+        if (instance == null) {
+            instance = new DefaultFresh();
+        }
+
+        return instance;
 	}
 	
 	@Override
@@ -24,7 +32,8 @@ public class DefaultFresh extends DefaultRoot implements Fresh {
 
 	@Override
 	public DefaultFresh clone() {
-		return create();
+		//return create();
+        return this;
 	}
 	
 	@Override
