@@ -85,7 +85,6 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 				
 				if (!predicateAbstractionFailed) {
 					choices = choiceCandidates;
-					System.out.printf("Switch> Expression: %s %s\n", expr, choices);
 				}
 			}
 
@@ -98,12 +97,9 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 
 				lastIdx = DEFAULT;
 				int value = sf.peek(0);
-				System.out.printf("Switch> Value: %d (%s)\n", value, abs_v);
 
 				for (int i = 0, l = matches.length; i < l; i++) {
 					AbstractBoolean result = Abstraction._eq(value, abs_v, matches[i], null);
-				
-					System.out.printf("Switch> Check %d -- %s\n", matches[i], result);
 				
 					if (result != AbstractBoolean.FALSE) {
 						choices.add(i);
@@ -120,7 +116,6 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 				return this;
 			} else {
 				sf.pop();
-				System.out.printf("Switch> Result: default\n");
 				return mi.getInstructionAt(target);
 			}
 		} else {
@@ -128,7 +123,6 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 			int idx = ((IntChoiceFromList) cg).getNextChoice();
 			sf.pop();
 
-			System.out.printf("Switch> Result: choice #%d\n", idx);
 			if (idx == -1) {
 				return mi.getInstructionAt(target);
 			}

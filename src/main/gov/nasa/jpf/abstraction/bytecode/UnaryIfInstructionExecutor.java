@@ -67,10 +67,6 @@ public class UnaryIfInstructionExecutor {
 					abs_condition = AbstractBoolean.TOP;
 					break;
 				}
-							
-				if (pred != TruthValue.UNDEFINED) {
-					System.out.printf("%s> Predicate: %s = 0\n", name, expr.toString(Notation.DOT_NOTATION));
-				}
 			}		
 	
 			// In case there was no predicate abstraction / no symbolic expression (or the execution did not yet reach the target program or we already left it)
@@ -81,7 +77,6 @@ public class UnaryIfInstructionExecutor {
 				}
 			
 				// the condition is abstract
-				System.out.printf("%s> Values: %d (%s)\n", name, sf.peek(0), abs_v);
 	
 				// NUMERIC ABSTRACTION
 				abs_condition = br.getCondition(0, abs_v, 0, null);
@@ -112,8 +107,6 @@ public class UnaryIfInstructionExecutor {
 				GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)));
 			}
 		}
-
-		System.out.println(name + "> Result: " + conditionValue);
 		
 		sf.pop();
 		

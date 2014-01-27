@@ -63,8 +63,6 @@ public abstract class BinaryOperatorExecutor<T> {
 			return ret;
 		}
 
-		System.out.printf("%s> Values: %s (%s), %s (%s)\n", name, v2.toString(), abs_v2, v1.toString(), abs_v1);
-
 		if (result.getAbstractValue().isComposite()) {
 			if (!ti.isFirstStepInsn()) { // first time around
 				int size = result.getAbstractValue().getTokensNumber();
@@ -81,8 +79,6 @@ public abstract class BinaryOperatorExecutor<T> {
 				result.setAbstractValue(result.getAbstractValue().getToken(key));
 			}
 		}
-		
-		System.out.printf("%s> Result: %s\n", name, result);
 
 		storeResult(result, sf);
 

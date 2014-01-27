@@ -70,10 +70,6 @@ public class BinaryIfInstructionExecutor {
 					abs_condition = AbstractBoolean.TOP;
 					break;
 				}
-							
-				if (truth != TruthValue.UNDEFINED) {
-					System.out.printf("%s> Predicate: %s\n", name, predicate.toString(Notation.DOT_NOTATION));
-				}
 			}		
 	
 			// IF THE abs_condition COULD NOT BE DERIVED BY PREDICATE ABSTRACTION (IT IS NOT ACTIVE)
@@ -87,7 +83,6 @@ public class BinaryIfInstructionExecutor {
 				int v2 = sf.peek(1);
 			
 				// the condition is abstract
-				System.out.printf("%s> Values: %d (%s) %d (%s)\n", name, v2, abs_v2, v1, abs_v1);
 	
 				// NUMERIC ABSTRACTION
 				abs_condition = br.getCondition(v1, abs_v1, v2, abs_v2);
@@ -118,8 +113,6 @@ public class BinaryIfInstructionExecutor {
 				GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)));
 			}
 		}
-
-		System.out.println(name + "> Result: " + conditionValue);
 		
 		sf.pop();
 		sf.pop();

@@ -94,8 +94,6 @@ public abstract class BinaryComparatorExecutor<T> {
 				// UNDEFINED MEANS THERE WAS NO ABSTRACTION TO DECIDE THE VALIDITY OF THE PREDICATE
 				if (gt != TruthValue.UNDEFINED) {
 					result = new NonEmptyAttribute(SignsAbstraction.getInstance().create(lt != TruthValue.FALSE, eq != TruthValue.FALSE, gt != TruthValue.FALSE), null);
-	
-					System.out.printf("%s> Expressions: %s, %s\n", name, expr1.toString(Notation.DOT_NOTATION), expr2.toString(Notation.DOT_NOTATION));
 				}
 			}
 			
@@ -111,8 +109,6 @@ public abstract class BinaryComparatorExecutor<T> {
 				}
 				
 				result = cmp.getResult(v1, attr1, v2, attr2);
-				
-				System.out.printf("%s> Values: %s (%s), %s (%s)\n", name, v2.toString(), abs_v2, v1.toString(), abs_v1);
 			}
 			
 			/**
@@ -161,8 +157,6 @@ public abstract class BinaryComparatorExecutor<T> {
 				GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.TRUE));
 			}
 		}
-		
-		System.out.printf("%s> Result: %s\n", name, result.getAbstractValue());
 
 		storeResult(result, sf);
 

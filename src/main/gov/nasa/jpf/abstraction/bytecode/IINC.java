@@ -74,8 +74,6 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 		} else {
 			Attribute result = new NonEmptyAttribute(Abstraction._add(0, abs_v, increment, null), expression);
 
-			System.out.printf("IINC> Value:  %d (%s)\n", sf.getLocalVariable(index), abs_v);
-
 			if (result.getAbstractValue().isComposite()) {	
 				if (!ti.isFirstStepInsn()) { // first time around
 					int size = result.getAbstractValue().getTokensNumber();
@@ -93,8 +91,6 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 					result.setAbstractValue(result.getAbstractValue().getToken(key));
 				}
 			}
-			
-			System.out.printf("IINC> Result: %s\n", result);
 			
 			sf.setLocalAttr(index, result);
 			sf.setLocalVariable(index, 0, false);

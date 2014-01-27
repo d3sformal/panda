@@ -59,8 +59,6 @@ public abstract class UnaryOperatorExecutor<T> {
 			return ret;
 		}
 
-		System.out.printf("%s> Values: %s (%s)\n", name, v.toString(), abs_v);
-
 		if (result.getAbstractValue().isComposite()) {
 			if (!ti.isFirstStepInsn()) { // first time around
 				int size = result.getAbstractValue().getTokensNumber();
@@ -77,8 +75,6 @@ public abstract class UnaryOperatorExecutor<T> {
 				result.setAbstractValue(result.getAbstractValue().getToken(key));
 			}
 		}
-		
-		System.out.printf("%s> Result: %s\n", name, result);
 
 		storeResult(result, sf);
 
