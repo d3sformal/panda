@@ -5,7 +5,7 @@ import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Tautology;
 
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 /**
@@ -21,8 +21,8 @@ public class Negation extends Predicate {
 	}
 	
 	@Override
-	public List<AccessExpression> getPaths() {
-		return predicate.getPaths();
+	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
+		predicate.addAccessExpressionsToSet(out);
 	}
 
 	@Override

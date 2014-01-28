@@ -5,8 +5,7 @@ import gov.nasa.jpf.abstraction.common.impl.DefaultPrimitiveExpression;
 import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 /**
  * A common ancestor for +, -, *, /, % ... (all binary operations over symbolic expressions)
@@ -21,13 +20,9 @@ public abstract class Operation extends DefaultPrimitiveExpression {
 	}
 	
 	@Override
-	public List<AccessExpression> getAccessExpressions() {
-		List<AccessExpression> ret = new ArrayList<AccessExpression>();
-		
-		ret.addAll(a.getAccessExpressions());
-		ret.addAll(b.getAccessExpressions());
-		
-		return ret;
+	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
+		a.addAccessExpressionsToSet(out);
+		b.addAccessExpressionsToSet(out);
 	}
 	
 	protected static boolean argumentsDefined(Expression a, Expression b) {

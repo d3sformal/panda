@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
-import java.util.List;
+import java.util.Set;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldExpression;
@@ -27,11 +27,9 @@ public abstract class DefaultObjectFieldExpression extends DefaultObjectAccessEx
 	public abstract DefaultObjectFieldExpression clone();
 	
 	@Override
-	public List<AccessExpression> getAccessSubExpressions() {
-		List<AccessExpression> ret = super.getAccessSubExpressions();
+	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
+		super.addAccessSubExpressionsToSet(out);
 		
-		ret.addAll(field.getAccessSubExpressions());
-		
-		return ret;
+		field.addAccessSubExpressionsToSet(out);
 	}
 }

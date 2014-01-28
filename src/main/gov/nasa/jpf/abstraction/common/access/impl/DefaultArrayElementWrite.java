@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -50,12 +50,10 @@ public class DefaultArrayElementWrite extends DefaultArrayElementExpression impl
 	}
 	
 	@Override
-	public List<AccessExpression> getAccessSubExpressions() {
-		List<AccessExpression> ret = super.getAccessSubExpressions();
+	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
+	    super.addAccessSubExpressionsToSet(out);
 		
-		ret.addAll(newValue.getAccessExpressions());
-		
-		return ret;
+		newValue.addAccessExpressionsToSet(out);
 	}
 
 	@Override

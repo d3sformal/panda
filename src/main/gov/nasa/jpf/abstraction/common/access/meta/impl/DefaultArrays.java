@@ -1,7 +1,6 @@
 package gov.nasa.jpf.abstraction.common.access.meta.impl;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -43,7 +42,6 @@ public class DefaultArrays implements Arrays {
 	}
 	
 	@Override
-	public List<AccessExpression> getAccessSubExpressions() {
-		return new LinkedList<AccessExpression>();
+	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
 	}
 }

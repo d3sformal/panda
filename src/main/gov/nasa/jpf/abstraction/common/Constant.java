@@ -6,8 +6,7 @@ import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.impl.DefaultExpression;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 /**
@@ -21,8 +20,7 @@ public class Constant extends DefaultExpression implements PrimitiveExpression {
 	}
 
 	@Override
-	public List<AccessExpression> getAccessExpressions() {
-		return new ArrayList<AccessExpression>();
+	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
 	}
 
 	@Override

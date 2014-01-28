@@ -2,8 +2,7 @@ package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 /**
  * A common ancestor to Conjunction and Disjunction (and Implication)
@@ -20,13 +19,9 @@ public abstract class Formula extends Predicate {
 	}
 
 	@Override
-	public List<AccessExpression> getPaths() {
-		List<AccessExpression> ret = new ArrayList<AccessExpression>();
-		
-		ret.addAll(a.getPaths());
-		ret.addAll(b.getPaths());
-		
-		return ret;
+	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
+		a.addAccessExpressionsToSet(out);
+		b.addAccessExpressionsToSet(out);
 	}
 	
 	public static boolean argumentsDefined(Predicate a, Predicate b) {

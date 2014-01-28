@@ -1,8 +1,7 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.LinkedList;
+import java.util.Set;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -30,28 +29,21 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 	 * 3) any access expression present in an update expression (fwrite, awrite, alengthupdate ...)
 	 */
 	@Override
-	public final List<AccessExpression> getAccessExpressions() {
-		List<AccessExpression> ret = getAccessSubExpressions();
-		
-		ret.add(this);
-		
-		return ret;
+	public final void addAccessExpressionsToSet(Set<AccessExpression> out) {
+		addAccessSubExpressionsToSet(out);
+		out.add(this);
 	}
 
 	@Override
-	public final List<AccessExpression> getAllPrefixes() {
-		List<AccessExpression> ret = new LinkedList<AccessExpression>();
-
+	public final void addAllPrefixesToSet(Set<AccessExpression> out) {
 		AccessExpression prefix = this;
 
 		while (!(prefix instanceof Root)) {
-			ret.add(prefix);
+			out.add(prefix);
 			prefix = prefix.cutTail();
 		}
 
-		ret.add(prefix);
-
-		return ret;
+		out.add(prefix);
 	}
 
 	/**

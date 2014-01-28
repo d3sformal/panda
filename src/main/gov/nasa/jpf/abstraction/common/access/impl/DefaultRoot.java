@@ -1,7 +1,6 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -71,8 +70,7 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 	}
 
 	@Override
-	public List<AccessExpression> getAccessSubExpressions() {
-		return new LinkedList<AccessExpression>();
+	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -33,8 +33,7 @@ public class UndefinedAccessExpression extends DefaultRoot implements Undefined 
 	}
 
 	@Override
-	public List<AccessExpression> getAccessSubExpressions() {
-		return null;
+	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
 	}
 
 	@Override

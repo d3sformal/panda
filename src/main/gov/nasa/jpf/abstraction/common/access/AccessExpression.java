@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.common.access;
 
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -12,10 +12,13 @@ import gov.nasa.jpf.abstraction.common.Expression;
  *  p.q.C.d[e].f
  */
 public interface AccessExpression extends Expression {	
-	public List<AccessExpression> getAccessSubExpressions();
-	public List<AccessExpression> getAccessExpressions();
+	public void addAccessSubExpressionsToSet(Set<AccessExpression> out);
+
+    @Override
+	public void addAccessExpressionsToSet(Set<AccessExpression> out);
+
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements);
-	public List<AccessExpression> getAllPrefixes();
+	public void addAllPrefixesToSet(Set<AccessExpression> out);
 	
 	public Root getRoot();
 	public AccessExpression get(int depth);

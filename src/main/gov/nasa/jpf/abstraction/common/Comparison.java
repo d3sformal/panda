@@ -3,8 +3,7 @@ package gov.nasa.jpf.abstraction.common;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 /**
  * A common ancestor to all non-constant elemental predicates supported in this project
@@ -23,13 +22,9 @@ public abstract class Comparison extends Predicate {
 	}
 	
 	@Override
-	public List<AccessExpression> getPaths() {
-		List<AccessExpression> ret = new ArrayList<AccessExpression>();
-		
-		ret.addAll(a.getAccessExpressions());
-		ret.addAll(b.getAccessExpressions());
-		
-		return ret;
+	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
+		a.addAccessExpressionsToSet(out);
+		b.addAccessExpressionsToSet(out);
 	}
 	
 	/**

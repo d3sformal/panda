@@ -131,6 +131,7 @@
            debug="${debug}" source="${src_level}" deprecation="${deprecation}"
            classpathref="lib.path" includeantruntime="false">
       <compilerarg value="-Xlint:all" />
+      <compilerarg value="-Xlint:overrides" />
     </javac>
   </target>
 

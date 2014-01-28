@@ -1,7 +1,6 @@
 package gov.nasa.jpf.abstraction.concrete;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -59,8 +58,7 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 	}
 
 	@Override
-	public List<AccessExpression> getAccessSubExpressions() {
-		return new ArrayList<AccessExpression>();
+	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
 	}
 
 	@Override

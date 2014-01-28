@@ -17,7 +17,7 @@ import java.util.Set;
  * A common ancestor to all predicates used in the abstraction
  */
 public abstract class Predicate implements PredicatesComponentVisitable, BranchingCondition {
-	public abstract List<AccessExpression> getPaths();
+	public abstract void addAccessExpressionsToSet(Set<AccessExpression> out);
 	public abstract Predicate replace(Map<AccessExpression, Expression> replacements);
 
     public final Predicate replace(AccessExpression original, Expression replacement) {

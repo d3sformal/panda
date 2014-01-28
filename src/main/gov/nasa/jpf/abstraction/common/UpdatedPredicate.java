@@ -4,7 +4,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 /**
@@ -34,8 +34,8 @@ public class UpdatedPredicate extends Predicate {
 	}
 
 	@Override
-	public List<AccessExpression> getPaths() {		
-		return apply().getPaths();
+	public void addAccessExpressionsToSet(Set<AccessExpression> out) {		
+		apply().addAccessExpressionsToSet(out);
 	}
 
 	@Override

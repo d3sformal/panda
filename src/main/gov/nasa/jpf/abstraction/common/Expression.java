@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.common;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Predicate;
 
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 /**
@@ -15,7 +15,7 @@ public interface Expression extends PredicatesComponentVisitable, Cloneable {
 	/**
 	 * Collects all complete access expressions present in this one
 	 */
-	public List<AccessExpression> getAccessExpressions();
+	public void addAccessExpressionsToSet(Set<AccessExpression> out);
 	
 	/**
 	 * Performs substitution of an access expression

@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.common.impl;
 
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -53,8 +53,8 @@ public class PrimitiveExpressionDecorator extends DefaultPrimitiveExpression {
 	}
 
 	@Override
-	public List<AccessExpression> getAccessExpressions() {
-		return expression.getAccessExpressions();
+	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
+		expression.addAccessExpressionsToSet(out);
 	}
 
 	@Override

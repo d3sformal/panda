@@ -647,11 +647,17 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
 	private int getMaximalAccessExpressionLength() {
 		int ret = GUARANTEED_LENGTH;
+
+        Set<AccessExpression> paths = new HashSet<AccessExpression>();
 		
 		for (Predicate predicate : abstraction.getPredicateValuation().getPredicates()) {
-			for (AccessExpression expr : predicate.getPaths()) {
+            predicate.addAccessExpressionsToSet(paths);
+
+			for (AccessExpression expr : paths) {
 				ret = Math.max(ret, expr.getLength());
 			}
+
+            paths.clear();
 		}
 		
 		return ret;

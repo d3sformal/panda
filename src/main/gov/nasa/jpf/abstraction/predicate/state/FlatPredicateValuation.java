@@ -46,18 +46,30 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
      */
     public static Set<Predicate> selectDeterminants(Predicate predicate, Set<Predicate> universe) {
     	Set<Predicate> ret = new HashSet<Predicate>();
+
+        Set<AccessExpression> paths = new HashSet<AccessExpression>();
+		Set<AccessExpression> candidatePaths = new HashSet<AccessExpression>();
+        Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
+
+        predicate.addAccessExpressionsToSet(paths);
     	
-	    for (AccessExpression path : predicate.getPaths()) {
+	    for (AccessExpression path : paths) {
     		for (Predicate candidate : universe) {
-			    List<AccessExpression> candidatePaths = candidate.getPaths();
+                candidate.addAccessExpressionsToSet(candidatePaths);
 
 			    for (AccessExpression candidatePath : candidatePaths) {
-				    for (AccessExpression candidateSubPath : candidatePath.getAllPrefixes()) {
+                    candidatePath.addAllPrefixesToSet(prefixes);
+
+				    for (AccessExpression candidateSubPath : prefixes) {
 					    if (candidateSubPath.isSimilarToPrefixOf(path)) {
 						    ret.add(candidate);
 					    }
 				    }
+
+                    prefixes.clear();
 			    }
+
+                candidatePaths.clear();
 		    }
 	    }
     	
@@ -216,8 +228,12 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
 		Map<Predicate, PredicateValueDeterminingInfo> predicates = new HashMap<Predicate, PredicateValueDeterminingInfo>();
 
+        Set<AccessExpression> paths = new HashSet<AccessExpression>();
+
 		for (Predicate predicate : valuations.keySet()) {
 			boolean affects = false;
+
+            predicate.addAccessExpressionsToSet(paths);
 			
 			/**
 			 * Affected may contain completely different paths:
@@ -242,7 +258,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			 * are affected predicates
 			 */
 			for (AccessExpression path1 : resolvedAffected) {
-				for (AccessExpression path2 : predicate.getPaths()) {
+				for (AccessExpression path2 : paths) {
 					affects = affects || path1.isSimilarToPrefixOf(path2);
 				}
 			}

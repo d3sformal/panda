@@ -4,8 +4,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 /**
@@ -22,8 +21,7 @@ public class Tautology extends Predicate {
 	}
 
 	@Override
-	public List<AccessExpression> getPaths() {
-		return new ArrayList<AccessExpression>();
+	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
 	}
 
 	@Override

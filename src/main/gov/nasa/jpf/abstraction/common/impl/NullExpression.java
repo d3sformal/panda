@@ -1,7 +1,6 @@
 package gov.nasa.jpf.abstraction.common.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -21,8 +20,7 @@ public class NullExpression extends Constant implements ObjectExpression {
 	}
 
 	@Override
-	public List<AccessExpression> getAccessExpressions() {
-		return new ArrayList<AccessExpression>();
+	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
 	}
 
 	@Override

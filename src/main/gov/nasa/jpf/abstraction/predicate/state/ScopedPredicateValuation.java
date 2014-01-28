@@ -393,10 +393,14 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				predicate = predicate.replace(replacements);
 
 				boolean isUnwanted = false;
+
+                Set<AccessExpression> paths = new HashSet<AccessExpression>();
+
+                predicate.addAccessExpressionsToSet(paths);
 				
                 // If any of the symbols used in the predicate has changed 
 				for (LocalVarInfo l : notWantedLocalVariables) {
-					for (AccessExpression path : predicate.getPaths()) {
+					for (AccessExpression path : paths) {
 						isUnwanted |= path.isLocalVariable() && path.getRoot().getName().equals(l.getName());
 					}
 				}
@@ -416,12 +420,14 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
             // Select predicates that need to be updated (refer to an object that may have been modified by the callee: static, o.field, modified heap)
 					
 			Set<Predicate> toBeUpdated = new HashSet<Predicate>();
+            Set<AccessExpression> paths = new HashSet<AccessExpression>();
 			
 			for (Predicate predicate : scope.getPredicates()) {
+                predicate.addAccessExpressionsToSet(paths);
 				
 				boolean canBeAffected = false;
 				
-				for (AccessExpression path : predicate.getPaths()) {
+				for (AccessExpression path : paths) {
 					canBeAffected |= path.getRoot().isThis() && sameObject;
 					canBeAffected |= path.isStatic();
 					
@@ -434,6 +440,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				if (canBeAffected) {
 					toBeUpdated.add(predicate);
 				}
+
+                paths.clear();
 			}
 			
             // Use the relevant predicates to valuate predicates that need to be updated
