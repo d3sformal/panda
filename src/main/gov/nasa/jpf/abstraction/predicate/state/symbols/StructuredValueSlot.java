@@ -46,12 +46,8 @@ public class StructuredValueSlot extends Slot {
 	}
 	
 	@Override
-	public Set<Value> getPossibleValues() {
-		Set<Value> values = new HashSet<Value>();
-		
-		values.addAll(getPossibleHeapValues());
-		
-		return values;
+	public Set<? extends Value> getPossibleValues() {
+		return getPossibleHeapValues();
 	}
 
 	@Override

@@ -160,7 +160,7 @@ public class Universe implements Cloneable {
 	 * 
 	 * lookup({obj1, obj2}, a.f.g) = {obj1, obj3}
 	 */
-	public Set<Value> lookupValues(Set<Value> roots, AccessExpression expression) {
+	public Set<Value> lookupValues(Set<? extends Value> roots, AccessExpression expression) {
 		Set<Value> ret = new HashSet<Value>();
 		
 		for (Value root : roots) {

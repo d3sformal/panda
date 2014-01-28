@@ -75,7 +75,7 @@ public abstract class Slot {
 		return getPossibleValues().size();
 	}
 	
-	public abstract Set<Value> getPossibleValues();
+	public abstract Set<? extends Value> getPossibleValues();
 	public abstract Slot cloneInto(Universe universe, Value parent);
 	public abstract void clear();
 	public abstract void add(Set<Value> sources);
