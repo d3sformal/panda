@@ -181,64 +181,66 @@ public class SMT {
     private String prepareFormula(Predicate predicate, String formula, FormulaType formulaType, InputType inputType, Boolean cachedIsValid) {
         String separator = inputType.getSeparator();
         String linePrefix = cachedIsValid == null ? "" : "; ";
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
 
         if (inputType == InputType.DEBUG) {
-            ret = "; Predicate: " + predicate.toString(Notation.DOT_NOTATION) + " (" + formulaType + ")\n";
+            ret.append("; Predicate: " + predicate.toString(Notation.DOT_NOTATION) + " (" + formulaType + ")\n");
         }
 
         if (inputType == InputType.DEBUG || cachedIsValid == null) {
-            ret +=  linePrefix + "(push 1)" + separator +
-	    			linePrefix + "(assert " + formula + ")" + separator +
-		    		linePrefix + "(check-sat)" + separator +
-			    	linePrefix + "(pop 1)" + separator;
+            ret.append(linePrefix); ret.append("(push 1)"); ret.append(separator);
+            ret.append(linePrefix); ret.append("(assert "); ret.append(formula); ret.append(")"); ret.append(separator);
+		    ret.append(linePrefix); ret.append("(check-sat)"); ret.append(separator);
+			ret.append(linePrefix); ret.append("(pop 1)"); ret.append(separator);
         }
 
 		// when the cached value says "is valid" (boolean value of the corresponding parameter is 'true'),
 		// the SMT solver must answer "unsat" and therefore input must be "assert false"
 
         if (inputType == InputType.NORMAL && cachedIsValid != null) {
-            ret +=  "(push 1)" + separator +
-                    "(assert " + (cachedIsValid ? "false" : "true") + ")" + separator +
-                    "(check-sat)" + separator +
-                    "(pop 1)" + separator;
+            ret.append("(push 1)"); ret.append(separator);
+            ret.append("(assert "); ret.append(cachedIsValid ? "false" : "true"); ret.append(")"); ret.append(separator);
+            ret.append("(check-sat)"); ret.append(separator);
+            ret.append("(pop 1)"); ret.append(separator);
         }
 
         if (inputType == InputType.DEBUG && cachedIsValid != null) {
-            ret += "; cached " + (cachedIsValid ? "unsat" : "sat") + "\n";
+            ret.append("; cached "); ret.append(cachedIsValid ? "unsat" : "sat"); ret.append(separator);
         }
 
-        ret += separator;
+        ret.append(separator);
 
-        return ret;
+        return ret.toString();
     }
 	
 	private String prepareInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<Predicate> predicates, List<String> formulas, InputType inputType) {
         String separator = inputType.getSeparator();
 
-		String input = "(push 1)" + separator;
+		StringBuilder input = new StringBuilder();
+
+        input.append("(push 1)"); input.append(separator);
 
 		for (String c : classes) {
-			input += "(declare-fun class_" + c.replace("_", "__").replace('.', '_') + " () Int)" + separator;
+			input.append("(declare-fun class_"); input.append(c.replace("_", "__").replace('.', '_')); input.append(" () Int)"); input.append(separator);
 		}
-		input += separator;
+		input.append(separator);
 		
 		for (String var : vars) {
-			input += "(declare-fun var_" + var + " () Int)" + separator;
+			input.append("(declare-fun var_"); input.append(var); input.append(" () Int)"); input.append(separator);
 		}
-		input += separator;
+		input.append(separator);
 		
 		for (String field : fields) {
-			input += "(declare-fun field_" + field + " () (Array Int Int))" + separator;
+			input.append("(declare-fun field_"); input.append(field); input.append(" () (Array Int Int))"); input.append(separator);
 		}
-		input += separator;
+		input.append(separator);
 		
 		for (AccessExpression object : objects) {
 			Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.create(DefaultFresh.create(), object)));
 			
-			input += "(assert " + convertToString(distinction) + ")" + separator;
+			input.append("(assert "); input.append(convertToString(distinction)); input.append(")"); input.append(separator);
 		}
-		input += separator;
+		input.append(separator);
 
         Iterator<Predicate> predicatesIterator = predicates.iterator();
         Iterator<String> formulasIterator = formulas.iterator();
@@ -252,13 +254,13 @@ public class SMT {
             Boolean cachedPositiveValue = cache.get(positiveWeakestPreconditionFormula);
             Boolean cachedNegativeValue = cache.get(negativeWeakestPreconditionFormula);
 
-			input += prepareFormula(predicate, positiveWeakestPreconditionFormula, FormulaType.POSITIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedPositiveValue);
-			input += prepareFormula(predicate, negativeWeakestPreconditionFormula, FormulaType.NEGATIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedNegativeValue);
+			input.append(prepareFormula(predicate, positiveWeakestPreconditionFormula, FormulaType.POSITIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedPositiveValue));
+			input.append(prepareFormula(predicate, negativeWeakestPreconditionFormula, FormulaType.NEGATIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedNegativeValue));
 		}
 		
-        input += "(pop 1)";
+        input.append("(pop 1)");
 		
-		return input;
+		return input.toString();
 	}
 
 	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateValueDeterminingInfo> predicates) throws SMTException {

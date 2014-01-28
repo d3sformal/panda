@@ -34,128 +34,128 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	
 	@Override
 	public void visit(Negation predicate) {
-		ret += "(not ";
+		ret.append("(not ");
 		
 		predicate.predicate.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 	
 	@Override
 	public void visit(Conjunction predicate) {
-		ret += "(and ";
+		ret.append("(and ");
 		
 		predicate.a.accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		predicate.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 	
 	@Override
 	public void visit(Disjunction predicate) {
-		ret += "(or ";
+		ret.append("(or ");
 		
 		predicate.a.accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		predicate.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 	
 	@Override
 	public void visit(Implication predicate) {
-		ret += "(=> ";
+		ret.append("(=> ");
 		
 		predicate.a.accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		predicate.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 	
 	@Override
 	public void visit(LessThan predicate) {
-		ret += "(< ";
+		ret.append("(< ");
 		
 		predicate.a.accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		predicate.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 	
 	@Override
 	public void visit(Equals predicate) {
-		ret += "(= ";
+		ret.append("(= ");
 		
 		predicate.a.accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		predicate.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 	
 	@Override
 	public void visit(Add expression) {
-		ret += "(+ ";
+		ret.append("(+ ");
 		
 		expression.a.accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 	
 	@Override
 	public void visit(Subtract expression) {
-		ret += "(- ";
+		ret.append("(- ");
 		
 		expression.a.accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 	
 	@Override
 	public void visit(Multiply expression) {
-		ret += "(* ";
+		ret.append("(* ");
 		
 		expression.a.accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 	
 	@Override
 	public void visit(Divide expression) {
-		ret += "(/ ";
+		ret.append("(/ ");
 		
 		expression.a.accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 	
 	@Override
@@ -167,163 +167,163 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 	@Override
 	public void visit(Constant expression) {
 		if (expression.value.doubleValue() < 0) {
-			ret += "(- " + (-expression.value.doubleValue()) + ")";
+			ret.append("(- " + (-expression.value.doubleValue()) + ")");
 		} else {
-			ret += expression;
+			ret.append(expression);
 		}
 	}
 
 	@Override
 	public void visit(AnonymousArray expression) {
-		ret += "fresh";
+		ret.append("fresh");
 	}
 
 	@Override
 	public void visit(AnonymousObject expression) {
-		ret += "fresh";
+		ret.append("fresh");
 	}
 
 	@Override
 	public void visit(Root expression) {
-		ret += "var_" + expression.getName();
+		ret.append("var_" + expression.getName());
 	}
 
 	@Override
 	public void visit(Fresh expression) {
-		ret += "fresh";
+		ret.append("fresh");
 	}
 
 	@Override
 	public void visit(ObjectFieldRead expression) {
-		ret += "(select ";
+		ret.append("(select ");
 				
 		expression.getField().accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.getObject().accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(ObjectFieldWrite expression) {
-		ret += "(store ";
+		ret.append("(store ");
 		
 		expression.getField().accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.getObject().accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.getNewValue().accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(ArrayElementRead expression) {
-		ret += "(select ";
+		ret.append("(select ");
 		
-		ret += "(select ";
+		ret.append("(select ");
 		
 		expression.getArrays().accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.getArray().accept(this);
 		
-		ret += ")";
+		ret.append(")");
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.getIndex().accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(ArrayElementWrite expression) {
-		ret += "(store "; // Store the updated array into arrays
+		ret.append("(store "); // Store the updated array into arrays
 		
 		expression.getArrays().accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.getArray().accept(this);
 
-		ret += " ";
+		ret.append(" ");
 
-		ret += "(store "; // Update the array
+		ret.append("(store "); // Update the array
 
-		ret += "(select "; // Select the concrete array
+		ret.append("(select "); // Select the concrete array
 
 		expression.getArrays().accept(this);
 
-		ret += " ";
+		ret.append(" ");
 		
 		expression.getArray().accept(this);
 
-		ret += ")";
+		ret.append(")");
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.getIndex().accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.getNewValue().accept(this);
 		
-		ret += ")";
+		ret.append(")");
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(ArrayLengthRead expression) {
-		ret += "(select ";
+		ret.append("(select ");
 			
 		expression.getArrayLengths().accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.getArray().accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(ArrayLengthWrite expression) {
-		ret += "(store ";
+		ret.append("(store ");
 		
 		expression.getArrayLengths().accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.getArray().accept(this);
 		
-		ret += " ";
+		ret.append(" ");
 		
 		expression.getNewValue().accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(DefaultArrays meta) {
-		ret += "arr";
+		ret.append("arr");
 	}
 
 	@Override
 	public void visit(DefaultField meta) {
-		ret += "field_" + meta.getName();
+		ret.append("field_" + meta.getName());
 	}
 	
 	@Override
 	public void visit(PackageAndClass packageAndClass) {
-		ret += "class_" + packageAndClass.getName().replace("_", "__").replace('.', '_');
+		ret.append("class_" + packageAndClass.getName().replace("_", "__").replace('.', '_'));
 	}
 
 }

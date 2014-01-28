@@ -32,72 +32,72 @@ import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
  */
 public abstract class PredicatesStringifier implements PredicatesComponentVisitor {
 	
-	protected String ret = "";
+	protected StringBuilder ret = new StringBuilder();
 	
 	public String getString() {
-		return ret;
+		return ret.toString();
 	}
 
 	@Override
 	public void visit(Predicates predicates) {		
 		for (Context c : predicates.contexts) {
 			c.accept(this);
-			ret += "\n";
+			ret.append("\n");
 		}
 	}
 
 	@Override
 	public void visit(ObjectContext context) {
-		ret += "[object ";
+		ret.append("[object ");
 		
 		context.getPackageAndClass().accept(this);
 		
-		ret += "]\n";
+		ret.append("]\n");
 
 		for (Predicate p : context.predicates) {
 			p.accept(this);
-			ret += "\n";
+			ret.append("\n");
 		}
 	}
 
 	@Override
 	public void visit(MethodContext context) {
-		ret += "[method ";
+		ret.append("[method ");
 		
 		context.getMethod().accept(this);
 		
-		ret += "]\n";
+		ret.append("]\n");
 
 		for (Predicate p : context.predicates) {
 			p.accept(this);
-			ret += "\n";
+			ret.append("\n");
 		}
 	}
 
 	@Override
 	public void visit(StaticContext context) {
-		ret += "[static]\n";
+		ret.append("[static]\n");
 
 		for (Predicate p : context.predicates) {
 			p.accept(this);
-			ret += "\n";
+			ret.append("\n");
 		}
 	}
 
 	@Override
 	public void visit(Negation predicate) {
-		ret += "not(";
+		ret.append("not(");
 		
 		predicate.predicate.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(LessThan predicate) {
 		predicate.a.accept(this);
 		
-		ret += " < ";
+		ret.append(" < ");
 		
 		predicate.b.accept(this);
 	}
@@ -106,148 +106,148 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 	public void visit(Equals predicate) {
 		predicate.a.accept(this);
 		
-		ret += " = ";
+		ret.append(" = ");
 		
 		predicate.b.accept(this);
 	}
 	
 	@Override
 	public void visit(Tautology predicate) {
-		ret += "true";
+		ret.append("true");
 	}
 	
 	@Override
 	public void visit(Contradiction predicate) {
-		ret += "false";
+		ret.append("false");
 	}
 	
 	@Override
 	public void visit(Conjunction predicate) {
-		ret += "(";
+		ret.append("(");
 		
 		predicate.a.accept(this);
 
-		ret += " and ";
+		ret.append(" and ");
 		
 		predicate.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 	
 	@Override
 	public void visit(Disjunction predicate) {
-		ret += "(";
+		ret.append("(");
 		
 		predicate.a.accept(this);
 
-		ret += " or ";
+		ret.append(" or ");
 		
 		predicate.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 	
 	@Override
 	public void visit(Implication predicate) {
-		ret += "(";
+		ret.append("(");
 		
 		predicate.a.accept(this);
 
-		ret += " => ";
+		ret.append(" => ");
 		
 		predicate.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(EmptyExpression expression) {
-		ret += " ? ";
+		ret.append(" ? ");
 	}
 	
 	@Override
 	public void visit(NullExpression expression) {
-		ret += "null";
+		ret.append("null");
 	}
 
 	@Override
 	public void visit(Add expression) {
-		ret += "(";
+		ret.append("(");
 		
 		expression.a.accept(this);
 		
-		ret += " + ";
+		ret.append(" + ");
 		
 		expression.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(Subtract expression) {
-		ret += "(";
+		ret.append("(");
 		
 		expression.a.accept(this);
 		
-		ret += " - ";
+		ret.append(" - ");
 		
 		expression.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(Multiply expression) {
-		ret += "(";
+		ret.append("(");
 		
 		expression.a.accept(this);
 		
-		ret += " * ";
+		ret.append(" * ");
 		
 		expression.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(Divide expression) {
-		ret += "(";
+		ret.append("(");
 		
 		expression.a.accept(this);
 		
-		ret += " / ";
+		ret.append(" / ");
 		
 		expression.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(Modulo expression) {
-		ret += "(";
+		ret.append("(");
 		
 		expression.a.accept(this);
 		
-		ret += " % ";
+		ret.append(" % ");
 		
 		expression.b.accept(this);
 		
-		ret += ")";
+		ret.append(")");
 	}
 
 	@Override
 	public void visit(Constant expression) {
-		ret += expression.value;
+		ret.append(expression.value);
 	}
 	
 	@Override
 	public void visit(DefaultArrayLengths meta) {
-		ret += "arrlen";
+		ret.append("arrlen");
 	}
 	
 	@Override
 	public void visit(Undefined expression) {
-		ret += "<<UNDEFINED>>";
+		ret.append("<<UNDEFINED>>");
 	}
 	
 	@Override
@@ -257,16 +257,16 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 	
 	@Override
 	public void visit(PackageAndClass packageAndClass) {
-		ret += packageAndClass.getName();
+		ret.append(packageAndClass.getName());
 	}
 	
 	@Override
 	public void visit(Method method) {
 		method.getPackageAndClass().accept(this);
 		
-		ret += ".";
+		ret.append(".");
 		
-		ret += method.getName();
+		ret.append(method.getName());
 	}
 
 }
