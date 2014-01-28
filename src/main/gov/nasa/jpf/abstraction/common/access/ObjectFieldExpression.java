@@ -7,4 +7,7 @@ import gov.nasa.jpf.abstraction.common.access.meta.Field;
  */
 public interface ObjectFieldExpression extends ObjectAccessExpression {
 	public Field getField();
+
+    @Override
+    public ObjectFieldExpression createShallowCopy();
 }

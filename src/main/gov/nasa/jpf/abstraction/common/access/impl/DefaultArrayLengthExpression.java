@@ -23,6 +23,9 @@ public abstract class DefaultArrayLengthExpression extends DefaultArrayAccessExp
 	public ArrayLengths getArrayLengths() {
 		return arrayLengths;
 	}
+
+    @Override
+    public abstract DefaultArrayLengthExpression createShallowCopy();
 	
 	@Override
 	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {

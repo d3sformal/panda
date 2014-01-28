@@ -30,7 +30,6 @@ public class DefaultField implements Field {
 			return null;
 		}
 
-		//return new DefaultField(name);
         if (!instances.containsKey(name)) {
             instances.put(name, new DefaultField(name));
         }
@@ -41,12 +40,6 @@ public class DefaultField implements Field {
 	@Override
 	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit(this);
-	}
-	
-	@Override
-	public DefaultField clone() {
-		//return create(getName());
-        return this;
 	}
 	
 	@Override

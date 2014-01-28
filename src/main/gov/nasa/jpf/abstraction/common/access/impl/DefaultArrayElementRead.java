@@ -22,6 +22,8 @@ import gov.nasa.jpf.abstraction.common.Predicate;
  */
 public class DefaultArrayElementRead extends DefaultArrayElementExpression implements ArrayElementRead {
 
+    private Integer hashCodeValue;
+
 	protected DefaultArrayElementRead(AccessExpression array, Expression index) {
 		this(array, DefaultArrays.create(), index);
 	}
@@ -51,14 +53,14 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 		visitor.visit(this);
 	}
 
-	@Override
-	public DefaultArrayElementRead clone() {
-		return create(getArray().clone(), getArrays().clone(), getIndex().clone());
-	}
+    @Override
+    public DefaultArrayElementRead createShallowCopy() {
+        return create(getArray(), getArrays(), getIndex());
+    }
 	
 	@Override
 	public AccessExpression reRoot(AccessExpression newPrefix) {
-		return create(newPrefix, getArrays().clone(), getIndex().clone());
+		return create(newPrefix, getArrays(), getIndex());
 	}
 	
 	@Override
@@ -85,12 +87,16 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	
 	@Override
 	public int hashCode() {
-		return ("read_element_" + getArray().hashCode() + "_" + getIndex().hashCode()).hashCode();
+        if (hashCodeValue == null) {
+		    hashCodeValue = ("read_element_" + getArray().hashCode() + "_" + getIndex().hashCode()).hashCode();
+        }
+
+        return hashCodeValue;
 	}
 	
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return create(getObject().replaceSubExpressions(replacements), getArrays().clone(), getIndex().replace(replacements));
+		return create(getObject().replaceSubExpressions(replacements), getArrays(), getIndex().replace(replacements));
 	}
 	
 
@@ -108,7 +114,7 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 			if (updated instanceof AccessExpression) {
 				AccessExpression updatedAccessExpression = (AccessExpression) updated;
 				
-				return create(updatedAccessExpression, DefaultArrayElementWrite.create(a.getArray(), a.getArrays().clone(), a.getIndex().clone(), newExpression), getIndex().update(expression, newExpression));
+				return create(updatedAccessExpression, DefaultArrayElementWrite.create(a.getArray(), a.getArrays(), a.getIndex(), newExpression), getIndex().update(expression, newExpression));
 			}
 				
 			return UndefinedAccessExpression.create();
@@ -116,7 +122,7 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 
 		// This element is not affected by the update (a := b) so update recursively
 		if (updated instanceof AccessExpression) {
-			return create((AccessExpression) updated, getArrays().clone(), getIndex().update(expression, newExpression));
+			return create((AccessExpression) updated, getArrays(), getIndex().update(expression, newExpression));
 		}
 
 		// If the update causes that this expression accesses element of null

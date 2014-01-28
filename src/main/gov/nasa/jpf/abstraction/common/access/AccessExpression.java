@@ -36,8 +36,7 @@ public interface AccessExpression extends Expression {
 	public AccessExpression reRoot(AccessExpression newPrefix);
 	public AccessExpression reRoot(AccessExpression oldPrefix, AccessExpression newPrefix);
 	
-	@Override
-	public abstract AccessExpression clone();
+    public AccessExpression createShallowCopy();
 
     /**
      * Comparison of two access expressions ignoring indices, arrays

@@ -13,7 +13,6 @@ public class DefaultArrays implements Arrays {
     private static DefaultArrays instance;
 
 	public static DefaultArrays create() {
-		//return new DefaultArrays();
         if (instance == null) {
             instance = new DefaultArrays();
         }
@@ -33,12 +32,6 @@ public class DefaultArrays implements Arrays {
 		}
 		
 		return false;
-	}
-	
-	@Override
-	public DefaultArrays clone() {
-		//return create();
-        return this;
 	}
 	
 	@Override

@@ -34,7 +34,7 @@ public abstract class DefaultObjectAccessExpression extends DefaultAccessExpress
 
 	@Override
 	public final AccessExpression cutTail() {
-		return getObject().clone();
+		return getObject();
 	}
 
 	@Override
@@ -58,9 +58,9 @@ public abstract class DefaultObjectAccessExpression extends DefaultAccessExpress
 		
 		return getObject().get(depth);
 	}
-	
-	@Override
-	public abstract DefaultObjectAccessExpression clone();
+
+    @Override
+    public abstract DefaultObjectAccessExpression createShallowCopy();
 
 	@Override
 	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {

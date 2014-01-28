@@ -13,7 +13,6 @@ public class DefaultArrayLengths implements ArrayLengths {
     private static DefaultArrayLengths instance;
 
 	public static DefaultArrayLengths create() {
-		//return new DefaultArrayLengths();
         if (instance == null) {
             instance = new DefaultArrayLengths();
         }
@@ -35,12 +34,6 @@ public class DefaultArrayLengths implements ArrayLengths {
 		return false;
 	}
 	
-	@Override
-	public DefaultArrayLengths clone() {
-		//return create();
-        return this;
-	}
-
 	@Override
 	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
 	}

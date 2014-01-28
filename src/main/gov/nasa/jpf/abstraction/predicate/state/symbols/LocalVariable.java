@@ -65,7 +65,7 @@ public class LocalVariable extends Value {
 	public LocalVariable cloneInto(Universe universe) {
 		LocalVariable clone = new LocalVariable(universe);
 		
-		clone.localVariable = localVariable.clone();
+		clone.localVariable = localVariable;
 		clone.slot = slot.cloneInto(universe, clone);
 		
 		return clone;

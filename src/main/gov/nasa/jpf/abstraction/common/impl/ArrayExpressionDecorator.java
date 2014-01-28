@@ -19,9 +19,4 @@ public class ArrayExpressionDecorator extends ObjectExpressionDecorator implemen
 		
 		return new ArrayExpressionDecorator(expression);
 	}
-	
-	@Override
-	public ArrayExpressionDecorator clone() {
-		return create(expression);
-	}
 }

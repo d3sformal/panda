@@ -50,11 +50,6 @@ public class Constant extends DefaultExpression implements PrimitiveExpression {
 	}
 	
 	@Override
-	public Constant clone() {
-		return new Constant(value);
-	}
-	
-	@Override
 	public boolean equals(Object o) {
 		if (o instanceof Constant) {
 			Constant c = (Constant) o;
@@ -72,7 +67,7 @@ public class Constant extends DefaultExpression implements PrimitiveExpression {
 
 	@Override
 	public Constant update(AccessExpression expression, Expression newExpression) {
-		return clone();
+		return this;
 	}
 
 	@Override

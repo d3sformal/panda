@@ -15,6 +15,7 @@ import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
  */
 public class DefaultPackageAndClass extends DefaultRoot implements PackageAndClass {
     private static Map<String, DefaultPackageAndClass> instances = new HashMap<String, DefaultPackageAndClass>();
+    private Integer hashCodeValue;
 	
 	protected DefaultPackageAndClass(List<String> name) {
 		this(createName(name));
@@ -55,14 +56,17 @@ public class DefaultPackageAndClass extends DefaultRoot implements PackageAndCla
 	
 	@Override
 	public int hashCode() {
-		return ("class_" + getName()).hashCode();
+        if (hashCodeValue == null) {
+		    hashCodeValue = ("class_" + getName()).hashCode();
+        }
+
+        return hashCodeValue;
 	}
-	
-	@Override
-	public DefaultPackageAndClass clone() {
-		//return create(getName());
+
+    @Override
+    public DefaultPackageAndClass createShallowCopy() {
         return this;
-	}
+    }
 	
 	public static DefaultPackageAndClass create(List<String> name) {
 		if (name == null || name.size() == 0) {

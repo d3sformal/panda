@@ -24,11 +24,11 @@ public class UndefinedAccessExpression extends DefaultRoot implements Undefined 
 	public void accept(PredicatesComponentVisitor visitor) {
 		visitor.visit((Undefined) this);
 	}
-	
-	@Override
-	public UndefinedAccessExpression clone() {
-		return this;
-	}
+
+    @Override
+    public UndefinedAccessExpression createShallowCopy() {
+        return this;
+    }
 	
 	public static UndefinedAccessExpression create() {
 		//return new UndefinedAccessExpression();
@@ -45,7 +45,7 @@ public class UndefinedAccessExpression extends DefaultRoot implements Undefined 
 
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return clone();
+		return this;
 	}
 
 	@Override

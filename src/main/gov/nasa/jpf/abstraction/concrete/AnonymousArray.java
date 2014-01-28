@@ -27,11 +27,11 @@ public class AnonymousArray extends AnonymousObject implements ArrayExpression {
 		visitor.visit(this);
 	}
 
-	@Override
-	public AnonymousArray clone() {
-		return create(getReference(), length);
-	}
-	
+    @Override
+    public AnonymousArray createShallowCopy() {
+        return this;
+    }
+
 	@Override
 	public boolean isSimilarTo(AccessExpression expression) {
 		if (expression instanceof AnonymousArray) {

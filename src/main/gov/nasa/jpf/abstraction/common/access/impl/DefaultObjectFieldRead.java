@@ -18,6 +18,8 @@ import gov.nasa.jpf.abstraction.common.Predicate;
  */
 public class DefaultObjectFieldRead extends DefaultObjectFieldExpression implements ObjectFieldRead {
 
+    private Integer hashCodeValue;
+
 	protected DefaultObjectFieldRead(AccessExpression object, String name) {
 		this(object, DefaultField.create(name));
 	}
@@ -47,14 +49,14 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 		visitor.visit(this);
 	}
 
-	@Override
-	public DefaultObjectFieldRead clone() {
-		return create(getObject().clone(), getField());
-	}
+    @Override
+    public DefaultObjectFieldRead createShallowCopy() {
+        return create(getObject(), getField());
+    }
 
 	@Override
 	public AccessExpression reRoot(AccessExpression newPrefix) {
-		return create(newPrefix, getField().clone());
+		return create(newPrefix, getField());
 	}
 	
 	@Override
@@ -81,12 +83,16 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 	
 	@Override
 	public int hashCode() {
-		return ("read_field_" + getObject().hashCode() + "_" + getField().getName().hashCode()).hashCode();
+        if (hashCodeValue == null) {
+    		hashCodeValue = ("read_field_" + getObject().hashCode() + "_" + getField().getName().hashCode()).hashCode();
+        }
+
+        return hashCodeValue;
 	}
 	
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return create(getObject().replaceSubExpressions(replacements), getField().clone());
+		return create(getObject().replaceSubExpressions(replacements), getField());
 	}
 	
     /**
@@ -109,7 +115,7 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 				if (updated instanceof AccessExpression) {
 					AccessExpression updatedAccessExpression = (AccessExpression) updated;
 		
-					return create(updatedAccessExpression, DefaultObjectFieldWrite.create(r.getObject(), r.getField().clone(), newExpression));
+					return create(updatedAccessExpression, DefaultObjectFieldWrite.create(r.getObject(), r.getField(), newExpression));
 				}
 				
                 // propagate failure
@@ -122,7 +128,7 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
         // updated prefix is a path and can be extended
         // a.b.c.d.e ... return a.b.c.d.e.f
 		if (updated instanceof AccessExpression) {
-			return create((AccessExpression) updated, getField().clone());
+			return create((AccessExpression) updated, getField());
 		}
 		
         // updated prefix is null

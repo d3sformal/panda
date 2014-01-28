@@ -77,11 +77,6 @@ public class ObjectExpressionDecorator extends DefaultObjectExpression {
 	}
 
 	@Override
-	public DefaultObjectExpression clone() {
-		return create(expression.clone());
-	}
-
-	@Override
 	public Predicate getPreconditionForBeingFresh() {
 		return expression.getPreconditionForBeingFresh();
 	}

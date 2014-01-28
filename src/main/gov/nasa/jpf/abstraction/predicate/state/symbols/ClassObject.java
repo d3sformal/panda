@@ -55,7 +55,7 @@ public class ClassObject extends Value {
 	public ClassObject cloneInto(Universe universe) {
 		ClassObject clone = new ClassObject(universe);
 		
-		clone.classObject = classObject.clone();
+		clone.classObject = classObject;
 		clone.slot = slot.cloneInto(universe, clone);
 		
 		return clone;

@@ -4,6 +4,4 @@ import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.PrimitiveExpression;
 
 public abstract class DefaultPrimitiveExpression extends DefaultExpression implements PrimitiveExpression {
-	@Override
-	public abstract DefaultPrimitiveExpression clone();
 }

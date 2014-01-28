@@ -18,6 +18,7 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 public class DefaultRoot extends DefaultAccessExpression implements Root {
 
 	private String name;
+    private Integer hashCodeValue;
 	
 	protected DefaultRoot(String name) {
 		this.name = name;
@@ -39,7 +40,7 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 	
 	@Override
 	public final AccessExpression cutTail() {
-		return clone();
+		return this;
 	}
 	
 	@Override
@@ -73,11 +74,10 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
 	}
 
-	@Override
-	public DefaultRoot clone() {
-		//return create(getName());
+    @Override
+    public DefaultRoot createShallowCopy() {
         return this;
-	}
+    }
 
 	@Override
 	public int getLength() {
@@ -95,7 +95,7 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 			return newExpression;
 		}
 		
-		return clone();
+		return this;
 	}
 	
 	@Override
@@ -116,12 +116,16 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 	
 	@Override
 	public int hashCode() {
-		return ("root_" + getName()).hashCode();
+        if (hashCodeValue == null) {
+		    hashCodeValue = ("root_" + getName()).hashCode();
+        }
+
+        return hashCodeValue;
 	}
 
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return clone();
+		return this;
 	}
 
 	@Override

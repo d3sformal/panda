@@ -16,8 +16,7 @@ public abstract class DefaultArrayAccessExpression extends DefaultObjectAccessEx
 	public AccessExpression getArray() {
 		return getObject();
 	}
-	
-	@Override
-	public abstract DefaultArrayAccessExpression clone();
 
+    @Override
+    public abstract DefaultArrayAccessExpression createShallowCopy();
 }

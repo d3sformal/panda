@@ -30,8 +30,5 @@ public abstract class DefaultExpression implements Expression {
 	public final String toString(Notation policy) {
 		return Notation.convertToString(this, policy);
 	}
-	
-	@Override
-	public abstract DefaultExpression clone();
 
 }

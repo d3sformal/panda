@@ -27,12 +27,12 @@ public class NullExpression extends Constant implements ObjectExpression {
 
 	@Override
 	public NullExpression replace(Map<AccessExpression, Expression> replacements) {
-		return clone();
+		return this;
 	}
 
 	@Override
 	public NullExpression update(AccessExpression expression, Expression newExpression) {
-		return clone();
+		return this;
 	}
 
 	@Override
@@ -40,13 +40,7 @@ public class NullExpression extends Constant implements ObjectExpression {
 		visitor.visit(this);
 	}
 	
-	@Override
-	public NullExpression clone() {
-		return this;
-	}
-	
 	public static NullExpression create() {
-		//return new NullExpression();
         if (instance == null) {
             instance = new NullExpression();
         }

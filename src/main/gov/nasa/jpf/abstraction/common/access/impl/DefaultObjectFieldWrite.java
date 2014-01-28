@@ -17,6 +17,7 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implements ObjectFieldWrite {
 
 	private Expression newValue;
+    private Integer hashCodeValue;
 
 	protected DefaultObjectFieldWrite(AccessExpression object, String name, Expression newValue) {
 		this(object, DefaultField.create(name), newValue);
@@ -61,10 +62,10 @@ public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implem
 		visitor.visit(this);
 	}
 
-	@Override
-	public DefaultObjectFieldWrite clone() {
-		return create(getObject().clone(), getName(), newValue.clone());
-	}
+    @Override
+    public DefaultObjectFieldWrite createShallowCopy() {
+        return create(getObject(), getName(), getNewValue());
+    }
 	
 	@Override
 	public String getName() {
@@ -73,7 +74,7 @@ public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implem
 	
 	@Override
 	public AccessExpression reRoot(AccessExpression newPrefix) {
-		return create(newPrefix, getField().clone(), getNewValue().clone());
+		return create(newPrefix, getField(), getNewValue());
 	}
 	
 	@Override
@@ -100,12 +101,16 @@ public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implem
 	
 	@Override
 	public int hashCode() {
-		return ("write_field_" + getObject().hashCode() + "_" + getField().getName().hashCode() + "_" + getNewValue().hashCode()).hashCode();
+        if (hashCodeValue == null) {
+		    hashCodeValue = ("write_field_" + getObject().hashCode() + "_" + getField().getName().hashCode() + "_" + getNewValue().hashCode()).hashCode();
+        }
+
+        return hashCodeValue;
 	}
 	
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return create(getObject().replaceSubExpressions(replacements), getField().clone(), getNewValue().replace(replacements));
+		return create(getObject().replaceSubExpressions(replacements), getField(), getNewValue().replace(replacements));
 	}
 
 	@Override

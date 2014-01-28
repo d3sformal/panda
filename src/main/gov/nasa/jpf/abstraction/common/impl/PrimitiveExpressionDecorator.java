@@ -71,11 +71,6 @@ public class PrimitiveExpressionDecorator extends DefaultPrimitiveExpression {
 	public void accept(PredicatesComponentVisitor visitor) {
 		expression.accept(visitor);
 	}
-
-	@Override
-	public DefaultPrimitiveExpression clone() {
-		return create(expression.clone());
-	}
 	
 	@Override
 	public Predicate getPreconditionForBeingFresh() {

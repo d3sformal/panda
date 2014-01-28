@@ -35,11 +35,11 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 		visitor.visit(this);
 	}
 
-	@Override
-	public AnonymousObject clone() {
-		return create(reference);
-	}
-	
+    @Override
+    public AnonymousObject createShallowCopy() {
+        return this;
+    }
+
 	public static AnonymousObject create(Reference reference) {
 		if (reference == null) {
 			return null;
@@ -50,7 +50,7 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
-		return clone();
+		return this;
 	}
 	
 	@Override
@@ -64,7 +64,7 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return clone();
+		return this;
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 
 	@Override
 	public AccessExpression cutTail() {
-		return clone();
+		return this;
 	}
 
 	@Override

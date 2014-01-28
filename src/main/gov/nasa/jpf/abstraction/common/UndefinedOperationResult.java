@@ -20,11 +20,6 @@ public class UndefinedOperationResult extends Operation implements Undefined {
 		visitor.visit(this);
 	}
 	
-	@Override
-	public UndefinedOperationResult clone() {
-		return this;
-	}
-	
 	public static UndefinedOperationResult create() {
 		//return new UndefinedOperationResult();
         if (instance == null) {
@@ -36,12 +31,12 @@ public class UndefinedOperationResult extends Operation implements Undefined {
 
 	@Override
 	public Expression replace(Map<AccessExpression, Expression> replacements) {
-		return clone();
+		return this;
 	}
 
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
-		return clone();
+        return this;
 	}
 
 }

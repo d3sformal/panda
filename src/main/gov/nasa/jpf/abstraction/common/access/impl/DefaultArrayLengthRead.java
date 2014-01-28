@@ -21,6 +21,8 @@ import gov.nasa.jpf.abstraction.common.Predicate;
  */
 public class DefaultArrayLengthRead extends DefaultArrayLengthExpression implements ArrayLengthRead {
 
+    private Integer hashCodeValue;
+
 	protected DefaultArrayLengthRead(AccessExpression array) {
 		this(array, DefaultArrayLengths.create());
 	}
@@ -50,14 +52,14 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 		visitor.visit(this);
 	}
 
-	@Override
-	public DefaultArrayLengthRead clone() {
-		return create(getArray().clone(), getArrayLengths().clone());
-	}
+    @Override
+    public DefaultArrayLengthRead createShallowCopy() {
+        return create(getArray(), getArrayLengths());
+    }
 
 	@Override
 	public AccessExpression reRoot(AccessExpression newPrefix) {
-		return create(newPrefix, getArrayLengths().clone());
+		return create(newPrefix, getArrayLengths());
 	}
 	
 	@Override
@@ -95,12 +97,16 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 	
 	@Override
 	public int hashCode() {
-		return ("read_length_" + getObject().hashCode()).hashCode();
+        if (hashCodeValue == null) {
+	        hashCodeValue = ("read_length_" + getObject().hashCode()).hashCode();
+        }
+
+        return hashCodeValue;
 	}
 	
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return create(getObject().replaceSubExpressions(replacements), getArrayLengths().clone());
+		return create(getObject().replaceSubExpressions(replacements), getArrayLengths());
 	}
 	
     /**
@@ -120,7 +126,7 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 			AnonymousArray updatedAnonymousArray = (AnonymousArray) updated;
 			
             return updatedAnonymousArray.getArrayLength();
-			//return create(getArray().clone(), DefaultArrayLengthWrite.create(expression, getArrayLengths().clone(), updatedAnonymousArray.getArrayLength().clone()));
+			//return create(getArray(), DefaultArrayLengthWrite.create(expression, getArrayLengths(), updatedAnonymousArray.getArrayLength()));
 		}
 
         // the prefix is an access expression, as is the case with `alength(arrlen, y.z)` where the access expression is `y.z`
@@ -132,12 +138,12 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 
                 // x := new Integer[10]
                 // alength(alengthwrite(arrlen, x, 10), y.z)
-				return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths().clone(), aa.getArrayLength()));
+				return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths(), aa.getArrayLength()));
 			}
 
             // x := a
             // alength(arrlen, update(y.z, x, a))
-    	    return create(updatedAccessExpression, getArrayLengths().clone());
+    	    return create(updatedAccessExpression, getArrayLengths());
 		}
 
         /**

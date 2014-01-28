@@ -494,24 +494,21 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		clone.classes = new HashMap<PackageAndClass, ClassObject>();
 		
 		for (Root l : locals.keySet()) {
-			Root lClone = l.clone();
 			LocalVariable lValue = locals.get(l).cloneInto(clone.universe);
 			
-			clone.locals.put(lClone, lValue);
+			clone.locals.put(l, lValue);
 		}
 		
 		for (ReturnValue r : returns.keySet()) {
-			ReturnValue rClone = r.clone();
 			LocalVariable lValue = returns.get(r).cloneInto(clone.universe);
 
-			clone.returns.put(rClone, lValue);
+			clone.returns.put(r, lValue);
 		}
 
 		for (PackageAndClass c : classes.keySet()) {
-			PackageAndClass cClone = c.clone();
 			ClassObject cValue = classes.get(c).cloneInto(clone.universe);
 			
-			clone.classes.put(cClone, cValue);
+			clone.classes.put(c, cValue);
 		}
 
 		return clone;
@@ -702,17 +699,15 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		clone.removeLocals();
 		
 		for (Root l : locals.keySet()) {
-			Root lClone = l.clone();
 			LocalVariable lValue = locals.get(l).cloneInto(clone.universe);
 			
-			clone.locals.put(lClone, lValue);
+			clone.locals.put(l, lValue);
 		}
 		
 		for (ReturnValue r : returns.keySet()) {
-			ReturnValue rClone = r.clone();
 			LocalVariable rValue = returns.get(r).cloneInto(clone.universe);
 
-			clone.returns.put(rClone, rValue);
+			clone.returns.put(r, rValue);
 		}
 
 		locals = clone.locals;

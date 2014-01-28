@@ -22,9 +22,9 @@ public abstract class DefaultObjectFieldExpression extends DefaultObjectAccessEx
 	public Field getField() {
 		return field;
 	}
-	
-	@Override
-	public abstract DefaultObjectFieldExpression clone();
+
+    @Override
+    public abstract DefaultObjectFieldExpression createShallowCopy();
 	
 	@Override
 	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {

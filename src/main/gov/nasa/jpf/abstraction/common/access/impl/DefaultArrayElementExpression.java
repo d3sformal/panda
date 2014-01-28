@@ -31,6 +31,9 @@ public abstract class DefaultArrayElementExpression extends DefaultArrayAccessEx
 	public Arrays getArrays() {
 		return arrays;
 	}
+
+    @Override
+    public abstract DefaultArrayElementExpression createShallowCopy();
 	
 	@Override
 	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {

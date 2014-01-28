@@ -65,7 +65,7 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 			Expression newExpression = replacements.get(expression);
 
 			if (expression.isPrefixOf(path) && newExpression instanceof AccessExpression) {
-				AccessExpression newPrefix = ((AccessExpression)newExpression).clone();
+				AccessExpression newPrefix = (AccessExpression) newExpression;
 
 				path = path.reRoot(expression, newPrefix);
 
@@ -85,11 +85,11 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 	 */
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
-		return clone();
+		return this;
 	}
-	
-	@Override
-	public abstract DefaultAccessExpression clone();
+
+    @Override
+    public abstract DefaultAccessExpression createShallowCopy();
 
 	/**
 	 * Is this expression referring (entirely) to the java keyword this
@@ -177,16 +177,28 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 	@Override
 	public final AccessExpression reRoot(AccessExpression oldPrefix, AccessExpression newPrefix) {
 		if (oldPrefix.isPrefixOf(this)) {
-			AccessExpression clone = clone();
-			ObjectAccessExpression parent = (ObjectAccessExpression) clone.get(oldPrefix.getLength() + 1);
+            AccessExpression oldPrefixTail = get(oldPrefix.getLength());
+            AccessExpression result = newPrefix;
+			AccessExpression parent = this;
+            ObjectAccessExpression parentCopy = null;
+            ObjectAccessExpression previousParentCopy = null;
 			
-			if (parent == null) {
-				return newPrefix;
-			}
-									
-			parent.setObject(parent.getObject().reRoot(newPrefix));
-			
-			return clone;
+            while (parent != oldPrefixTail && parent instanceof ObjectAccessExpression) {
+                parentCopy = (ObjectAccessExpression) parent.createShallowCopy();
+
+                if (result == newPrefix) {
+                    result = parentCopy;
+                }
+
+                if (previousParentCopy != null) {
+                    previousParentCopy.setObject(parentCopy);
+                }
+
+                previousParentCopy = parentCopy;
+                parent = ((ObjectAccessExpression)parent).getObject();
+            }
+
+            return result;
 		}
 		
 		return null;

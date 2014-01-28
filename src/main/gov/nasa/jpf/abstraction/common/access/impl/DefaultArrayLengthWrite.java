@@ -17,6 +17,7 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 public class DefaultArrayLengthWrite extends DefaultArrayLengthExpression implements ArrayLengthWrite {
 
 	private Expression newValue;
+    private Integer hashCodeValue;
 
 	protected DefaultArrayLengthWrite(AccessExpression array, Expression newValue) {
 		this(array, DefaultArrayLengths.create(), newValue);
@@ -61,14 +62,14 @@ public class DefaultArrayLengthWrite extends DefaultArrayLengthExpression implem
 		visitor.visit(this);
 	}
 
-	@Override
-	public DefaultArrayLengthWrite clone() {
-		return create(getArray().clone(), getArrayLengths().clone(), getNewValue().clone());
-	}
+    @Override
+    public DefaultArrayLengthWrite createShallowCopy() {
+        return create(getArray(), getArrayLengths(), getNewValue());
+    }
 	
 	@Override
 	public AccessExpression reRoot(AccessExpression newPrefix) {
-		return create(newPrefix, getArrayLengths().clone(), getNewValue().clone());
+		return create(newPrefix, getArrayLengths(), getNewValue());
 	}
 	
 	@Override
@@ -95,12 +96,16 @@ public class DefaultArrayLengthWrite extends DefaultArrayLengthExpression implem
 	
 	@Override
 	public int hashCode() {
-		return ("write_length_" + getObject().hashCode() + "_" + getNewValue().hashCode()).hashCode();
+        if (hashCodeValue == null) {
+		    hashCodeValue = ("write_length_" + getObject().hashCode() + "_" + getNewValue().hashCode()).hashCode();
+        }
+
+        return hashCodeValue;
 	}
 	
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return create(getObject().replaceSubExpressions(replacements), getArrayLengths().clone(), getNewValue().replace(replacements));
+		return create(getObject().replaceSubExpressions(replacements), getArrayLengths(), getNewValue().replace(replacements));
 	}
 	
 	@Override

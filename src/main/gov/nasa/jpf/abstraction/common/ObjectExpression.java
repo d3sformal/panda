@@ -8,6 +8,4 @@ package gov.nasa.jpf.abstraction.common;
  * and array expressions @see gov.nasa.jpf.abstraction.common.ArrayExpression
  */
 public interface ObjectExpression extends Expression {
-	@Override
-	public abstract ObjectExpression clone();
 }

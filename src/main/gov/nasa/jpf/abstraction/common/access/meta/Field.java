@@ -10,8 +10,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
  * 
  * This is the field "f" in the expression fread(f, o)
  */
-public interface Field extends PredicatesComponentVisitable, Cloneable {
+public interface Field extends PredicatesComponentVisitable {
 	public String getName();
-	public Field clone();
 	public void addAccessSubExpressionsToSet(Set<AccessExpression> out);
 }

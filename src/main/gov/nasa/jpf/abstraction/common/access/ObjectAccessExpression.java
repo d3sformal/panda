@@ -13,6 +13,6 @@ public interface ObjectAccessExpression extends AccessExpression, ObjectExpressi
 	public void setObject(AccessExpression expression);
 	public AccessExpression getObject();
 	
-	@Override
-	public ObjectAccessExpression clone();
+    @Override
+    public ObjectAccessExpression createShallowCopy();
 }

@@ -7,6 +7,6 @@ import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
  * Write to an array length: alengthupdate(arrlen, a, l) ~ a := new int[l]
  */
 public interface ArrayLengthWrite extends ArrayLengthExpression, UpdateExpression, ArrayLengths {
-	@Override
-	public ArrayLengthWrite clone();
+    @Override
+    public ArrayLengthWrite createShallowCopy();
 }

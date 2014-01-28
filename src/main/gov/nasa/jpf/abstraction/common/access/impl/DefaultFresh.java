@@ -30,11 +30,10 @@ public class DefaultFresh extends DefaultRoot implements Fresh {
 		visitor.visit(this);
 	}
 
-	@Override
-	public DefaultFresh clone() {
-		//return create();
+    @Override
+    public DefaultFresh createShallowCopy() {
         return this;
-	}
+    }
 	
 	@Override
 	public boolean equals(Object o) {

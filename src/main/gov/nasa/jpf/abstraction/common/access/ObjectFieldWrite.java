@@ -7,6 +7,6 @@ import gov.nasa.jpf.abstraction.common.access.meta.Field;
  * Expressions fwrite(f, o, e) ~ o.f := e
  */
 public interface ObjectFieldWrite extends ObjectFieldExpression, UpdateExpression, Field {
-	@Override
-	public ObjectFieldWrite clone();
+    @Override
+    public ObjectFieldWrite createShallowCopy();
 }

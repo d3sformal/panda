@@ -48,8 +48,8 @@ public class DefaultReturnValue extends DefaultRoot implements ReturnValue {
 		return false;
 	}
 
-	@Override
-	public DefaultReturnValue clone() {
-		return create(getName(), isReference);
-	}
+    @Override
+    public DefaultReturnValue createShallowCopy() {
+        return this;
+    }
 }

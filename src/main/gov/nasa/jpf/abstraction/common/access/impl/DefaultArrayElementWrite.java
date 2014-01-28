@@ -17,6 +17,7 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 public class DefaultArrayElementWrite extends DefaultArrayElementExpression implements ArrayElementWrite {
 
 	private Expression newValue;
+    private Integer hashCodeValue;
 
 	protected DefaultArrayElementWrite(AccessExpression array, Expression index, Expression newValue) {
 		this(array, DefaultArrays.create(), index, newValue);
@@ -61,14 +62,14 @@ public class DefaultArrayElementWrite extends DefaultArrayElementExpression impl
 		visitor.visit(this);
 	}
 
-	@Override
-	public DefaultArrayElementWrite clone() {
-		return create(getArray().clone(), getArrays().clone(), getIndex().clone(), newValue.clone());
-	}
+    @Override
+    public DefaultArrayElementWrite createShallowCopy() {
+        return create(getArray(), getArrays(), getIndex(), getNewValue());
+    }
 	
 	@Override
 	public AccessExpression reRoot(AccessExpression newPrefix) {
-		return create(newPrefix, getArrays().clone(), getIndex().clone(), getNewValue().clone());
+		return create(newPrefix, getArrays(), getIndex(), getNewValue());
 	}
 	
 	@Override
@@ -95,12 +96,16 @@ public class DefaultArrayElementWrite extends DefaultArrayElementExpression impl
 	
 	@Override
 	public int hashCode() {
-		return ("write_element_" + getArray().hashCode() + "_" + getIndex().hashCode() + "_" + getNewValue().hashCode()).hashCode();
+        if (hashCodeValue == null) {
+		    hashCodeValue = ("write_element_" + getArray().hashCode() + "_" + getIndex().hashCode() + "_" + getNewValue().hashCode()).hashCode();
+        }
+
+        return hashCodeValue;
 	}
 	
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return create(getObject().replaceSubExpressions(replacements), getArrays().clone(), getIndex().replace(replacements), getNewValue().replace(replacements));
+		return create(getObject().replaceSubExpressions(replacements), getArrays(), getIndex().replace(replacements), getNewValue().replace(replacements));
 	}
 
 	@Override
