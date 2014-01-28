@@ -29,6 +29,8 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
     }
 
     private Integer hashCodeValue = null;
+    private String stringValue = null;
+
 
     public String toString() {
     	return toString(Notation.policy);
@@ -56,11 +58,19 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
 	 * @return a predicate reflecting the updates
 	 */
 	public abstract Predicate update(AccessExpression expression, Expression newExpression);
+
+    private final String string() {
+        if (stringValue == null) {
+            stringValue = toString(Notation.DOT_NOTATION);
+        }
+
+        return stringValue;
+    }
 	
 	@Override
 	public final int hashCode() {
         if (hashCodeValue == null) {
-		    hashCodeValue = toString(Notation.DOT_NOTATION).hashCode();
+		    hashCodeValue = string().hashCode();
         }
 		return hashCodeValue;
 	}
@@ -70,7 +80,7 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
 		if (o instanceof Predicate) {
 			Predicate p = (Predicate) o;
 
-			return toString(Notation.DOT_NOTATION).equals(p.toString(Notation.DOT_NOTATION));
+			return string().equals(p.string());
 		}
 		
 		return false;

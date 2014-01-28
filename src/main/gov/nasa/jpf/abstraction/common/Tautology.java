@@ -11,6 +11,8 @@ import java.util.Map;
  * A predicate with a constant truth value ~ true
  */
 public class Tautology extends Predicate {
+
+    private static Tautology instance;
 	
 	protected Tautology() {
 	}
@@ -30,7 +32,12 @@ public class Tautology extends Predicate {
 	}
 	
 	public static Predicate create() {
-		return new Tautology();
+		//return new Tautology();
+        if (instance == null) {
+            instance = new Tautology();
+        }
+
+        return instance;
 	}
 	
 	@Override

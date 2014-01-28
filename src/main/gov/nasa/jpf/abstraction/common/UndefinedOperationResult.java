@@ -8,6 +8,8 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
  * A concrete instance of an undefined result
  */
 public class UndefinedOperationResult extends Operation implements Undefined {
+
+    private static UndefinedOperationResult instance;
 	
 	protected UndefinedOperationResult() {
 		super(null, null);
@@ -20,11 +22,16 @@ public class UndefinedOperationResult extends Operation implements Undefined {
 	
 	@Override
 	public UndefinedOperationResult clone() {
-		return create();
+		return this;
 	}
 	
 	public static UndefinedOperationResult create() {
-		return new UndefinedOperationResult();
+		//return new UndefinedOperationResult();
+        if (instance == null) {
+            instance = new UndefinedOperationResult();
+        }
+
+        return instance;
 	}
 
 	@Override

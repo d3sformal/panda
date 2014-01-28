@@ -15,6 +15,8 @@ import gov.nasa.jpf.abstraction.common.impl.DefaultExpression;
  * A dummy expression (may be used when there would be no expression = null)
  */
 public class EmptyExpression extends DefaultExpression {
+
+    private static EmptyExpression instance;
 	
 	protected EmptyExpression() {
 	}
@@ -29,12 +31,17 @@ public class EmptyExpression extends DefaultExpression {
 	}
 	
 	public static EmptyExpression create() {
-		return new EmptyExpression();
+		//return new EmptyExpression();
+        if (instance == null) {
+            instance = new EmptyExpression();
+        }
+
+        return instance;
 	}
 	
 	@Override
 	public EmptyExpression clone() {
-		return create();
+		return this;
 	}
 	
 	@Override

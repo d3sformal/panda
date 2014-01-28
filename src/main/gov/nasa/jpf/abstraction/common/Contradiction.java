@@ -11,6 +11,8 @@ import java.util.Map;
  * A predicate with a constant truth value ~ false
  */
 public class Contradiction extends Predicate {
+
+    private static Contradiction instance;
 	
 	protected Contradiction() {
 	}
@@ -30,7 +32,12 @@ public class Contradiction extends Predicate {
 	}
 	
 	public static Predicate create() {
-		return new Contradiction();
+		//return new Contradiction();
+        if (instance == null) {
+            instance = new Contradiction();
+        }
+
+        return instance;
 	}
 	
 	@Override

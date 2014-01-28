@@ -19,6 +19,7 @@ import gov.nasa.jpf.abstraction.common.Tautology;
 public class AnonymousObject extends DefaultAccessExpression implements Root, AnonymousExpression {
 	
 	private Reference reference;
+    private String name;
 
 	protected AnonymousObject(Reference reference) {
 		this.reference = reference;
@@ -108,7 +109,11 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 
 	@Override
 	public String getName() {
-		return "ref(" + reference + ")";
+        if (name == null) {
+            name = "ref(" + reference + ")";
+        }
+
+        return name;
 	}
 
 	@Override

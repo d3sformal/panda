@@ -13,6 +13,8 @@ import gov.nasa.jpf.abstraction.common.access.Root;
  * An access expression produces in circumstances where there is no other valid result 
  */
 public class UndefinedAccessExpression extends DefaultRoot implements Undefined {
+
+    private static UndefinedAccessExpression instance;
 	
 	protected UndefinedAccessExpression() {
 		super(null);
@@ -25,11 +27,16 @@ public class UndefinedAccessExpression extends DefaultRoot implements Undefined 
 	
 	@Override
 	public UndefinedAccessExpression clone() {
-		return create();
+		return this;
 	}
 	
 	public static UndefinedAccessExpression create() {
-		return new UndefinedAccessExpression();
+		//return new UndefinedAccessExpression();
+        if (instance == null) {
+            instance = new UndefinedAccessExpression();
+        }
+
+        return instance;
 	}
 
 	@Override

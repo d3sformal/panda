@@ -14,6 +14,8 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.symbols.Universe;
 
 public class NullExpression extends Constant implements ObjectExpression {
+
+    private static NullExpression instance;
 	
 	protected NullExpression() {
 		super(Universe.NULL);
@@ -40,11 +42,16 @@ public class NullExpression extends Constant implements ObjectExpression {
 	
 	@Override
 	public NullExpression clone() {
-		return create();
+		return this;
 	}
 	
 	public static NullExpression create() {
-		return new NullExpression();
+		//return new NullExpression();
+        if (instance == null) {
+            instance = new NullExpression();
+        }
+
+        return instance;
 	}
 
 	@Override
