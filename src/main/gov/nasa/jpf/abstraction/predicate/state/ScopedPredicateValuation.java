@@ -298,9 +298,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	public SideEffect processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
         if (RunDetector.isRunning()) {
 			AffectedAccessExpressions affected = (AffectedAccessExpressions) sideEffect; // MAY BE USED OR NOT ... OVERAPPROXIMATING THIS MAY SAVE A LOT WHEN DETERMINING THE sideEffect SET
-			FlatPredicateValuation scope;
+			FlatPredicateValuation callerScope;
 			
-			scope = scopes.top(1);
+			callerScope = scopes.top(1);
 			
 			boolean sameObject = before.getThis() == after.getThis();
 		
@@ -370,7 +370,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
             // Arguments that are of a reference type are not bound to the callee scope and may be used to determine truth value of a predicate refering to it
 			notWantedLocalVariables.removeAll(referenceArgs);
 			
-            // Collection of predicates in callee that have additional value for update of the caller
+            // Collection of predicates in callee and caller that have additional value for update of the caller
 			FlatPredicateValuation relevant = new FlatPredicateValuation(smt);
 			
 			// Filter out predicates from the callee that cannot be used for propagation to the caller 
@@ -411,7 +411,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					
 					// Handling mainly constructor (object still anonymous) 
 					if (isAnonymous) {
-						scope.put(predicate, value);
+						callerScope.put(predicate, value);
 					}
 				}
 			}
@@ -422,7 +422,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			Set<Predicate> toBeUpdated = new HashSet<Predicate>();
             Set<AccessExpression> paths = new HashSet<AccessExpression>();
 			
-			for (Predicate predicate : scope.getPredicates()) {
+			for (Predicate predicate : callerScope.getPredicates()) {
                 predicate.addAccessExpressionsToSet(paths);
 				
 				boolean canBeAffected = false;
@@ -439,11 +439,12 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				
                 /**
                  * Predicates are either updated (when they were possibly affected) or can be used for value inference
+                 * We take all predicates that are not to-be-updated as possibly relevant (for simplicity). Actual determining predicates are selected later.
                  */
 				if (canBeAffected) {
 					toBeUpdated.add(predicate);
 				} else {
-                    relevant.put(predicate, scope.get(predicate));
+                    relevant.put(predicate, callerScope.get(predicate));
                 }
 
                 paths.clear();
@@ -455,7 +456,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			for (Predicate predicate : valuation.keySet()) {
 				TruthValue value = valuation.get(predicate);
 				
-				scope.put(predicate, value);
+				callerScope.put(predicate, value);
 			}
         }
 		
