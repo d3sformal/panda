@@ -40,13 +40,8 @@ public class EmptyExpression extends DefaultExpression {
 	}
 	
 	@Override
-	public EmptyExpression clone() {
-		return this;
-	}
-	
-	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
-		return clone();
+		return this;
 	}
 
 	@Override

@@ -59,7 +59,7 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
 	 */
 	public abstract Predicate update(AccessExpression expression, Expression newExpression);
 
-    private final String string() {
+    private final String getStringRep() {
         if (stringValue == null) {
             stringValue = toString(Notation.DOT_NOTATION);
         }
@@ -70,7 +70,7 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
 	@Override
 	public final int hashCode() {
         if (hashCodeValue == null) {
-		    hashCodeValue = string().hashCode();
+		    hashCodeValue = getStringRep().hashCode();
         }
 		return hashCodeValue;
 	}
@@ -80,7 +80,7 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
 		if (o instanceof Predicate) {
 			Predicate p = (Predicate) o;
 
-			return string().equals(p.string());
+			return getStringRep().equals(p.getStringRep());
 		}
 		
 		return false;

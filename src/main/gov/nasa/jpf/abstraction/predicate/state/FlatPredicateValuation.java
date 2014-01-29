@@ -97,8 +97,8 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 				cur.addAll(selectDeterminants(p, universe));
 			}
 			
-            // each `p` in `ret` is contained in it `selectDet(p)` and therefore in `cur`
-            // thus the following statement avoid unnecessary merge of the sets
+            // each `p` in `ret` is contained in `selectDet(p)` and therefore also in `cur`
+            // thus the following statement avoids unnecessary merge of the sets
 			ret = cur;
 		}
 		
@@ -233,8 +233,6 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		for (Predicate predicate : valuations.keySet()) {
 			boolean affects = false;
 
-            predicate.addAccessExpressionsToSet(paths);
-			
 			/**
 			 * Affected may contain completely different paths:
 			 * 
@@ -257,11 +255,16 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			 * 
 			 * are affected predicates
 			 */
+
+            predicate.addAccessExpressionsToSet(paths);
+
 			for (AccessExpression path1 : resolvedAffected) {
 				for (AccessExpression path2 : paths) {
 					affects = affects || path1.isSimilarToPrefixOf(path2);
 				}
 			}
+
+			paths.clear();
 
 			/**
 			 * If the predicate may be affected, compute preconditions and determinants and schedule the predicate for reevaluation

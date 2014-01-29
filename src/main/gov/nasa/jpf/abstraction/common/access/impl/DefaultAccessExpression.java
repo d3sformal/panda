@@ -177,26 +177,45 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 	@Override
 	public final AccessExpression reRoot(AccessExpression oldPrefix, AccessExpression newPrefix) {
 		if (oldPrefix.isPrefixOf(this)) {
-            AccessExpression oldPrefixTail = get(oldPrefix.getLength());
+			// get the last element of the prefix ("b" in "o.p.a.b")
+            AccessExpression oldPrefixEnd = get(oldPrefix.getLength());
+
+			// fallback value in the case of "this.equals(oldPrefix)"
+			// used when the loop body not executed at all
             AccessExpression result = newPrefix;
-			AccessExpression parent = this;
-            ObjectAccessExpression parentCopy = null;
-            ObjectAccessExpression previousParentCopy = null;
 			
-            while (parent != oldPrefixTail && parent instanceof ObjectAccessExpression) {
-                parentCopy = (ObjectAccessExpression) parent.createShallowCopy();
+			// idea: we must create a new shallow copy of the suffix (each element) because the reference to its parent object is changed here
+			// using the copy-on-write mechanism
 
+			AccessExpression currentExpr = this;
+            ObjectAccessExpression currentExprCopy = null;
+            ObjectAccessExpression previousExprCopy = null;
+			
+            while (currentExpr != oldPrefixEnd && currentExpr instanceof ObjectAccessExpression) {
+                currentExprCopy = (ObjectAccessExpression) currentExpr.createShallowCopy();
+
+				// we must overwrite the fallback now (in the first iteration of the loop)
+				// situation: oldPrefix is not the whole expression ("this")
                 if (result == newPrefix) {
-                    result = parentCopy;
+                    result = currentExprCopy;
                 }
 
-                if (previousParentCopy != null) {
-                    previousParentCopy.setObject(parentCopy);
+				// change parent of the shallow copy from previous iteration (next element of the suffix)
+                if (previousExprCopy != null) {
+                    previousExprCopy.setObject(currentExprCopy);
                 }
 
-                previousParentCopy = parentCopy;
-                parent = ((ObjectAccessExpression)parent).getObject();
+                previousExprCopy = currentExprCopy;
+
+				// move to the preceding element of the suffix (towards the "oldPrefixEnd")
+                currentExpr = ((ObjectAccessExpression) currentExpr).getObject();
             }
+
+			// insert the new prefix
+			// this happens only when the loop was executed at least once
+			if (previousExprCopy != null) {
+				previousExprCopy.setObject(newPrefix);
+			}
 
             return result;
 		}
