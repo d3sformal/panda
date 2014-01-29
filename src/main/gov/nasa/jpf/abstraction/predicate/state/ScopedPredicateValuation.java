@@ -437,13 +437,18 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					}
 				}
 				
+                /**
+                 * Predicates are either updated (when they were possibly affected) or can be used for value inference
+                 */
 				if (canBeAffected) {
 					toBeUpdated.add(predicate);
-				}
+				} else {
+                    relevant.put(predicate, scope.get(predicate));
+                }
 
                 paths.clear();
 			}
-			
+
             // Use the relevant predicates to valuate predicates that need to be updated
 			Map<Predicate, TruthValue> valuation = relevant.evaluatePredicates(toBeUpdated);
 			
