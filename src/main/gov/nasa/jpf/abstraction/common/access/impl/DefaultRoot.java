@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.common.access.impl;
 
 import java.util.Set;
 import java.util.Map;
+import java.util.HashMap;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
@@ -16,6 +17,7 @@ import gov.nasa.jpf.abstraction.common.Predicate;
  * this contrasts with expressions such as object field read (@see gov.nasa.jpf.abstraction.common.access.ObjectFieldRead) that are not atomic enough in this sense
  */
 public class DefaultRoot extends DefaultAccessExpression implements Root {
+    private static Map<String, DefaultRoot> instances = new HashMap<String, DefaultRoot>();
 
 	private String name;
     private Integer hashCodeValue;
@@ -61,8 +63,12 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 		if (name == null) {
 			return null;
 		}
+
+        if (!instances.containsKey(name)) {
+            instances.put(name, new DefaultRoot(name));
+        }
 		
-		return new DefaultRoot(name);
+		return instances.get(name);
 	}
 
 	@Override
