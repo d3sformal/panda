@@ -373,6 +373,8 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
             // Collection of predicates in callee and caller that have additional value for update of the caller
 			FlatPredicateValuation relevant = new FlatPredicateValuation(smt);
 			
+            Set<AccessExpression> temporaryPathsHolder = new HashSet<AccessExpression>();
+
 			// Filter out predicates from the callee that cannot be used for propagation to the caller 
 			for (Predicate predicate : getPredicates()) {
 				TruthValue value = get(predicate);
@@ -394,13 +396,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 
 				boolean isUnwanted = false;
 
-                Set<AccessExpression> paths = new HashSet<AccessExpression>();
-
-                predicate.addAccessExpressionsToSet(paths);
+                predicate.addAccessExpressionsToSet(temporaryPathsHolder);
 				
                 // If any of the symbols used in the predicate has changed 
 				for (LocalVarInfo l : notWantedLocalVariables) {
-					for (AccessExpression path : paths) {
+					for (AccessExpression path : temporaryPathsHolder) {
 						isUnwanted |= path.isLocalVariable() && path.getRoot().getName().equals(l.getName());
 					}
 				}
@@ -414,20 +414,21 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 						callerScope.put(predicate, value);
 					}
 				}
+
+                temporaryPathsHolder.clear();
 			}
 
             // Usable predicates from callee with replaced occurences of formal parameters were collected
             // Select predicates that need to be updated (refer to an object that may have been modified by the callee: static, o.field, modified heap)
 					
 			Set<Predicate> toBeUpdated = new HashSet<Predicate>();
-            Set<AccessExpression> paths = new HashSet<AccessExpression>();
 			
 			for (Predicate predicate : callerScope.getPredicates()) {
-                predicate.addAccessExpressionsToSet(paths);
+                predicate.addAccessExpressionsToSet(temporaryPathsHolder);
 				
 				boolean canBeAffected = false;
 				
-				for (AccessExpression path : paths) {
+				for (AccessExpression path : temporaryPathsHolder) {
 					canBeAffected |= path.getRoot().isThis() && sameObject;
 					canBeAffected |= path.isStatic();
 					
@@ -446,7 +447,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
                     relevant.put(predicate, callerScope.get(predicate));
                 }
 
-                paths.clear();
+                temporaryPathsHolder.clear();
 			}
 
             // Use the relevant predicates to valuate predicates that need to be updated
