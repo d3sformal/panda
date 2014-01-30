@@ -106,7 +106,10 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 	
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return create(getObject().replaceSubExpressions(replacements), getArrayLengths());
+		AccessExpression newA = getObject().replaceSubExpressions(replacements);
+
+		if (newA == getObject()) return this;
+		else return create(newA, getArrayLengths());
 	}
 	
     /**

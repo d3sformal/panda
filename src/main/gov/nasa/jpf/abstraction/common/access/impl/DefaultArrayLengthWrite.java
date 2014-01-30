@@ -105,7 +105,11 @@ public class DefaultArrayLengthWrite extends DefaultArrayLengthExpression implem
 	
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return create(getObject().replaceSubExpressions(replacements), getArrayLengths(), getNewValue().replace(replacements));
+		AccessExpression newA = getObject().replaceSubExpressions(replacements);
+		Expression newNV = getNewValue().replace(replacements);
+
+		if (newA == getObject() && newNV == getNewValue()) return this;
+		else return create(newA, getArrayLengths(), newNV);
 	}
 	
 	@Override

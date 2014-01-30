@@ -437,10 +437,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					}
 				}
 				
-                /**
-                 * Predicates are either updated (when they were possibly affected) or can be used for value inference
-                 * We take all predicates that are not to-be-updated as possibly relevant (for simplicity). Actual determining predicates are selected later.
-                 */
+                // Predicates are either updated (when they were possibly affected) or can be used for value inference.
+                // We take all predicates that are not to-be-updated as possibly relevant (for simplicity). Actual determining predicates are selected later.
+				
 				if (canBeAffected) {
 					toBeUpdated.add(predicate);
 				} else {

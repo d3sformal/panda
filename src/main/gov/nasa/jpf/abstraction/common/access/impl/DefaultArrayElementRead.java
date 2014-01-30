@@ -96,7 +96,11 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return create(getObject().replaceSubExpressions(replacements), getArrays(), getIndex().replace(replacements));
+		AccessExpression newA = getObject().replaceSubExpressions(replacements);
+		Expression newI = getIndex().replace(replacements);
+
+		if (newA == getObject() && newI == getIndex()) return this;
+		else return create(newA, getArrays(), newI);
 	}
 	
 

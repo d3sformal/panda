@@ -92,7 +92,10 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 	
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return create(getObject().replaceSubExpressions(replacements), getField());
+		AccessExpression newO = getObject().replaceSubExpressions(replacements);
+
+		if (newO == getObject()) return this;
+		else return create(newO, getField());
 	}
 	
     /**

@@ -23,7 +23,11 @@ public class Equals extends Comparison {
 
 	@Override
 	public Predicate replace(Map<AccessExpression, Expression> replacements) {
-		return create(a.replace(replacements), b.replace(replacements));
+		Expression newA = a.replace(replacements);
+		Expression newB = b.replace(replacements);
+
+		if (newA == a && newB == b) return this; 
+		else return create(newA, newB);  
 	}
 	
 	public static Predicate create(Expression a, Expression b) {
@@ -54,13 +58,17 @@ public class Equals extends Comparison {
          * b = a ... false
          */
 		if (b instanceof AccessExpression) {
-			AccessExpression ae = (AccessExpression) b;
+			AccessExpression be = (AccessExpression) b;
 			
-			if (expression.equals(ae) && newExpression instanceof AnonymousExpression && !a.equals(b)) {
+			if (expression.equals(be) && newExpression instanceof AnonymousExpression && !a.equals(b)) {
 				return Contradiction.create();
 			}
 		}
-		
-		return create(a.update(expression, newExpression), b.update(expression, newExpression));
+
+		Expression newA = a.update(expression, newExpression);
+		Expression newB = b.update(expression, newExpression);
+
+		if (newA == a && newB == b) return this;
+		else return create(newA, newB); 
 	}
 }

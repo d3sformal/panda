@@ -32,7 +32,10 @@ public class Negation extends Predicate {
 
 	@Override
 	public Predicate replace(Map<AccessExpression, Expression> replacements) {
-		return create(predicate.replace(replacements));
+		Predicate newP = predicate.replace(replacements);
+
+		if (newP == predicate) return this;
+		else return create(newP);
 	}
 	
 	public static Predicate create(Predicate predicate) {
@@ -54,6 +57,9 @@ public class Negation extends Predicate {
 
 	@Override
 	public Predicate update(AccessExpression expression, Expression newExpression) {
-		return create(predicate.update(expression, newExpression));
+		Predicate newP = predicate.update(expression, newExpression);
+	
+		if (newP == predicate) return this;
+		else return create(newP);
 	}
 }

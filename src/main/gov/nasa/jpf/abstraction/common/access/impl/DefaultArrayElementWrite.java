@@ -105,7 +105,12 @@ public class DefaultArrayElementWrite extends DefaultArrayElementExpression impl
 	
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return create(getObject().replaceSubExpressions(replacements), getArrays(), getIndex().replace(replacements), getNewValue().replace(replacements));
+		AccessExpression newA = getObject().replaceSubExpressions(replacements);
+		Expression newI = getIndex().replace(replacements);
+		Expression newNV = getNewValue().replace(replacements);
+
+		if (newA == getObject() && newI == getIndex() && newNV == getNewValue()) return this;
+		else return create(newA, getArrays(), newI, newNV); 
 	}
 
 	@Override

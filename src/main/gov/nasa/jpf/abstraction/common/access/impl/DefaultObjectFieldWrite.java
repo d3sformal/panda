@@ -110,7 +110,11 @@ public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implem
 	
 	@Override
 	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return create(getObject().replaceSubExpressions(replacements), getField(), getNewValue().replace(replacements));
+		AccessExpression newO = getObject().replaceSubExpressions(replacements);
+		Expression newNV = getNewValue().replace(replacements);
+
+		if (newO == getObject() && newNV == getNewValue()) return this;
+		else return create(newO, getField(), newNV);
 	}
 
 	@Override

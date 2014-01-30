@@ -42,7 +42,7 @@ public class Tautology extends Predicate {
 	
 	@Override
 	public Predicate update(AccessExpression expression, Expression newExpression) {
-		return create();
+		return this;
 	}
 
 }

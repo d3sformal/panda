@@ -63,12 +63,18 @@ public class ObjectExpressionDecorator extends DefaultObjectExpression {
 	
 	@Override
 	public Expression replace(Map<AccessExpression, Expression> replacements) {
-		return create(this.expression.replace(replacements));
+		Expression newE = this.expression.replace(replacements);
+		
+		if (newE == this.expression) return this;
+		else return create(newE);
 	}
 
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
-		return create(this.expression.update(expression, newExpression));
+		Expression newE = this.expression.update(expression, newExpression);
+
+		if (newE == this.expression) return this;
+		else return create(newE);
 	}
 
 	@Override

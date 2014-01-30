@@ -19,7 +19,11 @@ public class Subtract extends Operation {
 
 	@Override
 	public Subtract replace(Map<AccessExpression, Expression> replacements) {
-		return new Subtract(a.replace(replacements), b.replace(replacements));
+		Expression newA = a.replace(replacements);
+		Expression newB = b.replace(replacements);
+
+		if (newA == a && newB == b) return this;
+		else return new Subtract(newA, newB); 
 	}
 	
 	/**
@@ -42,6 +46,10 @@ public class Subtract extends Operation {
 	
 	@Override
 	public Expression update(AccessExpression expression, Expression newExpression) {
-		return create(a.update(expression, newExpression), b.update(expression, newExpression));
+		Expression newA = a.update(expression, newExpression);
+		Expression newB = b.update(expression, newExpression);
+
+		if (newA == a && newB == b) return this;
+		else return create(newA, newB); 
 	}
 }

@@ -48,12 +48,20 @@ public class Implication extends Disjunction {
 
 	@Override
 	public Predicate replace(Map<AccessExpression, Expression> replacements) {
-		return create(a.replace(replacements), b.replace(replacements));
+		Predicate newA = a.replace(replacements);
+		Predicate newB = b.replace(replacements);
+
+		if (newA == a && newB == b) return this; 
+		else return create(newA, newB);  
 	}
 	
 	@Override
 	public Predicate update(AccessExpression expression, Expression newExpression) {
-		return create(a.update(expression, newExpression), b.update(expression, newExpression));
+		Predicate newA = a.update(expression, newExpression);
+		Predicate newB = b.update(expression, newExpression);
+
+		if (newA == a && newB == b) return this;
+		else return create(newA, newB); 
 	}
 
 }
