@@ -1,0 +1,356 @@
+verbatimtex
+%&latex
+\documentclass{article}
+\begin{document}
+etex
+
+input metauml;
+%input TEX;
+
+beginfig(1)
+
+bboxmargin := 30;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Class.SymbolTable("SymbolTable")(
+    "- localVariables: Map<Root, LocalVariable>",
+    "- returnValues: Map<ReturnValue, LocalVariable>",
+    "- loadedClasses: Map<PackageAndClass, LoadedClass>",
+    "- universe: Universe"
+)(
+    "+ getLocalVariables(): LocalVariable[0..*]",
+    "+ getReturnValues(): LocalVariable[0..*]",
+    "+ getLoadedClasses(): LoadedClass[0..*]",
+    "+ addPrimitiveLocalVariable(Root name): void",
+    "+ addHeapValueLocalVariable(Root name): void",
+    "+ addPrimitiveReturn(ReturnValue value): void",
+    "+ addHeapValueReturn(ReturnValue value): void",
+    "+ addClass(ThreadInfo thread, ElementInfo classObject): void",
+    "+ addThread(ThreadInfo thread, ElementInfo elementInfo): void",
+    "+ lookupValues(AccessExpression access): UniverseStructuredValue[0..*]",
+    "+ valueToAccessExpressions(UniverseStructuredValue value, int max): AccessExpression[0..*]",
+    "+ processPrimitiveStore(Expression from, SymbolTable fromTable, AccessExpression to): AccessExpression[0..*]",
+    "+ processObjectStore(Expression from, SymbolTable fromTable, AccessExpression to): AccessExpression[0..*]",
+    "- ensureAnonymousObjectExistence(Expression expression): void",
+    "+ isObject(AccessExpression expression): boolean",
+    "+ isArray(AccessExpression expression): boolean",
+    "+ isPrimitive(AccessExpression expression): boolean",
+    "+ toString(): String"
+);
+
+Class.Universe("Universe")(
+    "- currentRealization: Map<StructuredValueIdentifier, UniverseStructuredValue>",
+    "- NULL: int"
+)(
+    "- createNull(): void",
+    "+ contains(StructuredValueIdentifier id): boolean",
+    "+ contains(Reference reference): boolean",
+    "+ contains(ClassName className): boolean",
+    "+ get(StructuredValueIdentifier id): UniverseStructuredValue",
+    "+ get(Reference ref): HeapValue",
+    "+ get(ClassName className): UniverseClass",
+    "+ lookupValues(Root[0..*] roots, AccessExpression access): Value[0..*]",
+    "+ getStructuredValues(): UniverseStructuredValue[0..*]",
+    "+ toString(): String"
+);
+
+Class.Identifier("Identifier")()();
+classStereotypes.Identifier("<<interface>>");
+Identifier.info.iAttributeStack.top    := 0;
+Identifier.info.iAttributeStack.bottom := 0;
+Identifier.info.iMethodStack.top       := 0;
+Identifier.info.iMethodStack.bottom    := 0;
+
+Class.UniverseIdentifier("UniverseIdentifier")()();
+classStereotypes.UniverseIdentifier("<<interface>>");
+UniverseIdentifier.info.iAttributeStack.top    := 0;
+UniverseIdentifier.info.iAttributeStack.bottom := 0;
+UniverseIdentifier.info.iMethodStack.top       := 0;
+UniverseIdentifier.info.iMethodStack.bottom    := 0;
+
+Class.StructuredValueIdentifier("StructuredValueIdentifier")()();
+classStereotypes.StructuredValueIdentifier("<<interface>>");
+StructuredValueIdentifier.info.iAttributeStack.top    := 0;
+StructuredValueIdentifier.info.iAttributeStack.bottom := 0;
+StructuredValueIdentifier.info.iMethodStack.top       := 0;
+StructuredValueIdentifier.info.iMethodStack.bottom    := 0;
+
+Class.PrimitiveValueIdentifier("PrimitiveValueIdentifier")(
+    "- uuid: UUID"
+)(
+    "+ getUUID(): UUID"
+);
+
+Class.Reference("Reference")(
+    "- elementInfo: ElementInfo",
+    "- threadInfo: ThreadInfo"
+)(
+    "+ getReference(): Integer"
+);
+Class.ClazzName("ClassName")(
+    "- className: String"
+)(
+    "+ getClassName(): String"
+);
+
+Class.LocalVariable("LocalVariable")()();
+classStereotypes.LocalVariable("<<interface>>");
+LocalVariable.info.iAttributeStack.top    := 0;
+LocalVariable.info.iAttributeStack.bottom := 0;
+LocalVariable.info.iMethodStack.top       := 0;
+LocalVariable.info.iMethodStack.bottom    := 0;
+
+leftToRight.top(160)(UniverseIdentifier, Identifier, LocalVariable);
+
+leftToRight.top(160)(StructuredValueIdentifier, PrimitiveValueIdentifier);
+Group.subIdentifiers(StructuredValueIdentifier, PrimitiveValueIdentifier);
+
+leftToRight.top(80)(Reference, ClazzName);
+Group.subSubIdentifiers(Reference, ClazzName);
+
+topToBottom.midx(30)(UniverseIdentifier, subIdentifiers);
+topToBottom.midx(30)(StructuredValueIdentifier, subSubIdentifiers);
+Group.identifiers(UniverseIdentifier, Identifier, LocalVariable, subIdentifiers, subSubIdentifiers);
+
+Class.UniverseStructuredValue("UniverseStructuredValue")(
+    "# frozen: boolean",
+    "- parentSlots: <Identifier, UniverseSlotKey>[0..*]"
+)(
+    "+ freeze(): void",
+    "+ getParentSlots(): <Identifier, UniverseSlotKey>[0..*]",
+    "+ getIdentifier(): StructuredValueIdentifier",
+    "+ getSlot(UniverseSlotKey key): UniverseSlot",
+    "+ getSlots(): Map<UniverseSlotKey, UniverseSlot>",
+    "+ hashCode(): int",
+    "+ equals(Object object): boolean"
+);
+classStereotypes.UniverseStructuredValue("<<abstract>>");
+
+Class.UniverseClass("UniverseClass")(
+    "- identifier: ClassName",
+    "- fields: Map<FieldName, UniverseSlot>"
+)(
+    "+ getClassName(): ClassName"
+);
+
+Class.HeapValue("HeapValue")(
+    "- identifier: Reference"
+)(
+    "+ getReference(): Reference"
+);
+classStereotypes.HeapValue("<<abstract>>");
+
+Class.UniverseObject("UniverseObject")(
+    "- fields: Map<FieldName, UniverseSlot>"
+)();
+UniverseObject.info.iMethodStack.top    := 0;
+UniverseObject.info.iMethodStack.bottom := 0;
+
+Class.UniverseNull("UniverseNull")()();
+UniverseNull.info.iAttributeStack.top    := 0;
+UniverseNull.info.iAttributeStack.bottom := 0;
+UniverseNull.info.iMethodStack.top       := 0;
+UniverseNull.info.iMethodStack.bottom    := 0;
+
+Class.UniverseArray("UniverseArray")(
+    "- elements: Map<ElementIndex, UniverseSlot>"
+)();
+UniverseArray.info.iMethodStack.top    := 0;
+UniverseArray.info.iMethodStack.bottom := 0;
+
+leftToRight.top(80)(UniverseClass, HeapValue);
+Group.subValues(UniverseClass, HeapValue);
+
+leftToRight.top(80)(UniverseObject, UniverseNull, UniverseArray);
+Group.subSubValues(UniverseObject, UniverseNull, UniverseArray);
+
+topToBottom.midx(30)(UniverseStructuredValue, subValues);
+topToBottom.midx(30)(HeapValue, subSubValues);
+Group.values(UniverseStructuredValue, subValues, subSubValues);
+
+Class.UniverseSlotKey("UniverseSlotKey")()(
+    "+ hashCode(): int",
+    "+ equals(Object object): boolean"
+);
+classStereotypes.UniverseSlotKey("<<interface>>");
+UniverseSlotKey.info.iAttributeStack.top    := 0;
+UniverseSlotKey.info.iAttributeStack.bottom := 0;
+
+Class.FieldName("FieldName")(
+    "- name: String"
+)();
+FieldName.info.iMethodStack.top := 0;
+FieldName.info.iMethodStack.bottom := 0;
+
+Class.ElementIndex("ElementIndex")(
+    "- index: Integer"
+)();
+ElementIndex.info.iMethodStack.top := 0;
+ElementIndex.info.iMethodStack.bottom := 0;
+
+leftToRight.top(80)(FieldName, ElementIndex);
+Group.subSlotKeys(FieldName, ElementIndex);
+
+topToBottom.midx(30)(UniverseSlotKey, subSlotKeys);
+Group.slotKeys(UniverseSlotKey, subSlotKeys);
+
+Class.Associative("Associative")()(
+    "+ getField(FieldName name): UniverseSlot",
+    "+ getFields(): Map<FieldName, UniverseSlot>"
+);
+classStereotypes.Associative("<<interface>>");
+Associative.info.iAttributeStack.top    := 0;
+Associative.info.iAttributeStack.bottom := 0;
+
+Class.Indexed("Indexed")()(
+    "+ getElement(ElementIndex index): UniverseSlot",
+    "+ getElements(): Map<ElementIndex, UniverseSlot>",
+    "+ getLength(): Integer"
+);
+classStereotypes.Indexed("<<interface>>");
+Indexed.info.iAttributeStack.top    := 0;
+Indexed.info.iAttributeStack.bottom := 0;
+
+Group.entities(Associative, Indexed);
+
+topToBottom.midx(60)(UniverseObject, Associative);
+topToBottom.midx(60)(UniverseArray, Indexed);
+
+Class.UniverseSlot("UniverseSlot")()(
+    "+ freeze(): void",
+    "+ getParent(): Identifier",
+    "+ getSlotKey(): UniverseSlotKey",
+    "+ getPossibleValues(): UniverseIdentifier[0..*]",
+    "+ clear(): void"
+);
+classStereotypes.UniverseSlot("<<interface>>");
+UniverseSlot.info.iAttributeStack.top    := 0;
+UniverseSlot.info.iAttributeStack.bottom := 0;
+
+Class.AbstractUniverseSlot("AbstractUniverseSlot")(
+    "# frozen: boolean",
+    "- parent: Identifier",
+    "- slotKey: UniverseSlotKey"
+)();
+classStereotypes.AbstractUniverseSlot("<<abstract>>");
+AbstractUniverseSlot.info.iMethodStack.top    := 0;
+AbstractUniverseSlot.info.iMethodStack.bottom := 0;
+
+Class.StructuredValueSlot("StructuredValueSlot")(
+    "- possibleValues: StructuredValueIdentifier[0..*]"
+)(
+    "+ getPossibleStructuredValues(): StructuredValueIdentifier[0..*]",
+    "+ addPossibleStructuredValue(StructuredValueIdentifier value): void"
+);
+
+Class.PrimitiveValueSlot("PrimitiveValueSlot")(
+    "- possibleValues: PrimitiveValueIdentifier[0..*]"
+)(
+    "+ getPossiblePrimitiveValues(): PrimitiveValueIdentifier[0..*]",
+    "+ addPossiblePrimitiveValue(PrimitiveValueIdentifier value): void"
+);
+
+Class.LoadedClass("LoadedClass")()();
+LoadedClass.info.iAttributeStack.top    := 0;
+LoadedClass.info.iAttributeStack.bottom := 0;
+LoadedClass.info.iMethodStack.top       := 0;
+LoadedClass.info.iMethodStack.bottom    := 0;
+
+Class.StructuredLocalVariable("StructuredLocalVariable")()();
+StructuredLocalVariable.info.iAttributeStack.top    := 0;
+StructuredLocalVariable.info.iAttributeStack.bottom := 0;
+StructuredLocalVariable.info.iMethodStack.top       := 0;
+StructuredLocalVariable.info.iMethodStack.bottom    := 0;
+
+Class.PrimitiveLocalVariable("PrimitiveLocalVariable")()();
+PrimitiveLocalVariable.info.iAttributeStack.top    := 0;
+PrimitiveLocalVariable.info.iAttributeStack.bottom := 0;
+PrimitiveLocalVariable.info.iMethodStack.top       := 0;
+PrimitiveLocalVariable.info.iMethodStack.bottom    := 0;
+
+leftToRight.top(80)(PrimitiveValueSlot, StructuredValueSlot);
+Group.subSlots(PrimitiveValueSlot, StructuredValueSlot);
+
+leftToRight.top(80)(StructuredLocalVariable, LoadedClass);
+Group.subSubSlotsi(StructuredLocalVariable, LoadedClass);
+Group.subSubSlotsii(PrimitiveLocalVariable);
+
+topToBottom.midx(30)(StructuredValueSlot, subSubSlotsi);
+topToBottom.midx(30)(PrimitiveValueSlot, subSubSlotsii);
+
+topToBottom.midx(30)(UniverseSlot, AbstractUniverseSlot, subSlots);
+Group.slots(UniverseSlot, AbstractUniverseSlot, subSlots, subSubSlotsi, subSubSlotsii);
+
+topToBottom.midx(80)(SymbolTable, Universe);
+
+same.midy(LocalVariable, UniverseSlot);
+same.top(SymbolTable, UniverseSlotKey, UniverseStructuredValue);
+
+LocalVariable.right = UniverseSlot.left - 480;
+SymbolTable.left    = Reference.left;
+Indexed.right       = StructuredValueSlot.right;
+
+UniverseSlotKey.left - SymbolTable.right = UniverseStructuredValue.left - UniverseSlotKey.right;
+
+Universe.midy = Identifier.top + 160;
+
+drawObjects(SymbolTable, Universe, identifiers, values, slots, entities, slotKeys);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+link(composition)(Universe.n -- SymbolTable.s);
+
+link(inheritance)(UniverseIdentifier.e -- Identifier.w);
+link(inheritance)(LoadedClass.s        -- (LoadedClass.s + (0, -40)) -- (Identifier.midx, LoadedClass.bottom - 40) -- Identifier.s);
+link(inheritance)(LocalVariable.w      -- Identifier.e);
+
+link(inheritance)(StructuredValueIdentifier.n -- (UniverseIdentifier.s + (-20, 0)));
+link(inheritance)(PrimitiveValueIdentifier.n  -- (UniverseIdentifier.s + ( 20, 0)));
+
+link(inheritance)(Reference.n -- (StructuredValueIdentifier.s + (-10, 0)));
+link(inheritance)(ClazzName.n -- (StructuredValueIdentifier.s + ( 10, 0)));
+
+link(inheritance)(UniverseClass.n -- (UniverseStructuredValue.s + (-20, 0)));
+link(inheritance)(HeapValue.n     -- (UniverseStructuredValue.s + ( 20, 0)));
+
+link(inheritance)(UniverseObject.n -- (HeapValue.s + (-20, 0)));
+link(inheritance)(UniverseNull.n   -- (HeapValue.s + (  0, 0)));
+link(inheritance)(UniverseArray.n  -- (HeapValue.s + ( 20, 0)));
+
+link(inheritance)(UniverseClass.w  -- (UniverseClass.w + (-20, 0)) -- (UniverseClass.left - 20, Associative.midy) -- Associative.w);
+link(inheritance)(UniverseObject.s --  Associative.n);
+link(inheritance)(UniverseNull.s   -- (Associative.n + ( 20, 0)));
+link(inheritance)(UniverseNull.s   -- (Indexed.n  + (-20, 0)));
+link(inheritance)(UniverseArray.s  --  Indexed.n);
+
+link(inheritance)(LocalVariable.e        -- UniverseSlot.w);
+link(inheritance)(AbstractUniverseSlot.n -- UniverseSlot.s);
+
+link(inheritance)(PrimitiveValueSlot.n  -- (AbstractUniverseSlot.s + (-20, 0)));
+link(inheritance)(StructuredValueSlot.n -- (AbstractUniverseSlot.s + ( 20, 0)));
+
+link(inheritance)(PrimitiveLocalVariable.n -- PrimitiveValueSlot.s);
+
+link(inheritance)(StructuredLocalVariable.n -- (StructuredValueSlot.s + (-20, 0)));
+link(inheritance)(LoadedClass.n             -- (StructuredValueSlot.s + ( 20, 0)));
+
+link(inheritance)(StructuredLocalVariable.s -- (StructuredLocalVariable.s + (0, -20)) -- (LocalVariable.midx, StructuredLocalVariable.bottom - 20) -- LocalVariable.s);
+link(association)(PrimitiveLocalVariable.s -- (PrimitiveLocalVariable.s + (0, -20)));
+
+link(inheritance)(FieldName.n    -- (UniverseSlotKey.s + (-20, 0)));
+link(inheritance)(ElementIndex.n -- (UniverseSlotKey.s + ( 20, 0)));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+pair ul, ur, lr, ll;
+
+ul := (ulcorner currentpicture) + (-30,  30);
+ur := (urcorner currentpicture) + ( 30,  30);
+lr := (lrcorner currentpicture) + ( 30, -30);
+ll := (llcorner currentpicture) + (-30, -30);
+
+setbounds currentpicture to (ul--ur--lr--ll--cycle);
+endfig;
+
+end
