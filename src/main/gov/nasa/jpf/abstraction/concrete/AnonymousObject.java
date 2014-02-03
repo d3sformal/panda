@@ -11,6 +11,8 @@ import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Tautology;
 
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+
 /**
  * Represents a freshly allocated object (freshly allocated = not loaded from a variable)
  *
@@ -121,14 +123,14 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 		if (o instanceof AnonymousObject) {
 			AnonymousObject ao = (AnonymousObject) o;
 
-			return getReference().getObjectRef() == ao.getReference().getObjectRef();
+			return getReference().getReference() == ao.getReference().getReference();
 		}
 		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return getReference().getObjectRef();
+		return getReference().getReference();
 	}
 
 }

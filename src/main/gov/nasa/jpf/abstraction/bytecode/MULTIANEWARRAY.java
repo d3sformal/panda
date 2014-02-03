@@ -5,7 +5,7 @@ import java.util.List;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
-import gov.nasa.jpf.abstraction.concrete.Reference;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.ArrayFields;
@@ -49,7 +49,7 @@ public class MULTIANEWARRAY extends gov.nasa.jpf.jvm.bytecode.MULTIANEWARRAY {
 		ElementInfo array = ti.getElementInfo(sf.peek());
 		
 		sf = ti.getModifiableTopFrame();
-		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousArray.create(new Reference(ti, array), attr.getExpression())));
+		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousArray.create(new Reference(array, ti), attr.getExpression())));
 		
 		// ALL ELEMENTS ARE NULL
 		setArrayAttributes(ti, array, attrs);

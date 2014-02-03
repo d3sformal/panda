@@ -189,12 +189,12 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 
 	@Override
 	public void visit(AnonymousObject expression) {
-		fresh.add(expression.getReference().getObjectRef());
+		fresh.add(expression.getReference().getReference());
 	}
 
 	@Override
 	public void visit(AnonymousArray expression) {
-		fresh.add(expression.getReference().getObjectRef());
+		fresh.add(expression.getReference().getReference());
 		
 		expression.getArrayLength().accept(this);
 	}

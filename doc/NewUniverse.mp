@@ -55,12 +55,13 @@ Class.Universe("Universe")(
     "+ toString(): String"
 );
 
-Class.Identifier("Identifier")()();
+Class.Identifier("Identifier")()(
+    "+ hashCode(): int",
+    "+ equals(Object object): boolean"
+);
 classStereotypes.Identifier("<<interface>>");
 Identifier.info.iAttributeStack.top    := 0;
 Identifier.info.iAttributeStack.bottom := 0;
-Identifier.info.iMethodStack.top       := 0;
-Identifier.info.iMethodStack.bottom    := 0;
 
 Class.UniverseIdentifier("UniverseIdentifier")()();
 classStereotypes.UniverseIdentifier("<<interface>>");
@@ -89,19 +90,20 @@ Class.Reference("Reference")(
     "+ getReference(): Integer"
 );
 Class.ClazzName("ClassName")(
-    "- className: String"
+    "- staticElementInfo: StaticElementInfo",
+    "- threadInfo: ThreadInfo"
 )(
     "+ getClassName(): String"
 );
 
-Class.LocalVariable("LocalVariable")()();
+Class.LocalVariable("LocalVariable")()(
+    "+ getAccessExpression(): Root"
+);
 classStereotypes.LocalVariable("<<interface>>");
 LocalVariable.info.iAttributeStack.top    := 0;
 LocalVariable.info.iAttributeStack.bottom := 0;
-LocalVariable.info.iMethodStack.top       := 0;
-LocalVariable.info.iMethodStack.bottom    := 0;
 
-leftToRight.top(160)(UniverseIdentifier, Identifier, LocalVariable);
+leftToRight.midy(160)(UniverseIdentifier, Identifier, LocalVariable);
 
 leftToRight.top(160)(StructuredValueIdentifier, PrimitiveValueIdentifier);
 Group.subIdentifiers(StructuredValueIdentifier, PrimitiveValueIdentifier);
@@ -122,6 +124,7 @@ Class.UniverseStructuredValue("UniverseStructuredValue")(
     "+ getIdentifier(): StructuredValueIdentifier",
     "+ getSlot(UniverseSlotKey key): UniverseSlot",
     "+ getSlots(): Map<UniverseSlotKey, UniverseSlot>",
+    "+ createShallowCopy(): UniverseStructuredValue",
     "+ hashCode(): int",
     "+ equals(Object object): boolean"
 );
@@ -179,15 +182,17 @@ UniverseSlotKey.info.iAttributeStack.bottom := 0;
 
 Class.FieldName("FieldName")(
     "- name: String"
-)();
-FieldName.info.iMethodStack.top := 0;
-FieldName.info.iMethodStack.bottom := 0;
+)(
+    "+ getName(): String"
+);
+classStereotypes.FieldName("<<comparable>>");
 
 Class.ElementIndex("ElementIndex")(
     "- index: Integer"
-)();
-ElementIndex.info.iMethodStack.top := 0;
-ElementIndex.info.iMethodStack.bottom := 0;
+)(
+    "+ getIndex(): Integer"
+);
+classStereotypes.ElementIndex("<<comparable>>");
 
 leftToRight.top(80)(FieldName, ElementIndex);
 Group.subSlotKeys(FieldName, ElementIndex);
@@ -197,7 +202,8 @@ Group.slotKeys(UniverseSlotKey, subSlotKeys);
 
 Class.Associative("Associative")()(
     "+ getField(FieldName name): UniverseSlot",
-    "+ getFields(): Map<FieldName, UniverseSlot>"
+    "+ getFields(): Map<FieldName, UniverseSlot>",
+    "+ setField(FieldName name, UniverseIdentifier value): void"
 );
 classStereotypes.Associative("<<interface>>");
 Associative.info.iAttributeStack.top    := 0;
@@ -206,6 +212,7 @@ Associative.info.iAttributeStack.bottom := 0;
 Class.Indexed("Indexed")()(
     "+ getElement(ElementIndex index): UniverseSlot",
     "+ getElements(): Map<ElementIndex, UniverseSlot>",
+    "+ setElement(ElementIndex index, UniverseIdentifier value): void",
     "+ getLength(): Integer"
 );
 classStereotypes.Indexed("<<interface>>");
@@ -222,7 +229,8 @@ Class.UniverseSlot("UniverseSlot")()(
     "+ getParent(): Identifier",
     "+ getSlotKey(): UniverseSlotKey",
     "+ getPossibleValues(): UniverseIdentifier[0..*]",
-    "+ clear(): void"
+    "+ clear(): void",
+    "+ createShallowCopy(): UniverseSlot"
 );
 classStereotypes.UniverseSlot("<<interface>>");
 UniverseSlot.info.iAttributeStack.top    := 0;
@@ -251,11 +259,11 @@ Class.PrimitiveValueSlot("PrimitiveValueSlot")(
     "+ addPossiblePrimitiveValue(PrimitiveValueIdentifier value): void"
 );
 
-Class.LoadedClass("LoadedClass")()();
+Class.LoadedClass("LoadedClass")()(
+    "+ getAccessExpression(): PackageAndClass"
+);
 LoadedClass.info.iAttributeStack.top    := 0;
 LoadedClass.info.iAttributeStack.bottom := 0;
-LoadedClass.info.iMethodStack.top       := 0;
-LoadedClass.info.iMethodStack.bottom    := 0;
 
 Class.StructuredLocalVariable("StructuredLocalVariable")()();
 StructuredLocalVariable.info.iAttributeStack.top    := 0;

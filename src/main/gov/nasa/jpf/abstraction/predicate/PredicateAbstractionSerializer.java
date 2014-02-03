@@ -29,6 +29,7 @@ import java.util.Comparator;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
+import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Fields;
@@ -51,17 +52,19 @@ import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Universe;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.LocalVariable;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.StructuredValue;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Slot;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.StructuredValueSlot;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.UniverseIdentifier;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapObject;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapArray;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.HeapObjectReference;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassStatics;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.ClassStaticsReference;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseStructuredValue;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseSlot;
+import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueSlot;
+import gov.nasa.jpf.abstraction.predicate.state.universe.FieldName;
+import gov.nasa.jpf.abstraction.predicate.state.universe.ElementIndex;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseObject;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseArray;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseClass;
+import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueIdentifier;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.predicate.state.universe.LocalVariable;
 
 /**
  * a serializer that uses Abstract values stored in attributes 
@@ -73,187 +76,84 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     private int depth = 0;
     private PredicateAbstraction pabs;
     private Universe universe;
-    private Map<UniverseIdentifier, Integer> canonical = new HashMap<UniverseIdentifier, Integer>();
+    private Map<StructuredValueIdentifier, Integer> canonical = new HashMap<StructuredValueIdentifier, Integer>();
 
 	public PredicateAbstractionSerializer(Config conf) {
 	}
 
-    private Integer canonicalId (StructuredValue value) {
-        return canonical.get(value.getReference());
+    private Integer canonicalId (StructuredValueIdentifier value) {
+        return canonical.get(value);
     }
 
-    private int currentType (StructuredValue value) {
-        return universe.get(value.getReference()).getElementInfo().getClassInfo().getName().hashCode();
+    private int getValueType(Reference ref) {
+        return ref.getElementInfo().getClassInfo().getName().hashCode();
     }
 
-    protected Set<StructuredValue> sortStructuredValues(Set<StructuredValue> values) {
-    	Set<StructuredValue> order = new TreeSet<StructuredValue>();
-
-        order.addAll(values);
-
-        return order;
+    private SortedSet<StructuredValueIdentifier> sortStructuredValues(Set<StructuredValueIdentifier> values) {
+        throw new RuntimeException("IMPLEMENT");
     }
 
     protected void serializeHeap() {    
-    	Set<StructuredValue> sorted = sortStructuredValues(collectReachableHeap());
+    	Set<StructuredValueIdentifier> sorted = sortStructuredValues(collectReachableHeap());
 	    int i = 0;
 	
     	canonical.clear();
 	
         // define canonical ids for all heap objects
-	    for (StructuredValue value : sorted) {
-	        canonical.put(value.getReference(), i);
+	    for (StructuredValueIdentifier value : sorted) {
+	        canonical.put(value, i);
     	    ++i;
 	    }
 
-        for (StructuredValue value : sorted) {
+        for (StructuredValueIdentifier value : sorted) {
             serializeStructuredValue(value);
         }
     }
 
-    protected void serializeSlot(Slot slot) {
+    protected void serializeSlot(UniverseSlot slot) {
         if (slot instanceof StructuredValueSlot) {
             StructuredValueSlot svs = (StructuredValueSlot) slot;
 
-            buf.add(svs.getPossibleHeapValues().size());
+            buf.add(svs.getPossibleStructuredValues().size());
 
-            for (StructuredValue p : sortStructuredValues(svs.getPossibleHeapValues())) {
+            for (StructuredValueIdentifier p : sortStructuredValues(svs.getPossibleStructuredValues())) {
                 buf.add(canonicalId(p));
             }
         }
     }
 
-    protected void serializeStructuredValue(StructuredValue value) {
-        if (value instanceof HeapArray) {
-            HeapArray a = (HeapArray) value;
-            buf.add(HeapArray.class.hashCode());
+    protected void serializeStructuredValue(StructuredValueIdentifier id) {
+        UniverseStructuredValue value = universe.get(id);
+
+        if (value instanceof UniverseArray) {
+            UniverseArray a = (UniverseArray) value;
+            buf.add(UniverseArray.class.hashCode());
             buf.add(a.getLength());
 
-            for (Integer index : new TreeSet<Integer>(a.getElements().keySet())) {
+            for (ElementIndex index : new TreeSet<ElementIndex>(a.getElements().keySet())) {
                 serializeSlot(a.getElement(index));
             }
-        } else if (value instanceof HeapObject) {
-            HeapObject o = (HeapObject) value;
-            buf.add(HeapObject.class.hashCode());
+        } else if (value instanceof UniverseObject) {
+            UniverseObject o = (UniverseObject) value;
+            buf.add(UniverseObject.class.hashCode());
             buf.add(o.getFields().size());
 
-            for (String field : new TreeSet<String>(o.getFields().keySet())) {
+            for (FieldName field : new TreeSet<FieldName>(o.getFields().keySet())) {
             	serializeSlot(o.getField(field));
             }
-        } else if (value instanceof ClassStatics) {
-            ClassStatics s = (ClassStatics) value;
-            buf.add(ClassStatics.class.hashCode());
-            buf.add(((ClassStaticsReference)s.getReference()).getClassName().hashCode());
+        } else if (value instanceof UniverseClass) {
+            UniverseClass c = (UniverseClass) value;
+            buf.add(UniverseClass.class.hashCode());
+            buf.add(c.getClassName().getClassName().hashCode());
 
-            for (String field : new TreeSet<String>(s.getFields().keySet())) {
-            	serializeSlot(s.getField(field));
+            for (FieldName field : new TreeSet<FieldName>(c.getFields().keySet())) {
+            	serializeSlot(c.getField(field));
             }
         }
     }
 
-    protected SortedSet<StructuredValue> collectReachableHeap() {
-        TreeSet<StructuredValue> heap = new TreeSet<StructuredValue>();
-
-        ThreadList tl = ks.getThreadList();
-
-        // Collect all objects stored in live variables
-
-        for (ThreadInfo ti : tl) {
-            heap.add(universe.get(ti.getThreadObjectRef()));
-
-            if (ti.isAlive()) {
-                for (int depth = 0; depth < pabs.getSymbolTable().depth(); ++depth) {
-                    FlatSymbolTable sym = pabs.getSymbolTable().get(depth);
-
-                    for (Root lv : sym.getLocalVariables()) {
-                        if (sym.getLocal(lv).getSlot() instanceof StructuredValueSlot) {
-                            StructuredValueSlot svs = (StructuredValueSlot) sym.getLocal(lv).getSlot();
-
-                            for (StructuredValue possibility : svs.getPossibleHeapValues()) {
-                                if (universe.contains(possibility.getReference())) {
-                                    StructuredValue object = universe.get(possibility.getReference());
-
-                                    heap.add(object);
-                                } else {
-                                    throw new RuntimeException("Reached an unknown object " + possibility.getReference());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Collect all statics (modelled within abstract heap as distinguished objects)
-
-        for (ClassLoaderInfo cl : ks.classLoaders) {
-            if(cl.isAlive()) {
-                for (StaticElementInfo sei : cl.getStatics().liveStatics()) {
-                    ClassInfo cls = sei.getClassInfo();
-                    String ref = cls.getName();
-
-                    if (cls.isInitialized() && !cls.isInterface()) {
-                        if (universe.contains(ref)) {
-                            StructuredValue object = universe.get(ref);
-
-                            heap.add(object);
-                        } else {
-                            throw new RuntimeException("Reached an unknown class " + ref);
-                        }
-                    }
-                }
-            }
-        }
-
-        // Construct reachable closure
-
-        Set<StructuredValue> open = new HashSet<StructuredValue>();
-
-        open.addAll(heap);
-
-        while (!open.isEmpty()) {
-            Set<StructuredValue> nextGen = new HashSet<StructuredValue>();
-
-            for (StructuredValue object : open) {
-                Collection<Slot> slots = new HashSet<Slot>();
-
-                if (object instanceof HeapObject) {
-                    HeapObject ho = (HeapObject) object;
-
-                    slots = ho.getFields().values();
-                }
-
-                if (object instanceof HeapArray) {
-                    HeapArray ha = (HeapArray) object;
-
-                    slots = ha.getElements().values();
-                }
-
-                if (object instanceof ClassStatics) {
-                    ClassStatics cs = (ClassStatics) object;
-
-                    slots = cs.getFields().values();
-                }
-
-                for (Slot slot : slots) {
-                    if (slot instanceof StructuredValueSlot) {
-                        StructuredValueSlot s = (StructuredValueSlot) slot;
-
-                        for (StructuredValue child : s.getPossibleHeapValues()) {
-                            if (!heap.contains(child)) {
-                                nextGen.add(child);
-                            }
-                        }
-                    }
-                }
-            }
-
-            heap.addAll(open);
-            open.clear();
-            open.addAll(nextGen);
-        }
-
-        return heap;
+    protected Set<StructuredValueIdentifier> collectReachableHeap() {
+        throw new RuntimeException("MISSING IMPLEMENTATION"); //return current universe.keySet()
     }
 
     @Override
@@ -272,12 +172,19 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
     @Override
     public void processReference(int objRef) {
-        buf.add(canonicalId(universe.get(objRef)));
+        VM vm = VM.getVM();
+        ThreadInfo ti = vm.getCurrentThread();
+        ElementInfo ei = ti.getElementInfo(objRef);
+
+        buf.add(canonicalId(new Reference(ei, ti)));
     }
 
     @Override
-    protected int getSerializedReferenceValue (ElementInfo ei){
-        return canonicalId(universe.get(ei.getObjectRef()));
+    protected int getSerializedReferenceValue(ElementInfo ei){
+        VM vm = VM.getVM();
+        ThreadInfo ti = vm.getCurrentThread();
+
+        return canonicalId(new Reference(ei, ti));
     }
 
     @Override
@@ -328,16 +235,16 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         for (Root local : currentScope.getLocalVariables()) {
             LocalVariable v = currentScope.getLocal(local);
 
-            if (v.getSlot() instanceof StructuredValueSlot) {
-                StructuredValueSlot svs = (StructuredValueSlot)v.getSlot();
-                Set<StructuredValue> possibilities = svs.getPossibleHeapValues();
+            if (v instanceof StructuredValueSlot) {
+                StructuredValueSlot svs = (StructuredValueSlot)v;
+                Set<StructuredValueIdentifier> possibilities = svs.getPossibleStructuredValues();
 
                 buf.add(possibilities.size());
 
-                Set<StructuredValue> possibilitiesOrder = sortStructuredValues(possibilities);
+                Set<StructuredValueIdentifier> possibilitiesOrder = sortStructuredValues(possibilities);
 
-                for (StructuredValue p : possibilitiesOrder) {
-                    buf.add(currentType(p));
+                for (StructuredValueIdentifier p : possibilitiesOrder) {
+                    buf.add(getValueType((Reference) p));
                     buf.add(canonicalId(p));
                 }
             }

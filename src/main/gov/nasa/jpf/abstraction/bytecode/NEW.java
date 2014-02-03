@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
-import gov.nasa.jpf.abstraction.concrete.Reference;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -27,7 +27,7 @@ public class NEW extends gov.nasa.jpf.jvm.bytecode.NEW {
 		StackFrame sf = ti.getModifiableTopFrame();
 		ElementInfo object = ti.getElementInfo(sf.peek());
 
-		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousObject.create(new Reference(ti, object))));
+		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousObject.create(new Reference(object, ti))));
 
 		return actualNextInsn;
 	}

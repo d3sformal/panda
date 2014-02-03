@@ -13,7 +13,6 @@ import gov.nasa.jpf.abstraction.common.BranchingCondition;
 import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
 import gov.nasa.jpf.abstraction.common.BranchingDecision;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
-import gov.nasa.jpf.abstraction.predicate.state.AffectedAccessExpressions;
 import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
@@ -73,14 +72,14 @@ public class PredicateAbstraction extends Abstraction {
 	
 	@Override
 	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		AffectedAccessExpressions affected = symbolTable.processMethodReturn(threadInfo, before, after, null);
-		predicateValuation.processMethodReturn(threadInfo, before, after, affected);
+		symbolTable.processMethodReturn(threadInfo, before, after);
+		predicateValuation.processMethodReturn(threadInfo, before, after);
 	}
 	
 	@Override
 	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		AffectedAccessExpressions affected = symbolTable.processVoidMethodReturn(threadInfo, before, after, null);
-		predicateValuation.processVoidMethodReturn(threadInfo, before, after, affected);
+		symbolTable.processVoidMethodReturn(threadInfo, before, after);
+		predicateValuation.processVoidMethodReturn(threadInfo, before, after);
 	}
 	
 	@Override
@@ -93,7 +92,7 @@ public class PredicateAbstraction extends Abstraction {
     @Override
     public void processNewClass(ThreadInfo thread, ClassInfo classInfo) {
 		// register class into the symbol table (universe)
-        symbolTable.get(0).addClass(classInfo.getName(), thread, classInfo.getStaticElementInfo());
+        symbolTable.get(0).addClass(classInfo.getStaticElementInfo(), thread);
     }
 	
 	@Override

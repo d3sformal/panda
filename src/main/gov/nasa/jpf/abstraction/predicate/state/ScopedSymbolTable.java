@@ -8,9 +8,9 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
-import gov.nasa.jpf.abstraction.concrete.Reference;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.predicate.state.symbols.Universe;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -75,7 +75,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			
 			LocalVarInfo args = method.getArgumentLocalVars()[0];
 
-			ret.processObjectStore(AnonymousArray.create(new Reference(threadInfo, ei), Constant.create(length)), DefaultRoot.create(args.getName()));
+			ret.processObjectStore(AnonymousArray.create(new Reference(ei, threadInfo), Constant.create(length)), DefaultRoot.create(args.getName()));
 		}
 		
 		return ret;
@@ -95,13 +95,13 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	 * At a method call it is necessary to change the scope correspondingly
 	 */
 	@Override
-	public AffectedAccessExpressions processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
 		
 		FlatSymbolTable originalScope = scopes.top();
 		FlatSymbolTable transitionScope = createDefaultScope(threadInfo, method);
-		
-		transitionScope.updateUniverse(scopes.top());
+
+        if (originalScope != transitionScope /** essentially true ... just tricking the compiler **/) throw new RuntimeException("copy last scope, with different set of locals + empty returns");
 		
 		scopes.push(transitionScope);
 
@@ -135,12 +135,10 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 				}
 			}
 		}
-		
-		return null;
 	}
 	
 	@Override
-	public AffectedAccessExpressions processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
+	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		ReturnValue calleeReturnValue = DefaultReturnValue.create();
 		ReturnValue callerReturnValue = DefaultReturnValue.create(threadInfo.getPC(), before.getMethodInfo().isReferenceReturnType());
 
@@ -174,37 +172,15 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
         /**
          * Handle the rest as if there were no return values
          */
-		return processVoidMethodReturn(threadInfo, before, after, sideEffect);
+		processVoidMethodReturn(threadInfo, before, after);
 	}
 	
 	@Override
-	public AffectedAccessExpressions processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
-		AffectedAccessExpressions ret = new AffectedAccessExpressions();
-		
-		FlatSymbolTable transitionScope = scopes.top(1);
-		
-		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
-
-		/**
-		 * Detect what objects accessible in the caller scope were modified in the callee
-		 */
-		if (RunDetector.isRunning()) {			
-			Set<AccessExpression> modifications = transitionScope.getModifiedObjectAccessExpressions(scopes.top());
-			
-			ret.addAll(modifications);
-		}
-		
-        /**
-         * Propagate heap modifications from callee to the caller
-         */
-		transitionScope.updateUniverse(scopes.top());
-		
+	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         /**
          * Drop callee scope
          */
 		scopes.pop();
-		
-		return ret;
 	}
 	
 	@Override

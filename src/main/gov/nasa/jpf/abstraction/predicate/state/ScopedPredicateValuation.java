@@ -162,7 +162,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public SideEffect processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
 		
         // Scope to be added as the callee scope
@@ -226,8 +226,6 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 		}
 		
 		scopes.push(finalScope);
-		
-		return null;
 	}
 	
 	private static boolean isPredicateOverReturn(Predicate predicate) {
@@ -247,7 +245,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public SideEffect processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
+	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
 
         if (RunDetector.isRunning()) {
@@ -291,13 +289,12 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
         }
 		
         // The rest is the same as if no return happend
-		return processVoidMethodReturn(threadInfo, before, after, sideEffect);
+		processVoidMethodReturn(threadInfo, before, after);
 	}
 	
 	@Override
-	public SideEffect processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after, SideEffect sideEffect) {
+	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         if (RunDetector.isRunning()) {
-			AffectedAccessExpressions affected = (AffectedAccessExpressions) sideEffect; // MAY BE USED OR NOT ... OVERAPPROXIMATING THIS MAY SAVE A LOT WHEN DETERMINING THE sideEffect SET
 			FlatPredicateValuation callerScope;
 			
 			callerScope = scopes.top(1);
@@ -433,9 +430,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					canBeAffected |= path.isStatic();
 					
                     // objects modified in the heap
-					for (AccessExpression affectedPath : affected) {
-						canBeAffected |= affectedPath.isPrefixOf(path);
-					}
+					//for (AccessExpression affectedPath : affected) {
+					//	canBeAffected |= affectedPath.isPrefixOf(path);
+					//}
+                    
+                    throw new RuntimeException("Mark all reference method parameters as possibly affected");
 				}
 				
                 // Predicates are either updated (when they were possibly affected) or can be used for value inference.
@@ -461,8 +460,6 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
         }
 		
 		scopes.pop();
-		
-		return null;
 	}
 	
 	@Override
