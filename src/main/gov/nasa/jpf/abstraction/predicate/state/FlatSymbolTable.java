@@ -81,7 +81,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	/**
 	 * Abstract heap
 	 */
-	private Universe universe = new Universe();
+	private Universe universe;
 	
 	/**
 	 * Entry points to the abstract heap
@@ -102,8 +102,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
 	private PredicateAbstraction abstraction;
 	
-	public FlatSymbolTable(PredicateAbstraction abstraction) {
+	public FlatSymbolTable(Universe universe, PredicateAbstraction abstraction) {
 		this.abstraction = abstraction;
+        this.universe = universe;
 	}
 
     public FlatSymbolTable(FlatSymbolTable previous) {
@@ -498,19 +499,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			}
 		}
 
-        System.err.println(to + " := " + from + " \t " + ret);
-
-        Set<UniverseIdentifier> objs = new HashSet<UniverseIdentifier>();
-
-        lookupValues(to, objs);
-
-        for (UniverseIdentifier id : objs) {
-            Set<AccessExpression> vals = new HashSet<AccessExpression>();
-            valueToAccessExpressions(id, 10, vals);
-
-            System.err.println(to + " = " + vals);
-        }
-		
 		return ret;
 	}
 
@@ -578,9 +566,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	@Override
 	public FlatSymbolTable clone() {
-		FlatSymbolTable clone = new FlatSymbolTable(abstraction);
+		FlatSymbolTable clone = new FlatSymbolTable(universe.clone(), abstraction);
 		
-		clone.universe = universe.clone();
 		clone.locals = new HashMap<Root, LocalVariable>();
 		clone.returns = new HashMap<ReturnValue, LocalVariable>();
 		clone.classes = new HashMap<PackageAndClass, LoadedClass>();

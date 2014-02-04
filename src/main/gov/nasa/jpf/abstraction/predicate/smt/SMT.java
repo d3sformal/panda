@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.Iterator;
 
 /**
@@ -235,11 +236,17 @@ public class SMT {
 		}
 		input.append(separator);
 		
+        Set<String> freshConstraints = new HashSet<String>();
+
 		for (AccessExpression object : objects) {
 			Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.create(DefaultFresh.create(), object)));
 			
-			input.append("(assert "); input.append(convertToString(distinction)); input.append(")"); input.append(separator);
+			freshConstraints.add("(assert " + convertToString(distinction) + ")" + separator);
 		}
+
+        for (String constraint : freshConstraints) {
+            input.append(constraint);
+        }
 		input.append(separator);
 
         Iterator<Predicate> predicatesIterator = predicates.iterator();

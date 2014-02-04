@@ -28,6 +28,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	/**
 	 * Stack of scopes (pushed by invoke, poped by return)
 	 */
+    private Universe universe = new Universe();
 	private SymbolTableStack scopes = new SymbolTableStack();
 	private PredicateAbstraction abstraction;
 	
@@ -36,7 +37,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		
 		// Scope for passing what has been statically initialised
 		// without this all static initialisations return and remove their scope without writing it anywhere else
-		scopes.push(new FlatSymbolTable(abstraction));
+		scopes.push(new FlatSymbolTable(universe, abstraction));
 	}
 
 	/**
