@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.state.universe;
 
-public abstract class HeapValue extends UniverseStructuredValue {
+public abstract class HeapValue extends StructuredValue {
     private Reference identifier;
 
     public HeapValue(Reference identifier) {

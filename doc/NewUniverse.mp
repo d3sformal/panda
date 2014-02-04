@@ -28,8 +28,8 @@ Class.SymbolTable("SymbolTable")(
     "+ addHeapValueReturn(ReturnValue value): void",
     "+ addClass(ThreadInfo thread, ElementInfo classObject): void",
     "+ addThread(ThreadInfo thread, ElementInfo elementInfo): void",
-    "+ lookupValues(AccessExpression access): UniverseStructuredValue[0..*]",
-    "+ valueToAccessExpressions(UniverseStructuredValue value, int max): AccessExpression[0..*]",
+    "+ lookupValues(AccessExpression access): UniverseIdentifier[0..*]",
+    "+ valueToAccessExpressions(UniverseIdentifier value, int max): AccessExpression[0..*]",
     "+ processPrimitiveStore(Expression from, SymbolTable fromTable, AccessExpression to): AccessExpression[0..*]",
     "+ processObjectStore(Expression from, SymbolTable fromTable, AccessExpression to): AccessExpression[0..*]",
     "- ensureAnonymousObjectExistence(Expression expression): void",
@@ -40,18 +40,21 @@ Class.SymbolTable("SymbolTable")(
 );
 
 Class.Universe("Universe")(
-    "- currentRealization: Map<StructuredValueIdentifier, UniverseStructuredValue>",
+    "- currentStructuredRealization: Map<StructuredValueIdentifier, StructuredValue>",
+    "- currentPrimitiveRealization: Map<PrimitiveValueIdentifier, PrimitiveValue>",
     "- NULL: int"
 )(
     "- createNull(): void",
+    "+ contains(PrimitiveValueIdentifier id): boolean",
     "+ contains(StructuredValueIdentifier id): boolean",
     "+ contains(Reference reference): boolean",
     "+ contains(ClassName className): boolean",
-    "+ get(StructuredValueIdentifier id): UniverseStructuredValue",
+    "+ get(PrimitiveValueIdentifier id): PrimitiveValue",
+    "+ get(StructuredValueIdentifier id): StructuredValue",
     "+ get(Reference ref): HeapValue",
     "+ get(ClassName className): UniverseClass",
     "+ lookupValues(Root[0..*] roots, AccessExpression access): Value[0..*]",
-    "+ getStructuredValues(): UniverseStructuredValue[0..*]",
+    "+ getStructuredValues(): StructuredValue[0..*]",
     "+ toString(): String"
 );
 
@@ -115,20 +118,37 @@ topToBottom.midx(30)(UniverseIdentifier, subIdentifiers);
 topToBottom.midx(30)(StructuredValueIdentifier, subSubIdentifiers);
 Group.identifiers(UniverseIdentifier, Identifier, LocalVariable, subIdentifiers, subSubIdentifiers);
 
-Class.UniverseStructuredValue("UniverseStructuredValue")(
+Class.UniverseValue("UniverseValue")(
     "# frozen: boolean",
-    "- parentSlots: <Identifier, UniverseSlotKey>[0..*]"
+    "# parentSlots: <Identifier, UniverseSlotKey>[0..*]"
 )(
     "+ freeze(): void",
     "+ getParentSlots(): <Identifier, UniverseSlotKey>[0..*]",
-    "+ getIdentifier(): StructuredValueIdentifier",
-    "+ getSlot(UniverseSlotKey key): UniverseSlot",
-    "+ getSlots(): Map<UniverseSlotKey, UniverseSlot>",
-    "+ createShallowCopy(): UniverseStructuredValue",
+    "+ addParentSlot(Identifier parent, UniverseSlotKey slotKey): void",
+    "+ getIdentifier(): UniverseIdentifier",
+    "+ createShallowCopy(): UniverseValue",
     "+ hashCode(): int",
     "+ equals(Object object): boolean"
 );
-classStereotypes.UniverseStructuredValue("<<abstract>>");
+classStereotypes.UniverseValue("<<abstract>>");
+
+Class.StructuredValue("StructuredValue")()(
+    "+ getIdentifier(): StructuredValueIdentifier",
+    "+ getSlot(UniverseSlotKey key): UniverseSlot",
+    "+ getSlots(): Map<UniverseSlotKey, UniverseSlot>",
+    "+ addSlot(UniverseSlotKey slotKey, UniverseSlot slot): void",
+    "+ createShallowCopy(): StructuredValue"
+);
+StructuredValue.info.iAttributeStack.top    := 0;
+StructuredValue.info.iAttributeStack.bottom := 0;
+classStereotypes.StructuredValue("<<abstract>>");
+
+Class.PrimitiveValue("PrimitiveValue")(
+    "- identifier: PrimitiveValueIdentifier"
+)(
+    "+ getIdentifier(): PrimitiveValueIdentifier",
+    "+ createShallowCopy(): PrimitiveValue"
+);
 
 Class.UniverseClass("UniverseClass")(
     "- identifier: ClassName",
@@ -162,15 +182,19 @@ Class.UniverseArray("UniverseArray")(
 UniverseArray.info.iMethodStack.top    := 0;
 UniverseArray.info.iMethodStack.bottom := 0;
 
+leftToRight.top(80)(StructuredValue, PrimitiveValue);
+Group.subValues(StructuredValue, PrimitiveValue);
+
 leftToRight.top(80)(UniverseClass, HeapValue);
-Group.subValues(UniverseClass, HeapValue);
+Group.subSubValues(UniverseClass, HeapValue);
 
 leftToRight.top(80)(UniverseObject, UniverseNull, UniverseArray);
-Group.subSubValues(UniverseObject, UniverseNull, UniverseArray);
+Group.subSubSubValues(UniverseObject, UniverseNull, UniverseArray);
 
-topToBottom.midx(30)(UniverseStructuredValue, subValues);
-topToBottom.midx(30)(HeapValue, subSubValues);
-Group.values(UniverseStructuredValue, subValues, subSubValues);
+topToBottom.midx(30)(UniverseValue, subValues);
+topToBottom.midx(30)(StructuredValue, subSubValues);
+topToBottom.midx(30)(HeapValue, subSubSubValues);
+Group.values(UniverseValue, subValues, subSubValues, subSubSubValues);
 
 Class.UniverseSlotKey("UniverseSlotKey")()(
     "+ hashCode(): int",
@@ -202,8 +226,7 @@ Group.slotKeys(UniverseSlotKey, subSlotKeys);
 
 Class.Associative("Associative")()(
     "+ getField(FieldName name): UniverseSlot",
-    "+ getFields(): Map<FieldName, UniverseSlot>",
-    "+ setField(FieldName name, UniverseIdentifier value): void"
+    "+ getFields(): Map<FieldName, UniverseSlot>"
 );
 classStereotypes.Associative("<<interface>>");
 Associative.info.iAttributeStack.top    := 0;
@@ -212,7 +235,6 @@ Associative.info.iAttributeStack.bottom := 0;
 Class.Indexed("Indexed")()(
     "+ getElement(ElementIndex index): UniverseSlot",
     "+ getElements(): Map<ElementIndex, UniverseSlot>",
-    "+ setElement(ElementIndex index, UniverseIdentifier value): void",
     "+ getLength(): Integer"
 );
 classStereotypes.Indexed("<<interface>>");
@@ -227,7 +249,9 @@ topToBottom.midx(60)(UniverseArray, Indexed);
 Class.UniverseSlot("UniverseSlot")()(
     "+ freeze(): void",
     "+ getParent(): Identifier",
+    "+ setParent(Identifier identifier): void",
     "+ getSlotKey(): UniverseSlotKey",
+    "+ setSlotKey(UniverseSlotKey slotKey): void",
     "+ getPossibleValues(): UniverseIdentifier[0..*]",
     "+ clear(): void",
     "+ createShallowCopy(): UniverseSlot"
@@ -293,13 +317,13 @@ Group.slots(UniverseSlot, AbstractUniverseSlot, subSlots, subSubSlotsi, subSubSl
 topToBottom.midx(80)(SymbolTable, Universe);
 
 same.midy(LocalVariable, UniverseSlot);
-same.top(SymbolTable, UniverseSlotKey, UniverseStructuredValue);
+same.top(SymbolTable, UniverseSlotKey, UniverseValue);
 
 LocalVariable.right = UniverseSlot.left - 480;
 SymbolTable.left    = Reference.left;
 Indexed.right       = StructuredValueSlot.right;
 
-UniverseSlotKey.left - SymbolTable.right = UniverseStructuredValue.left - UniverseSlotKey.right;
+UniverseSlotKey.left - SymbolTable.right = UniverseValue.left - UniverseSlotKey.right;
 
 Universe.midy = Identifier.top + 160;
 
@@ -319,14 +343,17 @@ link(inheritance)(PrimitiveValueIdentifier.n  -- (UniverseIdentifier.s + ( 20, 0
 link(inheritance)(Reference.n -- (StructuredValueIdentifier.s + (-10, 0)));
 link(inheritance)(ClazzName.n -- (StructuredValueIdentifier.s + ( 10, 0)));
 
-link(inheritance)(UniverseClass.n -- (UniverseStructuredValue.s + (-20, 0)));
-link(inheritance)(HeapValue.n     -- (UniverseStructuredValue.s + ( 20, 0)));
+link(inheritance)(StructuredValue.n -- (UniverseValue.s + (-20, 0)));
+link(inheritance)(PrimitiveValue.n  -- (UniverseValue.s + ( 20, 0)));
+
+link(inheritance)(UniverseClass.n -- (StructuredValue.s + (-20, 0)));
+link(inheritance)(HeapValue.n     -- (StructuredValue.s + ( 20, 0)));
 
 link(inheritance)(UniverseObject.n -- (HeapValue.s + (-20, 0)));
 link(inheritance)(UniverseNull.n   -- (HeapValue.s + (  0, 0)));
 link(inheritance)(UniverseArray.n  -- (HeapValue.s + ( 20, 0)));
 
-link(inheritance)(UniverseClass.w  -- (UniverseClass.w + (-20, 0)) -- (UniverseClass.left - 20, Associative.midy) -- Associative.w);
+link(inheritance)(UniverseClass.w  -- (Associative.left - 20, UniverseClass.midy) -- (Associative.w + (-20, 0)) -- Associative.w);
 link(inheritance)(UniverseObject.s --  Associative.n);
 link(inheritance)(UniverseNull.s   -- (Associative.n + ( 20, 0)));
 link(inheritance)(UniverseNull.s   -- (Indexed.n  + (-20, 0)));

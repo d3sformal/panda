@@ -6,6 +6,13 @@ import java.util.Set;
 public class StructuredValueSlot extends AbstractUniverseSlot {
     private Set<StructuredValueIdentifier> possibleValues = new HashSet<StructuredValueIdentifier>();
 
+    public StructuredValueSlot(Identifier parent, UniverseSlotKey slotKey) {
+        super(parent, slotKey);
+    }
+
+    protected StructuredValueSlot() {
+    }
+
     @Override
     public Set<? extends UniverseIdentifier> getPossibleValues() {
         return possibleValues;

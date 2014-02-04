@@ -7,6 +7,9 @@ public class StructuredLocalVariable extends StructuredValueSlot implements Loca
 
     public StructuredLocalVariable(Root accessExpression) {
         this.accessExpression = accessExpression;
+
+        setParent(this);
+        setSlotKey(null);
     }
 
     @Override

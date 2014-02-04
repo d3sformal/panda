@@ -53,7 +53,9 @@ import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
-import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseStructuredValue;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseValue;
+import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValue;
+import gov.nasa.jpf.abstraction.predicate.state.universe.PrimitiveValue;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseSlot;
 import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueSlot;
@@ -123,7 +125,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     }
 
     protected void serializeStructuredValue(StructuredValueIdentifier id) {
-        UniverseStructuredValue value = universe.get(id);
+        StructuredValue value = universe.get(id);
 
         if (value instanceof UniverseArray) {
             UniverseArray a = (UniverseArray) value;

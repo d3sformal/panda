@@ -433,8 +433,31 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					//for (AccessExpression affectedPath : affected) {
 					//	canBeAffected |= affectedPath.isPrefixOf(path);
 					//}
-                    
-                    throw new RuntimeException("Mark all reference method parameters as possibly affected");
+                }
+
+				for (AccessExpression path : temporaryPathsHolder) {
+                    for (int i = 0; i < args.length; ++i) {
+					    if (args[i] != null && !args[i].isNumeric() && !args[i].isBoolean()) {
+						    AccessExpression actualParameter = (AccessExpression) attrs[i].getExpression();
+
+                            // reference-passed objects may have been affected by the method
+                            canBeAffected |= actualParameter.isPrefixOf(path);
+
+                            //DEBUG PURPOSES ONLY
+                            /*
+                            if (actualParameter.isPrefixOf(path)) {
+                                System.out.print(path + " is affected due to call " + before.getMethodInfo().getName() + "(");
+
+                                for (int k = 0; k < args.length; ++k) {
+                                    if (k > 0) System.out.println(", ");
+                                    System.out.print(attrs[k].getExpression());
+                                }
+
+                                System.out.println(")");
+                            }
+                            */
+                        }
+                    }					   
 				}
 				
                 // Predicates are either updated (when they were possibly affected) or can be used for value inference.

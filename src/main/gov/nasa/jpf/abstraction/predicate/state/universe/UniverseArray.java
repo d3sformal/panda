@@ -37,33 +37,13 @@ public class UniverseArray extends HeapValue implements Indexed {
     }
 
     @Override
-    public Integer getLength() {
-        return length;
+    public void addSlot(UniverseSlotKey slotKey, UniverseSlot slot) {
+        elements.put((ElementIndex) slotKey, slot);
     }
 
     @Override
-    public void setElement(ElementIndex index, UniverseIdentifier value) {
-        if (elements.containsKey(index)) throw new RuntimeException("Redefinition of an element [" + index + "]");
-
-        UniverseSlot slot = null;
-
-        if (value instanceof StructuredValueIdentifier) {
-            StructuredValueSlot sslot = new StructuredValueSlot();
-
-            sslot.addPossibleStructuredValue((StructuredValueIdentifier) value);
-
-            slot = sslot;
-        }
-
-        if (value instanceof PrimitiveValueIdentifier) {
-            PrimitiveValueSlot pslot = new PrimitiveValueSlot();
-
-            pslot.addPossiblePrimitiveValue((PrimitiveValueIdentifier) value);
-
-            slot = pslot;
-        }
-
-        elements.put(index, slot);
+    public Integer getLength() {
+        return length;
     }
 
 }

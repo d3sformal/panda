@@ -7,6 +7,9 @@ public class LoadedClass extends StructuredValueSlot implements Identifier {
 
     public LoadedClass(PackageAndClass accessExpression) {
         this.accessExpression = accessExpression;
+
+        setParent(this);
+        setSlotKey(null);
     }
 
     public PackageAndClass getAccessExpression() {

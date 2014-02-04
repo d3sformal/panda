@@ -32,11 +32,6 @@ public class UniverseNull extends HeapValue implements Associative, Indexed {
     }
 
     @Override
-    public void setField(FieldName name, UniverseIdentifier value) {
-        throw new RuntimeException("Trying to redefine a field of a NULL object");
-    }
-
-    @Override
     public UniverseSlot getElement(ElementIndex index) {
         throw new RuntimeException("Trying to access an element of a NULL array");
     }
@@ -47,8 +42,8 @@ public class UniverseNull extends HeapValue implements Associative, Indexed {
     }
 
     @Override
-    public void setElement(ElementIndex index, UniverseIdentifier value) {
-        throw new RuntimeException("Trying to redefine an element of a NULL array");
+    public void addSlot(UniverseSlotKey slotKey, UniverseSlot slot) {
+        throw new RuntimeException("Trying to add a slot to a NULL object");
     }
 
     @Override

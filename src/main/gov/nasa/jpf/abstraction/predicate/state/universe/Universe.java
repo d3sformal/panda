@@ -24,18 +24,74 @@ public class Universe {
     private static Reference nullReference = UniverseNull.nullReference;
     private static UniverseNull nullObject = new UniverseNull();
 
-    private Map<StructuredValueIdentifier, UniverseStructuredValue> currentRealization = new HashMap<StructuredValueIdentifier, UniverseStructuredValue>();
+    private Map<StructuredValueIdentifier, StructuredValue> currentStructuredRealization = new HashMap<StructuredValueIdentifier, StructuredValue>();
+    private Map<PrimitiveValueIdentifier, PrimitiveValue> currentPrimitiveRealization = new HashMap<PrimitiveValueIdentifier, PrimitiveValue>();
 
     public Universe() {
-        currentRealization.put(nullReference, nullObject);
+        currentStructuredRealization.put(nullReference, nullObject);
+    }
+
+    public boolean contains(UniverseIdentifier id) {
+        if (id instanceof PrimitiveValueIdentifier) {
+            return contains((PrimitiveValueIdentifier) id);
+        }
+        
+        if (id instanceof StructuredValueIdentifier) {
+            return contains((StructuredValueIdentifier) id);
+        }
+
+        return false;
     }
 
     public boolean contains(StructuredValueIdentifier id) {
-        return currentRealization.containsKey(id);
+        return currentStructuredRealization.containsKey(id);
     }
 
-    public UniverseStructuredValue get(StructuredValueIdentifier id) {
-        return currentRealization.get(id);
+    public boolean contains(PrimitiveValueIdentifier id) {
+        return currentPrimitiveRealization.containsKey(id);
+    }
+
+    public UniverseValue get(UniverseIdentifier id) {
+        if (id instanceof PrimitiveValueIdentifier) {
+            return get((PrimitiveValueIdentifier) id);
+        }
+
+        if (id instanceof StructuredValueIdentifier) {
+            return get((StructuredValueIdentifier) id);
+        }
+
+        return null;
+    }
+
+    public StructuredValue get(StructuredValueIdentifier id) {
+        return currentStructuredRealization.get(id);
+    }
+
+    public PrimitiveValue get(PrimitiveValueIdentifier id) {
+        return currentPrimitiveRealization.get(id);
+    }
+
+    public void addSlot(StructuredValueIdentifier parent, UniverseSlotKey slotKey, UniverseIdentifier value) {
+        UniverseSlot slot = null;
+
+        if (value instanceof PrimitiveValueIdentifier) {
+            PrimitiveValueSlot pslot = new PrimitiveValueSlot(parent, slotKey);
+
+            pslot.addPossiblePrimitiveValue((PrimitiveValueIdentifier) value);
+
+            slot = pslot;
+        }
+
+        if (value instanceof StructuredValueIdentifier) {
+            StructuredValueSlot pslot = new StructuredValueSlot(parent, slotKey);
+
+            pslot.addPossibleStructuredValue((StructuredValueIdentifier) value);
+
+            slot = pslot;
+        }
+
+        get(parent).addSlot(slotKey, slot);
+        get(value).addParentSlot(parent, slotKey);
     }
 
     public StructuredValueIdentifier add(ElementInfo elementInfo, ThreadInfo threadInfo) {
@@ -58,21 +114,25 @@ public class Universe {
         if (elementInfo.isArray()) {
             UniverseArray array = new UniverseArray(elementInfo, threadInfo);
 
+            currentStructuredRealization.put(array.getReference(), array);
+
             for (int i = 0; i < elementInfo.arrayLength(); ++i) {
                 if (elementInfo.isReferenceArray()) {
                     ElementInfo subElementInfo = threadInfo.getElementInfo(elementInfo.getReferenceElement(i));
 
-                    array.setElement(new ElementIndex(i), add(subElementInfo, threadInfo));
+                    addSlot(array.getIdentifier(), new ElementIndex(i), add(subElementInfo, threadInfo));
                 } else {
-                    array.setElement(new ElementIndex(i), new PrimitiveValueIdentifier());
+                    PrimitiveValue val = new PrimitiveValue();
+
+                    currentPrimitiveRealization.put(val.getIdentifier(), val);
+
+                    addSlot(array.getIdentifier(), new ElementIndex(i), val.getIdentifier());
                 }
             }
 
-            currentRealization.put(array.getReference(), array);
-
             return array.getReference();
         } else {
-            UniverseStructuredValue value;
+            StructuredValue value;
 
             if (elementInfo instanceof StaticElementInfo) {
                 value = new UniverseClass((StaticElementInfo) elementInfo, threadInfo);
@@ -80,19 +140,23 @@ public class Universe {
                 value = new UniverseObject(elementInfo, threadInfo);
             }
 
+            currentStructuredRealization.put(value.getIdentifier(), value);
+
             for (int i = 0; i < elementInfo.getNumberOfFields(); ++i) {
                 FieldInfo fieldInfo = elementInfo.getFieldInfo(i);
 
                 if (fieldInfo.isReference()) {
                     ElementInfo subElementInfo = threadInfo.getElementInfo(elementInfo.getReferenceField(fieldInfo));
 
-                    ((Associative) value).setField(new FieldName(fieldInfo.getName()), add(subElementInfo, threadInfo));
+                    addSlot(value.getIdentifier(), new FieldName(fieldInfo.getName()), add(subElementInfo, threadInfo));
                 } else {
-                    ((Associative) value).setField(new FieldName(fieldInfo.getName()), new PrimitiveValueIdentifier());
+                    PrimitiveValue val = new PrimitiveValue();
+
+                    currentPrimitiveRealization.put(val.getIdentifier(), val);
+
+                    addSlot(value.getIdentifier(), new FieldName(fieldInfo.getName()), val.getIdentifier());
                 }
             }
-
-            currentRealization.put(value.getIdentifier(), value);
 
             return value.getIdentifier();
         }
@@ -107,6 +171,8 @@ public class Universe {
     public void lookupValues(UniverseIdentifier root, AccessExpression expression, Set<UniverseIdentifier> outValues) {
         if (expression instanceof Root) {
             outValues.add(root);
+
+            return;
         }
 
         ObjectAccessExpression read = (ObjectAccessExpression) expression;
@@ -116,21 +182,21 @@ public class Universe {
         lookupValues(root, read.getObject(), parents);
 
         for (UniverseIdentifier parent : parents) {
-            StructuredValueIdentifier parentObject = (StructuredValueIdentifier) parent;
+            StructuredValue parentObject = get((StructuredValueIdentifier) parent);
 
             if (read instanceof ObjectFieldRead) {
-                if (parent instanceof UniverseNull) continue;
+                if (parentObject instanceof UniverseNull) continue;
 
-                UniverseObject object = (UniverseObject) parentObject;
+                Associative object = (Associative) parentObject;
                 ObjectFieldRead fieldRead = (ObjectFieldRead) read;
 
                 outValues.addAll(object.getField(new FieldName(fieldRead.getField().getName())).getPossibleValues());
             }
 
             if (read instanceof ArrayElementRead) {
-                if (parent instanceof UniverseNull) continue;
+                if (parentObject instanceof UniverseNull) continue;
 
-                UniverseArray array = (UniverseArray) parentObject;
+                Indexed array = (Indexed) parentObject;
 
                 for (int i = 0; i < array.getLength(); ++i) {
                     outValues.addAll(array.getElement(new ElementIndex(i)).getPossibleValues());
@@ -143,12 +209,13 @@ public class Universe {
     public Universe clone() {
         Universe universe = new Universe();
 
-        universe.currentRealization.putAll(currentRealization);
+        universe.currentStructuredRealization.putAll(currentStructuredRealization);
+        universe.currentPrimitiveRealization.putAll(currentPrimitiveRealization);
 
         return universe;
     }
 
     public Set<StructuredValueIdentifier> getStructuredValues() {
-        return currentRealization.keySet();
+        return currentStructuredRealization.keySet();
     }
 }

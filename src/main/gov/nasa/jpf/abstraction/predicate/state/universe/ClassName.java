@@ -29,4 +29,9 @@ public class ClassName implements StructuredValueIdentifier {
 
         return false;
     }
+
+    @Override
+    public String toString() {
+        return getClassName();
+    }
 }

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-public class UniverseClass extends UniverseStructuredValue implements Associative {
+public class UniverseClass extends StructuredValue implements Associative {
     private ClassName identifier;
     private Map<FieldName, UniverseSlot> fields = new HashMap<FieldName, UniverseSlot>();
 
@@ -34,6 +34,11 @@ public class UniverseClass extends UniverseStructuredValue implements Associativ
     }
 
     @Override
+    public void addSlot(UniverseSlotKey slotKey, UniverseSlot slot) {
+        fields.put((FieldName) slotKey, slot);
+    }
+
+    @Override
     public UniverseSlot getField(FieldName name) {
         return fields.get(name);
     }
@@ -41,31 +46,6 @@ public class UniverseClass extends UniverseStructuredValue implements Associativ
     @Override
     public Map<FieldName, UniverseSlot> getFields() {
         return fields;
-    }
-
-    @Override
-    public void setField(FieldName name, UniverseIdentifier value) {
-        if (fields.containsKey(name)) throw new RuntimeException("Redefinition of a field `" + name + "`");
-
-        UniverseSlot slot = null;
-
-        if (value instanceof StructuredValueIdentifier) {
-            StructuredValueSlot sslot = new StructuredValueSlot();
-
-            sslot.addPossibleStructuredValue((StructuredValueIdentifier) value);
-
-            slot = sslot;
-        }
-
-        if (value instanceof PrimitiveValueIdentifier) {
-            PrimitiveValueSlot pslot = new PrimitiveValueSlot();
-
-            pslot.addPossiblePrimitiveValue((PrimitiveValueIdentifier) value);
-
-            slot = pslot;
-        }
-
-        fields.put(name, slot);
     }
 
     @Override

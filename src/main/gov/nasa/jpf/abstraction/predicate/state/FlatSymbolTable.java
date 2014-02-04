@@ -20,7 +20,9 @@ import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseObject;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseArray;
-import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseStructuredValue;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseValue;
+import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValue;
+import gov.nasa.jpf.abstraction.predicate.state.universe.PrimitiveValue;
 import gov.nasa.jpf.abstraction.predicate.state.universe.LocalVariable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.LoadedClass;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
@@ -103,6 +105,12 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public FlatSymbolTable(PredicateAbstraction abstraction) {
 		this.abstraction = abstraction;
 	}
+
+    public FlatSymbolTable(FlatSymbolTable previous) {
+        this.abstraction = previous.abstraction;
+        this.universe = previous.universe;
+        this.classes = previous.classes;
+    }
 	
 	public Set<Root> getLocalVariables() {
 		return locals.keySet();
@@ -175,7 +183,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
 			classes.put(c, lc);
 
-            lc.addPossibleStructuredValue(universe.add(elementInfo, threadInfo));
+            StructuredValueIdentifier value = universe.add(elementInfo, threadInfo);
+
+            lc.addPossibleStructuredValue(value);
+
+            universe.get(value).addParentSlot(lc, null);
 		}
 	}
 
@@ -236,11 +248,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
         /**
          * Each object/array can be described by an anonymous object/array access expression
          */
-        if (id instanceof PrimitiveValueIdentifier) {
-            throw new RuntimeException("IMPLEMENT valueToAccessExpression(primitive) - PrimitiveValueIdentifier shall contain reference to its parent slot");
-        }
-
-        UniverseStructuredValue value = universe.get((StructuredValueIdentifier) id);
+        UniverseValue value = universe.get(id);
 
         // Objects
 		if (value instanceof UniverseObject) {
@@ -260,7 +268,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
          * It can as well be described as object field/array element of its parental object/array
          * or a local variable that contains it
          */
-		for (UniverseStructuredValue.Pair<Identifier, UniverseSlotKey> pair: value.getParentSlots()) {
+		for (UniverseValue.Pair<Identifier, UniverseSlotKey> pair: value.getParentSlots()) {
 			Identifier parent = pair.getFirst();
 			
 			if (parent instanceof StructuredValueIdentifier) {
@@ -392,25 +400,27 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				ObjectFieldRead read = (ObjectFieldRead) to;
 				StructuredValueIdentifier parent = (StructuredValueIdentifier) destination;
 				
-				String field = read.getField().getName();
+				FieldName field = new FieldName(read.getField().getName());
 
                 Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
                 valueToAccessExpressions(parent, getMaximalAccessExpressionLength(), prefixes);
 				
 				for (AccessExpression prefix : prefixes) {
-					ret.add(DefaultObjectFieldRead.create(prefix, field));
+					ret.add(DefaultObjectFieldRead.create(prefix, field.getName()));
 				}
 				
     			Associative associative = (Associative) universe.get(parent);
 
 				if (!ambiguous) {
-					associative.getField(new FieldName(field)).clear();
+					associative.getField(field).clear();
 				}
 				
                 for (UniverseIdentifier value : sources) {
-                    StructuredValueSlot slot = (StructuredValueSlot) associative.getField(new FieldName(field));
+                    StructuredValueSlot slot = (StructuredValueSlot) associative.getField(field);
                     
                     slot.addPossibleStructuredValue((StructuredValueIdentifier) value);
+
+                    universe.get(value).addParentSlot(parent, field);
                 }
 			}
 			
@@ -426,15 +436,18 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 					}
 					
 					Indexed indexed = (Indexed) universe.get(parent);
+                    ElementIndex index = new ElementIndex(i);
 
 					if (!ambiguous) {
-						indexed.getElement(new ElementIndex(i)).clear();
+						indexed.getElement(index).clear();
 					}
 					
                     for (UniverseIdentifier value : sources) {
-                        StructuredValueSlot slot = (StructuredValueSlot) indexed.getElement(new ElementIndex(i));
+                        StructuredValueSlot slot = (StructuredValueSlot) indexed.getElement(index);
                         
                         slot.addPossibleStructuredValue((StructuredValueIdentifier) value);
+
+                        universe.get(value).addParentSlot(parent, index);
                     }
 				}
 			}
@@ -456,6 +469,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 					
                 for (UniverseIdentifier value : sources) {
                     parent.addPossibleStructuredValue((StructuredValueIdentifier) value);
+
+                    universe.get(value).addParentSlot(parent, null);
                 }
 			}
 		}
@@ -654,13 +669,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	private void subValueAccessExpressions(UniverseIdentifier id, AccessExpression prefix, int maximalAccessExpressionLength, Set<AccessExpression> outAccessExpressions) {
 		if (maximalAccessExpressionLength == 0) return;
 		
-		if (id instanceof PrimitiveValueIdentifier) {
-			outAccessExpressions.add(prefix);
+		outAccessExpressions.add(prefix);
 
-            return;
-		}
+        if (id instanceof PrimitiveValueIdentifier) return;
 
-        UniverseStructuredValue value = universe.get((StructuredValueIdentifier) id);
+        StructuredValue value = universe.get((StructuredValueIdentifier) id);
 
 		if (value instanceof Associative) {
 			Associative object = (Associative) value;
@@ -670,8 +683,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 					subValueAccessExpressions(field, DefaultObjectFieldRead.create(prefix, fieldName.getName()), maximalAccessExpressionLength - 1, outAccessExpressions);
 				}
 			}
-			
-			outAccessExpressions.add(prefix);
 		}
 		
 		if (value instanceof Indexed) {
@@ -682,8 +693,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 					subValueAccessExpressions(element, DefaultArrayElementRead.create(prefix, Constant.create(index.getIndex())), maximalAccessExpressionLength - 1, outAccessExpressions);
 				}
 			}
-			
-			outAccessExpressions.add(prefix);
 		}
 		
 	}

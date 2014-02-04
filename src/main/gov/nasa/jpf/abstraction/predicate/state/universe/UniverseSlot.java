@@ -5,7 +5,9 @@ import java.util.Set;
 public interface UniverseSlot {
     public void freeze();
     public Identifier getParent();
+    public void setParent(Identifier identifier);
     public UniverseSlotKey getSlotKey();
+    public void setSlotKey(UniverseSlotKey slotKey);
     public Set<? extends UniverseIdentifier> getPossibleValues();
     public void clear();
 }

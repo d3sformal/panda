@@ -44,7 +44,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	 */
 	@Override
 	public FlatSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-		FlatSymbolTable ret = new FlatSymbolTable(abstraction);
+		FlatSymbolTable ret = new FlatSymbolTable(scopes.top());
 
 		LocalVarInfo[] locals = method.getLocalVars() == null ? new LocalVarInfo[0] : method.getLocalVars();
 		
@@ -99,18 +99,16 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		MethodInfo method = after.getMethodInfo();
 		
 		FlatSymbolTable originalScope = scopes.top();
-		FlatSymbolTable transitionScope = createDefaultScope(threadInfo, method);
+		FlatSymbolTable newScope = createDefaultScope(threadInfo, method);
 
-        if (originalScope != transitionScope /** essentially true ... just tricking the compiler **/) throw new RuntimeException("copy last scope, with different set of locals + empty returns");
-		
-		scopes.push(transitionScope);
+		scopes.push(newScope);
 
 		// this is not needed anymore
 		// registration for all classes done through "PredicateAbstraction.processNewClass" (called from the AbstractListener)
 		/**
 		 * Ensure that all statics are present for the current class (class in which the method is defined)
 		 */
-		//transitionScope.addClass(method.getClassName(), threadInfo, method.getClassInfo().getStaticElementInfo());
+		//newScope.addClass(method.getClassName(), threadInfo, method.getClassInfo().getStaticElementInfo());
 		
 		Object attrs[] = before.getArgumentAttrs(method);
 		LocalVarInfo args[] = method.getArgumentLocalVars();
@@ -127,10 +125,10 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 				if (args[i] != null) {					
 					if (args[i].isNumeric() || args[i].isBoolean()) {
 						// Assign to numeric (primitive) arg
-						transitionScope.processPrimitiveStore(attr.getExpression(), originalScope, DefaultRoot.create(args[i].getName()));
+						newScope.processPrimitiveStore(attr.getExpression(), originalScope, DefaultRoot.create(args[i].getName()));
 					} else {						
 						// Assign to object arg
-						transitionScope.processObjectStore(attr.getExpression(), originalScope, DefaultRoot.create(args[i].getName()));
+						newScope.processObjectStore(attr.getExpression(), originalScope, DefaultRoot.create(args[i].getName()));
 					}
 				}
 			}

@@ -7,6 +7,9 @@ public class PrimitiveLocalVariable extends PrimitiveValueSlot implements LocalV
 
      public PrimitiveLocalVariable(Root accessExpression) {
          this.accessExpression = accessExpression;
+
+         setParent(this);
+         setSlotKey(null);
      }
 
      @Override

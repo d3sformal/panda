@@ -6,6 +6,13 @@ import java.util.Set;
 public class PrimitiveValueSlot extends AbstractUniverseSlot {
     private Set<PrimitiveValueIdentifier> possibleValues = new HashSet<PrimitiveValueIdentifier>();
 
+    public PrimitiveValueSlot(Identifier parent, UniverseSlotKey slotKey) {
+        super(parent, slotKey);
+    }
+
+    protected PrimitiveValueSlot() {
+    }
+
     @Override
     public Set<? extends UniverseIdentifier> getPossibleValues() {
         return possibleValues;
