@@ -56,6 +56,10 @@ public abstract class UniverseValue {
         parentSlots.add(new Pair<Identifier, UniverseSlotKey>(parent, slotKey));
     }
 
+    public void removeParentSlot(Identifier parent, UniverseSlotKey slotKey) {
+        parentSlots.remove(new Pair<Identifier, UniverseSlotKey>(parent, slotKey));
+    }
+
     public abstract UniverseIdentifier getIdentifier();
 
     @Override

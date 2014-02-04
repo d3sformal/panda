@@ -435,6 +435,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
     			Associative associative = (Associative) universe.get(parent);
 
 				if (!ambiguous) {
+                    for (UniverseIdentifier value : associative.getField(field).getPossibleValues()) {
+                        universe.get(value).removeParentSlot(parent, field);
+                    }
 					associative.getField(field).clear();
 				}
 				
@@ -462,6 +465,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
                     ElementIndex index = new ElementIndex(i);
 
 					if (!ambiguous) {
+                        for (UniverseIdentifier value : indexed.getElement(index).getPossibleValues()) {
+                            universe.get(value).removeParentSlot(parent, index);
+                        }
 						indexed.getElement(index).clear();
 					}
 					
@@ -487,7 +493,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				ret.add(parent.getAccessExpression());
 					
 				if (!ambiguous) {
-                    //TODO for all remove parent
+                    for (UniverseIdentifier value : parent.getPossibleValues()) {
+                        universe.get(value).removeParentSlot(parent, StructuredLocalVariable.slotKey);
+                    }
 					parent.clear();
 				}
 					
