@@ -21,14 +21,13 @@ import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 public class Universe {
     public static int NULL = MJIEnv.NULL;
     
-    private static Reference nullReference = UniverseNull.nullReference;
-    private static UniverseNull nullObject = new UniverseNull();
+    public static Reference nullReference = UniverseNull.nullReference;
 
     private Map<StructuredValueIdentifier, StructuredValue> currentStructuredRealization = new HashMap<StructuredValueIdentifier, StructuredValue>();
     private Map<PrimitiveValueIdentifier, PrimitiveValue> currentPrimitiveRealization = new HashMap<PrimitiveValueIdentifier, PrimitiveValue>();
 
     public Universe() {
-        currentStructuredRealization.put(nullReference, nullObject);
+        currentStructuredRealization.put(nullReference, new UniverseNull());
     }
 
     public boolean contains(UniverseIdentifier id) {
@@ -69,6 +68,14 @@ public class Universe {
 
     public PrimitiveValue get(PrimitiveValueIdentifier id) {
         return currentPrimitiveRealization.get(id);
+    }
+
+    public PrimitiveValueIdentifier add() {
+        PrimitiveValue p = new PrimitiveValue();
+
+        currentPrimitiveRealization.put(p.getIdentifier(), p);
+
+        return p.getIdentifier();
     }
 
     public void addSlot(StructuredValueIdentifier parent, UniverseSlotKey slotKey, UniverseIdentifier value) {
@@ -122,11 +129,7 @@ public class Universe {
 
                     addSlot(array.getIdentifier(), new ElementIndex(i), add(subElementInfo, threadInfo));
                 } else {
-                    PrimitiveValue val = new PrimitiveValue();
-
-                    currentPrimitiveRealization.put(val.getIdentifier(), val);
-
-                    addSlot(array.getIdentifier(), new ElementIndex(i), val.getIdentifier());
+                    addSlot(array.getIdentifier(), new ElementIndex(i), add());
                 }
             }
 
@@ -150,11 +153,7 @@ public class Universe {
 
                     addSlot(value.getIdentifier(), new FieldName(fieldInfo.getName()), add(subElementInfo, threadInfo));
                 } else {
-                    PrimitiveValue val = new PrimitiveValue();
-
-                    currentPrimitiveRealization.put(val.getIdentifier(), val);
-
-                    addSlot(value.getIdentifier(), new FieldName(fieldInfo.getName()), val.getIdentifier());
+                    addSlot(value.getIdentifier(), new FieldName(fieldInfo.getName()), add());
                 }
             }
 

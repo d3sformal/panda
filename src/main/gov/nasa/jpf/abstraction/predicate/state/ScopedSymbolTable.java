@@ -53,9 +53,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		 */
 		for (LocalVarInfo local : locals) {
 			if (local.isNumeric() || local.isBoolean()) {
-				ret.addPrimitiveLocal(local.getName());
+				ret.addPrimitiveLocalVariable(DefaultRoot.create(local.getName()));
 			} else {
-				ret.addHeapValueLocal(local.getName());
+				ret.addStructuredLocalVariable(DefaultRoot.create(local.getName()));
 			}
 		}
 		
@@ -156,9 +156,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
          * 4) write callee return into caller return
 		 */
 		if (before.getMethodInfo().isReferenceReturnType()) {
-			scopes.top().addHeapValueReturn(calleeReturnValue);
+			scopes.top().addStructuredReturn(calleeReturnValue);
 			scopes.top().processObjectStore(returnExpression, calleeReturnValue);
-			scopes.top(1).addHeapValueReturn(callerReturnValue);
+			scopes.top(1).addStructuredReturn(callerReturnValue);
 			scopes.top(1).processObjectStore(calleeReturnValue, scopes.top(), callerReturnValue);
 		} else {
 			scopes.top().addPrimitiveReturn(calleeReturnValue);

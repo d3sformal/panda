@@ -140,31 +140,51 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public Universe getUniverse() {
 		return universe;
 	}
+
+    private void createPrimitiveLocalVariable(PrimitiveLocalVariable v) {
+        PrimitiveValue value = universe.get(universe.add());
+
+        v.addPossiblePrimitiveValue(value.getIdentifier());
+        value.addParentSlot(v, PrimitiveLocalVariable.slotKey);
+    }
+
+    private void createStructuredLocalVariable(StructuredLocalVariable v) {
+        StructuredValue value = universe.get(Universe.nullReference);
+
+        v.addPossibleStructuredValue(value.getIdentifier());
+        value.addParentSlot(v, StructuredLocalVariable.slotKey);
+    }
 	
-	public void addPrimitiveLocal(String name) {
-		Root l = DefaultRoot.create(name);
-		LocalVariable v = new PrimitiveLocalVariable(l);
-				
+	public void addPrimitiveLocalVariable(Root l) {
+		PrimitiveLocalVariable v = new PrimitiveLocalVariable(l, this);
+
+        createPrimitiveLocalVariable(v);
+
 		locals.put(l, v);
 	}
 	
-	public void addHeapValueLocal(String name) {
-		Root l = DefaultRoot.create(name);
-		LocalVariable v = new StructuredLocalVariable(l);
+	public void addStructuredLocalVariable(Root l) {
+		StructuredLocalVariable v = new StructuredLocalVariable(l, this);
+
+        createStructuredLocalVariable(v);
 				
 		locals.put(l, v);
 	}
 	
 	public void addPrimitiveReturn(ReturnValue r) {
-		LocalVariable v = new PrimitiveLocalVariable(r);
+		PrimitiveLocalVariable v = new PrimitiveLocalVariable(r, this);
+
+        createPrimitiveLocalVariable(v);
 
 		returns.put(r, v);
 	}
 
-	public void addHeapValueReturn(ReturnValue r) {
-		LocalVariable ret = new StructuredLocalVariable(r);
+	public void addStructuredReturn(ReturnValue r) {
+		StructuredLocalVariable v = new StructuredLocalVariable(r, this);
 
-		returns.put(r, ret);
+        createStructuredLocalVariable(v);
+
+		returns.put(r, v);
 	}
 
 	public void addClass(StaticElementInfo elementInfo, ThreadInfo threadInfo) {
@@ -187,7 +207,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
             lc.addPossibleStructuredValue(value);
 
-            universe.get(value).addParentSlot(lc, null);
+            universe.get(value).addParentSlot(lc, LoadedClass.slotKey);
 		}
 	}
 
@@ -295,7 +315,10 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			} else if (parent instanceof LocalVariable) {
 				LocalVariable l = (LocalVariable) parent;
 				
-				outAccessExpressions.add(l.getAccessExpression());
+                //TODO change scope from flatsymboltable instance to something else that does get broken after making copies
+				if (l.getScope() == this) {
+                    outAccessExpressions.add(l.getAccessExpression());
+                }
 			} else if (parent instanceof LoadedClass) {
 				LoadedClass c = (LoadedClass) parent;
 				
@@ -338,7 +361,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
 			valueToAccessExpressions(oldValue, getMaximalAccessExpressionLength(), ret);
 		}
-		
+
 		return ret;
 	}
 	
@@ -365,14 +388,13 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		Set<UniverseIdentifier> destinations = new HashSet<UniverseIdentifier>();
         
         lookupValues(to.cutTail(), destinations);
-
-		Set<UniverseIdentifier> sources = new HashSet<UniverseIdentifier>();
 		
+        Set<UniverseIdentifier> sources = new HashSet<UniverseIdentifier>();
+
         // First collect objects which may be referred to by the `from` access expression
 
 		if (from instanceof AccessExpression) {
-			Set<UniverseIdentifier> rawSources = new HashSet<UniverseIdentifier>();
-            fromTable.lookupValues((AccessExpression) from, rawSources);
+            fromTable.lookupValues((AccessExpression) from, sources);
 		}
 		
         // Special case is, when we store a constant MJIEnv.NULL which stands for NULL (by type of the target we know whether it is primitive MJIEnv.NULL or NULL)
@@ -464,16 +486,30 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				ret.add(parent.getAccessExpression());
 					
 				if (!ambiguous) {
+                    //TODO for all remove parent
 					parent.clear();
 				}
 					
                 for (UniverseIdentifier value : sources) {
                     parent.addPossibleStructuredValue((StructuredValueIdentifier) value);
 
-                    universe.get(value).addParentSlot(parent, null);
+                    universe.get(value).addParentSlot(parent, StructuredLocalVariable.slotKey);
                 }
 			}
 		}
+
+        System.err.println(to + " := " + from + " \t " + ret);
+
+        Set<UniverseIdentifier> objs = new HashSet<UniverseIdentifier>();
+
+        lookupValues(to, objs);
+
+        for (UniverseIdentifier id : objs) {
+            Set<AccessExpression> vals = new HashSet<AccessExpression>();
+            valueToAccessExpressions(id, 10, vals);
+
+            System.err.println(to + " = " + vals);
+        }
 		
 		return ret;
 	}
