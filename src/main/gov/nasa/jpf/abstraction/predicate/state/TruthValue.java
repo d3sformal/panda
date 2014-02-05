@@ -15,7 +15,9 @@ public enum TruthValue implements BranchingConditionInfo {
 	TRUE,      // 1 .. 01
 	FALSE,     // 2 .. 10
 	UNKNOWN;   // 3 .. 11
-	
+
+    private static TruthValue[] ALL_VALUES = new TruthValue[] {UNDEFINED, TRUE, FALSE, UNKNOWN};
+
 	private static TruthValue create(int i) {
         if (i == UNDEFINED.ordinal()) return UNDEFINED;
         if (i == TRUE.ordinal()) return TRUE;
@@ -41,6 +43,16 @@ public enum TruthValue implements BranchingConditionInfo {
 	public static TruthValue create(boolean isTrue) {
 		return create(isTrue, !isTrue);
 	}
+    
+    public static TruthValue create(String str) {
+        for (TruthValue t : ALL_VALUES) {
+            if (t.toString().equals(str.trim().toUpperCase())) {
+                return t;
+            }
+        }
+
+        return UNDEFINED;
+    }
 
     /**
      * Returns the greatest common predecesor of both the elements of the lattice over {0, 1}
