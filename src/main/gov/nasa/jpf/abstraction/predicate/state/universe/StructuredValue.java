@@ -17,6 +17,8 @@ public abstract class StructuredValue extends UniverseValue {
 
     public abstract void addSlot(UniverseSlotKey slotKey, UniverseSlot slot);
 
+    public abstract void removeSlot(UniverseSlotKey slotKey);
+
     @Override
     public abstract int hashCode();
 

@@ -357,6 +357,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
         
         lookupValues(to, destinations);
 
+        // Not creating shallow copies and not updating the universe because there is no need to change anything, the primitive value is completely symbolic and as such the symbol does not have to change
+
 		for (UniverseIdentifier destination : destinations) {
             PrimitiveValueIdentifier oldValue = (PrimitiveValueIdentifier) destination;
 
@@ -432,21 +434,71 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 					ret.add(DefaultObjectFieldRead.create(prefix, field.getName()));
 				}
 				
-    			Associative associative = (Associative) universe.get(parent);
+                StructuredValue parentObject = universe.get(parent);
+                
+                // If the object whose slot is being modified is frozen, modify a copy
+                if (parentObject.isFrozen()) {
+                    parentObject = parentObject.createShallowCopy();
+
+                    universe.put(parent, parentObject);
+                }
+
+    			Associative associative = (Associative) parentObject;
 
 				if (!ambiguous) {
-                    for (UniverseIdentifier value : associative.getField(field).getPossibleValues()) {
-                        universe.get(value).removeParentSlot(parent, field);
+                    // In case of complete overwrite of the field
+                    // (there is no doubt this is the only possible target object being written to)
+                    // All the former values should be removed from the object    
+                    for (UniverseIdentifier valueId : associative.getField(field).getPossibleValues()) {
+                        UniverseValue value = universe.get(valueId);
+
+                        // If the former value was frozen, modify a copy
+                        if (value.isFrozen()) {
+                            value = value.createShallowCopy();
+
+                            universe.put(valueId, value);
+                        }
+                        
+                        value.removeParentSlot(parent, field);
                     }
-					associative.getField(field).clear();
+
+					UniverseSlot slot = associative.getField(field);
+                    
+                    // If the slot being modified is frozen, modify a copy
+                    if (slot.isFrozen()) {
+                        slot = slot.createShallowCopy();
+
+                        parentObject.removeSlot(field);
+                        parentObject.addSlot(field, slot);
+                    }
+
+                    slot.clear();
 				}
 				
-                for (UniverseIdentifier value : sources) {
+                // All new values should be added into the appropriate slot
+                for (UniverseIdentifier valueId : sources) {
                     StructuredValueSlot slot = (StructuredValueSlot) associative.getField(field);
                     
-                    slot.addPossibleStructuredValue((StructuredValueIdentifier) value);
+                    // If the slot being modified is frozen, modify a copy
+                    if (slot.isFrozen()) {
+                        slot = slot.createShallowCopy();
 
-                    universe.get(value).addParentSlot(parent, field);
+                        parentObject.removeSlot(field);
+                        parentObject.addSlot(field, slot);
+                    }
+
+                    slot.addPossibleStructuredValue((StructuredValueIdentifier) valueId);
+
+                    StructuredValue value = (StructuredValue) universe.get(valueId);
+
+                    // If the new value is frozen, modify a copy
+                    if (value.isFrozen()) {
+                        value = value.createShallowCopy();
+
+                        universe.put(valueId, value);
+                    }
+                    
+                    value.addParentSlot(parent, field);
                 }
 			}
 			
@@ -457,26 +509,76 @@ public class FlatSymbolTable implements SymbolTable, Scope {
                 valueToAccessExpressions(parent, getMaximalAccessExpressionLength(), prefixes);
 				
 				for (int i = 0; i < ((UniverseArray) universe.get(parent)).getLength(); ++i) {
+                    ElementIndex index = new ElementIndex(i);
+
 					for (AccessExpression prefix : prefixes) {
 						ret.add(DefaultArrayElementRead.create(prefix, Constant.create(i)));
 					}
 					
-					Indexed indexed = (Indexed) universe.get(parent);
-                    ElementIndex index = new ElementIndex(i);
+                    StructuredValue parentObject = universe.get(parent);
+
+                    if (parentObject.isFrozen()) {
+                        parentObject = parentObject.createShallowCopy();
+
+                        universe.put(parent, parentObject);
+                    }
+
+                    Indexed indexed = (Indexed) parentObject;
 
 					if (!ambiguous) {
-                        for (UniverseIdentifier value : indexed.getElement(index).getPossibleValues()) {
-                            universe.get(value).removeParentSlot(parent, index);
+                        // In case of complete overwrite of the element
+                        // (there is no doubt this is the only possible target array being written to)
+                        // All the former values should be removed from the object    
+                        for (UniverseIdentifier valueId : indexed.getElement(index).getPossibleValues()) {
+                            UniverseValue value = universe.get(valueId);
+
+                            // If the former value was frozen, modify a copy
+                            if (value.isFrozen()) {
+                                value = value.createShallowCopy();
+
+                                universe.put(valueId, value);
+                            }
+
+                            value.removeParentSlot(parent, index);
                         }
-						indexed.getElement(index).clear();
+
+                        UniverseSlot slot = indexed.getElement(index);
+                        
+                        // If the slot being modified is frozen, modify a copy
+                        if (slot.isFrozen()) {
+                            slot = slot.createShallowCopy();
+
+                            parentObject.removeSlot(index);
+                            parentObject.addSlot(index, slot);
+                        }
+
+                        slot.clear();
 					}
 					
-                    for (UniverseIdentifier value : sources) {
+                    // All new values should be added into the appropriate slot
+                    for (UniverseIdentifier valueId : sources) {
                         StructuredValueSlot slot = (StructuredValueSlot) indexed.getElement(index);
-                        
-                        slot.addPossibleStructuredValue((StructuredValueIdentifier) value);
 
-                        universe.get(value).addParentSlot(parent, index);
+                        // If the slot being modified is frozen, modify a copy
+                        if (slot.isFrozen()) {
+                            slot = slot.createShallowCopy();
+
+                            parentObject.removeSlot(index);
+                            parentObject.addSlot(index, slot);
+                        }
+                        
+                        slot.addPossibleStructuredValue((StructuredValueIdentifier) valueId);
+
+                        UniverseValue value = universe.get(valueId);
+
+                        // If the new value is frozen, modify a copy
+                        if (value.isFrozen()) {
+                            value = value.createShallowCopy();
+
+                            universe.put(valueId, value);
+                        }
+
+                        value.addParentSlot(parent, index);
                     }
 				}
 			}
@@ -486,23 +588,66 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 
 				if (to instanceof ReturnValue) {
 					parent = (StructuredLocalVariable) returns.get(to);
+
+                    // If the return value being written to is frozen, modify a copy
+                    if (parent.isFrozen()) {
+                        parent = parent.createShallowCopy();
+
+                        returns.put((ReturnValue) to, parent);
+                    }
 				} else {
 					parent = (StructuredLocalVariable) locals.get(to);
+
+                    // If the variable being written to is frozen, modify a copy
+                    if (parent.isFrozen()) {
+                        parent = parent.createShallowCopy();
+
+                        locals.put((Root) to, parent);
+                    }
 				}
-				
+
 				ret.add(parent.getAccessExpression());
 					
 				if (!ambiguous) {
-                    for (UniverseIdentifier value : parent.getPossibleValues()) {
-                        universe.get(value).removeParentSlot(parent, StructuredLocalVariable.slotKey);
+                    // In case of complete overwrite of the variable
+                    // (there is no doubt this is the only possible target being written to)
+                    // All the former values should be removed from the variable    
+                    for (UniverseIdentifier valueId : parent.getPossibleValues()) {
+                        UniverseValue value = universe.get(valueId);
+
+                        // If the former value was frozen, modify a copy
+                        if (value.isFrozen()) {
+                            value = value.createShallowCopy();
+
+                            universe.put(valueId, value);
+                        }
+
+                        value.removeParentSlot(parent, StructuredLocalVariable.slotKey);
                     }
+
+                    
+                    // The local variable (parent) is guaranteed not to be frozen
+                    // Taken care of above
+                    // We may modify straightaway
 					parent.clear();
 				}
-					
-                for (UniverseIdentifier value : sources) {
-                    parent.addPossibleStructuredValue((StructuredValueIdentifier) value);
+				
+                for (UniverseIdentifier valueId : sources) {
+                    // The local variable (parent) is guaranteed not to be frozen
+                    // Taken care of above
+                    // We may modify straightaway
+                    parent.addPossibleStructuredValue((StructuredValueIdentifier) valueId);
 
-                    universe.get(value).addParentSlot(parent, StructuredLocalVariable.slotKey);
+                    UniverseValue value = universe.get(valueId);
+
+                    // If the new value is frozen, modify a copy
+                    if (value.isFrozen()) {
+                        value = value.createShallowCopy();
+
+                        universe.put(valueId, value);
+                    }
+                    
+                    value.addParentSlot(parent, StructuredLocalVariable.slotKey);
                 }
 			}
 		}

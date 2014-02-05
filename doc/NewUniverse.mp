@@ -42,17 +42,18 @@ Class.SymbolTable("SymbolTable")(
 Class.Universe("Universe")(
     "- currentStructuredRealization: Map<StructuredValueIdentifier, StructuredValue>",
     "- currentPrimitiveRealization: Map<PrimitiveValueIdentifier, PrimitiveValue>",
-    "- NULL: int"
+    "- NULL: int",
+    "- nullReference: Reference"
 )(
-    "- createNull(): void",
+    "+ contains(UniverseIdentifier id): boolean",
     "+ contains(PrimitiveValueIdentifier id): boolean",
     "+ contains(StructuredValueIdentifier id): boolean",
-    "+ contains(Reference reference): boolean",
-    "+ contains(ClassName className): boolean",
+    "+ get(UniverseIdentifier id): UniverseValue",
     "+ get(PrimitiveValueIdentifier id): PrimitiveValue",
     "+ get(StructuredValueIdentifier id): StructuredValue",
-    "+ get(Reference ref): HeapValue",
-    "+ get(ClassName className): UniverseClass",
+    "+ put(UniverseIdentifier id, UniverseValue value): void",
+    "+ put(PrimitiveValueIdentifier id, PrimitiveValue value): void",
+    "+ put(StructuredValueIdentifier id, StructuredValue value): void",
     "+ lookupValues(Root[0..*] roots, AccessExpression access): Value[0..*]",
     "+ getStructuredValues(): StructuredValue[0..*]",
     "+ toString(): String"
@@ -137,6 +138,7 @@ Class.StructuredValue("StructuredValue")()(
     "+ getSlot(UniverseSlotKey key): UniverseSlot",
     "+ getSlots(): Map<UniverseSlotKey, UniverseSlot>",
     "+ addSlot(UniverseSlotKey slotKey, UniverseSlot slot): void",
+    "+ removeSlot(UniverseSlotKey slotKey): void",
     "+ createShallowCopy(): StructuredValue"
 );
 StructuredValue.info.iAttributeStack.top    := 0;

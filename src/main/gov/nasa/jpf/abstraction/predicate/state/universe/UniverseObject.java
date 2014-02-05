@@ -55,4 +55,9 @@ public class UniverseObject extends HeapValue implements Associative {
         fields.put((FieldName) slotKey, slot);
     }
 
+    @Override
+    public void removeSlot(UniverseSlotKey slotKey) {
+        fields.remove((FieldName) slotKey);
+    }
+
 }

@@ -56,6 +56,11 @@ public class UniverseClass extends StructuredValue implements Associative {
     }
 
     @Override
+    public void removeSlot(UniverseSlotKey slotKey) {
+        fields.remove((FieldName) slotKey);
+    }
+
+    @Override
     public UniverseSlot getField(FieldName name) {
         return fields.get(name);
     }

@@ -61,6 +61,11 @@ public class UniverseArray extends HeapValue implements Indexed {
     }
 
     @Override
+    public void removeSlot(UniverseSlotKey slotKey) {
+        elements.remove((ElementIndex) slotKey);
+    }
+
+    @Override
     public Integer getLength() {
         return length;
     }

@@ -58,6 +58,11 @@ public class UniverseNull extends HeapValue implements Associative, Indexed {
     }
 
     @Override
+    public void removeSlot(UniverseSlotKey slotKey) {
+        throw new RuntimeException("Trying to remove a slot from a NULL object");
+    }
+
+    @Override
     public Integer getLength() {
         throw new RuntimeException("Trying to access the length of a NULL array");
     }

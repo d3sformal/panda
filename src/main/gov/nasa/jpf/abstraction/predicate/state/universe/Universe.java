@@ -70,6 +70,28 @@ public class Universe {
         return currentPrimitiveRealization.get(id);
     }
 
+    public void put(UniverseIdentifier id, UniverseValue value) {
+        if (id instanceof PrimitiveValueIdentifier) {
+            put((PrimitiveValueIdentifier) id, (PrimitiveValue) value);
+            return;
+        }
+
+        if (id instanceof StructuredValueIdentifier) {
+            put((StructuredValueIdentifier) id, (StructuredValue) value);
+            return;
+        }
+
+        throw new RuntimeException("Updating an unknown type of universe entity `" + id + "` (" + (id == null ? "null" : id.getClass().getSimpleName()) + ") with `" + value + "`");
+    }
+
+    public void put(StructuredValueIdentifier id, StructuredValue value) {
+        currentStructuredRealization.put(id, value);
+    }
+
+    public void put(PrimitiveValueIdentifier id, PrimitiveValue value) {
+        currentPrimitiveRealization.put(id, value);
+    }
+
     public PrimitiveValueIdentifier add() {
         PrimitiveValue p = new PrimitiveValue();
 
