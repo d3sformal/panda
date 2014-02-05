@@ -19,6 +19,14 @@ public abstract class AbstractUniverseSlot implements UniverseSlot {
     }
 
     @Override
+    public boolean isFrozen() {
+        return frozen;
+    }
+
+    @Override
+    public abstract AbstractUniverseSlot createShallowCopy();
+
+    @Override
     public Identifier getParent() {
         return parent;
     }

@@ -16,6 +16,25 @@ public class UniverseArray extends HeapValue implements Indexed {
         length = elementInfo.arrayLength();
     }
 
+    protected UniverseArray(Reference identifier, Integer length) {
+        super(identifier);
+
+        this.length = length;
+    }
+
+    @Override
+    public UniverseArray createShallowCopy() {
+        UniverseArray copy = new UniverseArray(getReference(), getLength());
+
+        for (UniverseValue.Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
+            copy.addParentSlot(parentSlot.getFirst(), parentSlot.getSecond());
+        }
+
+        copy.elements.putAll(elements);
+
+        return copy;
+    }
+
     @Override
     public UniverseSlot getSlot(UniverseSlotKey key) {
         return elements.get((ElementIndex) key);

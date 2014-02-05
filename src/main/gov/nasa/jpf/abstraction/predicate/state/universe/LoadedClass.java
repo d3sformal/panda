@@ -16,6 +16,17 @@ public class LoadedClass extends StructuredValueSlot implements Identifier {
         setSlotKey(slotKey);
     }
 
+    @Override
+    public LoadedClass createShallowCopy() {
+        LoadedClass copy = new LoadedClass(getAccessExpression());
+
+        for (StructuredValueIdentifier value : getPossibleStructuredValues()) {
+            copy.addPossibleStructuredValue(value);
+        }
+
+        return copy;
+    }
+
     public PackageAndClass getAccessExpression() {
         return accessExpression;
     }

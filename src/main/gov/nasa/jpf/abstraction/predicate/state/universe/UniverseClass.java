@@ -14,8 +14,25 @@ public class UniverseClass extends StructuredValue implements Associative {
         identifier = new ClassName(elementInfo, threadInfo);
     }
 
+    protected UniverseClass(ClassName identifier) {
+        this.identifier = identifier;
+    }
+
     public ClassName getClassName() {
         return identifier;
+    }
+
+    @Override
+    public UniverseClass createShallowCopy() {
+        UniverseClass copy = new UniverseClass(identifier);
+
+        for (UniverseValue.Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
+            copy.addParentSlot(parentSlot.getFirst(), parentSlot.getSecond());
+        }
+
+        copy.fields.putAll(fields);
+
+        return copy;
     }
 
     @Override

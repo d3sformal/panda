@@ -14,6 +14,15 @@ public class StructuredValueSlot extends AbstractUniverseSlot {
     }
 
     @Override
+    public StructuredValueSlot createShallowCopy() {
+        StructuredValueSlot copy = new StructuredValueSlot(getParent(), getSlotKey());
+
+        copy.possibleValues.addAll(possibleValues);
+
+        return copy;
+    }
+
+    @Override
     public Set<? extends UniverseIdentifier> getPossibleValues() {
         return possibleValues;
     }

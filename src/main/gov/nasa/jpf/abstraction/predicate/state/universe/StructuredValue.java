@@ -6,6 +6,9 @@ import java.util.Set;
 
 public abstract class StructuredValue extends UniverseValue {
     @Override
+    public abstract StructuredValue createShallowCopy();
+
+    @Override
     public abstract StructuredValueIdentifier getIdentifier();
 
     public abstract UniverseSlot getSlot(UniverseSlotKey key);

@@ -13,6 +13,23 @@ public class UniverseObject extends HeapValue implements Associative {
         super(new Reference(elementInfo, threadInfo));
     }
 
+    protected UniverseObject(Reference identifier) {
+        super(identifier);
+    }
+
+    @Override
+    public UniverseObject createShallowCopy() {
+        UniverseObject copy = new UniverseObject(getReference());
+
+        for (UniverseValue.Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
+            copy.addParentSlot(parentSlot.getFirst(), parentSlot.getSecond());
+        }
+
+        copy.fields.putAll(fields);
+
+        return copy;
+    }
+
     @Override
     public UniverseSlot getSlot(UniverseSlotKey key) {
         return fields.get((FieldName) key);

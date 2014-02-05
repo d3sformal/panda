@@ -16,6 +16,14 @@ public class ClassName implements StructuredValueIdentifier {
         return staticElementInfo.getClassInfo().getName();
     }
 
+    public StaticElementInfo getStaticElementInfo() {
+        return staticElementInfo;
+    }
+
+    public ThreadInfo getThreadInfo() {
+        return threadInfo;
+    }
+
     @Override
     public int hashCode() {
         return getClassName().hashCode();

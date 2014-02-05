@@ -7,6 +7,9 @@ public interface LocalVariable extends Identifier, UniverseSlot {
     public class SlotKey implements UniverseSlotKey {
     }
 
+    @Override
+    public LocalVariable createShallowCopy();
+
     public Root getAccessExpression();
     public FlatSymbolTable getScope();
 }

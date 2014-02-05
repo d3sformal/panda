@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class UniverseValue {
+public abstract class UniverseValue implements Freezable {
     protected boolean frozen = false;
 
     public class Pair<S, T> {
@@ -44,9 +44,18 @@ public abstract class UniverseValue {
 
     protected Set<Pair<Identifier, UniverseSlotKey>> parentSlots = new HashSet<Pair<Identifier, UniverseSlotKey>>();
 
+    @Override
     public void freeze() {
         frozen = true;
     }
+
+    @Override
+    public boolean isFrozen() {
+        return frozen;
+    }
+
+    @Override
+    public abstract UniverseValue createShallowCopy();
 
     public Set<Pair<Identifier, UniverseSlotKey>> getParentSlots() {
         return parentSlots;

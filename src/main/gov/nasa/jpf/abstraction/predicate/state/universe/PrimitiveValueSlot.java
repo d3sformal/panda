@@ -14,6 +14,15 @@ public class PrimitiveValueSlot extends AbstractUniverseSlot {
     }
 
     @Override
+    public PrimitiveValueSlot createShallowCopy() {
+        PrimitiveValueSlot copy = new PrimitiveValueSlot(getParent(), getSlotKey());
+
+        copy.possibleValues.addAll(possibleValues);
+
+        return copy;
+    }
+
+    @Override
     public Set<? extends UniverseIdentifier> getPossibleValues() {
         return possibleValues;
     }

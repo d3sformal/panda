@@ -12,6 +12,17 @@ public class UniverseNull extends HeapValue implements Associative, Indexed {
     }
 
     @Override
+    public UniverseNull createShallowCopy() {
+        UniverseNull copy = new UniverseNull();
+
+        for (UniverseValue.Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
+            copy.addParentSlot(parentSlot.getFirst(), parentSlot.getSecond());
+        }
+
+        return copy;
+    }
+
+    @Override
     public UniverseSlot getSlot(UniverseSlotKey key) {
         throw new RuntimeException("Trying to access a slot of a NULL object");
     }

@@ -8,6 +8,9 @@ public abstract class HeapValue extends StructuredValue {
     }
 
     @Override
+    public abstract HeapValue createShallowCopy();
+
+    @Override
     public StructuredValueIdentifier getIdentifier() {
         return identifier;
     }

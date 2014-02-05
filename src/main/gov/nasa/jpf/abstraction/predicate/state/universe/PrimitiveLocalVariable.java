@@ -18,6 +18,17 @@ public class PrimitiveLocalVariable extends PrimitiveValueSlot implements LocalV
     }
 
     @Override
+    public PrimitiveLocalVariable createShallowCopy() {
+        PrimitiveLocalVariable copy = new PrimitiveLocalVariable(getAccessExpression(), getScope());
+
+        for (PrimitiveValueIdentifier value : getPossiblePrimitiveValues()) {
+            copy.addPossiblePrimitiveValue(value);
+        }
+
+        return copy;
+    }
+
+    @Override
     public Root getAccessExpression() {
         return accessExpression;
     }

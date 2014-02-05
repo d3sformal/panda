@@ -18,6 +18,17 @@ public class StructuredLocalVariable extends StructuredValueSlot implements Loca
     }
 
     @Override
+    public StructuredLocalVariable createShallowCopy() {
+        StructuredLocalVariable copy = new StructuredLocalVariable(getAccessExpression(), getScope());
+
+        for (StructuredValueIdentifier value : getPossibleStructuredValues()) {
+            copy.addPossibleStructuredValue(value);
+        }
+
+        return copy;
+    }
+
+    @Override
     public Root getAccessExpression() {
         return accessExpression;
     }

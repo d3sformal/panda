@@ -100,7 +100,8 @@ Class.ClazzName("ClassName")(
 );
 
 Class.LocalVariable("LocalVariable")()(
-    "+ getAccessExpression(): Root"
+    "+ getAccessExpression(): Root",
+    "+ createShallowCopy(): LocalVariable"
 );
 classStereotypes.LocalVariable("<<interface>>");
 LocalVariable.info.iAttributeStack.top    := 0;
@@ -122,7 +123,6 @@ Class.UniverseValue("UniverseValue")(
     "# frozen: boolean",
     "# parentSlots: <Identifier, UniverseSlotKey>[0..*]"
 )(
-    "+ freeze(): void",
     "+ getParentSlots(): <Identifier, UniverseSlotKey>[0..*]",
     "+ addParentSlot(Identifier parent, UniverseSlotKey slotKey): void",
     "+ getIdentifier(): UniverseIdentifier",
@@ -247,7 +247,6 @@ topToBottom.midx(60)(UniverseObject, Associative);
 topToBottom.midx(60)(UniverseArray, Indexed);
 
 Class.UniverseSlot("UniverseSlot")()(
-    "+ freeze(): void",
     "+ getParent(): Identifier",
     "+ setParent(Identifier identifier): void",
     "+ getSlotKey(): UniverseSlotKey",
@@ -273,33 +272,36 @@ Class.StructuredValueSlot("StructuredValueSlot")(
     "- possibleValues: StructuredValueIdentifier[0..*]"
 )(
     "+ getPossibleStructuredValues(): StructuredValueIdentifier[0..*]",
-    "+ addPossibleStructuredValue(StructuredValueIdentifier value): void"
+    "+ addPossibleStructuredValue(StructuredValueIdentifier value): void",
+    "+ createShallowCopy(): StructuredValueSlot",
 );
 
 Class.PrimitiveValueSlot("PrimitiveValueSlot")(
     "- possibleValues: PrimitiveValueIdentifier[0..*]"
 )(
     "+ getPossiblePrimitiveValues(): PrimitiveValueIdentifier[0..*]",
-    "+ addPossiblePrimitiveValue(PrimitiveValueIdentifier value): void"
+    "+ addPossiblePrimitiveValue(PrimitiveValueIdentifier value): void",
+    "+ createShallowCopy(): PrimitiveValueSlot",
 );
 
 Class.LoadedClass("LoadedClass")()(
-    "+ getAccessExpression(): PackageAndClass"
+    "+ getAccessExpression(): PackageAndClass",
+    "+ createShallowCopy(): LoadedClass"
 );
 LoadedClass.info.iAttributeStack.top    := 0;
 LoadedClass.info.iAttributeStack.bottom := 0;
 
-Class.StructuredLocalVariable("StructuredLocalVariable")()();
+Class.StructuredLocalVariable("StructuredLocalVariable")()(
+    "+ createShallowCopy(): StructuredLocalVariable"
+);
 StructuredLocalVariable.info.iAttributeStack.top    := 0;
 StructuredLocalVariable.info.iAttributeStack.bottom := 0;
-StructuredLocalVariable.info.iMethodStack.top       := 0;
-StructuredLocalVariable.info.iMethodStack.bottom    := 0;
 
-Class.PrimitiveLocalVariable("PrimitiveLocalVariable")()();
+Class.PrimitiveLocalVariable("PrimitiveLocalVariable")()(
+    "+ createShallowCopy(): PrimitiveLocalVariable"
+);
 PrimitiveLocalVariable.info.iAttributeStack.top    := 0;
 PrimitiveLocalVariable.info.iAttributeStack.bottom := 0;
-PrimitiveLocalVariable.info.iMethodStack.top       := 0;
-PrimitiveLocalVariable.info.iMethodStack.bottom    := 0;
 
 leftToRight.top(80)(PrimitiveValueSlot, StructuredValueSlot);
 Group.subSlots(PrimitiveValueSlot, StructuredValueSlot);
@@ -327,7 +329,19 @@ UniverseSlotKey.left - SymbolTable.right = UniverseValue.left - UniverseSlotKey.
 
 Universe.midy = Identifier.top + 160;
 
-drawObjects(SymbolTable, Universe, identifiers, values, slots, entities, slotKeys);
+Class.Freezable("Freezable")()(
+    "+ freeze(): void",
+    "+ isFrozen(): boolean",
+    "+ createShallowCopy(): Freezable"
+);
+classStereotypes.Freezable("<<interface>>");
+Freezable.info.iAttributeStack.top    := 0;
+Freezable.info.iAttributeStack.bottom := 0;
+
+Freezable.midy = 0.5(UniverseValue.bottom + UniverseSlot.top);
+Freezable.left = Indexed.right + 80;
+
+drawObjects(SymbolTable, Universe, identifiers, values, slots, entities, slotKeys, Freezable);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -342,6 +356,9 @@ link(inheritance)(PrimitiveValueIdentifier.n  -- (UniverseIdentifier.s + ( 20, 0
 
 link(inheritance)(Reference.n -- (StructuredValueIdentifier.s + (-10, 0)));
 link(inheritance)(ClazzName.n -- (StructuredValueIdentifier.s + ( 10, 0)));
+
+link(inheritance)(UniverseValue.e -- (Freezable.midx, UniverseValue.midy) -- Freezable.n);
+link(inheritance)(UniverseSlot.e  -- (Freezable.midx, UniverseSlot.midy)  -- Freezable.s);
 
 link(inheritance)(StructuredValue.n -- (UniverseValue.s + (-20, 0)));
 link(inheritance)(PrimitiveValue.n  -- (UniverseValue.s + ( 20, 0)));

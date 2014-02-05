@@ -8,6 +8,11 @@ public class PrimitiveValue extends UniverseValue {
     private PrimitiveValueIdentifier identifier = new PrimitiveValueIdentifier();
 
     @Override
+    public PrimitiveValue createShallowCopy() {
+        return this; // No need to copy primitive values, they do not change nor get transferred
+    }
+
+    @Override
     public PrimitiveValueIdentifier getIdentifier() {
         return identifier;
     }
