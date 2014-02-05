@@ -576,27 +576,21 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public FlatSymbolTable clone() {
 		FlatSymbolTable clone = new FlatSymbolTable(universe.clone(), abstraction);
 		
-		clone.locals = new HashMap<Root, LocalVariable>();
-		clone.returns = new HashMap<ReturnValue, LocalVariable>();
-		clone.classes = new HashMap<PackageAndClass, LoadedClass>();
-		
-		for (Root l : locals.keySet()) {
-			LocalVariable lValue = locals.get(l);
-			
-			clone.locals.put(l, lValue);
-		}
-		
-		for (ReturnValue r : returns.keySet()) {
-			LocalVariable lValue = returns.get(r);
+        clone.locals.putAll(locals);
+        clone.returns.putAll(returns);
+        clone.classes.putAll(classes);
 
-			clone.returns.put(r, lValue);
-		}
+        for (LocalVariable var : locals.values()) {
+            var.freeze();
+        }
 
-		for (PackageAndClass c : classes.keySet()) {
-			LoadedClass cValue = classes.get(c);
-			
-			clone.classes.put(c, cValue);
-		}
+        for (LocalVariable ret : returns.values()) {
+            ret.freeze();
+        }
+
+        for (LoadedClass cls : classes.values()) {
+            cls.freeze();
+        }
 
 		return clone;
 	}

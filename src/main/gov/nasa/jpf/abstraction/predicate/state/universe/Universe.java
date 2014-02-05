@@ -211,6 +211,22 @@ public class Universe {
         universe.currentStructuredRealization.putAll(currentStructuredRealization);
         universe.currentPrimitiveRealization.putAll(currentPrimitiveRealization);
 
+        for (StructuredValue value : currentStructuredRealization.values()) {
+            value.freeze();
+
+            for (UniverseSlot slot : value.getSlots().values()) {
+                slot.freeze();
+            }
+        }
+
+        // May not be needed
+        // Primitive values do not change
+        /*
+        for (PrimitiveValue value : currentPrimitiveRealization.values()) {
+            value.freeze();
+        }
+        */
+
         return universe;
     }
 
