@@ -246,9 +246,9 @@
 
     <property name="junit.usefile" value="true"/>
 
-    <junit printsummary="withOutAndErr" showoutput="on" haltonfailure="yes"
+    <junit printsummary="withOutAndErr" showoutput="off" haltonfailure="yes"
            fork="yes" forkmode="perTest" maxmemory="1024m">
-      <formatter type="failure"/> <!-- usefile="${junit.usefile}"/> -->
+      <formatter type="plain" usefile="${junit.usefile}"/>
 
       <classpath>
         <path refid="lib.path"/>
@@ -256,13 +256,13 @@
         <pathelement location="build/tests"/>
         <pathelement location="build/classes"/>
         <pathelement location="build/annotations"/>
+
       </classpath>
 
       <batchtest todir="build/tests">
         <fileset dir="build/tests">
           <exclude name="**/JPF_*.class"/>
           <include name="**/Test*.class"/>
-          <include name="**/*Test.class"/>
         </fileset>
       </batchtest>
 
