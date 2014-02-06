@@ -54,7 +54,7 @@ public class AbstractListener extends PropertyListenerAdapter {
     private Map<String, Handler> testMethods = new HashMap<String, Handler>();
 
     public AbstractListener() {
-        testMethods.put("gov.nasa.jpf.abstraction.predicate.BaseTest.assertConjunction", new Handler() {
+        testMethods.put("gov.nasa.jpf.abstraction.predicate.BaseTest.assertConjunction([Ljava/lang/String;)V", new Handler() {
 
             @Override
             public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
@@ -126,7 +126,12 @@ public class AbstractListener extends PropertyListenerAdapter {
 
                 h.executeInstruction(vm, curTh, nextInsn);
 
-                curTh.advancePC();
+                System.err.println("Trying to skip the next instruction (THE INVOKE)");
+                System.err.println("Original Next Instruction: " + curTh.getPC() + " " + curTh.getPC().getMethodInfo().getFullName() + " " + curTh.getPC().getPosition());
+
+                curTh.skipInstruction(curTh.getPC().getNext());
+
+                System.err.println("New Next Instruction: " + curTh.getPC() + " " + curTh.getPC().getMethodInfo().getFullName() + " " + curTh.getPC().getPosition());
             }
         }
     }

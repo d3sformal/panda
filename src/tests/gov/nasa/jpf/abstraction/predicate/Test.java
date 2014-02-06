@@ -7,10 +7,10 @@ public class Test extends BaseTest {
 }
 
 class ClassA {
-    public void main (String[] args) {
+    public static void main (String[] args) {
         //...
 
-        Test.assertConjunction("x = 0: true", "y = 1: false");
+        Test.assertConjunction("x = 0: unknown");
         //Test.assertDisjunction(new String[] {"x = 0: true", "y = 1: false"}, new String[] {"a = b: UNKNOWN"});
         //Test.assertAliasing("a.b.c.d", "x");
         //Test.assertNumberOfPossibleValues("a.b.c.d[10].e", 8);

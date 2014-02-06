@@ -8,23 +8,16 @@ public class BaseTest {
 
     public static void invokeOn(Class<?> cls) {
         /*
-         @using=jpf-abstraction
-
-        target=gov.nasa.jpf.abstraction.predicate.Test
-
         classpath=${jpf-abstraction}/build/tests
         sourcepath=${jpf-abstraction}/src/tests
-
-        abstract.domain=PREDICATES ${jpf-abstraction}/src/tests/gov/nasa/jpf/abstraction/predicate/Test.pred
-
-        listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker
-        #,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.predicate.util.SMTMonitor
-        #,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor
-
-        #vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer
-        #search.multiple_errors=true
          */
-        String[] args =  new String[] {};
+        String[] args =  new String[] {
+            "+classpath=build/tests",
+            "+abstract.domain=PREDICATES src/tests/" + cls.getName().replace(".", "/") + ".pred",
+            "+listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker",
+            "+target=" + cls.getName(),
+            
+        };
 
         Config config = JPF.createConfig(args);
 
