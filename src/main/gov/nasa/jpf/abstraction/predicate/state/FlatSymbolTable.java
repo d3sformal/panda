@@ -219,7 +219,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	/**
 	 * Resolve a path to all values it may be pointing to (primitive/objects)
 	 */
-	private void lookupValues(AccessExpression expression, Set<UniverseIdentifier> outValues) {
+	public void lookupValues(AccessExpression expression, Set<UniverseIdentifier> outValues) {
 		if (expression.getRoot() instanceof AnonymousExpression) {
 			AnonymousExpression anonymous = (AnonymousExpression) expression.getRoot();
 			Reference reference = anonymous.getReference();

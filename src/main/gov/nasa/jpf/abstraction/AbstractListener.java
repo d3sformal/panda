@@ -34,7 +34,7 @@ import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.assertions.AssertConjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertDisjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertExclusiveDisjunctionHandler;
-import gov.nasa.jpf.abstraction.assertions.AssertAliasingHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertAliasedHandler;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -62,8 +62,8 @@ public class AbstractListener extends PropertyListenerAdapter {
         testMethods.put(BaseTestClass + ".assertExclusiveDisjunction([Ljava/lang/String;)V", new AssertExclusiveDisjunctionHandler(AssertDisjunctionHandler.Type.ONE_PREDICATE_PER_SET));
         testMethods.put(BaseTestClass + ".assertExclusiveDisjunction([[Ljava/lang/String;)V", new AssertExclusiveDisjunctionHandler(AssertDisjunctionHandler.Type.MULTIPLE_PREDICATES_PER_SET));
 
-        // Aliasing
-        testMethods.put(BaseTestClass + ".assertAliasing([Ljava/lang/String;)V", new AssertAliasingHandler());
+        // Aliased
+        testMethods.put(BaseTestClass + ".assertAliased([Ljava/lang/String;)V", new AssertAliasedHandler());
     }
 
 	@Override
