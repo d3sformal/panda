@@ -20,6 +20,8 @@ public class BaseTest {
     native public static void assertExclusiveDisjunction(String... assertions); // Each argument is a standalone fact
     native public static void assertExclusiveDisjunction(String[]... assertions); // Each argument is a set of standalone facts
 
+    native public static void assertAliasing(String... aliases);
+
     @Test
     public void bootstrap() {
         // CANNOT USE multiple_errors !!! NEVER EVER !!!

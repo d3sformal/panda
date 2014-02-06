@@ -12,7 +12,7 @@ import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
-public class AssertDisjunctionHandler extends AssertHandler {
+public class AssertDisjunctionHandler extends AssertPredicateHandler {
 
     public enum Type {
         ONE_PREDICATE_PER_SET,
@@ -27,7 +27,7 @@ public class AssertDisjunctionHandler extends AssertHandler {
 
     @Override
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
-        StackFrame sf = curTh.getTopFrame();
+        StackFrame sf = curTh.getModifiableTopFrame();
 
         ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
 

@@ -26,7 +26,7 @@ public class PredicateTest {
         p = p.replace(a, aplusb);
         p = p.replace(b, c);
 
-        Predicate q = PredicatesFactory.createPredicateFromString("(a + b) + c = 2");
+        Predicate q = PredicatesFactory.createPredicateFromString("(a + c) + c = 2");
 
         assertEquals(p, q);
 	}

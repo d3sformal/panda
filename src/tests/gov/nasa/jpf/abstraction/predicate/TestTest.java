@@ -12,7 +12,9 @@ public class TestTest extends BaseTest {
 
         assertDisjunction("x = 4: unknown", "0 = 0: false");
 
-        //assertAliasing("a.b.c.d", "x");
+        assertAliasing("a.b.c.d", "e.f.g");
+        assertAliasing("x", "x");
+
         //assertNumberOfPossibleValues("a.b.c.d[10].e", 8);
 
         //...

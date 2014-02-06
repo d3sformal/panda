@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.common.access;
 
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
@@ -14,7 +17,8 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
 
 public class AccessExpressionTest {
 
-	public static void main(String[] args) {
+    @Test
+	public void testAccessExpressions() {
 		Notation.policy = Notation.DOT_NOTATION;
 		
 		AccessExpression p = PredicatesFactory.createAccessExpressionFromString("a[a.length - 1]");
@@ -24,14 +28,10 @@ public class AccessExpressionTest {
 		
 		Expression e = p.replace(a, c);
 		
-		System.out.println(e /*+ " " + e.getPaths()*/);
-		
 		AccessExpression x = PredicatesFactory.createAccessExpressionFromString("x.x");		
 		AccessExpression y = PredicatesFactory.createAccessExpressionFromString("x");
 		AccessExpression z = PredicatesFactory.createAccessExpressionFromString("y");
 		x = x.reRoot(y, z);
-		
-		System.out.println(x + " " + x.getClass().getSimpleName());
 		
 		AccessExpression e1;
 		AccessExpression e2;
@@ -45,9 +45,7 @@ public class AccessExpressionTest {
 		e1 = DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create()));
 		e2 = DefaultObjectFieldRead.create(DefaultRoot.create("this"), DefaultObjectFieldWrite.create(DefaultRoot.create("this"), "rectangles", DefaultFresh.create()));
 		
-		System.out.println(Notation.convertToString(e1, new PredicatesSMTStringifier()));
-		System.out.println(Notation.convertToString(e2, new PredicatesSMTStringifier()));
-		System.out.println(e1.equals(e2) + " " + e1.hashCode() + " " + e2.hashCode());
+        assertFalse(e1.equals(e2));
 	}
 
 }

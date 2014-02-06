@@ -262,25 +262,12 @@
       <batchtest todir="build/tests">
         <fileset dir="build/tests">
           <exclude name="**/JPF_*.class"/>
-          <include name="**/Test*.class"/>
+          <include name="**/*Test.class"/>
         </fileset>
       </batchtest>
 
     </junit>
 
-  </target>
-
-  <target name="test-apf" depends="build">
-    <java classname="org.junit.runner.JUnitCore">
-        <classpath>
-           <pathelement location="../jpf-core/build/jpf.jar"/>
-           <pathelement location="../jpf-core/lib/junit-4.10.jar"/>
-           <pathelement location="build/tests/"/>
-           <pathelement location="build/classes/"/> 
-        </classpath>
-
-        <arg value="gov.nasa.jpf.abstraction.predicate.TestTest"/>
-    </java>
   </target>
 
 

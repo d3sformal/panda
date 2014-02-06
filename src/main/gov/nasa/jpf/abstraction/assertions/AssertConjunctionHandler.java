@@ -7,11 +7,11 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ElementInfo;
 
-public class AssertConjunctionHandler extends AssertHandler {
+public class AssertConjunctionHandler extends AssertPredicateHandler {
 
     @Override
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
-        StackFrame sf = curTh.getTopFrame();
+        StackFrame sf = curTh.getModifiableTopFrame();
 
         ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
 
