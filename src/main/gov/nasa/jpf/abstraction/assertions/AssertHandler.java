@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction;
+package gov.nasa.jpf.abstraction.assertions;
 
 import gov.nasa.jpf.GenericProperty;
 import gov.nasa.jpf.search.Search;
@@ -8,10 +8,13 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ElementInfo;
 
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+
+import gov.nasa.jpf.abstraction.ExecuteInstructionHandler;
 
 public abstract class AssertHandler implements ExecuteInstructionHandler {
 

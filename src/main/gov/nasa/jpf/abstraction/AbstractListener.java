@@ -31,6 +31,10 @@ import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
 
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 
+import gov.nasa.jpf.abstraction.assertions.AssertConjunctionHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertDisjunctionHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertExclusiveDisjunctionHandler;
+
 import java.util.Map;
 import java.util.HashMap;
 

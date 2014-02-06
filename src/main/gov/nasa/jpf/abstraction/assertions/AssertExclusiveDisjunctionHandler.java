@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction;
+package gov.nasa.jpf.abstraction.assertions;
 
 import gov.nasa.jpf.Property;
 import gov.nasa.jpf.vm.VM;
