@@ -90,7 +90,9 @@ public class AbstractListener extends PropertyListenerAdapter {
 
                 handler.executeInstruction(vm, curTh, nextInsn);
 
-                curTh.skipInstruction(curTh.getPC().getNext());
+                if (!vm.getSearch().isErrorState()) {
+                    curTh.skipInstruction(curTh.getPC().getNext());
+                }
             }
         }
     }

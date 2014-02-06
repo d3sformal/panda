@@ -246,9 +246,9 @@
 
     <property name="junit.usefile" value="true"/>
 
-    <junit printsummary="withOutAndErr" showoutput="off" haltonfailure="yes"
+    <junit printsummary="withOutAndErr" showoutput="on" haltonfailure="yes"
            fork="yes" forkmode="perTest" maxmemory="1024m">
-      <formatter type="plain" usefile="${junit.usefile}"/>
+      <formatter type="failure"/> <!-- usefile="${junit.usefile}"/> -->
 
       <classpath>
         <path refid="lib.path"/>
@@ -256,18 +256,31 @@
         <pathelement location="build/tests"/>
         <pathelement location="build/classes"/>
         <pathelement location="build/annotations"/>
-
       </classpath>
 
       <batchtest todir="build/tests">
         <fileset dir="build/tests">
           <exclude name="**/JPF_*.class"/>
           <include name="**/Test*.class"/>
+          <include name="**/*Test.class"/>
         </fileset>
       </batchtest>
 
     </junit>
 
+  </target>
+
+  <target name="test-apf" depends="build">
+    <java classname="org.junit.runner.JUnitCore">
+        <classpath>
+           <pathelement location="../jpf-core/build/jpf.jar"/>
+           <pathelement location="../jpf-core/lib/junit-4.10.jar"/>
+           <pathelement location="build/tests/"/>
+           <pathelement location="build/classes/"/> 
+        </classpath>
+
+        <arg value="gov.nasa.jpf.abstraction.predicate.ClassATest"/>
+    </java>
   </target>
 
 

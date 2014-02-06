@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate;
 
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.Config;
 
@@ -17,12 +20,15 @@ public class BaseTest {
     native public static void assertExclusiveDisjunction(String... assertions); // Each argument is a standalone fact
     native public static void assertExclusiveDisjunction(String[]... assertions); // Each argument is a set of standalone facts
 
-    public static void invokeOn(Class<?> cls) {
+    @Test
+    public void bootstrap() {
+        // CANNOT USE multiple_errors !!! NEVER EVER !!!
+        // why: test driver would not skip calls to native assert methods
         String[] args =  new String[] {
             "+classpath=build/tests",
-            "+abstract.domain=PREDICATES src/tests/" + cls.getName().replace(".", "/") + ".pred",
+            "+abstract.domain=PREDICATES src/tests/" + getClass().getName().replace(".", "/") + ".pred",
             "+listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker",
-            "+target=" + cls.getName(),
+            "+target=" + getClass().getName(),
         };
 
         Config config = JPF.createConfig(args);
@@ -30,5 +36,7 @@ public class BaseTest {
         JPF jpf = new JPF(config);
 
         jpf.run();
+
+        assertFalse(jpf.foundErrors());
     }
 }

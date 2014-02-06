@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction;
 
+import gov.nasa.jpf.Property;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -18,8 +19,12 @@ public class AssertExclusiveDisjunctionHandler extends AssertDisjunctionHandler 
     }
 
     @Override
-    protected void respondToFindingTwoValid(int lineNumber) {
-        throw new RuntimeException("Line " + lineNumber + ": More than one set of assertions satisfied.");
+    protected void respondToFindingTwoValid(VM vm, int lineNumber) {
+        String reason = "Line " + lineNumber + ": More than one set of assertions satisfied.";
+        Property property = new AssertProperty(reason);
+
+        vm.getSearch().error(property);
+        vm.breakTransition(reason);
     }
 
 }
