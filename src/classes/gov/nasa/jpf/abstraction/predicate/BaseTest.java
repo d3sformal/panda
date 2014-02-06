@@ -10,7 +10,12 @@ import java.io.File;
 
 public class BaseTest {
     native public static void assertConjunction(String... assertions);
-    native public static void assertDisjunction(String[]... assertions);
+
+    native public static void assertDisjunction(String... assertions); // Each argument is a standalone fact
+    native public static void assertDisjunction(String[]... assertions); // Each argument is a set of standalone facts
+
+    native public static void assertExclusiveDisjunction(String... assertions); // Each argument is a standalone fact
+    native public static void assertExclusiveDisjunction(String[]... assertions); // Each argument is a set of standalone facts
 
     public static void invokeOn(Class<?> cls) {
         String[] args =  new String[] {

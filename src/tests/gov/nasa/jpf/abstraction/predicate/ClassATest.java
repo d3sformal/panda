@@ -14,6 +14,8 @@ class ClassA {
 
         x = 4;
 
+        ClassATest.assertExclusiveDisjunction("x = x: true", "y = y + 1: false");
+
         ClassATest.assertDisjunction(
             new String[] {
                 "x = 3: true"

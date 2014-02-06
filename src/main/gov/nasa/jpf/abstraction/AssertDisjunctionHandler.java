@@ -11,71 +11,62 @@ import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
-public class AssertDisjunctionHandler implements ExecuteInstructionHandler {
+public class AssertDisjunctionHandler extends AssertHandler {
+
+    public enum Type {
+        ONE_PREDICATE_PER_SET,
+        MULTIPLE_PREDICATES_PER_SET
+    }
+
+    private Type type;
+
+    public AssertDisjunctionHandler(Type type) {
+        this.type = type;
+    }
 
     @Override
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
         StackFrame sf = curTh.getTopFrame();
 
-        ElementInfo arraysEI = curTh.getElementInfo(sf.pop());
+        ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
 
-        boolean[] validAssertions = new boolean[arraysEI.arrayLength()];
+        boolean foundValid = false;
+        boolean foundTwoValid = false;
 
-        for (int i = 0; i < arraysEI.arrayLength(); ++i) {
-            ElementInfo arrayEI = curTh.getElementInfo(arraysEI.getReferenceElement(i));
+        for (int i = 0; i < arrayEI.arrayLength(); ++i) {
+            ElementInfo ei = curTh.getElementInfo(arrayEI.getReferenceElement(i));
 
             try {
-                checkAssertionSet(arrayEI, curTh, nextInsn);
+                switch (type) {
+                    case ONE_PREDICATE_PER_SET:
+                        checkAssertion(ei, curTh, nextInsn);
+                        break;
 
-                validAssertions[i] = true;
+                    case MULTIPLE_PREDICATES_PER_SET:
+                        checkAssertionSet(ei, curTh, nextInsn);
+                        break;
+                }
+
+                foundTwoValid |= foundValid;
+                foundValid |= true;
             } catch (RuntimeException e) {
-                validAssertions[i] = false;
             }
         }
 
-        boolean foundValid = false;
-
-        for (int i = 0; i < validAssertions.length; ++i) {
-            if (foundValid && validAssertions[i]) {
-                throw new RuntimeException("Line " + nextInsn.getLineNumber() + ": More than one set of assertions satisfied.");
-            }
-
-            foundValid |= validAssertions[i];
+        if (foundTwoValid) {
+            respondToFindingTwoValid(nextInsn.getLineNumber());
         }
 
         if (!foundValid) {
-            throw new RuntimeException("Line " + nextInsn.getLineNumber() + ": No set of assertions satisfied.");
+            respondToNotFindingAnyValid(nextInsn.getLineNumber());
         }
     }
 
-    protected void checkAssertionSet(ElementInfo arrayEI, ThreadInfo curTh, Instruction nextInsn) {
-        for (int j = 0; j < arrayEI.arrayLength(); ++j) {
-            ElementInfo ei = curTh.getElementInfo(arrayEI.getReferenceElement(j));
+    protected void respondToFindingTwoValid(int lineNumber) {
+    }
 
-            String assertion = new String(ei.getStringChars());
-
-            Predicate assertedFact = Tautology.create();
-            TruthValue assertedValuation = TruthValue.TRUE;
-
-            try {
-                String[] assertionParts = assertion.split(":");
-
-                if (assertionParts.length != 2) {
-                    throw new Exception();
-                }
-
-                assertedFact = PredicatesFactory.createPredicateFromString(assertionParts[0]);
-                assertedValuation = TruthValue.create(assertionParts[1]);
-            } catch (Exception e) {
-                throw new RuntimeException("Line " + nextInsn.getLineNumber() + ": Incorrect format of asserted facts: `" + assertion + "`");
-            }
-
-            TruthValue inferredValuation = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(assertedFact);
-
-            if (assertedValuation != inferredValuation) {
-                throw new RuntimeException("Line " + nextInsn.getLineNumber() + ": Asserted incorrect predicate valuation: `" + assertedFact + "` expected to valuate to `" + assertedValuation + "` but actually valuated to `" + inferredValuation + "`");
-            }
-        }
+    protected void respondToNotFindingAnyValid(int lineNumber) {
+        throw new RuntimeException("Line " + lineNumber + ": No set of assertions satisfied.");
     }
 
 }

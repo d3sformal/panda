@@ -46,8 +46,16 @@ public class AbstractListener extends PropertyListenerAdapter {
     private static String BaseTestClass = "gov.nasa.jpf.abstraction.predicate.BaseTest";
 
     public AbstractListener() {
+        // Conjunction
         testMethods.put(BaseTestClass + ".assertConjunction([Ljava/lang/String;)V", new AssertConjunctionHandler());
-        testMethods.put(BaseTestClass + ".assertDisjunction([[Ljava/lang/String;)V", new AssertDisjunctionHandler());
+
+        // Disjunction (Flat, Structured)
+        testMethods.put(BaseTestClass + ".assertDisjunction([Ljava/lang/String;)V", new AssertDisjunctionHandler(AssertDisjunctionHandler.Type.ONE_PREDICATE_PER_SET));
+        testMethods.put(BaseTestClass + ".assertDisjunction([[Ljava/lang/String;)V", new AssertDisjunctionHandler(AssertDisjunctionHandler.Type.MULTIPLE_PREDICATES_PER_SET));
+
+        // Exclusive disjunction (Flat, Structured)
+        testMethods.put(BaseTestClass + ".assertExclusiveDisjunction([Ljava/lang/String;)V", new AssertExclusiveDisjunctionHandler(AssertDisjunctionHandler.Type.ONE_PREDICATE_PER_SET));
+        testMethods.put(BaseTestClass + ".assertExclusiveDisjunction([[Ljava/lang/String;)V", new AssertExclusiveDisjunctionHandler(AssertDisjunctionHandler.Type.MULTIPLE_PREDICATES_PER_SET));
     }
 
 	@Override
