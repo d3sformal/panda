@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-public class Test extends BaseTest {
+public class ClassATest extends BaseTest {
     public static void main(String[] args) {
         invokeOn(ClassA.class);
     }
@@ -8,10 +8,21 @@ public class Test extends BaseTest {
 
 class ClassA {
     public static void main (String[] args) {
-        //...
+        int x = 3;
 
-        Test.assertConjunction("x = 0: unknown");
-        //Test.assertDisjunction(new String[] {"x = 0: true", "y = 1: false"}, new String[] {"a = b: UNKNOWN"});
+        ClassATest.assertConjunction("x = 3: true");
+
+        x = 4;
+
+        ClassATest.assertDisjunction(
+            new String[] {
+                "x = 3: true"
+            },
+            new String[] {
+                "a = b: false"
+            }
+        );
+
         //Test.assertAliasing("a.b.c.d", "x");
         //Test.assertNumberOfPossibleValues("a.b.c.d[10].e", 8);
 

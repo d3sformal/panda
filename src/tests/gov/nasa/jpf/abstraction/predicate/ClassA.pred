@@ -1,0 +1,2 @@
+[method gov.nasa.jpf.abstraction.predicate.ClassA.main]
+x = 3

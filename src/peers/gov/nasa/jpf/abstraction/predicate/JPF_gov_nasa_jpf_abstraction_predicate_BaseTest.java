@@ -12,4 +12,9 @@ public class JPF_gov_nasa_jpf_abstraction_predicate_BaseTest extends NativePeer 
         throw new RuntimeException("Should never be reached!");
     }
 
+    @MJI
+    public void assertDisjunction___3_3Ljava_lang_String_2__V(MJIEnv env, int objRef, int argRef) {
+        /** Should never be reached */
+        throw new RuntimeException("Should never be reached!");
+    }
 }
