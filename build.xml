@@ -279,7 +279,7 @@
            <pathelement location="build/classes/"/> 
         </classpath>
 
-        <arg value="gov.nasa.jpf.abstraction.predicate.ClassATest"/>
+        <arg value="gov.nasa.jpf.abstraction.predicate.TestTest"/>
     </java>
   </target>
 
