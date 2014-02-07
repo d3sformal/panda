@@ -6,8 +6,6 @@ package gov.nasa.jpf.abstraction.common.access;
  * @see gov.nasa.jpf.abstraction.common.ObjectContext
  */
 public interface PackageAndClass extends Root {
-	public String getName();
-	
     @Override
     public PackageAndClass createShallowCopy();
 }
