@@ -14,7 +14,7 @@ import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
 public abstract class AssertPredicateHandler extends AssertHandler {
 
-    protected void checkAssertion(ElementInfo ei, ThreadInfo curTh, Instruction nextInsn) {
+    protected void checkAssertion(ElementInfo ei, ThreadInfo curTh) {
         String assertion = new String(ei.getStringChars());
 
         Predicate assertedFact = Tautology.create();
@@ -30,21 +30,21 @@ public abstract class AssertPredicateHandler extends AssertHandler {
             assertedFact = PredicatesFactory.createPredicateFromString(assertionParts[0]);
             assertedValuation = TruthValue.create(assertionParts[1]);
         } catch (Exception e) {
-            throw new RuntimeException("Line " + nextInsn.getLineNumber() + ": Incorrect format of asserted facts: `" + assertion + "`");
+            throw new RuntimeException("Incorrect format of asserted facts: `" + assertion + "`");
         }
 
         TruthValue inferredValuation = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(assertedFact);
 
         if (assertedValuation != inferredValuation) {
-            throw new RuntimeException("Line " + nextInsn.getLineNumber() + ": Asserted incorrect predicate valuation: `" + assertedFact + "` expected to valuate to `" + assertedValuation + "` but actually valuated to `" + inferredValuation + "`");
+            throw new RuntimeException("Asserted incorrect predicate valuation: `" + assertedFact + "` expected to valuate to `" + assertedValuation + "` but actually valuated to `" + inferredValuation + "`");
         }
     }
 
-    protected void checkAssertionSet(ElementInfo arrayEI, ThreadInfo curTh, Instruction nextInsn) {
+    protected void checkAssertionSet(ElementInfo arrayEI, ThreadInfo curTh) {
         for (int j = 0; j < arrayEI.arrayLength(); ++j) {
             ElementInfo ei = curTh.getElementInfo(arrayEI.getReferenceElement(j));
 
-            checkAssertion(ei, curTh, nextInsn);
+            checkAssertion(ei, curTh);
         }
     }
 

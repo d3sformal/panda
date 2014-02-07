@@ -35,6 +35,8 @@ import gov.nasa.jpf.abstraction.assertions.AssertConjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertDisjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertExclusiveDisjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertAliasedHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertNotAliasedHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertNumberOfPossibleValuesHandler;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -64,6 +66,12 @@ public class AbstractListener extends PropertyListenerAdapter {
 
         // Aliased
         testMethods.put(BaseTestClass + ".assertAliased([Ljava/lang/String;)V", new AssertAliasedHandler());
+
+        // Not aliased
+        testMethods.put(BaseTestClass + ".assertNotAliased([Ljava/lang/String;)V", new AssertNotAliasedHandler());
+
+        // Number of possible values
+        testMethods.put(BaseTestClass + ".assertNumberOfPossibleValues(Ljava/lang/String;I)V", new AssertNumberOfPossibleValuesHandler());
     }
 
 	@Override

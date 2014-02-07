@@ -1,6 +1,5 @@
 package gov.nasa.jpf.abstraction.assertions;
 
-import gov.nasa.jpf.Property;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -40,11 +39,11 @@ public class AssertDisjunctionHandler extends AssertPredicateHandler {
             try {
                 switch (type) {
                     case ONE_PREDICATE_PER_SET:
-                        checkAssertion(ei, curTh, nextInsn);
+                        checkAssertion(ei, curTh);
                         break;
 
                     case MULTIPLE_PREDICATES_PER_SET:
-                        checkAssertionSet(ei, curTh, nextInsn);
+                        checkAssertionSet(ei, curTh);
                         break;
                 }
 
@@ -67,11 +66,7 @@ public class AssertDisjunctionHandler extends AssertPredicateHandler {
     }
 
     protected void respondToNotFindingAnyValid(VM vm, int lineNumber) {
-        String reason = "Line " + lineNumber + ": No set of assertions satisfied.";
-        Property property = new AssertProperty(reason);
-
-        vm.getSearch().error(property);
-        vm.breakTransition(reason);
+        reportError(vm, lineNumber, "No set of assertions satisfied.");
     }
 
 }

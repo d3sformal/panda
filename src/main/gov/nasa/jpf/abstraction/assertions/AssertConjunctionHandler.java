@@ -1,6 +1,5 @@
 package gov.nasa.jpf.abstraction.assertions;
 
-import gov.nasa.jpf.Property;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -16,13 +15,9 @@ public class AssertConjunctionHandler extends AssertPredicateHandler {
         ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
 
         try {
-            checkAssertionSet(arrayEI, curTh, nextInsn);
+            checkAssertionSet(arrayEI, curTh);
         } catch (Exception e) {
-            String reason = e.getMessage();
-            Property property = new AssertProperty(reason);
-
-            vm.getSearch().error(property);
-            vm.breakTransition(reason);
+            reportError(vm, nextInsn.getLineNumber(), e.getMessage());
         }
     }
 
