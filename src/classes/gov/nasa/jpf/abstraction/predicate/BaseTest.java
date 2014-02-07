@@ -33,7 +33,8 @@ public class BaseTest {
             "+classpath=build/tests",
             "+abstract.domain=PREDICATES src/tests/" + getClass().getName().replace(".", "/") + ".pred",
             "+listener=gov.nasa.jpf.abstraction.AbstractListener",
-            "+target=" + getClass().getName(),
+            "+vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer",
+            "+target=" + getClass().getName()
         };
 
         Config config = JPF.createConfig(args);
