@@ -42,7 +42,6 @@ public class IALOAD extends gov.nasa.jpf.jvm.bytecode.IALOAD {
     private AccessExpression array;
     private Expression index;
     private AccessExpression path;
-    private ThreadInfo threadInfo;
 
 	@Override
 	public Instruction execute(ThreadInfo ti) {
@@ -53,6 +52,10 @@ public class IALOAD extends gov.nasa.jpf.jvm.bytecode.IALOAD {
 		arrayAttr = Attribute.ensureNotNull(arrayAttr);
 		indexAttr = Attribute.ensureNotNull(indexAttr);
 	
+		array = (AccessExpression) arrayAttr.getExpression();
+        index = indexAttr.getExpression();
+		path = DefaultArrayElementRead.create(array, index);
+						
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
 		Instruction actualNextInsn = super.execute(ti);
@@ -60,10 +63,6 @@ public class IALOAD extends gov.nasa.jpf.jvm.bytecode.IALOAD {
 		if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}     
-		
-		AccessExpression path = (AccessExpression) arrayAttr.getExpression();
-			
-		path = DefaultArrayElementRead.create(path, indexAttr.getExpression());
 						
 		Attribute attribute = new NonEmptyAttribute(null, path);
 

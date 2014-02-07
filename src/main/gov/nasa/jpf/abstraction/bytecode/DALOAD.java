@@ -19,19 +19,33 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.LessThan;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.ElementInfo;
 
 /**
  * Reads an element of an array
  */
 public class DALOAD extends gov.nasa.jpf.jvm.bytecode.DALOAD {
 	
+    private AccessExpression array;
+    private Expression index;
+    private AccessExpression path;
+
 	@Override
 	public Instruction execute(ThreadInfo ti) {		
 		StackFrame sf = ti.getTopFrame();
@@ -40,6 +54,10 @@ public class DALOAD extends gov.nasa.jpf.jvm.bytecode.DALOAD {
 		
 		arrayAttr = Attribute.ensureNotNull(arrayAttr);
 		indexAttr = Attribute.ensureNotNull(indexAttr);
+	
+		array = (AccessExpression) arrayAttr.getExpression();
+        index = indexAttr.getExpression();
+		path = DefaultArrayElementRead.create(array, index);
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
@@ -52,10 +70,6 @@ public class DALOAD extends gov.nasa.jpf.jvm.bytecode.DALOAD {
 			return actualNextInsn;
 		}   
 		
-		AccessExpression path = (AccessExpression) arrayAttr.getExpression();
-			
-		path = DefaultArrayElementRead.create(path, indexAttr.getExpression());
-						
 		Attribute attribute = new NonEmptyAttribute(null, path);
 
 		sf = ti.getModifiableTopFrame();
@@ -63,4 +77,21 @@ public class DALOAD extends gov.nasa.jpf.jvm.bytecode.DALOAD {
 
 		return actualNextInsn;
 	}
+
+    @Override
+    public void push (StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsException {
+        // i >= 0 && i < a.length
+        Predicate inBounds = Conjunction.create(
+            Negation.create(LessThan.create(index, Constant.create(0))),
+            LessThan.create(index, DefaultArrayLengthRead.create(array))
+        );
+
+        TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
+
+        if (value != TruthValue.TRUE) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        sf.push(0);
+    }
 }
