@@ -51,7 +51,13 @@ public class Reference implements StructuredValueIdentifier {
             if (getElementInfo() == null) return -1;
             if (ref.getElementInfo() == null) return +1;
 
-            return getElementInfo().getClassInfo().getName().compareTo(ref.getElementInfo().getClassInfo().getName());
+            int classComparison = getElementInfo().getClassInfo().getName().compareTo(ref.getElementInfo().getClassInfo().getName());
+
+            if (classComparison == 0) {
+                return getReference().compareTo(ref.getReference());
+            }
+
+            return classComparison;
         }
 
         return Identifier.Ordering.compare(this, id);
