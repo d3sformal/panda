@@ -92,11 +92,23 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     }
 
     private SortedSet<StructuredValueIdentifier> sortStructuredValues(Set<StructuredValueIdentifier> values) {
-        throw new RuntimeException("IMPLEMENT");
+        SortedSet<StructuredValueIdentifier> sorted = new TreeSet<StructuredValueIdentifier>(new Comparator<StructuredValueIdentifier>() {
+            @Override
+            public int compare(StructuredValueIdentifier i1, StructuredValueIdentifier i2) {
+
+                // Identifier.compareTo(Identifier)
+                // make sure that the TreeSet uses the correct comparison method despite different types
+                return i1.compareTo(i2);
+            }
+        });
+
+        sorted.addAll(values);
+
+        return sorted;
     }
 
     protected void serializeHeap() {    
-    	Set<StructuredValueIdentifier> sorted = sortStructuredValues(collectReachableHeap());
+    	Set<StructuredValueIdentifier> sorted = sortStructuredValues(universe.getStructuredValues());
 	    int i = 0;
 	
     	canonical.clear();
@@ -152,10 +164,6 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
             	serializeSlot(c.getField(field));
             }
         }
-    }
-
-    protected Set<StructuredValueIdentifier> collectReachableHeap() {
-        throw new RuntimeException("MISSING IMPLEMENTATION"); //return current universe.keySet()
     }
 
     @Override

@@ -30,4 +30,15 @@ public class LoadedClass extends StructuredValueSlot implements Identifier {
     public PackageAndClass getAccessExpression() {
         return accessExpression;
     }
+
+    @Override
+    public int compareTo(Identifier id) {
+        if (id instanceof LoadedClass) {
+            LoadedClass lcls = (LoadedClass) id;
+
+            return getAccessExpression().getName().compareTo(lcls.getAccessExpression().getName());
+        }
+
+        return Identifier.Ordering.compare(this, id);
+    }
 }

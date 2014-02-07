@@ -37,4 +37,15 @@ public class PrimitiveLocalVariable extends PrimitiveValueSlot implements LocalV
     public FlatSymbolTable getScope() {
         return scope;
     }
+
+    @Override
+    public int compareTo(Identifier id) {
+        if (id instanceof PrimitiveLocalVariable) {
+            PrimitiveLocalVariable var = (PrimitiveLocalVariable) id;
+
+            return getAccessExpression().getName().compareTo(var.getAccessExpression().getName());
+        }
+
+        return Identifier.Ordering.compare(this, id);
+    }
 }

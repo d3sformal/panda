@@ -61,7 +61,8 @@ Class.Universe("Universe")(
 
 Class.Identifier("Identifier")()(
     "+ hashCode(): int",
-    "+ equals(Object object): boolean"
+    "+ equals(Object object): boolean",
+    "+ compareTo(Identifier id): int"
 );
 classStereotypes.Identifier("<<interface>>");
 Identifier.info.iAttributeStack.top    := 0;

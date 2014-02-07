@@ -42,4 +42,15 @@ public class ClassName implements StructuredValueIdentifier {
     public String toString() {
         return getClassName();
     }
+
+    @Override
+    public int compareTo(Identifier id) {
+        if (id instanceof ClassName) {
+            ClassName cln = (ClassName) id;
+
+            return getStaticElementInfo().getClassInfo().getName().compareTo(cln.getStaticElementInfo().getClassInfo().getName());
+        }
+
+        return Identifier.Ordering.compare(this, id);
+    }
 }

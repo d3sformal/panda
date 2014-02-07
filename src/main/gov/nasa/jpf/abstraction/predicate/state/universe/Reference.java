@@ -43,4 +43,18 @@ public class Reference implements StructuredValueIdentifier {
         return getReference().toString();
     }
 
+    @Override
+    public int compareTo(Identifier id) {
+        if (id instanceof Reference) {
+            Reference ref = (Reference) id;
+
+            if (getElementInfo() == null) return -1;
+            if (ref.getElementInfo() == null) return +1;
+
+            return getElementInfo().getClassInfo().getName().compareTo(ref.getElementInfo().getClassInfo().getName());
+        }
+
+        return Identifier.Ordering.compare(this, id);
+    }
+
 }

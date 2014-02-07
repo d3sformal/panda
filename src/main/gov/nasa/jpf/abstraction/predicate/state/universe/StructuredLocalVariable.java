@@ -37,4 +37,15 @@ public class StructuredLocalVariable extends StructuredValueSlot implements Loca
     public FlatSymbolTable getScope() {
         return scope;
     }
+
+    @Override
+    public int compareTo(Identifier id) {
+        if (id instanceof StructuredLocalVariable) {
+            StructuredLocalVariable var = (StructuredLocalVariable) id;
+
+            return getAccessExpression().getName().compareTo(var.getAccessExpression().getName());
+        }
+
+        return Identifier.Ordering.compare(this, id);
+    }
 }
