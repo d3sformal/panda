@@ -10,6 +10,8 @@ import java.net.URLClassLoader;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.io.File;
+import java.util.List;
+import java.util.LinkedList;
 
 public class BaseTest {
     native public static void assertConjunction(String... assertions);
@@ -25,19 +27,25 @@ public class BaseTest {
 
     native public static void assertNumberOfPossibleValues(String expression, int expectedNumber);
 
-    @Test
-    public void bootstrap() {
+    protected List<String> config = new LinkedList<String>();
+
+    public BaseTest() {
         // CANNOT USE multiple_errors !!! NEVER EVER !!!
         // why: test driver would not skip calls to native assert methods
-        String[] args =  new String[] {
-            "+classpath=build/tests",
-            "+abstract.domain=PREDICATES src/tests/" + getClass().getName().replace(".", "/") + ".pred",
-            "+listener=gov.nasa.jpf.abstraction.AbstractListener",
-            "+vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer",
-            "+target=" + getClass().getName()
-        };
+        config.add("+classpath=build/tests");
+        config.add("+abstract.domain=PREDICATES src/tests/" + getClass().getName().replace(".", "/") + ".pred");
+        config.add("+listener=gov.nasa.jpf.abstraction.AbstractListener");
+        config.add("+vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer");
+        config.add("+target=" + getClass().getName());
+    }
 
-        Config config = JPF.createConfig(args);
+    private String[] getConfig() {
+        return config.toArray(new String[config.size()]);
+    }
+
+    @Test
+    public void bootstrap() {
+        Config config = JPF.createConfig(getConfig());
 
         JPF jpf = new JPF(config);
 
