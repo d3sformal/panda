@@ -416,7 +416,14 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			}
 		}
 		
-		boolean ambiguous = destinations.size() > 1;
+        // If there are either
+        //
+        // 1) more objects we are writing to
+        //
+        // or
+        //
+        // 2) more indices we are writing to
+		boolean ambiguous = destinations.size() > 1 || ((to instanceof ArrayElementRead) && !(((ArrayElementRead) to).getIndex() instanceof Constant));
 		
         // For each new parent (object whose field/element is being set, or a local var ...)
         // Add the objects into the field/element or rewrite a local variable
@@ -508,7 +515,17 @@ public class FlatSymbolTable implements SymbolTable, Scope {
                 Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
                 valueToAccessExpressions(parent, getMaximalAccessExpressionLength(), prefixes);
 				
+                ArrayElementRead aeRead = (ArrayElementRead) to;
+
 				for (int i = 0; i < ((UniverseArray) universe.get(parent)).getLength(); ++i) {
+
+                    // Overwrite the exact element in case of a constant index
+                    if (aeRead.getIndex() instanceof Constant) {
+                        int j = ((Constant) aeRead.getIndex()).value.intValue();
+
+                        if (i != j) continue;
+                    }
+
                     ElementIndex index = new ElementIndex(i);
 
 					for (AccessExpression prefix : prefixes) {

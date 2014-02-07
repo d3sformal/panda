@@ -12,6 +12,7 @@ import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
@@ -219,8 +220,17 @@ public class Universe {
 
                 Indexed array = (Indexed) parentObject;
 
-                for (int i = 0; i < array.getLength(); ++i) {
+                ArrayElementRead aeRead = (ArrayElementRead) read;
+
+                // Get the exact element in case of a constant index
+                if (aeRead.getIndex() instanceof Constant) {
+                    int i = ((Constant) aeRead.getIndex()).value.intValue();
+
                     outValues.addAll(array.getElement(new ElementIndex(i)).getPossibleValues());
+                } else {
+                    for (int i = 0; i < array.getLength(); ++i) {
+                        outValues.addAll(array.getElement(new ElementIndex(i)).getPossibleValues());
+                    }
                 }
             }
         }
