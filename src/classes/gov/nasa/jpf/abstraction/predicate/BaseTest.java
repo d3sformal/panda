@@ -32,7 +32,7 @@ public class BaseTest {
         String[] args =  new String[] {
             "+classpath=build/tests",
             "+abstract.domain=PREDICATES src/tests/" + getClass().getName().replace(".", "/") + ".pred",
-            "+listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker",
+            "+listener=gov.nasa.jpf.abstraction.AbstractListener",
             "+target=" + getClass().getName(),
         };
 
