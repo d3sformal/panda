@@ -42,7 +42,7 @@ public class ImageTest extends BaseTest {
         assertAliased("this.rectangles[0]", "r1");
 
         assertNumberOfPossibleValues("this.rectangles[1]", 1); // [1] --> null
-        assertNotAliased("this.rectangles[1]", "r2");
+        assertNotAliased("this.rectangles[1]", "r1");
 		
 		r2.top = 0;
 		r2.left = 0;
