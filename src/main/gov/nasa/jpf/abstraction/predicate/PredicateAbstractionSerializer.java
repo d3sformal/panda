@@ -87,16 +87,6 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         return canonical.get(value);
     }
 
-    private int getValueType(Reference ref) {
-        String className = "null";
-
-        if (ref.getElementInfo() != null) {
-            className = ref.getElementInfo().getClassInfo().getName();
-        }
-        
-        return className.hashCode();
-    }
-
     private SortedSet<StructuredValueIdentifier> sortStructuredValues(Set<StructuredValueIdentifier> values) {
         SortedSet<StructuredValueIdentifier> sorted = new TreeSet<StructuredValueIdentifier>(new Comparator<StructuredValueIdentifier>() {
             @Override
@@ -148,6 +138,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         if (value instanceof UniverseArray) {
             UniverseArray a = (UniverseArray) value;
             buf.add(UniverseArray.class.hashCode());
+            buf.add(a.getReference().getElementInfo().getClassInfo().getName().hashCode());
             buf.add(a.getLength());
 
             for (ElementIndex index : new TreeSet<ElementIndex>(a.getElements().keySet())) {
@@ -156,6 +147,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         } else if (value instanceof UniverseObject) {
             UniverseObject o = (UniverseObject) value;
             buf.add(UniverseObject.class.hashCode());
+            buf.add(o.getReference().getElementInfo().getClassInfo().getName().hashCode());
             buf.add(o.getFields().size());
 
             for (FieldName field : new TreeSet<FieldName>(o.getFields().keySet())) {
@@ -260,7 +252,6 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
                 Set<StructuredValueIdentifier> possibilitiesOrder = sortStructuredValues(possibilities);
 
                 for (StructuredValueIdentifier p : possibilitiesOrder) {
-                    buf.add(getValueType((Reference) p));
                     buf.add(canonicalId(p));
                 }
             }
