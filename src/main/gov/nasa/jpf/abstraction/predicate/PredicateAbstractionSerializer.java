@@ -88,7 +88,13 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     }
 
     private int getValueType(Reference ref) {
-        return ref.getElementInfo().getClassInfo().getName().hashCode();
+        String className = "null";
+
+        if (ref.getElementInfo() != null) {
+            className = ref.getElementInfo().getClassInfo().getName();
+        }
+        
+        return className.hashCode();
     }
 
     private SortedSet<StructuredValueIdentifier> sortStructuredValues(Set<StructuredValueIdentifier> values) {
