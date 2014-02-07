@@ -83,7 +83,7 @@ public class PredicateAbstraction extends Abstraction {
 	}
 	
 	@Override
-	public BranchingConditionInfo processBranchingCondition(BranchingCondition condition) {
+	public TruthValue processBranchingCondition(BranchingCondition condition) {
         Predicate predicate = (Predicate) condition;
 
 		return predicateValuation.evaluatePredicate(predicate);

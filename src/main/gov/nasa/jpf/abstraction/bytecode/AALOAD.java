@@ -19,15 +19,43 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.LessThan;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.choice.IntChoiceFromList;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+
+import java.util.Set;
+import java.util.HashSet;
 
 public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
+
+    private AccessExpression array;
+    private Expression index;
+    private AccessExpression path;
+    private ThreadInfo threadInfo;
+
+    // TODO multiple values
+    private boolean isChoice = false;
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
@@ -38,18 +66,21 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 		arrayAttr = Attribute.ensureNotNull(arrayAttr);
 		indexAttr = Attribute.ensureNotNull(indexAttr);
 
+		array = (AccessExpression) arrayAttr.getExpression();
+        index = indexAttr.getExpression();
+		path = DefaultArrayElementRead.create(array, index);
+        threadInfo = ti;
+						
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
+        // TODO: if first step then bad things happens :) (double pop)
+        // reason: choice in push (below)
 		Instruction actualNextInsn = super.execute(ti);
-		
+
 		if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}
 		
-		AccessExpression path = (AccessExpression) arrayAttr.getExpression();
-			
-		path = DefaultArrayElementRead.create(path, indexAttr.getExpression());
-						
 		Attribute attribute = new NonEmptyAttribute(null, path);
 
 		sf = ti.getModifiableTopFrame();
@@ -57,4 +88,64 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 
 		return actualNextInsn;
 	}
+
+    @Override
+    public void push (StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsException {
+        SystemState ss = threadInfo.getVM().getSystemState();
+
+        if (!threadInfo.isFirstStepInsn()) {
+
+            // i >= 0 && i < a.length
+            Predicate inBounds = Conjunction.create(
+                Negation.create(LessThan.create(index, Constant.create(0))),
+                LessThan.create(index, DefaultArrayLengthRead.create(array))
+            );
+
+            TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
+
+            if (value != TruthValue.TRUE) {
+                throw new ArrayIndexOutOfBoundsException();
+            }
+
+            if (ei.arrayLength() > 1) {
+                FlatSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
+
+                Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
+                symbolTable.lookupValues(path, values);
+
+                int[] references = new int[values.size()];
+
+                int i = 0;
+
+                for (UniverseIdentifier id : values) {
+                    Reference ref = (Reference) id;
+
+                    references[i] = ref.getReference();
+
+                    ++i;
+                }
+
+                ChoiceGenerator<?> cg = new IntChoiceFromList("abstractArrayElementLoad", references);
+
+                ss.setNextChoiceGenerator(cg);
+
+                isChoice = true;
+            } else {
+                sf.push(ei.getReferenceElement(0));
+            }
+        } else {
+            ChoiceGenerator<?> cg = ss.getCurrentChoiceGenerator("abstractArrayElementLoad", IntChoiceFromList.class);
+
+            int ref = ((IntChoiceFromList) cg).getNextChoice();
+
+            sf.push(ref);
+        }
+    }
+
+    @Override
+    public Instruction getNext(ThreadInfo ti) {
+        if (isChoice) return super.getNext(ti);
+
+        return this;
+    }
 }

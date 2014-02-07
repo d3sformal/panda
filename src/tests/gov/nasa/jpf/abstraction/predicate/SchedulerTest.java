@@ -10,7 +10,7 @@ public class SchedulerTest extends BaseTest {
     private static int SCHEDULE_SIZE = 5;
 
     public SchedulerTest() {
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
+        config.add("+listener+=,gov.nasa.jpf.listener.ExecTracker");
         config.add("+listener+=,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor");
     }
 
