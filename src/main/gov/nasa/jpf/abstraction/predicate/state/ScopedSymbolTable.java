@@ -38,7 +38,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		
 		// Scope for passing what has been statically initialised
 		// without this all static initialisations return and remove their scope without writing it anywhere else
-		scopes.push(new FlatSymbolTable(universe, abstraction));
+		scopes.push("-- Dummy stop scope --", new FlatSymbolTable(universe, abstraction));
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			int length = ei.arrayLength();
 			
 			LocalVarInfo args = method.getArgumentLocalVars()[0];
-            Expression argsExpr = AnonymousArray.create(new Reference(ei, threadInfo), Constant.create(length));
+            Expression argsExpr = AnonymousArray.create(new Reference(ei), Constant.create(length));
 
             method.addAttr(new NonEmptyAttribute(null, argsExpr));
 
@@ -102,19 +102,12 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	@Override
 	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
-		
+
 		FlatSymbolTable originalScope = scopes.top();
 		FlatSymbolTable newScope = createDefaultScope(threadInfo, method);
 
-		scopes.push(newScope);
+		scopes.push(method.getFullName(), newScope);
 
-		// this is not needed anymore
-		// registration for all classes done through "PredicateAbstraction.processNewClass" (called from the AbstractListener)
-		/**
-		 * Ensure that all statics are present for the current class (class in which the method is defined)
-		 */
-		//newScope.addClass(method.getClassName(), threadInfo, method.getClassInfo().getStaticElementInfo());
-		
 		Object attrs[] = before.getArgumentAttrs(method);
 		LocalVarInfo args[] = method.getArgumentLocalVars();
 
@@ -127,13 +120,13 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 				
 				attr = Attribute.ensureNotNull(attr);
 				
-				if (args[i] != null) {					
+				   if (args[i] != null) {					
 					if (args[i].isNumeric() || args[i].isBoolean()) {
 						// Assign to numeric (primitive) arg
 						newScope.processPrimitiveStore(attr.getExpression(), originalScope, DefaultRoot.create(args[i].getName()));
 					} else {						
 						// Assign to object arg
-						newScope.processObjectStore(attr.getExpression(), originalScope, DefaultRoot.create(args[i].getName()));
+						   newScope.processObjectStore(attr.getExpression(), originalScope, DefaultRoot.create(args[i].getName()));
 					}
 				}
 			}
@@ -184,15 +177,6 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
          * Drop callee scope
          */
 		scopes.pop();
-	}
-	
-	@Override
-	public void store(Scope scope) {
-		if (scope instanceof FlatSymbolTable) {
-			scopes.push((FlatSymbolTable) scope.clone());
-		} else {
-			throw new RuntimeException("Invalid scope type being pushed!");
-		}
 	}
 	
 	@Override
@@ -247,6 +231,11 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
     @Override
     public FlatSymbolTable get(int depth) {
         return scopes.top(depth);
+    }
+
+    @Override
+    public void print() {
+        scopes.print();
     }
 	
 }

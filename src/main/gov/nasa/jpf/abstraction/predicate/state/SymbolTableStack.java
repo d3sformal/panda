@@ -3,6 +3,8 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import java.util.ArrayList;
 import java.util.List;
 
+import gov.nasa.jpf.abstraction.util.Pair;
+
 /**
  * Stack keeping Symbol Table scopes
  * 
@@ -11,7 +13,7 @@ import java.util.List;
  */
 public class SymbolTableStack implements Scopes {
 	
-	private List<FlatSymbolTable> scopes = new ArrayList<FlatSymbolTable>();
+	private List<Pair<String, FlatSymbolTable>> scopes = new ArrayList<Pair<String, FlatSymbolTable>>();
 
 	@Override
 	public FlatSymbolTable top() {
@@ -24,9 +26,9 @@ public class SymbolTableStack implements Scopes {
 	}
 
 	@Override
-	public void push(Scope scope) {
+	public void push(String name, Scope scope) {
 		if (scope instanceof FlatSymbolTable) {
-			scopes.add((FlatSymbolTable) scope);
+			scopes.add(new Pair<String, FlatSymbolTable>(name, (FlatSymbolTable) scope));
 		} else {
 			throw new RuntimeException("Invalid scope type being pushed!");
 		}
@@ -41,8 +43,8 @@ public class SymbolTableStack implements Scopes {
 	public SymbolTableStack clone() {
 		SymbolTableStack clone = new SymbolTableStack();
 		
-		for (FlatSymbolTable scope : scopes) {
-			clone.push(scope.clone());
+		for (Pair<String, FlatSymbolTable> scope : scopes) {
+			clone.push(scope.getFirst(), scope.getSecond().clone());
 		}
 		
 		return clone;
@@ -50,7 +52,14 @@ public class SymbolTableStack implements Scopes {
 
 	@Override
 	public FlatSymbolTable top(int i) {
-		return scopes.get(scopes.size() - i - 1);
+		return scopes.get(scopes.size() - i - 1).getSecond();
 	}
+
+    @Override
+    public void print() {
+        for (Pair<String, FlatSymbolTable> scope : scopes) {
+            System.out.println(scope.getFirst());
+        }
+    }
 
 }

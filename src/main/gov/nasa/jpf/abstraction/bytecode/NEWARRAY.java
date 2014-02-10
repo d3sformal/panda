@@ -34,7 +34,7 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
 		ElementInfo array = ti.getElementInfo(sf.peek());
 		
 		sf = ti.getModifiableTopFrame();
-		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousArray.create(new Reference(array, ti), attr.getExpression())));
+		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousArray.create(new Reference(array), attr.getExpression())));
 		
 		return actualNextInsn;
 	}

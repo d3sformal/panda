@@ -45,7 +45,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	public ScopedPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
 		this.predicateSet = predicateSet;
 		
-		scopes.push(new FlatPredicateValuation(smt));
+		scopes.push("-- Dummy stop scope --", new FlatPredicateValuation(smt));
 		
 		Set<Predicate> predicates = new HashSet<Predicate>();
 
@@ -165,13 +165,13 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
 		
-        // Scope to be added as the callee scope
+		// Scope to be added as the callee scope
 		FlatPredicateValuation finalScope = createDefaultScope(threadInfo, method);
 		
 		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
 
 		if (RunDetector.isRunning()) {
-            // Copy of the current caller scope - to avoid modifications - may not be needed now, it is not different from .top() and it is not modified here
+			// Copy of the current caller scope - to avoid modifications - may not be needed now, it is not different from .top() and it is not modified here
 			FlatPredicateValuation transitionScope;
 			transitionScope = scopes.top().clone();
 			
@@ -199,12 +199,12 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			 * Reason about the value of the predicates using known values of predicates in the caller
 			 */
 			if (args != null && attrs != null) {
-                // Each predicate to be initialised for the callee
+				// Each predicate to be initialised for the callee
 				for (Predicate predicate : finalScope.getPredicates()) {
 
 					Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
 					
-                    // Replace formal parameters with actual parameters
+					// Replace formal parameters with actual parameters
 					for (int i = 0; i < args.length; ++i) {
 						Attribute attr = attrs[i];
 											
@@ -216,7 +216,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 					replaced.put(predicate.replace(replacements), predicate);
 				}
 				
-                // Valuate predicates in the caller scope, and adopt the valuation for the callee predicates
+				// Valuate predicates in the caller scope, and adopt the valuation for the callee predicates
 				Map<Predicate, TruthValue> valuation = transitionScope.evaluatePredicates(replaced.keySet());
 				
 				for (Predicate predicate : replaced.keySet()) {
@@ -225,7 +225,7 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			}
 		}
 		
-		scopes.push(finalScope);
+		scopes.push(method.getFullName(), finalScope);
 	}
 	
 	private static boolean isPredicateOverReturn(Predicate predicate) {
@@ -486,15 +486,6 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	}
 	
 	@Override
-	public void store(Scope scope) {
-		if (scope instanceof FlatPredicateValuation) {
-			scopes.push((FlatPredicateValuation) scope.clone());
-		} else {
-			throw new RuntimeException("Invalid scope type being pushed!");
-		}
-	}
-	
-	@Override
 	public void restore(Scopes scopes) {
 		if (scopes instanceof PredicateValuationStack) {
 			this.scopes = (PredicateValuationStack) scopes.clone();
@@ -555,6 +546,11 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
     @Override
     public FlatPredicateValuation get(int depth) {
         return scopes.top(depth);
+    }
+
+    @Override
+    public void print() {
+        scopes.print();
     }
 
 }

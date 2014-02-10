@@ -6,11 +6,13 @@ import java.util.HashMap;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.util.Pair;
+
 public class UniverseObject extends HeapValue implements Associative {
     private Map<FieldName, UniverseSlot> fields = new HashMap<FieldName, UniverseSlot>();
 
-    public UniverseObject(ElementInfo elementInfo, ThreadInfo threadInfo) {
-        super(new Reference(elementInfo, threadInfo));
+    public UniverseObject(ElementInfo elementInfo) {
+        super(new Reference(elementInfo));
     }
 
     protected UniverseObject(Reference identifier) {
@@ -21,7 +23,7 @@ public class UniverseObject extends HeapValue implements Associative {
     public UniverseObject createShallowCopy() {
         UniverseObject copy = new UniverseObject(getReference());
 
-        for (UniverseValue.Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
+        for (Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
             copy.addParentSlot(parentSlot.getFirst(), parentSlot.getSecond());
         }
 

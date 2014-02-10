@@ -3,9 +3,11 @@ package gov.nasa.jpf.abstraction.predicate.state.universe;
 import java.util.Map;
 import java.util.Collections;
 
+import gov.nasa.jpf.abstraction.util.Pair;
+
 public class UniverseNull extends HeapValue implements Associative, Indexed {
 
-    public static Reference nullReference = new Reference(null, null);
+    public static Reference nullReference = new Reference(null);
 
     public UniverseNull() {
         super(nullReference);
@@ -15,7 +17,7 @@ public class UniverseNull extends HeapValue implements Associative, Indexed {
     public UniverseNull createShallowCopy() {
         UniverseNull copy = new UniverseNull();
 
-        for (UniverseValue.Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
+        for (Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
             copy.addParentSlot(parentSlot.getFirst(), parentSlot.getSecond());
         }
 

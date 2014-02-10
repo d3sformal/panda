@@ -1,18 +1,15 @@
 package gov.nasa.jpf.abstraction.predicate.state.universe;
 
 import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.ThreadInfo;
 
 public class Reference implements StructuredValueIdentifier {
     private ElementInfo elementInfo;
-    private ThreadInfo threadInfo;
 
-    public Reference(ElementInfo elementInfo, ThreadInfo threadInfo) {
+    public Reference(ElementInfo elementInfo) {
         this.elementInfo = elementInfo;
-        this.threadInfo = threadInfo;
     }
 
-    public Integer getReference() {
+    public Integer getReferenceNumber() {
         return elementInfo == null ? Universe.NULL : elementInfo.getObjectRef();
     }
 
@@ -20,19 +17,15 @@ public class Reference implements StructuredValueIdentifier {
         return elementInfo;
     }
 
-    public ThreadInfo getThreadInfo() {
-        return threadInfo;
-    }
-
     @Override
     public int hashCode() {
-        return getReference();
+        return getReferenceNumber();
     }
 
     @Override
     public boolean equals(Object object) {
         if (object instanceof Reference) {
-            return getReference().equals(((Reference) object).getReference());
+            return getReferenceNumber().equals(((Reference) object).getReferenceNumber());
         }
 
         return false;
@@ -40,7 +33,7 @@ public class Reference implements StructuredValueIdentifier {
 
     @Override
     public String toString() {
-        return getReference().toString();
+        return getReferenceNumber().toString();
     }
 
     @Override
@@ -54,7 +47,7 @@ public class Reference implements StructuredValueIdentifier {
             int classComparison = getElementInfo().getClassInfo().getName().compareTo(ref.getElementInfo().getClassInfo().getName());
 
             if (classComparison == 0) {
-                return getReference().compareTo(ref.getReference());
+                return getReferenceNumber().compareTo(ref.getReferenceNumber());
             }
 
             return classComparison;

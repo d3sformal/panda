@@ -1,15 +1,12 @@
 package gov.nasa.jpf.abstraction.predicate.state.universe;
 
 import gov.nasa.jpf.vm.StaticElementInfo;
-import gov.nasa.jpf.vm.ThreadInfo;
 
 public class ClassName implements StructuredValueIdentifier {
     private StaticElementInfo staticElementInfo;
-    private ThreadInfo threadInfo;
 
-    public ClassName(StaticElementInfo staticElementInfo, ThreadInfo threadInfo) {
+    public ClassName(StaticElementInfo staticElementInfo) {
         this.staticElementInfo = staticElementInfo;
-        this.threadInfo = threadInfo;
     }
 
     public String getClassName() {
@@ -18,10 +15,6 @@ public class ClassName implements StructuredValueIdentifier {
 
     public StaticElementInfo getStaticElementInfo() {
         return staticElementInfo;
-    }
-
-    public ThreadInfo getThreadInfo() {
-        return threadInfo;
     }
 
     @Override

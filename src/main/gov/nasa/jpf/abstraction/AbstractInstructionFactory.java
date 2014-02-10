@@ -215,6 +215,11 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 	public Instruction ddiv() {
 		return (filter.isPassing(ci) ? new DDIV() : super.ddiv());
 	}
+
+    @Override
+    public Instruction directcallreturn() {
+        return (filter.isPassing(ci) ? new DIRECTCALLRETURN() : super.directcallreturn());
+    }
 	
 	@Override
 	public Instruction dload(int index) {

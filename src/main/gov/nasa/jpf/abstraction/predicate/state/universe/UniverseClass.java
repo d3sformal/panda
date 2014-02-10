@@ -6,12 +6,14 @@ import java.util.HashMap;
 import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.util.Pair;
+
 public class UniverseClass extends StructuredValue implements Associative {
     private ClassName identifier;
     private Map<FieldName, UniverseSlot> fields = new HashMap<FieldName, UniverseSlot>();
 
-    public UniverseClass(StaticElementInfo elementInfo, ThreadInfo threadInfo) {
-        identifier = new ClassName(elementInfo, threadInfo);
+    public UniverseClass(StaticElementInfo elementInfo) {
+        identifier = new ClassName(elementInfo);
     }
 
     protected UniverseClass(ClassName identifier) {
@@ -26,7 +28,7 @@ public class UniverseClass extends StructuredValue implements Associative {
     public UniverseClass createShallowCopy() {
         UniverseClass copy = new UniverseClass(identifier);
 
-        for (UniverseValue.Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
+        for (Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
             copy.addParentSlot(parentSlot.getFirst(), parentSlot.getSecond());
         }
 

@@ -1,6 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate;
 
 import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -13,6 +15,7 @@ import gov.nasa.jpf.abstraction.common.BranchingCondition;
 import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
 import gov.nasa.jpf.abstraction.common.BranchingDecision;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
@@ -20,6 +23,9 @@ import gov.nasa.jpf.abstraction.predicate.state.State;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTableStack;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueIdentifier;
+import gov.nasa.jpf.abstraction.predicate.state.universe.ClassName;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
@@ -112,11 +118,10 @@ public class PredicateAbstraction extends Abstraction {
 	
 	@Override
 	public void start(ThreadInfo mainThread) {
-        MethodInfo method = mainThread.getTopFrameMethodInfo();
-
 		SymbolTableStack symbols = new SymbolTableStack();
 		PredicateValuationStack predicates = new PredicateValuationStack();
 
+        // Initial state for last backtrack
 		State state = new State(symbols, predicates);
 		
 		trace.push(state);
@@ -126,23 +131,21 @@ public class PredicateAbstraction extends Abstraction {
          */
         symbolTable.get(0).addThread(mainThread);
 
-		// this is not needed anymore
-		// registration for all classes done through "processNewClass" (called from the AbstractListener)
-        /*
-		// register startup classes into the symbol table (universe)
-        for (ClassInfo classInfo : VM.getVM().getCurrentApplicationContext().getSystemClassLoader()) {
-            symbolTable.get(0).addClass(classInfo.getName(), mainThread, classInfo.getStaticElementInfo());
-        }
+        Set<ClassName> classes = new HashSet<ClassName>();
 
-		// register classes for objects loaded during initialization
-        for (ElementInfo ei : VM.getVM().getHeap()) {
-            if (ei.isReferenceArray()) {
-                ClassInfo arrayClassInfo = ei.getClassInfo();
-
-                symbolTable.get(0).addClass(arrayClassInfo.getName(), mainThread, arrayClassInfo.getStaticElementInfo());
+        // Make sure to add all class objects
+        for (StructuredValueIdentifier value : symbolTable.getUniverse().getStructuredValues()) {
+            if (value instanceof ClassName) {
+                classes.add((ClassName) value);
             }
         }
-        */
+
+        for (ClassName cls : classes) {
+            Reference classObjectRef = new Reference(mainThread.getElementInfo(cls.getStaticElementInfo().getClassObjectRef()));
+            AnonymousObject classObject = AnonymousObject.create(classObjectRef);
+
+            symbolTable.get(0).ensureAnonymousObjectExistance(classObject);
+        }
 	}
 
 	@Override

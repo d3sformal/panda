@@ -49,7 +49,7 @@ public class MULTIANEWARRAY extends gov.nasa.jpf.jvm.bytecode.MULTIANEWARRAY {
 		ElementInfo array = ti.getElementInfo(sf.peek());
 		
 		sf = ti.getModifiableTopFrame();
-		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousArray.create(new Reference(array, ti), attr.getExpression())));
+		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousArray.create(new Reference(array), attr.getExpression())));
 		
 		// ALL ELEMENTS ARE NULL
 		setArrayAttributes(ti, array, attrs);

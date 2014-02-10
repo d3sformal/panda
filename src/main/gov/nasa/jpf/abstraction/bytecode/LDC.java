@@ -40,7 +40,7 @@ public class LDC extends gov.nasa.jpf.jvm.bytecode.LDC {
 			break;
         case STRING:
         case CLASS:
-            expression = AnonymousObject.create(new Reference(ti.getElementInfo(sf.peek()), ti));
+            expression = AnonymousObject.create(new Reference(ti.getElementInfo(sf.peek())));
             break;
 		default:
 			expression = null;

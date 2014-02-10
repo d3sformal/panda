@@ -6,12 +6,14 @@ import java.util.HashMap;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.util.Pair;
+
 public class UniverseArray extends HeapValue implements Indexed {
     private Map<ElementIndex, UniverseSlot> elements = new HashMap<ElementIndex, UniverseSlot>();
     private Integer length;
 
-    public UniverseArray(ElementInfo elementInfo, ThreadInfo threadInfo) {
-        super(new Reference(elementInfo, threadInfo));
+    public UniverseArray(ElementInfo elementInfo) {
+        super(new Reference(elementInfo));
 
         length = elementInfo.arrayLength();
     }
@@ -26,7 +28,7 @@ public class UniverseArray extends HeapValue implements Indexed {
     public UniverseArray createShallowCopy() {
         UniverseArray copy = new UniverseArray(getReference(), getLength());
 
-        for (UniverseValue.Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
+        for (Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
             copy.addParentSlot(parentSlot.getFirst(), parentSlot.getSecond());
         }
 

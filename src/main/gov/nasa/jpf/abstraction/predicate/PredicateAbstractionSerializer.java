@@ -83,8 +83,12 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 	public PredicateAbstractionSerializer(Config conf) {
 	}
 
-    private Integer canonicalId (StructuredValueIdentifier value) {
-        return canonical.get(value);
+    private int canonicalId (StructuredValueIdentifier value) {
+        if (canonical.containsKey(value)) {
+            return canonical.get(value);
+        }
+
+        throw new RuntimeException("Could not canonicalize: " + value);
     }
 
     private SortedSet<StructuredValueIdentifier> sortStructuredValues(Set<StructuredValueIdentifier> values) {
@@ -184,15 +188,15 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         ThreadInfo ti = vm.getCurrentThread();
         ElementInfo ei = ti.getElementInfo(objRef);
 
-        buf.add(canonicalId(new Reference(ei, ti)));
+        Reference ref = new Reference(ei);
+        int id = canonicalId(ref);
+
+        buf.add(id);
     }
 
     @Override
     protected int getSerializedReferenceValue(ElementInfo ei){
-        VM vm = VM.getVM();
-        ThreadInfo ti = vm.getCurrentThread();
-
-        return canonicalId(new Reference(ei, ti));
+        return canonicalId(new Reference(ei));
     }
 
     @Override
@@ -204,6 +208,8 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
     @Override
 	protected void serializeFrame(StackFrame frame){
+        if (frame.isSynthetic()) return;
+
 		buf.add(frame.getMethodInfo().getGlobalId());
 
         FlatSymbolTable currentScope = pabs.getSymbolTable().get(depth);

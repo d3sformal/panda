@@ -12,10 +12,10 @@ public interface Scoped {
 	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after);
 	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after);
 	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after);
-	public void store(Scope scope);
 	public void restore(Scopes scopes);
 	public Scopes memorize();
     public int count();
     public int depth();
     public Scope get(int depth);
+    public void print();
 }

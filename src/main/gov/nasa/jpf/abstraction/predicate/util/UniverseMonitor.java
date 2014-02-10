@@ -65,7 +65,7 @@ public class UniverseMonitor extends ListenerAdapter {
 					Reference r1 = (Reference) o1;
 					Reference r2 = (Reference) o2;
 					
-					return r1.getReference().compareTo(r2.getReference());
+					return r1.getReferenceNumber().compareTo(r2.getReferenceNumber());
 				}
 			});
 			

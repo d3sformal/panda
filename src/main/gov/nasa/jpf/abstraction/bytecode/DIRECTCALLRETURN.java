@@ -38,8 +38,10 @@ public class DIRECTCALLRETURN extends gov.nasa.jpf.jvm.bytecode.DIRECTCALLRETURN
 		if (JPFInstructionAdaptor.testDirectCallReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		}
-				
-        GlobalAbstraction.getInstance().processMethodReturn(ti, before, after);
+
+        
+        // We do not add special scopes for synthetic stack frames yet, therefore we cannot return from them (would remove a different frame, whose return would then remove yet another frame)
+        //GlobalAbstraction.getInstance().processMethodReturn(ti, before, after);
 
 		return actualNextInsn;
 	}

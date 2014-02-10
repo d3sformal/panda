@@ -27,7 +27,7 @@ public class NEW extends gov.nasa.jpf.jvm.bytecode.NEW {
 		StackFrame sf = ti.getModifiableTopFrame();
 		ElementInfo object = ti.getElementInfo(sf.peek());
 
-		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousObject.create(new Reference(object, ti))));
+		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousObject.create(new Reference(object))));
 
 		return actualNextInsn;
 	}

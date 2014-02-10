@@ -132,9 +132,9 @@ public class Universe {
         StructuredValueIdentifier identifier;
 
         if (elementInfo instanceof StaticElementInfo) {
-            identifier = new ClassName((StaticElementInfo) elementInfo, threadInfo);
+            identifier = new ClassName((StaticElementInfo) elementInfo);
         } else {
-            identifier = new Reference(elementInfo, threadInfo);
+            identifier = new Reference(elementInfo);
         }
 
         if (contains(identifier)) {
@@ -142,7 +142,7 @@ public class Universe {
         }
 
         if (elementInfo.isArray()) {
-            UniverseArray array = new UniverseArray(elementInfo, threadInfo);
+            UniverseArray array = new UniverseArray(elementInfo);
 
             currentStructuredRealization.put(array.getReference(), array);
 
@@ -161,9 +161,9 @@ public class Universe {
             StructuredValue value;
 
             if (elementInfo instanceof StaticElementInfo) {
-                value = new UniverseClass((StaticElementInfo) elementInfo, threadInfo);
+                value = new UniverseClass((StaticElementInfo) elementInfo);
             } else {
-                value = new UniverseObject(elementInfo, threadInfo);
+                value = new UniverseObject(elementInfo);
             }
 
             currentStructuredRealization.put(value.getIdentifier(), value);
@@ -199,6 +199,27 @@ public class Universe {
 
         ObjectAccessExpression read = (ObjectAccessExpression) expression;
 
+        // Preallocate SlotKey (FieldName or ElementIndex) to avoid repetitive reallocations
+        FieldName fName = null;
+        ElementIndex eIndex = null;
+
+        if (read instanceof ObjectFieldRead) {
+            ObjectFieldRead fieldRead = (ObjectFieldRead) read;
+
+            fName = new FieldName(fieldRead.getField().getName());
+        }
+
+        if (read instanceof ArrayElementRead) {
+            ArrayElementRead aeRead = (ArrayElementRead) read;
+
+            // Get the exact element in case of a constant index
+            if (aeRead.getIndex() instanceof Constant) {
+                int i = ((Constant) aeRead.getIndex()).value.intValue();
+
+                eIndex = new ElementIndex(i);
+            }
+        }
+
         Set<UniverseIdentifier> parents = new HashSet<UniverseIdentifier>();
 
         lookupValues(root, read.getObject(), parents);
@@ -208,11 +229,9 @@ public class Universe {
 
             if (read instanceof ObjectFieldRead) {
                 if (parentObject instanceof UniverseNull) continue;
-
                 Associative object = (Associative) parentObject;
-                ObjectFieldRead fieldRead = (ObjectFieldRead) read;
 
-                outValues.addAll(object.getField(new FieldName(fieldRead.getField().getName())).getPossibleValues());
+                outValues.addAll(object.getField(fName).getPossibleValues());
             }
 
             if (read instanceof ArrayElementRead) {
@@ -226,7 +245,7 @@ public class Universe {
                 if (aeRead.getIndex() instanceof Constant) {
                     int i = ((Constant) aeRead.getIndex()).value.intValue();
 
-                    outValues.addAll(array.getElement(new ElementIndex(i)).getPossibleValues());
+                    outValues.addAll(array.getElement(eIndex).getPossibleValues());
                 } else {
                     for (int i = 0; i < array.getLength(); ++i) {
                         outValues.addAll(array.getElement(new ElementIndex(i)).getPossibleValues());

@@ -123,14 +123,14 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 		if (o instanceof AnonymousObject) {
 			AnonymousObject ao = (AnonymousObject) o;
 
-			return getReference().getReference() == ao.getReference().getReference();
+			return getReference().getReferenceNumber() == ao.getReference().getReferenceNumber();
 		}
 		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return getReference().getReference();
+		return getReference().getReferenceNumber();
 	}
 
 }

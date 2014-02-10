@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
@@ -209,6 +210,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
             lc.addPossibleStructuredValue(value);
 
             universe.get(value).addParentSlot(lc, LoadedClass.slotKey);
+
+            universe.add(threadInfo.getElementInfo(elementInfo.getClassObjectRef()), threadInfo);
 		}
 	}
 
@@ -289,7 +292,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
          * It can as well be described as object field/array element of its parental object/array
          * or a local variable that contains it
          */
-		for (UniverseValue.Pair<Identifier, UniverseSlotKey> pair: value.getParentSlots()) {
+		for (Pair<Identifier, UniverseSlotKey> pair: value.getParentSlots()) {
 			Identifier parent = pair.getFirst();
 			
 			if (parent instanceof StructuredValueIdentifier) {
@@ -409,7 +412,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
             ThreadInfo ti = vm.getCurrentThread();
             ElementInfo ei = ti.getElementInfo(ref);
 
-            Reference reference = new Reference(ei, ti);
+            Reference reference = new Reference(ei);
 
 			if (universe.contains(reference)) {
 				sources.add(reference);
@@ -675,11 +678,13 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	/**
 	 * Creates (if not already existent) object in the universe to match an anonymous expression
 	 */
-	private void ensureAnonymousObjectExistance(Expression expr) {
+	public void ensureAnonymousObjectExistance(Expression expr) {
 		if (expr instanceof AnonymousExpression) {
             Reference reference = ((AnonymousExpression) expr).getReference();
+            VM vm = VM.getVM();
+            ThreadInfo ti = vm.getCurrentThread();
 
-			universe.add(reference.getElementInfo(), reference.getThreadInfo());
+			universe.add(reference.getElementInfo(), ti);
 		}
 	}
 

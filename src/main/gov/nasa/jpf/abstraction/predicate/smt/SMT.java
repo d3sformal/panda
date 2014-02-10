@@ -148,8 +148,8 @@ public class SMT {
         }
     }
 	
-	private Boolean[] isValid(int count, String input) throws SMTException {
-		List<Boolean> values = new ArrayList<Boolean>();
+	private boolean[] isValid(int count, String input) throws SMTException {
+		boolean[] values = new boolean[2 * count];
 			
 		String output = "";
 		
@@ -168,7 +168,7 @@ public class SMT {
 				if (output == null || !output.matches("^(un)?sat$")) {
 					throw new SMTException("SMT replied with '" + output + "'");
 				}
-				values.add(output.matches("^unsat$"));
+				values[i] = output.matches("^unsat$");
 			}
 		} catch (IOException e) {
 			System.err.println("SMT refuses to provide output.");
@@ -176,7 +176,7 @@ public class SMT {
 			throw new SMTException(e);
 		}
 
-		return values.toArray(new Boolean[values.size()]);
+		return values;
 	}
 
     private String prepareFormula(Predicate predicate, String formula, FormulaType formulaType, InputType inputType, Boolean cachedIsValid) {
@@ -378,7 +378,7 @@ public class SMT {
 	private Map<Predicate, TruthValue> evaluate(String input, String debugInput, List<Predicate> predicates, List<String> formulas) throws SMTException {
 		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 		
-		Boolean[] valid;
+		boolean[] valid;
 
         try {
     		valid = isValid(predicates.size(), input);
