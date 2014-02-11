@@ -73,7 +73,7 @@ public class UniverseMonitor extends ListenerAdapter {
 			
 			for (StructuredValueIdentifier v : ordered) {
 				if (universe.get(v) instanceof Associative) {
-					Associative a = (Associative) v;
+					Associative a = (Associative) universe.get(v);
 					
 					System.out.print(a + "::");
 					
@@ -84,8 +84,8 @@ public class UniverseMonitor extends ListenerAdapter {
 					System.out.println();
 				}
 				
-				if (v instanceof Indexed) {
-					Indexed i = (Indexed) v;
+				if (universe.get(v) instanceof Indexed) {
+					Indexed i = (Indexed) universe.get(v);
 					
 					System.out.print(i + "::");
 					

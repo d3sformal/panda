@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
@@ -29,6 +30,8 @@ import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.Types;
 
 public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 	
@@ -39,12 +42,34 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 	@Override
 	public Instruction execute(ThreadInfo ti) {        
 		StackFrame sf = ti.getTopFrame();
-        Attribute source = (Attribute) sf.getOperandAttr(0);
+        Attribute source = null;
+        
+        ElementInfo ei = getClassInfo().getModifiableStaticElementInfo();
+        FieldInfo fi = getFieldInfo();
+
+        switch (fi.getTypeCode()) {
+            case Types.T_ARRAY:
+            case Types.T_REFERENCE:
+            case Types.T_BOOLEAN:
+            case Types.T_BYTE:
+            case Types.T_CHAR:
+            case Types.T_SHORT:
+            case Types.T_INT:
+            case Types.T_FLOAT:
+                source = (Attribute) sf.getOperandAttr();
+                break;
+
+            case Types.T_LONG:
+            case Types.T_DOUBLE:
+                source = (Attribute) sf.getLongOperandAttr();
+                break;
+
+            default:
+        }
         
         source = Attribute.ensureNotNull(source);
         
-        ElementInfo ei = getClassInfo().getModifiableStaticElementInfo();
-		ei.setFieldAttr(getFieldInfo(), source);
+		ei.setFieldAttr(fi, source);
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
@@ -60,7 +85,9 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 		to = DefaultPackageAndClass.create(getClassName());
         to = DefaultObjectFieldRead.create(to, getFieldName());
 
-        if (ei.getFieldValueObject(getFieldName()) instanceof ElementInfo) {
+        if (from instanceof NullExpression) {
+        	GlobalAbstraction.getInstance().processObjectStore(from, to);
+        } else if (ei.getFieldValueObject(getFieldName()) instanceof ElementInfo) {
         	GlobalAbstraction.getInstance().processObjectStore(from, to);
         } else {
         	GlobalAbstraction.getInstance().processPrimitiveStore(from, to);

@@ -248,15 +248,13 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
 
-        if (RunDetector.isRunning()) {
-			Attribute attr = (Attribute) after.getResultAttr();
-			ReturnValue ret = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
+		Attribute attr = Attribute.ensureNotNull((Attribute) after.getResultAttr());
+		ReturnValue ret = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
 			
+        if (RunDetector.isRunning()) {
 			FlatPredicateValuation scope;
 			
 			scope = scopes.top(1);
-			
-			attr = Attribute.ensureNotNull(attr);
 			
 			Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
 			Set<Predicate> determinants = new HashSet<Predicate>();
@@ -284,9 +282,9 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			for (Predicate predicate : valuation.keySet()) {
 				scope.put(predicates.get(predicate).replace(DefaultReturnValue.create(), ret), valuation.get(predicate));
 			}
-					
-			after.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), ret));
         }
+			
+		after.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), ret));
 		
         // The rest is the same as if no return happend
 		processVoidMethodReturn(threadInfo, before, after);

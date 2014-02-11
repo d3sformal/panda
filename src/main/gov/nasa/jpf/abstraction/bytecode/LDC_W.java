@@ -7,6 +7,9 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+
 public class LDC_W extends gov.nasa.jpf.jvm.bytecode.LDC_W {
 	
 	public LDC_W(int v) {
@@ -35,6 +38,10 @@ public class LDC_W extends gov.nasa.jpf.jvm.bytecode.LDC_W {
 		case FLOAT:
 			expression = Constant.create(getFloatValue());
 			break;
+        case STRING:
+        case CLASS:
+            expression = AnonymousObject.create(new Reference(ti.getElementInfo(sf.peek())));
+            break;
 		default:
 			expression = null;
 			break;

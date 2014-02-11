@@ -11,7 +11,10 @@ public class SchedulerTest extends BaseTest {
 
     public SchedulerTest() {
         config.add("+listener+=,gov.nasa.jpf.listener.ExecTracker");
+        config.add("+et.skip_init=false");
+        config.add("+et.print_mth=true");
         config.add("+listener+=,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor");
+        config.add("+listener+=,gov.nasa.jpf.abstraction.predicate.util.StackExpressionMonitor");
     }
 
 	public static void main(String[] args) {
@@ -48,6 +51,7 @@ public class SchedulerTest extends BaseTest {
 			ThreadInfo actTh = id2thread[k];
 
             //assertAliasedWithOneOf("actTh", "id2thread[0]", "id2thread[1]", "id2thread[2]");
+            assertConjunction("false: true");
 
 			if (!actTh.active) continue;
 

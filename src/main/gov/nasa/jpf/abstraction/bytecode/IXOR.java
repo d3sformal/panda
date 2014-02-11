@@ -25,6 +25,8 @@ import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.common.Constant;
+
 /**
  * Xor integer
  * ..., value1, value2 => ..., result
@@ -50,7 +52,7 @@ public class IXOR extends gov.nasa.jpf.jvm.bytecode.IXOR implements AbstractBina
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new NonEmptyAttribute(Abstraction._xor(v1, abs_v1, v2, abs_v2), null);
+		return new NonEmptyAttribute(Abstraction._xor(v1, abs_v1, v2, abs_v2), Constant.create(0)); // TODO: IMPLEMENT LOGICAL AND BITWISE OPERATORS
 	}
 
 	@Override

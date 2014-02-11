@@ -83,6 +83,13 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	 * Abstract heap
 	 */
 	private Universe universe;
+
+    /**
+     * A dummy variable
+     * mostly for native calls and their returns
+     * used to imitate actual return value (which sorts of falls from the sky in case of native code)
+     */
+    public static Root DUMMY_VARIABLE = DefaultRoot.create("__@?#!%__");
 	
 	/**
 	 * Entry points to the abstract heap
@@ -106,11 +113,13 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	public FlatSymbolTable(Universe universe, PredicateAbstraction abstraction) {
 		this.abstraction = abstraction;
         this.universe = universe;
+
+        addPrimitiveLocalVariable(DUMMY_VARIABLE);
 	}
 
     public FlatSymbolTable(FlatSymbolTable previous) {
-        this.abstraction = previous.abstraction;
-        this.universe = previous.universe;
+        this(previous.universe, previous.abstraction);
+
         this.classes = previous.classes;
     }
 	

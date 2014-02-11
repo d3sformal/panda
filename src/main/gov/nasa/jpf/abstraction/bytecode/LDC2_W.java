@@ -36,7 +36,7 @@ public class LDC2_W extends gov.nasa.jpf.jvm.bytecode.LDC2_W {
 			break;
 		}
 		
-		sf.setOperandAttr(new NonEmptyAttribute(null, expression));
+		sf.setLongOperandAttr(new NonEmptyAttribute(null, expression));
 		
 		return ret;
 	}

@@ -21,8 +21,16 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.NativeStackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Types;
+
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
+import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 
 public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
 	
@@ -30,10 +38,41 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
 	public Instruction execute(ThreadInfo ti) {
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
-		StackFrame before = ti.getTopFrame();
+		NativeStackFrame before = (NativeStackFrame) ti.getModifiableTopFrame();
+        Object retValue = before.getReturnValue();
 
-		Instruction actualNextInsn = super.execute(ti);
+        // Push the value onto the stack
+        // no matter it is native, we need to have an attribute on the stack to return it in processMethodReturn
+        switch (before.getMethodInfo().getReturnTypeCode()) {
+            case Types.T_ARRAY:
+            case Types.T_REFERENCE:
+                int ref = ((Integer) retValue).intValue();
+
+                AnonymousObject returnValue = AnonymousObject.create(new Reference(ti.getElementInfo(ref)));
+                
+                before.setReturnAttr(new NonEmptyAttribute(null, returnValue));
+                break;
+
+            case Types.T_BOOLEAN:
+            case Types.T_BYTE:
+            case Types.T_CHAR:
+            case Types.T_SHORT:
+            case Types.T_INT:
+            case Types.T_FLOAT:
+                before.setReturnAttr(new NonEmptyAttribute(null, FlatSymbolTable.DUMMY_VARIABLE));
+                break;
+
+            case Types.T_LONG:
+            case Types.T_DOUBLE:
+                before.setReturnAttr(new NonEmptyAttribute(null, FlatSymbolTable.DUMMY_VARIABLE));
+                break;
+            
+            case Types.T_VOID:
+            default:
+        }
 		
+		Instruction actualNextInsn = super.execute(ti);
+
 		StackFrame after = ti.getTopFrame();
 		
 		if (JPFInstructionAdaptor.testReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
@@ -45,7 +84,7 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
         } else {
     		GlobalAbstraction.getInstance().processMethodReturn(ti, before, after);
         }
-		
+
 		return actualNextInsn;
 	}
 }

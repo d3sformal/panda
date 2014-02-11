@@ -80,14 +80,14 @@ public class GlobalAbstraction extends Abstraction {
 	
 	@Override
 	public void processPrimitiveStore(Expression from, AccessExpression to) {
-		if (!RunDetector.isRunning()) return;
+		//if (!RunDetector.isRunning()) return; // Cannot be omitted because we need FlatSymbolTable / Universe to be updated properly (for example AALOAD needs lookupValues)
 		
 		abs.processPrimitiveStore(from, to);
 	}
 	
 	@Override
 	public void processObjectStore(Expression from, AccessExpression to) {
-		if (!RunDetector.isRunning()) return;
+		//if (!RunDetector.isRunning()) return; // Cannot be omitted because we need FlatSymbolTable / Universe to be updated properly (for example AALOAD needs lookupValues)
 		
 		abs.processObjectStore(from, to);
 	}
@@ -109,7 +109,7 @@ public class GlobalAbstraction extends Abstraction {
 	
 	@Override
 	public BranchingConditionInfo processBranchingCondition(BranchingCondition condition) {
-		if (!RunDetector.isRunning()) return BranchingConditionInfo.NONE;
+		//if (!RunDetector.isRunning()) return BranchingConditionInfo.NONE; // Cannot be omitted we need to valuate conditions before main (AALOAD)
 		
 		return abs.processBranchingCondition(condition);
 	}
