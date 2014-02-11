@@ -25,7 +25,7 @@ public class LSTORE extends gov.nasa.jpf.jvm.bytecode.LSTORE {
 		Instruction actualNextInsn = super.execute(ti);
         
 		Expression from = source.getExpression();
-		AccessExpression to = DefaultRoot.create(getLocalVariableName());
+		AccessExpression to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
 		
 		sf = ti.getModifiableTopFrame();
 		sf.setLocalAttr(getLocalVariableIndex(), source);

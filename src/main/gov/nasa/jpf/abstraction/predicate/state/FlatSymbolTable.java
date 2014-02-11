@@ -36,6 +36,7 @@ import gov.nasa.jpf.abstraction.predicate.state.universe.ElementIndex;
 import gov.nasa.jpf.abstraction.predicate.state.universe.PrimitiveLocalVariable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredLocalVariable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.predicate.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Identifier;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseSlotKey;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseSlot;
@@ -89,7 +90,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
      * mostly for native calls and their returns
      * used to imitate actual return value (which sorts of falls from the sky in case of native code)
      */
-    public static Root DUMMY_VARIABLE = DefaultRoot.create("__@?#!%__");
+    public static Root DUMMY_VARIABLE = DefaultRoot.create("__@?#!%__ DUMMY VARIABLE __@?#!__");
 	
 	/**
 	 * Entry points to the abstract heap
@@ -223,6 +224,13 @@ public class FlatSymbolTable implements SymbolTable, Scope {
             universe.add(threadInfo.getElementInfo(elementInfo.getClassObjectRef()), threadInfo);
 		}
 	}
+
+    public void addClassObject(ClassName className, ThreadInfo threadInfo) {
+        Reference classObjectRef = new Reference(threadInfo.getElementInfo(className.getStaticElementInfo().getClassObjectRef()));
+        AnonymousObject classObject = AnonymousObject.create(classObjectRef);
+
+        ensureAnonymousObjectExistence(classObject);
+    }
 
     public void addThread(ThreadInfo threadInfo) {
         universe.add(threadInfo.getThreadObject(), threadInfo);
@@ -359,10 +367,10 @@ public class FlatSymbolTable implements SymbolTable, Scope {
      * @return access path to all the affected objects
 	 */
 	public Set<AccessExpression> processPrimitiveStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
-        fromTable.ensureAnonymousObjectExistance(from);
+        fromTable.ensureAnonymousObjectExistence(from);
 
-		ensureAnonymousObjectExistance(from);
-		ensureAnonymousObjectExistance(to);
+		ensureAnonymousObjectExistence(from);
+		ensureAnonymousObjectExistence(to);
 		
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		Set<UniverseIdentifier> destinations = new HashSet<UniverseIdentifier>();
@@ -394,10 +402,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
     // The universes may differ instance-wise (different objects representing the same universe)
     // FromTable may have a different Locals/Statics sets
     public Set<AccessExpression> processObjectStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
-        fromTable.ensureAnonymousObjectExistance(from);
+        System.out.println(">>\t" + to + " := " + from);
+        fromTable.ensureAnonymousObjectExistence(from);
 
-		ensureAnonymousObjectExistance(from);
-		ensureAnonymousObjectExistance(to);
+		ensureAnonymousObjectExistence(from);
+		ensureAnonymousObjectExistence(to);
 		
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		Set<UniverseIdentifier> destinations = new HashSet<UniverseIdentifier>();
@@ -687,7 +696,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	/**
 	 * Creates (if not already existent) object in the universe to match an anonymous expression
 	 */
-	public void ensureAnonymousObjectExistance(Expression expr) {
+	private void ensureAnonymousObjectExistence(Expression expr) {
 		if (expr instanceof AnonymousExpression) {
             Reference reference = ((AnonymousExpression) expr).getReference();
             VM vm = VM.getVM();
@@ -738,7 +747,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
         Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
 
         lookupValues(path, values);
-		
+
 		for (UniverseIdentifier value : values) {
 			if (value instanceof StructuredValueIdentifier) return false;
 			

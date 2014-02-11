@@ -36,6 +36,7 @@ import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
@@ -73,36 +74,38 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
         SystemState ss = ti.getVM().getSystemState();
         ElementInfo ei = ti.getElementInfo(sf.peek(1));
 
-        if (!ti.isFirstStepInsn()) {
-            if (ei.arrayLength() > 1) {
-                FlatSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
-
-                Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
-                symbolTable.lookupValues(path, values);
-
-                int[] references = new int[values.size()];
-
-                int i = 0;
-
-                for (UniverseIdentifier id : values) {
-                    Reference ref = (Reference) id;
-
-                    references[i] = ref.getReferenceNumber();
-
-                    ++i;
+        if (RunDetector.isRunning()) {
+            if (!ti.isFirstStepInsn()) {
+                if (ei.arrayLength() > 1) {
+                    FlatSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
+    
+                    Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
+                    symbolTable.lookupValues(path, values);
+    
+                    int[] references = new int[values.size()];
+    
+                    int i = 0;
+    
+                    for (UniverseIdentifier id : values) {
+                        Reference ref = (Reference) id;
+    
+                        references[i] = ref.getReferenceNumber();
+    
+                        ++i;
+                    }
+    
+                    ChoiceGenerator<?> cg = new IntChoiceFromList("abstractArrayElementLoad", references);
+    
+                    ss.setNextChoiceGenerator(cg);
+    
+                    return this;
                 }
-
-                ChoiceGenerator<?> cg = new IntChoiceFromList("abstractArrayElementLoad", references);
-
-                ss.setNextChoiceGenerator(cg);
-
-                return this;
-            }
-        } else {
-            if (ei.arrayLength() > 1) {
-                ChoiceGenerator<?> cg = ss.getCurrentChoiceGenerator("abstractArrayElementLoad", IntChoiceFromList.class);
-
-                selectedElementRef = ((IntChoiceFromList) cg).getNextChoice();
+            } else {
+                if (ei.arrayLength() > 1) {
+                    ChoiceGenerator<?> cg = ss.getCurrentChoiceGenerator("abstractArrayElementLoad", IntChoiceFromList.class);
+    
+                    selectedElementRef = ((IntChoiceFromList) cg).getNextChoice();
+                }
             }
         }
 
@@ -122,22 +125,26 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 
     @Override
     public void push (StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsException {
-        // i >= 0 && i < a.length
-        Predicate inBounds = Conjunction.create(
-            Negation.create(LessThan.create(index, Constant.create(0))),
-            LessThan.create(index, DefaultArrayLengthRead.create(array))
-        );
-
-        TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
-
-        if (value != TruthValue.TRUE) {
-            throw new ArrayIndexOutOfBoundsException("Cannot ensure: " + inBounds);
-        }
-
-        if (ei.arrayLength() <= 1) {
-            sf.push(ei.getReferenceElement(0));
+        if (RunDetector.isRunning()) {
+            // i >= 0 && i < a.length
+            Predicate inBounds = Conjunction.create(
+                Negation.create(LessThan.create(index, Constant.create(0))),
+                LessThan.create(index, DefaultArrayLengthRead.create(array))
+            );
+    
+            TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
+    
+            if (value != TruthValue.TRUE) {
+                throw new ArrayIndexOutOfBoundsException("Cannot ensure: " + inBounds);
+            }
+    
+            if (ei.arrayLength() <= 1) {
+                sf.push(ei.getReferenceElement(0));
+            } else {
+                sf.push(selectedElementRef.intValue());
+            }
         } else {
-            sf.push(selectedElementRef.intValue());
+            super.push(sf, ei, someIndex);
         }
     }
 }

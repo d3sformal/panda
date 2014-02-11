@@ -133,7 +133,8 @@ public class PredicateAbstraction extends Abstraction {
 
         Set<ClassName> classes = new HashSet<ClassName>();
 
-        // Make sure to add all class objects
+        // Make sure to add all objects of type java.lang.Class for startup builtin classes
+        
         for (StructuredValueIdentifier value : symbolTable.getUniverse().getStructuredValues()) {
             if (value instanceof ClassName) {
                 classes.add((ClassName) value);
@@ -141,10 +142,7 @@ public class PredicateAbstraction extends Abstraction {
         }
 
         for (ClassName cls : classes) {
-            Reference classObjectRef = new Reference(mainThread.getElementInfo(cls.getStaticElementInfo().getClassObjectRef()));
-            AnonymousObject classObject = AnonymousObject.create(classObjectRef);
-
-            symbolTable.get(0).ensureAnonymousObjectExistance(classObject);
+            symbolTable.get(0).addClassObject(cls, mainThread);
         }
 	}
 

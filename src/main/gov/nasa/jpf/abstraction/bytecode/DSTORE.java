@@ -28,7 +28,7 @@ public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
 		Instruction actualNextInsn = super.execute(ti);
 		
 		Expression from = source.getExpression();
-		AccessExpression to = DefaultRoot.create(getLocalVariableName());
+		AccessExpression to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
 		
 		sf = ti.getModifiableTopFrame();
 

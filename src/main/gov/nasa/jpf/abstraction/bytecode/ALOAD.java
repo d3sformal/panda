@@ -24,7 +24,6 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -36,22 +35,20 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 	
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		LocalVarInfo var = getLocalVarInfo();
-	
 		Instruction actualNextInsn = super.execute(ti);
 		
-        if (var != null) {
-        	StackFrame sf = ti.getTopFrame();
-    		ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(index));
-	    	AccessExpression path = DefaultRoot.create(var.getName());
+        StackFrame sf = ti.getTopFrame();
+	    AccessExpression path = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
+
+
+        java.util.Set<gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier> values = new java.util.HashSet<gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier>();
+        ((gov.nasa.jpf.abstraction.predicate.PredicateAbstraction) gov.nasa.jpf.abstraction.GlobalAbstraction.getInstance().get()).getSymbolTable().get(0).lookupValues(path, values);
+        System.out.println("LOADED SYMBOL -> " + values);
 			
-    		if (ei != null) {
-	    		Attribute attribute = new NonEmptyAttribute(null, path);
+	    Attribute attribute = new NonEmptyAttribute(null, path);
 	    		
-	    		sf = ti.getModifiableTopFrame();
-		    	sf.setOperandAttr(attribute);
-    		}
-        }
+	    sf = ti.getModifiableTopFrame();
+		sf.setOperandAttr(attribute);
 
 		return actualNextInsn;
 	}

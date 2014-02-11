@@ -109,7 +109,7 @@ public class GlobalAbstraction extends Abstraction {
 	
 	@Override
 	public BranchingConditionInfo processBranchingCondition(BranchingCondition condition) {
-		//if (!RunDetector.isRunning()) return BranchingConditionInfo.NONE; // Cannot be omitted we need to valuate conditions before main (AALOAD)
+		if (!RunDetector.isRunning()) return BranchingConditionInfo.NONE;
 		
 		return abs.processBranchingCondition(condition);
 	}

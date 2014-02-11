@@ -18,7 +18,19 @@ import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.Instruction;
+
+import gov.nasa.jpf.jvm.bytecode.DLOAD;
+import gov.nasa.jpf.jvm.bytecode.FLOAD;
+import gov.nasa.jpf.jvm.bytecode.ILOAD;
+import gov.nasa.jpf.jvm.bytecode.LLOAD;
+import gov.nasa.jpf.jvm.bytecode.DSTORE;
+import gov.nasa.jpf.jvm.bytecode.FSTORE;
+import gov.nasa.jpf.jvm.bytecode.ISTORE;
+import gov.nasa.jpf.jvm.bytecode.LSTORE;
+import gov.nasa.jpf.jvm.bytecode.LocalVariableInstruction;
 
 import java.util.Set;
 
@@ -48,19 +60,58 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	public FlatSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
 		FlatSymbolTable ret = new FlatSymbolTable(scopes.top());
 
-		LocalVarInfo[] locals = method.getLocalVars() == null ? new LocalVarInfo[0] : method.getLocalVars();
-		
 		/**
 		 * Register new local variables
 		 */
-		for (LocalVarInfo local : locals) {
-			if (local.isNumeric() || local.isBoolean()) {
-				ret.addPrimitiveLocalVariable(DefaultRoot.create(local.getName()));
+        StackFrame sf = threadInfo.getTopFrame();
+
+        boolean[] localVarIsPrimitive = new boolean[sf.getLocalVariableCount() + method.getNumberOfStackArguments() + (method.isStatic() ? 0 : 1)];
+        int offset = 0;
+
+        if (!method.isStatic()) {
+            localVarIsPrimitive[offset++] = false;
+        }
+
+        for (byte argType : method.getArgumentTypes()) {
+            switch (argType) {
+                case Types.T_ARRAY:
+                case Types.T_REFERENCE:
+                    localVarIsPrimitive[offset++] = false;
+                    break;
+
+                default:
+                    localVarIsPrimitive[offset++] = true;
+            }
+        }
+
+        for (Instruction insn : method.getInstructions()) {
+            if (insn instanceof LocalVariableInstruction) {
+                LocalVariableInstruction lvInsn = (LocalVariableInstruction) insn;
+
+                int index = lvInsn.getLocalVariableIndex();
+
+                localVarIsPrimitive[index] = false;
+
+                localVarIsPrimitive[index] |= insn instanceof DLOAD || insn instanceof FLOAD || insn instanceof ILOAD || insn instanceof LLOAD;
+                localVarIsPrimitive[index] |= insn instanceof DSTORE || insn instanceof FSTORE || insn instanceof ISTORE || insn instanceof LSTORE;
+            }
+        }
+
+        System.out.println("Preparing scope: " + method);
+        for (int slotIndex = 0; slotIndex < sf.getLocalVariableCount() + method.getNumberOfStackArguments(); ++slotIndex) {
+            LocalVarInfo local = sf.getLocalVarInfo(slotIndex);
+            String name = local == null ? null : local.getName();
+
+            System.out.println("Registering " + (sf.isLocalVariableRef(slotIndex) ? "reference" : "primitive") + " " + (slotIndex < method.getNumberOfStackArguments() ? "argument" : "local variable") + ": " + DefaultRoot.create(name, slotIndex));
+
+            if (localVarIsPrimitive[slotIndex]) {
+				ret.addPrimitiveLocalVariable(DefaultRoot.create(name, slotIndex));
 			} else {
-				ret.addStructuredLocalVariable(DefaultRoot.create(local.getName()));
-			}
-		}
-		
+				ret.addStructuredLocalVariable(DefaultRoot.create(name, slotIndex));
+            }
+        }
+        System.out.println(sf.getReferenceMap());
+
 		/**
 		 * Handle main(String[] args)
          *
@@ -70,8 +121,6 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		String target = vm.getConfig().getTarget();
 		
 		if (method.getFullName().equals(target + ".main([Ljava/lang/String;)V")) {
-			StackFrame sf = threadInfo.getTopFrame();
-			
 			ElementInfo ei = threadInfo.getElementInfo(sf.getLocalVariable(0));
 			int length = ei.arrayLength();
 			
@@ -80,7 +129,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 
             method.addAttr(new NonEmptyAttribute(null, argsExpr));
 
-			ret.processObjectStore(argsExpr, DefaultRoot.create(args.getName()));
+			ret.processObjectStore(argsExpr, DefaultRoot.create(args.getName(), 0));
 		}
 		
 		return ret;
@@ -109,28 +158,30 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		scopes.push(method.getFullName(), newScope);
 
 		Object attrs[] = before.getArgumentAttrs(method);
-		LocalVarInfo args[] = method.getArgumentLocalVars();
 
 		/**
 		 * Assign values to the formal parameters according to the actual parameters
 		 */
-		if (args != null && attrs != null) {
-			for (int i = 0; i < args.length; ++i) {
-				Attribute attr = (Attribute) attrs[i];
-				
-				attr = Attribute.ensureNotNull(attr);
-				
-				   if (args[i] != null) {					
-					if (args[i].isNumeric() || args[i].isBoolean()) {
-						// Assign to numeric (primitive) arg
-						newScope.processPrimitiveStore(attr.getExpression(), originalScope, DefaultRoot.create(args[i].getName()));
-					} else {						
-						// Assign to object arg
-						   newScope.processObjectStore(attr.getExpression(), originalScope, DefaultRoot.create(args[i].getName()));
-					}
-				}
-			}
-		}
+        for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
+			Attribute attr = (Attribute) attrs[slotIndex];
+
+            LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
+            String name = arg == null ? null : arg.getName();
+
+            Set<gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier> values = new java.util.HashSet<gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier>();
+
+            if (attr.getExpression() instanceof AccessExpression) {
+                newScope.lookupValues((AccessExpression) attr.getExpression(), values);
+            }
+
+            System.out.println("Initializing argument: " + DefaultRoot.create(name, slotIndex) + " to value " + attr.getExpression() + " " + values);
+
+            if (after.isLocalVariableRef(slotIndex)) {
+				newScope.processObjectStore(attr.getExpression(), originalScope, DefaultRoot.create(name, slotIndex));
+            } else {
+				newScope.processPrimitiveStore(attr.getExpression(), originalScope, DefaultRoot.create(name, slotIndex));
+            }
+        }
 	}
 	
 	@Override
