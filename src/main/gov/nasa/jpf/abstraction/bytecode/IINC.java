@@ -51,7 +51,6 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 
 		SystemState ss = ti.getVM().getSystemState();
 		StackFrame sf = ti.getModifiableTopFrame();
-		LocalVarInfo var = sf.getLocalVarInfo(index);
 		Attribute attr = (Attribute) sf.getLocalAttr(index);
 		
 		attr = Attribute.ensureNotNull(attr);
@@ -61,10 +60,8 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 		AccessExpression path = null;
 		Expression expression = null;
 		
-		if (var != null) {
-			path = DefaultRoot.create(var.getName());
-			expression = Add.create(path, Constant.create(increment));
-		}
+		path = DefaultRoot.create(sf.getLocalVarInfo(getIndex()) == null ? null : sf.getLocalVarInfo(getIndex()).getName(), getIndex());
+		expression = Add.create(path, Constant.create(increment));
 			
 		if (abs_v == null) {
 			Attribute result = new NonEmptyAttribute(null, expression);

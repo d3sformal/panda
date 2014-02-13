@@ -25,7 +25,10 @@ public class JPFInstructionAdaptor {
 
 	public static Instruction getStandardNextInstruction(gov.nasa.jpf.jvm.bytecode.DIRECTCALLRETURN curInsn, ThreadInfo curTh)
 	{
-		return curTh.getCallerStackFrame().getPC();
+		if (curTh.getCallerStackFrame() == null) {
+            return null;
+        }
+        return curTh.getCallerStackFrame().getPC();
 	}
 
 	public static Instruction getStandardNextInstruction(gov.nasa.jpf.jvm.bytecode.ReturnInstruction curInsn, ThreadInfo curTh)

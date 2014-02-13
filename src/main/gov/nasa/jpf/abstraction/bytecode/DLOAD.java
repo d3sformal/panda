@@ -18,8 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
@@ -36,11 +36,13 @@ public class DLOAD extends gov.nasa.jpf.jvm.bytecode.DLOAD {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction actualNextInsn = super.execute(ti);
 		
-		AccessExpression path = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
+		DefaultRoot path = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
 		Attribute attribute = new NonEmptyAttribute(null, path);
 			
 		StackFrame sf = ti.getModifiableTopFrame();
 		sf.setLongOperandAttr(attribute);
+
+        GlobalAbstraction.getInstance().informAboutPrimitiveLocalVariable(path);
 
 		return actualNextInsn;
 	}

@@ -21,8 +21,8 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
@@ -48,10 +48,12 @@ public class DCMPG extends gov.nasa.jpf.jvm.bytecode.DCMPG implements AbstractBi
 		AbstractValue abs_v1 = attr1.getAbstractValue();
 		AbstractValue abs_v2 = attr2.getAbstractValue();
 
+        AbstractValue absValue = Abstraction._cmpg(v1, abs_v1, v2, abs_v2);
+
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new NonEmptyAttribute(Abstraction._cmpg(v1, abs_v1, v2, abs_v2), null);
+		return new NonEmptyAttribute(absValue, Constant.create(absValue.getKey() - 1));
 	}
 
 	@Override

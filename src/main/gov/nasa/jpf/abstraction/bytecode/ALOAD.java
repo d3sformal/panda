@@ -18,11 +18,10 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
-import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -37,18 +36,13 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 	public Instruction execute(ThreadInfo ti) {
 		Instruction actualNextInsn = super.execute(ti);
 		
-        StackFrame sf = ti.getTopFrame();
-	    AccessExpression path = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
-
-
-        java.util.Set<gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier> values = new java.util.HashSet<gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier>();
-        ((gov.nasa.jpf.abstraction.predicate.PredicateAbstraction) gov.nasa.jpf.abstraction.GlobalAbstraction.getInstance().get()).getSymbolTable().get(0).lookupValues(path, values);
-        System.out.println("LOADED SYMBOL -> " + values);
-			
+	    DefaultRoot path = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
 	    Attribute attribute = new NonEmptyAttribute(null, path);
 	    		
-	    sf = ti.getModifiableTopFrame();
+	    StackFrame sf = ti.getModifiableTopFrame();
 		sf.setOperandAttr(attribute);
+
+        GlobalAbstraction.getInstance().informAboutStructuredLocalVariable(path);
 
 		return actualNextInsn;
 	}

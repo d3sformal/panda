@@ -22,6 +22,7 @@ import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
@@ -93,7 +94,9 @@ public abstract class BinaryComparatorExecutor<T> {
 				
 				// UNDEFINED MEANS THERE WAS NO ABSTRACTION TO DECIDE THE VALIDITY OF THE PREDICATE
 				if (gt != TruthValue.UNDEFINED) {
-					result = new NonEmptyAttribute(SignsAbstraction.getInstance().create(lt != TruthValue.FALSE, eq != TruthValue.FALSE, gt != TruthValue.FALSE), null);
+					SignsValue absValue = SignsAbstraction.getInstance().create(lt != TruthValue.FALSE, eq != TruthValue.FALSE, gt != TruthValue.FALSE);
+					
+					result = new NonEmptyAttribute(absValue, Constant.create(absValue.getKey() - 1));
 				}
 			}
 			
@@ -105,7 +108,11 @@ public abstract class BinaryComparatorExecutor<T> {
 				T v2 = getRightOperand(sf);
 	
 				if (abs_v1 == null && abs_v2 == null) {
-					return cmp.executeConcrete(ti);
+					Instruction ret = cmp.executeConcrete(ti);
+
+                    sf.setOperandAttr(new NonEmptyAttribute(null, Constant.create(sf.peek())));
+
+                    return ret;
 				}
 				
 				result = cmp.getResult(v1, attr1, v2, attr2);
@@ -141,16 +148,17 @@ public abstract class BinaryComparatorExecutor<T> {
 			int key = (Integer) cg.getNextChoice();
 			
 			SignsValue custom = new SignsValue(key);
+			SignsValue absValue = SignsAbstraction.getInstance().create(custom.can_be_NEG(), custom.can_be_ZERO(), custom.can_be_POS());
 			
-			result = new NonEmptyAttribute(SignsAbstraction.getInstance().create(custom.can_be_NEG(), custom.can_be_ZERO(), custom.can_be_POS()), null);
+			result = new NonEmptyAttribute(absValue, Constant.create(absValue.getKey() - 1));
 			
 			if (expr1 != null && expr2 != null) {
 				Predicate predicate = Equals.create(expr1, expr2);
 				
-				if (result.getAbstractValue() == SignsAbstraction.NEG) {
+				if (absValue == SignsAbstraction.NEG) {
 					predicate = LessThan.create(expr1, expr2);
 				}
-				if (result.getAbstractValue() == SignsAbstraction.POS) {
+				if (absValue == SignsAbstraction.POS) {
 					predicate = LessThan.create(expr2, expr1);
 				}
 				

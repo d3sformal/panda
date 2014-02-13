@@ -3,7 +3,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -28,7 +27,7 @@ public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
 		Instruction actualNextInsn = super.execute(ti);
 		
 		Expression from = source.getExpression();
-		AccessExpression to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
+		DefaultRoot to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
 		
 		sf = ti.getModifiableTopFrame();
 
@@ -40,6 +39,7 @@ public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
         /**
          * Inform the abstractions that a primitive value of a local variable may have changed
          */
+        GlobalAbstraction.getInstance().informAboutPrimitiveLocalVariable(to);
 		GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
 		
 		return actualNextInsn;

@@ -21,7 +21,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -43,11 +42,12 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
 		Instruction actualNextInsn = super.execute(ti);
 		
 		Expression from = source.getExpression();
-		AccessExpression to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
+		DefaultRoot to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
 		
 		sf = ti.getModifiableTopFrame();
 		sf.setLocalAttr(getLocalVariableIndex(), source);
 
+        GlobalAbstraction.getInstance().informAboutStructuredLocalVariable(to);
 		GlobalAbstraction.getInstance().processObjectStore(from, to);
 		
 		return actualNextInsn;
