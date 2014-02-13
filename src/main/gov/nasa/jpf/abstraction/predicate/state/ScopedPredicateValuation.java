@@ -205,12 +205,14 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 
                 // Replace formal parameters with actual parameters
                 for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
-                    Attribute attr = Attribute.ensureNotNull((Attribute) after.getSlotAttr(slotIndex));
+                    if (slotInUse[slotIndex]) {
+                        Attribute attr = Attribute.ensureNotNull((Attribute) after.getSlotAttr(slotIndex));
 
-                    LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
-                    String name = arg == null ? null : arg.getName();
+                        LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
+                        String name = arg == null ? null : arg.getName();
 
-                    replacements.put(DefaultRoot.create(name, slotIndex), attr.getExpression());
+                        replacements.put(DefaultRoot.create(name, slotIndex), attr.getExpression());
+                    }
                 }
 
                 replaced.put(predicate.replace(replacements), predicate);
