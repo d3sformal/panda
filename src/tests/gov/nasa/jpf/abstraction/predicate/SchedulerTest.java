@@ -1,20 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-class SchedulerTestDriver {
-    public static void main(String[] args) {
-        new SchedulerTest().bootstrap();
-    }
-}
-
 public class SchedulerTest extends BaseTest {
     private static int SCHEDULE_SIZE = 5;
-
-    public SchedulerTest() {
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.predicate.util.SMTMonitor");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor");
-    }
 
 	public static void main(String[] args) {
 		ThreadInfo[] id2thread = new ThreadInfo[3];

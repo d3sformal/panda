@@ -37,7 +37,7 @@ import java.util.Set;
 /**
  * Symbol table aware of method call scope changes
  */
-public class ScopedSymbolTable implements SymbolTable, Scoped {
+public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scoped {
 	/**
 	 * Stack of scopes (pushed by invoke, poped by return)
 	 */
@@ -52,68 +52,6 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		// without this all static initialisations return and remove their scope without writing it anywhere else
 		scopes.push("-- Dummy stop scope --", new FlatSymbolTable(universe, abstraction));
 	}
-
-    private interface ArgumentDiscriminant {
-        public boolean getDecision(byte type);
-    }
-
-    private void getArgumentSlotUsage(MethodInfo method, boolean[] slotInUse) {
-        for (int i = 0; i < method.getNumberOfStackArguments(); ++i) {
-            slotInUse[i] = false;
-        }
-
-        getArgumentSlotProperties(method, slotInUse, new ArgumentDiscriminant() {
-            @Override
-            public boolean getDecision(byte type) {
-                return true;
-            }
-        });
-    }
-
-    private void getArgumentSlotType(MethodInfo method, boolean[] localVarIsPrimitive) {
-        for (int i = 0; i < method.getNumberOfStackArguments(); ++i) {
-            localVarIsPrimitive[i] = false;
-        }
-
-        getArgumentSlotProperties(method, localVarIsPrimitive, new ArgumentDiscriminant() {
-            @Override
-            public boolean getDecision(byte argType) {
-                switch (argType) {
-                    case Types.T_ARRAY:
-                    case Types.T_REFERENCE:
-                        return false;
-
-                    default:
-                        return true;
-                }
-            }
-        });
-    }
-
-    private void getArgumentSlotProperties(MethodInfo method, boolean[] properties, ArgumentDiscriminant discriminant) {
-        int offset = 0;
-
-        if (!method.isStatic()) {
-            properties[offset] = discriminant.getDecision(Types.T_REFERENCE);
-
-            ++offset;
-        }
-
-        for (byte argType : method.getArgumentTypes()) {
-            properties[offset] = discriminant.getDecision(argType);
-
-            switch (argType) {
-                case Types.T_LONG:
-                case Types.T_DOUBLE:
-                    offset += 2;
-                    break;
-
-                default:
-                    ++offset;
-                    break;
-            }
-        }
-    }
 
 	/**
 	 * Create a scope for a given method
@@ -251,7 +189,9 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	public void restore(Scopes scopes) {
 		if (scopes instanceof SymbolTableStack) {
 			this.scopes = (SymbolTableStack) scopes.clone();
-            this.universe = this.scopes.top().getUniverse();
+            if (this.scopes.count() > 0) {
+                this.universe = this.scopes.top().getUniverse();
+            }
 		} else {
 			throw new RuntimeException("Invalid scopes type being restored!");
 		}

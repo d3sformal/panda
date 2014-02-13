@@ -36,7 +36,7 @@ import java.util.Set;
 /**
  * A predicate valuation aware of method scope changes
  */
-public class ScopedPredicateValuation implements PredicateValuation, Scoped {
+public class ScopedPredicateValuation extends CallAnalyzer implements PredicateValuation, Scoped {
 	private PredicateValuationStack scopes = new PredicateValuationStack();
 	private Predicates predicateSet;
 	private Map<Predicate, TruthValue> initialValuation;
@@ -188,9 +188,6 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 				attrsList.add(attr);
 			}
 			
-			Attribute[] attrs = attrsList.toArray(new Attribute[attrsList.size()]);
-			LocalVarInfo args[] = method.getArgumentLocalVars();
-			
 			Map<Predicate, Predicate> replaced = new HashMap<Predicate, Predicate>();
 			
 			/**
@@ -198,31 +195,33 @@ public class ScopedPredicateValuation implements PredicateValuation, Scoped {
 			 * Replace formal parameters with the concrete assignment
 			 * Reason about the value of the predicates using known values of predicates in the caller
 			 */
-			if (args != null && attrs != null) {
-				// Each predicate to be initialised for the callee
-				for (Predicate predicate : finalScope.getPredicates()) {
+            boolean[] slotInUse = new boolean[method.getNumberOfStackArguments()];
 
-					Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
-					
-					// Replace formal parameters with actual parameters
-					for (int i = 0; i < args.length; ++i) {
-						Attribute attr = attrs[i];
-											
-						if (args[i] != null && attr.getExpression() != null) {
-							replacements.put(DefaultRoot.create(args[i].getName()), attr.getExpression());
-						}
-					}
-					
-					replaced.put(predicate.replace(replacements), predicate);
-				}
-				
-				// Valuate predicates in the caller scope, and adopt the valuation for the callee predicates
-				Map<Predicate, TruthValue> valuation = transitionScope.evaluatePredicates(replaced.keySet());
-				
-				for (Predicate predicate : replaced.keySet()) {
-					finalScope.put(replaced.get(predicate), valuation.get(predicate));
-				}
-			}
+            getArgumentSlotUsage(method, slotInUse);
+
+            // Each predicate to be initialised for the callee
+            for (Predicate predicate : finalScope.getPredicates()) {
+                Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+
+                // Replace formal parameters with actual parameters
+                for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
+                    Attribute attr = Attribute.ensureNotNull((Attribute) after.getSlotAttr(slotIndex));
+
+                    LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
+                    String name = arg == null ? null : arg.getName();
+
+                    replacements.put(DefaultRoot.create(name, slotIndex), attr.getExpression());
+                }
+
+                replaced.put(predicate.replace(replacements), predicate);
+            }
+
+            // Valuate predicates in the caller scope, and adopt the valuation for the callee predicates
+            Map<Predicate, TruthValue> valuation = transitionScope.evaluatePredicates(replaced.keySet());
+
+            for (Predicate predicate : replaced.keySet()) {
+                finalScope.put(replaced.get(predicate), valuation.get(predicate));
+            }
 		}
 		
 		scopes.push(method.getFullName(), finalScope);
