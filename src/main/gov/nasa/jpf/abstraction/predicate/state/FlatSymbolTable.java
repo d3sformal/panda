@@ -61,6 +61,8 @@ import java.util.TreeSet;
  */
 public class FlatSymbolTable implements SymbolTable, Scope {
 	
+    private static int scopePool = 0;
+
 	private static String[] doNotMonitor = new String[] {
 	};
 	private static String[] doNotPrint = new String[] {
@@ -111,20 +113,26 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	private Map<PackageAndClass, LoadedClass> classes = new HashMap<PackageAndClass, LoadedClass>();
 
 	private PredicateAbstraction abstraction;
+    private int scope;
 	
-	public FlatSymbolTable(Universe universe, PredicateAbstraction abstraction) {
+	protected FlatSymbolTable(Universe universe, PredicateAbstraction abstraction, int scope) {
 		this.abstraction = abstraction;
         this.universe = universe;
+        this.scope = scope;
 
         addPrimitiveLocalVariable(DUMMY_VARIABLE);
 	}
+
+    public FlatSymbolTable(Universe universe, PredicateAbstraction abstraction) {
+        this(universe, abstraction, ++scopePool);
+    }
 
     public FlatSymbolTable(FlatSymbolTable previous) {
         this(previous.universe, previous.abstraction);
 
         this.classes = previous.classes;
     }
-	
+
 	public Set<Root> getLocalVariables() {
 		return locals.keySet();
 	}
@@ -169,7 +177,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
     }
 	
 	public void addPrimitiveLocalVariable(Root l) {
-		PrimitiveLocalVariable v = new PrimitiveLocalVariable(l, this);
+		PrimitiveLocalVariable v = new PrimitiveLocalVariable(l, getScope());
 
         createPrimitiveLocalVariable(v);
 
@@ -177,7 +185,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 	
 	public void addStructuredLocalVariable(Root l) {
-		StructuredLocalVariable v = new StructuredLocalVariable(l, this);
+		StructuredLocalVariable v = new StructuredLocalVariable(l, getScope());
 
         createStructuredLocalVariable(v);
 				
@@ -185,7 +193,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 	
 	public void addPrimitiveReturn(ReturnValue r) {
-		PrimitiveLocalVariable v = new PrimitiveLocalVariable(r, this);
+		PrimitiveLocalVariable v = new PrimitiveLocalVariable(r, getScope());
 
         createPrimitiveLocalVariable(v);
 
@@ -193,7 +201,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 
 	public void addStructuredReturn(ReturnValue r) {
-		StructuredLocalVariable v = new StructuredLocalVariable(r, this);
+		StructuredLocalVariable v = new StructuredLocalVariable(r, getScope());
 
         createStructuredLocalVariable(v);
 
@@ -339,8 +347,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			} else if (parent instanceof LocalVariable) {
 				LocalVariable l = (LocalVariable) parent;
 				
-                //TODO change scope from flatsymboltable instance to something else that does get broken after making copies
-				if (l.getScope() == this) {
+				if (l.getScope() == getScope()) {
                     outAccessExpressions.add(l.getAccessExpression());
                 }
 			} else if (parent instanceof LoadedClass) {
@@ -818,7 +825,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	
 	@Override
 	public FlatSymbolTable clone() {
-		FlatSymbolTable clone = new FlatSymbolTable(universe.clone(), abstraction);
+		FlatSymbolTable clone = new FlatSymbolTable(universe.clone(), abstraction, getScope());
 		
         clone.locals.putAll(locals);
         clone.returns.putAll(returns);
@@ -1000,5 +1007,9 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		locals.clear();
 		returns.clear();
 	}
+
+    public int getScope() {
+        return scope;
+    }
 
 }

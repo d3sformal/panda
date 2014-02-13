@@ -5,11 +5,11 @@ import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
 
 public class StructuredLocalVariable extends StructuredValueSlot implements LocalVariable {
     private Root accessExpression;
-    private FlatSymbolTable scope;
+    private int scope;
 
     public static LocalVariable.SlotKey slotKey = new LocalVariable.SlotKey();
 
-    public StructuredLocalVariable(Root accessExpression, FlatSymbolTable scope) {
+    public StructuredLocalVariable(Root accessExpression, int scope) {
         this.accessExpression = accessExpression;
         this.scope = scope;
 
@@ -34,7 +34,7 @@ public class StructuredLocalVariable extends StructuredValueSlot implements Loca
     }
 
     @Override
-    public FlatSymbolTable getScope() {
+    public int getScope() {
         return scope;
     }
 

@@ -11,5 +11,5 @@ public interface LocalVariable extends Identifier, UniverseSlot {
     public LocalVariable createShallowCopy();
 
     public Root getAccessExpression();
-    public FlatSymbolTable getScope();
+    public int getScope();
 }
