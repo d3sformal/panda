@@ -166,27 +166,13 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 		MethodInfo method = after.getMethodInfo();
 		
 		// Scope to be added as the callee scope
-		FlatPredicateValuation finalScope = createDefaultScope(threadInfo, method);
+		FlatPredicateValuation calleeScope = createDefaultScope(threadInfo, method);
 		
 		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
 
 		if (RunDetector.isRunning()) {
 			// Copy of the current caller scope - to avoid modifications - may not be needed now, it is not different from .top() and it is not modified here
-			FlatPredicateValuation transitionScope;
-			transitionScope = scopes.top().clone();
-			
-			/**
-			 * Collect actual arguments
-			 */
-			ArrayList<Attribute> attrsList = new ArrayList<Attribute>();
-			
-			Iterator<Object> it = after.getMethodInfo().attrIterator();
-			
-			while (it.hasNext()) {
-				Attribute attr = (Attribute) it.next();
-				
-				attrsList.add(attr);
-			}
+			FlatPredicateValuation callerScope = scopes.top();
 			
 			Map<Predicate, Predicate> replaced = new HashMap<Predicate, Predicate>();
 			
@@ -200,12 +186,13 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
             getArgumentSlotUsage(method, slotInUse);
 
             // Each predicate to be initialised for the callee
-            for (Predicate predicate : finalScope.getPredicates()) {
+            for (Predicate predicate : calleeScope.getPredicates()) {
                 Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
 
                 // Replace formal parameters with actual parameters
                 for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
                     if (slotInUse[slotIndex]) {
+                        // Actual symbolic parameter
                         Attribute attr = Attribute.ensureNotNull((Attribute) after.getSlotAttr(slotIndex));
 
                         LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
@@ -219,14 +206,14 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
             }
 
             // Valuate predicates in the caller scope, and adopt the valuation for the callee predicates
-            Map<Predicate, TruthValue> valuation = transitionScope.evaluatePredicates(replaced.keySet());
+            Map<Predicate, TruthValue> valuation = callerScope.evaluatePredicates(replaced.keySet());
 
             for (Predicate predicate : replaced.keySet()) {
-                finalScope.put(replaced.get(predicate), valuation.get(predicate));
+                calleeScope.put(replaced.get(predicate), valuation.get(predicate));
             }
 		}
 		
-		scopes.push(method.getFullName(), finalScope);
+		scopes.push(method.getFullName(), calleeScope);
 	}
 	
 	private static boolean isPredicateOverReturn(Predicate predicate) {
