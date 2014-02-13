@@ -10,23 +10,24 @@ import gov.nasa.jpf.abstraction.util.Pair;
 
 public class UniverseArray extends HeapValue implements Indexed {
     private Map<ElementIndex, UniverseSlot> elements = new HashMap<ElementIndex, UniverseSlot>();
+    private PrimitiveValueSlot lengthSlot;
+
     private Integer length;
 
     public UniverseArray(ElementInfo elementInfo) {
-        super(new Reference(elementInfo));
-
-        length = elementInfo.arrayLength();
+        this(new Reference(elementInfo), elementInfo.arrayLength(), new PrimitiveValueSlot(new Reference(elementInfo), LengthSlotKey.getInstance()));
     }
 
-    protected UniverseArray(Reference identifier, Integer length) {
+    protected UniverseArray(Reference identifier, Integer length, PrimitiveValueSlot lengthSlot) {
         super(identifier);
 
         this.length = length;
+        this.lengthSlot = lengthSlot;
     }
 
     @Override
     public UniverseArray createShallowCopy() {
-        UniverseArray copy = new UniverseArray(getReference(), getLength());
+        UniverseArray copy = new UniverseArray(getReference(), getLength(), getLengthSlot());
 
         for (Pair<Identifier, UniverseSlotKey> parentSlot : getParentSlots()) {
             copy.addParentSlot(parentSlot.getFirst(), parentSlot.getSecond());
@@ -39,7 +40,16 @@ public class UniverseArray extends HeapValue implements Indexed {
 
     @Override
     public UniverseSlot getSlot(UniverseSlotKey key) {
+        if (key instanceof LengthSlotKey) {
+            return lengthSlot;
+        }
+
         return elements.get((ElementIndex) key);
+    }
+
+    @Override
+    public PrimitiveValueSlot getLengthSlot() {
+        return lengthSlot;
     }
 
     @Override

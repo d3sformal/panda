@@ -50,6 +50,11 @@ public class UniverseNull extends HeapValue implements Associative, Indexed {
     }
 
     @Override
+    public PrimitiveValueSlot getLengthSlot() {
+        throw new RuntimeException("Trying to access the length of a NULL array");
+    }
+
+    @Override
     public Map<ElementIndex, UniverseSlot> getElements() {
         return Collections.emptyMap();
     }

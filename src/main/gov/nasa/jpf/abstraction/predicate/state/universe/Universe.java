@@ -18,6 +18,7 @@ import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
 
 public class Universe {
     public static int NULL = MJIEnv.NULL;
@@ -156,6 +157,8 @@ public class Universe {
                 }
             }
 
+            array.getLengthSlot().addPossiblePrimitiveValue(add());
+
             return array.getReference();
         } else {
             StructuredValue value;
@@ -251,6 +254,14 @@ public class Universe {
                         outValues.addAll(array.getElement(new ElementIndex(i)).getPossibleValues());
                     }
                 }
+            }
+
+            if (read instanceof ArrayLengthRead) {
+                if (parentObject instanceof UniverseNull) continue;
+
+                Indexed array = (Indexed) parentObject;
+
+                outValues.addAll(array.getLengthSlot().getPossibleValues());
             }
         }
     }

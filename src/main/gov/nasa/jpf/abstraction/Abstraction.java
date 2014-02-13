@@ -19,6 +19,7 @@ package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.abstraction.common.Predicate;
@@ -132,6 +133,12 @@ public abstract class Abstraction {
      * this is an alternative approach to let the abstraction know about its existence
      */
     public void processNewClass(ThreadInfo thread, ClassInfo classInfo) {
+    }
+
+    public void informAboutPrimitiveLocalVariable(Root root) {
+    }
+
+    public void informAboutStructuredLocalVariable(Root root) {
     }
 	
 	public void informAboutBranchingDecision(BranchingDecision decision) {

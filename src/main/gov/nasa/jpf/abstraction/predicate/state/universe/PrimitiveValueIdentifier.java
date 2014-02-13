@@ -19,4 +19,9 @@ public class PrimitiveValueIdentifier implements UniverseIdentifier {
 
         return Identifier.Ordering.compare(this, id);
     }
+
+    @Override
+    public String toString() {
+        return uuid.toString().substring(0, 8);
+    }
 }

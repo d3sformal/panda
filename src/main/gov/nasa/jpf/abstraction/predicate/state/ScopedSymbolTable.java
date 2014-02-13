@@ -53,6 +53,68 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		scopes.push("-- Dummy stop scope --", new FlatSymbolTable(universe, abstraction));
 	}
 
+    private interface ArgumentDiscriminant {
+        public boolean getDecision(byte type);
+    }
+
+    private void getArgumentSlotUsage(MethodInfo method, boolean[] slotInUse) {
+        for (int i = 0; i < method.getNumberOfStackArguments(); ++i) {
+            slotInUse[i] = false;
+        }
+
+        getArgumentSlotProperties(method, slotInUse, new ArgumentDiscriminant() {
+            @Override
+            public boolean getDecision(byte type) {
+                return true;
+            }
+        });
+    }
+
+    private void getArgumentSlotType(MethodInfo method, boolean[] localVarIsPrimitive) {
+        for (int i = 0; i < method.getNumberOfStackArguments(); ++i) {
+            localVarIsPrimitive[i] = false;
+        }
+
+        getArgumentSlotProperties(method, localVarIsPrimitive, new ArgumentDiscriminant() {
+            @Override
+            public boolean getDecision(byte argType) {
+                switch (argType) {
+                    case Types.T_ARRAY:
+                    case Types.T_REFERENCE:
+                        return false;
+
+                    default:
+                        return true;
+                }
+            }
+        });
+    }
+
+    private void getArgumentSlotProperties(MethodInfo method, boolean[] properties, ArgumentDiscriminant discriminant) {
+        int offset = 0;
+
+        if (!method.isStatic()) {
+            properties[offset] = discriminant.getDecision(Types.T_REFERENCE);
+
+            ++offset;
+        }
+
+        for (byte argType : method.getArgumentTypes()) {
+            properties[offset] = discriminant.getDecision(argType);
+
+            switch (argType) {
+                case Types.T_LONG:
+                case Types.T_DOUBLE:
+                    offset += 2;
+                    break;
+
+                default:
+                    ++offset;
+                    break;
+            }
+        }
+    }
+
 	/**
 	 * Create a scope for a given method
 	 */
@@ -64,53 +126,6 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 		 * Register new local variables
 		 */
         StackFrame sf = threadInfo.getTopFrame();
-
-        boolean[] localVarIsPrimitive = new boolean[sf.getLocalVariableCount() + method.getNumberOfStackArguments() + (method.isStatic() ? 0 : 1)];
-        int offset = 0;
-
-        if (!method.isStatic()) {
-            localVarIsPrimitive[offset++] = false;
-        }
-
-        for (byte argType : method.getArgumentTypes()) {
-            switch (argType) {
-                case Types.T_ARRAY:
-                case Types.T_REFERENCE:
-                    localVarIsPrimitive[offset++] = false;
-                    break;
-
-                default:
-                    localVarIsPrimitive[offset++] = true;
-            }
-        }
-
-        for (Instruction insn : method.getInstructions()) {
-            if (insn instanceof LocalVariableInstruction) {
-                LocalVariableInstruction lvInsn = (LocalVariableInstruction) insn;
-
-                int index = lvInsn.getLocalVariableIndex();
-
-                localVarIsPrimitive[index] = false;
-
-                localVarIsPrimitive[index] |= insn instanceof DLOAD || insn instanceof FLOAD || insn instanceof ILOAD || insn instanceof LLOAD;
-                localVarIsPrimitive[index] |= insn instanceof DSTORE || insn instanceof FSTORE || insn instanceof ISTORE || insn instanceof LSTORE;
-            }
-        }
-
-        System.out.println("Preparing scope: " + method);
-        for (int slotIndex = 0; slotIndex < sf.getLocalVariableCount() + method.getNumberOfStackArguments(); ++slotIndex) {
-            LocalVarInfo local = sf.getLocalVarInfo(slotIndex);
-            String name = local == null ? null : local.getName();
-
-            System.out.println("Registering " + (sf.isLocalVariableRef(slotIndex) ? "reference" : "primitive") + " " + (slotIndex < method.getNumberOfStackArguments() ? "argument" : "local variable") + ": " + DefaultRoot.create(name, slotIndex));
-
-            if (localVarIsPrimitive[slotIndex]) {
-				ret.addPrimitiveLocalVariable(DefaultRoot.create(name, slotIndex));
-			} else {
-				ret.addStructuredLocalVariable(DefaultRoot.create(name, slotIndex));
-            }
-        }
-        System.out.println(sf.getReferenceMap());
 
 		/**
 		 * Handle main(String[] args)
@@ -126,8 +141,10 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 			
 			LocalVarInfo args = method.getArgumentLocalVars()[0];
             Expression argsExpr = AnonymousArray.create(new Reference(ei), Constant.create(length));
+            Attribute attr = new NonEmptyAttribute(null, argsExpr);
 
-            method.addAttr(new NonEmptyAttribute(null, argsExpr));
+            sf.setLocalAttr(0, attr);
+            method.addAttr(attr);
 
 			ret.processObjectStore(argsExpr, DefaultRoot.create(args.getName(), 0));
 		}
@@ -157,29 +174,29 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 
 		scopes.push(method.getFullName(), newScope);
 
-		Object attrs[] = before.getArgumentAttrs(method);
-
 		/**
 		 * Assign values to the formal parameters according to the actual parameters
 		 */
+        boolean[] slotInUse = new boolean[method.getNumberOfStackArguments()];
+        boolean[] localVarIsPrimitive = new boolean[method.getNumberOfStackArguments()];
+
+        getArgumentSlotUsage(method, slotInUse);
+        getArgumentSlotType(method, localVarIsPrimitive);
+
         for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
-			Attribute attr = (Attribute) attrs[slotIndex];
+            if (slotInUse[slotIndex]) {
+    			Attribute attr = Attribute.ensureNotNull((Attribute) after.getSlotAttr(slotIndex));
 
-            LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
-            String name = arg == null ? null : arg.getName();
+                LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
+                String name = arg == null ? null : arg.getName();
 
-            Set<gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier> values = new java.util.HashSet<gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier>();
-
-            if (attr.getExpression() instanceof AccessExpression) {
-                newScope.lookupValues((AccessExpression) attr.getExpression(), values);
-            }
-
-            System.out.println("Initializing argument: " + DefaultRoot.create(name, slotIndex) + " to value " + attr.getExpression() + " " + values);
-
-            if (after.isLocalVariableRef(slotIndex)) {
-				newScope.processObjectStore(attr.getExpression(), originalScope, DefaultRoot.create(name, slotIndex));
-            } else {
-				newScope.processPrimitiveStore(attr.getExpression(), originalScope, DefaultRoot.create(name, slotIndex));
+                if (localVarIsPrimitive[slotIndex]) {
+	    			newScope.addPrimitiveLocalVariable(DefaultRoot.create(name, slotIndex));
+		    		newScope.processPrimitiveStore(attr.getExpression(), originalScope, DefaultRoot.create(name, slotIndex));
+                } else {
+			    	newScope.addStructuredLocalVariable(DefaultRoot.create(name, slotIndex));
+    				newScope.processObjectStore(attr.getExpression(), originalScope, DefaultRoot.create(name, slotIndex));
+                }
             }
         }
 	}
@@ -234,6 +251,7 @@ public class ScopedSymbolTable implements SymbolTable, Scoped {
 	public void restore(Scopes scopes) {
 		if (scopes instanceof SymbolTableStack) {
 			this.scopes = (SymbolTableStack) scopes.clone();
+            this.universe = this.scopes.top().getUniverse();
 		} else {
 			throw new RuntimeException("Invalid scopes type being restored!");
 		}

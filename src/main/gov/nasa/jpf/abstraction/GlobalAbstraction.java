@@ -6,6 +6,7 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.BranchingCondition;
 import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
 import gov.nasa.jpf.abstraction.common.BranchingDecision;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ClassInfo;
@@ -117,6 +118,16 @@ public class GlobalAbstraction extends Abstraction {
     @Override
     public void processNewClass(ThreadInfo thread, ClassInfo classInfo) {
         abs.processNewClass(thread, classInfo);
+    }
+
+    @Override
+    public void informAboutPrimitiveLocalVariable(Root root) {
+        abs.informAboutPrimitiveLocalVariable(root);
+    }
+
+    @Override
+    public void informAboutStructuredLocalVariable(Root root) {
+        abs.informAboutStructuredLocalVariable(root);
     }
 	
 	@Override

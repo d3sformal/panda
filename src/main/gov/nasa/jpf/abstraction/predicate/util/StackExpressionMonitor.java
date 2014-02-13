@@ -19,10 +19,10 @@ public class StackExpressionMonitor extends ListenerAdapter {
 	
 	@Override
 	public void executeInstruction(VM vm, ThreadInfo curTh, Instruction insn) {
-		//if (RunDetector.isRunning()) {
+		if (RunDetector.isRunning()) {
 			StackFrame sf = curTh.getTopFrame();
 			inspect(sf);
-		//}
+		}
 	}
 
 	public static void inspect(StackFrame sf) {

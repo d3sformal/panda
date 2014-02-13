@@ -19,6 +19,7 @@ import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseNull;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseObject;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseArray;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseValue;
@@ -78,7 +79,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		"sun",
 		"gov.nasa.jpf" // JPF
 	};
-	private static int GUARANTEED_LENGTH = 8;
+	private static int GUARANTEED_LENGTH = 0;
 	
 	/**
 	 * Abstract heap
@@ -243,6 +244,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		if (expression.getRoot() instanceof AnonymousExpression) {
 			AnonymousExpression anonymous = (AnonymousExpression) expression.getRoot();
 			Reference reference = anonymous.getReference();
+
+            ensureAnonymousObjectExistence(anonymous);
 			
 			if (universe.contains(reference)) {
 				universe.lookupValues(reference, expression, outValues);
@@ -402,7 +405,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
     // The universes may differ instance-wise (different objects representing the same universe)
     // FromTable may have a different Locals/Statics sets
     public Set<AccessExpression> processObjectStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
-        System.out.println(">>\t" + to + " := " + from);
         fromTable.ensureAnonymousObjectExistence(from);
 
 		ensureAnonymousObjectExistence(from);
@@ -456,14 +458,17 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				FieldName field = new FieldName(read.getField().getName());
 
                 Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
+
                 valueToAccessExpressions(parent, getMaximalAccessExpressionLength(), prefixes);
 				
+                StructuredValue parentObject = universe.get(parent);
+
+                if (parentObject instanceof UniverseNull) continue;
+
 				for (AccessExpression prefix : prefixes) {
 					ret.add(DefaultObjectFieldRead.create(prefix, field.getName()));
 				}
 				
-                StructuredValue parentObject = universe.get(parent);
-                
                 // If the object whose slot is being modified is frozen, modify a copy
                 if (parentObject.isFrozen()) {
                     parentObject = parentObject.createShallowCopy();
@@ -528,9 +533,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
                     
                     value.addParentSlot(parent, field);
                 }
-			}
-			
-			if (to instanceof ArrayElementRead) {
+
+			} else if (to instanceof ArrayElementRead) {
 				StructuredValueIdentifier parent = (StructuredValueIdentifier) destination;
 
                 Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
@@ -538,7 +542,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				
                 ArrayElementRead aeRead = (ArrayElementRead) to;
 
-				for (int i = 0; i < ((UniverseArray) universe.get(parent)).getLength(); ++i) {
+                StructuredValue parentObject = universe.get(parent);
+
+                if (parentObject instanceof UniverseNull) continue;
+
+				for (int i = 0; i < ((UniverseArray) parentObject).getLength(); ++i) {
 
                     // Overwrite the exact element in case of a constant index
                     if (aeRead.getIndex() instanceof Constant) {
@@ -553,8 +561,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 						ret.add(DefaultArrayElementRead.create(prefix, Constant.create(i)));
 					}
 					
-                    StructuredValue parentObject = universe.get(parent);
-
                     if (parentObject.isFrozen()) {
                         parentObject = parentObject.createShallowCopy();
 
@@ -619,9 +625,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
                         value.addParentSlot(parent, index);
                     }
 				}
-			}
-			
-			if (to instanceof Root) {
+
+			} else if (to instanceof Root) {
 				StructuredLocalVariable parent;
 
 				if (to instanceof ReturnValue) {
@@ -705,6 +710,60 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 			universe.add(reference.getElementInfo(), ti);
 		}
 	}
+
+    // may overwrite a variable without removing the mapping from its values
+    //
+    // public void m() {
+    //
+    //   {
+    //     int x;
+    //   }
+    //
+    //   {
+    //     int x;
+    //   }
+    //
+    // }
+    //
+    // does not matter much when it comes to primitive values
+    //
+    // TODO: variables may change type (primitive <---> reference)
+	public void ensurePrimitiveLocalVariableExistence(Expression expr) {
+        if (expr instanceof Root) {
+            Root l = (Root) expr;
+
+            if (!locals.containsKey(l)) {
+                addPrimitiveLocalVariable(l);
+            }
+        }
+    }
+
+    // may overwrite a variable without removing the mapping from its values
+    //
+    // public void m() {
+    //
+    //   {
+    //     Object x;
+    //   }
+    //
+    //   {
+    //     Object x;
+    //   }
+    //
+    // }
+    //
+    // may cause trouble (or may not... writes to locals are always unambiguous, therefore destructive)
+    //
+    // TODO: variables may change type (primitive <---> reference)
+	public void ensureStructuredLocalVariableExistence(Expression expr) {
+        if (expr instanceof Root) {
+            Root l = (Root) expr;
+
+            if (!locals.containsKey(l)) {
+                addStructuredLocalVariable(l);
+            }
+        }
+    }
 
 	@Override
 	public boolean isArray(AccessExpression path) {

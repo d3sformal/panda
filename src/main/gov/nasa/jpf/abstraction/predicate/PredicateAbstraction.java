@@ -15,6 +15,7 @@ import gov.nasa.jpf.abstraction.common.BranchingCondition;
 import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
 import gov.nasa.jpf.abstraction.common.BranchingDecision;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
 import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
@@ -101,6 +102,16 @@ public class PredicateAbstraction extends Abstraction {
         symbolTable.get(0).addClass(classInfo.getStaticElementInfo(), thread);
     }
 	
+    @Override
+    public void informAboutPrimitiveLocalVariable(Root root) {
+        symbolTable.get(0).ensurePrimitiveLocalVariableExistence(root);
+    }
+    
+    @Override
+    public void informAboutStructuredLocalVariable(Root root) {
+        symbolTable.get(0).ensureStructuredLocalVariableExistence(root);
+    }
+    
 	@Override
 	public void informAboutBranchingDecision(BranchingDecision decision) {
         BranchingConditionValuation bcv = (BranchingConditionValuation) decision;
