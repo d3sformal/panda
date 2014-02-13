@@ -246,8 +246,8 @@
 
     <property name="junit.usefile" value="true"/>
 
-    <junit printsummary="withOutAndErr" showoutput="off" haltonfailure="yes"
-           fork="yes" forkmode="perTest" maxmemory="1024m">
+    <junit printsummary="withOutAndErr" showoutput="off" haltonfailure="no"
+           fork="yes" forkmode="perTest" maxmemory="1024m" failureproperty="apf.failedtest">
       <formatter type="plain" usefile="${junit.usefile}"/>
 
       <classpath>
@@ -267,6 +267,8 @@
       </batchtest>
 
     </junit>
+
+    <fail if="${apf.failedtest}" message="Test failed"/>
 
   </target>
 
