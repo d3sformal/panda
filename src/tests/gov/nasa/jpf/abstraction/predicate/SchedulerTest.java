@@ -1,8 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate;
 
 public class SchedulerTest extends BaseTest {
-    private static int SCHEDULE_SIZE = 5;
-
 	public static void main(String[] args) {
 		ThreadInfo[] id2thread = new ThreadInfo[3];
 
@@ -25,7 +23,7 @@ public class SchedulerTest extends BaseTest {
 
 		// compute order in which threads should run
 		int schedule_size = 0;
-		int[] schedule = new int[SCHEDULE_SIZE];
+		int[] schedule = new int[SchedulerConfig.SIZE];
 
 		// set of active threads is iterated when to make scheduling decisions
 		for (int k = 0; k < id2thread.length; ++k) {
@@ -66,8 +64,11 @@ public class SchedulerTest extends BaseTest {
 	}
 }
 
-class ThreadInfo
-{
+class SchedulerConfig {
+    public static int SIZE = 5;
+}
+
+class ThreadInfo {
 	public int priority;
     public boolean active;
 

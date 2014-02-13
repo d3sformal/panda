@@ -1,29 +1,33 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-public class ImageTest extends BaseTest {
-    private static int SIZE = 6;
-	private Rectangle[] rectangles;
-	private int[][] pixels;
+import static gov.nasa.jpf.abstraction.predicate.BaseTest.*;
 
-    public ImageTest() {
-		pixels = new int[SIZE][SIZE];
-    }
-	
+public class ImageTest extends BaseTest {
 	public static void main(String[] args) {
-		ImageTest img = new ImageTest();
+		Image img = new Image();
 
         assertNumberOfPossibleValues("img.pixels", 1);
-        assertConjunction("alength(arrlen, img.pixels) = class(gov.nasa.jpf.abstraction.predicate.ImageTest).SIZE: true");
+        assertConjunction("alength(arrlen, img.pixels) = class(gov.nasa.jpf.abstraction.predicate.Image).SIZE: true");
 
 		img.load();
 
         assertConjunction(
             "alength(arrlen, img.rectangles) = 2: true",
-            "alength(arrlen, img.pixels) = class(gov.nasa.jpf.abstraction.predicate.ImageTest).SIZE: true"
+            "alength(arrlen, img.pixels) = class(gov.nasa.jpf.abstraction.predicate.Image).SIZE: true"
         );
 
 		img.render();
 	}
+}
+  
+class Image {
+    private static int SIZE = 6;
+	private Rectangle[] rectangles;
+	private int[][] pixels;
+
+    public Image() {
+		pixels = new int[SIZE][SIZE];
+    }
 	
 	public void load() {
 		rectangles = new Rectangle[2];

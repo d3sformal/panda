@@ -1,0 +1,17 @@
+[method gov.nasa.jpf.abstraction.predicate.DataFlowAnalysisTest.main]
+alength(arrlen, newFacts) >= alength(arrlen, oldFacts)
+i = 0
+i >= 0
+j >= 0
+i < alength(arrlen, queue)
+j < alength(arrlen, queue)
+i = j
+alength(arrlen, newFacts) = 0
+queue[i] = 0
+queue[i] = 1
+queue[i] = 2
+queue[i] = 3
+queue[i] = 4
+i = 1
+i = 2
+j = i + 1

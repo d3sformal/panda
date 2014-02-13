@@ -1,5 +1,5 @@
 [static]
-class(gov.nasa.jpf.abstraction.predicate.SchedulerTest).SCHEDULE_SIZE = 5
+class(gov.nasa.jpf.abstraction.predicate.SchedulerConfig).SIZE = 5
 
 [method gov.nasa.jpf.abstraction.predicate.SchedulerTest.main]
 alength(arrlen, schedule) = 5
