@@ -180,7 +180,9 @@ UniverseNull.info.iMethodStack.top       := 0;
 UniverseNull.info.iMethodStack.bottom    := 0;
 
 Class.UniverseArray("UniverseArray")(
-    "- elements: Map<ElementIndex, UniverseSlot>"
+    "- elements: Map<ElementIndex, UniverseSlot>",
+    "- lengthSlot: PrimitiveValueSlot",
+    "- length: Integer"
 )();
 UniverseArray.info.iMethodStack.top    := 0;
 UniverseArray.info.iMethodStack.bottom := 0;
@@ -221,8 +223,14 @@ Class.ElementIndex("ElementIndex")(
 );
 classStereotypes.ElementIndex("<<comparable>>");
 
-leftToRight.top(80)(FieldName, ElementIndex);
-Group.subSlotKeys(FieldName, ElementIndex);
+Class.LengthSlotKey("LengthSlotKey")()();
+LengthSlotKey.info.iAttributeStack.top    := 0;
+LengthSlotKey.info.iAttributeStack.bottom := 0;
+LengthSlotKey.info.iMethodStack.top       := 0;
+LengthSlotKey.info.iMethodStack.bottom    := 0;
+
+leftToRight.top(80)(FieldName, ElementIndex, LengthSlotKey);
+Group.subSlotKeys(FieldName, ElementIndex, LengthSlotKey);
 
 topToBottom.midx(30)(UniverseSlotKey, subSlotKeys);
 Group.slotKeys(UniverseSlotKey, subSlotKeys);
@@ -238,6 +246,7 @@ Associative.info.iAttributeStack.bottom := 0;
 Class.Indexed("Indexed")()(
     "+ getElement(ElementIndex index): UniverseSlot",
     "+ getElements(): Map<ElementIndex, UniverseSlot>",
+    "+ getLengthSlot(): PrimitiveValueSlot",
     "+ getLength(): Integer"
 );
 classStereotypes.Indexed("<<interface>>");
@@ -393,8 +402,9 @@ link(inheritance)(LoadedClass.n             -- (StructuredValueSlot.s + ( 20, 0)
 link(inheritance)(StructuredLocalVariable.s -- (StructuredLocalVariable.s + (0, -20)) -- (LocalVariable.midx, StructuredLocalVariable.bottom - 20) -- LocalVariable.s);
 link(association)(PrimitiveLocalVariable.s -- (PrimitiveLocalVariable.s + (0, -20)));
 
-link(inheritance)(FieldName.n    -- (UniverseSlotKey.s + (-20, 0)));
-link(inheritance)(ElementIndex.n -- (UniverseSlotKey.s + ( 20, 0)));
+link(inheritance)(FieldName.n     -- (UniverseSlotKey.s + (-20, 0)));
+link(inheritance)(ElementIndex.n  -- (UniverseSlotKey.s + (  0, 0)));
+link(inheritance)(LengthSlotKey.n -- (UniverseSlotKey.s + ( 20, 0)));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
