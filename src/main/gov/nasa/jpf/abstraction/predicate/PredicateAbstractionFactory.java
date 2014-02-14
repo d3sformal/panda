@@ -12,15 +12,17 @@ import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
 
+import gov.nasa.jpf.Config;
+
 /**
  * A factory used to produce predicate abstraction instances from definition in an input file whose name is the first element of the @param args parameter
  */
 public class PredicateAbstractionFactory extends AbstractionFactory {
 
 	@Override
-	public Abstraction create(String[] args) {
+	public Abstraction create(Config config, String[] args) {
 		String filename = args[1];
-		
+
 		try {
 			ANTLRInputStream chars = new ANTLRInputStream(new FileInputStream(filename));
 			PredicatesLexer lexer = new PredicatesLexer(chars);
@@ -29,7 +31,9 @@ public class PredicateAbstractionFactory extends AbstractionFactory {
 		
 			Predicates predicates = parser.predicates().val;
 			
-			System.out.println(predicates.toString());
+            if (config.getBoolean("abstract.verbose")) {
+    			System.out.println(predicates.toString());
+            }
 
 			return new PredicateAbstraction(predicates);
 		} catch (IOException e) {

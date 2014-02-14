@@ -12,7 +12,7 @@ class AssertTestDriver {
 
 public class AssertTest extends BaseTest {
     public AssertTest() {
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
+        //config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
     }
 
     public static void main(String[] args) {

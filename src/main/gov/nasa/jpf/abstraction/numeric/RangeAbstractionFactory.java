@@ -3,10 +3,12 @@ package gov.nasa.jpf.abstraction.numeric;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.AbstractionFactory;
 
+import gov.nasa.jpf.Config;
+
 public class RangeAbstractionFactory extends AbstractionFactory {
 
 	@Override
-	public Abstraction create(String[] args) {
+	public Abstraction create(Config config, String[] args) {
 		try {
 			int min = Integer.parseInt(args[1]);
 			int max = Integer.parseInt(args[2]);

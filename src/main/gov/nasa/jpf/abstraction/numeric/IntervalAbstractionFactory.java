@@ -3,10 +3,12 @@ package gov.nasa.jpf.abstraction.numeric;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.AbstractionFactory;
 
+import gov.nasa.jpf.Config;
+
 public class IntervalAbstractionFactory extends AbstractionFactory {
 
 	@Override
-	public Abstraction create(String[] args) {
+	public Abstraction create(Config config, String[] args) {
 		try {
 			double min = Double.parseDouble(args[1]);
 			double max = Double.parseDouble(args[2]);

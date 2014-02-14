@@ -75,7 +75,7 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 				System.out.println("### jpf-abstraction: " + s
 						+ " is unknown abstraction");
 			} else {
-				Abstraction abs = factory.create(args);
+				Abstraction abs = factory.create(conf, args);
 				
 				if (abs != null) {
 					abs_list.add(abs);

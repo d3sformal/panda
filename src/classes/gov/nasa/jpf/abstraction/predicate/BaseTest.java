@@ -35,6 +35,7 @@ public class BaseTest {
         config.add("+classpath=build/tests");
         config.add("+sourcepath=src/tests");
         config.add("+abstract.domain=PREDICATES src/tests/" + getClass().getName().replace(".", "/") + ".pred");
+        config.add("+abstract.verbose=false");
         config.add("+listener=gov.nasa.jpf.abstraction.AbstractListener");
         config.add("+vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer");
         config.add("+target=" + getClass().getName());
