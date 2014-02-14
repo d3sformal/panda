@@ -262,6 +262,15 @@
       <batchtest todir="build/tests">
         <fileset dir="build/tests">
           <exclude name="**/JPF_*.class"/>
+
+          <!--
+               Incomplete tests (causing possibly spurious failures)
+
+               re-enable when debugging them, keep disabled while debugging the rest (to ease the process of spotting errors)
+            -->
+          <exclude name="**/CyclingRaceTest.class"/>
+          <exclude name="**/DataFlowAnalysisTest.class"/>
+
           <include name="**/*Test.class"/>
         </fileset>
       </batchtest>

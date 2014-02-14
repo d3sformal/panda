@@ -52,6 +52,10 @@ public class BaseTest {
 
         jpf.run();
 
+        checkResult(jpf);
+    }
+
+    protected void checkResult(JPF jpf) {
         assertFalse(jpf.foundErrors());
     }
 }

@@ -21,13 +21,26 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Tautology;
+import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MJIEnv;
+
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
+
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Branch if int comparison with NULL value succeeds
@@ -63,6 +76,28 @@ public class IFNULL extends gov.nasa.jpf.jvm.bytecode.IFNULL implements Abstract
 
 	@Override
 	public Predicate createPredicate(Expression expr1, Expression expr2) {
+        if (expr1 instanceof NullExpression) {
+            return Tautology.create();
+        } else if (expr1 instanceof AnonymousExpression) {
+            return Contradiction.create();
+        } else if (expr1 instanceof AccessExpression) {
+            AccessExpression access = (AccessExpression) expr1;
+
+            FlatSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
+
+            Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
+
+            symbolTable.lookupValues(access, values);
+
+            if (values.size() == 1) {
+                if (values.contains(Universe.nullReference)) {
+                    return Tautology.create();
+                } else {
+                    return Contradiction.create();
+                }
+            }
+        }
+
 		return Equals.create(expr1, expr2);
 	}
 

@@ -11,6 +11,7 @@ public class InstructionTracker extends ListenerAdapter {
 		if (RunDetector.isRunning()) {
 			String source = execInsn.getSourceLine() == null ? "" : "'" + execInsn.getSourceLine().trim() + "'";
 			System.out.println("Current instruction [first step = " + curTh.isFirstStepInsn() +  "]: " + execInsn.getClass().getSimpleName() + "\t" + source);
+            System.out.println("\t in method: " + execInsn.getMethodInfo().getFullName());
 		}
 	}
 }
