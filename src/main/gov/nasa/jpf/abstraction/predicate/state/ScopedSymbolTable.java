@@ -33,6 +33,8 @@ import gov.nasa.jpf.jvm.bytecode.LSTORE;
 import gov.nasa.jpf.jvm.bytecode.LocalVariableInstruction;
 
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Symbol table aware of method call scope changes
@@ -42,15 +44,18 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	 * Stack of scopes (pushed by invoke, poped by return)
 	 */
     private Universe universe = new Universe();
-	private SymbolTableStack scopes = new SymbolTableStack();
+	private Map<Integer, SymbolTableStack> scopes = new HashMap<Integer, SymbolTableStack>();
 	private PredicateAbstraction abstraction;
+    private int currentThread = 0;
 	
 	public ScopedSymbolTable(PredicateAbstraction abstraction) {
 		this.abstraction = abstraction;
 		
 		// Scope for passing what has been statically initialised
 		// without this all static initialisations return and remove their scope without writing it anywhere else
-		scopes.push("-- Dummy stop scope --", new FlatSymbolTable(universe, abstraction));
+		SymbolTableStack mainThreadStack = new SymbolTableStack();
+        mainThreadStack.push("-- Dummy stop scope --", new FlatSymbolTable(universe, abstraction));
+        scopes.put(currentThread, mainThreadStack);
 	}
 
 	/**
@@ -58,7 +63,7 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	 */
 	@Override
 	public FlatSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-		FlatSymbolTable ret = new FlatSymbolTable(scopes.top());
+		FlatSymbolTable ret = new FlatSymbolTable(scopes.get(currentThread).top());
 
 		/**
 		 * Register new local variables
@@ -92,12 +97,12 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	
 	@Override
 	public Set<AccessExpression> processPrimitiveStore(Expression from, AccessExpression to) {
-		return scopes.top().processPrimitiveStore(from, to);
+		return scopes.get(currentThread).top().processPrimitiveStore(from, to);
 	}
 	
 	@Override
 	public Set<AccessExpression> processObjectStore(Expression from, AccessExpression to) {
-		return scopes.top().processObjectStore(from, to);
+		return scopes.get(currentThread).top().processObjectStore(from, to);
 	}
 	
 	/**
@@ -107,10 +112,10 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
 
-		FlatSymbolTable originalScope = scopes.top();
+		FlatSymbolTable originalScope = scopes.get(currentThread).top();
 		FlatSymbolTable newScope = createDefaultScope(threadInfo, method);
 
-		scopes.push(method.getFullName(), newScope);
+		scopes.get(currentThread).push(method.getFullName(), newScope);
 
 		/**
 		 * Assign values to the formal parameters according to the actual parameters
@@ -160,15 +165,15 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
          * 4) write callee return into caller return
 		 */
 		if (before.getMethodInfo().isReferenceReturnType()) {
-			scopes.top().addStructuredReturn(calleeReturnValue);
-			scopes.top().processObjectStore(returnExpression, calleeReturnValue);
-			scopes.top(1).addStructuredReturn(callerReturnValue);
-			scopes.top(1).processObjectStore(calleeReturnValue, scopes.top(), callerReturnValue);
+			scopes.get(currentThread).top().addStructuredReturn(calleeReturnValue);
+			scopes.get(currentThread).top().processObjectStore(returnExpression, calleeReturnValue);
+			scopes.get(currentThread).top(1).addStructuredReturn(callerReturnValue);
+			scopes.get(currentThread).top(1).processObjectStore(calleeReturnValue, scopes.get(currentThread).top(), callerReturnValue);
 		} else {
-			scopes.top().addPrimitiveReturn(calleeReturnValue);
-			scopes.top().processPrimitiveStore(returnExpression, calleeReturnValue);
-			scopes.top(1).addPrimitiveReturn(callerReturnValue);
-			scopes.top(1).processPrimitiveStore(calleeReturnValue, scopes.top(), callerReturnValue);
+			scopes.get(currentThread).top().addPrimitiveReturn(calleeReturnValue);
+			scopes.get(currentThread).top().processPrimitiveStore(returnExpression, calleeReturnValue);
+			scopes.get(currentThread).top(1).addPrimitiveReturn(callerReturnValue);
+			scopes.get(currentThread).top(1).processPrimitiveStore(calleeReturnValue, scopes.get(currentThread).top(), callerReturnValue);
 		}
 
         /**
@@ -182,69 +187,84 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
         /**
          * Drop callee scope
          */
-		scopes.pop();
+		scopes.get(currentThread).pop();
 	}
 	
 	@Override
-	public void restore(Scopes scopes) {
-		if (scopes instanceof SymbolTableStack) {
-			this.scopes = (SymbolTableStack) scopes.clone();
-            if (this.scopes.count() > 0) {
-                this.universe = this.scopes.top().getUniverse();
-            }
-		} else {
-			throw new RuntimeException("Invalid scopes type being restored!");
-		}
+	public void restore(Map<Integer, ? extends Scopes> scopes) {
+        this.scopes.clear();
+
+        for (Integer threadId : scopes.keySet()) {
+            Scopes threadScopes = scopes.get(threadId);
+
+		    if (threadScopes instanceof SymbolTableStack) {
+                SymbolTableStack threadSymbolTableScopes = (SymbolTableStack) threadScopes;
+
+                this.scopes.put(threadId, threadSymbolTableScopes.clone());
+
+                if (threadSymbolTableScopes.count() > 0) {
+                    this.universe = threadSymbolTableScopes.top().getUniverse();
+                }
+		    } else {
+        		throw new RuntimeException("Invalid scopes type being restored!");
+		    }
+        }
 	}
 	
 	@Override
-	public SymbolTableStack memorize() {
-		return scopes.clone();
+	public Map<Integer, SymbolTableStack> memorize() {
+        Map<Integer, SymbolTableStack> scopesClone = new HashMap<Integer, SymbolTableStack>();
+
+        for (Integer threadId : scopes.keySet()) {
+            scopesClone.put(threadId, scopes.get(threadId).clone());
+        }
+
+		return scopesClone;
 	}
 	
 	@Override
 	public String toString() {
-		return scopes.count() > 0 ? scopes.top().toString() : "";
+		return scopes.get(currentThread).count() > 0 ? scopes.get(currentThread).top().toString() : "";
 	}
 
 	@Override
 	public boolean isArray(AccessExpression path) {
-		return scopes.top().isArray(path);
+		return scopes.get(currentThread).top().isArray(path);
 	}
 
 	@Override
 	public boolean isObject(AccessExpression path) {
-		return scopes.top().isObject(path);
+		return scopes.get(currentThread).top().isObject(path);
 	}
 
 	@Override
 	public boolean isPrimitive(AccessExpression path) {
-		return scopes.top().isPrimitive(path);
+		return scopes.get(currentThread).top().isPrimitive(path);
 	}
 
 	@Override
 	public Universe getUniverse() {
-		return scopes.top().getUniverse();
+		return scopes.get(currentThread).top().getUniverse();
 	}
 
 	@Override
 	public int count() {
-		return scopes.count() > 0 ? scopes.top().count() : 0;
+		return scopes.get(currentThread).count() > 0 ? scopes.get(currentThread).top().count() : 0;
 	}
 
 	@Override
 	public int depth() {
-        return scopes.count();
+        return scopes.get(currentThread).count();
 	}
 
     @Override
     public FlatSymbolTable get(int depth) {
-        return scopes.top(depth);
+        return scopes.get(currentThread).top(depth);
     }
 
     @Override
     public void print() {
-        scopes.print();
+        scopes.get(currentThread).print();
     }
 	
 }

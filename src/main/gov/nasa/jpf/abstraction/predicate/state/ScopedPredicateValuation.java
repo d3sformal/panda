@@ -42,15 +42,18 @@ import java.util.Set;
  * A predicate valuation aware of method scope changes
  */
 public class ScopedPredicateValuation extends CallAnalyzer implements PredicateValuation, Scoped {
-	private PredicateValuationStack scopes = new PredicateValuationStack();
+	private Map<Integer, PredicateValuationStack> scopes = new HashMap<Integer, PredicateValuationStack>();
 	private Predicates predicateSet;
 	private Map<Predicate, TruthValue> initialValuation;
     private SMT smt = new SMT();
+    private int currentThread = 0;
 	
 	public ScopedPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
 		this.predicateSet = predicateSet;
 		
-		scopes.push("-- Dummy stop scope --", new FlatPredicateValuation(smt));
+		PredicateValuationStack mainThreadStack = new PredicateValuationStack();
+        mainThreadStack.push("-- Dummy stop scope --", new FlatPredicateValuation(smt));
+        scopes.put(currentThread, mainThreadStack);
 		
 		Set<Predicate> predicates = new HashSet<Predicate>();
 
@@ -96,7 +99,7 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 		for (Context context : predicateSet.contexts) {
 			if (context instanceof StaticContext) {
 				for (Predicate predicate : context.predicates) {
-					scopes.top().put(predicate, initialValuation.get(predicate));
+					scopes.get(currentThread).top().put(predicate, initialValuation.get(predicate));
 				}
 			}
 		}
@@ -147,23 +150,23 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 
 	@Override
 	public void put(Predicate predicate, TruthValue value) {
-		scopes.top().put(predicate, value);
+		scopes.get(currentThread).top().put(predicate, value);
 	}
 	
 
 	@Override
 	public void putAll(Map<Predicate, TruthValue> values) {
-		scopes.top().putAll(values);
+		scopes.get(currentThread).top().putAll(values);
 	}
 	
 	@Override
 	public void remove(Predicate predicate) {
-		scopes.top().remove(predicate);
+		scopes.get(currentThread).top().remove(predicate);
 	}
 
 	@Override
 	public TruthValue get(Predicate predicate) {
-		return scopes.top().get(predicate);
+		return scopes.get(currentThread).top().get(predicate);
 	}
 	
 	@Override
@@ -177,7 +180,7 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 
 		if (RunDetector.isRunning()) {
 			// Copy of the current caller scope - to avoid modifications - may not be needed now, it is not different from .top() and it is not modified here
-			FlatPredicateValuation callerScope = scopes.top();
+			FlatPredicateValuation callerScope = scopes.get(currentThread).top();
 			
 			Map<Predicate, Predicate> replaced = new HashMap<Predicate, Predicate>();
 			
@@ -218,7 +221,7 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
             }
 		}
 		
-		scopes.push(method.getFullName(), calleeScope);
+		scopes.get(currentThread).push(method.getFullName(), calleeScope);
 	}
 	
 	private static boolean isPredicateOverReturn(Predicate predicate) {
@@ -247,7 +250,7 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
         if (RunDetector.isRunning()) {
 			FlatPredicateValuation scope;
 			
-			scope = scopes.top(1);
+			scope = scopes.get(currentThread).top(1);
 			
 			Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
 			Set<Predicate> determinants = new HashSet<Predicate>();
@@ -288,7 +291,7 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
         if (RunDetector.isRunning()) {
             FlatPredicateValuation callerScope;
 
-            callerScope = scopes.top(1);
+            callerScope = scopes.get(currentThread).top(1);
 
             boolean sameObject = before.getThis() == after.getThis();
 
@@ -474,56 +477,69 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
             }
         }
 
-        scopes.pop();
+        scopes.get(currentThread).pop();
     }
 	
 	@Override
-	public void restore(Scopes scopes) {
-		if (scopes instanceof PredicateValuationStack) {
-			this.scopes = (PredicateValuationStack) scopes.clone();
-		} else {
-			throw new RuntimeException("Invalid scopes type being restored!");
-		}
-	}
-	
-	@Override
-	public PredicateValuationStack memorize() {
-		return scopes.clone();
-	}
-	
+    public void restore(Map<Integer, ? extends Scopes> scopes) {
+        this.scopes.clear();
+        for (Integer threadId : scopes.keySet()) {
+            Scopes threadScopes = scopes.get(threadId);
+
+            if (threadScopes instanceof PredicateValuationStack) {
+                PredicateValuationStack threadPredicateValuationScopes = (PredicateValuationStack) threadScopes;
+
+                this.scopes.put(threadId, threadPredicateValuationScopes.clone());
+            } else {
+                throw new RuntimeException("Invalid scopes type being restored!");
+            }
+        }
+    }
+    
+    @Override
+    public Map<Integer, PredicateValuationStack> memorize() {
+        Map<Integer, PredicateValuationStack> scopesClone = new HashMap<Integer, PredicateValuationStack>();
+        
+        for (Integer threadId : scopes.keySet()) {
+            scopesClone.put(threadId, scopes.get(threadId).clone());
+        }
+
+        return scopesClone;
+    }
+    
 	@Override
 	public String toString() {
-		return scopes.count() > 0 ? scopes.top().toString() : "";
+		return scopes.get(currentThread).count() > 0 ? scopes.get(currentThread).top().toString() : "";
 	}
 
 	@Override
 	public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
-		scopes.top().reevaluate(affected, resolvedAffected, expression);
+		scopes.get(currentThread).top().reevaluate(affected, resolvedAffected, expression);
 	}
 	
 	@Override
 	public TruthValue evaluatePredicate(Predicate predicate) {
-		return scopes.top().evaluatePredicate(predicate);
+		return scopes.get(currentThread).top().evaluatePredicate(predicate);
 	}
 	
 	@Override
 	public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
-		return scopes.top().evaluatePredicates(predicates);
+		return scopes.get(currentThread).top().evaluatePredicates(predicates);
 	}
 	
 	@Override
 	public int count() {
-		return scopes.count() > 0 ? scopes.top().count() : 0;
+		return scopes.get(currentThread).count() > 0 ? scopes.get(currentThread).top().count() : 0;
 	}
 
 	@Override
 	public int depth() {
-        return scopes.count();
+        return scopes.get(currentThread).count();
 	}
 
 	@Override
 	public boolean containsKey(Predicate predicate) {
-		return scopes.top().containsKey(predicate);
+		return scopes.get(currentThread).top().containsKey(predicate);
 	}
 
 	@Override
@@ -532,17 +548,17 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 	}
 	
 	public Set<Predicate> getPredicates(int i) {
-		return scopes.top(i).getPredicates();
+		return scopes.get(currentThread).top(i).getPredicates();
 	}
 
     @Override
     public FlatPredicateValuation get(int depth) {
-        return scopes.top(depth);
+        return scopes.get(currentThread).top(depth);
     }
 
     @Override
     public void print() {
-        scopes.print();
+        scopes.get(currentThread).print();
     }
 
 }

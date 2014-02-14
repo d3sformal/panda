@@ -2,6 +2,8 @@ package gov.nasa.jpf.abstraction.predicate;
 
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import gov.nasa.jpf.abstraction.Abstraction;
@@ -129,8 +131,8 @@ public class PredicateAbstraction extends Abstraction {
 	
 	@Override
 	public void start(ThreadInfo mainThread) {
-		SymbolTableStack symbols = new SymbolTableStack();
-		PredicateValuationStack predicates = new PredicateValuationStack();
+		Map<Integer, SymbolTableStack> symbols = new HashMap<Integer, SymbolTableStack>();
+		Map<Integer, PredicateValuationStack> predicates = new HashMap<Integer, PredicateValuationStack>();
 
         // Initial state for last backtrack
 		State state = new State(symbols, predicates);
@@ -168,8 +170,8 @@ public class PredicateAbstraction extends Abstraction {
 	public void backtrack(MethodInfo method) {		
 		trace.pop();
 		
-		symbolTable.restore(trace.top().symbolTableStack);
-		predicateValuation.restore(trace.top().predicateValuationStack);
+		symbolTable.restore(trace.top().symbolTableStacks);
+		predicateValuation.restore(trace.top().predicateValuationStacks);
 
         if (trace.isEmpty()) {
             predicateValuation.close();
