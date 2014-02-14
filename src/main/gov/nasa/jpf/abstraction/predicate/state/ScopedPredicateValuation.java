@@ -4,6 +4,7 @@ import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
@@ -25,6 +26,10 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.Instruction;
+
+import gov.nasa.jpf.jvm.bytecode.LocalVariableInstruction;
+import gov.nasa.jpf.jvm.bytecode.IINC;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -278,198 +283,199 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 		processVoidMethodReturn(threadInfo, before, after);
 	}
 	
-	@Override
-	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+    @Override
+    public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         if (RunDetector.isRunning()) {
-			FlatPredicateValuation callerScope;
-			
-			callerScope = scopes.top(1);
-			
-			boolean sameObject = before.getThis() == after.getThis();
-		
+            FlatPredicateValuation callerScope;
+
+            callerScope = scopes.top(1);
+
+            boolean sameObject = before.getThis() == after.getThis();
+
             // Collect original symbolic arguments of the method
-			ArrayList<Attribute> attrsList = new ArrayList<Attribute>();
-			
-			Iterator<Object> it = before.getMethodInfo().attrIterator();
-			
-			while (it.hasNext()) {
-				Attribute attr = (Attribute) it.next();
-				
-				attrsList.add(attr);
-			}
-			
-			Attribute[] attrs = attrsList.toArray(new Attribute[attrsList.size()]);
-			LocalVarInfo[] args = before.getMethodInfo().getArgumentLocalVars() == null ? new LocalVarInfo[0] : before.getMethodInfo().getArgumentLocalVars();
-			LocalVarInfo[] locals = before.getLocalVars() == null ? new LocalVarInfo[0] : before.getLocalVars();
-			
-			Set<LocalVarInfo> referenceArgs = new HashSet<LocalVarInfo>();
-			Set<LocalVarInfo> notWantedLocalVariables = new HashSet<LocalVarInfo>();
-			
-			/**
-			 * Determine what reference arguments were written to (they contain a different reference from the initial one)
-			 * 
-			 * those parameters and predicates over them cannot be used to argue about the value of predicates over the initial value back in the caller
-			 */
-			for (int i = 0; i < args.length; ++i) {
-				LocalVarInfo l = args[i];
-				
-				if (l != null) {
-					
+            Set<Root> referenceArgs = new HashSet<Root>();
+            Set<Root> notWantedLocalVariables = new HashSet<Root>();
+
+            /**
+             * Determine what reference arguments were written to (they contain a different reference from the initial one)
+             *
+             * those parameters and predicates over them cannot be used to argue about the value of predicates over the initial value back in the caller
+             */
+            MethodInfo method = before.getMethodInfo();
+
+            boolean[] slotInUse = new boolean[method.getNumberOfStackArguments()];
+            boolean[] argIsPrimitive = new boolean[method.getNumberOfStackArguments()];
+
+            getArgumentSlotUsage(method, slotInUse);
+            getArgumentSlotType(method, argIsPrimitive);
+
+            Iterator<Object> originalArgumentAttributes = method.attrIterator();
+
+            // Replace formal parameters with actual parameters
+            for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
+                if (slotInUse[slotIndex]) {
+                    // Actual symbolic parameter
+                    Attribute attr = Attribute.ensureNotNull((Attribute) before.getSlotAttr(slotIndex));
+
+                    LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
+                    String name = arg == null ? null : arg.getName();
+
+                    Root l = DefaultRoot.create(name, slotIndex);
+
                     // Determine type of the arguments
-					if (!l.isNumeric() && !l.isBoolean()) {
-						referenceArgs.add(l);
-					}
-				
-					Attribute actualAttribute = (Attribute) before.getLocalAttr(l.getSlotIndex());
-					
-					actualAttribute = Attribute.ensureNotNull(actualAttribute);
-					
-					Expression originalExpr = attrs[i].getExpression();
-					Expression actuaExpr = actualAttribute.getExpression();
-					
-					boolean different = false;
-					
-					different |= originalExpr == null && actuaExpr != null;
-					different |= originalExpr != null && actuaExpr == null;
-					different |= originalExpr != null && actuaExpr != null && !originalExpr.equals(actuaExpr);
-					
-					// Someone has changed the argument, we cannot use predicates about it to infer information about the original value supplied by the caller
-					if (different) {
-						notWantedLocalVariables.add(l);
-					}
-				}
-			}
-			
-			/**
-			 * No predicate containing a callee's local variable (not a parameter) can be used to infer value of predicates in the caller
-			 */
-			// Local variables are out of scope
-			for (LocalVarInfo l : locals) {
-				if (l != null) {
-					notWantedLocalVariables.add(l);
-				}
-			}
-			
+                    if (!argIsPrimitive[slotIndex]) {
+                        referenceArgs.add(l);
+                    }
+
+                    Expression originalExpr = Attribute.ensureNotNull((Attribute) originalArgumentAttributes.next()).getExpression();
+                    Expression actualExpr = Attribute.ensureNotNull((Attribute) before.getLocalAttr(slotIndex)).getExpression();
+
+                    boolean different = false;
+
+                    different |= originalExpr == null && actualExpr != null;
+                    different |= originalExpr != null && actualExpr == null;
+                    different |= originalExpr != null && actualExpr != null && !originalExpr.equals(actualExpr);
+
+                    // Someone has changed the argument, we cannot use predicates about it to infer information about the original value supplied by the caller
+                    if (different) {
+                        notWantedLocalVariables.add(l);
+                    }
+                }
+            }
+
+            /**
+             * No predicate containing a callee's local variable (not a parameter) can be used to infer value of predicates in the caller
+             */
+            // Local variables are out of scope
+            for (Instruction instruction : method.getInstructions()) {
+                if (instruction instanceof LocalVariableInstruction) {
+                    LocalVariableInstruction lvInsn = (LocalVariableInstruction) instruction;
+
+                    notWantedLocalVariables.add(DefaultRoot.create(lvInsn.getLocalVariableName(), lvInsn.getLocalVariableIndex()));
+                } else if (instruction instanceof IINC) {
+                    IINC iinc = (IINC) instruction;
+
+                    LocalVarInfo lv = method.getLocalVar(iinc.getIndex(), iinc.getPosition() + iinc.getLength());
+                    String name = lv == null ? null : lv.getName();
+
+                    notWantedLocalVariables.add(DefaultRoot.create(name, iinc.getIndex()));
+                }
+            }
+
             // Arguments that are of a reference type are not bound to the callee scope and may be used to determine truth value of a predicate refering to it
-			notWantedLocalVariables.removeAll(referenceArgs);
-			
+            notWantedLocalVariables.removeAll(referenceArgs);
+
             // Collection of predicates in callee and caller that have additional value for update of the caller
-			FlatPredicateValuation relevant = new FlatPredicateValuation(smt);
-			
+            FlatPredicateValuation relevant = new FlatPredicateValuation(smt);
+
             Set<AccessExpression> temporaryPathsHolder = new HashSet<AccessExpression>();
 
-			// Filter out predicates from the callee that cannot be used for propagation to the caller 
-			for (Predicate predicate : getPredicates()) {
-				TruthValue value = get(predicate);
-				
-				boolean isAnonymous = false;
-				
-				Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+            // Filter out predicates from the callee that cannot be used for propagation to the caller
+            for (Predicate predicate : getPredicates()) {
+                TruthValue value = get(predicate);
+
+                boolean isAnonymous = false;
+
+                Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
 
                 // Replace formal parameters present in the predicate with actual expressions
-				for (int i = 0; i < args.length; ++i) {
-					if (args[i] != null && !args[i].isNumeric() && !args[i].isBoolean()) {
-						replacements.put(DefaultRoot.create(args[i].getName()), attrs[i].getExpression());
-						
-						isAnonymous |= attrs[i].getExpression() instanceof AnonymousExpression;
-					}
-				}
-				
-				predicate = predicate.replace(replacements);
+                for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
+                    if (slotInUse[slotIndex]) {
+                        if (!argIsPrimitive[slotIndex]) {
+                            LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
+                            String name = arg == null ? null : arg.getName();
 
-				boolean isUnwanted = false;
+                            Expression actualExpr = Attribute.ensureNotNull((Attribute) before.getLocalAttr(slotIndex)).getExpression();
+
+                            replacements.put(DefaultRoot.create(name, slotIndex), actualExpr);
+
+                            isAnonymous |= actualExpr instanceof AnonymousExpression;
+                        }
+                    }
+                }
+
+                predicate = predicate.replace(replacements);
+
+                boolean isUnwanted = false;
 
                 predicate.addAccessExpressionsToSet(temporaryPathsHolder);
-				
-                // If any of the symbols used in the predicate has changed 
-				for (LocalVarInfo l : notWantedLocalVariables) {
-					for (AccessExpression path : temporaryPathsHolder) {
-						isUnwanted |= path.isLocalVariable() && path.getRoot().getName().equals(l.getName());
-					}
-				}
-				
+
+                // If any of the symbols used in the predicate has changed
+                for (Root l : notWantedLocalVariables) {
+                    for (AccessExpression path : temporaryPathsHolder) {
+                        isUnwanted |= path.isLocalVariable() && path.getRoot().getName().equals(l.getName());
+                    }
+                }
+
                 // If the predicate uses only allowed symbols (those that do not lose their meaning by changing scope)
-				if (!isUnwanted) {
-					relevant.put(predicate, value);
-					
-					// Handling mainly constructor (object still anonymous) 
-					if (isAnonymous) {
-						callerScope.put(predicate, value);
-					}
-				}
+                if (!isUnwanted) {
+                    relevant.put(predicate, value);
+
+                    // Handling mainly constructor (object still anonymous)
+                    if (isAnonymous) {
+                        callerScope.put(predicate, value);
+                    }
+                }
 
                 temporaryPathsHolder.clear();
-			}
+            }
 
             // Usable predicates from callee with replaced occurences of formal parameters were collected
             // Select predicates that need to be updated (refer to an object that may have been modified by the callee: static, o.field, modified heap)
-					
-			Set<Predicate> toBeUpdated = new HashSet<Predicate>();
-			
-			for (Predicate predicate : callerScope.getPredicates()) {
+
+            Set<Predicate> toBeUpdated = new HashSet<Predicate>();
+
+            for (Predicate predicate : callerScope.getPredicates()) {
                 predicate.addAccessExpressionsToSet(temporaryPathsHolder);
-				
-				boolean canBeAffected = false;
-				
-				for (AccessExpression path : temporaryPathsHolder) {
-					canBeAffected |= path.getRoot().isThis() && sameObject;
-					canBeAffected |= path.isStatic();
-					
-                    // objects modified in the heap
-					//for (AccessExpression affectedPath : affected) {
-					//	canBeAffected |= affectedPath.isPrefixOf(path);
-					//}
+
+                boolean canBeAffected = false;
+
+                for (AccessExpression path : temporaryPathsHolder) {
+                    canBeAffected |= path.getRoot().isThis() && sameObject;
+                    canBeAffected |= path.isStatic();
                 }
 
-				for (AccessExpression path : temporaryPathsHolder) {
-                    for (int i = 0; i < args.length; ++i) {
-					    if (args[i] != null && !args[i].isNumeric() && !args[i].isBoolean()) {
-						    AccessExpression actualParameter = (AccessExpression) attrs[i].getExpression();
+                for (AccessExpression path : temporaryPathsHolder) {
+                    Iterator<Object> originalActualParameters = method.attrIterator();
 
-                            // reference-passed objects may have been affected by the method
-                            canBeAffected |= actualParameter.isPrefixOf(path);
+                    for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
+                        if (slotInUse[slotIndex]) {
+                            Expression expr = Attribute.ensureNotNull((Attribute) originalActualParameters.next()).getExpression();
 
-                            //DEBUG PURPOSES ONLY
-                            /*
-                            if (actualParameter.isPrefixOf(path)) {
-                                System.out.print(path + " is affected due to call " + before.getMethodInfo().getName() + "(");
+                            if (!argIsPrimitive[slotIndex]) {
+                                AccessExpression actualParameter = (AccessExpression) expr;
 
-                                for (int k = 0; k < args.length; ++k) {
-                                    if (k > 0) System.out.println(", ");
-                                    System.out.print(attrs[k].getExpression());
-                                }
-
-                                System.out.println(")");
+                                // reference-passed objects may have been affected by the method
+                                canBeAffected |= actualParameter.isPrefixOf(path);
                             }
-                            */
                         }
-                    }					   
-				}
-				
+                    }
+                }
+
                 // Predicates are either updated (when they were possibly affected) or can be used for value inference.
                 // We take all predicates that are not to-be-updated as possibly relevant (for simplicity). Actual determining predicates are selected later.
-				
-				if (canBeAffected) {
-					toBeUpdated.add(predicate);
-				} else {
+
+                if (canBeAffected) {
+                    toBeUpdated.add(predicate);
+                } else {
                     relevant.put(predicate, callerScope.get(predicate));
                 }
 
                 temporaryPathsHolder.clear();
-			}
+            }
 
             // Use the relevant predicates to valuate predicates that need to be updated
-			Map<Predicate, TruthValue> valuation = relevant.evaluatePredicates(toBeUpdated);
-			
-			for (Predicate predicate : valuation.keySet()) {
-				TruthValue value = valuation.get(predicate);
-				
-				callerScope.put(predicate, value);
-			}
+            Map<Predicate, TruthValue> valuation = relevant.evaluatePredicates(toBeUpdated);
+
+            for (Predicate predicate : valuation.keySet()) {
+                TruthValue value = valuation.get(predicate);
+
+                callerScope.put(predicate, value);
+            }
         }
-		
-		scopes.pop();
-	}
+
+        scopes.pop();
+    }
 	
 	@Override
 	public void restore(Scopes scopes) {

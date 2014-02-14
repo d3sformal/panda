@@ -76,8 +76,7 @@ class Image {
 	}
 }
 
-class Rectangle
-{
+class Rectangle {
 	public int top,left,right,bottom;
 	public int color;
 }
