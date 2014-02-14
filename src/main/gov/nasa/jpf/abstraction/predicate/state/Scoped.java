@@ -20,4 +20,6 @@ public interface Scoped {
     public int depth();
     public Scope get(int depth);
     public void print();
+    public void addThread(ThreadInfo threadInfo);
+    public void scheduleThread(ThreadInfo threadInfo);
 }

@@ -150,6 +150,20 @@ public class ContainerAbstraction extends Abstraction {
     		abs.informAboutBranchingDecision(decision);
     	}
 	}
+
+    @Override
+    public void addThread(ThreadInfo threadInfo) {
+        for (Abstraction abs : list) {
+            abs.addThread(threadInfo);
+        }
+    }
+
+    @Override
+    public void scheduleThread(ThreadInfo threadInfo) {
+        for (Abstraction abs : list) {
+            abs.scheduleThread(threadInfo);
+        }
+    }
     
     public ContainerValue create(List<AbstractValue> lst) {
     	ContainerValue res = new ContainerValue(lst);

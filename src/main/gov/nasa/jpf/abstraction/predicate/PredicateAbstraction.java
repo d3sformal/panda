@@ -51,7 +51,9 @@ public class PredicateAbstraction extends Abstraction {
 	private ScopedSymbolTable symbolTable;
 	private ScopedPredicateValuation predicateValuation;
 	private Trace trace;
-	
+    private boolean isInitialized = false;
+    private Set<ClassInfo> startupClasses = new HashSet<ClassInfo>();
+
 	public PredicateAbstraction(Predicates predicateSet) {
 		symbolTable = new ScopedSymbolTable(this);
 		predicateValuation = new ScopedPredicateValuation(this, predicateSet);
@@ -100,8 +102,11 @@ public class PredicateAbstraction extends Abstraction {
 
     @Override
     public void processNewClass(ThreadInfo thread, ClassInfo classInfo) {
-		// register class into the symbol table (universe)
-        symbolTable.get(0).addClass(classInfo.getStaticElementInfo(), thread);
+        if (isInitialized) {
+            symbolTable.get(0).addClass(classInfo.getStaticElementInfo(), thread);
+        } else {
+            startupClasses.add(classInfo);
+        }
     }
 	
     @Override
@@ -120,6 +125,18 @@ public class PredicateAbstraction extends Abstraction {
 
 		predicateValuation.put(bcv.getCondition(), bcv.getValuation());
 	}
+
+    @Override
+    public void addThread(ThreadInfo threadInfo) {
+        symbolTable.addThread(threadInfo);
+        predicateValuation.addThread(threadInfo);
+    }
+
+    @Override
+    public void scheduleThread(ThreadInfo threadInfo) {
+        symbolTable.scheduleThread(threadInfo);
+        predicateValuation.scheduleThread(threadInfo);
+    }
 	
 	public ScopedSymbolTable getSymbolTable() {		
 		return symbolTable;
@@ -142,20 +159,13 @@ public class PredicateAbstraction extends Abstraction {
         /**
          * Register the main thread as it is not explicitely created elsewhere
          */
-        symbolTable.get(0).addThread(mainThread);
+        addThread(mainThread);
+        scheduleThread(mainThread);
 
-        Set<ClassName> classes = new HashSet<ClassName>();
+        isInitialized = true;
 
-        // Make sure to add all objects of type java.lang.Class for startup builtin classes
-        
-        for (StructuredValueIdentifier value : symbolTable.getUniverse().getStructuredValues()) {
-            if (value instanceof ClassName) {
-                classes.add((ClassName) value);
-            }
-        }
-
-        for (ClassName cls : classes) {
-            symbolTable.get(0).addClassObject(cls, mainThread);
+        for (ClassInfo cls : startupClasses) {
+            processNewClass(mainThread, cls);
         }
 	}
 

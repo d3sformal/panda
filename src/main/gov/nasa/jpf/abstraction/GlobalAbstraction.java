@@ -136,4 +136,14 @@ public class GlobalAbstraction extends Abstraction {
 		
 		abs.informAboutBranchingDecision(decision);
 	}
+
+    @Override
+    public void addThread(ThreadInfo threadInfo) {
+        abs.addThread(threadInfo);
+    }
+
+    @Override
+    public void scheduleThread(ThreadInfo threadInfo) {
+        abs.scheduleThread(threadInfo);
+    }
 }

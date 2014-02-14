@@ -46,16 +46,10 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
     private Universe universe = new Universe();
 	private Map<Integer, SymbolTableStack> scopes = new HashMap<Integer, SymbolTableStack>();
 	private PredicateAbstraction abstraction;
-    private int currentThread = 0;
+    private Integer currentThread = 0;
 	
 	public ScopedSymbolTable(PredicateAbstraction abstraction) {
 		this.abstraction = abstraction;
-		
-		// Scope for passing what has been statically initialised
-		// without this all static initialisations return and remove their scope without writing it anywhere else
-		SymbolTableStack mainThreadStack = new SymbolTableStack();
-        mainThreadStack.push("-- Dummy stop scope --", new FlatSymbolTable(universe, abstraction));
-        scopes.put(currentThread, mainThreadStack);
 	}
 
 	/**
@@ -260,6 +254,21 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
     @Override
     public FlatSymbolTable get(int depth) {
         return scopes.get(currentThread).top(depth);
+    }
+
+    @Override
+    public void addThread(ThreadInfo threadInfo) {
+        universe.add(threadInfo.getThreadObject(), threadInfo);
+
+		SymbolTableStack threadStack = new SymbolTableStack();
+        threadStack.push("-- Dummy stop scope --", new FlatSymbolTable(universe, abstraction));
+
+        scopes.put(threadInfo.getId(), threadStack);
+    }
+
+    @Override
+    public void scheduleThread(ThreadInfo threadInfo) {
+        currentThread = threadInfo.getId();
     }
 
     @Override

@@ -123,4 +123,13 @@ public class AbstractListener extends PropertyListenerAdapter {
         GlobalAbstraction.getInstance().processNewClass(ThreadInfo.getCurrentThread(), classInfo);
     }
 	
+    @Override
+    public void threadStarted(VM vm, ThreadInfo threadInfo) {
+        GlobalAbstraction.getInstance().addThread(threadInfo);
+    }
+
+    @Override
+    public void threadScheduled(VM vm, ThreadInfo threadInfo) {
+        GlobalAbstraction.getInstance().scheduleThread(threadInfo);
+    }
 }

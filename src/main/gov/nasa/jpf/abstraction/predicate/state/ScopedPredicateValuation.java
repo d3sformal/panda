@@ -46,14 +46,10 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 	private Predicates predicateSet;
 	private Map<Predicate, TruthValue> initialValuation;
     private SMT smt = new SMT();
-    private int currentThread = 0;
+    private Integer currentThread;
 	
 	public ScopedPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
 		this.predicateSet = predicateSet;
-		
-		PredicateValuationStack mainThreadStack = new PredicateValuationStack();
-        mainThreadStack.push("-- Dummy stop scope --", new FlatPredicateValuation(smt));
-        scopes.put(currentThread, mainThreadStack);
 		
 		Set<Predicate> predicates = new HashSet<Predicate>();
 
@@ -91,16 +87,6 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 		if (initialValuation.isEmpty()) {
 			for (Predicate predicate : predicates) {
 				initialValuation.put(predicate, TruthValue.UNDEFINED);
-			}
-		}
-		
-		// Monitor static predicates in the special starting scope
-		// This allows to pass static predicates throw clinit/main...
-		for (Context context : predicateSet.contexts) {
-			if (context instanceof StaticContext) {
-				for (Predicate predicate : context.predicates) {
-					scopes.get(currentThread).top().put(predicate, initialValuation.get(predicate));
-				}
 			}
 		}
 	}
@@ -554,6 +540,28 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
     @Override
     public FlatPredicateValuation get(int depth) {
         return scopes.get(currentThread).top(depth);
+    }
+
+    @Override
+    public void addThread(ThreadInfo threadInfo) {
+		PredicateValuationStack threadStack = new PredicateValuationStack();
+        threadStack.push("-- Dummy stop scope --", new FlatPredicateValuation(smt));
+        scopes.put(threadInfo.getId(), threadStack);
+		
+		// Monitor static predicates in the special starting scope
+		// This allows to pass static predicates throw clinit/main...
+		for (Context context : predicateSet.contexts) {
+			if (context instanceof StaticContext) {
+				for (Predicate predicate : context.predicates) {
+					scopes.get(threadInfo.getId()).top().put(predicate, initialValuation.get(predicate));
+				}
+			}
+		}
+    }
+
+    @Override
+    public void scheduleThread(ThreadInfo threadInfo) {
+        currentThread = threadInfo.getId();
     }
 
     @Override

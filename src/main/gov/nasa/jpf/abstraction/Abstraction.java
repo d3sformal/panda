@@ -144,6 +144,12 @@ public abstract class Abstraction {
 	public void informAboutBranchingDecision(BranchingDecision decision) {
 	}
 
+    public void addThread(ThreadInfo threadInfo) {
+    }
+
+    public void scheduleThread(ThreadInfo threadInfo) {
+    }
+
 	/**
 	 * Computes abs_v2 + abs_v1, making calls to abstract_map
 	 * before actual computation if one of the AbstractValues is null. Should never

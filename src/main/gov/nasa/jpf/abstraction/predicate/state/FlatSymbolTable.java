@@ -234,17 +234,6 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 		}
 	}
 
-    public void addClassObject(ClassName className, ThreadInfo threadInfo) {
-        Reference classObjectRef = new Reference(threadInfo.getElementInfo(className.getStaticElementInfo().getClassObjectRef()));
-        AnonymousObject classObject = AnonymousObject.create(classObjectRef);
-
-        ensureAnonymousObjectExistence(classObject);
-    }
-
-    public void addThread(ThreadInfo threadInfo) {
-        universe.add(threadInfo.getThreadObject(), threadInfo);
-    }
-	
 	/**
 	 * Resolve a path to all values it may be pointing to (primitive/objects)
 	 */
