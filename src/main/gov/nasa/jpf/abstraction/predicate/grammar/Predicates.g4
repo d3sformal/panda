@@ -3,8 +3,9 @@ grammar Predicates;
 @header {
 	import java.util.List;
 	import java.util.LinkedList;
-	
+
 	import gov.nasa.jpf.abstraction.common.*;
+	import gov.nasa.jpf.abstraction.common.impl.*;
 	import gov.nasa.jpf.abstraction.common.access.*;
 	import gov.nasa.jpf.abstraction.common.access.impl.*;
 }
@@ -14,7 +15,7 @@ predicates returns [Predicates val]
 		$ctx.val = new Predicates($cs.val);
 	}
 	;
-	
+
 standalonepath returns [DefaultAccessExpression val]
 	: p=path {
 		$ctx.val = $p.val;
@@ -30,26 +31,26 @@ contextlist returns [List<Context> val]
 		$ctx.val.add($c.val);
 	}
 	;
-	
+
 context returns [Context val] locals [List<String> name = new LinkedList<String>()]
-	: '[' 'static' ']' ps=predicatelist {
+	: '[' STATIC_TOKEN ']' ps=predicatelist {
 		$ctx.val = new StaticContext($ps.val);
 	}
-	| '[' 'object' ( pkg=ID {$ctx.name.add($pkg.text);} '.' ) * c=ID {$ctx.name.add($c.text);} ']' ps=predicatelist {			
+	| '[' OBJECT_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} ']' ps=predicatelist {
 		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
-		
+
 		$ctx.val = new ObjectContext(packageAndClass, $ps.val);
 	}
-	| '[' 'method' ( pkg=ID {$ctx.name.add($pkg.text);} '.' ) * c=ID {$ctx.name.add($c.text);} '.' m=ID ']' ps=predicatelist {		
+	| '[' METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=ID_TOKEN ']' ps=predicatelist {
 		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
 		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
-		
+
 		$ctx.val = new MethodContext(method, $ps.val);
 	}
-	| '[' 'method' ( pkg=ID {$ctx.name.add($pkg.text);} '.' ) * c=ID {$ctx.name.add($c.text);} '.' m=INIT ']' ps=predicatelist {		
+	| '[' METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=INIT_TOKEN ']' ps=predicatelist {
 		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
 		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
-		
+
 		$ctx.val = new MethodContext(method, $ps.val);
 	}
 	;
@@ -62,20 +63,29 @@ predicatelist returns [List<Predicate> val]
 		$ctx.val = $ps.val;
 		$ctx.val.add($p.val);
 	}
-	; 
+	;
 
 predicate returns [Predicate val]
-	: 'true' {
+	: TRUE_TOKEN {
 		$ctx.val = Tautology.create();
 	}
-	| 'false' {
+	| FALSE_TOKEN {
 		$ctx.val = Contradiction.create();
 	}
-	| 'not' '(' p=predicate ')' {
+	| NOT_TOKEN '(' p=predicate ')' {
 		$ctx.val = Negation.create($p.val);
 	}
 	| a=expressionorreturn '=' b=expressionorreturn {
 		$ctx.val = Equals.create($a.val, $b.val);
+	}
+	| a=expressionorreturn '=' NULL_TOKEN {
+		$ctx.val = Equals.create($a.val, NullExpression.create());
+	}
+	| NULL_TOKEN '=' b=expressionorreturn {
+		$ctx.val = Equals.create(NullExpression.create(), $b.val);
+	}
+	| NULL_TOKEN '=' NULL_TOKEN {
+		$ctx.val = Tautology.create();
 	}
 	| a=expressionorreturn '<' b=expressionorreturn {
 		$ctx.val = LessThan.create($a.val, $b.val);
@@ -92,10 +102,19 @@ predicate returns [Predicate val]
 	| a=expressionorreturn '!=' b=expressionorreturn {
 		$ctx.val = Negation.create(Equals.create($a.val, $b.val));
 	}
+	| a=expressionorreturn '!=' NULL_TOKEN {
+		$ctx.val = Negation.create(Equals.create($a.val, NullExpression.create()));
+	}
+	| NULL_TOKEN '!=' b=expressionorreturn {
+		$ctx.val = Negation.create(Equals.create(NullExpression.create(), $b.val));
+	}
+	| NULL_TOKEN '!=' NULL_TOKEN {
+		$ctx.val = Contradiction.create();
+	}
 	;
-	
+
 expressionorreturn returns [Expression val]
-	: 'return' {
+	: RETURN_TOKEN {
 		$ctx.val = DefaultReturnValue.create();
 	}
 	| e=expression {
@@ -128,10 +147,10 @@ term returns [Expression val]
 	;
 
 factor returns [Expression val]
-	: CONSTANT {
-		$ctx.val = Constant.create(Integer.parseInt($CONSTANT.text));
+	: CONSTANT_TOKEN {
+		$ctx.val = Constant.create(Integer.parseInt($CONSTANT_TOKEN.text));
 	}
-	| 'alength' '(' 'arrlen' ',' p=path ')' {
+	| ALENGTH_TOKEN '(' ARRLEN_TOKEN ',' p=path ')' {
 		$ctx.val = DefaultArrayLengthRead.create($p.val);
 	}
 	| p=path {
@@ -143,42 +162,55 @@ factor returns [Expression val]
 	;
 
 path returns [DefaultAccessExpression val] locals [List<String> name = new LinkedList<String>()]
-	: f=ID {
+	: f=ID_TOKEN {
 		$ctx.val = DefaultRoot.create($f.text);
 	}
-	| 'class' '(' ( pkg=ID {$ctx.name.add($pkg.text);} '.' ) * c=ID {$ctx.name.add($c.text);} ')' '.' f=ID {		
+	| CLASS_TOKEN '(' ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} ')' '.' f=ID_TOKEN {
 		$ctx.val = DefaultObjectFieldRead.create(DefaultPackageAndClass.create($ctx.name), $f.text);
 	}
-	| 'sfread' '(' f=ID ',' ( pkg=ID {$ctx.name.add($pkg.text);} '.' ) * c=ID {$ctx.name.add($c.text);} ')' {		
+	| SFREAD_TOKEN '(' f=ID_TOKEN ',' ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} ')' {
 		$ctx.val = DefaultObjectFieldRead.create(DefaultPackageAndClass.create($ctx.name), $f.text);
 	}
-	| p=path '.' f=ID {
+	| p=path '.' f=ID_TOKEN {
 		$ctx.val = DefaultObjectFieldRead.create($p.val, $f.text);
 	}
 	| p=path '[' e=expression ']' {
 		$ctx.val = DefaultArrayElementRead.create($p.val, $e.val);
 	}
-	| 'fread' '(' f=ID ',' p=path ')' {
+	| FREAD_TOKEN '(' f=ID_TOKEN ',' p=path ')' {
 		$ctx.val = DefaultObjectFieldRead.create($p.val, $f.text);
 	}
-	| 'aread' '(' 'arr' ',' p=path ',' e=expression ')' {
+	| AREAD_TOKEN '(' ARR_TOKEN ',' p=path ',' e=expression ')' {
 		$ctx.val = DefaultArrayElementRead.create($p.val, $e.val);
 	}
 	;
 
-CONSTANT
+ALENGTH_TOKEN: 'alength';
+AREAD_TOKEN  : 'aread';
+ARR_TOKEN    : 'arr';
+ARRLEN_TOKEN : 'arrlen';
+CLASS_TOKEN  : 'class';
+FALSE_TOKEN  : 'false';
+FREAD_TOKEN  : 'fread';
+INIT_TOKEN   : '<init>';
+METHOD_TOKEN : 'method';
+NOT_TOKEN    : 'not';
+NULL_TOKEN   : 'null';
+OBJECT_TOKEN : 'object';
+RETURN_TOKEN : 'return';
+SFREAD_TOKEN : 'sfread';
+STATIC_TOKEN : 'static';
+TRUE_TOKEN   : 'true';
+
+CONSTANT_TOKEN
 	: [-+]?'0'('.' [0-9]*)?
 	| [-+]?[1-9][0-9]*('.' [0-9]*)?
 	;
 
-ID
+ID_TOKEN
 	: [a-zA-Z_][a-zA-Z0-9_]*
 	;
-	
-INIT
-	: '<init>'
-	;
-	
-WS
+
+WS_TOKEN
 	: ([ \t\n])+ { skip(); }
 	;

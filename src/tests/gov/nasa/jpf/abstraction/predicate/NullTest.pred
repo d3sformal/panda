@@ -1,0 +1,2 @@
+[method gov.nasa.jpf.abstraction.predicate.NullTest.main]
+alength(arrlen, array) > 1
