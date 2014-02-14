@@ -21,22 +21,23 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MJIEnv;
 
 /**
- * Branch if int comparison with zero succeeds
+ * Branch if int comparison with NULL value succeeds
  * ..., value => ...
  */
-public class IFEQ extends gov.nasa.jpf.jvm.bytecode.IFEQ implements AbstractBranching {
+public class IFNULL extends gov.nasa.jpf.jvm.bytecode.IFNULL implements AbstractBranching {
 	
-	UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor(Constant.create(0));
+	UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor(NullExpression.create());
 
-	public IFEQ(int targetPc) {
+	public IFNULL(int targetPc) {
 		super(targetPc);
 	}
 
@@ -57,7 +58,7 @@ public class IFEQ extends gov.nasa.jpf.jvm.bytecode.IFEQ implements AbstractBran
 
 	@Override
 	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
-		return Abstraction._eq(v1, abs_v1, 0, null);
+		return Abstraction._eq(v1, abs_v1, MJIEnv.NULL, null);
 	}
 
 	@Override

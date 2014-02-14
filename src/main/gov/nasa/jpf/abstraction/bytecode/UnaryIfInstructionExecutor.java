@@ -25,6 +25,12 @@ import gov.nasa.jpf.vm.ThreadInfo;
  */
 public class UnaryIfInstructionExecutor {
 
+    private Constant constant;
+
+    public UnaryIfInstructionExecutor(Constant constant) {
+        this.constant = constant;
+    }
+
 	final public Instruction execute(AbstractBranching br, ThreadInfo ti) {
 		
 		String name = br.getClass().getSimpleName();
@@ -54,7 +60,7 @@ public class UnaryIfInstructionExecutor {
 			 * No other abstraction can do that, the rest of them returns UNDEFINED.
 			 */
 			if (expr != null && RunDetector.isRunning()) {
-				TruthValue pred = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(br.createPredicate(expr, Constant.create(0)));
+				TruthValue pred = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(br.createPredicate(expr, constant));
 	
 				switch (pred) {
 				case TRUE:

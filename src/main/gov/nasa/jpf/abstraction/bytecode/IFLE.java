@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.LessThan;
@@ -34,7 +35,7 @@ import gov.nasa.jpf.vm.Instruction;
  */
 public class IFLE extends gov.nasa.jpf.jvm.bytecode.IFLE implements AbstractBranching {
 	
-	UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor();
+	UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor(Constant.create(0));
 
 	public IFLE(int targetPc) {
 		super(targetPc);

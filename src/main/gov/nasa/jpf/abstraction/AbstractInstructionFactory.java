@@ -513,6 +513,18 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 				.ifne(targetPc));
 	}
 
+    @Override
+    public Instruction ifnonnull(int targetPc) {
+		return (filter.isPassing(ci) ? new IFNONNULL(targetPc) : super
+				.ifnonnull(targetPc));
+    }
+
+    @Override
+    public Instruction ifnull(int targetPc) {
+		return (filter.isPassing(ci) ? new IFNULL(targetPc) : super
+				.ifnull(targetPc));
+    }
+
 	@Override
 	public Instruction iinc(int localVarIndex, int incConstant) {
 		return (filter.isPassing(ci) ? new IINC(localVarIndex, incConstant) : super.iinc(localVarIndex, incConstant));
