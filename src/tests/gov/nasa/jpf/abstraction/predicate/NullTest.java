@@ -6,7 +6,7 @@ class NullTestDriver {
     }
 }
 
-public class NullTest extends NegativeBaseTest {
+public class NullTest extends FailingBaseTest {
     public static void main(String[] args) {
         Object[] array = new Object[2];
         int i = 0;

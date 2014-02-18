@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-public class NativeAssertionTest extends NegativeBaseTest {
+public class NativeAssertionTest extends FailingBaseTest {
     public NativeAssertionTest() {
         config.add("+search.multiple_errors=true");
     }

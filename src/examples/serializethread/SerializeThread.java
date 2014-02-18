@@ -1,12 +1,12 @@
-package serialize;
+package serializethread;
 
-public class Serialize {
+public class SerializeThread {
     public static void main(String[] args) throws Exception {
-        new Serialize().test();
+        new SerializeThread().test();
     }
 
     public void test() throws Exception {
-        final Serialize lock = this;
+        final SerializeThread lock = this;
 
         Thread t = new Thread(new Runnable() {
             @Override

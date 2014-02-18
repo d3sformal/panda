@@ -46,7 +46,7 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
     private Universe universe = new Universe();
 	private Map<Integer, SymbolTableStack> scopes = new HashMap<Integer, SymbolTableStack>();
 	private PredicateAbstraction abstraction;
-    private Integer currentThread = 0;
+    private Integer currentThreadID = 0;
 	
 	public ScopedSymbolTable(PredicateAbstraction abstraction) {
 		this.abstraction = abstraction;
@@ -57,7 +57,7 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	 */
 	@Override
 	public FlatSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-		FlatSymbolTable ret = new FlatSymbolTable(scopes.get(currentThread).top());
+		FlatSymbolTable ret = new FlatSymbolTable(scopes.get(currentThreadID).top());
 
 		/**
 		 * Register new local variables
@@ -91,12 +91,12 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	
 	@Override
 	public Set<AccessExpression> processPrimitiveStore(Expression from, AccessExpression to) {
-		return scopes.get(currentThread).top().processPrimitiveStore(from, to);
+		return scopes.get(currentThreadID).top().processPrimitiveStore(from, to);
 	}
 	
 	@Override
 	public Set<AccessExpression> processObjectStore(Expression from, AccessExpression to) {
-		return scopes.get(currentThread).top().processObjectStore(from, to);
+		return scopes.get(currentThreadID).top().processObjectStore(from, to);
 	}
 	
 	/**
@@ -106,10 +106,10 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
 
-		FlatSymbolTable originalScope = scopes.get(currentThread).top();
+		FlatSymbolTable originalScope = scopes.get(currentThreadID).top();
 		FlatSymbolTable newScope = createDefaultScope(threadInfo, method);
 
-		scopes.get(currentThread).push(method.getFullName(), newScope);
+		scopes.get(currentThreadID).push(method.getFullName(), newScope);
 
 		/**
 		 * Assign values to the formal parameters according to the actual parameters
@@ -159,15 +159,15 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
          * 4) write callee return into caller return
 		 */
 		if (before.getMethodInfo().isReferenceReturnType()) {
-			scopes.get(currentThread).top().addStructuredReturn(calleeReturnValue);
-			scopes.get(currentThread).top().processObjectStore(returnExpression, calleeReturnValue);
-			scopes.get(currentThread).top(1).addStructuredReturn(callerReturnValue);
-			scopes.get(currentThread).top(1).processObjectStore(calleeReturnValue, scopes.get(currentThread).top(), callerReturnValue);
+			scopes.get(currentThreadID).top().addStructuredReturn(calleeReturnValue);
+			scopes.get(currentThreadID).top().processObjectStore(returnExpression, calleeReturnValue);
+			scopes.get(currentThreadID).top(1).addStructuredReturn(callerReturnValue);
+			scopes.get(currentThreadID).top(1).processObjectStore(calleeReturnValue, scopes.get(currentThreadID).top(), callerReturnValue);
 		} else {
-			scopes.get(currentThread).top().addPrimitiveReturn(calleeReturnValue);
-			scopes.get(currentThread).top().processPrimitiveStore(returnExpression, calleeReturnValue);
-			scopes.get(currentThread).top(1).addPrimitiveReturn(callerReturnValue);
-			scopes.get(currentThread).top(1).processPrimitiveStore(calleeReturnValue, scopes.get(currentThread).top(), callerReturnValue);
+			scopes.get(currentThreadID).top().addPrimitiveReturn(calleeReturnValue);
+			scopes.get(currentThreadID).top().processPrimitiveStore(returnExpression, calleeReturnValue);
+			scopes.get(currentThreadID).top(1).addPrimitiveReturn(callerReturnValue);
+			scopes.get(currentThreadID).top(1).processPrimitiveStore(calleeReturnValue, scopes.get(currentThreadID).top(), callerReturnValue);
 		}
 
         /**
@@ -181,7 +181,7 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
         /**
          * Drop callee scope
          */
-		scopes.get(currentThread).pop();
+		scopes.get(currentThreadID).pop();
 	}
 	
 	@Override
@@ -218,42 +218,42 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	
 	@Override
 	public String toString() {
-		return scopes.get(currentThread).count() > 0 ? scopes.get(currentThread).top().toString() : "";
+		return scopes.get(currentThreadID).count() > 0 ? scopes.get(currentThreadID).top().toString() : "";
 	}
 
 	@Override
 	public boolean isArray(AccessExpression path) {
-		return scopes.get(currentThread).top().isArray(path);
+		return scopes.get(currentThreadID).top().isArray(path);
 	}
 
 	@Override
 	public boolean isObject(AccessExpression path) {
-		return scopes.get(currentThread).top().isObject(path);
+		return scopes.get(currentThreadID).top().isObject(path);
 	}
 
 	@Override
 	public boolean isPrimitive(AccessExpression path) {
-		return scopes.get(currentThread).top().isPrimitive(path);
+		return scopes.get(currentThreadID).top().isPrimitive(path);
 	}
 
 	@Override
 	public Universe getUniverse() {
-		return scopes.get(currentThread).top().getUniverse();
+		return scopes.get(currentThreadID).top().getUniverse();
 	}
 
 	@Override
 	public int count() {
-		return scopes.get(currentThread).count() > 0 ? scopes.get(currentThread).top().count() : 0;
+		return scopes.get(currentThreadID).count() > 0 ? scopes.get(currentThreadID).top().count() : 0;
 	}
 
 	@Override
 	public int depth() {
-        return scopes.get(currentThread).count();
+        return scopes.get(currentThreadID).count();
 	}
 
     @Override
     public FlatSymbolTable get(int depth) {
-        return scopes.get(currentThread).top(depth);
+        return scopes.get(currentThreadID).top(depth);
     }
 
     @Override
@@ -268,12 +268,12 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 
     @Override
     public void scheduleThread(ThreadInfo threadInfo) {
-        currentThread = threadInfo.getId();
+        currentThreadID = threadInfo.getId();
     }
 
     @Override
     public void print() {
-        scopes.get(currentThread).print();
+        scopes.get(currentThreadID).print();
     }
 	
 }

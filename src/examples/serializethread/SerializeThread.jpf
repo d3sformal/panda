@@ -1,11 +1,11 @@
 @using=jpf-abstraction
 
-target=serialize.Serialize
+target=serializethread.SerializeThread
 
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/serialize/Serialize.pred
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/serializethread/SerializeThread.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.ClassInitializedMonitor,gov.nasa.jpf.listener.ExecTracker
 #,gov.nasa.jpf.abstraction.util.InstructionTracker
@@ -13,4 +13,4 @@ listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util
 #,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor
 
 vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer
-et.skip_init=false
+
