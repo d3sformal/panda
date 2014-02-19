@@ -36,7 +36,7 @@ public abstract class AssertHandler implements ExecuteInstructionHandler {
     protected void reportError(VM vm, int lineNumber, String message) {
         Property property = new AssertProperty("Line " + lineNumber + ": " + message);
 
-        vm.getSearch().error(property);
+        vm.getSearch().error(property, vm.getClonedPath(), vm.getThreadList());
         vm.breakTransition(message);
     }
 
