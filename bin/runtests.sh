@@ -5,9 +5,9 @@ cd src/tests
 common_tests=`find gov/nasa/jpf/abstraction/common -name "*.java" | xargs | tr '/' '.'`
 predabs_tests=`find gov/nasa/jpf/abstraction/predicate -name "*.java" | xargs | tr '/' '.'`
 
-java_suffix=".java"
-
 cd ../..
+
+java_suffix=".java"
 
 for t in $common_tests 
 do
