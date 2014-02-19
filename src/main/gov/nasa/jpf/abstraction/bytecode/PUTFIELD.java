@@ -40,7 +40,7 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 	@Override
 	public Instruction execute(ThreadInfo ti) {		
 		StackFrame sf = ti.getTopFrame();
-        Attribute source = (Attribute) sf.getOperandAttr(0);
+        Attribute source = null;
 		Attribute destination = (Attribute) sf.getOperandAttr(1);
 		
 		destination = Attribute.ensureNotNull(destination);

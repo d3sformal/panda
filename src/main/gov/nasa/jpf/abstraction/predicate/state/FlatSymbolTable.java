@@ -93,7 +93,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
      * mostly for native calls and their returns
      * used to imitate actual return value (which sorts of falls from the sky in case of native code)
      */
-    public static Root DUMMY_VARIABLE = DefaultRoot.create("__@?#!%__ DUMMY VARIABLE __@?#!__");
+    public static Root DUMMY_VARIABLE = DefaultRoot.create("<dummy var>");
 	
 	/**
 	 * Entry points to the abstract heap

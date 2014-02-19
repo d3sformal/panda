@@ -59,9 +59,6 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
             case Types.T_SHORT:
             case Types.T_INT:
             case Types.T_FLOAT:
-                before.setReturnAttr(new NonEmptyAttribute(null, FlatSymbolTable.DUMMY_VARIABLE));
-                break;
-
             case Types.T_LONG:
             case Types.T_DOUBLE:
                 before.setReturnAttr(new NonEmptyAttribute(null, FlatSymbolTable.DUMMY_VARIABLE));

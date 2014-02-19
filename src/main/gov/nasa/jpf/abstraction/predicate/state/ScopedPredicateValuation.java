@@ -42,7 +42,12 @@ import java.util.Set;
  * A predicate valuation aware of method scope changes
  */
 public class ScopedPredicateValuation extends CallAnalyzer implements PredicateValuation, Scoped {
+
+	/**
+	 * Stacks of scopes (pushed by invoke, poped by return) separately for all threads
+	 */
 	private Map<Integer, PredicateValuationStack> scopes = new HashMap<Integer, PredicateValuationStack>();
+    
 	private Predicates predicateSet;
 	private Map<Predicate, TruthValue> initialValuation;
     private SMT smt = new SMT();

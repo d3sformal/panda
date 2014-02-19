@@ -40,11 +40,13 @@ import java.util.HashMap;
  * Symbol table aware of method call scope changes
  */
 public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scoped {
-	/**
-	 * Stack of scopes (pushed by invoke, poped by return)
-	 */
     private Universe universe = new Universe();
+
+	/**
+	 * Stacks of scopes (pushed by invoke, poped by return) separately for all threads
+	 */
 	private Map<Integer, SymbolTableStack> scopes = new HashMap<Integer, SymbolTableStack>();
+
 	private PredicateAbstraction abstraction;
     private Integer currentThreadID = 0;
 	
