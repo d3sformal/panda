@@ -57,17 +57,20 @@ public class SASTORE extends gov.nasa.jpf.jvm.bytecode.SASTORE {
 		
 		Expression from = source.getExpression();
 		AccessExpression to = null;
+		AccessExpression element = null;
 		
 		if (destination.getExpression() instanceof AccessExpression) {
 			to = (AccessExpression) destination.getExpression();
-			to = DefaultArrayElementRead.create(to, index.getExpression());
+			element = DefaultArrayElementRead.create(to, index.getExpression());
 		}
 
         /**
          * Inform abstractions about the write to the array
          */
-		GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
+		GlobalAbstraction.getInstance().processPrimitiveStore(from, element);
 		
+        AnonymousExpressionTracker.notifyPopped(to);
+
 		return actualNextInsn;
 	}
 }

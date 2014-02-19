@@ -51,14 +51,17 @@ public class IASTORE extends gov.nasa.jpf.jvm.bytecode.IASTORE {
 		
 		Expression from = source.getExpression();
 		AccessExpression to = null;
+		AccessExpression element = null;
 		
 		if (destination.getExpression() instanceof AccessExpression) {
 			to = (AccessExpression) destination.getExpression();
-			to = DefaultArrayElementRead.create(to, index.getExpression());
-
-			GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
+			element = DefaultArrayElementRead.create(to, index.getExpression());
 		}
+
+		GlobalAbstraction.getInstance().processPrimitiveStore(from, element);
 		
+        AnonymousExpressionTracker.notifyPopped(to);
+
 		return actualNextInsn;
 	}
 }

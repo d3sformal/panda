@@ -84,13 +84,15 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
 		to = DefaultPackageAndClass.create(getClassName());
         to = DefaultObjectFieldRead.create(to, getFieldName());
 
-		if (ei.getFieldValueObject(getFieldName()) == null) {
-        	GlobalAbstraction.getInstance().processObjectStore(from, to);
+        if (ei.getFieldValueObject(getFieldName()) == null) {
+            GlobalAbstraction.getInstance().processObjectStore(from, to);
         } else if (ei.getFieldValueObject(getFieldName()) instanceof ElementInfo) {
-        	GlobalAbstraction.getInstance().processObjectStore(from, to);
+            GlobalAbstraction.getInstance().processObjectStore(from, to);
         } else {
-        	GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
+            GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
         }
+
+        AnonymousExpressionTracker.notifyPopped(from);
 		
 		return actualNextInsn;
 	}

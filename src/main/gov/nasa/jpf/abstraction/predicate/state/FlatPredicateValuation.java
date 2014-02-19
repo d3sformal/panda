@@ -303,6 +303,28 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			
 		valuations.putAll(newValuations);
 	}
+
+    @Override
+    public void dropAllPredicatesIncidentWith(AccessExpression expr) {
+        Set<AccessExpression> paths = new HashSet<AccessExpression>();
+        Set<Predicate> toBeRemoved = new HashSet<Predicate>();
+
+        for (Predicate p : getPredicates()) {
+            p.addAccessExpressionsToSet(paths);
+
+            for (AccessExpression path : paths) {
+                if (expr.isPrefixOf(path)) {
+                    toBeRemoved.add(p);
+                }
+            }
+
+            paths.clear();
+        }
+
+        for (Predicate p : toBeRemoved) {
+            valuations.remove(p);
+        }
+    }
 	
     /**
      * Evaluate a single predicate regardless of a statement

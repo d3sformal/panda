@@ -507,6 +507,11 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 	public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
 		scopes.get(currentThreadID).top().reevaluate(affected, resolvedAffected, expression);
 	}
+
+    @Override
+    public void dropAllPredicatesIncidentWith(AccessExpression expr) {
+        scopes.get(currentThreadID).top().dropAllPredicatesIncidentWith(expr);
+    }
 	
 	@Override
 	public TruthValue evaluatePredicate(Predicate predicate) {

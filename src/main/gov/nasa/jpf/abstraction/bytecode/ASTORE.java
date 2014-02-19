@@ -50,6 +50,8 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
         GlobalAbstraction.getInstance().informAboutStructuredLocalVariable(to);
 		GlobalAbstraction.getInstance().processObjectStore(from, to);
 		
+        AnonymousExpressionTracker.notifyPopped(from);
+
 		return actualNextInsn;
 	}
 }

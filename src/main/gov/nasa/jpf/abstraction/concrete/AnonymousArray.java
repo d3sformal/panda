@@ -14,8 +14,8 @@ public class AnonymousArray extends AnonymousObject implements ArrayExpression {
 	
 	private Expression length;
 	
-	protected AnonymousArray(Reference reference, Expression length) {
-		super(reference);
+	protected AnonymousArray(Reference reference, Expression length, boolean duplicate) {
+		super(reference, duplicate);
 		
 		this.length = length;
 	}
@@ -45,12 +45,16 @@ public class AnonymousArray extends AnonymousObject implements ArrayExpression {
 		return false;
 	}
 	
-	public static AnonymousArray create(Reference reference, Expression length) {
+	public static AnonymousArray create(Reference reference, Expression length, boolean duplicate) {
 		if (reference == null) {
 			return null;
 		}
 
-		return new AnonymousArray(reference, length);
+		return new AnonymousArray(reference, length, duplicate);
+	}
+
+	public static AnonymousArray create(Reference reference, Expression length) {
+		return create(reference, length, false);
 	}
 
 }

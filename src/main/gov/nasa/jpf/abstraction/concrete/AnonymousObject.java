@@ -22,9 +22,11 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 	
 	private Reference reference;
     private String name;
+    private boolean duplicate;
 
-	protected AnonymousObject(Reference reference) {
+	protected AnonymousObject(Reference reference, boolean duplicate) {
 		this.reference = reference;
+        this.duplicate = duplicate;
 	}
 	
 	@Override
@@ -42,12 +44,16 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
         return this;
     }
 
-	public static AnonymousObject create(Reference reference) {
+	public static AnonymousObject create(Reference reference, boolean duplicate) {
 		if (reference == null) {
 			return null;
 		}
 		
-		return new AnonymousObject(reference);
+		return new AnonymousObject(reference, duplicate);
+	}
+
+	public static AnonymousObject create(Reference reference) {
+        return create(reference, false);
 	}
 
 	@Override
@@ -123,7 +129,7 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 		if (o instanceof AnonymousObject) {
 			AnonymousObject ao = (AnonymousObject) o;
 
-			return getReference().getReferenceNumber() == ao.getReference().getReferenceNumber();
+			return getReference().equals(ao.getReference());
 		}
 		return false;
 	}
@@ -132,5 +138,10 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 	public int hashCode() {
 		return getReference().getReferenceNumber();
 	}
+
+    @Override
+    public boolean isDuplicate() {
+        return duplicate;
+    }
 
 }

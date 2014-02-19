@@ -82,20 +82,24 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 		
 		Expression from = source.getExpression();
 		AccessExpression to = null;
+		AccessExpression field = null;
 
 		if (destination.getExpression() instanceof AccessExpression) {
 			to = (AccessExpression) destination.getExpression();
-			to = DefaultObjectFieldRead.create(to, getFieldName());
-
-			if (ei.getFieldValueObject(getFieldName()) == null) {
-	        	GlobalAbstraction.getInstance().processObjectStore(from, to);
-            } else if (ei.getFieldValueObject(getFieldName()) instanceof ElementInfo) {
-	        	GlobalAbstraction.getInstance().processObjectStore(from, to);
-	        } else {
-	        	GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
-	        }
+			field = DefaultObjectFieldRead.create(to, getFieldName());
 		}
-		
-		return actualNextInsn;
+
+        if (ei.getFieldValueObject(getFieldName()) == null) {
+            GlobalAbstraction.getInstance().processObjectStore(from, field);
+        } else if (ei.getFieldValueObject(getFieldName()) instanceof ElementInfo) {
+            GlobalAbstraction.getInstance().processObjectStore(from, field);
+        } else {
+            GlobalAbstraction.getInstance().processPrimitiveStore(from, field);
+        }
+
+        AnonymousExpressionTracker.notifyPopped(from);
+        AnonymousExpressionTracker.notifyPopped(to);
+        
+        return actualNextInsn;
 	}
 }

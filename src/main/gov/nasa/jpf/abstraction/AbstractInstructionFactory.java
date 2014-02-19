@@ -256,6 +256,11 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 		return (filter.isPassing(ci) ? new DSUB() : super.dsub());
 	}
 
+    @Override
+    public Instruction dup() {
+        return (filter.isPassing(ci) ? new DUP() : super.dup());
+    }
+
 	@Override
 	public Instruction f2d() {
 		return (filter.isPassing(ci) ? new F2D() : super.f2d());

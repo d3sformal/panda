@@ -55,11 +55,13 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 			return actualNextInsn;
 		}
 		
-		AccessExpression path = (AccessExpression) attr.getExpression();
-		path = DefaultObjectFieldRead.create(path, getFieldName());
+		AccessExpression from = (AccessExpression) attr.getExpression();
+		AccessExpression path = DefaultObjectFieldRead.create(from, getFieldName());
 
 		sf = ti.getModifiableTopFrame();
 		sf.setOperandAttr(new NonEmptyAttribute(null, path));
+
+        AnonymousExpressionTracker.notifyPopped(from);
 		
 		return actualNextInsn;
 	}

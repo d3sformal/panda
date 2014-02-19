@@ -70,6 +70,12 @@ public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
          */
 		GlobalAbstraction.getInstance().processMethodCall(ti, before, after);
 
+        for (int i = 0; i < after.getMethodInfo().getNumberOfStackArguments(); ++i) {
+			Attribute attr = Attribute.ensureNotNull((Attribute) before.getOperandAttr(i));
+            
+            AnonymousExpressionTracker.notifyPopped(attr.getExpression(), 1);
+        }
+
 		return actualNextInsn;
 	}
 }

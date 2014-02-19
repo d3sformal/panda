@@ -48,6 +48,8 @@ public interface PredicateValuation {
 	 * @param expression the value being written
 	 */
 	public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression);
+
+    public void dropAllPredicatesIncidentWith(AccessExpression expression);
 	
 	/**
 	 * Evaluate a predicate but do not store its value, just use other predicates to infer the truth value

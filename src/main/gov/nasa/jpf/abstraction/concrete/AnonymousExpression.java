@@ -8,4 +8,5 @@ import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
  */
 public interface AnonymousExpression extends Expression {
 	public Reference getReference();
+    public boolean isDuplicate();
 }
