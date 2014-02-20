@@ -232,7 +232,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
                 int h1 = p1.hashCode();
                 int h2 = p2.hashCode();
 
-                return h1 - h2;
+                return Integer.valueOf(h1).compareTo(Integer.valueOf(h2));
             }
         });
 
