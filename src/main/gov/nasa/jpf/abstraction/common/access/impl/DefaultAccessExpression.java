@@ -8,7 +8,6 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
@@ -19,6 +18,12 @@ import gov.nasa.jpf.abstraction.predicate.smt.PredicatesSMTStringifier;
  * Implements common behaviour of most of the access expression elements
  */
 public abstract class DefaultAccessExpression extends DefaultObjectExpression implements AccessExpression {
+
+    protected int length;
+
+    protected DefaultAccessExpression(int length) {
+        this.length = length;
+    }
 
 	/**
 	 * Retrieves all access expressions present in this expression
@@ -188,11 +193,14 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 			// using the copy-on-write mechanism
 
 			AccessExpression currentExpr = this;
-            ObjectAccessExpression currentExprCopy = null;
-            ObjectAccessExpression previousExprCopy = null;
+            DefaultObjectAccessExpression currentExprCopy = null;
+            DefaultObjectAccessExpression previousExprCopy = null;
 			
-            while (currentExpr != oldPrefixEnd && currentExpr instanceof ObjectAccessExpression) {
-                currentExprCopy = (ObjectAccessExpression) currentExpr.createShallowCopy();
+            while (currentExpr != oldPrefixEnd && currentExpr instanceof DefaultObjectAccessExpression) {
+                currentExprCopy = (DefaultObjectAccessExpression) currentExpr.createShallowCopy();
+
+                // update cached length, as the prefix may now have a different length
+                currentExprCopy.length += newPrefix.getLength() - oldPrefix.getLength();
 
 				// we must overwrite the fallback now (in the first iteration of the loop)
 				// situation: oldPrefix is not the whole expression ("this")
@@ -208,7 +216,7 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
                 previousExprCopy = currentExprCopy;
 
 				// move to the preceding element of the suffix (towards the "oldPrefixEnd")
-                currentExpr = ((ObjectAccessExpression) currentExpr).getObject();
+                currentExpr = ((DefaultObjectAccessExpression) currentExpr).getObject();
             }
 
 			// insert the new prefix
@@ -222,5 +230,10 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 		
 		return null;
 	}
+
+    @Override
+    public final int getLength() {
+        return length;
+    }
 	
 }

@@ -18,12 +18,14 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.List;
 import java.util.Comparator;
+import java.util.Collections;
 
 /**
  * A predicate valuation for a single scope
  */
 public class FlatPredicateValuation implements PredicateValuation, Scope {
 	private HashMap<Predicate, TruthValue> valuations = new HashMap<Predicate, TruthValue>();
+    private HashMap<Predicate, Set<Predicate>> determinantCache= new HashMap<Predicate, Set<Predicate>>();
     private SMT smt;
 
     public FlatPredicateValuation(SMT smt) {
@@ -36,6 +38,11 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		FlatPredicateValuation clone = new FlatPredicateValuation(smt);
 		
 		clone.valuations = (HashMap<Predicate, TruthValue>)valuations.clone();
+
+        /**
+         * No need to memorize
+         */
+		clone.determinantCache = new HashMap<Predicate, Set<Predicate>>();
 		
 		return clone;
 	}
@@ -44,7 +51,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
      * @param universe Universe of all predicates that may or may not determine the value of this predicate
      * @return A selection of those predicates from the universe that may directly determine the value of this predicate
      */
-    public static Set<Predicate> selectDeterminants(Predicate predicate, Set<Predicate> universe) {
+    private static Set<Predicate> selectDeterminants(Predicate predicate, Set<Predicate> universe) {
     	Set<Predicate> ret = new HashSet<Predicate>();
 
         Set<AccessExpression> paths = new HashSet<AccessExpression>();
@@ -82,27 +89,31 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
      * @param universe Universe of all predicates that may or may not determine the value of this predicate
      * @return A selection of those predicates from the universe that may determine the value of this predicate
      */
-	public static Set<Predicate> computeDeterminantClosure(Predicate predicate, Set<Predicate> universe) {
-		Set<Predicate> cur;
-		Set<Predicate> ret = selectDeterminants(predicate, universe);
+	private Set<Predicate> computeDeterminantClosure(Predicate predicate, Set<Predicate> universe) {
+        if (!determinantCache.containsKey(predicate)) {
+    		Set<Predicate> cur;
+	    	Set<Predicate> ret = selectDeterminants(predicate, universe);
 		
-		int prevSize = 0;
+    		int prevSize = 0;
 		
-		while (prevSize != ret.size()) {
-			prevSize = ret.size();
+	    	while (prevSize != ret.size()) {
+		    	prevSize = ret.size();
 
-			cur = new HashSet<Predicate>();
+			    cur = new HashSet<Predicate>();
 
-			for (Predicate p : ret) {
-				cur.addAll(selectDeterminants(p, universe));
-			}
+    			for (Predicate p : ret) {
+	    			cur.addAll(selectDeterminants(p, universe));
+		    	}
 			
-            // each `p` in `ret` is contained in `selectDet(p)` and therefore also in `cur`
-            // thus the following statement avoids unnecessary merge of the sets
-			ret = cur;
-		}
-		
-		return ret;
+                // each `p` in `ret` is contained in `selectDet(p)` and therefore also in `cur`
+                // thus the following statement avoids unnecessary merge of the sets
+		    	ret = cur;
+    		}
+
+            determinantCache.put(predicate, ret);
+        }
+
+		return determinantCache.get(predicate);
 	}
 	
 	/**
@@ -156,6 +167,11 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		
 		Config config = VM.getVM().getJPF().getConfig();
 		String key = "abstract.branch.reevaluate_predicates";
+
+        // Change of the set of predicates -> need to recompute determinant sets
+        if (!valuations.containsKey(predicate)) {
+            determinantCache.clear();
+        }
 		
 		if (config.containsKey(key) && config.getBoolean(key)) {
 			performCascadeReevaluation(newValuations);
@@ -258,11 +274,14 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
             predicate.addAccessExpressionsToSet(paths);
 
-			for (AccessExpression path1 : resolvedAffected) {
-				for (AccessExpression path2 : paths) {
-					affects = affects || path1.isSimilarToPrefixOf(path2);
-				}
-			}
+            // Do not cycle through the collection if the other is empty
+            if (!paths.isEmpty()) {
+    			for (AccessExpression path1 : resolvedAffected) {
+	    			for (AccessExpression path2 : paths) {
+		    			affects = affects || path1.isSimilarToPrefixOf(path2);
+			    	}
+			    }
+            }
 
 			paths.clear();
 
@@ -324,6 +343,11 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
         for (Predicate p : toBeRemoved) {
             valuations.remove(p);
         }
+
+        // Change of the set of predicates -> need to recompute determinant sets
+        if (!toBeRemoved.isEmpty()) {
+            determinantCache.clear();
+        }
     }
 	
     /**
@@ -348,10 +372,11 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	 */
 	@Override
 	public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
-		if (predicates.isEmpty()) return new HashMap<Predicate, TruthValue>();
-		
+		if (predicates.isEmpty()) return Collections.emptyMap();
+
 		Map<Predicate, PredicateValueDeterminingInfo> input = new HashMap<Predicate, PredicateValueDeterminingInfo>();
-		
+
+        // This takes long
 		for (Predicate predicate : predicates) {
 			Predicate positiveWeakestPrecondition = predicate;
 			Predicate negativeWeakestPrecondition = Negation.create(predicate);

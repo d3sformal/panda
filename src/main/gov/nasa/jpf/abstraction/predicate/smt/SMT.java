@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Collections;
 
 /**
  * Class responsible for invocations of SMT, transformation of predicates into input that the SMT can solve
@@ -154,8 +155,11 @@ public class SMT {
 		String output = "";
 		
 		try {
-			in.write(input);
-			in.flush();
+            // Avoid flushing / sync / etc. on pipe to the SMT
+            if (count > 0) {
+    			in.write(input);
+    			in.flush();
+            }
 		} catch (IOException e) {
 			System.err.println("SMT refuses input.");
 			
@@ -326,7 +330,9 @@ public class SMT {
         Map<Predicate, PredicateValueDeterminingInfo> predicateDeterminingInfos = new HashMap<Predicate, PredicateValueDeterminingInfo>();
 
         for (Predicate predicate : predicates) {
-            PredicateValueDeterminingInfo determiningInfo = new PredicateValueDeterminingInfo(predicate, Negation.create(predicate), new HashMap<Predicate, TruthValue>());
+            Map<Predicate, TruthValue> determinants = Collections.emptyMap();
+
+            PredicateValueDeterminingInfo determiningInfo = new PredicateValueDeterminingInfo(predicate, Negation.create(predicate), determinants);
 
             predicateDeterminingInfos.put(predicate, determiningInfo);
         }

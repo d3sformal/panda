@@ -19,17 +19,14 @@ public abstract class DefaultObjectAccessExpression extends DefaultAccessExpress
 	private AccessExpression expression;
 	
 	protected DefaultObjectAccessExpression(AccessExpression expression) {
+        super(expression.getLength() + 1);
+
 		this.expression = expression;
 	}
 
 	@Override
 	public void accept(PredicatesComponentVisitor visitor) {
 		expression.accept(visitor);
-	}
-
-	@Override
-	public final int getLength() {
-		return getObject().getLength() + 1;
 	}
 
 	@Override

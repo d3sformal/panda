@@ -2,18 +2,7 @@ package gov.nasa.jpf.abstraction.predicate;
 
 import static gov.nasa.jpf.abstraction.predicate.BaseTest.*;
 
-class ImageTestDriver {
-    public static void main(String[] args) {
-        new ImageTest().bootstrap();
-    }
-}
-
 public class ImageTest extends BaseTest {
-    public ImageTest() {
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor");
-    }
-
 	public static void main(String[] args) {
 		Image img = new Image();
 

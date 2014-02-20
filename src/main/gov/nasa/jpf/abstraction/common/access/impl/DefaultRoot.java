@@ -25,6 +25,8 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
     private Integer hashCodeValue;
 	
 	protected DefaultRoot(String name) {
+        super(1);
+
 		this.name = name;
 	}
 	
@@ -95,11 +97,6 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
         return this;
     }
 
-	@Override
-	public int getLength() {
-		return 1;
-	}
-	
 	@Override
 	public AccessExpression reRoot(AccessExpression newPrefix) {
 		return newPrefix;

@@ -29,6 +29,8 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
     private boolean duplicate;
 
 	protected AnonymousObject(Reference reference, boolean duplicate) {
+        super(1);
+
 		this.reference = reference;
         this.duplicate = duplicate;
 	}
@@ -91,11 +93,6 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 		}
 		
 		return null;
-	}
-
-	@Override
-	public int getLength() {
-		return 1;
 	}
 
 	@Override
