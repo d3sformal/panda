@@ -8,5 +8,11 @@ import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
  */
 public interface AnonymousExpression extends Expression {
 	public Reference getReference();
+    
+    /**
+     * An anonymous expression can be either created by NEW or duplicated by DUP
+     *
+     * in the latter case it isDuplicate
+     */
     public boolean isDuplicate();
 }

@@ -22,6 +22,10 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 	
 	private Reference reference;
     private String name;
+
+    /**
+     * Flag determining whether the anonymous object represents a value directly pushed to the stack by NEW (`false`) or DUP (`true`)
+     */
     private boolean duplicate;
 
 	protected AnonymousObject(Reference reference, boolean duplicate) {
