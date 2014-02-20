@@ -73,22 +73,22 @@ public class DefaultArrayLengthWrite extends DefaultArrayLengthExpression implem
 	}
 	
 	@Override
-	public boolean equals(Object o) {
+	public boolean isEqualToSlow(AccessExpression o) {
 		if (o instanceof ArrayLengthWrite) {
 			ArrayLengthWrite w = (ArrayLengthWrite) o;
 			
-			return getArrayLengths().equals(w.getArrayLengths()) && getArray().equals(w.getArray()) && getNewValue().equals(w.getNewValue());
+			return getArrayLengths().equals(w.getArrayLengths()) && getArray().isEqualToSlow(w.getArray()) && getNewValue().equals(w.getNewValue());
 		}
 		
 		return false;
 	}
 	
 	@Override
-	public boolean isSimilarTo(AccessExpression expression) {
+	public boolean isSimilarToSlow(AccessExpression expression) {
 		if (expression instanceof ArrayLengthWrite) {
 			ArrayLengthWrite w = (ArrayLengthWrite) expression;
 			
-			return getArray().isSimilarTo(w.getArray());
+			return getArray().isSimilarToSlow(w.getArray());
 		}
 		
 		return false;

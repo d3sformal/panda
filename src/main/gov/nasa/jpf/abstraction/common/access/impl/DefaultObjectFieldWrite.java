@@ -78,22 +78,22 @@ public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implem
 	}
 	
 	@Override
-	public boolean equals(Object o) {
+	public boolean isEqualToSlow(AccessExpression o) {
 		if (o instanceof ObjectFieldWrite) {
 			ObjectFieldWrite w = (ObjectFieldWrite) o;
 			
-			return getObject().equals(w.getObject()) && getField().equals(w.getField()) && getNewValue().equals(w.getNewValue());
+			return getObject().isEqualToSlow(w.getObject()) && getField().equals(w.getField()) && getNewValue().equals(w.getNewValue());
 		}
 		
 		return false;
 	}
 	
 	@Override
-	public boolean isSimilarTo(AccessExpression expression) {
+	public boolean isSimilarToSlow(AccessExpression expression) {
 		if (expression instanceof ObjectFieldWrite) {
 			ObjectFieldWrite w = (ObjectFieldWrite) expression;
 			
-			return getObject().isSimilarTo(w.getObject());
+			return getObject().isSimilarToSlow(w.getObject());
 		}
 		
 		return false;

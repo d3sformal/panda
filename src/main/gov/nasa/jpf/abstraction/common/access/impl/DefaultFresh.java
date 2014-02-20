@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Fresh;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Tautology;
@@ -36,7 +37,7 @@ public class DefaultFresh extends DefaultRoot implements Fresh {
     }
 	
 	@Override
-	public boolean equals(Object o) {
+	public boolean isEqualToSlow(AccessExpression o) {
 		return false;
 	}
 	

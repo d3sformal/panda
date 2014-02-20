@@ -16,11 +16,13 @@ import gov.nasa.jpf.abstraction.common.access.Root;
  */
 public abstract class DefaultObjectAccessExpression extends DefaultAccessExpression implements ObjectAccessExpression {
 
+    protected Root root;
 	private AccessExpression expression;
 	
 	protected DefaultObjectAccessExpression(AccessExpression expression) {
         super(expression.getLength() + 1);
 
+        this.root = expression.getRoot();
 		this.expression = expression;
 	}
 
@@ -66,6 +68,6 @@ public abstract class DefaultObjectAccessExpression extends DefaultAccessExpress
 
 	@Override
 	public final Root getRoot() {
-		return getObject().getRoot();
+		return root;
 	}
 }

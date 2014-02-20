@@ -41,5 +41,9 @@ public interface AccessExpression extends Expression {
     /**
      * Comparison of two access expressions ignoring indices, arrays
      */
+	public boolean isEqualTo(AccessExpression expression);
+	public boolean isEqualToSlow(AccessExpression expression);
+
 	public boolean isSimilarTo(AccessExpression expression);
+	public boolean isSimilarToSlow(AccessExpression expression);
 }

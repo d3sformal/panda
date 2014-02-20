@@ -112,7 +112,7 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 	}
 	
 	@Override
-	public boolean equals(Object o) {
+	public boolean isEqualToSlow(AccessExpression o) {
 		if (o instanceof Root) {
 			Root r = (Root) o;
 			
@@ -123,8 +123,8 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 	}
 	
 	@Override
-	public boolean isSimilarTo(AccessExpression expression) {
-		return equals(expression);
+	public boolean isSimilarToSlow(AccessExpression expression) {
+		return isEqualToSlow(expression);
 	}
 	
 	@Override

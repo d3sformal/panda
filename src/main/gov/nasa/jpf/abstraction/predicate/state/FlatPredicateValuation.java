@@ -51,9 +51,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
      * @param universe Universe of all predicates that may or may not determine the value of this predicate
      * @return A selection of those predicates from the universe that may directly determine the value of this predicate
      */
-    private static Set<Predicate> selectDeterminants(Predicate predicate, Set<Predicate> universe) {
-    	Set<Predicate> ret = new HashSet<Predicate>();
-
+    private static void selectDeterminants(Predicate predicate, Set<Predicate> universe, Set<Predicate> outDeterminants) {
         Set<AccessExpression> paths = new HashSet<AccessExpression>();
 		Set<AccessExpression> candidatePaths = new HashSet<AccessExpression>();
         Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
@@ -69,7 +67,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
 				    for (AccessExpression candidateSubPath : prefixes) {
 					    if (candidateSubPath.isSimilarToPrefixOf(path)) {
-						    ret.add(candidate);
+						    outDeterminants.add(candidate);
 					    }
 				    }
 
@@ -79,8 +77,6 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
                 candidatePaths.clear();
 		    }
 	    }
-    	
-    	return ret;
     }
     
     /**
@@ -92,7 +88,9 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	private Set<Predicate> computeDeterminantClosure(Predicate predicate, Set<Predicate> universe) {
         if (!determinantCache.containsKey(predicate)) {
     		Set<Predicate> cur;
-	    	Set<Predicate> ret = selectDeterminants(predicate, universe);
+	    	Set<Predicate> ret = new HashSet<Predicate>();
+            
+            selectDeterminants(predicate, universe, ret);
 		
     		int prevSize = 0;
 		
@@ -102,7 +100,7 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 			    cur = new HashSet<Predicate>();
 
     			for (Predicate p : ret) {
-	    			cur.addAll(selectDeterminants(p, universe));
+	    			selectDeterminants(p, universe, cur);
 		    	}
 			
                 // each `p` in `ret` is contained in `selectDet(p)` and therefore also in `cur`
@@ -127,7 +125,9 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 		int size = updated.size();
 		
 		for (Predicate affectedCandidate : valuations.keySet()) {
-			Set<Predicate> updatedDeterminants = selectDeterminants(affectedCandidate, updated.keySet());
+			Set<Predicate> updatedDeterminants = new HashSet<Predicate>();
+            
+            selectDeterminants(affectedCandidate, updated.keySet(), updatedDeterminants);
 			
 			if (!updatedDeterminants.isEmpty()) {
 				Predicate positiveWeakestPrecondition = affectedCandidate;

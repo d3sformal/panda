@@ -63,22 +63,22 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 	}
 	
 	@Override
-	public boolean equals(Object o) {
+	public boolean isEqualToSlow(AccessExpression o) {
 		if (o instanceof ArrayLengthRead) {
 			ArrayLengthRead r = (ArrayLengthRead) o;
 			
-			return getArrayLengths().equals(r.getArrayLengths()) && getArray().equals(r.getArray());
+			return getArrayLengths().equals(r.getArrayLengths()) && getArray().isEqualToSlow(r.getArray());
 		}
 		
 		return false;
 	}
 	
 	@Override
-	public boolean isSimilarTo(AccessExpression expression) {
+	public boolean isSimilarToSlow(AccessExpression expression) {
 		if (expression instanceof ArrayLengthRead) {
 			ArrayLengthRead r = (ArrayLengthRead) expression;
 			
-			return getArray().isSimilarTo(r.getArray());
+			return getArray().isSimilarToSlow(r.getArray());
 		}
 		
 		return false;

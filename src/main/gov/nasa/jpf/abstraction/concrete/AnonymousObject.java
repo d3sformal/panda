@@ -106,7 +106,7 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 	}
 
 	@Override
-	public boolean isSimilarTo(AccessExpression expression) {
+	public boolean isSimilarToSlow(AccessExpression expression) {
 		if (expression instanceof AnonymousObject) {
 			AnonymousObject o = (AnonymousObject) expression;
 			
@@ -126,7 +126,7 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean isEqualToSlow(AccessExpression o) {
 		if (o instanceof AnonymousObject) {
 			AnonymousObject ao = (AnonymousObject) o;
 

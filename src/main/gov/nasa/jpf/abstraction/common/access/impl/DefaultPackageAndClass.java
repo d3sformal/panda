@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 
 /**
@@ -44,7 +45,7 @@ public class DefaultPackageAndClass extends DefaultRoot implements PackageAndCla
 	}
 	
 	@Override
-	public boolean equals(Object o) {
+	public boolean isEqualToSlow(AccessExpression o) {
 		if (o instanceof PackageAndClass) {
 			PackageAndClass r = (PackageAndClass) o;
 			

@@ -51,6 +51,35 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 		out.add(prefix);
 	}
 
+    @Override
+    public final boolean isEqualTo(AccessExpression expression) {
+        // First check lengths ... quick
+        // Secondly check roots ... quickly exclude expressions rooted in different local variables / classes (fast for roots)
+        // Lastly perform recursive check ... slow
+
+        return getLength() == expression.getLength() && getRoot().isEqualToSlow(expression.getRoot()) && isEqualToSlow(expression);
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (o instanceof AccessExpression) {
+            AccessExpression ae = (AccessExpression) o;
+
+            return isEqualTo(ae);
+        }
+
+        return false;
+    }
+
+    @Override
+    public final boolean isSimilarTo(AccessExpression expression) {
+        // First check lengths ... quick
+        // Secondly check roots ... quickly exclude expressions rooted in different local variables / classes (fast for roots)
+        // Lastly perform recursive check ... slow
+
+        return getLength() == expression.getLength() && getRoot().isSimilarToSlow(expression.getRoot()) && isSimilarToSlow(expression);
+    }
+
 	/**
 	 * Replaces occurances of access expressions by other expressions 
 	 */
@@ -198,6 +227,9 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
 			
             while (currentExpr != oldPrefixEnd && currentExpr instanceof DefaultObjectAccessExpression) {
                 currentExprCopy = (DefaultObjectAccessExpression) currentExpr.createShallowCopy();
+
+                // update cached root, as the prefix may now have a different root
+                currentExprCopy.root = newPrefix.getRoot();
 
                 // update cached length, as the prefix may now have a different length
                 currentExprCopy.length += newPrefix.getLength() - oldPrefix.getLength();

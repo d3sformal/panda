@@ -35,7 +35,7 @@ public class AnonymousArray extends AnonymousObject implements ArrayExpression {
     }
 
 	@Override
-	public boolean isSimilarTo(AccessExpression expression) {
+	public boolean isSimilarToSlow(AccessExpression expression) {
 		if (expression instanceof AnonymousArray) {
 			AnonymousArray o = (AnonymousArray) expression;
 			

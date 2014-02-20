@@ -73,22 +73,22 @@ public class DefaultArrayElementWrite extends DefaultArrayElementExpression impl
 	}
 	
 	@Override
-	public boolean equals(Object o) {
+	public boolean isEqualToSlow(AccessExpression o) {
 		if (o instanceof ArrayElementWrite) {
 			ArrayElementWrite w = (ArrayElementWrite) o;
 			
-			return getArrays().equals(w.getArrays()) && getArray().equals(w.getArray()) && getIndex().equals(w.getIndex()) && getNewValue().equals(w.getNewValue());
+			return getArrays().equals(w.getArrays()) && getArray().isEqualToSlow(w.getArray()) && getIndex().equals(w.getIndex()) && getNewValue().equals(w.getNewValue());
 		}
 		
 		return false;
 	}
 	
 	@Override
-	public boolean isSimilarTo(AccessExpression expression) {
+	public boolean isSimilarToSlow(AccessExpression expression) {
 		if (expression instanceof ArrayElementWrite) {
 			ArrayElementWrite w = (ArrayElementWrite) expression;
 			
-			return getArray().isSimilarTo(w.getArray());
+			return getArray().isSimilarToSlow(w.getArray());
 		}
 		
 		return false;

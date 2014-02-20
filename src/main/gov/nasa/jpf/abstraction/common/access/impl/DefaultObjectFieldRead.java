@@ -60,22 +60,22 @@ public class DefaultObjectFieldRead extends DefaultObjectFieldExpression impleme
 	}
 	
 	@Override
-	public boolean equals(Object o) {
+	public boolean isEqualToSlow(AccessExpression o) {
 		if (o instanceof ObjectFieldRead) {
 			ObjectFieldRead r = (ObjectFieldRead) o;
 			
-			return getObject().equals(r.getObject()) && getField().equals(r.getField());
+			return getObject().isEqualToSlow(r.getObject()) && getField().equals(r.getField());
 		}
 		
 		return false;
 	}
 	
 	@Override
-	public boolean isSimilarTo(AccessExpression expression) {
+	public boolean isSimilarToSlow(AccessExpression expression) {
 		if (expression instanceof ObjectFieldRead) {
 			ObjectFieldRead r = (ObjectFieldRead) expression;
 			
-			return getField().getName().equals(r.getField().getName()) && getObject().isSimilarTo(r.getObject());
+			return getField().getName().equals(r.getField().getName()) && getObject().isSimilarToSlow(r.getObject());
 		}
 		
 		return false;

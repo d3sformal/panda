@@ -64,22 +64,22 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	}
 	
 	@Override
-	public boolean equals(Object o) {
+	public boolean isEqualToSlow(AccessExpression o) {
 		if (o instanceof ArrayElementRead) {
 			ArrayElementRead r = (ArrayElementRead) o;
 			
-			return getArrays().equals(r.getArrays()) && getArray().equals(r.getArray()) && getIndex().equals(r.getIndex());
+			return getArrays().equals(r.getArrays()) && getArray().isEqualToSlow(r.getArray()) && getIndex().equals(r.getIndex());
 		}
 		
 		return false;
 	}
 	
 	@Override
-	public boolean isSimilarTo(AccessExpression expression) {
+	public boolean isSimilarToSlow(AccessExpression expression) {
 		if (expression instanceof ArrayElementRead) {
 			ArrayElementRead r = (ArrayElementRead) expression;
 			
-			return getArray().isSimilarTo(r.getArray());
+			return getArray().isSimilarToSlow(r.getArray());
 		}
 		
 		return false;

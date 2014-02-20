@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.vm.Instruction;
 
@@ -38,7 +39,7 @@ public class DefaultReturnValue extends DefaultRoot implements ReturnValue {
 	}
 	
 	@Override
-	public boolean equals(Object o) {
+	public boolean isEqualToSlow(AccessExpression o) {
 		if (o instanceof ReturnValue) {
 			ReturnValue r = (ReturnValue) o;
 			
