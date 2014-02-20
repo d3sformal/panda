@@ -25,7 +25,7 @@ import java.util.Collections;
  */
 public class FlatPredicateValuation implements PredicateValuation, Scope {
 	private HashMap<Predicate, TruthValue> valuations = new HashMap<Predicate, TruthValue>();
-    private HashMap<Predicate, Set<Predicate>> determinantCache= new HashMap<Predicate, Set<Predicate>>();
+    private HashMap<Predicate, Set<Predicate>> determinantCache = new HashMap<Predicate, Set<Predicate>>();
     private SMT smt;
 
     public FlatPredicateValuation(SMT smt) {
