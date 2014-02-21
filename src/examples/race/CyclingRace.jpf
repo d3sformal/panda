@@ -7,4 +7,5 @@ sourcepath=${jpf-abstraction}/src/examples
 
 abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/race/CyclingRace.pred
 
-listener=gov.nasa.jpf.abstraction.AbstractListener
+listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor
+

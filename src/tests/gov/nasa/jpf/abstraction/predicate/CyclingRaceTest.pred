@@ -1,16 +1,24 @@
 [method gov.nasa.jpf.abstraction.predicate.CyclingRaceTest.main]
 results[0].time < results[1].time
 results[1].time < results[2].time
+results[0] = null
+results[1] = null
+results[2] = null
 diff >= 0
+cl = null
 cyclists[0].bonus >= 0
 cyclists[1].bonus >= 0
 cyclists[2].bonus >= 0
+cyclists[0] = null
+cyclists[1] = null
+cyclists[2] = null
 i = 0
 i = 1
 i = 2
 i = 3
 i < 3
 alength(arrlen,cyclists) = 3
+j = -1
 j = 0
 j = 1
 j = 2
