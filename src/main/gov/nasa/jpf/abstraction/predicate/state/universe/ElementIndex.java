@@ -29,4 +29,9 @@ public class ElementIndex implements UniverseSlotKey, Comparable<ElementIndex> {
     public int compareTo(ElementIndex i) {
         return getIndex().compareTo(i.getIndex());
     }
+
+    @Override
+    public String toString() {
+        return getIndex().toString();
+    }
 }

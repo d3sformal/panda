@@ -29,4 +29,9 @@ public class FieldName implements UniverseSlotKey, Comparable<FieldName> {
     public int compareTo(FieldName f) {
         return getName().compareTo(f.getName());
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

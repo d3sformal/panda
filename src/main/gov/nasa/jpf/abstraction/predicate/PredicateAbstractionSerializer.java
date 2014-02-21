@@ -52,6 +52,7 @@ import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.FlatPredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseValue;
 import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValue;
@@ -75,15 +76,15 @@ import gov.nasa.jpf.abstraction.predicate.state.universe.LocalVariable;
 public class PredicateAbstractionSerializer extends FilteringSerializer {
 
 	static JPFLogger logger = JPF.getLogger("gov.nasa.jpf.abstraction.PredicateAbstractionSerializer");
-    private int depth = 0;
-    private PredicateAbstraction pabs;
-    private Universe universe;
-    private Map<StructuredValueIdentifier, Integer> canonical = new HashMap<StructuredValueIdentifier, Integer>();
+    protected int depth = 0;
+    protected PredicateAbstraction pabs;
+    protected Universe universe;
+    protected Map<StructuredValueIdentifier, Integer> canonical = new HashMap<StructuredValueIdentifier, Integer>();
 
 	public PredicateAbstractionSerializer(Config conf) {
 	}
 
-    private int canonicalId (StructuredValueIdentifier value) {
+    protected int canonicalId (StructuredValueIdentifier value) {
         if (canonical.containsKey(value)) {
             return canonical.get(value);
         }
@@ -91,20 +92,16 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         throw new RuntimeException("Could not canonicalize: " + value);
     }
 
-    private SortedSet<StructuredValueIdentifier> sortStructuredValues(Set<StructuredValueIdentifier> values) {
-        SortedSet<StructuredValueIdentifier> sorted = new TreeSet<StructuredValueIdentifier>(new Comparator<StructuredValueIdentifier>() {
-            @Override
-            public int compare(StructuredValueIdentifier i1, StructuredValueIdentifier i2) {
-
-                // Identifier.compareTo(Identifier)
-                // make sure that the TreeSet uses the correct comparison method despite different types
-                return i1.compareTo(i2);
-            }
-        });
+    protected SortedSet<StructuredValueIdentifier> sortStructuredValues(Set<StructuredValueIdentifier> values) {
+        SortedSet<StructuredValueIdentifier> sorted = new TreeSet<StructuredValueIdentifier>();
 
         sorted.addAll(values);
 
         return sorted;
+    }
+
+    protected void serializeHeapValue(StructuredValueIdentifier value) {
+        serializeStructuredValue(value);
     }
 
     protected void serializeHeap() {    
@@ -120,7 +117,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 	    }
 
         for (StructuredValueIdentifier value : sorted) {
-            serializeStructuredValue(value);
+            serializeHeapValue(value);
         }
     }
 
@@ -176,8 +173,8 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         universe = pabs.getSymbolTable().getUniverse();
 
         serializeHeap();
-        serializeStackFrames();
         serializeThreadStates();
+        serializeStackFrames();
 
         return buf.toArray();
     }
@@ -206,13 +203,60 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         super.serializeStackFrames(ti);
 	}
 
+    protected void serializeLocalVariable(Root localVariable, Set<StructuredValueIdentifier> values) {
+        buf.add(values.size());
+
+        for (StructuredValueIdentifier p : values) {
+            buf.add(canonicalId(p));
+        }
+    }
+
+    protected void serializeLocalVariables(FlatSymbolTable currentScope) {
+        for (Root local : currentScope.getLocalVariables()) {
+            LocalVariable v = currentScope.getLocal(local);
+
+            if (v instanceof StructuredValueSlot) {
+                StructuredValueSlot svs = (StructuredValueSlot)v;
+                Set<StructuredValueIdentifier> possibilities = svs.getPossibleStructuredValues();
+                Set<StructuredValueIdentifier> possibilitiesOrder = sortStructuredValues(possibilities);
+
+                serializeLocalVariable(local, possibilitiesOrder);
+            }
+        }
+    }
+
+    protected void serializePredicate(Predicate p, TruthValue value) {
+        buf.add(p.hashCode());
+        buf.add(value.ordinal());
+    }
+
+    protected void serializePredicates(FlatPredicateValuation currentScope) {
+        // sort predicates
+        Set<Predicate> order = new TreeSet<Predicate>(new Comparator<Predicate>() {
+            public int compare(Predicate p1, Predicate p2) {
+                int h1 = p1.hashCode();
+                int h2 = p2.hashCode();
+
+                return Integer.valueOf(h1).compareTo(Integer.valueOf(h2));
+            }
+        });
+
+        order.addAll(currentScope.getPredicates());
+
+        // store all predicate valuations in the current scope in a predefined order
+        for (Predicate p : order) {
+            serializePredicate(p, currentScope.get(p));
+        }
+    }
+
     @Override
 	protected void serializeFrame(StackFrame frame){
         if (frame.isSynthetic()) return;
 
 		buf.add(frame.getMethodInfo().getGlobalId());
 
-        FlatSymbolTable currentScope = pabs.getSymbolTable().get(depth);
+        FlatSymbolTable currentSymbolScope = pabs.getSymbolTable().get(depth);
+        FlatPredicateValuation currentPredicateScope = pabs.getPredicateValuation().get(depth);
 
 		// there can be (rare) cases where a listener sets a null nextPc in
 		// a frame that is still on the stack
@@ -226,42 +270,12 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 		int len = frame.getTopPos()+1;
 		buf.add(len);
 
-        // sort predicates
-        Set<Predicate> order = new TreeSet<Predicate>(new Comparator<Predicate>() {
-            public int compare(Predicate p1, Predicate p2) {
-                int h1 = p1.hashCode();
-                int h2 = p2.hashCode();
-
-                return Integer.valueOf(h1).compareTo(Integer.valueOf(h2));
-            }
-        });
-
-        order.addAll(pabs.getPredicateValuation().getPredicates(depth));
-
-        // store all predicate valuations in the current scope in a predefined order
-        for (Predicate p : order) {
-            buf.add(p.hashCode());
-            buf.add(pabs.getPredicateValuation().get(depth).get(p).ordinal());
-        }
-
         // store all local variables of a reference type
         // use canonical ids of referred objects
-        for (Root local : currentScope.getLocalVariables()) {
-            LocalVariable v = currentScope.getLocal(local);
+        serializeLocalVariables(currentSymbolScope);
 
-            if (v instanceof StructuredValueSlot) {
-                StructuredValueSlot svs = (StructuredValueSlot)v;
-                Set<StructuredValueIdentifier> possibilities = svs.getPossibleStructuredValues();
-
-                buf.add(possibilities.size());
-
-                Set<StructuredValueIdentifier> possibilitiesOrder = sortStructuredValues(possibilities);
-
-                for (StructuredValueIdentifier p : possibilitiesOrder) {
-                    buf.add(canonicalId(p));
-                }
-            }
-        }
+        // store all predicate valuations
+        serializePredicates(currentPredicateScope);
 
         ++depth;
 	}
