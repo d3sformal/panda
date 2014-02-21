@@ -17,7 +17,7 @@ public class DataFlowAnalysis
 		int i, j;
 
         // Each node can be placed in the queue as a successor of any other node -> at most n^2 elements
-        int[] queue = new int[cfg.length * cfg.length + 1];
+        int[] queue = new int[26]; // cfg.length * cfg.length + 1
 
         i = 0;
         j = i + 1;
@@ -29,7 +29,10 @@ public class DataFlowAnalysis
 		while (i != j)
 		{
 			int cfnodeID = queue[i];
-			i = (i + 1) % queue.length;
+
+			// we cannot use modulo
+			i = i + 1;
+			if (i >= queue.length) i = 0;
 			
 			oldFacts = cfg[cfnodeID].facts;
 
@@ -38,7 +41,9 @@ public class DataFlowAnalysis
 			for (int k = 0; k < oldFacts.length; ++k) {
                 newFacts[k] = oldFacts[k];
             }
-			newFacts[newFacts.length - 1] = (queue.length + i - j) % queue.length;
+
+			newFacts[newFacts.length - 1] = queue.length + i - j;
+			if (newFacts[newFacts.length - 1] >= queue.length) newFacts[newFacts.length - 1] = 0;
 			
 			cfg[cfnodeID].facts = newFacts;
 

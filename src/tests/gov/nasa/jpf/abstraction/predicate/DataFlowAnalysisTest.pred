@@ -6,7 +6,11 @@ j >= 0
 i < alength(arrlen, queue)
 j < alength(arrlen, queue)
 i = j
+alength(arrlen, oldFacts) = 0
+alength(arrlen, oldFacts) = 1
 alength(arrlen, newFacts) = 0
+alength(arrlen, newFacts) = 1
+alength(arrlen, queue) = 26
 queue[i] = 0
 queue[i] = 1
 queue[i] = 2
@@ -15,3 +19,28 @@ queue[i] = 4
 i = 1
 i = 2
 j = i + 1
+alength(arrlen, cfg) = 5
+cfnodeID = 0
+cfnodeID = 1
+cfnodeID = 2
+cfnodeID = 3
+cfnodeID = 4
+alength(arrlen, cfg[0].facts) = 0
+alength(arrlen, cfg[0].facts) = 1
+alength(arrlen, cfg[1].facts) = 0
+alength(arrlen, cfg[1].facts) = 1
+alength(arrlen, cfg[2].facts) = 0
+alength(arrlen, cfg[2].facts) = 1
+alength(arrlen, cfg[3].facts) = 0
+alength(arrlen, cfg[3].facts) = 1
+alength(arrlen, cfg[4].facts) = 0
+alength(arrlen, cfg[4].facts) = 1
+k = 0
+k = 1
+k = 2
+k = 3
+k = 4
+
+[object gov.nasa.jpf.abstraction.predicate.NodeInfo]
+alength(arrlen, this.facts) = 0
+

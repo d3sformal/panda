@@ -246,7 +246,7 @@ public class Universe {
 
                 // Get the exact element in case of a constant index
                 if (aeRead.getIndex() instanceof Constant) {
-                    int i = ((Constant) aeRead.getIndex()).value.intValue();
+					if (eIndex.getIndex().intValue() >= array.getLength()) continue;
 
                     outValues.addAll(array.getElement(eIndex).getPossibleValues());
                 } else {

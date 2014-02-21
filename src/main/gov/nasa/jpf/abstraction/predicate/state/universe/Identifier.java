@@ -1,9 +1,12 @@
 package gov.nasa.jpf.abstraction.predicate.state.universe;
 
 public interface Identifier extends Comparable<Identifier> {
+
+	// sorting order: heap objects < class names
     public static class Ordering {
+		// Identifier.getClass().getName(): Reference or ClassName (for example)
         public static int compare(Identifier i1, Identifier i2) {
-            return i1.getClass().getName().compareTo(i2.getClass().getName());
+            return (-1) * i1.getClass().getName().compareTo(i2.getClass().getName());
         }
     }
 

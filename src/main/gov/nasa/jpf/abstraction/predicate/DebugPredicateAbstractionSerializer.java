@@ -20,6 +20,7 @@ import gov.nasa.jpf.vm.DebugStateSerializer;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.Instruction;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -137,6 +138,8 @@ public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSer
             imitateSerializeHeapValue(cls);
         }
 
+
+		out.println();
         out.println("======== Heap ========");
 
         for (Reference ref : references) {
@@ -166,7 +169,7 @@ public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSer
 
     @Override
     protected void serializeLocalVariables(FlatSymbolTable currentScope) {
-        out.println("\t\t" + "Local variables:");
+        out.println("\t\t" + "local variables:");
 
         super.serializeLocalVariables(currentScope);
     }
@@ -191,7 +194,7 @@ public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSer
 
     @Override
     protected void serializePredicates(FlatPredicateValuation currentScope) {
-        out.println("\t\t" + "Predicates");
+        out.println("\t\t" + "predicates:");
 
         predicateLength = 0;
 
@@ -208,18 +211,27 @@ public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSer
 
     @Override
     protected void serializeFrame(StackFrame frame) {
-        out.println("\t" + "Frame [depth = " + depth + ", method = " + frame.getMethodInfo().getFullName() + "]");
+		if ( ! frame.isSynthetic() ) {
+	        out.println("\t" + "frame [depth = " + depth + "]");
+
+			Instruction pcInsn = frame.getPC();
+			String pcSourceLine = (pcInsn.getSourceLine() != null) ? pcInsn.getSourceLine().trim() : "";
+			out.println("\t\t" + "pc: " + frame.getMethodInfo().getFullName() + "[" + pcInsn.getPosition() + "]");
+			out.println("\t\t\t" + "source line: " + pcSourceLine);
+			out.println("\t\t\t" + "instruction: " + pcInsn.getMnemonic());
+		}
 
         super.serializeFrame(frame);
     }
 
     @Override
     protected void serializeStackFrames(ThreadInfo threadInfo) {
+		out.println();
         out.println("======== Thread ========");
         out.println("\t" + "id: " + threadInfo.getId());
         out.println("\t" + "state: " + threadInfo.getState());
 
-        out.println("\t" + "lock: " + canonicalId(new Reference(threadInfo.getLockObject())));
+        out.println("\t" + "waiting for lock: " + canonicalId(new Reference(threadInfo.getLockObject())));
 
         Set<Integer> lockedObjects = new TreeSet<Integer>();
 
