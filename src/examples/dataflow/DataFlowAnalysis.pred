@@ -40,6 +40,8 @@ k = 1
 k = 2
 k = 3
 k = 4
+equal = 0
+equal = 1
 
 [object dataflow.NodeInfo]
 alength(arrlen, this.facts) = 0
