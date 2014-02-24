@@ -59,7 +59,9 @@ public class DataFlowAnalysisTest extends BaseTest {
 
 				for (int k = 0; k < succ.length; ++k) {
                     queue[j] = succ[k];
-                    j = (j + 1) % queue.length;
+
+					j = j + 1;
+					if (j >= queue.length) j = 0;
                 }
 			}
 		}
