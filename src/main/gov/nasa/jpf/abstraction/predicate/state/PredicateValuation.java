@@ -60,4 +60,6 @@ public interface PredicateValuation {
 	 * The same as evaluatePredicate, only for multiple predicates at once (effective due to a single call to the SMT)
 	 */
 	public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates);
+
+    public Integer evaluateExpression(Expression expression);
 }

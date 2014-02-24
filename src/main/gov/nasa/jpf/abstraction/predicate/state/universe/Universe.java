@@ -20,6 +20,9 @@ import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
 
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+
 public class Universe {
     public static int NULL = MJIEnv.NULL;
     
@@ -220,6 +223,12 @@ public class Universe {
                 int i = ((Constant) aeRead.getIndex()).value.intValue();
 
                 eIndex = new ElementIndex(i);
+            } else {
+               Integer i = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getPredicateValuation().evaluateExpression(aeRead.getIndex());
+
+               if (i != null) {
+                   eIndex = new ElementIndex(i);
+               }
             }
         }
 
@@ -245,7 +254,7 @@ public class Universe {
                 ArrayElementRead aeRead = (ArrayElementRead) read;
 
                 // Get the exact element in case of a constant index
-                if (aeRead.getIndex() instanceof Constant) {
+                if (eIndex != null) {
 					if (eIndex.getIndex().intValue() >= array.getLength()) continue;
 
                     outValues.addAll(array.getElement(eIndex).getPossibleValues());

@@ -522,6 +522,11 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 	public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
 		return scopes.get(currentThreadID).top().evaluatePredicates(predicates);
 	}
+
+    @Override
+    public Integer evaluateExpression(Expression expression) {
+        return scopes.get(currentThreadID).top().evaluateExpression(expression);
+    }
 	
 	@Override
 	public int count() {

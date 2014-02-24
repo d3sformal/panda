@@ -1,5 +1,9 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
 import gov.nasa.jpf.abstraction.common.Negation;
@@ -110,6 +114,7 @@ public class SMT {
 
 			in = new BufferedWriter(inwriter);
             in.write(
+                "(set-option :produce-models true)" + separator +
                 "(set-logic QF_AUFLIA)" + separator +
 		        "(declare-fun arr () (Array Int (Array Int Int)))" + separator +
     		    "(declare-fun arrlen () (Array Int Int))" + separator +
@@ -217,6 +222,27 @@ public class SMT {
 
         return ret.toString();
     }
+
+    private void appendClassDeclarations(Set<String> classes, StringBuilder input, String separator) {
+		for (String c : classes) {
+			input.append("(declare-fun class_"); input.append(c.replace("_", "__").replace('.', '_')); input.append(" () Int)"); input.append(separator);
+		}
+		input.append(separator);
+    }
+	
+    private void appendVariableDeclarations(Set<String> vars, StringBuilder input, String separator) {
+		for (String var : vars) {
+			input.append("(declare-fun var_"); input.append(var); input.append(" () Int)"); input.append(separator);
+		}
+		input.append(separator);
+    }
+	
+    private void appendFieldDeclarations(Set<String> fields, StringBuilder input, String separator) {
+		for (String field : fields) {
+			input.append("(declare-fun field_"); input.append(field); input.append(" () (Array Int Int))"); input.append(separator);
+		}
+		input.append(separator);
+    }
 	
 	private String prepareInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<Predicate> predicates, List<String> formulas, InputType inputType) {
         String separator = inputType.getSeparator();
@@ -224,21 +250,9 @@ public class SMT {
 		StringBuilder input = new StringBuilder();
 
         input.append("(push 1)"); input.append(separator);
-
-		for (String c : classes) {
-			input.append("(declare-fun class_"); input.append(c.replace("_", "__").replace('.', '_')); input.append(" () Int)"); input.append(separator);
-		}
-		input.append(separator);
-		
-		for (String var : vars) {
-			input.append("(declare-fun var_"); input.append(var); input.append(" () Int)"); input.append(separator);
-		}
-		input.append(separator);
-		
-		for (String field : fields) {
-			input.append("(declare-fun field_"); input.append(field); input.append(" () (Array Int Int))"); input.append(separator);
-		}
-		input.append(separator);
+        appendClassDeclarations(classes, input, separator);
+        appendVariableDeclarations(vars, input, separator);
+        appendFieldDeclarations(fields, input, separator);
 		
         Set<String> freshConstraints = new HashSet<String>();
 
@@ -269,10 +283,92 @@ public class SMT {
 			input.append(prepareFormula(predicate, negativeWeakestPreconditionFormula, FormulaType.NEGATIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedNegativeValue));
 		}
 		
-        input.append("(pop 1)");
+        input.append("(pop 1)"); input.append(separator);
 		
 		return input.toString();
 	}
+
+    public Integer getModel(Expression expression, Map<Predicate, TruthValue> determinants) {
+        Predicate valueConstraint = Equals.create(expression, SMTSpecialValue.create());
+
+        PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
+
+        collector.collect(valueConstraint);
+
+        Predicate query = valueConstraint;
+
+        for (Predicate determinant : determinants.keySet()) {
+            collector.collect(determinant);
+
+            switch (determinants.get(determinant)) {
+                case TRUE:
+                    query = Conjunction.create(query, determinant);
+                    break;
+                    
+                case FALSE:
+                    query = Conjunction.create(query, Negation.create(determinant));
+                    break;
+
+                default:
+            }
+        
+            for (Predicate additional : collector.getAdditionalPredicates(determinant)) {
+                query = Conjunction.create(query, additional);
+            }
+        }
+
+        String separator = InputType.NORMAL.getSeparator();
+
+        StringBuilder input = new StringBuilder();
+
+        input.append("(push 1)"); input.append(separator);
+        input.append("(declare-fun value () Int)"); input.append(separator);
+
+        appendClassDeclarations(collector.getClasses(), input, separator);
+        appendVariableDeclarations(collector.getVars(), input, separator);
+        appendFieldDeclarations(collector.getFields(), input, separator);
+
+        input.append("(assert " + convertToString(query) + ")"); input.append(separator);
+
+        input.append("(check-sat)"); input.append(separator);
+        input.append("(get-value (value))"); input.append(separator);
+        input.append("(pop 1)"); input.append(separator);
+
+        Integer ret = null;
+
+		try {
+    		in.write(input.toString());
+    		in.flush();
+		} catch (IOException e) {
+			System.err.println("SMT refuses input.");
+			
+			throw new SMTException(e);
+		}
+
+		try {
+            String output = out.readLine();
+			if (output == null || !output.matches("^(un)?sat$")) {
+				throw new SMTException("SMT replied with '" + output + "'");
+			}
+			if (output.matches("^sat$")) {
+                output = out.readLine();
+
+                Pattern pattern = Pattern.compile("^\\( \\(value (?<value>[0-9]*)\\) \\)$");
+                Matcher matcher = pattern.matcher(output);
+
+                if (matcher.matches()) {
+                    String value = matcher.group("value");
+                    ret = Integer.valueOf(value);
+                }
+            }
+		} catch (IOException e) {
+			System.err.println("SMT refuses to provide output.");
+			
+			throw new SMTException(e);
+		}
+
+        return ret;
+    }
 
 	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateValueDeterminingInfo> predicates) throws SMTException {
 		notifyValuatePredicatesInvoked(predicates);

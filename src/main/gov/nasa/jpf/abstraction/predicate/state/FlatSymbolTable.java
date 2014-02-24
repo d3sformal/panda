@@ -438,11 +438,26 @@ public class FlatSymbolTable implements SymbolTable, Scope {
         // If there are either
         //
         // 1) more objects we are writing to
-        //
+		boolean ambiguous = destinations.size() > 1;
+
         // or
         //
         // 2) more indices we are writing to
-		boolean ambiguous = destinations.size() > 1 || ((to instanceof ArrayElementRead) && !(((ArrayElementRead) to).getIndex() instanceof Constant));
+        Integer index = null;
+
+        if (to instanceof ArrayElementRead) {
+            Expression i = ((ArrayElementRead) to).getIndex();
+            
+            if (i instanceof Constant) {
+                index = ((Constant) i).value.intValue();
+            } else {
+                index = abstraction.getPredicateValuation().evaluateExpression(i);
+
+                if (index == null) {
+                    ambiguous = true;
+                }
+            }
+        }
 		
         // For each new parent (object whose field/element is being set, or a local var ...)
         // Add the objects into the field/element or rewrite a local variable
@@ -545,13 +560,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 				for (int i = 0; i < ((UniverseArray) parentObject).getLength(); ++i) {
 
                     // Overwrite the exact element in case of a constant index
-                    if (aeRead.getIndex() instanceof Constant) {
-                        int j = ((Constant) aeRead.getIndex()).value.intValue();
-
-                        if (i != j) continue;
+                    if (index != null) {
+                        if (i != index) continue;
                     }
 
-                    ElementIndex index = new ElementIndex(i);
+                    ElementIndex eIndex = new ElementIndex(i);
 
 					for (AccessExpression prefix : prefixes) {
 						ret.add(DefaultArrayElementRead.create(prefix, Constant.create(i)));
@@ -569,7 +582,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
                         // In case of complete overwrite of the element
                         // (there is no doubt this is the only possible target array being written to)
                         // All the former values should be removed from the object    
-                        for (UniverseIdentifier valueId : indexed.getElement(index).getPossibleValues()) {
+                        for (UniverseIdentifier valueId : indexed.getElement(eIndex).getPossibleValues()) {
                             UniverseValue value = universe.get(valueId);
 
                             // If the former value was frozen, modify a copy
@@ -579,17 +592,17 @@ public class FlatSymbolTable implements SymbolTable, Scope {
                                 universe.put(valueId, value);
                             }
 
-                            value.removeParentSlot(parent, index);
+                            value.removeParentSlot(parent, eIndex);
                         }
 
-                        UniverseSlot slot = indexed.getElement(index);
+                        UniverseSlot slot = indexed.getElement(eIndex);
                         
                         // If the slot being modified is frozen, modify a copy
                         if (slot.isFrozen()) {
                             slot = slot.createShallowCopy();
 
-                            parentObject.removeSlot(index);
-                            parentObject.addSlot(index, slot);
+                            parentObject.removeSlot(eIndex);
+                            parentObject.addSlot(eIndex, slot);
                         }
 
                         slot.clear();
@@ -597,14 +610,14 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 					
                     // All new values should be added into the appropriate slot
                     for (UniverseIdentifier valueId : sources) {
-                        StructuredValueSlot slot = (StructuredValueSlot) indexed.getElement(index);
+                        StructuredValueSlot slot = (StructuredValueSlot) indexed.getElement(eIndex);
 
                         // If the slot being modified is frozen, modify a copy
                         if (slot.isFrozen()) {
                             slot = slot.createShallowCopy();
 
-                            parentObject.removeSlot(index);
-                            parentObject.addSlot(index, slot);
+                            parentObject.removeSlot(eIndex);
+                            parentObject.addSlot(eIndex, slot);
                         }
                         
                         slot.addPossibleStructuredValue((StructuredValueIdentifier) valueId);
@@ -618,7 +631,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
                             universe.put(valueId, value);
                         }
 
-                        value.addParentSlot(parent, index);
+                        value.addParentSlot(parent, eIndex);
                     }
 				}
 

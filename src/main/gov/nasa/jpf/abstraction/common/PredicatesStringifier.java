@@ -20,6 +20,8 @@ import gov.nasa.jpf.abstraction.common.StaticContext;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 
+import gov.nasa.jpf.abstraction.predicate.smt.SMTSpecialValue;
+
 /**
  * A special visitor of the hierarchy:
  * 
@@ -268,5 +270,10 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 		
 		ret.append(method.getName());
 	}
+
+    @Override
+    public void visit(SMTSpecialValue expression) {
+        ret.append(expression.getName());
+    }
 
 }

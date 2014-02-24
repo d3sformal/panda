@@ -3,9 +3,11 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateValueDeterminingInfo;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
@@ -410,5 +412,36 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 	public Set<Predicate> getPredicates() {
 		return valuations.keySet();
 	}
+
+    @Override
+    public Integer evaluateExpression(Expression expression) {
+        Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+                
+        // An auxiliary predicate used to get all determining predicates
+        // Determinants are defined only for predicates, not expressions
+        Predicate determinantSelector = Equals.create(expression, Constant.create(0));
+
+        // Collect determinant valuations
+        for (Predicate predicate : computeDeterminantClosure(determinantSelector, getPredicates())) {
+            determinants.put(predicate, get(predicate));
+        }
+
+        // Query any model
+        Integer model1 = smt.getModel(expression, determinants);
+
+        if (model1 != null) {
+            // Forbid the first model, look for others
+            determinants.put(Equals.create(expression, Constant.create(model1)), TruthValue.FALSE);
+
+            Integer model2 = smt.getModel(expression, determinants);
+
+            // Only if there is a single satisfying value for the expression
+            if (model2 == null) {
+                return model1;
+            }
+        }
+
+        return null;
+    }
 	
 }

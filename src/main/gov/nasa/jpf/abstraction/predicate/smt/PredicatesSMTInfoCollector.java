@@ -234,6 +234,10 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 		addObject(expression);
 	}
 
+    @Override
+    public void visit(SMTSpecialValue expression) {
+    }
+
 	@Override
 	public void visit(Fresh expression) {	
 	}

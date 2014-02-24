@@ -65,7 +65,7 @@ public class DefaultRoot extends DefaultAccessExpression implements Root {
 
     public static DefaultRoot create(String name, int index) {
         if (name == null || name.equals("?")) {
-            return create("local#" + index);
+            return create("local_" + index);
         }
 
         return create(name);
