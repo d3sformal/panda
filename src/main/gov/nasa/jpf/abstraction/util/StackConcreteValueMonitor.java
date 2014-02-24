@@ -10,7 +10,7 @@ import gov.nasa.jpf.vm.VM;
 public class StackConcreteValueMonitor extends ListenerAdapter {
 	
 	@Override
-	public void executeInstruction(VM vm, ThreadInfo curTh, Instruction insn) {
+	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
 		if (RunDetector.isRunning()) {
 			StackFrame sf = curTh.getTopFrame();
 			inspect(sf);
