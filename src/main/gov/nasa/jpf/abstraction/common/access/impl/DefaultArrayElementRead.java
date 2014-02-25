@@ -4,6 +4,7 @@ import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.ArrayExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayAccessExpression;
@@ -78,6 +79,13 @@ public class DefaultArrayElementRead extends DefaultArrayElementExpression imple
 	public boolean isSimilarToSlow(AccessExpression expression) {
 		if (expression instanceof ArrayElementRead) {
 			ArrayElementRead r = (ArrayElementRead) expression;
+
+            /**
+             * Distinct constant indices are not similar
+             */
+            if (getIndex() instanceof Constant && r.getIndex() instanceof Constant && !getIndex().equals(r.getIndex())) {
+                return false;
+            }
 			
 			return getArray().isSimilarToSlow(r.getArray());
 		}

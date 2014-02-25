@@ -60,24 +60,40 @@ public class FlatPredicateValuation implements PredicateValuation, Scope {
 
         predicate.addAccessExpressionsToSet(paths);
     	
-	    for (AccessExpression path : paths) {
-    		for (Predicate candidate : universe) {
-                candidate.addAccessExpressionsToSet(candidatePaths);
+        // filter all determinants from all the candidates
+    	for (Predicate candidate : universe) {
+            boolean alreadyAdded = false;
 
+            candidate.addAccessExpressionsToSet(candidatePaths);
+
+	        for (AccessExpression path : paths) {
+                // check shared access expressions between the candidate and the input predicate
+                // stop at first match
 			    for (AccessExpression candidatePath : candidatePaths) {
                     candidatePath.addAllPrefixesToSet(prefixes);
 
 				    for (AccessExpression candidateSubPath : prefixes) {
 					    if (candidateSubPath.isSimilarToPrefixOf(path)) {
 						    outDeterminants.add(candidate);
+
+                            alreadyAdded = true;
+                            break;
 					    }
 				    }
 
                     prefixes.clear();
+
+                    if (alreadyAdded) {
+                        break;
+                    }
 			    }
 
-                candidatePaths.clear();
+                if (alreadyAdded) {
+                    break;
+                }
 		    }
+
+            candidatePaths.clear();
 	    }
     }
     
