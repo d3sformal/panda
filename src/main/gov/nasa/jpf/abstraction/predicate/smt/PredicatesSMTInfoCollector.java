@@ -16,6 +16,7 @@ import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
@@ -235,7 +236,7 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 	}
 
     @Override
-    public void visit(SMTSpecialValue expression) {
+    public void visit(SpecialVariable expression) {
     }
 
 	@Override

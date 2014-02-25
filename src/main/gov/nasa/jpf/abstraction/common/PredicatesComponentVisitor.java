@@ -30,7 +30,7 @@ import gov.nasa.jpf.abstraction.common.StaticContext;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 
-import gov.nasa.jpf.abstraction.predicate.smt.SMTSpecialValue;
+import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 
 /**
  * An interface for visitors of the hierarchy:
@@ -67,7 +67,7 @@ public interface PredicatesComponentVisitor {
 	public void visit(DefaultArrayLengths meta);
 	public void visit(DefaultField meta);
 	public void visit(Root expression);
-	public void visit(SMTSpecialValue expression);
+	public void visit(SpecialVariable expression);
 	public void visit(Fresh expression);
 	public void visit(PackageAndClass expression);
 	public void visit(Method expression);

@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
@@ -120,6 +121,7 @@ public class SMT {
     		    "(declare-fun arrlen () (Array Int Int))" + separator +
 	    	    "(declare-fun fresh () Int)" + separator +
 		        "(declare-fun null () Int)" + separator +
+		        "(declare-fun dummy () Int)" + separator +
     		    separator
             );
             in.flush();
@@ -289,7 +291,7 @@ public class SMT {
 	}
 
     public Integer getModel(Expression expression, Map<Predicate, TruthValue> determinants) {
-        Predicate valueConstraint = Equals.create(expression, SMTSpecialValue.create());
+        Predicate valueConstraint = Equals.create(expression, SpecialVariable.create("value"));
 
         PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
 

@@ -7,6 +7,7 @@ import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
@@ -93,7 +94,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
      * mostly for native calls and their returns
      * used to imitate actual return value (which sorts of falls from the sky in case of native code)
      */
-    public static Root DUMMY_VARIABLE = DefaultRoot.create("<dummy var>");
+    public static Root DUMMY_VARIABLE = SpecialVariable.create("dummy");
 	
 	/**
 	 * Entry points to the abstract heap
