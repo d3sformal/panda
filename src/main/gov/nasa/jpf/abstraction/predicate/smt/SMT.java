@@ -360,6 +360,8 @@ public class SMT {
                     String value = matcher.group("value");
                     ret = Integer.valueOf(value);
                 }
+            } else {
+                out.readLine();
             }
 		} catch (IOException e) {
 			System.err.println("SMT refuses to provide output.");
