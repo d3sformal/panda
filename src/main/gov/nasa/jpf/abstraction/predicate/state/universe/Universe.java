@@ -224,7 +224,7 @@ public class Universe {
 
                 eIndex = new ElementIndex(i);
             } else {
-               Integer i = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getPredicateValuation().evaluateExpression(aeRead.getIndex());
+               Integer i = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).computePreciseExpressionValue(aeRead.getIndex());
 
                if (i != null) {
                    eIndex = new ElementIndex(i);

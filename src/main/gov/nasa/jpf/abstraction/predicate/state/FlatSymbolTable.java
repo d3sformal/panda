@@ -451,7 +451,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
             if (i instanceof Constant) {
                 index = ((Constant) i).value.intValue();
             } else {
-                index = abstraction.getPredicateValuation().evaluateExpression(i);
+                index = abstraction.computePreciseExpressionValue(i);
 
                 if (index == null) {
                     ambiguous = true;

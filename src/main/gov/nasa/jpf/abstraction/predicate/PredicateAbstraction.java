@@ -80,6 +80,10 @@ public class PredicateAbstraction extends Abstraction {
 		
 		predicateValuation.processMethodCall(threadInfo, before, after);
 	}
+
+    public Integer computePreciseExpressionValue(Expression expression) {
+        return predicateValuation.evaluateExpression(expression);
+    }
 	
 	@Override
 	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
