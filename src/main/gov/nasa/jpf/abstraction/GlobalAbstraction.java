@@ -81,14 +81,14 @@ public class GlobalAbstraction extends Abstraction {
 	
 	@Override
 	public void processPrimitiveStore(Expression from, AccessExpression to) {
-		//if (!RunDetector.isRunning()) return; // Cannot be omitted because we need FlatSymbolTable / Universe to be updated properly (for example AALOAD needs lookupValues)
+		//if (!RunDetector.isRunning()) return; // Cannot be omitted because we need MethodFrameSymbolTable / Universe to be updated properly (for example AALOAD needs lookupValues)
 		
 		abs.processPrimitiveStore(from, to);
 	}
 	
 	@Override
 	public void processObjectStore(Expression from, AccessExpression to) {
-		//if (!RunDetector.isRunning()) return; // Cannot be omitted because we need FlatSymbolTable / Universe to be updated properly (for example AALOAD needs lookupValues)
+		//if (!RunDetector.isRunning()) return; // Cannot be omitted because we need MethodFrameSymbolTable / Universe to be updated properly (for example AALOAD needs lookupValues)
 		
 		abs.processObjectStore(from, to);
 	}

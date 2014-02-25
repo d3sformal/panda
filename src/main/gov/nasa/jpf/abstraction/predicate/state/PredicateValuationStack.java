@@ -13,10 +13,10 @@ import gov.nasa.jpf.abstraction.util.Pair;
  */
 public class PredicateValuationStack implements Scopes {
 	
-	private List<Pair<String, FlatPredicateValuation>> scopes = new ArrayList<Pair<String, FlatPredicateValuation>>();
+	private List<Pair<String, MethodFramePredicateValuation>> scopes = new ArrayList<Pair<String, MethodFramePredicateValuation>>();
 
 	@Override
-	public FlatPredicateValuation top() {
+	public MethodFramePredicateValuation top() {
 		return top(0);
 	}
 
@@ -27,8 +27,8 @@ public class PredicateValuationStack implements Scopes {
 
 	@Override
 	public void push(String name, Scope scope) {
-		if (scope instanceof FlatPredicateValuation) {
-			scopes.add(new Pair<String, FlatPredicateValuation>(name, (FlatPredicateValuation) scope));
+		if (scope instanceof MethodFramePredicateValuation) {
+			scopes.add(new Pair<String, MethodFramePredicateValuation>(name, (MethodFramePredicateValuation) scope));
 		} else {
 			throw new RuntimeException("Invalid scope type being pushed!");
 		}
@@ -43,7 +43,7 @@ public class PredicateValuationStack implements Scopes {
 	public PredicateValuationStack clone() {
 		PredicateValuationStack clone = new PredicateValuationStack();
 		
-		for (Pair<String, FlatPredicateValuation> scope : scopes) {
+		for (Pair<String, MethodFramePredicateValuation> scope : scopes) {
 			clone.push(scope.getFirst(), scope.getSecond().clone());
 		}
 		
@@ -51,13 +51,13 @@ public class PredicateValuationStack implements Scopes {
 	}
 
 	@Override
-	public FlatPredicateValuation top(int i) {
+	public MethodFramePredicateValuation top(int i) {
 		return scopes.get(scopes.size() - i - 1).getSecond();
 	}
 
     @Override
     public void print() {
-        for (Pair<String, FlatPredicateValuation> scope : scopes) {
+        for (Pair<String, MethodFramePredicateValuation> scope : scopes) {
             System.out.println(scope.getFirst());
         }
     }

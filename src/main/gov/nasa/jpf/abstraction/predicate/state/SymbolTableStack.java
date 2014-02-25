@@ -13,10 +13,10 @@ import gov.nasa.jpf.abstraction.util.Pair;
  */
 public class SymbolTableStack implements Scopes {
 	
-	private List<Pair<String, FlatSymbolTable>> scopes = new ArrayList<Pair<String, FlatSymbolTable>>();
+	private List<Pair<String, MethodFrameSymbolTable>> scopes = new ArrayList<Pair<String, MethodFrameSymbolTable>>();
 
 	@Override
-	public FlatSymbolTable top() {
+	public MethodFrameSymbolTable top() {
 		return top(0);
 	}
 
@@ -27,8 +27,8 @@ public class SymbolTableStack implements Scopes {
 
 	@Override
 	public void push(String name, Scope scope) {
-		if (scope instanceof FlatSymbolTable) {
-			scopes.add(new Pair<String, FlatSymbolTable>(name, (FlatSymbolTable) scope));
+		if (scope instanceof MethodFrameSymbolTable) {
+			scopes.add(new Pair<String, MethodFrameSymbolTable>(name, (MethodFrameSymbolTable) scope));
 		} else {
 			throw new RuntimeException("Invalid scope type being pushed!");
 		}
@@ -43,7 +43,7 @@ public class SymbolTableStack implements Scopes {
 	public SymbolTableStack clone() {
 		SymbolTableStack clone = new SymbolTableStack();
 		
-		for (Pair<String, FlatSymbolTable> scope : scopes) {
+		for (Pair<String, MethodFrameSymbolTable> scope : scopes) {
 			clone.push(scope.getFirst(), scope.getSecond().clone());
 		}
 		
@@ -51,13 +51,13 @@ public class SymbolTableStack implements Scopes {
 	}
 
 	@Override
-	public FlatSymbolTable top(int i) {
+	public MethodFrameSymbolTable top(int i) {
 		return scopes.get(scopes.size() - i - 1).getSecond();
 	}
 
     @Override
     public void print() {
-        for (Pair<String, FlatSymbolTable> scope : scopes) {
+        for (Pair<String, MethodFrameSymbolTable> scope : scopes) {
             System.out.println(scope.getFirst());
         }
     }

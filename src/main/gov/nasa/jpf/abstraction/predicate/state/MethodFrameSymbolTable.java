@@ -60,7 +60,7 @@ import java.util.TreeSet;
 /**
  * A symbol table for a single scope
  */
-public class FlatSymbolTable implements SymbolTable, Scope {
+public class MethodFrameSymbolTable implements SymbolTable, Scope {
 	
     private static int scopePool = 0;
 
@@ -116,7 +116,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	private PredicateAbstraction abstraction;
     private int scope;
 	
-	protected FlatSymbolTable(Universe universe, PredicateAbstraction abstraction, int scope) {
+	protected MethodFrameSymbolTable(Universe universe, PredicateAbstraction abstraction, int scope) {
 		this.abstraction = abstraction;
         this.universe = universe;
         this.scope = scope;
@@ -124,11 +124,11 @@ public class FlatSymbolTable implements SymbolTable, Scope {
         addPrimitiveLocalVariable(DUMMY_VARIABLE);
 	}
 
-    public FlatSymbolTable(Universe universe, PredicateAbstraction abstraction) {
+    public MethodFrameSymbolTable(Universe universe, PredicateAbstraction abstraction) {
         this(universe, abstraction, ++scopePool);
     }
 
-    public FlatSymbolTable(FlatSymbolTable previous) {
+    public MethodFrameSymbolTable(MethodFrameSymbolTable previous) {
         this(previous.universe, previous.abstraction);
 
         this.classes = previous.classes;
@@ -366,7 +366,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
      *
      * @return access path to all the affected objects
 	 */
-	public Set<AccessExpression> processPrimitiveStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
+	public Set<AccessExpression> processPrimitiveStore(Expression from, MethodFrameSymbolTable fromTable, AccessExpression to) {
         fromTable.ensureAnonymousObjectExistence(from);
 
 		ensureAnonymousObjectExistence(from);
@@ -401,7 +401,7 @@ public class FlatSymbolTable implements SymbolTable, Scope {
      */
     // The universes may differ instance-wise (different objects representing the same universe)
     // FromTable may have a different Locals/Statics sets
-    public Set<AccessExpression> processObjectStore(Expression from, FlatSymbolTable fromTable, AccessExpression to) {
+    public Set<AccessExpression> processObjectStore(Expression from, MethodFrameSymbolTable fromTable, AccessExpression to) {
         fromTable.ensureAnonymousObjectExistence(from);
 
 		ensureAnonymousObjectExistence(from);
@@ -827,8 +827,8 @@ public class FlatSymbolTable implements SymbolTable, Scope {
 	}
 	
 	@Override
-	public FlatSymbolTable clone() {
-		FlatSymbolTable clone = new FlatSymbolTable(universe.clone(), abstraction, getScope());
+	public MethodFrameSymbolTable clone() {
+		MethodFrameSymbolTable clone = new MethodFrameSymbolTable(universe.clone(), abstraction, getScope());
 		
         clone.locals.putAll(locals);
         clone.returns.putAll(returns);

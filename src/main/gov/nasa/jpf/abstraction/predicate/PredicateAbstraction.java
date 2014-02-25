@@ -20,8 +20,8 @@ import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
-import gov.nasa.jpf.abstraction.predicate.state.ScopedPredicateValuation;
-import gov.nasa.jpf.abstraction.predicate.state.ScopedSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.SystemPredicateValuation;
+import gov.nasa.jpf.abstraction.predicate.state.SystemSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.State;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTableStack;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
@@ -48,15 +48,15 @@ import gov.nasa.jpf.vm.VM;
  * different access expressions (used in predicates or updated by instructions)
  */
 public class PredicateAbstraction extends Abstraction {
-	private ScopedSymbolTable symbolTable;
-	private ScopedPredicateValuation predicateValuation;
+	private SystemSymbolTable symbolTable;
+	private SystemPredicateValuation predicateValuation;
 	private Trace trace;
     private boolean isInitialized = false;
     private Set<ClassInfo> startupClasses = new HashSet<ClassInfo>();
 
 	public PredicateAbstraction(Predicates predicateSet) {
-		symbolTable = new ScopedSymbolTable(this);
-		predicateValuation = new ScopedPredicateValuation(this, predicateSet);
+		symbolTable = new SystemSymbolTable(this);
+		predicateValuation = new SystemPredicateValuation(this, predicateSet);
 		trace = new Trace();
 	}
 	
@@ -142,11 +142,11 @@ public class PredicateAbstraction extends Abstraction {
         predicateValuation.scheduleThread(threadInfo);
     }
 	
-	public ScopedSymbolTable getSymbolTable() {		
+	public SystemSymbolTable getSymbolTable() {		
 		return symbolTable;
 	}
 	
-	public ScopedPredicateValuation getPredicateValuation() {	
+	public SystemPredicateValuation getPredicateValuation() {	
 		return predicateValuation;
 	}
 	

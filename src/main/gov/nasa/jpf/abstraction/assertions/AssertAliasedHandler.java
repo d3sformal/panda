@@ -4,14 +4,14 @@ import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
-import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
 
 import java.util.Set;
 import java.util.HashSet;
 
 public class AssertAliasedHandler extends AssertAliasingHandler {
     @Override
-    public void checkAliasing(VM vm, int lineNumber, AccessExpression[] exprs, FlatSymbolTable symbolTable) {
+    public void checkAliasing(VM vm, int lineNumber, AccessExpression[] exprs, MethodFrameSymbolTable symbolTable) {
         // Pick a set of values as a `reference`
         boolean equal = true;
 

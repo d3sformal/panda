@@ -36,7 +36,7 @@ import gov.nasa.jpf.vm.MJIEnv;
 
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
 
@@ -84,7 +84,7 @@ public class IFNONNULL extends gov.nasa.jpf.jvm.bytecode.IFNONNULL implements Ab
         } else if (expr1 instanceof AccessExpression) {
             AccessExpression access = (AccessExpression) expr1;
 
-            FlatSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
+            MethodFrameSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
 
             Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
 

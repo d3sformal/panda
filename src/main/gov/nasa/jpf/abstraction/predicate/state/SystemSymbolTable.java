@@ -39,7 +39,7 @@ import java.util.HashMap;
 /**
  * Symbol table aware of method call scope changes
  */
-public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scoped {
+public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scoped {
     private Universe universe = new Universe();
 
 	/**
@@ -50,7 +50,7 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	private PredicateAbstraction abstraction;
     private Integer currentThreadID = 0;
 	
-	public ScopedSymbolTable(PredicateAbstraction abstraction) {
+	public SystemSymbolTable(PredicateAbstraction abstraction) {
 		this.abstraction = abstraction;
 	}
 
@@ -58,8 +58,8 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	 * Create a scope for a given method
 	 */
 	@Override
-	public FlatSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-		FlatSymbolTable ret = new FlatSymbolTable(scopes.get(currentThreadID).top());
+	public MethodFrameSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
+		MethodFrameSymbolTable ret = new MethodFrameSymbolTable(scopes.get(currentThreadID).top());
 
 		/**
 		 * Register new local variables
@@ -108,8 +108,8 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
 		MethodInfo method = after.getMethodInfo();
 
-		FlatSymbolTable originalScope = scopes.get(currentThreadID).top();
-		FlatSymbolTable newScope = createDefaultScope(threadInfo, method);
+		MethodFrameSymbolTable originalScope = scopes.get(currentThreadID).top();
+		MethodFrameSymbolTable newScope = createDefaultScope(threadInfo, method);
 
 		scopes.get(currentThreadID).push(method.getFullName(), newScope);
 
@@ -254,7 +254,7 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	}
 
     @Override
-    public FlatSymbolTable get(int depth) {
+    public MethodFrameSymbolTable get(int depth) {
         return scopes.get(currentThreadID).top(depth);
     }
 
@@ -263,7 +263,7 @@ public class ScopedSymbolTable extends CallAnalyzer implements SymbolTable, Scop
         universe.add(threadInfo.getThreadObject(), threadInfo);
 
 		SymbolTableStack threadStack = new SymbolTableStack();
-        threadStack.push("-- Dummy stop scope --", new FlatSymbolTable(universe, abstraction));
+        threadStack.push("-- Dummy stop scope --", new MethodFrameSymbolTable(universe, abstraction));
 
         scopes.put(threadInfo.getId(), threadStack);
     }

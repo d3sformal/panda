@@ -32,7 +32,7 @@ import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
@@ -77,7 +77,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
         if (RunDetector.isRunning()) {
             if (!ti.isFirstStepInsn()) {
                 if (ei.arrayLength() > 1) {
-                    FlatSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
+                    MethodFrameSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
     
                     Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
                     symbolTable.lookupValues(path, values);

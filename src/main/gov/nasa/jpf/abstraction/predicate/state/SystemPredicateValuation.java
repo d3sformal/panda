@@ -41,7 +41,7 @@ import java.util.Set;
 /**
  * A predicate valuation aware of method scope changes
  */
-public class ScopedPredicateValuation extends CallAnalyzer implements PredicateValuation, Scoped {
+public class SystemPredicateValuation extends CallAnalyzer implements PredicateValuation, Scoped {
 
 	/**
 	 * Stacks of scopes (pushed by invoke, poped by return) separately for all threads
@@ -53,7 +53,7 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
     private SMT smt = new SMT();
     private Integer currentThreadID;
 	
-	public ScopedPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
+	public SystemPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
 		this.predicateSet = predicateSet;
 		
 		Set<Predicate> predicates = new HashSet<Predicate>();
@@ -104,8 +104,8 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 	 * Collect predicates targeted at the given method and store them in the upcoming scope
 	 */
 	@Override
-	public FlatPredicateValuation createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-		FlatPredicateValuation valuation = new FlatPredicateValuation(smt);
+	public MethodFramePredicateValuation createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
+		MethodFramePredicateValuation valuation = new MethodFramePredicateValuation(smt);
 		
 		if (method == null) return valuation;
 		
@@ -165,13 +165,13 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 		MethodInfo method = after.getMethodInfo();
 		
 		// Scope to be added as the callee scope
-		FlatPredicateValuation calleeScope = createDefaultScope(threadInfo, method);
+		MethodFramePredicateValuation calleeScope = createDefaultScope(threadInfo, method);
 		
 		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
 
 		if (RunDetector.isRunning()) {
 			// Copy of the current caller scope - to avoid modifications - may not be needed now, it is not different from .top() and it is not modified here
-			FlatPredicateValuation callerScope = scopes.get(currentThreadID).top();
+			MethodFramePredicateValuation callerScope = scopes.get(currentThreadID).top();
 			
 			Map<Predicate, Predicate> replaced = new HashMap<Predicate, Predicate>();
 			
@@ -239,7 +239,7 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 		ReturnValue ret = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
 			
         if (RunDetector.isRunning()) {
-			FlatPredicateValuation scope;
+			MethodFramePredicateValuation scope;
 			
 			scope = scopes.get(currentThreadID).top(1);
 			
@@ -280,7 +280,7 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
     @Override
     public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         if (RunDetector.isRunning()) {
-            FlatPredicateValuation callerScope;
+            MethodFramePredicateValuation callerScope;
 
             callerScope = scopes.get(currentThreadID).top(1);
 
@@ -360,7 +360,7 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
             notWantedLocalVariables.removeAll(referenceArgs);
 
             // Collection of predicates in callee and caller that have additional value for update of the caller
-            FlatPredicateValuation relevant = new FlatPredicateValuation(smt);
+            MethodFramePredicateValuation relevant = new MethodFramePredicateValuation(smt);
 
             Set<AccessExpression> temporaryPathsHolder = new HashSet<AccessExpression>();
 
@@ -553,14 +553,14 @@ public class ScopedPredicateValuation extends CallAnalyzer implements PredicateV
 	}
 
     @Override
-    public FlatPredicateValuation get(int depth) {
+    public MethodFramePredicateValuation get(int depth) {
         return scopes.get(currentThreadID).top(depth);
     }
 
     @Override
     public void addThread(ThreadInfo threadInfo) {
 		PredicateValuationStack threadStack = new PredicateValuationStack();
-        threadStack.push("-- Dummy stop scope --", new FlatPredicateValuation(smt));
+        threadStack.push("-- Dummy stop scope --", new MethodFramePredicateValuation(smt));
         scopes.put(threadInfo.getId(), threadStack);
 		
 		// Monitor static predicates in the special starting scope

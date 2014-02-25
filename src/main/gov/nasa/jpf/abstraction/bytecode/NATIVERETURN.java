@@ -29,7 +29,7 @@ import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
-import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 
 public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
@@ -61,7 +61,7 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
             case Types.T_FLOAT:
             case Types.T_LONG:
             case Types.T_DOUBLE:
-                before.setReturnAttr(new NonEmptyAttribute(null, FlatSymbolTable.DUMMY_VARIABLE));
+                before.setReturnAttr(new NonEmptyAttribute(null, MethodFrameSymbolTable.DUMMY_VARIABLE));
                 break;
             
             case Types.T_VOID:

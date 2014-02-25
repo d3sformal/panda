@@ -25,19 +25,19 @@ import java.util.Collections;
 /**
  * A predicate valuation for a single scope
  */
-public class FlatPredicateValuation implements PredicateValuation, Scope {
+public class MethodFramePredicateValuation implements PredicateValuation, Scope {
 	private HashMap<Predicate, TruthValue> valuations = new HashMap<Predicate, TruthValue>();
     private HashMap<Predicate, Set<Predicate>> determinantCache = new HashMap<Predicate, Set<Predicate>>();
     private SMT smt;
 
-    public FlatPredicateValuation(SMT smt) {
+    public MethodFramePredicateValuation(SMT smt) {
         this.smt = smt;
     }
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public FlatPredicateValuation clone() {
-		FlatPredicateValuation clone = new FlatPredicateValuation(smt);
+	public MethodFramePredicateValuation clone() {
+		MethodFramePredicateValuation clone = new MethodFramePredicateValuation(smt);
 		
 		clone.valuations = (HashMap<Predicate, TruthValue>)valuations.clone();
 

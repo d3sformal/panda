@@ -51,8 +51,8 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
-import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
-import gov.nasa.jpf.abstraction.predicate.state.FlatPredicateValuation;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFramePredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseValue;
 import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValue;
@@ -211,7 +211,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         }
     }
 
-    protected void serializeLocalVariables(FlatSymbolTable currentScope) {
+    protected void serializeLocalVariables(MethodFrameSymbolTable currentScope) {
         for (Root local : currentScope.getLocalVariables()) {
             LocalVariable v = currentScope.getLocal(local);
 
@@ -230,7 +230,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         buf.add(value.ordinal());
     }
 
-    protected void serializePredicates(FlatPredicateValuation currentScope) {
+    protected void serializePredicates(MethodFramePredicateValuation currentScope) {
         // sort predicates
         Set<Predicate> order = new TreeSet<Predicate>(new Comparator<Predicate>() {
             public int compare(Predicate p1, Predicate p2) {
@@ -255,8 +255,8 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
 		buf.add(frame.getMethodInfo().getGlobalId());
 
-        FlatSymbolTable currentSymbolScope = pabs.getSymbolTable().get(depth);
-        FlatPredicateValuation currentPredicateScope = pabs.getPredicateValuation().get(depth);
+        MethodFrameSymbolTable currentSymbolScope = pabs.getSymbolTable().get(depth);
+        MethodFramePredicateValuation currentPredicateScope = pabs.getPredicateValuation().get(depth);
 
 		// there can be (rare) cases where a listener sets a null nextPc in
 		// a frame that is still on the stack

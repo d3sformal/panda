@@ -3,8 +3,8 @@ package gov.nasa.jpf.abstraction.predicate;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.Root;
-import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
-import gov.nasa.jpf.abstraction.predicate.state.FlatPredicateValuation;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFramePredicateValuation;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.predicate.state.universe.LocalVariable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
@@ -168,7 +168,7 @@ public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSer
     }
 
     @Override
-    protected void serializeLocalVariables(FlatSymbolTable currentScope) {
+    protected void serializeLocalVariables(MethodFrameSymbolTable currentScope) {
         out.println("\t\t" + "local variables:");
 
         super.serializeLocalVariables(currentScope);
@@ -193,7 +193,7 @@ public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSer
     }
 
     @Override
-    protected void serializePredicates(FlatPredicateValuation currentScope) {
+    protected void serializePredicates(MethodFramePredicateValuation currentScope) {
         out.println("\t\t" + "predicates:");
 
         predicateLength = 0;

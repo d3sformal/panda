@@ -10,7 +10,7 @@ import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.predicate.state.FlatSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
 
 import java.util.Set;
@@ -19,7 +19,7 @@ import java.util.HashSet;
 public class AssertNumberOfPossibleValuesHandler extends AssertHandler {
     @Override
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
-        FlatSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
+        MethodFrameSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
 
         StackFrame sf = curTh.getModifiableTopFrame();
 
