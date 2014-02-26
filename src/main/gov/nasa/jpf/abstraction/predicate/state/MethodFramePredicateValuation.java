@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.Config;
+import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Comparator;
 import java.util.Collections;
 
@@ -431,7 +433,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
     @Override
     public Integer evaluateExpression(Expression expression) {
-        Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+        List<Pair<Predicate, TruthValue>> determinants = new LinkedList<Pair<Predicate, TruthValue>>();
                 
         // An auxiliary predicate used to get all determining predicates
         // Determinants are defined only for predicates, not expressions
@@ -439,7 +441,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
         // Collect determinant valuations
         for (Predicate predicate : computeDeterminantClosure(determinantSelector, getPredicates())) {
-            determinants.put(predicate, get(predicate));
+            determinants.add(new Pair<Predicate, TruthValue>(predicate, get(predicate)));
         }
 
         // Query any model
@@ -447,7 +449,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
         if (model1 != null) {
             // Forbid the first model, look for others
-            determinants.put(Equals.create(expression, Constant.create(model1)), TruthValue.FALSE);
+            determinants.add(new Pair<Predicate, TruthValue>(Equals.create(expression, Constant.create(model1)), TruthValue.FALSE));
 
             Integer model2 = smt.getModel(expression, determinants);
 

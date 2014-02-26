@@ -17,6 +17,7 @@ import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.common.Notation;
+import gov.nasa.jpf.abstraction.util.Pair;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -290,7 +291,7 @@ public class SMT {
 		return input.toString();
 	}
 
-    public Integer getModel(Expression expression, Map<Predicate, TruthValue> determinants) {
+    public Integer getModel(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {
         Predicate valueConstraint = Equals.create(expression, SpecialVariable.create("value"));
 
         PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
@@ -299,10 +300,13 @@ public class SMT {
 
         Predicate query = valueConstraint;
 
-        for (Predicate determinant : determinants.keySet()) {
+        for (Pair<Predicate, TruthValue> pair : determinants) {
+            Predicate determinant = pair.getFirst();
+            TruthValue value = pair.getSecond();
+
             collector.collect(determinant);
 
-            switch (determinants.get(determinant)) {
+            switch (value) {
                 case TRUE:
                     query = Conjunction.create(query, determinant);
                     break;
@@ -459,7 +463,7 @@ public class SMT {
 			formula = Conjunction.create(formula, clause);
 		}
 		
-		for (Predicate predicate : determinants.keySet()) {		
+		for (Predicate predicate : determinants.keySet()) {
 			switch (determinants.get(predicate)) {
 			case TRUE:
 				formula = Conjunction.create(formula, predicate);
