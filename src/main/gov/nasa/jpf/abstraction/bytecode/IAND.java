@@ -25,7 +25,8 @@ import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Multiply;
 
 /**
  * And integer
@@ -49,10 +50,18 @@ public class IAND extends gov.nasa.jpf.jvm.bytecode.IAND implements AbstractBina
 		AbstractValue abs_v1 = attr1.getAbstractValue();
 		AbstractValue abs_v2 = attr2.getAbstractValue();
 
+        Expression a = attr1.getExpression();
+        Expression b = attr2.getExpression();
+
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new NonEmptyAttribute(Abstraction._and(v1, abs_v1, v2, abs_v2), Constant.create(0)); // TODO: IMPLEMENT LOGICAL AND BITWISE OPERATORS
+        // Assume input values to be either 0 or 1 (logical)
+        // Other values will result in errors (bitwise)
+        //
+        // Therefore:
+        // MUL(a, b) = AND(a, b)
+		return new NonEmptyAttribute(Abstraction._and(v1, abs_v1, v2, abs_v2), Multiply.create(a, b));
 	}
 
 	@Override
