@@ -304,4 +304,56 @@ public class Universe {
     public Set<StructuredValueIdentifier> getStructuredValues() {
         return currentStructuredRealization.keySet();
     }
+
+    public void retainLiveValuesOnly(Set<UniverseIdentifier> liveRoots) {
+        // Compute reachability closure
+        Set<UniverseIdentifier> open = liveRoots;
+        Set<UniverseIdentifier> closed = new HashSet<UniverseIdentifier>();
+
+        while (!open.isEmpty()) {
+            Set<UniverseIdentifier> nextOpen = new HashSet<UniverseIdentifier>();
+
+            for (UniverseIdentifier id : open) {
+                if (id instanceof StructuredValueIdentifier) {
+                    StructuredValue value = currentStructuredRealization.get((StructuredValueIdentifier) id);
+
+                    for (UniverseSlot slot : value.getSlots().values()) {
+                        nextOpen.addAll(slot.getPossibleValues());
+                    }
+                }
+            }
+
+            closed.addAll(open);
+            nextOpen.removeAll(closed);
+            open = nextOpen;
+        }
+
+        Set<UniverseIdentifier> liveValues = closed;
+
+        // Remove unreachable structured
+        Set<StructuredValueIdentifier> structuredToBeRemoved = new HashSet<StructuredValueIdentifier>();
+
+        for (StructuredValueIdentifier id : currentStructuredRealization.keySet()) {
+            if (!liveValues.contains(id)) {
+                structuredToBeRemoved.add(id);
+            }
+        }
+
+        for (StructuredValueIdentifier id : structuredToBeRemoved) {
+            currentStructuredRealization.remove(id);
+        }
+
+        // Remove unreachable primitive
+        Set<PrimitiveValueIdentifier> primitiveToBeRemoved = new HashSet<PrimitiveValueIdentifier>();
+
+        for (PrimitiveValueIdentifier id : currentPrimitiveRealization.keySet()) {
+            if (!liveValues.contains(id)) {
+                primitiveToBeRemoved.add(id);
+            }
+        }
+
+        for (PrimitiveValueIdentifier id : primitiveToBeRemoved) {
+            currentPrimitiveRealization.remove(id);
+        }
+    }
 }

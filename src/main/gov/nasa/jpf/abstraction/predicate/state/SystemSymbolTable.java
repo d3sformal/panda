@@ -190,6 +190,14 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	public void restore(Map<Integer, ? extends Scopes> scopes) {
         this.scopes.clear();
 
+        if (!scopes.isEmpty()) {
+            SymbolTableStack stack = (SymbolTableStack) scopes.get(scopes.keySet().iterator().next());
+
+            if (stack.count() > 0) {
+                this.universe = stack.top().getUniverse().clone();
+            }
+        }
+
         for (Integer threadId : scopes.keySet()) {
             Scopes threadScopes = scopes.get(threadId);
 
@@ -198,8 +206,8 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 
                 this.scopes.put(threadId, threadSymbolTableScopes.clone());
 
-                if (threadSymbolTableScopes.count() > 0) {
-                    this.universe = threadSymbolTableScopes.top().getUniverse();
+                for (MethodFrameSymbolTable scope : this.scopes.get(threadId)) {
+                    scope.setUniverse(this.universe);
                 }
 		    } else {
         		throw new RuntimeException("Invalid scopes type being restored!");
@@ -211,8 +219,14 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 	public Map<Integer, SymbolTableStack> memorize() {
         Map<Integer, SymbolTableStack> scopesClone = new HashMap<Integer, SymbolTableStack>();
 
+        Universe universeClone = universe.clone();
+
         for (Integer threadId : scopes.keySet()) {
             scopesClone.put(threadId, scopes.get(threadId).clone());
+
+            for (MethodFrameSymbolTable scope : scopesClone.get(threadId)) {
+                scope.setUniverse(universeClone);
+            }
         }
 
 		return scopesClone;
@@ -240,7 +254,7 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 
 	@Override
 	public Universe getUniverse() {
-		return scopes.get(currentThreadID).top().getUniverse();
+		return universe;
 	}
 
 	@Override
@@ -250,12 +264,20 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 
 	@Override
 	public int depth() {
-        return scopes.get(currentThreadID).count();
+        return depth(currentThreadID);
+	}
+
+	public int depth(int threadID) {
+        return scopes.get(threadID).count();
 	}
 
     @Override
     public MethodFrameSymbolTable get(int depth) {
-        return scopes.get(currentThreadID).top(depth);
+        return get(currentThreadID, depth);
+    }
+
+    public MethodFrameSymbolTable get(int threadID, int depth) {
+        return scopes.get(threadID).top(depth);
     }
 
     @Override

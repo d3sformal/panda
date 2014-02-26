@@ -163,6 +163,10 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 		return universe;
 	}
 
+    public void setUniverse(Universe universe) {
+        this.universe = universe;
+    }
+
     private void createPrimitiveLocalVariable(PrimitiveLocalVariable v) {
         PrimitiveValue value = universe.get(universe.add());
 
@@ -828,7 +832,7 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 	
 	@Override
 	public MethodFrameSymbolTable clone() {
-		MethodFrameSymbolTable clone = new MethodFrameSymbolTable(universe.clone(), abstraction, getScope());
+		MethodFrameSymbolTable clone = new MethodFrameSymbolTable(universe, abstraction, getScope());
 		
         clone.locals.putAll(locals);
         clone.returns.putAll(returns);

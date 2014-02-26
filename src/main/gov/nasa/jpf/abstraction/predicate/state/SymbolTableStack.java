@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 import gov.nasa.jpf.abstraction.util.Pair;
 
@@ -11,7 +12,7 @@ import gov.nasa.jpf.abstraction.util.Pair;
  * method call = push
  * method return = pop
  */
-public class SymbolTableStack implements Scopes {
+public class SymbolTableStack implements Scopes, Iterable<MethodFrameSymbolTable> {
 	
 	private List<Pair<String, MethodFrameSymbolTable>> scopes = new ArrayList<Pair<String, MethodFrameSymbolTable>>();
 
@@ -60,6 +61,28 @@ public class SymbolTableStack implements Scopes {
         for (Pair<String, MethodFrameSymbolTable> scope : scopes) {
             System.out.println(scope.getFirst());
         }
+    }
+
+    @Override
+    public Iterator<MethodFrameSymbolTable> iterator() {
+        final Iterator<Pair<String, MethodFrameSymbolTable>> iterator = scopes.iterator();
+
+        return new Iterator<MethodFrameSymbolTable>() {
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public MethodFrameSymbolTable next() {
+                return iterator.next().getSecond();
+            }
+
+            @Override
+            public void remove() {
+                iterator.remove();
+            }
+        };
     }
 
 }

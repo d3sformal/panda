@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 import gov.nasa.jpf.abstraction.util.Pair;
 
@@ -11,7 +12,7 @@ import gov.nasa.jpf.abstraction.util.Pair;
  * method call = push
  * method return = pop
  */
-public class PredicateValuationStack implements Scopes {
+public class PredicateValuationStack implements Scopes, Iterable<MethodFramePredicateValuation> {
 	
 	private List<Pair<String, MethodFramePredicateValuation>> scopes = new ArrayList<Pair<String, MethodFramePredicateValuation>>();
 
@@ -60,6 +61,28 @@ public class PredicateValuationStack implements Scopes {
         for (Pair<String, MethodFramePredicateValuation> scope : scopes) {
             System.out.println(scope.getFirst());
         }
+    }
+
+    @Override
+    public Iterator<MethodFramePredicateValuation> iterator() {
+        final Iterator<Pair<String, MethodFramePredicateValuation>> iterator = scopes.iterator();
+
+        return new Iterator<MethodFramePredicateValuation>() {
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public MethodFramePredicateValuation next() {
+                return iterator.next().getSecond();
+            }
+
+            @Override
+            public void remove() {
+                iterator.remove();
+            }
+        };
     }
 
 }

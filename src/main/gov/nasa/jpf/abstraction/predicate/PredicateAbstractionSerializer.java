@@ -33,8 +33,6 @@ import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Fields;
-import gov.nasa.jpf.vm.ClassInfo;
-import gov.nasa.jpf.vm.ClassLoaderInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -77,6 +75,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
 	static JPFLogger logger = JPF.getLogger("gov.nasa.jpf.abstraction.PredicateAbstractionSerializer");
     protected int depth = 0;
+    protected int thread = 0;
     protected PredicateAbstraction pabs;
     protected Universe universe;
     protected Map<StructuredValueIdentifier, Integer> canonical = new HashMap<StructuredValueIdentifier, Integer>();
@@ -199,6 +198,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     @Override
 	protected void serializeStackFrames(ThreadInfo ti){
         depth = 0;
+        thread = ti.getId();
 
         super.serializeStackFrames(ti);
 	}
@@ -255,8 +255,8 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
 		buf.add(frame.getMethodInfo().getGlobalId());
 
-        MethodFrameSymbolTable currentSymbolScope = pabs.getSymbolTable().get(depth);
-        MethodFramePredicateValuation currentPredicateScope = pabs.getPredicateValuation().get(depth);
+        MethodFrameSymbolTable currentSymbolScope = pabs.getSymbolTable().get(thread, depth);
+        MethodFramePredicateValuation currentPredicateScope = pabs.getPredicateValuation().get(thread, depth);
 
 		// there can be (rare) cases where a listener sets a null nextPc in
 		// a frame that is still on the stack

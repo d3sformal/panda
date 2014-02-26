@@ -554,7 +554,11 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
     @Override
     public MethodFramePredicateValuation get(int depth) {
-        return scopes.get(currentThreadID).top(depth);
+        return get(currentThreadID, depth);
+    }
+
+    public MethodFramePredicateValuation get(int threadID, int depth) {
+        return scopes.get(threadID).top(depth);
     }
 
     @Override
