@@ -20,6 +20,8 @@ import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -263,6 +265,8 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 		expression.getArray().accept(this);
 		expression.getArrays().accept(this);
 		expression.getIndex().accept(this);
+
+        addAdditionalPredicate(Equals.create(DefaultArrayElementRead.create(DefaultFresh.create(), expression.getIndex()), NullExpression.create()));
 		
 		addObject(expression);
 	}
