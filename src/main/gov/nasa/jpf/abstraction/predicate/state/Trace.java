@@ -10,8 +10,16 @@ public class Trace {
 	private Stack<State> states = new Stack<State>();
 	
 	public State top() {
-		return states.lastElement();
+		return top(0);
 	}
+
+    public State top(int i) {
+        return states.get(states.size() - i - 1);
+    }
+
+    public State get(int i) {
+        return states.get(i);
+    }
 	
 	public void pop() {
 		states.pop();

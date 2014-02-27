@@ -22,4 +22,5 @@ public interface Scoped {
     public void print();
     public void addThread(ThreadInfo threadInfo);
     public void scheduleThread(ThreadInfo threadInfo);
+    public void scheduleThread(int threadID);
 }

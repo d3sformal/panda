@@ -156,7 +156,7 @@ public class PredicateAbstraction extends Abstraction {
 		Map<Integer, PredicateValuationStack> predicates = new HashMap<Integer, PredicateValuationStack>();
 
         // Initial state for last backtrack
-		State state = new State(symbols, predicates);
+		State state = new State(mainThread.getId(), symbols, predicates);
 		
 		trace.push(state);
 
@@ -175,7 +175,7 @@ public class PredicateAbstraction extends Abstraction {
 
 	@Override
 	public void forward(MethodInfo method) {		
-		State state = new State(symbolTable.memorize(), predicateValuation.memorize());
+		State state = new State(VM.getVM().getCurrentThread().getId(), symbolTable.memorize(), predicateValuation.memorize());
 		
 		trace.push(state);
 	}
@@ -185,10 +185,16 @@ public class PredicateAbstraction extends Abstraction {
 		trace.pop();
 		
 		symbolTable.restore(trace.top().symbolTableStacks);
+        symbolTable.scheduleThread(trace.top().currentThread);
 		predicateValuation.restore(trace.top().predicateValuationStacks);
+        predicateValuation.scheduleThread(trace.top().currentThread);
 
         if (trace.isEmpty()) {
             predicateValuation.close();
         }
 	}
+
+    public Trace getTrace() {
+        return trace;
+    }
 }

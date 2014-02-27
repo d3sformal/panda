@@ -292,7 +292,12 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 
     @Override
     public void scheduleThread(ThreadInfo threadInfo) {
-        currentThreadID = threadInfo.getId();
+        scheduleThread(threadInfo.getId());
+    }
+
+    @Override
+    public void scheduleThread(int threadID) {
+        currentThreadID = threadID;
     }
 
     @Override
