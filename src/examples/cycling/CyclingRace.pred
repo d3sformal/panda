@@ -1,4 +1,4 @@
-[method race.CyclingRace.main]
+[method cycling.CyclingRace.main]
 results[0].time < results[1].time
 results[1].time < results[2].time
 results[0] = null

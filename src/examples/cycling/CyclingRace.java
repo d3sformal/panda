@@ -1,4 +1,4 @@
-package race;
+package cycling;
 
 public class CyclingRace
 {
