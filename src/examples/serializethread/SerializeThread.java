@@ -6,12 +6,12 @@ public class SerializeThread {
     }
 
     public void test() throws Exception {
-        final SerializeThread lock = this;
+        final SerializeThread lockObject = this;
 
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized (lock) {
+                synchronized (lockObject) {
                     // MAYBE DO SOMETHING
                 }
             }
@@ -19,7 +19,7 @@ public class SerializeThread {
 
         t.start();
 
-        synchronized (lock) {
+        synchronized (lockObject) {
             // MAYBE DO SOMETHING
         }
 

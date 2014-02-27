@@ -1,9 +1,7 @@
 package scheduler;
 
-public class Scheduler
+public class Scheduler 
 {
-    private static int SCHEDULE_SIZE = 5;
-
 	public static void main(String[] args) {
 		ThreadInfo[] id2thread = new ThreadInfo[3];
 
@@ -19,12 +17,8 @@ public class Scheduler
 
 		// compute order in which threads should run
 		int schedule_size = 0;
-		int[] schedule = new int[SCHEDULE_SIZE];
+		int[] schedule = new int[SchedulerConfig.SIZE];
 
-		//int i = 0;
-		//int j = 0;
-		//int k = 0;
-		
 		// set of active threads is iterated when to make scheduling decisions
 		for (int k = 0; k < id2thread.length; ++k) {
 			ThreadInfo actTh = id2thread[k];
@@ -57,6 +51,10 @@ public class Scheduler
 	}
 }
 
+class SchedulerConfig {
+    public static int SIZE = 5;
+}
+ 
 class ThreadInfo
 {
 	public int priority;
