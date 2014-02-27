@@ -53,6 +53,21 @@ public class SMT {
 			listener.valuatePredicatesInvoked(predicates);
 		}
 	}
+	private static void notifyGetModelInvoked(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {
+		for (SMTListener listener : listeners) {
+			listener.getModelInvoked(expression, determinants);
+		}
+	}
+	private static void notifyGetModelInputGenerated(String input) {
+		for (SMTListener listener : listeners) {
+			listener.getModelInputGenerated(input);
+		}
+	}
+	private static void notifyGetModelExecuted(Boolean satisfiability, Integer model) {
+		for (SMTListener listener : listeners) {
+			listener.getModelExecuted(satisfiability, model);
+		}
+	}
 	private static void notifyValuatePredicatesInvoked(Set<Predicate> predicates) {
 		for (SMTListener listener : listeners) {
 			listener.valuatePredicatesInvoked(predicates);
@@ -83,15 +98,34 @@ public class SMT {
     }
     private static enum FormulaType {
         POSITIVE_WEAKEST_PRECONDITION_CHECK,
-        NEGATIVE_WEAKEST_PRECONDITION_CHECK;
+        NEGATIVE_WEAKEST_PRECONDITION_CHECK,
+        MODEL_QUERY;
 
         @Override
         public String toString() {
             switch (this) {
                 case POSITIVE_WEAKEST_PRECONDITION_CHECK: return "positive weakest precondition check";
                 case NEGATIVE_WEAKEST_PRECONDITION_CHECK: return "negative weakest precondition check";
+                case MODEL_QUERY:                         return "model query";
                 default:                                  return null;
             }
+        }
+    }
+    public static class QueryResponse {
+        private Boolean satisfiable;
+        private Integer model;
+
+        public QueryResponse(Boolean satisfiable, Integer model) {
+            this.satisfiable = satisfiable;
+            this.model = model;
+        }
+
+        public Boolean getSatisfiability() {
+            return satisfiable;
+        }
+
+        public Integer getModel() {
+            return model;
         }
     }
 	
@@ -120,9 +154,10 @@ public class SMT {
                 "(set-logic QF_AUFLIA)" + separator +
 		        "(declare-fun arr () (Array Int (Array Int Int)))" + separator +
     		    "(declare-fun arrlen () (Array Int Int))" + separator +
-	    	    "(declare-fun fresh () Int)" + separator +
-		        "(declare-fun null () Int)" + separator +
-		        "(declare-fun dummy () Int)" + separator +
+	    	    "(declare-fun fresh () Int)" + separator + // new object
+		        "(declare-fun null () Int)" + separator +  // java null
+		        "(declare-fun dummy () Int)" + separator + // for emulating variables in native returns
+		        "(declare-fun value () Int)" + separator + // for extracting models
     		    separator
             );
             in.flush();
@@ -157,8 +192,8 @@ public class SMT {
         }
     }
 	
-	private boolean[] isValid(int count, String input) throws SMTException {
-		boolean[] values = new boolean[2 * count];
+	private QueryResponse[] isSatisfiable(int count, String input, boolean extractModels) throws SMTException {
+		QueryResponse[] values = new QueryResponse[count];
 			
 		String output = "";
 		
@@ -175,12 +210,32 @@ public class SMT {
 		}
 
 		try {
-            for (int i = 0; i < 2 * count; ++i) {
+            for (int i = 0; i < count; ++i) {
                 output = out.readLine();
 				if (output == null || !output.matches("^(un)?sat$")) {
 					throw new SMTException("SMT replied with '" + output + "'");
 				}
-				values[i] = output.matches("^unsat$");
+
+				Boolean satisfiable = output.matches("^sat$");
+                Integer model = null;
+
+                if (extractModels) {
+			        if (satisfiable) {
+                        output = out.readLine();
+
+                        Pattern pattern = Pattern.compile("^\\( \\(value (?<value>[0-9]*)\\) \\)$");
+                        Matcher matcher = pattern.matcher(output);
+
+                        if (matcher.matches()) {
+                            String value = matcher.group("value");
+                            model = Integer.valueOf(value);
+                        }
+                    } else {
+                        out.readLine();
+                    }
+                }
+
+                values[i] = new QueryResponse(satisfiable, model);
 			}
 		} catch (IOException e) {
 			System.err.println("SMT refuses to provide output.");
@@ -191,34 +246,45 @@ public class SMT {
 		return values;
 	}
 
-    private String prepareFormula(Predicate predicate, String formula, FormulaType formulaType, InputType inputType, Boolean cachedIsValid) {
+    private String prepareFormula(Predicate predicate, String formula, FormulaType formulaType, InputType inputType, Boolean cachedIsSatisfiable, Integer cachedModel, boolean extractModel) {
         String separator = inputType.getSeparator();
-        String linePrefix = cachedIsValid == null ? "" : "; ";
+        String linePrefix = cachedIsSatisfiable == null ? "" : "; ";
         StringBuilder ret = new StringBuilder();
 
         if (inputType == InputType.DEBUG) {
             ret.append("; Predicate: " + predicate.toString(Notation.DOT_NOTATION) + " (" + formulaType + ")\n");
         }
 
-        if (inputType == InputType.DEBUG || cachedIsValid == null) {
+        // The actual call to SMT (formula, model retrieval)
+        if (inputType == InputType.DEBUG || cachedIsSatisfiable == null) {
             ret.append(linePrefix); ret.append("(push 1)"); ret.append(separator);
             ret.append(linePrefix); ret.append("(assert "); ret.append(formula); ret.append(")"); ret.append(separator);
 		    ret.append(linePrefix); ret.append("(check-sat)"); ret.append(separator);
+
+            if (extractModel) {
+    		    ret.append(linePrefix); ret.append("(get-value (value))"); ret.append(separator);
+            }
+
 			ret.append(linePrefix); ret.append("(pop 1)"); ret.append(separator);
         }
 
-		// when the cached value says "is valid" (boolean value of the corresponding parameter is 'true'),
-		// the SMT solver must answer "unsat" and therefore input must be "assert false"
-
-        if (inputType == InputType.NORMAL && cachedIsValid != null) {
+        // Reuse of cached values
+        if (inputType == InputType.NORMAL && cachedIsSatisfiable != null) {
             ret.append("(push 1)"); ret.append(separator);
-            ret.append("(assert "); ret.append(cachedIsValid ? "false" : "true"); ret.append(")"); ret.append(separator);
+            ret.append("(assert "); ret.append(cachedIsSatisfiable); ret.append(")"); ret.append(separator);
+            ret.append("(assert (= value "); ret.append(cachedModel); ret.append("))"); ret.append(separator);
             ret.append("(check-sat)"); ret.append(separator);
+
+            if (extractModel) {
+                ret.append("(get-value (value))"); ret.append(separator);
+            }
+
             ret.append("(pop 1)"); ret.append(separator);
         }
 
-        if (inputType == InputType.DEBUG && cachedIsValid != null) {
-            ret.append("; cached "); ret.append(cachedIsValid ? "unsat" : "sat"); ret.append(separator);
+        // Report cached values
+        if (inputType == InputType.DEBUG && cachedIsSatisfiable != null) {
+            ret.append("; cached "); ret.append(cachedIsSatisfiable ? "sat" + (extractModel ? " " + cachedModel : "") : "unsat"); ret.append(separator);
         }
 
         ret.append(separator);
@@ -246,8 +312,41 @@ public class SMT {
 		}
 		input.append(separator);
     }
-	
-	private String prepareInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<Predicate> predicates, List<String> formulas, InputType inputType) {
+
+	private String prepareGetModelInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, Predicate predicate, String formula, InputType inputType) {
+        String separator = inputType.getSeparator();
+
+		StringBuilder input = new StringBuilder();
+
+        input.append("(push 1)"); input.append(separator);
+        appendClassDeclarations(classes, input, separator);
+        appendVariableDeclarations(vars, input, separator);
+        appendFieldDeclarations(fields, input, separator);
+		
+        Set<String> freshConstraints = new HashSet<String>();
+
+		for (AccessExpression object : objects) {
+			Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.create(DefaultFresh.create(), object)));
+			
+			freshConstraints.add("(assert " + convertToString(distinction) + ")" + separator);
+		}
+
+        for (String constraint : freshConstraints) {
+            input.append(constraint);
+        }
+		input.append(separator);
+
+        Boolean cachedValue = cache.get(formula).getSatisfiability();
+        Integer cachedModel = cache.get(formula).getModel();
+
+		input.append(prepareFormula(predicate, formula, FormulaType.MODEL_QUERY, inputType, cachedValue, cachedModel, true));
+		
+        input.append("(pop 1)"); input.append(separator);
+		
+		return input.toString();
+    }
+
+	private String prepareValuatePredicatesInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<Predicate> predicates, List<String> formulas, InputType inputType) {
         String separator = inputType.getSeparator();
 
 		StringBuilder input = new StringBuilder();
@@ -279,11 +378,11 @@ public class SMT {
             String positiveWeakestPreconditionFormula = formulasIterator.next();
             String negativeWeakestPreconditionFormula = formulasIterator.next();
 
-            Boolean cachedPositiveValue = cache.get(positiveWeakestPreconditionFormula);
-            Boolean cachedNegativeValue = cache.get(negativeWeakestPreconditionFormula);
+            Boolean cachedPositiveValue = cache.get(positiveWeakestPreconditionFormula).getSatisfiability();
+            Boolean cachedNegativeValue = cache.get(negativeWeakestPreconditionFormula).getSatisfiability();
 
-			input.append(prepareFormula(predicate, positiveWeakestPreconditionFormula, FormulaType.POSITIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedPositiveValue));
-			input.append(prepareFormula(predicate, negativeWeakestPreconditionFormula, FormulaType.NEGATIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedNegativeValue));
+			input.append(prepareFormula(predicate, positiveWeakestPreconditionFormula, FormulaType.POSITIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedPositiveValue, null, false));
+			input.append(prepareFormula(predicate, negativeWeakestPreconditionFormula, FormulaType.NEGATIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedNegativeValue, null, false));
 		}
 		
         input.append("(pop 1)"); input.append(separator);
@@ -292,90 +391,40 @@ public class SMT {
 	}
 
     public Integer getModel(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {
-        Predicate valueConstraint = Equals.create(expression, SpecialVariable.create("value"));
+		notifyGetModelInvoked(expression, determinants);
 
+        Predicate valueConstraint = Equals.create(SpecialVariable.create("value"), expression);
         PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
 
         collector.collect(valueConstraint);
 
-        Predicate query = valueConstraint;
-
         for (Pair<Predicate, TruthValue> pair : determinants) {
             Predicate determinant = pair.getFirst();
-            TruthValue value = pair.getSecond();
 
             collector.collect(determinant);
-
-            switch (value) {
-                case TRUE:
-                    query = Conjunction.create(query, determinant);
-                    break;
-                    
-                case FALSE:
-                    query = Conjunction.create(query, Negation.create(determinant));
-                    break;
-
-                default:
-            }
-        
-            for (Predicate additional : collector.getAdditionalPredicates(determinant)) {
-                query = Conjunction.create(query, additional);
-            }
         }
 
-        String separator = InputType.NORMAL.getSeparator();
+		Set<String> classes = collector.getClasses();
+		Set<String> variables = collector.getVars();
+		Set<String> fields = collector.getFields();
+		Set<AccessExpression> objects = Collections.emptySet();
 
-        StringBuilder input = new StringBuilder();
+        String formula = createFormula(valueConstraint, determinants, collector.getAdditionalPredicates(valueConstraint));
 
-        input.append("(push 1)"); input.append(separator);
-        input.append("(declare-fun value () Int)"); input.append(separator);
+        String input = prepareGetModelInput(classes, variables, fields, objects, valueConstraint, formula, InputType.NORMAL);
+        String debugInput = prepareGetModelInput(classes, variables, fields, objects, valueConstraint, formula, InputType.DEBUG);
 
-        appendClassDeclarations(collector.getClasses(), input, separator);
-        appendVariableDeclarations(collector.getVars(), input, separator);
-        appendFieldDeclarations(collector.getFields(), input, separator);
+		notifyGetModelInputGenerated(debugInput);
 
-        input.append("(assert " + convertToString(query) + ")"); input.append(separator);
+        QueryResponse response = isSatisfiable(1, input, true)[0];
 
-        input.append("(check-sat)"); input.append(separator);
-        input.append("(get-value (value))"); input.append(separator);
-        input.append("(pop 1)"); input.append(separator);
+        if (USE_CACHE) {
+            cache.put(input, response);
+        }
 
-        Integer ret = null;
+		notifyGetModelExecuted(response.getSatisfiability(), response.getModel());
 
-		try {
-    		in.write(input.toString());
-    		in.flush();
-		} catch (IOException e) {
-			System.err.println("SMT refuses input.");
-			
-			throw new SMTException(e);
-		}
-
-		try {
-            String output = out.readLine();
-			if (output == null || !output.matches("^(un)?sat$")) {
-				throw new SMTException("SMT replied with '" + output + "'");
-			}
-			if (output.matches("^sat$")) {
-                output = out.readLine();
-
-                Pattern pattern = Pattern.compile("^\\( \\(value (?<value>[0-9]*)\\) \\)$");
-                Matcher matcher = pattern.matcher(output);
-
-                if (matcher.matches()) {
-                    String value = matcher.group("value");
-                    ret = Integer.valueOf(value);
-                }
-            } else {
-                out.readLine();
-            }
-		} catch (IOException e) {
-			System.err.println("SMT refuses to provide output.");
-			
-			throw new SMTException(e);
-		}
-
-        return ret;
+        return response.getModel();
     }
 
 	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateValueDeterminingInfo> predicates) throws SMTException {
@@ -422,8 +471,8 @@ public class SMT {
 		Set<String> fields = collector.getFields();
 		Set<AccessExpression> objects = collector.getObjects();
 		
-		String input = prepareInput(classes, vars, fields, objects, predicatesList, formulasList, InputType.NORMAL);
-		String debugInput = prepareInput(classes, vars, fields, objects, predicatesList, formulasList, InputType.DEBUG);
+		String input = prepareValuatePredicatesInput(classes, vars, fields, objects, predicatesList, formulasList, InputType.NORMAL);
+		String debugInput = prepareValuatePredicatesInput(classes, vars, fields, objects, predicatesList, formulasList, InputType.DEBUG);
 
 		notifyValuatePredicatesInputGenerated(debugInput);
 		
@@ -451,6 +500,33 @@ public class SMT {
 		
 		return stringifier.getString();
 	}
+
+    private static String createFormula(Predicate valueConstraint, List<Pair<Predicate, TruthValue>> determinants, Set<Predicate> additionalClauses) {
+        Predicate formula = valueConstraint;
+
+        for (Pair<Predicate, TruthValue> pair : determinants) {
+            Predicate determinant = pair.getFirst();
+            TruthValue value = pair.getSecond();
+
+            switch (value) {
+                case TRUE:
+                    formula = Conjunction.create(formula, determinant);
+                    break;
+                    
+                case FALSE:
+                    formula = Conjunction.create(formula, Negation.create(determinant));
+                    break;
+
+                default:
+            }
+        
+            for (Predicate additional : additionalClauses) {
+                formula = Conjunction.create(formula, additional);
+            }
+        }
+
+        return convertToString(formula);
+    }
 	
 	private static String createFormula(Predicate weakestPrecondition, Map<Predicate, TruthValue> determinants, Set<Predicate> additionalClauses) {
 		Predicate formula = Tautology.create();
@@ -488,10 +564,10 @@ public class SMT {
 	private Map<Predicate, TruthValue> evaluate(String input, String debugInput, List<Predicate> predicates, List<String> formulas) throws SMTException {
 		Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 		
-		boolean[] valid;
+		QueryResponse[] negationSatisfiable;
 
         try {
-    		valid = isValid(predicates.size(), input);
+    		negationSatisfiable = isSatisfiable(2 * predicates.size(), input, false);
         } catch (SMTException e) {
     	    throw new SMTException("SMT failed on:\n" + debugInput + "\n" + e.getMessage());
         }
@@ -506,19 +582,19 @@ public class SMT {
             String positiveWeakestPrecondition = formulasIterator.next();
             String negativeWeakestPrecondition = formulasIterator.next();
 
-			if (valid[i] && valid[i + 1]) {
+			if (!negationSatisfiable[i].getSatisfiability() && !negationSatisfiable[i + 1].getSatisfiability()) {
 				valuation.put(predicate, TruthValue.UNKNOWN);
-			} else if (valid[i]) {
+			} else if (!negationSatisfiable[i].getSatisfiability()) {
 				valuation.put(predicate, TruthValue.TRUE);
-			} else if (valid[i + 1]) {
+			} else if (!negationSatisfiable[i + 1].getSatisfiability()) {
 				valuation.put(predicate, TruthValue.FALSE);
 			} else {
 				valuation.put(predicate, TruthValue.UNKNOWN);
 			}
 
             if (USE_CACHE) {
-                cache.put(positiveWeakestPrecondition, valid[i]);
-                cache.put(negativeWeakestPrecondition, valid[i + 1]);
+                cache.put(positiveWeakestPrecondition, negationSatisfiable[i]);
+                cache.put(negativeWeakestPrecondition, negationSatisfiable[i + 1]);
             }
 			
 			i += 2;

@@ -4,13 +4,19 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class SMTCache {
-    private Map<String, Boolean> responses = new HashMap<String, Boolean>();
+    private static SMT.QueryResponse emptyResponse = new SMT.QueryResponse(null, null);
 
-    public void put(String query, Boolean response) {
+    private Map<String, SMT.QueryResponse> responses = new HashMap<String, SMT.QueryResponse>();
+
+    public void put(String query, SMT.QueryResponse response) {
         responses.put(query, response);
     }
 
-    public Boolean get(String query) {
-        return responses.get(query);
+    public SMT.QueryResponse get(String query) {
+        if (responses.containsKey(query)) {
+            return responses.get(query);
+        }
+
+        return emptyResponse;
     }
 }
