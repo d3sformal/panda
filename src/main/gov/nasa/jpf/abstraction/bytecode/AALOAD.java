@@ -76,12 +76,14 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 
         if (RunDetector.isRunning()) {
             if (!ti.isFirstStepInsn()) {
-                if (ei.arrayLength() > 1) {
-                    MethodFrameSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
+                MethodFrameSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
     
-                    Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
-                    symbolTable.lookupValues(path, values);
-    
+                Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
+                symbolTable.lookupValues(path, values);
+
+                if (values.size() == 1) {
+                    selectedElementRef = ((Reference) values.iterator().next()).getReferenceNumber();
+                } else {
                     int[] references = new int[values.size()];
     
                     int i = 0;
@@ -101,11 +103,9 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
                     return this;
                 }
             } else {
-                if (ei.arrayLength() > 1) {
-                    ChoiceGenerator<?> cg = ss.getCurrentChoiceGenerator("abstractArrayElementLoad", IntChoiceFromList.class);
+                ChoiceGenerator<?> cg = ss.getCurrentChoiceGenerator("abstractArrayElementLoad", IntChoiceFromList.class);
     
-                    selectedElementRef = ((IntChoiceFromList) cg).getNextChoice();
-                }
+                selectedElementRef = ((IntChoiceFromList) cg).getNextChoice();
             }
         }
 
@@ -138,11 +138,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
                 throw new ArrayIndexOutOfBoundsException("Cannot ensure: " + inBounds);
             }
     
-            if (ei.arrayLength() <= 1) {
-                sf.push(ei.getReferenceElement(0));
-            } else {
-                sf.push(selectedElementRef.intValue());
-            }
+            sf.push(selectedElementRef.intValue());
         } else {
             super.push(sf, ei, someIndex);
         }
