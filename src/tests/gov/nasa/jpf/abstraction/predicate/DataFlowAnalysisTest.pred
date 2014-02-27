@@ -42,7 +42,25 @@ k = 3
 k = 4
 equal = 0
 equal = 1
+alength(arrlen, succ)
+alength(arrlen, cfg[0].successors) = 0
+alength(arrlen, cfg[0].successors) = 1
+alength(arrlen, cfg[0].successors) = 2
+alength(arrlen, cfg[1].successors) = 0
+alength(arrlen, cfg[1].successors) = 1
+alength(arrlen, cfg[1].successors) = 2
+alength(arrlen, cfg[2].successors) = 0
+alength(arrlen, cfg[2].successors) = 1
+alength(arrlen, cfg[2].successors) = 2
+alength(arrlen, cfg[3].successors) = 0
+alength(arrlen, cfg[3].successors) = 1
+alength(arrlen, cfg[3].successors) = 2
+alength(arrlen, cfg[4].successors) = 0
+alength(arrlen, cfg[4].successors) = 1
+alength(arrlen, cfg[4].successors) = 2
 
 [object gov.nasa.jpf.abstraction.predicate.NodeInfo]
 alength(arrlen, this.facts) = 0
-
+alength(arrlen, this.successors) = 0
+alength(arrlen, this.successors) = 1
+alength(arrlen, this.successors) = 2
