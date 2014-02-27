@@ -197,6 +197,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
     @Override
 	protected void serializeStackFrames(ThreadInfo ti){
+        // Set the context of subsequent serializations of individual frames
         depth = 0;
         thread = ti.getId();
 
@@ -255,6 +256,8 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
 		buf.add(frame.getMethodInfo().getGlobalId());
 
+        // thread is the actual thread being serialized (set in serializeStackFrames)
+        // depth is the current depth in the whole stack of the thread being currently processed
         MethodFrameSymbolTable currentSymbolScope = pabs.getSymbolTable().get(thread, depth);
         MethodFramePredicateValuation currentPredicateScope = pabs.getPredicateValuation().get(thread, depth);
 
