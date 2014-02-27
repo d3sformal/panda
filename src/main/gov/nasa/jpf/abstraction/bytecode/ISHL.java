@@ -26,6 +26,9 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Multiply;
+import gov.nasa.jpf.abstraction.common.UninterpretedShiftLeft;
 
 /**
  * Shift left integer
@@ -49,10 +52,25 @@ public class ISHL extends gov.nasa.jpf.jvm.bytecode.ISHL implements AbstractBina
 		AbstractValue abs_v1 = attr1.getAbstractValue();
 		AbstractValue abs_v2 = attr2.getAbstractValue();
 
+        Expression a = attr1.getExpression();
+        Expression b = attr2.getExpression();
+
+        Expression e;
+
+        if (b instanceof Constant) {
+            e = a;
+
+            for (int i = ((Constant) b).value.intValue(); i > 0; --i) {
+                e = Multiply.create(e, Constant.create(2));
+            }
+        } else {
+            e = UninterpretedShiftLeft.create(a, b);
+        }
+
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
-		return new NonEmptyAttribute(Abstraction._shl(v1, abs_v1, v2, abs_v2), Constant.create(0)); // TODO: IMPLEMENT LOGICAL AND BITWISE OPERATORS
+		return new NonEmptyAttribute(Abstraction._shl(v1, abs_v1, v2, abs_v2), e);
 	}
 
 	@Override

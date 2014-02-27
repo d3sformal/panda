@@ -63,6 +63,8 @@ public interface PredicatesComponentVisitor {
 	public void visit(Multiply expression);
 	public void visit(Divide expression);
 	public void visit(Modulo expression);
+	public void visit(UninterpretedShiftLeft expression);
+	public void visit(UninterpretedShiftRight expression);
 	public void visit(DefaultArrays meta);
 	public void visit(DefaultArrayLengths meta);
 	public void visit(DefaultField meta);

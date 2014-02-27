@@ -152,12 +152,25 @@ public class SMT {
             in.write(
                 "(set-option :produce-models true)" + separator +
                 "(set-logic QF_AUFLIA)" + separator +
+
+                // Memory model symbols
 		        "(declare-fun arr () (Array Int (Array Int Int)))" + separator +
     		    "(declare-fun arrlen () (Array Int Int))" + separator +
 	    	    "(declare-fun fresh () Int)" + separator + // new object
+
+                // Language symbols
 		        "(declare-fun null () Int)" + separator +  // java null
+
+                // Special variables
 		        "(declare-fun dummy () Int)" + separator + // for emulating variables in native returns
+
+                // Auxiliary logical variables
 		        "(declare-fun value () Int)" + separator + // for extracting models
+
+                // Uninterpreted functions
+		        "(declare-fun shl (Int Int) Int)" + separator +
+		        "(declare-fun shr (Int Int) Int)" + separator +
+
     		    separator
             );
             in.flush();

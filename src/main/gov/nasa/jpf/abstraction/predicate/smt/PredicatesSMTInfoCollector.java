@@ -27,6 +27,8 @@ import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Modulo;
+import gov.nasa.jpf.abstraction.common.UninterpretedShiftLeft;
+import gov.nasa.jpf.abstraction.common.UninterpretedShiftRight;
 import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
@@ -171,6 +173,18 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 		expression.a.accept(this);
 		expression.b.accept(this);
 	}
+
+    @Override
+    public void visit(UninterpretedShiftLeft expression) {
+        expression.a.accept(this);
+        expression.b.accept(this);
+    }
+
+    @Override
+    public void visit(UninterpretedShiftRight expression) {
+        expression.a.accept(this);
+        expression.b.accept(this);
+    }
 
 	private void addAdditionalPredicate(Predicate predicate) {		
 		if (!additionalPredicates.containsKey(currentCollectable)) {

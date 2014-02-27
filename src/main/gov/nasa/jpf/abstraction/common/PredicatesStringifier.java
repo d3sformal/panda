@@ -237,6 +237,32 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 		ret.append(")");
 	}
 
+    @Override
+    public void visit(UninterpretedShiftLeft expression) {
+        ret.append("SHL(");
+
+        expression.a.accept(this);
+
+        ret.append(", ");
+
+        expression.b.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(UninterpretedShiftRight expression) {
+        ret.append("SHR(");
+
+        expression.a.accept(this);
+
+        ret.append(", ");
+
+        expression.b.accept(this);
+
+        ret.append(")");
+    }
+
 	@Override
 	public void visit(Constant expression) {
 		ret.append(expression.value);

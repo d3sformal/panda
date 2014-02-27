@@ -4,6 +4,8 @@ import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Modulo;
+import gov.nasa.jpf.abstraction.common.UninterpretedShiftLeft;
+import gov.nasa.jpf.abstraction.common.UninterpretedShiftRight;
 import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
@@ -164,6 +166,32 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 		visit((Subtract)expression);
 	}
 	
+    @Override
+    public void visit(UninterpretedShiftLeft expression) {
+        ret.append("(shl");
+
+        expression.a.accept(this);
+
+        ret.append(" ");
+
+        expression.b.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(UninterpretedShiftRight expression) {
+        ret.append("(shr");
+
+        expression.a.accept(this);
+
+        ret.append(" ");
+
+        expression.b.accept(this);
+
+        ret.append(")");
+    }
+
 	@Override
 	public void visit(Constant expression) {
 		if (expression.value.doubleValue() < 0) {
