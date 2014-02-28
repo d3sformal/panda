@@ -84,7 +84,7 @@ public class LALOAD extends gov.nasa.jpf.jvm.bytecode.LALOAD {
         TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
 
         if (value != TruthValue.TRUE) {
-            throw new ArrayIndexOutOfBoundsExecutiveException(this);
+            throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException("java.lang.ArrayIndexOutOfBoundsException", "Cannot ensure: " + inBounds));
         }
 
         sf.push(0);

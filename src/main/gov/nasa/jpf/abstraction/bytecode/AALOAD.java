@@ -136,7 +136,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
             TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
     
             if (value != TruthValue.TRUE) {
-                throw new ArrayIndexOutOfBoundsExecutiveException(this, "Cannot ensure: " + inBounds);
+                throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException("java.lang.ArrayIndexOutOfBoundsException", "Cannot ensure: " + inBounds));
             }
     
             sf.push(selectedElementRef.intValue());
