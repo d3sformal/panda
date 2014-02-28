@@ -44,17 +44,20 @@ public class PredicateConsolePublisher extends ConsolePublisher {
 
             State state = trace.get(progressAlongTrace);
 
-            out.println("Predicates: ");
+            out.println("predicates: ");
 
             PredicateValuation valuation = state.predicateValuationStacks.get(state.currentThread).top();
 
             out.println("\t" + valuation.toString().replaceAll("\n", "\n\t"));
 
             if (showCG) {
-                out.println(t.getChoiceGenerator());
+                out.println("choice: " + t.getChoiceGenerator());
+				out.println("");
             }
 
             if (showSteps) {
+                out.println("instructions:");
+
                 String lastLine = null;
                 MethodInfo lastMi = null;
                 int nNoSrc = 0;
