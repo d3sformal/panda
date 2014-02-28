@@ -9,6 +9,7 @@ import java.util.LinkedList;
 
 public class AntTestTask extends JUnitTask {
 
+    private int total = 0;
     private List<String> errorTests = new LinkedList<String>();
     private List<String> failureTests = new LinkedList<String>();
     private List<String> timedOutTests = new LinkedList<String>();
@@ -19,6 +20,8 @@ public class AntTestTask extends JUnitTask {
 
     @Override
     protected void actOnTestResult(JUnitTask.TestResultHolder result, JUnitTest test, String name) {
+        ++total;
+
         switch (result.exitCode) {
             case JUnitTaskMirror.JUnitTestRunnerMirror.SUCCESS:
                 break;
@@ -50,7 +53,7 @@ public class AntTestTask extends JUnitTask {
     protected void cleanup() {
         super.cleanup();
 
-        System.out.println("Failed: " + (failureTests.size() + errorTests.size() + crashedTests.size()) + "; Timed out: " + timedOutTests.size());
+        System.out.println("Total: " + total + "; Failed: " + (failureTests.size() + errorTests.size() + crashedTests.size()) + "; Timed out: " + timedOutTests.size());
 
         if (!failureTests.isEmpty() || !errorTests.isEmpty() || !crashedTests.isEmpty()) {
             System.out.println("Failed tests:");
