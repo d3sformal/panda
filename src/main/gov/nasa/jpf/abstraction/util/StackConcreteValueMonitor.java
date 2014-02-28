@@ -13,7 +13,9 @@ public class StackConcreteValueMonitor extends ListenerAdapter {
 	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
 		if (RunDetector.isRunning()) {
 			StackFrame sf = curTh.getTopFrame();
-			inspect(sf);
+            if (sf != null) {
+    			inspect(sf);
+            }
 		}
 	}
 
