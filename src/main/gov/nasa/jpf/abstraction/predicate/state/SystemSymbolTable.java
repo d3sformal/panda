@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
@@ -10,8 +11,14 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.predicate.state.SystemSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
+import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueIdentifier;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.predicate.state.universe.ClassName;
+import gov.nasa.jpf.abstraction.predicate.state.universe.LocalVariable;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -20,6 +27,10 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.KernelState;
+import gov.nasa.jpf.vm.ClassLoaderInfo;
+import gov.nasa.jpf.vm.StaticElementInfo;
+import gov.nasa.jpf.vm.ThreadList;
 import gov.nasa.jpf.vm.Instruction;
 
 import gov.nasa.jpf.jvm.bytecode.DLOAD;
@@ -33,6 +44,7 @@ import gov.nasa.jpf.jvm.bytecode.LSTORE;
 import gov.nasa.jpf.jvm.bytecode.LocalVariableInstruction;
 
 import java.util.Set;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -305,4 +317,52 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
         scopes.get(currentThreadID).print();
     }
 	
+    public void collectGarbage(VM vm, ThreadInfo ti) {
+        KernelState ks = vm.getKernelState();
+
+        ThreadList threads = ks.getThreadList();
+
+        // Add roots
+        Set<UniverseIdentifier> liveRoots = new HashSet<UniverseIdentifier>();
+
+        // All classes
+        for (ClassLoaderInfo cl : ks.classLoaders) {
+            if(cl.isAlive()) {
+                for (StaticElementInfo sei : cl.getStatics().liveStatics()) {
+                    liveRoots.add(new ClassName(sei));
+                    liveRoots.add(new Reference(ti.getElementInfo(sei.getClassObjectRef())));
+                }
+            }
+        }
+
+        for (StructuredValueIdentifier candidate : universe.getStructuredValues()) {
+            if (candidate instanceof ClassName) {
+                liveRoots.add(candidate);
+            }
+        }
+
+        // All thread objects, lock objects, local variables
+        for (ThreadInfo thread : threads) {
+            liveRoots.add(new Reference(thread.getThreadObject()));
+            liveRoots.add(new Reference(thread.getLockObject()));
+
+            for (ElementInfo lock : thread.getLockedObjects()) {
+                liveRoots.add(new Reference(lock));
+            }
+
+            if (thread.isAlive()) {
+                for (int depth = 0; depth < depth(thread.getId()); ++depth) {
+                    MethodFrameSymbolTable currentSymbolScope = get(thread.getId(), depth);
+
+                    for (Root varName : currentSymbolScope.getLocalVariables()) {
+                        LocalVariable var = currentSymbolScope.getLocal(varName);
+
+                        liveRoots.addAll(var.getPossibleValues());
+                    }
+                }
+            }
+        }
+
+        universe.retainLiveValuesOnly(liveRoots);
+    }
 }

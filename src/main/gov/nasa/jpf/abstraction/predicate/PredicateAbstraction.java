@@ -197,4 +197,10 @@ public class PredicateAbstraction extends Abstraction {
     public Trace getTrace() {
         return trace;
     }
+
+    public void collectGarbage(VM vm, ThreadInfo threadInfo) {
+        if (isInitialized) {
+            symbolTable.collectGarbage(vm, threadInfo);
+        }
+    }
 }
