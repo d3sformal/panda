@@ -160,6 +160,7 @@ public class SMT {
 
                 // Language symbols
 		        "(declare-fun null () Int)" + separator +  // java null
+                "(assert (= null 0))" + separator +
 
                 // Special variables
 		        "(declare-fun dummy () Int)" + separator + // for emulating variables in native returns
