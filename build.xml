@@ -13,7 +13,6 @@
 -->
 
 <project name="jpf-abstraction" default="build" basedir=".">
-
   <!-- ========================== COMMON SECTION ========================== -->
 
   <!--
@@ -129,7 +128,7 @@
     <mkdir dir="build/main"/>
     <javac srcdir="src/main" destdir="build/main"
            debug="${debug}" source="${src_level}" deprecation="${deprecation}"
-           classpathref="lib.path" includeantruntime="false">
+           classpathref="lib.path" includeantruntime="yes">
       <compilerarg value="-Xlint:all" />
       <compilerarg value="-Xlint:overrides" />
     </javac>
@@ -243,6 +242,7 @@
 
   <target name="test" depends="build"
           description="compile and run core regression tests" if="have_tests">
+    <taskdef name="junit" classname="gov.nasa.jpf.abstraction.util.AntTestTask" classpath="build/main"/>
 
     <property name="junit.usefile" value="true"/>
 
