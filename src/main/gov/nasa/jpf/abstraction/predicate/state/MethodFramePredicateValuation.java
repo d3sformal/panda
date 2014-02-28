@@ -224,13 +224,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 	public String toString() {	
 		StringBuilder ret = new StringBuilder();
 
-		int padding = 0;
-		
-		for (Predicate p : valuations.keySet()) {
-			String predicate = p.toString(Notation.DOT_NOTATION);
-
-			padding = padding < predicate.length() ? predicate.length() : padding;
-		}
+		int padding = 8;
 
         Set<Predicate> sorted = new TreeSet<Predicate>(new Comparator<Predicate>() {
             @Override
@@ -241,13 +235,11 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
         sorted.addAll(valuations.keySet());
 		
-		padding += 4;
-		
 		for (Predicate p : sorted) {
 			String predicate = p.toString(Notation.DOT_NOTATION);
 			StringBuilder pad = new StringBuilder();
 			
-			for (int i = 0; i < padding - predicate.length(); ++i) {
+			for (int i = 0; i < padding; ++i) {
 				pad.append(" ");
 			}
 

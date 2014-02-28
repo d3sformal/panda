@@ -867,18 +867,13 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 		});
 		
 		order.addAll(getFilteredRelevantAccessExpressions());
-				
-		int maxLength = 0;
-		int padding = 4;
-		
-		for (AccessExpression expr : order) {
-			maxLength = Math.max(maxLength, expr.toString(Notation.DOT_NOTATION).length());
-		}
+			
+		int padding = 8;
 		
 		for (AccessExpression expr : order) {
 			ret.append(expr.toString(Notation.DOT_NOTATION));
 			
-			for (int i = 0; i < maxLength - expr.toString(Notation.DOT_NOTATION).length() + padding; ++i) {
+			for (int i = 0; i < padding; ++i) {
 				ret.append(' ');
 			}
 			
