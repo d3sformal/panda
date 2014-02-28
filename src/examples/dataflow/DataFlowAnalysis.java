@@ -53,7 +53,7 @@ public class DataFlowAnalysis
 			oldFacts = cfg[cfnodeID].facts;
 
 			// update facts and store in the newFacts variable
-			newFacts = new int[oldFacts.length + 1];
+			newFacts = new int[oldFacts.length];
 			for (int k = 0; k < oldFacts.length; ++k) {
                 newFacts[k] = oldFacts[k];
             }
@@ -63,11 +63,7 @@ public class DataFlowAnalysis
 			
 			cfg[cfnodeID].facts = newFacts;
 
-            boolean equal = (oldFacts.length == newFacts.length);
-
-            for (int k = 0; equal && k < newFacts.length; ++k) {
-                equal &= (newFacts[k] == oldFacts[k]);
-            }
+            boolean equal = (oldFacts[oldFacts.length - 1] == newFacts[newFacts.length - 1]);
 
 			if ( ! equal ) 
 			{
@@ -91,7 +87,7 @@ class NodeInfo
   int[] facts;
 
   NodeInfo(int[] successors) {
-    this.facts = new int[0];
+    this.facts = new int[1];
     this.successors = successors;
   }
 }

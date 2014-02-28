@@ -44,12 +44,6 @@ public class PredicateConsolePublisher extends ConsolePublisher {
 
             State state = trace.get(progressAlongTrace);
 
-            out.println("predicates: ");
-
-            PredicateValuation valuation = state.predicateValuationStacks.get(state.currentThread).top();
-
-            out.println("\t" + valuation.toString().replaceAll("\n", "\n\t"));
-
             if (showCG) {
                 out.println("choice: " + t.getChoiceGenerator());
 				out.println("");
@@ -119,7 +113,13 @@ public class PredicateConsolePublisher extends ConsolePublisher {
                 if (showSource && !showCode && (nNoSrc > 0)) {
                     out.println("      [" + nNoSrc + " insn w/o sources]");
                 }
+
+                out.println("");
             }
+
+            out.println("predicates: ");
+            PredicateValuation valuation = state.predicateValuationStacks.get(state.currentThread).top();
+            out.println("\t" + valuation.toString().replaceAll("\n", "\n\t"));
 
             ++progressAlongTrace;
         }
