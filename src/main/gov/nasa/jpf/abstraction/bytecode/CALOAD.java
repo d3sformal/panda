@@ -36,6 +36,7 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.ArrayIndexOutOfBoundsExecutiveException;
 
 public class CALOAD extends gov.nasa.jpf.jvm.bytecode.CALOAD {
 	
@@ -73,7 +74,7 @@ public class CALOAD extends gov.nasa.jpf.jvm.bytecode.CALOAD {
 	}
 
     @Override
-    public void push (StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsException {
+    public void push (StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsExecutiveException {
         // i >= 0 && i < a.length
         Predicate inBounds = Conjunction.create(
             Negation.create(LessThan.create(index, Constant.create(0))),
@@ -83,7 +84,7 @@ public class CALOAD extends gov.nasa.jpf.jvm.bytecode.CALOAD {
         TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
 
         if (value != TruthValue.TRUE) {
-            throw new ArrayIndexOutOfBoundsException();
+            throw new ArrayIndexOutOfBoundsExecutiveException(this);
         }
 
         sf.push(0);

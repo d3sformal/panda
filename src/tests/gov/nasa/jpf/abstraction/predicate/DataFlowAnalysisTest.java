@@ -5,13 +5,29 @@ public class DataFlowAnalysisTest extends BaseTest {
 	{
 		NodeInfo[] cfg = new NodeInfo[5];
 
+		int[] succ;
+
 		// initialize control flow graph
 		
-		cfg[0] = new NodeInfo(new int[]{1});
-		cfg[1] = new NodeInfo(new int[]{2,3});
-		cfg[2] = new NodeInfo(new int[]{4});
-		cfg[3] = new NodeInfo(new int[]{4});
-		cfg[4] = new NodeInfo(new int[0]);
+		succ = new int[1];
+		succ[0] = 1;
+		cfg[0] = new NodeInfo(succ);
+
+		succ = new int[2];
+		succ[0] = 2;
+		succ[1] = 3;
+		cfg[1] = new NodeInfo(succ);
+
+		succ = new int[1];
+		succ[0] = 4;
+		cfg[2] = new NodeInfo(succ);
+
+		succ = new int[1];
+		succ[0] = 4;
+		cfg[3] = new NodeInfo(succ);
+
+		succ = new int[0];
+		cfg[4] = new NodeInfo(succ);
 
 		int i, j;
 
@@ -55,12 +71,12 @@ public class DataFlowAnalysisTest extends BaseTest {
 			if ( ! equal ) 
 			{
 				// update queue based on CFG
-				int[] succ = cfg[cfnodeID].successors;
+				succ = cfg[cfnodeID].successors;
 
 				for (int k = 0; k < succ.length; ++k) {
                     queue[j] = succ[k];
 
-					j = j + 1;
+                    j = j + 1;
 					if (j >= queue.length) j = 0;
                 }
 			}

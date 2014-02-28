@@ -44,6 +44,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.ArrayIndexOutOfBoundsExecutiveException;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -124,7 +125,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 	}
 
     @Override
-    public void push (StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsException {
+    public void push (StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsExecutiveException {
         if (RunDetector.isRunning()) {
             // i >= 0 && i < a.length
             Predicate inBounds = Conjunction.create(
@@ -135,7 +136,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
             TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
     
             if (value != TruthValue.TRUE) {
-                throw new ArrayIndexOutOfBoundsException("Cannot ensure: " + inBounds);
+                throw new ArrayIndexOutOfBoundsExecutiveException(this, "Cannot ensure: " + inBounds);
             }
     
             sf.push(selectedElementRef.intValue());
