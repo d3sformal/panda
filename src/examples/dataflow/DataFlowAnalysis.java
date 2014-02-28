@@ -8,11 +8,11 @@ public class DataFlowAnalysis
 
 		// initialize control flow graph
 		
-		cfg[0] = new NodeInfo(1);
-		cfg[1] = new NodeInfo(2, 3);
-		cfg[2] = new NodeInfo(4);
-		cfg[3] = new NodeInfo(4);
-		cfg[4] = new NodeInfo();
+		cfg[0] = new NodeInfo(new int[]{1});
+		cfg[1] = new NodeInfo(new int[]{2,3});
+		cfg[2] = new NodeInfo(new int[]{4});
+		cfg[3] = new NodeInfo(new int[]{4});
+		cfg[4] = new NodeInfo(new int[0]);
 
 		int i, j;
 
@@ -74,7 +74,7 @@ class NodeInfo
   int[] successors;
   int[] facts;
 
-  NodeInfo(int... successors) {
+  NodeInfo(int[] successors) {
     this.facts = new int[0];
     this.successors = successors;
   }
