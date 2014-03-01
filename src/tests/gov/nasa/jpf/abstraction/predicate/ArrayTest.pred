@@ -1,3 +1,4 @@
 [method gov.nasa.jpf.abstraction.predicate.ArrayTest.main]
 i = -1
 a[0].f = 1
+alength(arrlen,class(gov.nasa.jpf.abstraction.predicate.ArrayTest).static_a) = 2

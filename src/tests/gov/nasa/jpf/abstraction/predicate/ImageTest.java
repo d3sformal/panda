@@ -17,7 +17,7 @@ public class ImageTest extends BaseTest {
             "alength(arrlen, img.pixels) = class(gov.nasa.jpf.abstraction.predicate.Image).SIZE: true"
         );
 
-		assertConjunction("img.rectangles[0].top = 1: true", "img.rectangles[0].right = 4: true", "img.rectangles[1].color = 3: true");
+		assertConjunction("img.rectangles[0].top = 1: true", "img.rectangles[0].right = 4: true", "img.rectangles[1].left = 0: true");
 
 		img.render();
 	}
@@ -74,7 +74,7 @@ class Image {
 	    	// change relevant pixels to rectangle color
 			for (int i = rec.left; i <= rec.right; i++) {
 				for (int j = rec.top; j <= rec.bottom; j++) {
-					assertDisjunction("rec.color = 2: true", "rec.color = 3: true");
+					assertDisjunction("rec.bottom = 2: true", "rec.bottom = 3: true");
 					pixels[i][j] = rec.color;
 				}
 			}

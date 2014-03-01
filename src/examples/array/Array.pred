@@ -1,3 +1,4 @@
 [method array.Array.main]
 i = -1
 a[0].f = 1
+alength(arrlen,class(array.Array).static_a) = 2

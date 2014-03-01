@@ -241,7 +241,7 @@
   <!-- ======================= TEST SECTION ================================ -->
 
   <target name="test" depends="build"
-          description="compile and run core regression tests" if="have_tests">
+          description="compile and run tests" if="have_tests">
     <taskdef name="junit" classname="gov.nasa.jpf.abstraction.util.AntTestTask" classpath="build/main"/>
 
     <property name="junit.usefile" value="true"/>
