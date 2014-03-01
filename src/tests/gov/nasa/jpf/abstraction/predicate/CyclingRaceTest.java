@@ -45,6 +45,9 @@ public class CyclingRaceTest extends BaseTest {
 			results[pos] = cyclists[i];
 		}
 
+		assertDisjunction("results[0] = cyclists[0]: true", "results[0] = cyclists[1]: true", "results[0] = cyclists[2]: true");
+		assertDisjunction("results[1].time = 3725: true", "results[1].time = 3569: true", "results[1].time = 3766: true");
+
         int[] diffs = new int[3];
 		
 		Cyclist bestCL = results[0];

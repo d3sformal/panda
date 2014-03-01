@@ -1,0 +1,9 @@
+# Ensure that this is run this with jpf-core project properties
+# e.g., from jpf-core folder
+target=prodcons.ProdConsEx_Bad
+
+classpath=${jpf-abstraction}/build/examples
+sourcepath=${jpf-abstraction}/src/examples
+
+listener = gov.nasa.jpf.abstraction.util.DebugMonitor
+

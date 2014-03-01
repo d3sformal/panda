@@ -8,6 +8,7 @@ public class ImageTest extends BaseTest {
 
         assertNumberOfPossibleValues("img.pixels", 1);
         assertConjunction("alength(arrlen, img.pixels) = class(gov.nasa.jpf.abstraction.predicate.Image).SIZE: true");
+        assertConjunction("alength(arrlen, img.pixels[0]) = 6: true");
 
 		img.load();
 
@@ -15,6 +16,8 @@ public class ImageTest extends BaseTest {
             "alength(arrlen, img.rectangles) = 2: true",
             "alength(arrlen, img.pixels) = class(gov.nasa.jpf.abstraction.predicate.Image).SIZE: true"
         );
+
+		assertConjunction("img.rectangles[0].top = 1: true", "img.rectangles[0].right = 4: true", "img.rectangles[1].color = 3: true");
 
 		img.render();
 	}
@@ -65,10 +68,13 @@ class Image {
 		// loop over all rectangles and draw them
 		for (int k = 0; k < rectangles.length; ++k) {
 			rec = rectangles[k];
+
+			assertDisjunction("rec.left = 1: true", "rec.left = 0: true");
 		
 	    	// change relevant pixels to rectangle color
 			for (int i = rec.left; i <= rec.right; i++) {
 				for (int j = rec.top; j <= rec.bottom; j++) {
+					assertDisjunction("rec.color = 2: true", "rec.color = 3: true");
 					pixels[i][j] = rec.color;
 				}
 			}

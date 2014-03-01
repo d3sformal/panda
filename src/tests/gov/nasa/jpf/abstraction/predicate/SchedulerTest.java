@@ -25,6 +25,8 @@ public class SchedulerTest extends BaseTest {
 		int schedule_size = 0;
 		int[] schedule = new int[SchedulerConfig.SIZE];
 
+		assertConjunction("alength(arrlen, schedule) = 5: true");
+
 		// set of active threads is iterated when to make scheduling decisions
 		for (int k = 0; k < id2thread.length; ++k) {
             assertDisjunction("k = 0: true", "k = 1: true", "k = 2: true");
@@ -34,7 +36,8 @@ public class SchedulerTest extends BaseTest {
 
 			ThreadInfo actTh = id2thread[k];
 
-            //assertAliasedWithOneOf("actTh", "id2thread[0]", "id2thread[1]", "id2thread[2]");
+			assertExclusiveDisjunction("actTh = id2thread[0]: true", "actTh = id2thread[1]: true", "actTh = id2thread[2]: true");
+			assertExclusiveDisjunction("actTh.priority = 5: true", "actTh.priority = 10: true", "actTh.priority = 18: true");
 
 			if (!actTh.active) continue;
 
@@ -48,6 +51,9 @@ public class SchedulerTest extends BaseTest {
 				// the info object is retrieved for each active thread
 				for (int i = 0; i < schedule_size; ++i) {
 					ThreadInfo schTh = id2thread[schedule[i]];
+
+					assertExclusiveDisjunction("schTh.priority = 5: true", "schTh.priority = 10: true", "schTh.priority = 18: true");
+					assertConjunction("schTh.active = 1");
 
 					if (actTh.priority > schTh.priority) {
             	        // insert into the scheduling queue

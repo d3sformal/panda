@@ -45,10 +45,16 @@ public class DataFlowAnalysisTest extends BaseTest {
 		{
 			int cfnodeID = queue[i];
 
+			assertDisjunction("cfnodeID = 0: true", "cfnodeID = 1: true", "cfnodeID = 2: true", "cfnodeID = 3: true", "cfnodeID = 4: true");
+
 			// we cannot use modulo
 			i = i + 1;
 			if (i >= queue.length) i = 0;
 			
+			assertNumberOfPossibleValues("cfg[cfnodeID].facts", 1);
+			assertNumberOfPossibleValues("cfg[0].facts", 1);
+			assertNumberOfPossibleValues("cfg[2].facts", 1);
+
 			oldFacts = cfg[cfnodeID].facts;
 
 			// update facts and store in the newFacts variable
