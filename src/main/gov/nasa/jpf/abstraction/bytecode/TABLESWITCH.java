@@ -53,7 +53,7 @@ public class TABLESWITCH extends SwitchInstruction implements gov.nasa.jpf.vm.Ta
 
 	@Override
 	public Instruction execute(ThreadInfo ti) {
-		/* TODO:
+		/*
 		 * TABLESWITCH is not implemented properly because it loses sense with
 		 * abstractions. Instead LOOKUPSWITCH behavior is used. 
 		 */

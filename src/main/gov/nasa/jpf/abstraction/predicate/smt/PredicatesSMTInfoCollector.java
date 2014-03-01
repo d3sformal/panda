@@ -280,7 +280,6 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 		expression.getArrays().accept(this);
 		expression.getIndex().accept(this);
 
-        //TODO avoid adding this in case that the actual fresh is AnonymousArray with .reference.elementinfo.isReferenceArray == false
         addAdditionalPredicate(Equals.create(DefaultArrayElementRead.create(DefaultFresh.create(), expression.getIndex()), NullExpression.create()));
 		
 		addObject(expression);

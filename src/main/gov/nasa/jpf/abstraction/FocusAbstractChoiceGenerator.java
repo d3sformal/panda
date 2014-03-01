@@ -44,11 +44,6 @@ public class FocusAbstractChoiceGenerator extends IntIntervalGenerator {
 		isReverseOrder = reverseOrder;
 	}
 
-	// TODO
-	// public IntChoiceGenerator randomize() {
-	// return new FocusAbstractChoiceGenerator(random.nextBoolean());
-	// }
-
 	public void setNextChoice(int nextChoice) {
 		super.next = nextChoice;
 	}

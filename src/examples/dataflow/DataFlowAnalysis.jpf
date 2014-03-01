@@ -9,3 +9,5 @@ abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/dataflow/DataFlowAnal
 
 listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.predicate.util.StackExpressionMonitor,gov.nasa.jpf.abstraction.predicate.util.SMTMonitor
 
+vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer
+

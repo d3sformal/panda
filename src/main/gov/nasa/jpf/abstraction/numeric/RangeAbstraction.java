@@ -174,8 +174,7 @@ public class RangeAbstraction extends Abstraction {
 				}
 				double _min, _max;
 				if (rv1 < 0 && 0 < rv2)
-					throw new RuntimeException("### ERROR: Division by ZERO may happen"); 
-				// TODO: Handle division by zero
+					throw new RuntimeException("### WARNING: Division by ZERO may happen"); 
 				if ((lv1 <= 0 && 0 <= lv2) || (rv1 < 0 && 0 < rv2)) {
 					_min = ___min(lv1/rv1, lv1/rv2, lv2/rv1, lv2/rv2, 0);
 					_max = ___max(lv1/rv1, lv1/rv2, lv2/rv1, lv2/rv2, 0);
@@ -215,7 +214,7 @@ public class RangeAbstraction extends Abstraction {
 		// * for false — any pair of different elements (or their sizes are different)
 		boolean t = false, f = leftList.size() != rightArr.length;
 		for (int r : rightArr)
-			if (leftList.contains(r)) // TODO: consider using binary search
+			if (leftList.contains(r))
 				t = true;
 			else
 				f = true;

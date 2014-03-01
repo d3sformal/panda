@@ -364,7 +364,6 @@ public class IntervalAbstraction extends Abstraction {
 		}
 		if (left2 <= 0 && 0 <= right2)
 			System.out.println("### WARNING: Division by ZERO may happen");
-		// TODO: Handle division by zero
 		double res_left, res_right;
 		if ((left1 <= 0 && 0 <= right1) || (left2 < 0 && 0 < right2)) {
 			res_left = ___min(left1 / left2, left1 / right2,
@@ -412,7 +411,7 @@ public class IntervalAbstraction extends Abstraction {
 			right2 = Math.max(right2, Double.POSITIVE_INFINITY);
 		}
 		if (left2 <= 0 && 0 <= right2) {
-		    // TODO: Handle division by zero
+			System.out.println("### WARNING: Division by ZERO may happen");
         }
 		double res_left = 0;
 		double res_right = ____max(Math.abs(left1), Math.abs(right1),

@@ -290,8 +290,6 @@ public class ContainerAbstraction extends Abstraction {
 
 		if (lArr.size() != rArr.size())
 			throw new RuntimeException("## Error: wrong container operands");
-		// TODO: method must be changed if interactions between different
-		// abstractions are meant to be allowed
 		for (int i = 0; i < lArr.size(); ++i)
 			if (lArr.get(i) == null || rArr.get(i) == null
 					|| lArr.get(i).getClass() == rArr.get(i).getClass())
