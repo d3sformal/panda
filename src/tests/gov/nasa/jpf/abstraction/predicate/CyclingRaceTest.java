@@ -51,6 +51,9 @@ public class CyclingRaceTest extends BaseTest {
         int[] diffs = new int[3];
 		
 		Cyclist bestCL = results[0];
+
+		assertConjunction("bestCL.time = 3569: true", "bestCL.bonus = 10: true");
+
 		int bestTime = bestCL.time - bestCL.bonus;
         diffs[0] = bestTime;
 		for (int i = 1; i < results.length; ++i) {

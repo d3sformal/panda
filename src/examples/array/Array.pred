@@ -1,4 +1,11 @@
+[static]
+alength(arrlen,class(array.Array).static_a) = 2
+class(array.Array).static_a[0].f = 1
+class(array.Array).static_a[0].f = 2
+class(array.Array).static_a[1].f = 2
+
 [method array.Array.main]
 i = -1
 a[0].f = 1
-alength(arrlen,class(array.Array).static_a) = 2
+a[0].f = 2
+alength(arrlen,a) = 2

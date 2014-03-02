@@ -18,7 +18,7 @@ public class ArrayTest extends BaseTest {
 	public static void main(String[] args) {
 		ArrA a[] = static_a;
 		assertConjunction("a[0].f = 2: true");
-		assertNumberOfPossibleValues("static_a[0]", 2);
+		assertNumberOfPossibleValues("class(gov.nasa.jpf.abstraction.predicate.ArrayTest).static_a[0]", 1);
 		int i = a[0].f;
 		i = -1;
         a[0].f = i + 2;

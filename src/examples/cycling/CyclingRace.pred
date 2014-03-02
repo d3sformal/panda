@@ -78,3 +78,5 @@ results[2].bonus = 50
 results[0] = cyclists[0]
 results[0] = cyclists[1]
 results[0] = cyclists[2]
+bestCL.time = 3569
+bestCL.bonus = 10
