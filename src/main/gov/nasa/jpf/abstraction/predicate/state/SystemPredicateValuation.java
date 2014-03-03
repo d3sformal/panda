@@ -437,10 +437,13 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                             Expression expr = Attribute.ensureNotNull((Attribute) originalActualParameters.next()).getExpression();
 
                             if (!argIsPrimitive[slotIndex]) {
-                                AccessExpression actualParameter = (AccessExpression) expr;
+                                // Could be null / access expression
+                                if (expr instanceof AccessExpression) {
+                                    AccessExpression actualParameter = (AccessExpression) expr;
 
-                                // reference-passed objects may have been affected by the method
-                                canBeAffected |= actualParameter.isPrefixOf(path);
+                                    // reference-passed objects may have been affected by the method
+                                    canBeAffected |= actualParameter.isPrefixOf(path);
+                                }
                             }
                         }
                     }
