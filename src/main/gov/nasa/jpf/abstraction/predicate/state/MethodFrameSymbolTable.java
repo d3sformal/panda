@@ -740,8 +740,6 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
     // }
     //
     // does not matter much when it comes to primitive values
-    //
-    // TODO: variables may change type (primitive <---> reference)
 	public void ensurePrimitiveLocalVariableExistence(Expression expr) {
         if (expr instanceof Root) {
             Root l = (Root) expr;
@@ -767,8 +765,6 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
     // }
     //
     // may cause trouble (or may not... writes to locals are always unambiguous, therefore destructive)
-    //
-    // TODO: variables may change type (primitive <---> reference)
 	public void ensureStructuredLocalVariableExistence(Expression expr) {
         if (expr instanceof Root) {
             Root l = (Root) expr;
@@ -867,10 +863,19 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 		});
 		
 		order.addAll(getFilteredRelevantAccessExpressions());
-			
-		int padding = 8;
+				
+		int maxLength = 0;
+		int padding = 4;
 		
 		for (AccessExpression expr : order) {
+			maxLength = Math.max(maxLength, expr.toString(Notation.DOT_NOTATION).length());
+		}
+		
+		for (AccessExpression expr : order) {
+			for (int i = 0; i < maxLength - expr.toString(Notation.DOT_NOTATION).length(); ++i) {
+				ret.append(' ');
+			}
+			
 			ret.append(expr.toString(Notation.DOT_NOTATION));
 			
 			for (int i = 0; i < padding; ++i) {

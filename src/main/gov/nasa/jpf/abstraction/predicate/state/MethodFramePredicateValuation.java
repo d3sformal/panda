@@ -224,8 +224,6 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 	public String toString() {	
 		StringBuilder ret = new StringBuilder();
 
-		int padding = 8;
-
         Set<Predicate> sorted = new TreeSet<Predicate>(new Comparator<Predicate>() {
             @Override
             public int compare(Predicate p1, Predicate p2) {
@@ -237,14 +235,9 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 		
 		for (Predicate p : sorted) {
 			String predicate = p.toString(Notation.DOT_NOTATION);
-			StringBuilder pad = new StringBuilder();
 			
-			for (int i = 0; i < padding; ++i) {
-				pad.append(" ");
-			}
-
 			ret.append(predicate);
-			ret.append(pad);
+		    ret.append(" : ");
 			ret.append(valuations.get(p));
 			ret.append("\n");
 		}
