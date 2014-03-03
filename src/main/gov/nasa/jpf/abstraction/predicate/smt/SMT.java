@@ -260,7 +260,7 @@ public class SMT {
 		return values;
 	}
 
-    private String prepareFormula(Predicate predicate, String formula, FormulaType formulaType, InputType inputType, Boolean cachedIsSatisfiable, Integer cachedModel, boolean extractModel) {
+    private String prepareFormulaEvaluation(Predicate predicate, String formula, FormulaType formulaType, InputType inputType, Boolean cachedIsSatisfiable, Integer cachedModel, boolean extractModel) {
         String separator = inputType.getSeparator();
         String linePrefix = cachedIsSatisfiable == null ? "" : "; ";
         StringBuilder ret = new StringBuilder();
@@ -353,7 +353,7 @@ public class SMT {
         Boolean cachedValue = cache.get(formula).getSatisfiability();
         Integer cachedModel = cache.get(formula).getModel();
 
-		input.append(prepareFormula(predicate, formula, FormulaType.MODEL_QUERY, inputType, cachedValue, cachedModel, true));
+		input.append(prepareFormulaEvaluation(predicate, formula, FormulaType.MODEL_QUERY, inputType, cachedValue, cachedModel, true));
 		
         input.append("(pop 1)"); input.append(separator);
 		
@@ -395,8 +395,8 @@ public class SMT {
             Boolean cachedPositiveValue = cache.get(positiveWeakestPreconditionFormula).getSatisfiability();
             Boolean cachedNegativeValue = cache.get(negativeWeakestPreconditionFormula).getSatisfiability();
 
-			input.append(prepareFormula(predicate, positiveWeakestPreconditionFormula, FormulaType.POSITIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedPositiveValue, null, false));
-			input.append(prepareFormula(predicate, negativeWeakestPreconditionFormula, FormulaType.NEGATIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedNegativeValue, null, false));
+			input.append(prepareFormulaEvaluation(predicate, positiveWeakestPreconditionFormula, FormulaType.POSITIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedPositiveValue, null, false));
+			input.append(prepareFormulaEvaluation(predicate, negativeWeakestPreconditionFormula, FormulaType.NEGATIVE_WEAKEST_PRECONDITION_CHECK, inputType, cachedNegativeValue, null, false));
 		}
 		
         input.append("(pop 1)"); input.append(separator);
