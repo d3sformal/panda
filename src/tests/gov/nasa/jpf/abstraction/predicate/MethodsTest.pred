@@ -1,22 +1,22 @@
 [static]
-class(gov.nasa.jpf.abstraction.predicate.MethodsTest).C = 2
+class(gov.nasa.jpf.abstraction.predicate.Methods).C = 2
 
-[object gov.nasa.jpf.abstraction.predicate.MethodsTest]
+[object gov.nasa.jpf.abstraction.predicate.Methods]
 this.b >= 6
 
-[method gov.nasa.jpf.abstraction.predicate.MethodsTest.<init>]
+[method gov.nasa.jpf.abstraction.predicate.Methods.<init>]
 this.a = 7
 
 [method gov.nasa.jpf.abstraction.predicate.MethodsTest.main]
 m.a = 1
 m.a = 7
 
-[method gov.nasa.jpf.abstraction.predicate.MethodsTest.do1]
+[method gov.nasa.jpf.abstraction.predicate.Methods.do1]
 this.a = 1
 c = 2
 this.x < 3
 
-[method gov.nasa.jpf.abstraction.predicate.MethodsTest.do2]
+[method gov.nasa.jpf.abstraction.predicate.Methods.do2]
 c = 3
 c = 4
 d = 1

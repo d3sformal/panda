@@ -1,13 +1,22 @@
 package gov.nasa.jpf.abstraction.predicate;
 
+import static gov.nasa.jpf.abstraction.predicate.BaseTest.*;
+
 public class MethodsTest extends BaseTest {
-	
+	public static void main(String[] args) {
+		Methods m = new Methods();
+
+		m.do1();
+	}
+}
+
+class Methods {
 	int a;
 	int b;
 	int x;
 	static int C = 2;
 	
-	public MethodsTest() {
+	public Methods() {
 		a = 7;
 	}
 	
@@ -17,7 +26,7 @@ public class MethodsTest extends BaseTest {
 		a = 1;
 		b = do2(c + 1, a) + 1;
 
-		assertConjunction("b = 6: true", "a = -10: true", "x = 1: false");
+		assertConjunction("this.b >= 6: true", "this.a = 1: false", "class(gov.nasa.jpf.abstraction.predicate.Methods).C = 2: true");
 	}
 	
 	public int do2(int c, int d) {
@@ -27,11 +36,4 @@ public class MethodsTest extends BaseTest {
 		
 		return c + d;
 	}
-
-	public static void main(String[] args) {
-		MethodsTest m = new MethodsTest();
-		
-		m.do1();
-	}
-
 }
