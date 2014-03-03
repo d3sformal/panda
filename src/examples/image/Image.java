@@ -4,10 +4,13 @@ public class Image
 {
     private static int SIZE = 6;
 	private Rectangle[] rectangles;
-	private int[][] pixels;
+	private Object[] pixels;
 
     private Image() {
-		pixels = new int[SIZE][SIZE];
+		pixels = new Object[SIZE];
+		for (int i = 0; i < SIZE; ++i) {
+			pixels[i] = new int[SIZE];
+		}
     }
 	
 	public static void main(String[] args) {
@@ -48,7 +51,7 @@ public class Image
 	    	// change relevant pixels to rectangle color
 			for (int i = rec.left; i <= rec.right; i++) {
 				for (int j = rec.top; j <= rec.bottom; j++) {
-					pixels[i][j] = rec.color;
+					((int[]) pixels[i])[j] = rec.color;
 				}
 			}
 		}
