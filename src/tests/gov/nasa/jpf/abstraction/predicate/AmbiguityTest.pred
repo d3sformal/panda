@@ -4,3 +4,4 @@ a.x.y.z = 3
 c.z = 3
 b.y.z = 0
 b.y.z = 3
+a.x = b
