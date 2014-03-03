@@ -8,7 +8,7 @@ public class ImageTest extends BaseTest {
 
         assertNumberOfPossibleValues("img.pixels", 1);
         assertConjunction("alength(arrlen, img.pixels) = class(gov.nasa.jpf.abstraction.predicate.Image).SIZE: true");
-        // TODO: assertConjunction("alength(arrlen, img.pixels[0]) = 6: true"); // Reasoning about fresh multidimensional arrays is not supported yet
+        assertConjunction("alength(arrlen, img.pixels[0]) = 6: true"); // Reasoning about fresh multidimensional arrays is not supported yet
 
 		img.load();
 
@@ -26,10 +26,14 @@ public class ImageTest extends BaseTest {
 class Image {
     private static int SIZE = 6;
 	private Rectangle[] rectangles;
-	private int[][] pixels;
+	private Object[] pixels;
 
     public Image() {
-		pixels = new int[SIZE][SIZE];
+		pixels = new Object[SIZE];
+
+        for (int i = 0; i < SIZE; ++i) {
+            pixels[i] = new int[SIZE];
+        }
     }
 	
 	public void load() {
@@ -75,7 +79,7 @@ class Image {
 			for (int i = rec.left; i <= rec.right; i++) {
 				for (int j = rec.top; j <= rec.bottom; j++) {
 					assertDisjunction("rec.bottom = 2: true", "rec.bottom = 3: true");
-					pixels[i][j] = rec.color;
+					((int[]) pixels[i])[j] = rec.color;
 				}
 			}
 		}
