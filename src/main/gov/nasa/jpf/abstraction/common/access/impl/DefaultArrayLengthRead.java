@@ -140,8 +140,9 @@ public class DefaultArrayLengthRead extends DefaultArrayLengthExpression impleme
 				AnonymousArray aa = (AnonymousArray) newExpression;
 
                 // x := new Integer[10]
-                // alength(alengthwrite(arrlen, x, 10), y.z)
-				return create(updatedAccessExpression, DefaultArrayLengthWrite.create(updatedAccessExpression, getArrayLengths(), aa.getArrayLength()));
+                // Scenario1 alength(arrlen, y.z): alength(alengthwrite(arrlen, fresh, 10), y.z)
+                // Scenario2 alength(arrlen, x):   alength(alengthwrite(arrlen, fresh, 10), fresh)
+				return create(updatedAccessExpression, DefaultArrayLengthWrite.create(aa, getArrayLengths(), aa.getArrayLength()));
 			}
 
             // x := a

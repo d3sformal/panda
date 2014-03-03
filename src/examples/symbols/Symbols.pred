@@ -1,7 +1,10 @@
 [method symbols.Symbols.main]
+k = l
 alength(arrlen, k) = alength(arrlen, l)
 alength(arrlen, l) = 1
 alength(arrlen, k) = 2
 alength(arrlen, o[0]) = 0
+m.b.i = 3
+k[0].b.i = 3
 true
 false
