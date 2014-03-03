@@ -93,8 +93,6 @@ public enum TruthValue implements BranchingConditionInfo {
             return or(this, (TruthValue) info);
         }
 
-        // TODO cope with compound info for container abs
-
         return BranchingConditionInfo.NONE;
     }
 }
