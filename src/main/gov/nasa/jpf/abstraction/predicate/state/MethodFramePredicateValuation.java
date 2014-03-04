@@ -4,6 +4,7 @@ import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Negation;
@@ -19,6 +20,7 @@ import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 import java.util.HashMap;
@@ -43,38 +45,54 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         this.smt = smt;
     }
 
-    public void addObject(AnonymousObject object) {
-        // add anonymous object predicates (through all its constructors)
-        
-        // 1)
-        // take all predicates over fields and no local variables
-        // take all paths that are rooted in the new object
-        // assume their initial (default) value to be 0 / null
-        // ask SMT for the predicate values
-        
-        // or
-        
-        // 2)
-        // add an artificial predicate for each field = 0 / null as TRUE
+    private void addArray(ElementInfo elementInfo, ThreadInfo threadInfo, AccessExpression name) {
+        // TODO: put(Equals.create(DefaultArrayLengthRead.create(name), length));
 
-        ElementInfo elementInfo = object.getReference().getElementInfo();
+        for (int i = 0; i < elementInfo.arrayLength(); ++i) {
+            AccessExpression elementExpression = DefaultArrayElementRead.create(name, Constant.create(i));
+
+            if (elementInfo.isReferenceArray()) {
+                ElementInfo subElementInfo = threadInfo.getElementInfo(elementInfo.getReferenceElement(i));
+
+                if (subElementInfo == null) {
+                    put(Equals.create(elementExpression, NullExpression.create()), TruthValue.TRUE);
+                } else {
+                    addArray(subElementInfo, threadInfo, elementExpression);
+                }
+            } else {
+                put(Equals.create(DefaultArrayElementRead.create(name, Constant.create(i)), Constant.create(0)), TruthValue.TRUE);
+            }
+        }
+    }
+
+    private void addObject(ElementInfo elementInfo, AccessExpression name) {
         ClassInfo classInfo = elementInfo.getClassInfo();
 
+        while (classInfo != null) {
+            for (FieldInfo field : classInfo.getInstanceFields()) {
+                if (field.isReference()) {
+                    put(Equals.create(DefaultObjectFieldRead.create(name, field.getName()), NullExpression.create()), TruthValue.TRUE);
+                } else {
+                    put(Equals.create(DefaultObjectFieldRead.create(name, field.getName()), Constant.create(0)), TruthValue.TRUE);
+                }
+            }
+
+            classInfo = classInfo.getSuperClass();
+        }
+    }
+
+    public void addObject(AnonymousObject object) {
+        VM vm = VM.getVM();
+        ThreadInfo threadInfo = vm.getCurrentThread();
+        ElementInfo elementInfo = object.getReference().getElementInfo();
+
         if (object instanceof AnonymousArray) {
-            // predicates over elements maybe
+            // initialize all elements
+            // Replaced with SMTInfoCollector's additional predicate
+            // addArray(elementInfo, threadInfo, object);
         } else {
             // initialize all fields across all super classes
-            while (classInfo != null) {
-                for (FieldInfo field : classInfo.getInstanceFields()) {
-                    if (field.isReference()) {
-                        put(Equals.create(DefaultObjectFieldRead.create(object, field.getName()), NullExpression.create()), TruthValue.TRUE);
-                    } else {
-                        put(Equals.create(DefaultObjectFieldRead.create(object, field.getName()), Constant.create(0)), TruthValue.TRUE);
-                    }
-                }
-
-                classInfo = classInfo.getSuperClass();
-            }
+            addObject(elementInfo, object);
         }
     }
 
