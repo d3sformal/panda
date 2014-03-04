@@ -3,6 +3,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Negation;
@@ -10,8 +11,14 @@ import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateValueDeterminingInfo;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.VM;
 
 import java.util.HashMap;
@@ -34,6 +41,41 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
     public MethodFramePredicateValuation(SMT smt) {
         this.smt = smt;
+    }
+
+    public void addObject(AnonymousObject object) {
+        // add anonymous object predicates (through all its constructors)
+        
+        // 1)
+        // take all predicates over fields and no local variables
+        // take all paths that are rooted in the new object
+        // assume their initial (default) value to be 0 / null
+        // ask SMT for the predicate values
+        
+        // or
+        
+        // 2)
+        // add an artificial predicate for each field = 0 / null as TRUE
+
+        ElementInfo elementInfo = object.getReference().getElementInfo();
+        ClassInfo classInfo = elementInfo.getClassInfo();
+
+        if (object instanceof AnonymousArray) {
+            // predicates over elements maybe
+        } else {
+            // initialize all fields across all super classes
+            while (classInfo != null) {
+                for (FieldInfo field : classInfo.getInstanceFields()) {
+                    if (field.isReference()) {
+                        put(Equals.create(DefaultObjectFieldRead.create(object, field.getName()), NullExpression.create()), TruthValue.TRUE);
+                    } else {
+                        put(Equals.create(DefaultObjectFieldRead.create(object, field.getName()), Constant.create(0)), TruthValue.TRUE);
+                    }
+                }
+
+                classInfo = classInfo.getSuperClass();
+            }
+        }
     }
 
 	@SuppressWarnings("unchecked")

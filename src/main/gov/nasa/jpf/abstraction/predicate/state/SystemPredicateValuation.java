@@ -383,7 +383,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
                             replacements.put(DefaultRoot.create(name, slotIndex), actualExpr);
 
-                            isAnonymous |= actualExpr instanceof AnonymousExpression;
+                            isAnonymous |= actualExpr instanceof AnonymousExpression; // o.method(..., new A(), ...)
+                            isAnonymous |= method.isInit(); // new C() ... C.<init> which calls B.<init> and A.<init> on "this" which is in fact anonymous
                         }
                     }
                 }

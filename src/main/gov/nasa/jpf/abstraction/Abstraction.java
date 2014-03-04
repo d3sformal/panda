@@ -23,6 +23,7 @@ import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.MethodInfo;
@@ -133,6 +134,9 @@ public abstract class Abstraction {
      * this is an alternative approach to let the abstraction know about its existence
      */
     public void processNewClass(ThreadInfo thread, ClassInfo classInfo) {
+    }
+
+    public void processNewObject(AnonymousObject object) {
     }
 
     public void informAboutPrimitiveLocalVariable(Root root) {

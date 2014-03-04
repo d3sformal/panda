@@ -112,6 +112,12 @@ public class PredicateAbstraction extends Abstraction {
             startupClasses.add(classInfo);
         }
     }
+
+    @Override
+    public void processNewObject(AnonymousObject object) {
+        symbolTable.get(0).addObject(object);
+        predicateValuation.get(0).addObject(object);
+    }
 	
     @Override
     public void informAboutPrimitiveLocalVariable(Root root) {

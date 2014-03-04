@@ -15,6 +15,7 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
@@ -46,6 +47,8 @@ import gov.nasa.jpf.abstraction.predicate.state.universe.PrimitiveValueSlot;
 import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueSlot;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
@@ -239,6 +242,46 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 		}
 	}
 
+	public void addObject(AnonymousObject object) {
+        VM vm = VM.getVM();
+        ThreadInfo ti = vm.getCurrentThread();
+        ElementInfo elementInfo = object.getReference().getElementInfo();
+
+        // Initialize new objects
+        if (!universe.contains(object.getReference())) {
+		    universe.add(elementInfo, ti);
+
+            if (elementInfo.isArray()) {
+                // write 0 / null to all elements (TODO: unless its multidimensional)
+                for (int i = 0; i < elementInfo.arrayLength(); ++i) {
+                    if (elementInfo.isReferenceArray()) {
+                        processObjectStore(NullExpression.create(), DefaultArrayElementRead.create(object, Constant.create(i)));
+                    } else {
+                        processPrimitiveStore(Constant.create(0), DefaultArrayElementRead.create(object, Constant.create(i)));
+                    }
+                }
+            } else {
+                ClassInfo cls = elementInfo.getClassInfo();
+
+                while (cls != null) {
+                    // write 0 / null to all fields
+                    for (FieldInfo field : cls.getInstanceFields()) {
+                        if (field.isReference()) {
+                            processObjectStore(NullExpression.create(), DefaultObjectFieldRead.create(object, field.getName()));
+                        } else {
+                            processPrimitiveStore(Constant.create(0), DefaultObjectFieldRead.create(object, field.getName()));
+                        }
+                    }
+
+                    cls = cls.getSuperClass();
+                }
+            }
+        }
+	}
+
+	public void addArray(ElementInfo array, Expression length) {
+    }
+
 	/**
 	 * Resolve a path to all values it may be pointing to (primitive/objects)
 	 */
@@ -247,8 +290,6 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 			AnonymousExpression anonymous = (AnonymousExpression) expression.getRoot();
 			Reference reference = anonymous.getReference();
 
-            ensureAnonymousObjectExistence(anonymous);
-			
 			if (universe.contains(reference)) {
 				universe.lookupValues(reference, expression, outValues);
 
@@ -373,9 +414,9 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 	public Set<AccessExpression> processPrimitiveStore(Expression from, MethodFrameSymbolTable fromTable, AccessExpression to) {
         fromTable.ensureAnonymousObjectExistence(from);
 
-		ensureAnonymousObjectExistence(from);
-		ensureAnonymousObjectExistence(to);
-		
+        ensureAnonymousObjectExistence(from);
+        ensureAnonymousObjectExistence(to);
+
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		Set<UniverseIdentifier> destinations = new HashSet<UniverseIdentifier>();
         
@@ -408,9 +449,9 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
     public Set<AccessExpression> processObjectStore(Expression from, MethodFrameSymbolTable fromTable, AccessExpression to) {
         fromTable.ensureAnonymousObjectExistence(from);
 
-		ensureAnonymousObjectExistence(from);
-		ensureAnonymousObjectExistence(to);
-		
+        ensureAnonymousObjectExistence(from);
+        ensureAnonymousObjectExistence(to);
+
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		Set<UniverseIdentifier> destinations = new HashSet<UniverseIdentifier>();
         
@@ -712,18 +753,11 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 		return ret;
 	}
 
-	/**
-	 * Creates (if not already existent) object in the universe to match an anonymous expression
-	 */
-	private void ensureAnonymousObjectExistence(Expression expr) {
-		if (expr instanceof AnonymousExpression) {
-            Reference reference = ((AnonymousExpression) expr).getReference();
-            VM vm = VM.getVM();
-            ThreadInfo ti = vm.getCurrentThread();
-
-			universe.add(reference.getElementInfo(), ti);
-		}
-	}
+    private void ensureAnonymousObjectExistence(Expression expression) {
+        if (expression instanceof AnonymousObject) {
+            addObject((AnonymousObject) expression);
+        }
+    }
 
     // may overwrite a variable without removing the mapping from its values
     //

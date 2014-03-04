@@ -3,6 +3,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import java.util.LinkedList;
 import java.util.List;
 
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
@@ -47,9 +48,12 @@ public class MULTIANEWARRAY extends gov.nasa.jpf.jvm.bytecode.MULTIANEWARRAY {
 		}
 		
 		ElementInfo array = ti.getElementInfo(sf.peek());
+        AnonymousArray expression = AnonymousArray.create(new Reference(array), attr.getExpression());
 		
+        GlobalAbstraction.getInstance().processNewObject(expression);
+
 		sf = ti.getModifiableTopFrame();
-		sf.setOperandAttr(new NonEmptyAttribute(null, AnonymousArray.create(new Reference(array), attr.getExpression())));
+		sf.setOperandAttr(new NonEmptyAttribute(null, expression));
 		
 		// ALL ELEMENTS ARE NULL
 		setArrayAttributes(ti, array, attrs);

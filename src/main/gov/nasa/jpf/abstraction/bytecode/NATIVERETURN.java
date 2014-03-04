@@ -21,6 +21,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.NativeStackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Types;
@@ -46,10 +47,10 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
         switch (before.getMethodInfo().getReturnTypeCode()) {
             case Types.T_ARRAY:
             case Types.T_REFERENCE:
-                int ref = ((Integer) retValue).intValue();
-
-                AnonymousObject returnValue = AnonymousObject.create(new Reference(ti.getElementInfo(ref)));
+                AnonymousObject returnValue = AnonymousObject.create(new Reference(ti.getElementInfo(((Integer) retValue).intValue())));
                 
+                GlobalAbstraction.getInstance().processNewObject(returnValue);
+
                 before.setReturnAttr(new NonEmptyAttribute(null, returnValue));
                 break;
 
