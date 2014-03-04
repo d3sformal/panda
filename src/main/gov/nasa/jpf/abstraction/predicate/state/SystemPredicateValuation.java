@@ -6,6 +6,7 @@ import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
@@ -23,6 +24,8 @@ import gov.nasa.jpf.abstraction.predicate.smt.SMTException;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
@@ -425,15 +428,20 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
                 boolean canBeAffected = false;
 
+                // Static
                 for (AccessExpression path : temporaryPathsHolder) {
-                    canBeAffected |= path.getRoot().isThis() && sameObject;
-                    canBeAffected |= path.isStatic();
+                    if (path.isStatic()) {
+                        canBeAffected = true;
+
+                        break;
+                    }
                 }
 
+                // Reference arguments
                 for (AccessExpression path : temporaryPathsHolder) {
                     Iterator<Object> originalActualParameters = method.attrIterator();
 
-                    for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
+                    for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments() && !canBeAffected; ++slotIndex) {
                         if (slotInUse[slotIndex]) {
                             Expression expr = Attribute.ensureNotNull((Attribute) originalActualParameters.next()).getExpression();
 
@@ -443,10 +451,41 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                                     AccessExpression actualParameter = (AccessExpression) expr;
 
                                     // reference-passed objects may have been affected by the method
-                                    canBeAffected |= actualParameter.isPrefixOf(path);
+                                    if (actualParameter.isPrefixOf(path)) {
+                                        if (path.getRoot().isThis() && sameObject) {
+                                            // Constructors affect `this` only in scope of the class
+                                            // No further subclass fields may be modified by the constructor
+                                            // Therefore the initial valuation may stay intact after calling super constructor
+                                            if (method.isInit() && path.getLength() > 1) {
+                                                ObjectFieldRead fr = (ObjectFieldRead) path.get(2);
+
+                                                ClassInfo cls = method.getClassInfo();
+
+                                                while (cls != null && !canBeAffected) {
+                                                    for (FieldInfo field : cls.getInstanceFields()) {
+                                                        if (fr.getField().getName().equals(field.getName())) {
+                                                            canBeAffected = true;
+
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    cls = cls.getSuperClass();
+                                                }
+                                            } else {
+                                                canBeAffected = true; // Not constructor
+                                            }
+                                        } else {
+                                            canBeAffected = true; // Any non-this parameter
+                                        }
+                                    }
                                 }
                             }
                         }
+                    }
+
+                    if (canBeAffected) {
+                        break;
                     }
                 }
 
