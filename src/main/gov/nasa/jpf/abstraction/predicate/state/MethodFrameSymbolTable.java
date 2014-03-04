@@ -412,11 +412,6 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
      * @return access path to all the affected objects
 	 */
 	public Set<AccessExpression> processPrimitiveStore(Expression from, MethodFrameSymbolTable fromTable, AccessExpression to) {
-        fromTable.ensureAnonymousObjectExistence(from);
-
-        ensureAnonymousObjectExistence(from);
-        ensureAnonymousObjectExistence(to);
-
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		Set<UniverseIdentifier> destinations = new HashSet<UniverseIdentifier>();
         
@@ -447,11 +442,6 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
     // The universes may differ instance-wise (different objects representing the same universe)
     // FromTable may have a different Locals/Statics sets
     public Set<AccessExpression> processObjectStore(Expression from, MethodFrameSymbolTable fromTable, AccessExpression to) {
-        fromTable.ensureAnonymousObjectExistence(from);
-
-        ensureAnonymousObjectExistence(from);
-        ensureAnonymousObjectExistence(to);
-
 		Set<AccessExpression> ret = new HashSet<AccessExpression>();
 		Set<UniverseIdentifier> destinations = new HashSet<UniverseIdentifier>();
         
@@ -752,12 +742,6 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
 		return ret;
 	}
-
-    private void ensureAnonymousObjectExistence(Expression expression) {
-        if (expression instanceof AnonymousObject) {
-            addObject((AnonymousObject) expression);
-        }
-    }
 
     // may overwrite a variable without removing the mapping from its values
     //
