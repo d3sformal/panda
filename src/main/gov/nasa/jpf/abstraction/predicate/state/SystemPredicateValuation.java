@@ -227,8 +227,25 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 		
 		if (predicate instanceof Comparison) {
 			Comparison c = (Comparison) predicate;
+
+            Expression a = c.a;
+            Expression b = c.b;
+
+            if (a instanceof AccessExpression) {
+                AccessExpression ae = (AccessExpression) a;
+
+                if (ae.getRoot() instanceof ReturnValue) {
+                    return true;
+                }
+            }
 			
-			return c.a instanceof ReturnValue || c.b instanceof ReturnValue;
+            if (b instanceof AccessExpression) {
+                AccessExpression ae = (AccessExpression) b;
+
+                if (ae.getRoot() instanceof ReturnValue) {
+                    return true;
+                }
+            }
 		}
 		
 		return false;

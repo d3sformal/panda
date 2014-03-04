@@ -75,50 +75,41 @@ predicate returns [Predicate val]
 	| NOT_TOKEN '(' p=predicate ')' {
 		$ctx.val = Negation.create($p.val);
 	}
-	| a=expressionorreturn '=' b=expressionorreturn {
+	| a=expression '=' b=expression {
 		$ctx.val = Equals.create($a.val, $b.val);
 	}
-	| a=expressionorreturn '=' NULL_TOKEN {
+	| a=expression '=' NULL_TOKEN {
 		$ctx.val = Equals.create($a.val, NullExpression.create());
 	}
-	| NULL_TOKEN '=' b=expressionorreturn {
+	| NULL_TOKEN '=' b=expression {
 		$ctx.val = Equals.create(NullExpression.create(), $b.val);
 	}
 	| NULL_TOKEN '=' NULL_TOKEN {
 		$ctx.val = Tautology.create();
 	}
-	| a=expressionorreturn '<' b=expressionorreturn {
+	| a=expression '<' b=expression {
 		$ctx.val = LessThan.create($a.val, $b.val);
 	}
-	| a=expressionorreturn '>' b=expressionorreturn {
+	| a=expression '>' b=expression {
 		$ctx.val = LessThan.create($b.val, $a.val);
 	}
-	| a=expressionorreturn '<=' b=expressionorreturn {
+	| a=expression '<=' b=expression {
 		$ctx.val = Negation.create(LessThan.create($b.val, $a.val));
 	}
-	| a=expressionorreturn '>=' b=expressionorreturn {
+	| a=expression '>=' b=expression {
 		$ctx.val = Negation.create(LessThan.create($a.val, $b.val));
 	}
-	| a=expressionorreturn '!=' b=expressionorreturn {
+	| a=expression '!=' b=expression {
 		$ctx.val = Negation.create(Equals.create($a.val, $b.val));
 	}
-	| a=expressionorreturn '!=' NULL_TOKEN {
+	| a=expression '!=' NULL_TOKEN {
 		$ctx.val = Negation.create(Equals.create($a.val, NullExpression.create()));
 	}
-	| NULL_TOKEN '!=' b=expressionorreturn {
+	| NULL_TOKEN '!=' b=expression {
 		$ctx.val = Negation.create(Equals.create(NullExpression.create(), $b.val));
 	}
 	| NULL_TOKEN '!=' NULL_TOKEN {
 		$ctx.val = Contradiction.create();
-	}
-	;
-
-expressionorreturn returns [Expression val]
-	: RETURN_TOKEN {
-		$ctx.val = DefaultReturnValue.create();
-	}
-	| e=expression {
-		$ctx.val = $e.val;
 	}
 	;
 
@@ -162,7 +153,10 @@ factor returns [Expression val]
 	;
 
 path returns [DefaultAccessExpression val] locals [List<String> name = new LinkedList<String>()]
-	: f=ID_TOKEN {
+    : f=RETURN_TOKEN {
+        $ctx.val = DefaultReturnValue.create();
+    }
+	| f=ID_TOKEN {
 		$ctx.val = DefaultRoot.create($f.text);
 	}
 	| CLASS_TOKEN '(' ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} ')' '.' f=ID_TOKEN {

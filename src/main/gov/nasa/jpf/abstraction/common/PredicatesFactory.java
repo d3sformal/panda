@@ -27,6 +27,6 @@ public class PredicatesFactory {
     }
 
     public static Expression createExpressionFromString(String definition) {
-        return createFromString(definition).expressionorreturn().val;
+        return createFromString(definition).expression().val;
     }
 }
