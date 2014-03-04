@@ -45,8 +45,10 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         this.smt = smt;
     }
 
+    // not used right now (might be useful for multi-dimensional arrays)
     private void addArray(ElementInfo elementInfo, ThreadInfo threadInfo, AccessExpression name) {
-        // TODO: put(Equals.create(DefaultArrayLengthRead.create(name), length));
+        // we would need the lengths of all nested sub-arrays from MULTIANEWARRAY
+        //put(Equals.create(DefaultArrayLengthRead.create(name), length));
 
         for (int i = 0; i < elementInfo.arrayLength(); ++i) {
             AccessExpression elementExpression = DefaultArrayElementRead.create(name, Constant.create(i));
@@ -87,11 +89,13 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         ElementInfo elementInfo = object.getReference().getElementInfo();
 
         if (object instanceof AnonymousArray) {
-            // initialize all elements
-            // Replaced with SMTInfoCollector's additional predicate
-            // addArray(elementInfo, threadInfo, object);
+            // initialize all elements to default values
+            // disabled now because it is too slow (it creates many predicates)
+            // instead we use additional predicate over fresh (SMTInfoCollector)
+            // we do not need it because there is very little support for multi-dimensional arrays
+            //addArray(elementInfo, threadInfo, object);
         } else {
-            // initialize all fields across all super classes
+            // initialize all fields across all super classes to default values
             addObject(elementInfo, object);
         }
     }
