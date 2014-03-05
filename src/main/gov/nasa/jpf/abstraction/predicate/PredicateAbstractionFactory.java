@@ -19,7 +19,7 @@ import gov.nasa.jpf.Config;
  */
 public class PredicateAbstractionFactory extends AbstractionFactory {
 
-    private static String systemPredicatesFilename = "system.pred";
+    private static String systemPredicatesFilename = "systemlibs.pred";
 
 	@Override
 	public Abstraction create(Config config, String[] args) {

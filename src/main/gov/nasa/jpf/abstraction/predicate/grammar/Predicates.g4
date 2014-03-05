@@ -41,25 +41,25 @@ context returns [Context val] locals [List<String> name = new LinkedList<String>
 
 		$ctx.val = new ObjectContext(packageAndClass, $ps.val);
 	}
-    | '[' METHOD_TOKEN ASSUME_TOKEN PRE_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=ID_TOKEN ']' ps=predicatelist {
+    | '[' ASSUME_TOKEN PRE_TOKEN METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=ID_TOKEN ']' ps=predicatelist {
 		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
 		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
 
 		$ctx.val = new MethodAssumePreContext(method, $ps.val);
     }
-    | '[' METHOD_TOKEN ASSUME_TOKEN PRE_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=INIT_TOKEN ']' ps=predicatelist {
+    | '[' ASSUME_TOKEN PRE_TOKEN METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=INIT_TOKEN ']' ps=predicatelist {
 		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
 		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
 
 		$ctx.val = new MethodAssumePreContext(method, $ps.val);
     }
-    | '[' METHOD_TOKEN ASSUME_TOKEN POST_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=ID_TOKEN ']' ps=predicatelist {
+    | '[' ASSUME_TOKEN POST_TOKEN METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=ID_TOKEN ']' ps=predicatelist {
 		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
 		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
 
 		$ctx.val = new MethodAssumePostContext(method, $ps.val);
     }
-    | '[' METHOD_TOKEN ASSUME_TOKEN POST_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=INIT_TOKEN ']' ps=predicatelist {
+    | '[' ASSUME_TOKEN POST_TOKEN METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=INIT_TOKEN ']' ps=predicatelist {
 		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
 		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
 
