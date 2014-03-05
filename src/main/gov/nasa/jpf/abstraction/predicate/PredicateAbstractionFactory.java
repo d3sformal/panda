@@ -19,6 +19,8 @@ import gov.nasa.jpf.Config;
  */
 public class PredicateAbstractionFactory extends AbstractionFactory {
 
+    private static String systemPredicatesFilename = "system.pred";
+
 	@Override
 	public Abstraction create(Config config, String[] args) {
 		String filename = args[1];
@@ -28,9 +30,18 @@ public class PredicateAbstractionFactory extends AbstractionFactory {
 			PredicatesLexer lexer = new PredicatesLexer(chars);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			PredicatesParser parser = new PredicatesParser(tokens);
-		
+
 			Predicates predicates = parser.predicates().val;
-			
+
+			chars = new ANTLRInputStream(new FileInputStream(systemPredicatesFilename));
+			lexer = new PredicatesLexer(chars);
+			tokens = new CommonTokenStream(lexer);
+			parser = new PredicatesParser(tokens);
+
+			Predicates systemPredicates = parser.predicates().val;
+
+            predicates.contexts.addAll(systemPredicates.contexts);
+
             if (config.getBoolean("abstract.verbose")) {
     			System.out.println(predicates.toString());
             }

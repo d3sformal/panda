@@ -1,0 +1,24 @@
+// Callsite of ThreadGroup.add
+// Track these to allow precise exception handling
+[method java.lang.Thread.<init>]
+group = null
+group.destroyed = 0
+
+this.group = cur.group
+cur.group.destroyed = 0
+
+// Transfer group.destroyed knowledge over this getter
+[method java.lang.Thread.getThreadGroup]
+this.destroyed = 0
+this.group.destroyed = 0
+return = this.group
+
+// Track these to allow precise exception handling
+[method java.lang.ThreadGroup.add]
+cur.destroyed = 0
+this.destroyed = 0
+
+// Assume that current thread cannot be destroyed
+[method assume post java.lang.Thread.currentThread]
+return.destroyed = 0
+return.group.destroyed = 0

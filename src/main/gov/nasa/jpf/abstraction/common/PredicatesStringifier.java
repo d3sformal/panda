@@ -77,6 +77,34 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 	}
 
 	@Override
+	public void visit(MethodAssumePreContext context) {
+		ret.append("[method assume pre ");
+
+		context.getMethod().accept(this);
+
+		ret.append("]\n");
+
+		for (Predicate p : context.predicates) {
+			p.accept(this);
+			ret.append("\n");
+		}
+	}
+
+	@Override
+	public void visit(MethodAssumePostContext context) {
+		ret.append("[method assume post ");
+
+		context.getMethod().accept(this);
+
+		ret.append("]\n");
+
+		for (Predicate p : context.predicates) {
+			p.accept(this);
+			ret.append("\n");
+		}
+	}
+
+	@Override
 	public void visit(StaticContext context) {
 		ret.append("[static]\n");
 

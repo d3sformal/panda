@@ -41,6 +41,30 @@ context returns [Context val] locals [List<String> name = new LinkedList<String>
 
 		$ctx.val = new ObjectContext(packageAndClass, $ps.val);
 	}
+    | '[' METHOD_TOKEN ASSUME_TOKEN PRE_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=ID_TOKEN ']' ps=predicatelist {
+		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
+		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
+
+		$ctx.val = new MethodAssumePreContext(method, $ps.val);
+    }
+    | '[' METHOD_TOKEN ASSUME_TOKEN PRE_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=INIT_TOKEN ']' ps=predicatelist {
+		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
+		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
+
+		$ctx.val = new MethodAssumePreContext(method, $ps.val);
+    }
+    | '[' METHOD_TOKEN ASSUME_TOKEN POST_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=ID_TOKEN ']' ps=predicatelist {
+		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
+		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
+
+		$ctx.val = new MethodAssumePostContext(method, $ps.val);
+    }
+    | '[' METHOD_TOKEN ASSUME_TOKEN POST_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=INIT_TOKEN ']' ps=predicatelist {
+		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
+		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
+
+		$ctx.val = new MethodAssumePostContext(method, $ps.val);
+    }
 	| '[' METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=ID_TOKEN ']' ps=predicatelist {
 		DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
 		DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
@@ -183,6 +207,7 @@ ALENGTH_TOKEN: 'alength';
 AREAD_TOKEN  : 'aread';
 ARR_TOKEN    : 'arr';
 ARRLEN_TOKEN : 'arrlen';
+ASSUME_TOKEN : 'assume';
 CLASS_TOKEN  : 'class';
 FALSE_TOKEN  : 'false';
 FREAD_TOKEN  : 'fread';
@@ -191,6 +216,8 @@ METHOD_TOKEN : 'method';
 NOT_TOKEN    : 'not';
 NULL_TOKEN   : 'null';
 OBJECT_TOKEN : 'object';
+PRE_TOKEN    : 'pre';
+POST_TOKEN   : 'post';
 RETURN_TOKEN : 'return';
 SFREAD_TOKEN : 'sfread';
 STATIC_TOKEN : 'static';
@@ -204,6 +231,10 @@ CONSTANT_TOKEN
 ID_TOKEN
 	: [a-zA-Z_][a-zA-Z0-9_]*
 	;
+
+COMMENT_TOKEN
+    : '//' ~('\n')* { skip(); }
+    ;
 
 WS_TOKEN
 	: ([ \t\n])+ { skip(); }

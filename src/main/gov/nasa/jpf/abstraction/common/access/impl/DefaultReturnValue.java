@@ -10,6 +10,7 @@ import gov.nasa.jpf.vm.Instruction;
 public class DefaultReturnValue extends DefaultRoot implements ReturnValue {
 	
 	private boolean isReference = false;
+    private boolean isReturnFromCurrentScope = true;
 	
 	protected DefaultReturnValue() {
 		super("return");
@@ -19,6 +20,7 @@ public class DefaultReturnValue extends DefaultRoot implements ReturnValue {
 		super(name);
 		
 		this.isReference = isReference;
+        this.isReturnFromCurrentScope = false;
 	}
 	
 	public static DefaultReturnValue create() {
@@ -37,6 +39,11 @@ public class DefaultReturnValue extends DefaultRoot implements ReturnValue {
 	public boolean isReference() {
 		return isReference;
 	}
+
+    @Override
+    public boolean isReturnFromCurrentScope() {
+        return isReturnFromCurrentScope;
+    }
 	
 	@Override
 	public boolean isEqualToSlow(AccessExpression o) {

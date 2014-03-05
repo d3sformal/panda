@@ -19,18 +19,10 @@ import java.util.List;
  * 
  * @see gov.nasa.jpf.abstraction.predicate.grammar (grammar file Predicates.g4)
  */
-public class MethodContext extends Context {
+public class MethodContext extends AbstractMethodContext {
 	
-	private Method method;
-
 	public MethodContext(Method method, List<Predicate> predicates) {
-		super(predicates);
-		
-		this.method = method;
-	}
-	
-	public Method getMethod() {
-		return method;
+		super(method, predicates);
 	}
 
 	@Override

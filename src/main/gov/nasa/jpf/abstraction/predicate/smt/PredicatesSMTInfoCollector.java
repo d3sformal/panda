@@ -46,6 +46,8 @@ import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Implication;
 import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.MethodContext;
+import gov.nasa.jpf.abstraction.common.MethodAssumePreContext;
+import gov.nasa.jpf.abstraction.common.MethodAssumePostContext;
 import gov.nasa.jpf.abstraction.common.ObjectContext;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Predicates;
@@ -89,6 +91,20 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 
 	@Override
 	public void visit(MethodContext context) {
+		for (Predicate predicate : context.predicates) {
+			predicate.accept(this);
+		}
+	}
+
+	@Override
+	public void visit(MethodAssumePreContext context) {
+		for (Predicate predicate : context.predicates) {
+			predicate.accept(this);
+		}
+	}
+
+	@Override
+	public void visit(MethodAssumePostContext context) {
 		for (Predicate predicate : context.predicates) {
 			predicate.accept(this);
 		}

@@ -17,18 +17,6 @@ import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
-import gov.nasa.jpf.abstraction.common.Conjunction;
-import gov.nasa.jpf.abstraction.common.Contradiction;
-import gov.nasa.jpf.abstraction.common.Disjunction;
-import gov.nasa.jpf.abstraction.common.Equals;
-import gov.nasa.jpf.abstraction.common.Implication;
-import gov.nasa.jpf.abstraction.common.LessThan;
-import gov.nasa.jpf.abstraction.common.MethodContext;
-import gov.nasa.jpf.abstraction.common.ObjectContext;
-import gov.nasa.jpf.abstraction.common.Predicates;
-import gov.nasa.jpf.abstraction.common.StaticContext;
-import gov.nasa.jpf.abstraction.common.Tautology;
-import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 
 import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 
@@ -46,6 +34,8 @@ public interface PredicatesComponentVisitor {
 	public void visit(Predicates predicates);
 	public void visit(ObjectContext context);
 	public void visit(MethodContext context);
+	public void visit(MethodAssumePreContext context);
+	public void visit(MethodAssumePostContext context);
 	public void visit(StaticContext context);
 	public void visit(Negation predicate);
 	public void visit(LessThan predicate);
