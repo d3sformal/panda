@@ -361,19 +361,19 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 			if (parent instanceof StructuredValueIdentifier) {
 				Set<AccessExpression> resolution = new HashSet<AccessExpression>();
 
-                StructuredValueIdentifier parentObject = (StructuredValueIdentifier) parent;
-                UniverseSlot slot = universe.get(parentObject).getSlot(pair.getSecond());
+                StructuredValueIdentifier parentObjectID = (StructuredValueIdentifier) parent;
+                UniverseSlot slot = universe.get(parentObjectID).getSlot(pair.getSecond());
                 
-                valueToAccessExpressions(parentObject,  maxLength - 1, resolution);
+                valueToAccessExpressions(parentObjectID, maxLength - 1, resolution);
 
 				for (AccessExpression prefix : resolution) {
 					AccessExpression path = null;
 					
-					if (universe.get(parentObject) instanceof Associative) {						
+					if (universe.get(parentObjectID) instanceof Associative) {						
 						path = DefaultObjectFieldRead.create(prefix, ((FieldName) slot.getSlotKey()).getName());
 					}
 					
-					if (universe.get(parentObject) instanceof Indexed) {
+					if (universe.get(parentObjectID) instanceof Indexed) {
 						path = DefaultArrayElementRead.create(prefix, Constant.create(((ElementIndex) slot.getSlotKey()).getIndex()));
 					}
 					
@@ -890,13 +890,9 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 		}
 		
 		for (AccessExpression expr : order) {
-			for (int i = 0; i < maxLength - expr.toString(Notation.DOT_NOTATION).length(); ++i) {
-				ret.append(' ');
-			}
-			
 			ret.append(expr.toString(Notation.DOT_NOTATION));
-			
-			for (int i = 0; i < padding; ++i) {
+
+			for (int i = 0; i < maxLength - expr.toString(Notation.DOT_NOTATION).length() + padding; ++i) {
 				ret.append(' ');
 			}
 			

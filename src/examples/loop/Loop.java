@@ -1,10 +1,10 @@
-package paper;
+package loop;
 
 class X {
 	int x = 42;
 } 
 
-public class Paper {
+public class Loop {
 	public static void main(String[] args) {
 		X x = new X();
 		

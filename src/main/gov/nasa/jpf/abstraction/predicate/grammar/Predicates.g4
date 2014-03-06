@@ -203,25 +203,25 @@ path returns [DefaultAccessExpression val] locals [List<String> name = new Linke
 	}
 	;
 
-ALENGTH_TOKEN: 'alength';
-AREAD_TOKEN  : 'aread';
-ARR_TOKEN    : 'arr';
-ARRLEN_TOKEN : 'arrlen';
-ASSUME_TOKEN : 'assume';
-CLASS_TOKEN  : 'class';
-FALSE_TOKEN  : 'false';
-FREAD_TOKEN  : 'fread';
-INIT_TOKEN   : '<init>';
-METHOD_TOKEN : 'method';
-NOT_TOKEN    : 'not';
-NULL_TOKEN   : 'null';
-OBJECT_TOKEN : 'object';
-PRE_TOKEN    : 'pre';
-POST_TOKEN   : 'post';
-RETURN_TOKEN : 'return';
-SFREAD_TOKEN : 'sfread';
-STATIC_TOKEN : 'static';
-TRUE_TOKEN   : 'true';
+ALENGTH_TOKEN : 'alength';
+AREAD_TOKEN   : 'aread';
+ARR_TOKEN     : 'arr';
+ARRLEN_TOKEN  : 'arrlen';
+ASSUME_TOKEN  : 'assume';
+CLASS_TOKEN   : 'class';
+FALSE_TOKEN   : 'false';
+FREAD_TOKEN   : 'fread';
+INIT_TOKEN    : '<init>';
+METHOD_TOKEN  : 'method';
+NOT_TOKEN     : 'not';
+NULL_TOKEN    : 'null';
+OBJECT_TOKEN  : 'object';
+PRE_TOKEN     : 'pre';
+POST_TOKEN    : 'post';
+RETURN_TOKEN  : 'return';
+SFREAD_TOKEN  : 'sfread';
+STATIC_TOKEN  : 'static';
+TRUE_TOKEN    : 'true';
 
 CONSTANT_TOKEN
 	: [-+]?'0'('.' [0-9]*)?
@@ -237,5 +237,5 @@ COMMENT_TOKEN
     ;
 
 WS_TOKEN
-	: ([ \t\n])+ { skip(); }
+	: ([ \t\n\r])+ { skip(); }
 	;

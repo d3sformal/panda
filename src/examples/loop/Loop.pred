@@ -1,0 +1,8 @@
+[method loop.X.<init>]
+this.x = 42
+
+[method loop.Loop.main]
+x.x = 42
+x.x > 0
+i = x.x
+x.x < i

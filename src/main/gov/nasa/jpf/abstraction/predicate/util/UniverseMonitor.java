@@ -20,6 +20,7 @@ import gov.nasa.jpf.abstraction.predicate.state.universe.Associative;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Indexed;
 import gov.nasa.jpf.abstraction.predicate.state.universe.FieldName;
 import gov.nasa.jpf.abstraction.predicate.state.universe.ElementIndex;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseNull;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -47,7 +48,7 @@ public class UniverseMonitor extends ListenerAdapter {
 		} else if (abs instanceof PredicateAbstraction) {
 			PredicateAbstraction predicate = (PredicateAbstraction) abs;
 			Universe universe = predicate.getSymbolTable().getUniverse();
-			System.out.println("--Universe--");
+			System.out.println("--UNIVERSE--");
 			
 			Set<StructuredValueIdentifier> ordered = new TreeSet<StructuredValueIdentifier>(new Comparator<StructuredValueIdentifier>() {
 				@Override
@@ -75,25 +76,26 @@ public class UniverseMonitor extends ListenerAdapter {
 				if (universe.get(v) instanceof Associative) {
 					Associative a = (Associative) universe.get(v);
 					
-					System.out.print(a + "::");
+					// nothing printed for "null"
+					if (v instanceof Reference) {
+						if ( ! (a instanceof UniverseNull) ) {
+							System.out.println(v + " @ " + ((Reference) v).getElementInfo().getClassInfo().getName());
+						}
+					} else {
+						System.out.println(v);
+					}
 					
 					for (FieldName f : a.getFields().keySet()) {
-						System.out.print(" " + f.getName() + ": " + a.getField(f).getPossibleValues());
+						System.out.println("\t" + f.getName() + ": " + a.getField(f).getPossibleValues());
 					}
-					
-					System.out.println();
-				}
-				
-				if (universe.get(v) instanceof Indexed) {
+				} else if (universe.get(v) instanceof Indexed) {
 					Indexed i = (Indexed) universe.get(v);
 					
-					System.out.print(i + "::");
+					System.out.println(v + " @ " + ((Reference) v).getElementInfo().getClassInfo().getName());
 					
 					for (ElementIndex j : i.getElements().keySet()) {
-						System.out.print(" " + j.getIndex() + ": " + i.getElement(j).getPossibleValues());
+						System.out.println("\t" + j.getIndex() + ": " + i.getElement(j).getPossibleValues());
 					}
-					
-					System.out.println();
 				}
 			}
 
