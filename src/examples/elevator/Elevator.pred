@@ -1,0 +1,4 @@
+[static]
+class(elevator.Lift).IDLE = 0
+class(elevator.Lift).UP = 1
+class(elevator.Lift).DOWN = 2

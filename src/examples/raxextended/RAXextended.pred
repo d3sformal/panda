@@ -1,0 +1,3 @@
+[static]
+class(raxextended.Events).plan.count = 0
+class(raxextended.Events).plan.count >= class(raxextended.Events).plan.wrapCount

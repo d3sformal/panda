@@ -1,6 +1,6 @@
 @using=jpf-abstraction
 
-target=prodcons.ProdConsEx
+target=prodcons.numeric.ProdConsEx
 
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples

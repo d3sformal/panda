@@ -1,4 +1,4 @@
-package prodcons;
+package prodcons.numeric;
 
 import gov.nasa.jpf.abstraction.Debug;
 
@@ -20,9 +20,9 @@ class Data {
 class Producer extends Thread {
 	private Data d;
 
-	public Producer(Data d_) {
+	public Producer(Data d) {
 		super("Producer");
-		this.d = d_;
+		this.d = d;
 	}
 
 	public void run() {
@@ -43,9 +43,9 @@ class Producer extends Thread {
 class Consumer extends Thread {
 	private Data d;
 
-	public Consumer(Data d_) {
+	public Consumer(Data d) {
 		super("Consumer");
-		this.d = d_;
+		this.d = d;
 	}
 
 	public void run() {

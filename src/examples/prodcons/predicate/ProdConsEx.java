@@ -1,32 +1,32 @@
-package prodcons;
+package prodcons.predicate;
 
-public class ProdConsEx_Bad {
+public class ProdConsEx {
 	public static final int DAILY_LIMIT = 1000000;
 
 	public static void main(String[] args) {
-		Data_Bad d = new Data_Bad();
-		new Producer_Bad(d).start();
-		new Consumer_Bad(d).start();
+		Data d = new Data();
+		new Producer(d).start();
+		new Consumer(d).start();
 	}
 }
 
-class Data_Bad {
+class Data {
 	public int value = 0;
 	public boolean isNew = false;
 }
 
-class Producer_Bad extends Thread {
-	private Data_Bad d;
+class Producer extends Thread {
+	private Data d;
 
-	public Producer_Bad(Data_Bad d_) {
+	public Producer(Data d) {
 		super("Producer");
-		this.d = d_;
+		this.d = d;
 	}
 
 	public void run() {
 		while (true) {
 			// one iteration corresponds to one production day
-			int remaining = ProdConsEx_Bad.DAILY_LIMIT;
+			int remaining = ProdConsEx.DAILY_LIMIT;
 			while (remaining > 0) {
 				synchronized (d) {
 					d.value = 10; // dummy value
@@ -38,12 +38,12 @@ class Producer_Bad extends Thread {
 	}
 }
 
-class Consumer_Bad extends Thread {
-	private Data_Bad d;
+class Consumer extends Thread {
+	private Data d;
 
-	public Consumer_Bad(Data_Bad d_) {
+	public Consumer(Data d) {
 		super("Consumer");
-		this.d = d_;
+		this.d = d;
 	}
 
 	public void run() {

@@ -1,0 +1,6 @@
+[static]
+class(prodcons.predicate.ProdConsEx).DAILY_LIMIT = 1000000
+
+[method prodcons.predicate.Producer.run]
+remaining = 1000000
+remaining > 0
