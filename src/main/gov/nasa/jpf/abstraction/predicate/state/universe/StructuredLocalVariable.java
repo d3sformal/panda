@@ -48,4 +48,9 @@ public class StructuredLocalVariable extends StructuredValueSlot implements Loca
 
         return Identifier.Ordering.compare(this, id);
     }
+
+    @Override
+    public String toString() {
+        return accessExpression.toString();
+    }
 }

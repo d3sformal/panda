@@ -5,6 +5,10 @@ import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
 
 public interface LocalVariable extends Identifier, UniverseSlot {
     public class SlotKey implements UniverseSlotKey {
+        @Override
+        public String toString() {
+            return "";
+        }
     }
 
     @Override

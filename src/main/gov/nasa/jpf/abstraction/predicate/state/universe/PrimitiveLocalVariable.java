@@ -48,4 +48,9 @@ public class PrimitiveLocalVariable extends PrimitiveValueSlot implements LocalV
 
         return Identifier.Ordering.compare(this, id);
     }
+
+    @Override
+    public String toString() {
+        return accessExpression.toString();
+    }
 }
