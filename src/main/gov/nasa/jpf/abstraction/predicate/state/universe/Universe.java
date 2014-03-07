@@ -346,7 +346,7 @@ public class Universe {
                 UniverseSlot slot = value.getSlot(key);
 
                 for (UniverseIdentifier subValueId : slot.getPossibleValues()) {
-                    // Primitive values are owned by a single parent, if that is unreachable, than the primitive value is as well
+                    // Primitive values are owned by a single parent, if that is unreachable, then the primitive value is unreachable as well
                     // Therefore only shared objects are processed here
                     // We do not need to update other unreachable objects
                     if (subValueId instanceof StructuredValueIdentifier && !structuredToBeRemoved.contains(subValueId)) {
