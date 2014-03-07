@@ -339,8 +339,32 @@ public class Universe {
             }
         }
 
-        for (StructuredValueIdentifier id : structuredToBeRemoved) {
-            currentStructuredRealization.remove(id);
+        for (StructuredValueIdentifier valueId : structuredToBeRemoved) {
+            StructuredValue value = get(valueId);
+
+            for (UniverseSlotKey key : value.getSlots().keySet()) {
+                UniverseSlot slot = value.getSlot(key);
+
+                for (UniverseIdentifier subValueId : slot.getPossibleValues()) {
+                    // Primitive values are owned by a single parent, if that is unreachable, than the primitive value is as well
+                    // Therefore only shared objects are processed here
+                    // We do not need to update other unreachable objects
+                    if (subValueId instanceof StructuredValueIdentifier && !structuredToBeRemoved.contains(subValueId)) {
+                        UniverseValue subValue = get(subValueId);
+
+                        if (subValue.isFrozen()) {
+                            subValue = subValue.createShallowCopy();
+
+                            put(subValueId, subValue);
+                        }
+                        subValue.removeParentSlot(valueId, key);
+                    }
+                }
+            }
+        }
+
+        for (StructuredValueIdentifier valueId : structuredToBeRemoved) {
+            currentStructuredRealization.remove(valueId);
         }
 
         // Remove unreachable primitive
