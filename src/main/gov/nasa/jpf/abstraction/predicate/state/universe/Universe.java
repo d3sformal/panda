@@ -330,6 +330,9 @@ public class Universe {
 
         Set<UniverseIdentifier> liveValues = closed;
 
+        // Always keep the representation of null, no matter what
+        liveValues.add(nullReference);
+
         // Remove unreachable structured
         Set<StructuredValueIdentifier> structuredToBeRemoved = new HashSet<StructuredValueIdentifier>();
 

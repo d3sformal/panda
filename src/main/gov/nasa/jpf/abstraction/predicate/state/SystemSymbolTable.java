@@ -9,6 +9,7 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.SystemSymbolTable;
@@ -358,6 +359,20 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
                         LocalVariable var = currentSymbolScope.getLocal(varName);
 
                         liveRoots.addAll(var.getPossibleValues());
+                    }
+                }
+
+                // Anonymous objects on stacks are also live
+                for (StackFrame frame = thread.getTopFrame(); frame != null; frame = frame.getPrevious()) {
+                    for (int i = 0; i < frame.getTopPos() - frame.getLocalVariableCount(); ++i) {
+                        Attribute attr = Attribute.ensureNotNull((Attribute) frame.getOperandAttr(i));
+                        Expression expr = attr.getExpression();
+
+                        if (expr instanceof AnonymousExpression) {
+                            AnonymousExpression ae = (AnonymousExpression) expr;
+
+                            liveRoots.add(ae.getReference());
+                        }
                     }
                 }
             }
