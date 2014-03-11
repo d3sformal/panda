@@ -1,6 +1,8 @@
-package gov.nasa.jpf.abstraction.predicate;
+package gov.nasa.jpf.abstraction.predicate.statematch;
 
-public class StateMatchingTest extends FailingBaseTest {
+import gov.nasa.jpf.abstraction.predicate.FailingBaseTest;
+
+public class MatchPrimitiveVarsTest extends FailingBaseTest {
     public static void main(String[] args) {
         boolean b = true, c = true;
         int n;

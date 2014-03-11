@@ -1,4 +1,6 @@
-package gov.nasa.jpf.abstraction.predicate;
+package gov.nasa.jpf.abstraction.predicate.statematch;
+
+import gov.nasa.jpf.abstraction.predicate.BaseTest;
 
 public class SerializeThreadTest extends BaseTest {
     public static void main(String[] args) throws Exception {
