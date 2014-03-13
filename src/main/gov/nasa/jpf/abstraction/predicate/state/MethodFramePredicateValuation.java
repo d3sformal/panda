@@ -5,6 +5,8 @@ import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.common.Tautology;
+import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Negation;
@@ -29,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Comparator;
 import java.util.Collections;
@@ -38,7 +41,7 @@ import java.util.Collections;
  */
 public class MethodFramePredicateValuation implements PredicateValuation, Scope {
 	private HashMap<Predicate, TruthValue> valuations = new HashMap<Predicate, TruthValue>();
-    private HashMap<Predicate, Set<Predicate>> determinantCache = new HashMap<Predicate, Set<Predicate>>();
+    private HashMap<Predicate, Set<Predicate>> symbolIncidentCache = new HashMap<Predicate, Set<Predicate>>();
     private SMT smt;
 
     public MethodFramePredicateValuation(SMT smt) {
@@ -110,7 +113,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         /**
          * No need to memorize
          */
-		clone.determinantCache = new HashMap<Predicate, Set<Predicate>>();
+		clone.symbolIncidentCache = new HashMap<Predicate, Set<Predicate>>();
 		
 		return clone;
 	}
@@ -119,7 +122,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
      * @param universe Universe of all predicates that may or may not determine the value of this predicate
      * @return A selection of those predicates from the universe that may directly determine the value of this predicate
      */
-    private static void selectDeterminants(Predicate predicate, Set<Predicate> universe, Set<Predicate> outDeterminants) {
+    private static void selectSymbolIncidentPredicates(Predicate predicate, Set<Predicate> universe, Set<Predicate> outPredicates) {
         Set<AccessExpression> paths = new HashSet<AccessExpression>();
 		Set<AccessExpression> candidatePaths = new HashSet<AccessExpression>();
         Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
@@ -140,7 +143,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
 				    for (AccessExpression candidateSubPath : prefixes) {
 					    if (candidateSubPath.isSimilarToPrefixOf(path)) {
-						    outDeterminants.add(candidate);
+						    outPredicates.add(candidate);
 
                             alreadyAdded = true;
                             break;
@@ -170,11 +173,19 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
      * @return A selection of those predicates from the universe that may determine the value of this predicate
      */
 	private Set<Predicate> computeDeterminantClosure(Predicate predicate, Set<Predicate> universe) {
-        if (!determinantCache.containsKey(predicate)) {
+        return computeSymbolIncidentClosure(predicate, universe);
+    }
+
+	private Set<Predicate> computeAffectedClosure(Predicate predicate, Set<Predicate> universe) {
+        return computeSymbolIncidentClosure(predicate, universe);
+    }
+
+	private Set<Predicate> computeSymbolIncidentClosure(Predicate predicate, Set<Predicate> universe) {
+        if (!symbolIncidentCache.containsKey(predicate)) {
     		Set<Predicate> cur;
 	    	Set<Predicate> ret = new HashSet<Predicate>();
             
-            selectDeterminants(predicate, universe, ret);
+            selectSymbolIncidentPredicates(predicate, universe, ret);
 		
     		int prevSize = 0;
 		
@@ -184,7 +195,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 			    cur = new HashSet<Predicate>();
 
     			for (Predicate p : ret) {
-	    			selectDeterminants(p, universe, cur);
+	    			selectSymbolIncidentPredicates(p, universe, cur);
 		    	}
 			
                 // each `p` in `ret` is contained in `selectDet(p)` and therefore also in `cur`
@@ -192,77 +203,125 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 		    	ret = cur;
     		}
 
-            determinantCache.put(predicate, ret);
+            symbolIncidentCache.put(predicate, ret);
         }
 
-		return determinantCache.get(predicate);
+		return symbolIncidentCache.get(predicate);
 	}
 	
-	/**
-	 * Suppose valuation of given predicates change, update all affected predicates, too
-	 * 
-	 * Keep doing so until a fixpoint is reached
-	 */
-	private void performCascadeReevaluation(Map<Predicate, TruthValue> updated) {
-		Map<Predicate, PredicateValueDeterminingInfo> predicates = new HashMap<Predicate, PredicateValueDeterminingInfo>();
-		
-		int size = updated.size();
-		
-		for (Predicate affectedCandidate : valuations.keySet()) {
-			Set<Predicate> updatedDeterminants = new HashSet<Predicate>();
-            
-            selectDeterminants(affectedCandidate, updated.keySet(), updatedDeterminants);
-			
-			if (!updatedDeterminants.isEmpty()) {
-				Predicate positiveWeakestPrecondition = affectedCandidate;
-				Predicate negativeWeakestPrecondition = Negation.create(affectedCandidate);
-				
-				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
-					
-				for (Predicate determinant : computeDeterminantClosure(positiveWeakestPrecondition, valuations.keySet())) {
-					determinants.put(determinant, valuations.get(determinant));
-				}
-				for (Predicate determinant : computeDeterminantClosure(negativeWeakestPrecondition, valuations.keySet())) {
-					determinants.put(determinant, valuations.get(determinant));
-				}
-				for (Predicate determinant : updatedDeterminants) {
-					determinants.put(determinant, updated.get(determinant));
-				}
-				
-				predicates.put(affectedCandidate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
-			}
-		}
-		
-		updated.putAll(smt.valuatePredicates(predicates));
-		
-		if (size != updated.size()) {
-			performCascadeReevaluation(updated);
-		}
-	}
+    @Override
+    public void checkConsistency(Predicate assumption, TruthValue value) {
+        Set<Predicate> affected = computeAffectedClosure(assumption, valuations.keySet());
+
+        Set<Predicate> inconsistent = new HashSet<Predicate>();
+        boolean[] satisfiable;
+
+        Predicate formula = Tautology.create();
+
+        switch (value) {
+            case TRUE:
+                formula = Conjunction.create(formula, assumption);
+                break;
+            case FALSE:
+                formula = Conjunction.create(formula, Negation.create(assumption));
+                break;
+
+            case UNKNOWN:
+            default:
+        }
+
+        List<Predicate> predicates = new ArrayList<Predicate>(affected.size());
+        List<Predicate> formulas = new ArrayList<Predicate>(affected.size());
+
+        for (Predicate predicate : affected) {
+            switch (valuations.get(predicate)) {
+                case TRUE:
+                    predicates.add(predicate);
+                    formulas.add(Conjunction.create(formula, predicate));
+                    break;
+                case FALSE:
+                    predicates.add(predicate);
+                    formulas.add(Conjunction.create(formula, Negation.create(predicate)));
+                    break;
+
+                case UNKNOWN:
+                default:
+            }
+        }
+
+        satisfiable = smt.isSatisfiable(formulas);
+    
+        for (int i = 0; i < predicates.size(); ++i) {
+            if (!satisfiable[i]) {
+                inconsistent.add(predicates.get(i));
+            }
+        }
+        
+        for (Predicate predicate : inconsistent) {
+            System.out.println("Warning: forced value of `" + assumption + "` is inconsistent with `" + predicate + "`");
+        }
+
+        if (!inconsistent.isEmpty()) {
+            throw new RuntimeException("Trying to make an inconsistent assumption");
+        }
+    }
 
 	/**
 	 * Force (create/overwrite) valuation of the given predicate to the given value
+     *
+     * precondition: the value must be consistent (it can only improve precision)
 	 */
-	@Override
-	public void put(Predicate predicate, TruthValue value) {
-		Map<Predicate, TruthValue> newValuations = new HashMap<Predicate, TruthValue>();
-		
-		newValuations.put(predicate, value);
-		
+    @Override
+	public void force(Predicate predicate, TruthValue value) {
 		Config config = VM.getVM().getJPF().getConfig();
 		String key = "abstract.branch.reevaluate_predicates";
 
         // Change of the set of predicates -> need to recompute determinant sets
         if (!valuations.containsKey(predicate)) {
-            determinantCache.clear();
+            symbolIncidentCache.clear();
+        }
+
+		valuations.put(predicate, value);
+
+		if (config.containsKey(key) && config.getBoolean(key)) {
+            Set<Predicate> affected = computeAffectedClosure(predicate, valuations.keySet());
+
+            Map<Predicate, PredicateValueDeterminingInfo> predicateDeterminingInfos = new HashMap<Predicate, PredicateValueDeterminingInfo>();
+
+            // Update predicates
+            // One-shot reevaluation is enough (no need to repeat until fixpoint)
+            //   1) we can only improve precision, not change from TRUE to FALSE or vice versa
+            //   2) a predicate can be valuated to UNKNOWN at first, but if it should be changed to TRUE (without loss of generality) in the second step, then we would not assign it UNKNOWN in the first step in the first place
+            for (Predicate affectedPredicate : affected) {
+                Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+
+                Predicate positiveWeakestPrecondition = affectedPredicate;
+                Predicate negativeWeakestPrecondition = Negation.create(affectedPredicate);
+
+                for (Predicate determinantCandidate : computeDeterminantClosure(positiveWeakestPrecondition, valuations.keySet())) {
+                    // When affectedPredicate = determinantCandidate: we know that
+                    // a) the value is either UNKNOWN (the determinant will be left out in the end)
+                    // b) the value is consistent with the forced predicate's value, therefore we can use it
+                    determinants.put(determinantCandidate, valuations.get(determinantCandidate));
+                }
+                // Symmetric for negativeWeakestPrecondition ... no need to do it twice now (the symbols should be the same)
+
+                predicateDeterminingInfos.put(affectedPredicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
+            }
+
+            valuations.putAll(smt.valuatePredicates(predicateDeterminingInfos));
+		}
+	}
+
+    @Override
+    public void put(Predicate predicate, TruthValue value) {
+        // Change of the set of predicates -> need to recompute determinant sets
+        if (!valuations.containsKey(predicate)) {
+            symbolIncidentCache.clear();
         }
 		
-		if (config.containsKey(key) && config.getBoolean(key)) {
-			performCascadeReevaluation(newValuations);
-		}
-		
-		valuations.putAll(newValuations);
-	}
+        valuations.put(predicate, value);
+    }
 	
 	/**
 	 * Same as the above (for more predicates at once)
@@ -415,7 +474,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
         // Change of the set of predicates -> need to recompute determinant sets
         if (!toBeRemoved.isEmpty()) {
-            determinantCache.clear();
+            symbolIncidentCache.clear();
         }
     }
 	

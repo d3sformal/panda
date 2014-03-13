@@ -149,10 +149,19 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 	}
 
 	@Override
+	public void checkConsistency(Predicate predicate, TruthValue value) {
+		scopes.get(currentThreadID).top().force(predicate, value);
+	}
+
+	@Override
+	public void force(Predicate predicate, TruthValue value) {
+		scopes.get(currentThreadID).top().force(predicate, value);
+	}
+
+	@Override
 	public void put(Predicate predicate, TruthValue value) {
 		scopes.get(currentThreadID).top().put(predicate, value);
 	}
-	
 
 	@Override
 	public void putAll(Map<Predicate, TruthValue> values) {
@@ -188,7 +197,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
     			}
 
                 for (Predicate predicate : context.predicates) {
-                    valuation.put(predicate, TruthValue.TRUE);
+                    valuation.checkConsistency(predicate, TruthValue.TRUE);
+                    valuation.force(predicate, TruthValue.TRUE);
                 }
             }
         }

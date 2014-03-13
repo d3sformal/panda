@@ -17,6 +17,40 @@ import gov.nasa.jpf.abstraction.util.Pair;
  */
 public class SMTMonitor extends SMTListener {
 
+    @Override
+    public void isSatisfiableInvoked(List<Predicate> formulas) {
+        System.out.println("SMT Is satisfiable:");
+
+		for (Predicate f : formulas) {
+			System.out.println("\t" + f.toString(Notation.DOT_NOTATION));
+		}
+
+		System.out.println();
+
+    }
+
+    @Override
+    public void isSatisfiableInputGenerated(String input) {
+        System.out.println("SMT Input: ");
+
+		System.out.println(input);
+
+		System.out.println();
+	}
+
+    @Override
+    public void isSatisfiableExecuted(List<Predicate> formulas, boolean[] satisfiable) {
+		System.out.println("SMT Returned:");
+
+        int i = 0;
+
+		for (Predicate f : formulas) {
+			System.out.println("\t" + f.toString(Notation.DOT_NOTATION) + ": " + (satisfiable[i++] ? "SAT" : "UNSAT"));
+		}
+
+		System.out.println();
+	}
+
 	@Override
 	public void valuatePredicatesInvoked(Map<Predicate, PredicateValueDeterminingInfo> predicates) {
 		System.out.println("SMT Valuate predicates:");
@@ -31,36 +65,6 @@ public class SMTMonitor extends SMTListener {
 				System.out.println("\t\t" + d.toString(Notation.DOT_NOTATION) + " " + determinants.get(d));
 			}
 		}
-		
-		System.out.println();
-	}
-	
-	@Override
-	public void getModelInvoked(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {
-		System.out.println("SMT Get model:");
-		
-        System.out.println("\t" + expression);
-
-		System.out.println("\tDET:");
-		for (Pair<Predicate, TruthValue> pair : determinants) {
-			System.out.println("\t\t" + pair.getFirst().toString(Notation.DOT_NOTATION) + " " + pair.getSecond());
-		}
-		
-		System.out.println();
-	}
-	
-	@Override
-	public void getModelInputGenerated(String input) {
-        System.out.println("SMT Input: ");
-
-		System.out.println(input);
-
-		System.out.println();
-	}
-	
-	@Override
-	public void getModelExecuted(Boolean satisfiability, Integer model) {
-		System.out.println("SMT Returned: " + (satisfiability ? "sat " + model : "unsat"));
 		
 		System.out.println();
 	}
@@ -96,4 +100,34 @@ public class SMTMonitor extends SMTListener {
 		System.out.println();
 	}
 	
+	@Override
+	public void getModelInvoked(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {
+		System.out.println("SMT Get model:");
+
+        System.out.println("\t" + expression);
+
+		System.out.println("\tDET:");
+		for (Pair<Predicate, TruthValue> pair : determinants) {
+			System.out.println("\t\t" + pair.getFirst().toString(Notation.DOT_NOTATION) + " " + pair.getSecond());
+		}
+
+		System.out.println();
+	}
+
+	@Override
+	public void getModelInputGenerated(String input) {
+        System.out.println("SMT Input: ");
+
+		System.out.println(input);
+
+		System.out.println();
+	}
+
+	@Override
+	public void getModelExecuted(Boolean satisfiability, Integer model) {
+		System.out.println("SMT Returned: " + (satisfiability ? "sat " + model : "unsat"));
+
+		System.out.println();
+	}
+
 }

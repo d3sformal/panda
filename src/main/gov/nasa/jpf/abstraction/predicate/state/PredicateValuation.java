@@ -11,6 +11,9 @@ import gov.nasa.jpf.abstraction.common.Predicate;
  * Interface of a structure managing valuations of predicates
  */
 public interface PredicateValuation {
+    public void checkConsistency(Predicate predicate, TruthValue value);
+    public void force(Predicate predicate, TruthValue value);
+
 	/**
 	 * Sets (or adds) a valution of a predicate (if scopes are taken into account, only to the current scope)
 	 */

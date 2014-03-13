@@ -19,12 +19,17 @@ public abstract class SMTListener extends ListenerAdapter {
 		SMT.registerListener(this);
 	}
 	
+    public void isSatisfiableInvoked(List<Predicate> formulas) {}
 	public void valuatePredicatesInvoked(Map<Predicate, PredicateValueDeterminingInfo> predicates) {}
-	public void getModelInvoked(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {}
-	public void getModelInputGenerated(String input) {}
-	public void getModelExecuted(Boolean satisfiability, Integer model) {}
 	public void valuatePredicatesInvoked(Set<Predicate> predicates) {}
+	public void getModelInvoked(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {}
+
+    public void isSatisfiableInputGenerated(String input) {}
 	public void valuatePredicatesInputGenerated(String input) {}
+	public void getModelInputGenerated(String input) {}
+
+	public void isSatisfiableExecuted(List<Predicate> formulas, boolean[] satisfiable) {}
 	public void valuatePredicatesExecuted(Map<Predicate, TruthValue> valuation) {}
+	public void getModelExecuted(Boolean satisfiability, Integer model) {}
 
 }

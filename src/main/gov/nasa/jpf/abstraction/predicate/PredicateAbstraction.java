@@ -133,7 +133,7 @@ public class PredicateAbstraction extends Abstraction {
 	public void informAboutBranchingDecision(BranchingDecision decision) {
         BranchingConditionValuation bcv = (BranchingConditionValuation) decision;
 
-		predicateValuation.put(bcv.getCondition(), bcv.getValuation());
+		predicateValuation.force(bcv.getCondition(), bcv.getValuation());
 	}
 
     @Override

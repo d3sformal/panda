@@ -48,7 +48,18 @@ public class SMT {
 		listeners.add(listener);
 	}
 	
+    // Notify about invocations
+	private static void notifyIsSatisfiableInvoked(List<Predicate> formulas) {
+		for (SMTListener listener : listeners) {
+			listener.isSatisfiableInvoked(formulas);
+		}
+	}
 	private static void notifyValuatePredicatesInvoked(Map<Predicate, PredicateValueDeterminingInfo> predicates) {
+		for (SMTListener listener : listeners) {
+			listener.valuatePredicatesInvoked(predicates);
+		}
+	}
+	private static void notifyValuatePredicatesInvoked(Set<Predicate> predicates) {
 		for (SMTListener listener : listeners) {
 			listener.valuatePredicatesInvoked(predicates);
 		}
@@ -58,19 +69,11 @@ public class SMT {
 			listener.getModelInvoked(expression, determinants);
 		}
 	}
-	private static void notifyGetModelInputGenerated(String input) {
+
+    // Notify about generation of input
+	private static void notifyIsSatisfiableInputGenerated(String input) {
 		for (SMTListener listener : listeners) {
-			listener.getModelInputGenerated(input);
-		}
-	}
-	private static void notifyGetModelExecuted(Boolean satisfiability, Integer model) {
-		for (SMTListener listener : listeners) {
-			listener.getModelExecuted(satisfiability, model);
-		}
-	}
-	private static void notifyValuatePredicatesInvoked(Set<Predicate> predicates) {
-		for (SMTListener listener : listeners) {
-			listener.valuatePredicatesInvoked(predicates);
+			listener.isSatisfiableInputGenerated(input);
 		}
 	}
 	private static void notifyValuatePredicatesInputGenerated(String input) {
@@ -78,9 +81,26 @@ public class SMT {
 			listener.valuatePredicatesInputGenerated(input);
 		}
 	}
+	private static void notifyGetModelInputGenerated(String input) {
+		for (SMTListener listener : listeners) {
+			listener.getModelInputGenerated(input);
+		}
+	}
+
+    // Notify about finished execution
+	private static void notifyIsSatisfiableExecuted(List<Predicate> formulas, boolean[] satisfiable) {
+		for (SMTListener listener : listeners) {
+			listener.isSatisfiableExecuted(formulas, satisfiable);
+		}
+	}
 	private static void notifyValuatePredicatesExecuted(Map<Predicate, TruthValue> valuation) {
 		for (SMTListener listener : listeners) {
 			listener.valuatePredicatesExecuted(valuation);
+		}
+	}
+	private static void notifyGetModelExecuted(Boolean satisfiability, Integer model) {
+		for (SMTListener listener : listeners) {
+			listener.getModelExecuted(satisfiability, model);
 		}
 	}
 
@@ -361,6 +381,10 @@ public class SMT {
     }
 
 	private String prepareValuatePredicatesInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<Predicate> predicates, List<String> formulas, InputType inputType) {
+        return prepareIsSatisfiableInput(classes, vars, fields, objects, predicates, formulas, inputType);
+    }
+
+	private String prepareIsSatisfiableInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<Predicate> predicates, List<String> formulas, InputType inputType) {
         String separator = inputType.getSeparator();
 
 		StringBuilder input = new StringBuilder();
@@ -433,12 +457,54 @@ public class SMT {
         QueryResponse response = isSatisfiable(1, input, true)[0];
 
         if (USE_CACHE) {
-            cache.put(input, response);
+            cache.put(formula, response);
         }
 
 		notifyGetModelExecuted(response.getSatisfiability(), response.getModel());
 
         return response.getModel();
+    }
+
+    public boolean[] isSatisfiable(List<Predicate> predicates) {
+        notifyIsSatisfiableInvoked(predicates);
+
+        boolean[] ret = new boolean[predicates.size()];
+
+        PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
+
+        for (Predicate predicate : predicates) {
+            collector.collect(predicate);
+        }
+
+		Set<String> classes = collector.getClasses();
+		Set<String> variables = collector.getVars();
+		Set<String> fields = collector.getFields();
+		Set<AccessExpression> objects = Collections.emptySet();
+
+        List<String> formulas = new ArrayList<String>(predicates.size());
+
+        for (Predicate predicate : predicates) {
+            formulas.add(convertToString(predicate));
+        }
+
+        String input = prepareIsSatisfiableInput(classes, variables, fields, objects, predicates, formulas, InputType.NORMAL);
+        String debugInput = prepareIsSatisfiableInput(classes, variables, fields, objects, predicates, formulas, InputType.DEBUG);
+
+        notifyIsSatisfiableInputGenerated(debugInput);
+
+        QueryResponse[] responses = isSatisfiable(1, input, false);
+
+        for (int i = 0; i < responses.length; ++i) {
+            ret[i] = responses[i].getSatisfiability();
+
+            if (USE_CACHE) {
+                cache.put(formulas.get(i), responses[i]);
+            }
+        }
+
+        notifyIsSatisfiableExecuted(predicates, ret);
+
+        return ret;
     }
 
 	public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateValueDeterminingInfo> predicates) throws SMTException {

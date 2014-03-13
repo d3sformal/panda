@@ -1,0 +1,5 @@
+[method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.main]
+b.f > 0
+b.g = 8
+b.h = 10
+a = b

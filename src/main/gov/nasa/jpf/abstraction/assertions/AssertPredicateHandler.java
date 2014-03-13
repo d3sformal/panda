@@ -33,11 +33,7 @@ public abstract class AssertPredicateHandler extends AssertHandler {
             throw new RuntimeException("Incorrect format of asserted facts: `" + assertion + "`");
         }
 
-        TruthValue inferredValuation = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(assertedFact);
-
-        if (assertedValuation != inferredValuation) {
-            throw new RuntimeException("Asserted incorrect predicate valuation: `" + assertedFact + "` expected to valuate to `" + assertedValuation + "` but actually valuated to `" + inferredValuation + "`");
-        }
+        checkValuation(assertedFact, assertedValuation);
     }
 
     protected void checkAssertionSet(ElementInfo arrayEI, ThreadInfo curTh) {
@@ -45,6 +41,14 @@ public abstract class AssertPredicateHandler extends AssertHandler {
             ElementInfo ei = curTh.getElementInfo(arrayEI.getReferenceElement(j));
 
             checkAssertion(ei, curTh);
+        }
+    }
+
+    protected void checkValuation(Predicate assertedFact, TruthValue assertedValuation) {
+        TruthValue inferredValuation = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(assertedFact);
+
+        if (assertedValuation != inferredValuation) {
+            throw new RuntimeException("Asserted incorrect predicate valuation: `" + assertedFact + "` expected to valuate to `" + assertedValuation + "` but actually valuated to `" + inferredValuation + "`");
         }
     }
 

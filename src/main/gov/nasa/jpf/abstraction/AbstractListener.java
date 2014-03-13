@@ -36,6 +36,7 @@ import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.assertions.AssertConjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertDisjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertExclusiveDisjunctionHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertKnownValuationHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertAliasedHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertNotAliasedHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertNumberOfPossibleValuesHandler;
@@ -64,6 +65,9 @@ public class AbstractListener extends PropertyListenerAdapter {
         // Exclusive disjunction (Flat, Structured)
         testMethods.put(BaseTestClass + ".assertExclusiveDisjunction([Ljava/lang/String;)V", new AssertExclusiveDisjunctionHandler(AssertDisjunctionHandler.Type.ONE_PREDICATE_PER_SET));
         testMethods.put(BaseTestClass + ".assertExclusiveDisjunction([[Ljava/lang/String;)V", new AssertExclusiveDisjunctionHandler(AssertDisjunctionHandler.Type.MULTIPLE_PREDICATES_PER_SET));
+
+        // Exact valuation stored
+        testMethods.put(BaseTestClass + ".assertKnownValuation([Ljava/lang/String;)V", new AssertKnownValuationHandler());
 
         // Aliased
         testMethods.put(BaseTestClass + ".assertAliased([Ljava/lang/String;)V", new AssertAliasedHandler());
