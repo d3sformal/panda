@@ -218,6 +218,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 			MethodFramePredicateValuation callerScope = scopes.get(currentThreadID).top();
 			
 			Map<Predicate, Predicate> replaced = new HashMap<Predicate, Predicate>();
+            Set<Predicate> unknown = new HashSet<Predicate>();
+            Set<AccessExpression> temporaryPathHolder = new HashSet<AccessExpression>();
 			
 			/**
 			 * Take predicates from the callee that describe formal parameters
@@ -228,24 +230,50 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
             getArgumentSlotUsage(method, slotInUse);
 
+            Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+            Set<AccessExpression> argumentSymbols = new HashSet<AccessExpression>();
+
+            // Replace formal parameters with actual parameters
+            for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
+                if (slotInUse[slotIndex]) {
+                    // Actual symbolic parameter
+                    Attribute attr = Attribute.ensureNotNull((Attribute) after.getSlotAttr(slotIndex));
+
+                    LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
+                    String name = arg == null ? null : arg.getName();
+
+                    AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
+
+                    replacements.put(formalArgument, attr.getExpression());
+                    argumentSymbols.add(formalArgument);
+                }
+            }
+
             // Each predicate to be initialised for the callee
             for (Predicate predicate : calleeScope.getPredicates()) {
-                Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+                predicate.addAccessExpressionsToSet(temporaryPathHolder);
 
-                // Replace formal parameters with actual parameters
-                for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
-                    if (slotInUse[slotIndex]) {
-                        // Actual symbolic parameter
-                        Attribute attr = Attribute.ensureNotNull((Attribute) after.getSlotAttr(slotIndex));
+                boolean usesLocals = false;
 
-                        LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
-                        String name = arg == null ? null : arg.getName();
+                for (AccessExpression path : temporaryPathHolder) {
+                    if (path.isLocalVariable() && !argumentSymbols.contains(path)) {
+                        usesLocals = true;
 
-                        replacements.put(DefaultRoot.create(name, slotIndex), attr.getExpression());
+                        break;
                     }
                 }
 
-                replaced.put(predicate.replace(replacements), predicate);
+                // Valuating predicates over uninitialised locals at this point does not make sense
+                //
+                // We would also identify caller locals with callee locals if they shared names
+                // which would result in a wrong valuation
+                if (usesLocals) {
+                    unknown.add(predicate);
+                } else {
+                    replaced.put(predicate.replace(replacements), predicate);
+                }
+
+                temporaryPathHolder.clear();
             }
 
             // Valuate predicates in the caller scope, and adopt the valuation for the callee predicates
@@ -253,6 +281,10 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
             for (Predicate predicate : replaced.keySet()) {
                 calleeScope.put(replaced.get(predicate), valuation.get(predicate));
+            }
+
+            for (Predicate predicate : unknown) {
+                calleeScope.put(predicate, initialValuation.get(predicate));
             }
 		
             overrideWithAssumedPreValuation(calleeScope, method);
@@ -432,34 +464,31 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
             Map<Predicate, TruthValue> calleeReturns = new HashMap<Predicate, TruthValue>();
 
+            // Replace formal parameters present in the predicate with actual expressions
+            Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+
+            for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
+                if (slotInUse[slotIndex]) {
+                    if (!argIsPrimitive[slotIndex]) {
+                        LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
+                        String name = arg == null ? null : arg.getName();
+
+                        Expression actualExpr = Attribute.ensureNotNull((Attribute) before.getLocalAttr(slotIndex)).getExpression();
+                        AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
+
+                        replacements.put(formalArgument, actualExpr);
+                    }
+                }
+            }
+
             // Filter out predicates from the callee that cannot be used for propagation to the caller
             for (Predicate predicate : getPredicates()) {
                 TruthValue value = get(predicate);
 
-                boolean isAnonymous = false;
-
-                Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
-
-                // Replace formal parameters present in the predicate with actual expressions
-                for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
-                    if (slotInUse[slotIndex]) {
-                        if (!argIsPrimitive[slotIndex]) {
-                            LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
-                            String name = arg == null ? null : arg.getName();
-
-                            Expression actualExpr = Attribute.ensureNotNull((Attribute) before.getLocalAttr(slotIndex)).getExpression();
-
-                            replacements.put(DefaultRoot.create(name, slotIndex), actualExpr);
-
-                            isAnonymous |= actualExpr instanceof AnonymousExpression; // o.method(..., new A(), ...)
-                            isAnonymous |= method.isInit(); // new C() ... C.<init> which calls B.<init> and A.<init> on "this" which is in fact anonymous
-                        }
-                    }
-                }
-
                 predicate = predicate.replace(replacements);
 
                 boolean isUnwanted = false;
+                boolean isAnonymous = false;
 
                 predicate.addAccessExpressionsToSet(temporaryPathsHolder);
 
@@ -468,6 +497,11 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                     for (AccessExpression path : temporaryPathsHolder) {
                         isUnwanted |= path.isLocalVariable() && path.getRoot().getName().equals(l.getName());
                     }
+                }
+
+                for (AccessExpression path : temporaryPathsHolder) {
+                    isAnonymous |= method.isInit() && path.getRoot().isThis(); // new C() ... C.<init> which calls B.<init> and A.<init> on "this" which is in fact anonymous
+                    isAnonymous |= path.getRoot() instanceof AnonymousExpression; // o.method(..., new A(), ...)
                 }
 
                 // If the predicate uses only allowed symbols (those that do not lose their meaning by changing scope)
