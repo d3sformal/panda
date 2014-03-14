@@ -1,5 +1,19 @@
-[method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.main]
+[method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCase1]
 b.f > 0
 b.g = 8
 b.h = 10
 a = b
+
+[method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCase2]
+a = b
+
+[method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCase3]
+a.f = 10
+a = p
+p.f = 10
+b = r
+r.f = 10
+
+[method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCase3M1]
+v.f = 10
+return.f = 10
