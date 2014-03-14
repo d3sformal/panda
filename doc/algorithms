@@ -1,0 +1,123 @@
+v := e
+    if the store is primitive
+        `leaves` := resolve `v` to individual primitive leaves in universe
+        mark all paths to `leaves` as affected
+    else
+        `values` := resolve `e`
+        `parents` := resolve `v` to individual nodes and take their parents (or variable)
+
+        for each `parent` in `parents`
+            if `parent` is a variable
+                store `values` in `parent`
+                mark the path to `parent` (variable name) as affected
+            else
+                store `values` in field/element depending on the type of the target (last element of the expression `v`)
+                mark all paths to `parent` augmented with the appropriate field/element access as affected
+
+    ---------------------------------------------------------------- end of symbol table part
+
+    `affected` := collect all predicates that refer to any affected path
+
+    for each `predicate` in `affected`
+        `positiveWeakestPrecondition` = wp for `predicate`
+        `negativeWeakestPrecondition` = wp for not `predicate`
+        `determinants` := collect determinants of `positiveWeakestPrecondition` and `negativeWeakestPrecondition`
+
+        `value` := SMT `determinants` => `positiveWeakestPrecondition` valid ?, `determinants` => `negativeWeakestPrecondition` valid ?
+            true, true => unknown
+            true, false => true
+            false, true => false
+            false, false => unknown
+
+        set `predicate` to `value` in current valuation
+
+################################################################
+
+if (p)
+    `determinants` := collect determinants of `p`
+    `value` := SMT `determinants` => `p` valid ?, `determinants` => not `p` valid ?
+        true, true => unknown
+        true, false => true
+        false, true => false
+        false, false => unknown
+
+    depending on `value`
+        true -> take then branch
+        false -> take else branch
+        unknown -> nondet choice
+
+    force current valuation of `p` to `value` to improve precision
+        set `p` to `value` in current valuation                                         // This is consistent with all the other values of other predicates, otherwise we would not pursue this branch
+
+        `affected` := collect affected predicates                                       // Those that share (transitively) symbols
+
+            for each `predicate` in `affected` such that value(`predicate`) = unknown   // Others are precise enough and as they are not in conflict with the assumed branching condition, they cannot be forced to switch values
+                `aDeterminants` := collect determinants of `predicate`
+                `aValue` := SMT `aDeterminants` => `predicate` valid ?, `aDeterminants` => `predicate` valid ?
+
+                set `predicate` to `aValue` in current valuation
+
+################################################################
+
+call m(a1, ... aN)
+    for each `a` in a1, ... aN
+        perform store `a` := actual expression for `a` (only the symbol table part)
+
+    `predicates` := empty set
+    for each `predicate` in callee scope
+        add replace(`predicate`, (a1, ... aN), actual expressions for (a1, ... aN)) to `predicates` unless it refers to local variable (non-argument)
+
+    `valuation` := SMT valuate all `predicates`
+
+    set valuation in callee according to `valuation`
+
+    override assumed predicate valuations (consistency check first, then force as above in "if(p)")
+
+    push callee scope
+
+################################################################
+
+return m(a1, ... aN)
+    if return type of `m` is not void
+        add return expression to symbolic scope
+        perform store `return` :=  actual expression being returned (only the symbol table part)
+
+    for each `predicate` in current scope
+        if `predicate` is over return
+            `precondition` := replace(`predicate`, `return`, actual expression of `return`)
+            `determinants` := collect determinants of `precondition`
+
+            `value` := SMT `determinants` => `precondition` valid ?, `determinants` => `precondition` valid ?
+                true, true => unknown
+                true, false => true
+                false, true => false
+                false, false => unknown
+
+            set `predicate` to `value` in current scope
+
+    set return expression to concrete `return_pcXYZ` expression
+
+    mark all arguments whose symbolic value has changed since call modified
+
+    `notWantedSymbols` := (all local variables + all modified args) - reference args
+
+    `predicates` := all predicates in callee scope with all formal args being replaced with actual arguments
+    `relevant` := subset of `predicates` where no predicate is incident with `notWantedSymbols`
+    `anon` := subset of `relevant` over anonymous objects
+    `returns` := subset of `relevant` over return
+
+    caller add `anon` directly // propagate info about new objects (mainly for constructor purposes)
+    caller add `returns` with `return` being replaced for a specific "return_pcXYZ"
+
+    `affected` := caller predicates over:
+        statics +
+        symbol passed as non-this reference arg +
+        `this.f...` where the object is the same as `this` in caller and `f` is a field of a super class (not subclass)
+
+    `relevant` := `relevant` + (all caller predicates - `affected`)
+
+    `valuation` := SMT valuate all `affected` using current_valuation(`relevant`) as the only input information
+
+    update caller valuation with `valutation`
+
+    pop callee scope
