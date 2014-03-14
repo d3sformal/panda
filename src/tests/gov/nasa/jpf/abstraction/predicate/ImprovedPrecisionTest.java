@@ -44,8 +44,7 @@ public class ImprovedPrecisionTest extends BaseTest {
 		}
 	}
 
-	public static void testCase3()
-	{
+	public static void testCase3() {
 		Data a = new Data();
 		a.f = 10;
 
@@ -57,10 +56,18 @@ public class ImprovedPrecisionTest extends BaseTest {
 
 		b = r;
 
+        // makes the following predicates unknown: b.f > 0 and also r.f = 10
+        b.f = identity(b.f);
+
+        // finding affected via symbol table (aliasing) does not help because predicates about r.f are unknown too
 		if (a.f > 0) {
-			assertKnownValuation("b.f > 0: true");
+			assertKnownValuation("b.f > 0: unknown");
 		}
 	}
+
+    private static int identity(int i) {
+        return i;
+    }
 
 	private static Data testCase3M1(Data v) {
 		v.g = 0;

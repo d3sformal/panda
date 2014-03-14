@@ -5,9 +5,11 @@ b.h = 10
 a = b
 
 [method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCase2]
+b.f > 0
 a = b
 
 [method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCase3]
+b.f > 0
 a.f = 10
 a = p
 p.f = 10
