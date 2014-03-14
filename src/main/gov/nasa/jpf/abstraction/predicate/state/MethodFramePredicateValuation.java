@@ -293,6 +293,10 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             //   1) we can only improve precision, not change from TRUE to FALSE or vice versa
             //   2) a predicate can be valuated to UNKNOWN at first, but if it should be changed to TRUE (without loss of generality) in the second step, then we would not assign it UNKNOWN in the first step in the first place
             for (Predicate affectedPredicate : affected) {
+
+                // Improve precision of only imprecise predicates
+                if (valuations.get(affectedPredicate) != TruthValue.UNKNOWN) continue;
+
                 Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 
                 Predicate positiveWeakestPrecondition = affectedPredicate;
