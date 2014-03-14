@@ -276,12 +276,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 		Config config = VM.getVM().getJPF().getConfig();
 		String key = "abstract.branch.reevaluate_predicates";
 
-        // Change of the set of predicates -> need to recompute determinant sets
-        if (!valuations.containsKey(predicate)) {
-            symbolIncidentCache.clear();
-        }
-
-		valuations.put(predicate, value);
+        put(predicate, value);
 
 		if (config.containsKey(key) && config.getBoolean(key)) {
             Set<Predicate> affected = computeAffectedClosure(predicate, valuations.keySet());
