@@ -1,0 +1,8 @@
+[method gov.nasa.jpf.abstraction.predicate.AssumeTest.main]
+c = 3
+
+[assume post method gov.nasa.jpf.abstraction.predicate.AssumeTest.m1]
+return = 3
+
+[assume pre method gov.nasa.jpf.abstraction.predicate.AssumeTest.m2]
+c = 7

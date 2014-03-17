@@ -150,7 +150,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
 	@Override
 	public void checkConsistency(Predicate predicate, TruthValue value) {
-		scopes.get(currentThreadID).top().force(predicate, value);
+		scopes.get(currentThreadID).top().checkConsistency(predicate, value);
 	}
 
 	@Override

@@ -117,6 +117,7 @@ public class SMT {
         }
     }
     private static enum FormulaType {
+        SATISFIABILITY_CHECK,
         POSITIVE_WEAKEST_PRECONDITION_CHECK,
         NEGATIVE_WEAKEST_PRECONDITION_CHECK,
         MODEL_QUERY;
@@ -124,6 +125,7 @@ public class SMT {
         @Override
         public String toString() {
             switch (this) {
+                case SATISFIABILITY_CHECK:                return "satisfiability check";
                 case POSITIVE_WEAKEST_PRECONDITION_CHECK: return "positive weakest precondition check";
                 case NEGATIVE_WEAKEST_PRECONDITION_CHECK: return "negative weakest precondition check";
                 case MODEL_QUERY:                         return "model query";
@@ -381,10 +383,6 @@ public class SMT {
     }
 
 	private String prepareValuatePredicatesInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<Predicate> predicates, List<String> formulas, InputType inputType) {
-        return prepareIsSatisfiableInput(classes, vars, fields, objects, predicates, formulas, inputType);
-    }
-
-	private String prepareIsSatisfiableInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<Predicate> predicates, List<String> formulas, InputType inputType) {
         String separator = inputType.getSeparator();
 
 		StringBuilder input = new StringBuilder();
@@ -426,6 +424,47 @@ public class SMT {
         input.append("(pop 1)"); input.append(separator);
 		
 		return input.toString();
+    }
+
+	private String prepareIsSatisfiableInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<Predicate> predicates, List<String> formulas, InputType inputType) {
+        String separator = inputType.getSeparator();
+
+        StringBuilder input = new StringBuilder();
+
+        input.append("(push 1)"); input.append(separator);
+        appendClassDeclarations(classes, input, separator);
+        appendVariableDeclarations(vars, input, separator);
+        appendFieldDeclarations(fields, input, separator);
+
+        Set<String> freshConstraints = new HashSet<String>();
+
+        for (AccessExpression object : objects) {
+            Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.create(DefaultFresh.create(), object)));
+
+            freshConstraints.add("(assert " + convertToString(distinction) + ")" + separator);
+        }
+
+        for (String constraint : freshConstraints) {
+            input.append(constraint);
+        }
+        input.append(separator);
+
+        Iterator<Predicate> predicatesIterator = predicates.iterator();
+        Iterator<String> formulasIterator = formulas.iterator();
+
+        while (predicatesIterator.hasNext()) {
+            Predicate predicate = predicatesIterator.next();
+
+            String formula = formulasIterator.next();
+
+            Boolean cachedValue = cache.get(formula).getSatisfiability();
+
+            input.append(prepareFormulaEvaluation(predicate, formula, FormulaType.SATISFIABILITY_CHECK, inputType, cachedValue, null, false));
+        }
+
+        input.append("(pop 1)"); input.append(separator);
+
+        return input.toString();
 	}
 
     public Integer getModel(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {
@@ -492,7 +531,7 @@ public class SMT {
 
         notifyIsSatisfiableInputGenerated(debugInput);
 
-        QueryResponse[] responses = isSatisfiable(1, input, false);
+        QueryResponse[] responses = isSatisfiable(predicates.size(), input, false);
 
         for (int i = 0; i < responses.length; ++i) {
             ret[i] = responses[i].getSatisfiability();
