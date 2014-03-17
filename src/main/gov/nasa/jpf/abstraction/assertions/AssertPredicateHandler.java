@@ -45,6 +45,7 @@ public abstract class AssertPredicateHandler extends AssertHandler {
     }
 
     protected void checkValuation(Predicate assertedFact, TruthValue assertedValuation) {
+        // we model assert in the same way as Java using branches: if (asserted != inferred) throw exception
         TruthValue inferredValuation = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(assertedFact);
 
         if (assertedValuation != inferredValuation) {
