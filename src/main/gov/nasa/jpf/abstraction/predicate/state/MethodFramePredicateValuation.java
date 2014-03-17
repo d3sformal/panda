@@ -41,7 +41,7 @@ import java.util.Collections;
  */
 public class MethodFramePredicateValuation implements PredicateValuation, Scope {
 	private HashMap<Predicate, TruthValue> valuations = new HashMap<Predicate, TruthValue>();
-    private HashMap<Predicate, Set<Predicate>> symbolIncidentCache = new HashMap<Predicate, Set<Predicate>>();
+    private HashMap<Predicate, Set<Predicate>> sharedSymbolCache = new HashMap<Predicate, Set<Predicate>>();
     private SMT smt;
 
     public MethodFramePredicateValuation(SMT smt) {
@@ -113,7 +113,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         /**
          * No need to memorize
          */
-		clone.symbolIncidentCache = new HashMap<Predicate, Set<Predicate>>();
+		clone.sharedSymbolCache = new HashMap<Predicate, Set<Predicate>>();
 		
 		return clone;
 	}
@@ -122,7 +122,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
      * @param universe Universe of all predicates that may or may not determine the value of this predicate
      * @return A selection of those predicates from the universe that may directly determine the value of this predicate
      */
-    private static void selectSymbolIncidentPredicates(Predicate predicate, Set<Predicate> universe, Set<Predicate> outPredicates) {
+    private static void selectPredicatesSharingSymbols(Predicate predicate, Set<Predicate> universe, Set<Predicate> outPredicates) {
         Set<AccessExpression> paths = new HashSet<AccessExpression>();
 		Set<AccessExpression> candidatePaths = new HashSet<AccessExpression>();
         Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
@@ -173,19 +173,19 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
      * @return A selection of those predicates from the universe that may determine the value of this predicate
      */
 	private Set<Predicate> computeDeterminantClosure(Predicate predicate, Set<Predicate> universe) {
-        return computeSymbolIncidentClosure(predicate, universe);
+        return computeSharedSymbolsClosure(predicate, universe);
     }
 
 	private Set<Predicate> computeAffectedClosure(Predicate predicate, Set<Predicate> universe) {
-        return computeSymbolIncidentClosure(predicate, universe);
+        return computeSharedSymbolsClosure(predicate, universe);
     }
 
-	private Set<Predicate> computeSymbolIncidentClosure(Predicate predicate, Set<Predicate> universe) {
-        if (!symbolIncidentCache.containsKey(predicate)) {
+	private Set<Predicate> computeSharedSymbolsClosure(Predicate predicate, Set<Predicate> universe) {
+        if (!sharedSymbolCache.containsKey(predicate)) {
     		Set<Predicate> cur;
 	    	Set<Predicate> ret = new HashSet<Predicate>();
             
-            selectSymbolIncidentPredicates(predicate, universe, ret);
+            selectPredicatesSharingSymbols(predicate, universe, ret);
 		
     		int prevSize = 0;
 		
@@ -195,7 +195,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 			    cur = new HashSet<Predicate>();
 
     			for (Predicate p : ret) {
-	    			selectSymbolIncidentPredicates(p, universe, cur);
+	    			selectPredicatesSharingSymbols(p, universe, cur);
 		    	}
 			
                 // each `p` in `ret` is contained in `selectDet(p)` and therefore also in `cur`
@@ -203,10 +203,10 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 		    	ret = cur;
     		}
 
-            symbolIncidentCache.put(predicate, ret);
+            sharedSymbolCache.put(predicate, ret);
         }
 
-		return symbolIncidentCache.get(predicate);
+		return sharedSymbolCache.get(predicate);
 	}
 	
     @Override
@@ -316,7 +316,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
     public void put(Predicate predicate, TruthValue value) {
         // Change of the set of predicates -> need to recompute determinant sets
         if (!valuations.containsKey(predicate)) {
-            symbolIncidentCache.clear();
+            sharedSymbolCache.clear();
         }
 		
         valuations.put(predicate, value);
@@ -451,7 +451,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 	}
 
     @Override
-    public void dropAllPredicatesIncidentWith(AccessExpression expr) {
+    public void dropAllPredicatesSharingSymbolsWith(AccessExpression expr) {
         Set<AccessExpression> paths = new HashSet<AccessExpression>();
         Set<Predicate> toBeRemoved = new HashSet<Predicate>();
 
@@ -473,7 +473,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
         // Change of the set of predicates -> need to recompute determinant sets
         if (!toBeRemoved.isEmpty()) {
-            symbolIncidentCache.clear();
+            sharedSymbolCache.clear();
         }
     }
 	

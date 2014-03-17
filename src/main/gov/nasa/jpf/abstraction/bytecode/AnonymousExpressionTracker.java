@@ -21,7 +21,7 @@ public class AnonymousExpressionTracker {
             AnonymousExpression anonymous = (AnonymousExpression) expr;
 
             if (!anonymous.isDuplicate()) {
-                ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getPredicateValuation().get(depth).dropAllPredicatesIncidentWith((AccessExpression) expr);
+                ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getPredicateValuation().get(depth).dropAllPredicatesSharingSymbolsWith((AccessExpression) expr);
             }
         }
     }

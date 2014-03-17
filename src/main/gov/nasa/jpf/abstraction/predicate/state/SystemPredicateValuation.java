@@ -660,8 +660,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 	}
 
     @Override
-    public void dropAllPredicatesIncidentWith(AccessExpression expr) {
-        scopes.get(currentThreadID).top().dropAllPredicatesIncidentWith(expr);
+    public void dropAllPredicatesSharingSymbolsWith(AccessExpression expr) {
+        scopes.get(currentThreadID).top().dropAllPredicatesSharingSymbolsWith(expr);
     }
 	
 	@Override
