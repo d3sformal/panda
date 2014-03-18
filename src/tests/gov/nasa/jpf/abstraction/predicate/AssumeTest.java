@@ -6,20 +6,28 @@ public class AssumeTest extends BaseTest {
 
         c = m1();
 
-        assertKnownValuation("c = 3: true");
+        assertKnownValuation("c = 0: true");
 
-        m2(c);
+        c = m2();
+
+        assertKnownValuation("c = 1: true");
+
+        m3(c);
     }
 
     public static int m1() {
-        return 6;
+        return 0;
     }
 
-    public static void m2(int c) {
-        assertKnownValuation("c = 7: true");
+    public static int m2() {
+        return 1;
+    }
+
+    public static void m3(int c) {
+        assertKnownValuation("c = 2: true");
 
         c = 3;
 
-        assertKnownValuation("c = 7: false");
+        assertKnownValuation("c = 2: false");
     }
 }
