@@ -485,8 +485,6 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             for (Predicate predicate : getPredicates()) {
                 TruthValue value = get(predicate);
 
-                predicate = predicate.replace(replacements);
-
                 boolean isUnwanted = false;
                 boolean isAnonymous = false;
 
@@ -501,11 +499,12 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
                 for (AccessExpression path : temporaryPathsHolder) {
                     isAnonymous |= method.isInit() && path.getRoot().isThis(); // new C() ... C.<init> which calls B.<init> and A.<init> on "this" which is in fact anonymous
-                    isAnonymous |= path.getRoot() instanceof AnonymousExpression; // o.method(..., new A(), ...)
                 }
 
                 // If the predicate uses only allowed symbols (those that do not lose their meaning by changing scope)
                 if (!isUnwanted) {
+                    predicate = predicate.replace(replacements);
+
                     relevant.put(predicate, value);
 
                     // Handling mainly constructor (object still anonymous)
