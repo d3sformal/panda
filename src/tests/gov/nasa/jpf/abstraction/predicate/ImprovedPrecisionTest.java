@@ -79,7 +79,7 @@ public class ImprovedPrecisionTest extends BaseTest {
 		b = r;
 
 		if (a.f > 5) {
-			assertKnownValuation("b.f > 5: true");
+			assertKnownValuation("b.f > 5: unknown");
 		}
 	}
 
