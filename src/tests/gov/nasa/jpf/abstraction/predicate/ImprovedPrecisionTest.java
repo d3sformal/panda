@@ -5,6 +5,7 @@ public class ImprovedPrecisionTest extends BaseTest {
 		testCase1();
 		testCase2();
 		testCase3();
+		testCase4();
 	}
 
 	public static void testCase1() {
@@ -52,7 +53,7 @@ public class ImprovedPrecisionTest extends BaseTest {
 
 		p = a;
 
-		r = testCase3M1(p);
+		r = testCasesM1(p);
 
 		b = r;
 
@@ -65,14 +66,31 @@ public class ImprovedPrecisionTest extends BaseTest {
 		}
 	}
 
-    private static int identity(int i) {
-        return i;
-    }
+	public static void testCase4() {
+		Data a = new Data();
+		a.f = 10;
 
-	private static Data testCase3M1(Data v) {
+		Data p,r,b;
+
+		p = a;
+
+		r = testCasesM1(p);
+
+		b = r;
+
+		if (a.f > 5) {
+			assertKnownValuation("b.f > 5: true");
+		}
+	}
+
+	private static Data testCasesM1(Data v) {
 		v.g = 0;
 		return v;
 	}
+
+    private static int identity(int i) {
+        return i;
+    }
 }
 
 
