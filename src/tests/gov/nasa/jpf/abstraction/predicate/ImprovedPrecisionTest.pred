@@ -23,7 +23,9 @@ a = p
 p.f = 10
 b = r
 r.f > 0
+r = p
 
 [method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCasesM1]
 v.f = 10
+return = v
 return.f = 10
