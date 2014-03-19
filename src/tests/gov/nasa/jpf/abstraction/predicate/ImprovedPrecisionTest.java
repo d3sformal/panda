@@ -105,17 +105,28 @@ public class ImprovedPrecisionTest extends BaseTest {
 	}
 
 	public static void testCase6() {
-		Data[] data = new Data[2];
+		Data[] data = new Data[3];
 		
 		data[0] = new Data();
 		data[1] = new Data();
-
-		data[0].f = 2;
+		data[2] = new Data();
 
 		int i = 0;
 
 		if (data[i].f > 5) {
-			assertKnownValuation("data[0].f > 5: true", "data[1].f > 5: unknown");
+            if (i == 0) {
+    			assertKnownValuation(
+                    "data[0].f > 5: true",
+                    "data[1].f > 5: unknown",
+                    "data[2].f > 5: unknown"
+                );
+            } else {
+                assertKnownValuation(
+                    "data[0].f > 5: unknown",
+                    "data[1].f > 5: true",
+                    "data[2].f > 5: unknown"
+                );
+            }
 		}
 	}
 

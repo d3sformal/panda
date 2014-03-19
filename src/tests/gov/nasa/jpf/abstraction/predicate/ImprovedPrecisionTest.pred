@@ -36,11 +36,13 @@ r.f > 0
 r = p
 
 [method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCase6]
-alength(arrlen,data) = 2
+alength(arrlen,data) = 3
 data[0].f > 0
 data[0].f > 5
-i < 1
 data[1].f > 5
+data[2].f > 5
+i < 2
+i >= 0
 
 [method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCasesM1]
 v.f = 10

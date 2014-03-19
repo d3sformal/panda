@@ -554,7 +554,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                                     AccessExpression actualParameter = (AccessExpression) expr;
 
                                     // reference-passed objects may have been affected by the method
-                                    if (actualParameter.isPrefixOf(path)) {
+                                    if (actualParameter.isProperPrefixOf(path)) {
                                         if (path.getRoot().isThis() && sameObject) {
                                             // Constructors affect `this` only in scope of the class
                                             // No further subclass fields may be modified by the constructor
