@@ -25,7 +25,26 @@ b = r
 r.f > 0
 r = p
 
+[method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCase5]
+b.f > 5
+a.f > 0
+a = p
+p.f > 0
+b = r
+b.f > 0
+r.f > 0
+r = p
+
+[method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCase6]
+alength(arrlen,data) = 2
+data[0].f > 0
+data[0].f > 5
+i < 1
+data[1].f > 5
+
 [method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCasesM1]
 v.f = 10
+v.f > 0
 return = v
 return.f = 10
+return.f > 0
