@@ -743,6 +743,58 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 		return ret;
 	}
 
+    public void restrictToSingleValue(AccessExpression array, int index, UniverseIdentifier singleValue) {
+        Set<UniverseIdentifier> parents = new HashSet<UniverseIdentifier>();
+
+        // Assume array can be only a single object (there is no choice)
+        lookupValues(array, parents);
+
+        UniverseSlotKey eIndex = new ElementIndex(index);
+
+        for (UniverseIdentifier parentId : parents) {
+            StructuredValue parent = universe.get((StructuredValueIdentifier) parentId);
+
+            // An optimization: if the element already contains only a single value do not create unnecessary copies of frozen objects
+            // This should be called only when there are multiple choices - therefore it may not help
+            {
+                Set<? extends UniverseIdentifier> originalValues = parent.getSlot(eIndex).getPossibleValues();
+
+                if (originalValues.size() == 1 && originalValues.contains(singleValue)) {
+                    continue;
+                }
+            }
+
+            if (parent.isFrozen()) {
+                parent = parent.createShallowCopy();
+
+                universe.put(parentId, parent);
+            }
+
+            UniverseSlot slot = parent.getSlot(eIndex);
+
+            if (slot.isFrozen()) {
+                slot = slot.createShallowCopy();
+
+                parent.removeSlot(eIndex);
+                parent.addSlot(eIndex, slot);
+            }
+
+            for (UniverseIdentifier id : slot.getPossibleValues()) {
+                if (!id.equals(singleValue)) {
+                    UniverseValue value = universe.get(id);
+
+                    if (value.isFrozen()) {
+                        value = value.createShallowCopy();
+
+                        universe.put(id, value);
+                    }
+
+                    value.removeParentSlot(parentId, eIndex);
+                }
+            }
+        }
+    }
+
     // may overwrite a variable without removing the mapping from its values
     //
     // public void m() {
