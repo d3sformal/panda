@@ -62,7 +62,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
     private Integer selectedElementRef = null;
 
     private static final String INDEX_CHOICE_ID = "abstractArrayElementLoadChooseIndex";
-    private static final String ELEMENT_CHOICE_ID = "abstractArrayElementLoadChooseElement";
+    private static final String ELEMENT_VALUE_CHOICE_ID = "abstractArrayElementLoadChooseElement";
 
     private static final String ARRAY_INDEX_OUT_OF_BOUNDS = "java.lang.ArrayIndexOutOfBoundsException";
 
@@ -91,7 +91,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
                 return this;
             }
 
-            if (selectElement(ti, ss, sym, array)) {
+            if (selectElementValue(ti, ss, sym, array)) {
                 return this;
             }
         }
@@ -146,7 +146,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
         return false;
     }
 
-    private boolean selectElement(ThreadInfo ti, SystemState ss, MethodFrameSymbolTable sym, AccessExpression array) {
+    private boolean selectElementValue(ThreadInfo ti, SystemState ss, MethodFrameSymbolTable sym, AccessExpression array) {
         if (!isElementChoiceFirstStep(ti, ss)) {
             Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
 
@@ -167,16 +167,16 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
                     ++i;
                 }
 
-                ChoiceGenerator<?> elementChoice = new IntChoiceFromList(ELEMENT_CHOICE_ID, references);
+                ChoiceGenerator<?> elementValueChoice = new IntChoiceFromList(ELEMENT_VALUE_CHOICE_ID, references);
 
-                ss.setNextChoiceGenerator(elementChoice);
+                ss.setNextChoiceGenerator(elementValueChoice);
 
                 return true;
             }
         } else {
-            ChoiceGenerator<?> elementChoice = ss.getCurrentChoiceGenerator(ELEMENT_CHOICE_ID, IntChoiceFromList.class);
+            ChoiceGenerator<?> elementValueChoice = ss.getCurrentChoiceGenerator(ELEMENT_VALUE_CHOICE_ID, IntChoiceFromList.class);
 
-            selectedElementRef = ((IntChoiceFromList) elementChoice).getNextChoice();
+            selectedElementRef = ((IntChoiceFromList) elementValueChoice).getNextChoice();
 
             sym.restrictToSingleValue(array, selectedIndex, new Reference(ti.getElementInfo(selectedElementRef)));
         }
@@ -193,7 +193,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
     private boolean isElementChoiceFirstStep(ThreadInfo ti, SystemState ss) {
         ChoiceGenerator<?> prev = null;
 
-        return ti.isFirstStepInsn() && ss.getCurrentChoiceGenerator(prev) != null && ss.getCurrentChoiceGenerator(prev).getId().equals(ELEMENT_CHOICE_ID);
+        return ti.isFirstStepInsn() && ss.getCurrentChoiceGenerator(prev) != null && ss.getCurrentChoiceGenerator(prev).getId().equals(ELEMENT_VALUE_CHOICE_ID);
     }
 
     @Override
