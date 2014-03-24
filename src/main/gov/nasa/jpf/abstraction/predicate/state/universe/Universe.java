@@ -114,14 +114,12 @@ public class Universe {
             pslot.addPossiblePrimitiveValue((PrimitiveValueIdentifier) value);
 
             slot = pslot;
-        }
+        } else {
+            StructuredValueSlot sslot = new StructuredValueSlot(parent, slotKey);
 
-        if (value instanceof StructuredValueIdentifier) {
-            StructuredValueSlot pslot = new StructuredValueSlot(parent, slotKey);
+            sslot.addPossibleStructuredValue((StructuredValueIdentifier) value);
 
-            pslot.addPossibleStructuredValue((StructuredValueIdentifier) value);
-
-            slot = pslot;
+            slot = sslot;
         }
 
         get(parent).addSlot(slotKey, slot);

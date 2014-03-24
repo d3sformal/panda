@@ -1,9 +1,9 @@
 package gov.nasa.jpf.abstraction.predicate.state.universe;
 
 public class ElementIndex implements UniverseSlotKey, Comparable<ElementIndex> {
-    private Integer index;
+    private int index;
 
-    public ElementIndex(Integer index) {
+    public ElementIndex(int index) {
         this.index = index;
     }
 

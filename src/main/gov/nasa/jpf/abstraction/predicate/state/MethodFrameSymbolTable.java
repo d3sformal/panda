@@ -248,35 +248,7 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
         ElementInfo elementInfo = object.getReference().getElementInfo();
 
         // Initialize new objects
-        if (!universe.contains(object.getReference())) {
-		    universe.add(elementInfo, ti);
-
-            if (elementInfo.isArray()) {
-                // write 0 / null to all elements (TODO: unless its multidimensional)
-                for (int i = 0; i < elementInfo.arrayLength(); ++i) {
-                    if (elementInfo.isReferenceArray()) {
-                        processObjectStore(NullExpression.create(), DefaultArrayElementRead.create(object, Constant.create(i)));
-                    } else {
-                        processPrimitiveStore(Constant.create(0), DefaultArrayElementRead.create(object, Constant.create(i)));
-                    }
-                }
-            } else {
-                ClassInfo cls = elementInfo.getClassInfo();
-
-                while (cls != null) {
-                    // write 0 / null to all fields
-                    for (FieldInfo field : cls.getInstanceFields()) {
-                        if (field.isReference()) {
-                            processObjectStore(NullExpression.create(), DefaultObjectFieldRead.create(object, field.getName()));
-                        } else {
-                            processPrimitiveStore(Constant.create(0), DefaultObjectFieldRead.create(object, field.getName()));
-                        }
-                    }
-
-                    cls = cls.getSuperClass();
-                }
-            }
-        }
+		universe.add(elementInfo, ti);
 	}
 
 	public void addArray(ElementInfo array, Expression length) {
@@ -555,10 +527,10 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
                     slot.clear();
 				}
 				
+                StructuredValueSlot slot = (StructuredValueSlot) associative.getField(field);
+
                 // All new values should be added into the appropriate slot
                 for (UniverseIdentifier valueId : sources) {
-                    StructuredValueSlot slot = (StructuredValueSlot) associative.getField(field);
-                    
                     // If the slot being modified is frozen, modify a copy
                     if (slot.isFrozen()) {
                         slot = slot.createShallowCopy();
@@ -580,7 +552,6 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
                     
                     value.addParentSlot(parent, field);
                 }
-
 			} else if (to instanceof ArrayElementRead) {
 				StructuredValueIdentifier parent = (StructuredValueIdentifier) destination;
 
@@ -632,7 +603,7 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
                         }
 
                         UniverseSlot slot = indexed.getElement(eIndex);
-                        
+
                         // If the slot being modified is frozen, modify a copy
                         if (slot.isFrozen()) {
                             slot = slot.createShallowCopy();
@@ -643,11 +614,11 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
                         slot.clear();
 					}
-					
+
+                    StructuredValueSlot slot = (StructuredValueSlot) indexed.getElement(eIndex);
+
                     // All new values should be added into the appropriate slot
                     for (UniverseIdentifier valueId : sources) {
-                        StructuredValueSlot slot = (StructuredValueSlot) indexed.getElement(eIndex);
-
                         // If the slot being modified is frozen, modify a copy
                         if (slot.isFrozen()) {
                             slot = slot.createShallowCopy();
