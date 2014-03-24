@@ -22,3 +22,7 @@ this.destroyed = 0
 [assume post method java.lang.Thread.currentThread]
 return.destroyed = 0
 return.group.destroyed = 0
+
+[method java.util.Vector.<init>]
+// initialCapacity >= 0
+local_1 >= 0
