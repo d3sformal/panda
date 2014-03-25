@@ -264,7 +264,11 @@ public class SMT {
 
                         if (matcher.matches()) {
                             String value = matcher.group("value");
-                            model = Integer.valueOf(value);
+                            try {
+                                model = Integer.valueOf(value);
+                            } catch (Exception e) {
+                                model = null; // Could not decode integer - probably the number is too large
+                            }
                         }
                     } else {
                         out.readLine();

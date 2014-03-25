@@ -2,3 +2,25 @@
 class(elevator.Lift).IDLE = 0
 class(elevator.Lift).UP = 1
 class(elevator.Lift).DOWN = 2
+
+[object elevator.Elevator]
+this.numberOfLifts = 2
+
+[method elevator.Elevator.<init>]
+numFloors = 4
+numLifts = 2
+numLifts = alength(arrlen, this.lifts)
+
+i = 0
+i = 1
+i = 2
+
+[method elevator.Controls.<init>]
+numFloors = 4
+numFloors + 1 = alength(arrlen, this.floors)
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5

@@ -26,3 +26,22 @@ return.group.destroyed = 0
 [method java.util.Vector.<init>]
 // initialCapacity >= 0
 local_1 >= 0
+
+[assume pre method java.util.Vector.grow]
+local_1 >= 0
+local_1 < 2147483639
+alength(arrlen, local_0.elementData) + this.capacityIncrement < 2147483639
+2 * alength(arrlen, local_0.elementData) < 2147483639
+
+[method java.util.Vector.grow]
+local_2 + local_0.capacityIncrement < 2147483639
+2 * local_2 < 2147483639
+
+local_3 < 2147483639
+
+[assume pre method java.util.Vector.elementAt]
+local_1 < local_0.elementCount
+
+[assume pre method java.util.Vector.elementData]
+local_1 >= 0
+local_1 < alength(arrlen, local_0.elementData)
