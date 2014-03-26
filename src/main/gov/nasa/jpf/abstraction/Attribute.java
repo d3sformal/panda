@@ -23,4 +23,9 @@ public abstract class Attribute {
 		
 		return attr;
 	}
+
+    @Override
+    public String toString() {
+        return getExpression() == null ? "_" : "@(" + getExpression() + ")";
+    }
 }

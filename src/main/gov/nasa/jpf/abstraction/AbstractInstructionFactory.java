@@ -26,6 +26,7 @@ import java.util.Map;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.abstraction.bytecode.*;
 import gov.nasa.jpf.abstraction.numeric.EvennessAbstractionFactory;
@@ -811,7 +812,12 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 	public Instruction return_() {
 		return (filter.isPassing(ci) ? new RETURN() : super.return_());
 	}
-	
+
+    @Override
+    public Instruction runstart(MethodInfo mi) {
+        return (filter.isPassing(ci) ? new RUNSTART() : super.runstart(mi));
+    }
+
 	@Override
 	public Instruction saload() {
 		return (filter.isPassing(ci) ? new SALOAD() : super.saload());

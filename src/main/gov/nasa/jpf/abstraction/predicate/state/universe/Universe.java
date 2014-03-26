@@ -211,9 +211,7 @@ public class Universe {
             ObjectFieldRead fieldRead = (ObjectFieldRead) read;
 
             fName = new FieldName(fieldRead.getField().getName());
-        }
-
-        if (read instanceof ArrayElementRead) {
+        } else if (read instanceof ArrayElementRead) {
             ArrayElementRead aeRead = (ArrayElementRead) read;
 
             // Get the exact element in case of a constant index
@@ -242,9 +240,7 @@ public class Universe {
                 Associative object = (Associative) parentObject;
 
                 outValues.addAll(object.getField(fName).getPossibleValues());
-            }
-
-            if (read instanceof ArrayElementRead) {
+            } else if (read instanceof ArrayElementRead) {
                 if (parentObject instanceof UniverseNull) continue;
 
                 Indexed array = (Indexed) parentObject;
@@ -261,9 +257,7 @@ public class Universe {
                         outValues.addAll(array.getElement(new ElementIndex(i)).getPossibleValues());
                     }
                 }
-            }
-
-            if (read instanceof ArrayLengthRead) {
+            } else if (read instanceof ArrayLengthRead) {
                 if (parentObject instanceof UniverseNull) continue;
 
                 Indexed array = (Indexed) parentObject;

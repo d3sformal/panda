@@ -92,12 +92,13 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 			int length = ei.arrayLength();
 			
 			LocalVarInfo args = method.getArgumentLocalVars()[0];
-            Expression argsExpr = AnonymousArray.create(new Reference(ei), Constant.create(length));
+            AnonymousArray argsExpr = AnonymousArray.create(new Reference(ei), Constant.create(length));
             Attribute attr = new NonEmptyAttribute(null, argsExpr);
 
             sf.setLocalAttr(0, attr);
             method.addAttr(attr);
 
+            ret.addObject(argsExpr);
 			ret.processObjectStore(argsExpr, DefaultRoot.create(args.getName(), 0));
 		}
 		
@@ -114,44 +115,46 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 		return scopes.get(currentThreadID).top().processObjectStore(from, to);
 	}
 	
-	/**
-	 * At a method call it is necessary to change the scope correspondingly
-	 */
-	@Override
-	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		MethodInfo method = after.getMethodInfo();
+    /**
+     * At a method call it is necessary to change the scope correspondingly
+     */
+    @Override
+    public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+        MethodInfo method = after.getMethodInfo();
 
-		MethodFrameSymbolTable originalScope = scopes.get(currentThreadID).top();
-		MethodFrameSymbolTable newScope = createDefaultScope(threadInfo, method);
+        MethodFrameSymbolTable originalScope = scopes.get(currentThreadID).top();
+        MethodFrameSymbolTable newScope = createDefaultScope(threadInfo, method);
 
-		scopes.get(currentThreadID).push(method.getFullName(), newScope);
+        scopes.get(currentThreadID).push(method.getFullName(), newScope);
 
-		/**
-		 * Assign values to the formal parameters according to the actual parameters
-		 */
-        boolean[] slotInUse = new boolean[method.getNumberOfStackArguments()];
-        boolean[] localVarIsPrimitive = new boolean[method.getNumberOfStackArguments()];
+        if (!method.isNative() && !method.isMJI()) {
+            /**
+             * Assign values to the formal parameters according to the actual parameters
+             */
+            boolean[] slotInUse = new boolean[method.getNumberOfStackArguments()];
+            boolean[] localVarIsPrimitive = new boolean[method.getNumberOfStackArguments()];
 
-        getArgumentSlotUsage(method, slotInUse);
-        getArgumentSlotType(method, localVarIsPrimitive);
+            getArgumentSlotUsage(method, slotInUse);
+            getArgumentSlotType(method, localVarIsPrimitive);
 
-        for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
-            if (slotInUse[slotIndex]) {
-    			Attribute attr = Attribute.ensureNotNull((Attribute) after.getSlotAttr(slotIndex));
+            for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
+                if (slotInUse[slotIndex]) {
+                    Attribute attr = Attribute.ensureNotNull((Attribute) after.getLocalAttr(slotIndex));
 
-                LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
-                String name = arg == null ? null : arg.getName();
+                    LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
+                    String name = arg == null ? null : arg.getName();
 
-                if (localVarIsPrimitive[slotIndex]) {
-	    			newScope.addPrimitiveLocalVariable(DefaultRoot.create(name, slotIndex));
-		    		newScope.processPrimitiveStore(attr.getExpression(), originalScope, DefaultRoot.create(name, slotIndex));
-                } else {
-			    	newScope.addStructuredLocalVariable(DefaultRoot.create(name, slotIndex));
-    				newScope.processObjectStore(attr.getExpression(), originalScope, DefaultRoot.create(name, slotIndex));
+                    if (localVarIsPrimitive[slotIndex]) {
+                        newScope.addPrimitiveLocalVariable(DefaultRoot.create(name, slotIndex));
+                        newScope.processPrimitiveStore(attr.getExpression(), originalScope, DefaultRoot.create(name, slotIndex));
+                    } else {
+                        newScope.addStructuredLocalVariable(DefaultRoot.create(name, slotIndex));
+                        newScope.processObjectStore(attr.getExpression(), originalScope, DefaultRoot.create(name, slotIndex));
+                    }
                 }
             }
         }
-	}
+    }
 	
 	@Override
 	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {

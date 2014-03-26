@@ -407,30 +407,42 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
     public Set<AccessExpression> processObjectStore(Expression from, AccessExpression to) {
         return processObjectStore(from, this, to);
     }
-       
+
     /**
      * Same as the other variant except it allows cross-universe writes (Necessary for method call boundaries)
      */
     // The universes may differ instance-wise (different objects representing the same universe)
     // FromTable may have a different Locals/Statics sets
     public Set<AccessExpression> processObjectStore(Expression from, MethodFrameSymbolTable fromTable, AccessExpression to) {
-		Set<AccessExpression> ret = new HashSet<AccessExpression>();
-		Set<UniverseIdentifier> destinations = new HashSet<UniverseIdentifier>();
-        
+        if (from == null) {
+            throw new RuntimeException("Undefined source encountered while processing store");
+        }
+
+        if (fromTable == null) {
+            throw new RuntimeException("Undefined source scope encountered while processing store");
+        }
+
+        if (to == null) {
+            throw new RuntimeException("Undefined destination encountered while processing store");
+        }
+
+        Set<AccessExpression> ret = new HashSet<AccessExpression>();
+        Set<UniverseIdentifier> destinations = new HashSet<UniverseIdentifier>();
+
         lookupValues(to.cutTail(), destinations);
-		
+
         Set<UniverseIdentifier> sources = new HashSet<UniverseIdentifier>();
 
         // First collect objects which may be referred to by the `from` access expression
 
-		if (from instanceof AccessExpression) {
+        if (from instanceof AccessExpression) {
             fromTable.lookupValues((AccessExpression) from, sources);
-		}
-		
+        }
+
         // Special case is, when we store a constant MJIEnv.NULL which stands for NULL (by type of the target we know whether it is primitive MJIEnv.NULL or NULL)
-		if (from instanceof Constant) {
-			Constant referenceConstant = (Constant) from; // null, MJIEnv.NULL
-			
+        if (from instanceof Constant) {
+            Constant referenceConstant = (Constant) from; // null, MJIEnv.NULL
+
             int ref = referenceConstant.value.intValue();
             VM vm = VM.getVM();
             ThreadInfo ti = vm.getCurrentThread();
@@ -438,15 +450,15 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
             Reference reference = new Reference(ei);
 
-			if (universe.contains(reference)) {
-				sources.add(reference);
-			}
-		}
-		
+            if (universe.contains(reference)) {
+                sources.add(reference);
+            }
+        }
+
         // If there are either
         //
         // 1) more objects we are writing to
-		boolean ambiguous = destinations.size() > 1;
+        boolean ambiguous = destinations.size() > 1;
 
         // or
         //
@@ -455,7 +467,7 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
         if (to instanceof ArrayElementRead) {
             Expression i = ((ArrayElementRead) to).getIndex();
-            
+
             if (i instanceof Constant) {
                 index = ((Constant) i).value.intValue();
             } else {
@@ -466,28 +478,28 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
                 }
             }
         }
-		
+
         // For each new parent (object whose field/element is being set, or a local var ...)
         // Add the objects into the field/element or rewrite a local variable
-		for (UniverseIdentifier destination : destinations) {
-			if (to instanceof ObjectFieldRead) {
-				ObjectFieldRead read = (ObjectFieldRead) to;
-				StructuredValueIdentifier parent = (StructuredValueIdentifier) destination;
-				
-				FieldName field = new FieldName(read.getField().getName());
+        for (UniverseIdentifier destination : destinations) {
+            if (to instanceof ObjectFieldRead) {
+                ObjectFieldRead read = (ObjectFieldRead) to;
+                StructuredValueIdentifier parent = (StructuredValueIdentifier) destination;
+
+                FieldName field = new FieldName(read.getField().getName());
 
                 Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
 
                 valueToAccessExpressions(parent, getMaximalAccessExpressionLength(), prefixes);
-				
+
                 StructuredValue parentObject = universe.get(parent);
 
                 if (parentObject instanceof UniverseNull) continue;
 
-				for (AccessExpression prefix : prefixes) {
-					ret.add(DefaultObjectFieldRead.create(prefix, field.getName()));
-				}
-				
+                for (AccessExpression prefix : prefixes) {
+                    ret.add(DefaultObjectFieldRead.create(prefix, field.getName()));
+                }
+
                 // If the object whose slot is being modified is frozen, modify a copy
                 if (parentObject.isFrozen()) {
                     parentObject = parentObject.createShallowCopy();
@@ -495,9 +507,9 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
                     universe.put(parent, parentObject);
                 }
 
-    			Associative associative = (Associative) parentObject;
+                Associative associative = (Associative) parentObject;
 
-				if (!ambiguous) {
+                if (!ambiguous) {
                     // In case of complete overwrite of the field
                     // (there is no doubt this is the only possible target object being written to)
                     // All the former values should be removed from the object    
@@ -510,12 +522,12 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
                             universe.put(valueId, value);
                         }
-                        
+
                         value.removeParentSlot(parent, field);
                     }
 
-					UniverseSlot slot = associative.getField(field);
-                    
+                    UniverseSlot slot = associative.getField(field);
+
                     // If the slot being modified is frozen, modify a copy
                     if (slot.isFrozen()) {
                         slot = slot.createShallowCopy();
@@ -525,8 +537,8 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
                     }
 
                     slot.clear();
-				}
-				
+                }
+
                 StructuredValueSlot slot = (StructuredValueSlot) associative.getField(field);
 
                 // All new values should be added into the appropriate slot
@@ -549,22 +561,22 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
                         universe.put(valueId, value);
                     }
-                    
+
                     value.addParentSlot(parent, field);
                 }
-			} else if (to instanceof ArrayElementRead) {
-				StructuredValueIdentifier parent = (StructuredValueIdentifier) destination;
+            } else if (to instanceof ArrayElementRead) {
+                StructuredValueIdentifier parent = (StructuredValueIdentifier) destination;
 
                 Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
                 valueToAccessExpressions(parent, getMaximalAccessExpressionLength(), prefixes);
-				
+
                 ArrayElementRead aeRead = (ArrayElementRead) to;
 
                 StructuredValue parentObject = universe.get(parent);
 
                 if (parentObject instanceof UniverseNull) continue;
 
-				for (int i = 0; i < ((UniverseArray) parentObject).getLength(); ++i) {
+                for (int i = 0; i < ((UniverseArray) parentObject).getLength(); ++i) {
 
                     // Overwrite the exact element in case of a constant index
                     if (index != null) {
@@ -573,10 +585,10 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
                     ElementIndex eIndex = new ElementIndex(i);
 
-					for (AccessExpression prefix : prefixes) {
-						ret.add(DefaultArrayElementRead.create(prefix, Constant.create(i)));
-					}
-					
+                    for (AccessExpression prefix : prefixes) {
+                        ret.add(DefaultArrayElementRead.create(prefix, Constant.create(i)));
+                    }
+
                     if (parentObject.isFrozen()) {
                         parentObject = parentObject.createShallowCopy();
 
@@ -585,7 +597,7 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
                     Indexed indexed = (Indexed) parentObject;
 
-					if (!ambiguous) {
+                    if (!ambiguous) {
                         // In case of complete overwrite of the element
                         // (there is no doubt this is the only possible target array being written to)
                         // All the former values should be removed from the object    
@@ -613,7 +625,7 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
                         }
 
                         slot.clear();
-					}
+                    }
 
                     StructuredValueSlot slot = (StructuredValueSlot) indexed.getElement(eIndex);
 
@@ -626,7 +638,7 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
                             parentObject.removeSlot(eIndex);
                             parentObject.addSlot(eIndex, slot);
                         }
-                        
+
                         slot.addPossibleStructuredValue((StructuredValueIdentifier) valueId);
 
                         UniverseValue value = universe.get(valueId);
@@ -640,13 +652,13 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
                         value.addParentSlot(parent, eIndex);
                     }
-				}
+                }
 
-			} else if (to instanceof Root) {
-				StructuredLocalVariable parent;
+            } else if (to instanceof Root) {
+                StructuredLocalVariable parent;
 
-				if (to instanceof ReturnValue) {
-					parent = (StructuredLocalVariable) returns.get(to);
+                if (to instanceof ReturnValue) {
+                    parent = (StructuredLocalVariable) returns.get(to);
 
                     // If the return value being written to is frozen, modify a copy
                     if (parent.isFrozen()) {
@@ -654,8 +666,8 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
                         returns.put((ReturnValue) to, parent);
                     }
-				} else {
-					parent = (StructuredLocalVariable) locals.get(to);
+                } else {
+                    parent = (StructuredLocalVariable) locals.get(to);
 
                     // If the variable being written to is frozen, modify a copy
                     if (parent.isFrozen()) {
@@ -663,14 +675,14 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
                         locals.put((Root) to, parent);
                     }
-				}
+                }
 
-				ret.add(parent.getAccessExpression());
-					
-				if (!ambiguous) {
+                ret.add(parent.getAccessExpression());
+
+                if (!ambiguous) {
                     // In case of complete overwrite of the variable
                     // (there is no doubt this is the only possible target being written to)
-                    // All the former values should be removed from the variable    
+                    // All the former values should be removed from the variable
                     for (UniverseIdentifier valueId : parent.getPossibleValues()) {
                         UniverseValue value = universe.get(valueId);
 
@@ -684,13 +696,12 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
                         value.removeParentSlot(parent, StructuredLocalVariable.slotKey);
                     }
 
-                    
                     // The local variable (parent) is guaranteed not to be frozen
                     // Taken care of above
                     // We may modify straightaway
-					parent.clear();
-				}
-				
+                    parent.clear();
+                }
+
                 for (UniverseIdentifier valueId : sources) {
                     // The local variable (parent) is guaranteed not to be frozen
                     // Taken care of above
@@ -705,14 +716,14 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
                         universe.put(valueId, value);
                     }
-                    
+
                     value.addParentSlot(parent, StructuredLocalVariable.slotKey);
                 }
-			}
-		}
+            }
+        }
 
-		return ret;
-	}
+        return ret;
+    }
 
     public void restrictToSingleValue(AccessExpression array, int index, UniverseIdentifier singleValue) {
         Set<UniverseIdentifier> parents = new HashSet<UniverseIdentifier>();

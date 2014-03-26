@@ -67,7 +67,7 @@ public class Elevator {
     			lifts[i].join();
     		}
     		catch(InterruptedException e){
-    			System.err.println("Error while waitinf for lift"+i+"to finish");
+    			System.err.println("Error while waiting for lift " + i + " to finish");
     		}
         }
     }
