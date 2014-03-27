@@ -40,7 +40,7 @@ public class BaseTest {
         config.add("+abstract.verbose=false");
         config.add("+listener=gov.nasa.jpf.abstraction.AbstractListener");
         config.add("+vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer");
-		config.add("+report.console.property_violation=error,snapshot");
+        config.add("+report.console.property_violation=error,snapshot");
         config.add("+target=" + getClass().getName());
     }
 
