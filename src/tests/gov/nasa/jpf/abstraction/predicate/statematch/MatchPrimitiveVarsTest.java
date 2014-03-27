@@ -15,7 +15,7 @@ public class MatchPrimitiveVarsTest extends FailingBaseTest {
             b = true;
         }
 
-        if (c); // Force state-matching
+        if (c) {} // Force state-matching
 
         int[] array = new int[n];
 
