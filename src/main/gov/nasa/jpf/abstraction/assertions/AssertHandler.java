@@ -7,7 +7,7 @@ import gov.nasa.jpf.GenericProperty;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.search.Search;
 
-public abstract class AssertHandler implements ExecuteInstructionHandler {
+public abstract class AssertHandler extends ExecuteInstructionHandler {
 
     protected static class AssertProperty extends GenericProperty {
 
@@ -24,12 +24,12 @@ public abstract class AssertHandler implements ExecuteInstructionHandler {
 
         @Override
         public String getErrorMessage() {
-            return message;
+            return null;
         }
 
         @Override
         public String getExplanation() {
-            return null;
+            return message;
         }
     }
 

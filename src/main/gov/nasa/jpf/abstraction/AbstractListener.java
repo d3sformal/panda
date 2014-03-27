@@ -40,7 +40,15 @@ import gov.nasa.jpf.abstraction.assertions.AssertKnownValuationHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertAliasedHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertNotAliasedHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertNumberOfPossibleValuesHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertRevisitedAtLeastHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertSameValuationOnEveryVisitHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertDifferentValuationOnEveryVisitHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertValuationVisitedAtMostHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertValuationRevisitedAtLeastHandler;
 
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -53,6 +61,7 @@ public class AbstractListener extends PropertyListenerAdapter {
     private Map<String, ExecuteInstructionHandler> testMethods = new HashMap<String, ExecuteInstructionHandler>();
 
     private static String BaseTestClass = "gov.nasa.jpf.abstraction.predicate.BaseTest";
+    private static String StateMatchingTestClass = "gov.nasa.jpf.abstraction.predicate.StateMatchingTest";
 
     public AbstractListener() {
         // Conjunction
@@ -77,6 +86,18 @@ public class AbstractListener extends PropertyListenerAdapter {
 
         // Number of possible values
         testMethods.put(BaseTestClass + ".assertNumberOfPossibleValues(Ljava/lang/String;I)V", new AssertNumberOfPossibleValuesHandler());
+
+        // Number of visits
+        testMethods.put(StateMatchingTestClass + ".assertVisitedAtMost(I)V", new AssertVisitedAtMostHandler());
+        testMethods.put(StateMatchingTestClass + ".assertRevisitedAtLeast(I)V", new AssertRevisitedAtLeastHandler());
+
+        // Valuations on all paths reaching a shared location
+        testMethods.put(StateMatchingTestClass + ".assertSameValuationOnEveryVisit([Ljava/lang/String;)V", new AssertSameValuationOnEveryVisitHandler());
+        testMethods.put(StateMatchingTestClass + ".assertDifferentValuationOnEveryVisit([Ljava/lang/String;)V", new AssertDifferentValuationOnEveryVisitHandler());
+
+        // Number of visits with a specific valuation
+        testMethods.put(StateMatchingTestClass + ".assertValuationVisitedAtMost(I[Ljava/lang/String;)V", new AssertValuationVisitedAtMostHandler());
+        testMethods.put(StateMatchingTestClass + ".assertValuationRevisitedAtLeast(I[Ljava/lang/String;)V", new AssertValuationRevisitedAtLeastHandler());
     }
 
 	@Override
@@ -84,7 +105,7 @@ public class AbstractListener extends PropertyListenerAdapter {
 		RunDetector.initialiseNotRunning();
 		GlobalAbstraction.getInstance().start(vm.getCurrentThread());
 	}
-	
+
 	@Override
 	public void stateAdvanced(Search search) {
 		RunDetector.advance();
@@ -127,7 +148,7 @@ public class AbstractListener extends PropertyListenerAdapter {
     public void classLoaded(VM vm, ClassInfo classInfo) {
         GlobalAbstraction.getInstance().processNewClass(ThreadInfo.getCurrentThread(), classInfo);
     }
-	
+
     @Override
     public void threadStarted(VM vm, ThreadInfo threadInfo) {
         GlobalAbstraction.getInstance().addThread(threadInfo);
@@ -140,6 +161,23 @@ public class AbstractListener extends PropertyListenerAdapter {
 
     @Override
     public void choiceGeneratorRegistered(VM vm, ChoiceGenerator<?> nextCG, ThreadInfo currentThread, Instruction executedInstruction) {
-        ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).collectGarbage(vm, currentThread);
+        if (!finished) {
+            ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).collectGarbage(vm, currentThread);
+        }
+    }
+
+    private boolean finished = false;
+
+    @Override
+    public void searchFinished(Search search) {
+        finished = true;
+
+        Set<ExecuteInstructionHandler> handlers = new HashSet<ExecuteInstructionHandler>();
+
+        handlers.addAll(testMethods.values());
+
+        for (ExecuteInstructionHandler h : handlers) {
+            h.finish();
+        }
     }
 }
