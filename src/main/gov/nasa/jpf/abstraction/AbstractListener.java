@@ -44,8 +44,8 @@ import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertRevisitedAtLeastHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertSameValuationOnEveryVisitHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertDifferentValuationOnEveryVisitHandler;
-import gov.nasa.jpf.abstraction.assertions.AssertValuationVisitedAtMostHandler;
-import gov.nasa.jpf.abstraction.assertions.AssertValuationRevisitedAtLeastHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostWithValuationHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertRevisitedAtLeastWithValuationHandler;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -96,8 +96,8 @@ public class AbstractListener extends PropertyListenerAdapter {
         testMethods.put(StateMatchingTestClass + ".assertDifferentValuationOnEveryVisit([Ljava/lang/String;)V", new AssertDifferentValuationOnEveryVisitHandler());
 
         // Number of visits with a specific valuation
-        testMethods.put(StateMatchingTestClass + ".assertValuationVisitedAtMost(I[Ljava/lang/String;)V", new AssertValuationVisitedAtMostHandler());
-        testMethods.put(StateMatchingTestClass + ".assertValuationRevisitedAtLeast(I[Ljava/lang/String;)V", new AssertValuationRevisitedAtLeastHandler());
+        testMethods.put(StateMatchingTestClass + ".assertVisitedAtMostWithValuation(I[Ljava/lang/String;)V", new AssertVisitedAtMostWithValuationHandler());
+        testMethods.put(StateMatchingTestClass + ".assertRevisitedAtLeastWithValuation(I[Ljava/lang/String;)V", new AssertRevisitedAtLeastWithValuationHandler());
     }
 
 	@Override

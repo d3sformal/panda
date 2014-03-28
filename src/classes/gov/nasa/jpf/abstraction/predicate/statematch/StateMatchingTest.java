@@ -9,8 +9,8 @@ public class StateMatchingTest extends BaseTest {
     // Predicates
     native public static void assertSameValuationOnEveryVisit(String... predicates);
     native public static void assertDifferentValuationOnEveryVisit(String... predicates);
-    native public static void assertValuationVisitedAtMost(int times, String... predicates);
-    native public static void assertValuationRevisitedAtLeast(int times, String... predicates);
+    native public static void assertVisitedAtMostWithValuation(int times, String... predicates);
+    native public static void assertRevisitedAtLeastWithValuation(int times, String... predicates);
 
     // Aliasing
     native public static void assertSameAliasingOnEveryVisit(String... accessExpressions);

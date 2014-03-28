@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.assertions;
 
-public class ValuationVisitedAtMostAssertion implements LocationAssertion {
+public class VisitedAtMostWithValuationAssertion implements LocationAssertion {
     private PredicateValuation valuation = null;
     private int limit = 0;
     private int visits = 0;

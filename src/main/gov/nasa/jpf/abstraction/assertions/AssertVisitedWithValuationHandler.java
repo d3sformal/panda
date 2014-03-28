@@ -12,7 +12,7 @@ import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
-public abstract class AssertValuationVisitedHandler extends AssertHandler {
+public abstract class AssertVisitedWithValuationHandler extends AssertHandler {
 
     @Override
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {

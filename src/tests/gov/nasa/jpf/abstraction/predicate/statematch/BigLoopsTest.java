@@ -9,18 +9,18 @@ public class BigLoopsTest extends StateMatchingTest {
         assertVisitedAtMost(1);
 
         while (i < 100) {
-            assertValuationVisitedAtMost(0, "pos < 0: true");
-            assertValuationVisitedAtMost(2, "pos = 0: true"); // The state is the same after executing for the second time (but no state matching yet)
-            assertValuationVisitedAtMost(1, "pos = 1: true");
-            assertValuationVisitedAtMost(1, "pos = 2: true");
-            assertValuationVisitedAtMost(1, "pos = 3: true");
-            assertValuationVisitedAtMost(1, "pos = 4: true");
-            assertValuationVisitedAtMost(1, "pos = 5: true");
-            assertValuationVisitedAtMost(1, "pos = 6: true");
-            assertValuationVisitedAtMost(1, "pos = 7: true");
-            assertValuationVisitedAtMost(1, "pos = 8: true");
-            assertValuationVisitedAtMost(1, "pos = 9: true");
-            assertValuationVisitedAtMost(0, "pos > 9: true");
+            assertVisitedAtMostWithValuation(0, "pos < 0: true");
+            assertVisitedAtMostWithValuation(2, "pos = 0: true"); // The state is the same after executing for the second time (but no state matching yet)
+            assertVisitedAtMostWithValuation(1, "pos = 1: true");
+            assertVisitedAtMostWithValuation(1, "pos = 2: true");
+            assertVisitedAtMostWithValuation(1, "pos = 3: true");
+            assertVisitedAtMostWithValuation(1, "pos = 4: true");
+            assertVisitedAtMostWithValuation(1, "pos = 5: true");
+            assertVisitedAtMostWithValuation(1, "pos = 6: true");
+            assertVisitedAtMostWithValuation(1, "pos = 7: true");
+            assertVisitedAtMostWithValuation(1, "pos = 8: true");
+            assertVisitedAtMostWithValuation(1, "pos = 9: true");
+            assertVisitedAtMostWithValuation(0, "pos > 9: true");
 
             assertVisitedAtMost(11);
             assertRevisitedAtLeast(10);
@@ -34,7 +34,7 @@ public class BigLoopsTest extends StateMatchingTest {
         }
 
         //assertVisitedAtMost(10);
-        assertValuationRevisitedAtLeast(10, "i >= 100: true");
+        assertRevisitedAtLeastWithValuation(10, "i >= 100: true");
 
         int total = 0;
 

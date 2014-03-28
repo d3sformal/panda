@@ -31,13 +31,13 @@ public class JPF_gov_nasa_jpf_abstraction_predicate_statematch_StateMatchingTest
     }
 
     @MJI
-    public void assertValuationVisitedAtMost__I_3Ljava_lang_String_2__V(MJIEnv env, int clsObjRef, int times, int rString1) {
+    public void assertVisitedAtMostWithValuation__I_3Ljava_lang_String_2__V(MJIEnv env, int clsObjRef, int times, int rString1) {
         /** Should never be reached */
         throw new RuntimeException("Should never be reached!");
     }
 
     @MJI
-    public void assertValuationRevisitedAtLeast__I_3Ljava_lang_String_2__V(MJIEnv env, int clsObjRef, int times, int rString1) {
+    public void assertRevisitedAtLeastWithValuation__I_3Ljava_lang_String_2__V(MJIEnv env, int clsObjRef, int times, int rString1) {
         /** Should never be reached */
         throw new RuntimeException("Should never be reached!");
     }

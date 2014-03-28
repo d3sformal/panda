@@ -3,11 +3,11 @@ package gov.nasa.jpf.abstraction.assertions;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.Instruction;
 
-public class AssertValuationVisitedAtMostHandler extends AssertValuationVisitedHandler {
+public class AssertVisitedAtMostWithValuationHandler extends AssertVisitedWithValuationHandler {
 
     @Override
     protected Class<? extends LocationAssertion> getAssertionClass() {
-        return ValuationVisitedAtMostAssertion.class;
+        return VisitedAtMostWithValuationAssertion.class;
     }
 
     @Override

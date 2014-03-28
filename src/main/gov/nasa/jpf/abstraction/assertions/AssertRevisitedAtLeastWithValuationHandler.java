@@ -3,11 +3,11 @@ package gov.nasa.jpf.abstraction.assertions;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.Instruction;
 
-public class AssertValuationRevisitedAtLeastHandler extends AssertValuationVisitedHandler {
+public class AssertRevisitedAtLeastWithValuationHandler extends AssertVisitedWithValuationHandler {
 
     @Override
     protected Class<? extends LocationAssertion> getAssertionClass() {
-        return ValuationRevisitedAtLeastAssertion.class;
+        return RevisitedAtLeastWithValuationAssertion.class;
     }
 
     @Override
@@ -20,7 +20,7 @@ public class AssertValuationRevisitedAtLeastHandler extends AssertValuationVisit
         for (Instruction insn : AssertStateMatchingContext.getLocations()) {
             LocationAssertion locationAssertion = AssertStateMatchingContext.get(insn);
 
-            if (locationAssertion instanceof ValuationRevisitedAtLeastAssertion && locationAssertion.isViolated()) {
+            if (locationAssertion instanceof RevisitedAtLeastWithValuationAssertion && locationAssertion.isViolated()) {
                 reportError(VM.getVM(), insn.getLineNumber(), AssertStateMatchingContext.get(insn).getError());
             }
         }
