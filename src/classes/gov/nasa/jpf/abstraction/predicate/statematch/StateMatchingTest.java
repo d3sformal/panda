@@ -1,6 +1,6 @@
-package gov.nasa.jpf.abstraction.predicate;
+package gov.nasa.jpf.abstraction.predicate.statematch;
 
-import static org.junit.Assert.assertFalse;
+import gov.nasa.jpf.abstraction.predicate.BaseTest;
 
 public class StateMatchingTest extends BaseTest {
     native public static void assertVisitedAtMost(int times);

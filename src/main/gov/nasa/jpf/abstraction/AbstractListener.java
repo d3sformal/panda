@@ -61,7 +61,7 @@ public class AbstractListener extends PropertyListenerAdapter {
     private Map<String, ExecuteInstructionHandler> testMethods = new HashMap<String, ExecuteInstructionHandler>();
 
     private static String BaseTestClass = "gov.nasa.jpf.abstraction.predicate.BaseTest";
-    private static String StateMatchingTestClass = "gov.nasa.jpf.abstraction.predicate.StateMatchingTest";
+    private static String StateMatchingTestClass = "gov.nasa.jpf.abstraction.predicate.statematch.StateMatchingTest";
 
     public AbstractListener() {
         // Conjunction

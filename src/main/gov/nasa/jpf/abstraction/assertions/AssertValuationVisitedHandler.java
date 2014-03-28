@@ -47,12 +47,12 @@ public abstract class AssertValuationVisitedHandler extends AssertHandler {
             }
         }
 
-        if (!AssertStateMatchingContext.update(nextInsn, getAssertionClass(), trackedValuation, valuation, new Integer(limit))) {
-            reportError(vm, nextInsn);
-        }
+        update(vm, nextInsn, trackedValuation, valuation, new Integer(limit));
     }
 
     protected abstract Class<? extends LocationAssertion> getAssertionClass();
+
+    protected abstract void update(VM vm, Instruction insn, PredicateValuation trackedValuation, PredicateValuation valuation, Integer limit);
 
     protected void reportError(VM vm, Instruction nextInsn) {
         reportError(vm, nextInsn.getLineNumber(), AssertStateMatchingContext.get(nextInsn).getError());

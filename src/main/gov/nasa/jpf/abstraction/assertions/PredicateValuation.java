@@ -45,7 +45,7 @@ public class PredicateValuation extends TreeMap<Predicate, TruthValue> {
                 Predicate p1 = it1.next();
                 Predicate p2 = it2.next();
 
-                if (!p1.equals(p2)) {
+                if (!p1.equals(p2) || get(p1) != assertion.get(p2)) {
                     return false;
                 }
             }
