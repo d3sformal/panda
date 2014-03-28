@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate;
 
 import org.junit.Test;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.Config;
@@ -12,6 +12,10 @@ import java.net.MalformedURLException;
 import java.io.File;
 import java.util.List;
 import java.util.LinkedList;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.annotation.Annotation;
 
 public class BaseTest {
     native public static void assertConjunction(String... assertions);
@@ -52,14 +56,51 @@ public class BaseTest {
     public void bootstrap() {
         Config config = JPF.createConfig(getConfig());
 
-        JPF jpf = new JPF(config);
+        Class<? extends BaseTest> cls = this.getClass();
 
-        jpf.run();
+        List<String> targetMethods = new LinkedList<String>();
 
-        checkResult(jpf);
+        for (Method m : cls.getDeclaredMethods()) {
+            Annotation t = m.getAnnotation(gov.nasa.jpf.abstraction.predicate.Test.class);
+
+            if (t != null) {
+                if (!Modifier.isStatic(m.getModifiers())) {
+                    throw new RuntimeException("The test method `" + m.getName() + "` must be static.");
+                }
+                if (!m.getReturnType().equals(Void.TYPE)) {
+                    throw new RuntimeException("The test method `" + m.getName() + "` must return void.");
+                }
+                if (m.getParameterTypes().length > 0) {
+                    throw new RuntimeException("The test method `" + m.getName() + "` cannot have parameters.");
+                }
+                targetMethods.add(m.getName() + "()V");
+            }
+        }
+
+        if (targetMethods.isEmpty()) {
+            targetMethods.add("main([Ljava/lang/String;)V");
+        }
+
+        boolean allPassed = true;
+
+        for (String entry : targetMethods) {
+            config.setTargetEntry(entry);
+
+            JPF jpf = new JPF(config);
+
+            jpf.run();
+
+            allPassed = reducePassed(allPassed, checkPassed(jpf));
+        }
+
+        assertTrue(allPassed);
     }
 
-    protected void checkResult(JPF jpf) {
-        assertFalse(jpf.foundErrors());
+    protected boolean reducePassed(boolean passedSoFar, boolean passedNext) {
+        return passedSoFar && passedNext;
+    }
+
+    protected boolean checkPassed(JPF jpf) {
+        return !jpf.foundErrors();
     }
 }

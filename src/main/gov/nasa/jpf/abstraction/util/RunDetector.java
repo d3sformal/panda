@@ -15,9 +15,9 @@ public class RunDetector {
 	private static Stack<RunningState> runningHistory = new Stack<RunningState>();
 	private static RunningState running = new RunningState();
 	
-	private static boolean detectRunningMethod(String targetClass, MethodInfo method) {
+	private static boolean detectRunningMethod(String targetClass, String targetMethod, MethodInfo method) {
 		if (method.getClassName().equals(targetClass)) {
-			if (method.getName().equals("main") || method.isClinit()) {
+			if (method.getFullName().equals(targetClass + "." + targetMethod) || method.isClinit()) {
 				return true;
 			}
 		}
@@ -31,16 +31,17 @@ public class RunDetector {
 	
 	public static void detectRunning(VM vm, Instruction nextInsn, Instruction execInsn) {
 		String targetClass = vm.getJPF().getConfig().getTarget();
+        String targetMethod = vm.getJPF().getConfig().getTargetEntry();
 
 		if (execInsn instanceof InvokeInstruction) {
-			if (detectRunningMethod(targetClass, nextInsn.getMethodInfo())) {
+			if (detectRunningMethod(targetClass, targetMethod, nextInsn.getMethodInfo())) {
 				running.enter();
 				return;
 			}
 		}
 		
 		if (execInsn instanceof ReturnInstruction) {
-			if (detectRunningMethod(targetClass, execInsn.getMethodInfo())) {
+			if (detectRunningMethod(targetClass, targetMethod, execInsn.getMethodInfo())) {
 				running.leave();
 				return;
 			}

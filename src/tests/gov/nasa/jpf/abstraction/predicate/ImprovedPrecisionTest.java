@@ -1,16 +1,9 @@
 package gov.nasa.jpf.abstraction.predicate;
 
 public class ImprovedPrecisionTest extends BaseTest {
-    public static void main(String[] args) {
-		testCase1();
-		testCase2();
-		testCase3();
-		testCase4();
-		testCase5();
-		testCase6();
-	}
 
-	public static void testCase1() {
+    @Test
+    public static void testCase1() {
         int x = 5;
 
         Data a = new Data();
@@ -30,92 +23,97 @@ public class ImprovedPrecisionTest extends BaseTest {
         }
     }
 
-	public static void testCase2() {
-		int x = 1;
-		int y = 2;
+    @Test
+    public static void testCase2() {
+        int x = 1;
+        int y = 2;
 
-		Data a = new Data();
-		a.f = x;
+        Data a = new Data();
+        a.f = x;
 
-		Data b = new Data();
-		b.f = y;
-		
-		b = a;
+        Data b = new Data();
+        b.f = y;
 
-		if (a.f > 5) {
-			assertKnownValuation("b.f > 0: true");
-		}
-	}
+        b = a;
 
-	public static void testCase3() {
-		Data a = new Data();
-		a.f = 10;
+        if (a.f > 5) {
+            assertKnownValuation("b.f > 0: true");
+        }
+    }
 
-		Data p,r,b;
+    @Test
+    public static void testCase3() {
+        Data a = new Data();
+        a.f = 10;
 
-		p = a;
+        Data p,r,b;
 
-		r = testCasesM1(p);
+        p = a;
 
-		b = r;
+        r = testCasesM1(p);
+
+        b = r;
 
         // makes the following predicates unknown: b.f > 0 and also r.f = 10
         b.f = identity(b.f);
 
         // finding affected via symbol table (aliasing) does not help because predicates about r.f are unknown too
-		if (a.f > 0) {
-			assertKnownValuation("b.f > 0: unknown");
-		}
-	}
+        if (a.f > 0) {
+            assertKnownValuation("b.f > 0: unknown");
+        }
+    }
 
-	public static void testCase4() {
-		Data a = new Data();
-		a.f = 10;
+    @Test
+    public static void testCase4() {
+        Data a = new Data();
+        a.f = 10;
 
-		Data p,r,b;
+        Data p,r,b;
 
-		p = a;
+        p = a;
 
-		r = testCasesM1(p);
+        r = testCasesM1(p);
 
-		b = r;
+        b = r;
 
-		if (a.f > 5) {
-			assertKnownValuation("b.f > 5: true");
-		}
-	}
+        if (a.f > 5) {
+            assertKnownValuation("b.f > 5: true");
+        }
+    }
 
-	public static void testCase5() {
-		Data a = new Data();
-		a.f = 10;
+    @Test
+    public static void testCase5() {
+        Data a = new Data();
+        a.f = 10;
 
-		Data p,r,b;
+        Data p,r,b;
 
-		p = a;
+        p = a;
 
-		r = testCasesM1(p);
+        r = testCasesM1(p);
 
-		b = r;
+        b = r;
 
-		assertKnownValuation("b.f > 0: true", "b.f > 5: unknown");
+        assertKnownValuation("b.f > 0: true", "b.f > 5: unknown");
 
-		if (a.f > 5) {
-			assertKnownValuation("b.f > 5: true");
-		}
-	}
+        if (a.f > 5) {
+            assertKnownValuation("b.f > 5: true");
+        }
+    }
 
-	public static void testCase6() {
-		Data[] data = new Data[3];
-		
-		data[0] = new Data();
-		data[1] = new Data();
-		data[2] = new Data();
+    @Test
+    public static void testCase6() {
+        Data[] data = new Data[3];
 
-		int i = 0;
+        data[0] = new Data();
+        data[1] = new Data();
+        data[2] = new Data();
 
-		if (data[i].f > 5) {
+        int i = 0;
+
+        if (data[i].f > 5) {
             if (i == 0) {
-    			assertKnownValuation(
+                assertKnownValuation(
                     "data[0].f > 5: true",
                     "data[1].f > 5: unknown",
                     "data[2].f > 5: unknown"
@@ -127,23 +125,21 @@ public class ImprovedPrecisionTest extends BaseTest {
                     "data[2].f > 5: unknown"
                 );
             }
-		}
-	}
+        }
+    }
 
-	private static Data testCasesM1(Data v) {
-		v.g = 0;
-		return v;
-	}
+    private static Data testCasesM1(Data v) {
+        v.g = 0;
+        return v;
+    }
 
     private static int identity(int i) {
         return i;
     }
 }
 
-
 class Data {
     int f;
     int g;
     int h;
 }
-

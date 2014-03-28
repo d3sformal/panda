@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 public class FailingBaseTest extends BaseTest {
     @Override
-    protected void checkResult(JPF jpf) {
-        assertTrue(jpf.foundErrors());
+    protected boolean checkPassed(JPF jpf) {
+        return jpf.foundErrors();
     }
 }

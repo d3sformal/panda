@@ -132,7 +132,7 @@ public class AbstractListener extends PropertyListenerAdapter {
 
                 handler.executeInstruction(vm, curTh, nextInsn);
 
-                if (!vm.getSearch().isErrorState()) {
+                if (!vm.getSearch().isErrorState() || vm.getConfig().getBoolean("search.multiple_errors")) {
                     curTh.skipInstruction(curTh.getPC().getNext());
                 }
             }

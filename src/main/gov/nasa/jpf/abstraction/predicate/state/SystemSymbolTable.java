@@ -10,6 +10,7 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.SystemSymbolTable;
@@ -86,20 +87,31 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 		 */
 		VM vm = threadInfo.getVM();
 		String target = vm.getConfig().getTarget();
-		
-		if (method.getFullName().equals(target + ".main([Ljava/lang/String;)V")) {
-			ElementInfo ei = threadInfo.getElementInfo(sf.getLocalVariable(0));
-			int length = ei.arrayLength();
-			
-			LocalVarInfo args = method.getArgumentLocalVars()[0];
-            AnonymousArray argsExpr = AnonymousArray.create(new Reference(ei), Constant.create(length));
-            Attribute attr = new NonEmptyAttribute(null, argsExpr);
+        String entry = vm.getConfig().getTargetEntry();
 
-            sf.setLocalAttr(0, attr);
-            method.addAttr(attr);
+        if (method.getFullName().equals(target + "." + entry)) {
+            for (int i = 0; i < method.getNumberOfStackArguments(); ++i) {
+                ElementInfo ei = threadInfo.getElementInfo(sf.getLocalVariable(i));
+                LocalVarInfo arg = method.getArgumentLocalVars()[i];
 
-            ret.addObject(argsExpr);
-			ret.processObjectStore(argsExpr, DefaultRoot.create(args.getName(), 0));
+                AnonymousObject argExpr = null;
+
+                if (ei.isArray()) {
+                    int length = ei.arrayLength();
+
+                    argExpr = AnonymousArray.create(new Reference(ei), Constant.create(length));
+                } else {
+                    argExpr = AnonymousObject.create(new Reference(ei));
+                }
+
+                Attribute attr = new NonEmptyAttribute(null, argExpr);
+
+                sf.setLocalAttr(i, attr);
+                method.addAttr(attr);
+
+                ret.addObject(argExpr);
+                ret.processObjectStore(argExpr, DefaultRoot.create(arg.getName(), i));
+            }
 		}
 		
 		return ret;
