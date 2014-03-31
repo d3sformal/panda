@@ -12,8 +12,8 @@ import gov.nasa.jpf.vm.VM;
  * Is responsible for determining whether the currently executed code is part of the targeted execution or not
  */
 public class RunDetector {
-	private static Stack<RunningState> runningHistory = new Stack<RunningState>();
-	private static RunningState running = new RunningState();
+	private static Stack<RunningState> runningHistory;
+	private static RunningState running;
 	
 	private static boolean detectRunningMethod(String targetClass, String targetMethod, MethodInfo method) {
 		if (method.getClassName().equals(targetClass)) {
@@ -26,6 +26,9 @@ public class RunDetector {
 	}
 	
 	public static void initialiseNotRunning() {
+        runningHistory = new Stack<RunningState>();
+        running = new RunningState();
+
 		runningHistory.add(running.clone());
 	}
 	
