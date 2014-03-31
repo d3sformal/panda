@@ -21,8 +21,8 @@ public abstract class AssertVisitedWithValuationHandler extends AssertHandler {
         ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
         int limit = sf.pop();
 
-        PredicateValuation trackedValuation = new PredicateValuation();
-        PredicateValuation valuation = new PredicateValuation();
+        PredicateValuationMap trackedValuation = new PredicateValuationMap();
+        PredicateValuationMap valuation = new PredicateValuationMap();
 
         for (int j = 0; j < arrayEI.arrayLength(); ++j) {
             ElementInfo ei = curTh.getElementInfo(arrayEI.getReferenceElement(j));
@@ -52,7 +52,7 @@ public abstract class AssertVisitedWithValuationHandler extends AssertHandler {
 
     protected abstract Class<? extends LocationAssertion> getAssertionClass();
 
-    protected abstract void update(VM vm, Instruction insn, PredicateValuation trackedValuation, PredicateValuation valuation, Integer limit);
+    protected abstract void update(VM vm, Instruction insn, PredicateValuationMap trackedValuation, PredicateValuationMap valuation, Integer limit);
 
     protected void reportError(VM vm, Instruction nextInsn) {
         reportError(vm, nextInsn.getLineNumber(), AssertStateMatchingContext.get(nextInsn).getError());

@@ -11,7 +11,7 @@ public class AssertVisitedAtMostWithValuationHandler extends AssertVisitedWithVa
     }
 
     @Override
-    protected  void update(VM vm, Instruction insn, PredicateValuation trackedValuation, PredicateValuation valuation, Integer limit) {
+    protected  void update(VM vm, Instruction insn, PredicateValuationMap trackedValuation, PredicateValuationMap valuation, Integer limit) {
         if (!AssertStateMatchingContext.update(insn, getAssertionClass(), trackedValuation, valuation, limit)) {
             reportError(vm, insn);
         }

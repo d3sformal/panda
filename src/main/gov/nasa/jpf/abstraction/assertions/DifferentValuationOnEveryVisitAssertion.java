@@ -4,13 +4,13 @@ import java.util.Set;
 import java.util.HashSet;
 
 public class DifferentValuationOnEveryVisitAssertion implements LocationAssertion {
-    private Set<PredicateValuation> valuations = new HashSet<PredicateValuation>();
-    private Set<PredicateValuation> duplicateValuations = new HashSet<PredicateValuation>();
+    private Set<PredicateValuationMap> valuations = new HashSet<PredicateValuationMap>();
+    private Set<PredicateValuationMap> duplicateValuations = new HashSet<PredicateValuationMap>();
 
     @Override
     public void update(Object... o) {
-        if (o[0] instanceof PredicateValuation) {
-            PredicateValuation valuation = (PredicateValuation) o[0];
+        if (o[0] instanceof PredicateValuationMap) {
+            PredicateValuationMap valuation = (PredicateValuationMap) o[0];
 
             if (valuations.contains(valuation)) {
                 duplicateValuations.add(valuation);

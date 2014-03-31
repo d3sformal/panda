@@ -177,7 +177,7 @@ public class AbstractListener extends PropertyListenerAdapter {
         handlers.addAll(testMethods.values());
 
         for (ExecuteInstructionHandler h : handlers) {
-            h.finish();
+            h.searchFinished();
         }
     }
 }

@@ -8,12 +8,12 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
-public class PredicateValuation extends TreeMap<Predicate, TruthValue> {
+public class PredicateValuationMap extends TreeMap<Predicate, TruthValue> {
     public static final long serialVersionUID = 1L;
 
     private int hashCode = 1;
 
-    public PredicateValuation() {
+    public PredicateValuationMap() {
         super(new Comparator<Predicate>() {
             @Override
             public int compare(Predicate p1, Predicate p2) {
@@ -31,8 +31,8 @@ public class PredicateValuation extends TreeMap<Predicate, TruthValue> {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof PredicateValuation) {
-            PredicateValuation assertion = (PredicateValuation) o;
+        if (o instanceof PredicateValuationMap) {
+            PredicateValuationMap assertion = (PredicateValuationMap) o;
 
             if (size() != assertion.size()) {
                 return false;

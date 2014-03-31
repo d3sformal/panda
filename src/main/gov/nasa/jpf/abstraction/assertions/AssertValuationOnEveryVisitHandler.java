@@ -20,7 +20,7 @@ public abstract class AssertValuationOnEveryVisitHandler extends AssertHandler {
 
         ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
 
-        PredicateValuation valuation = new PredicateValuation();
+        PredicateValuationMap valuation = new PredicateValuationMap();
 
         for (int j = 0; j < arrayEI.arrayLength(); ++j) {
             ElementInfo ei = curTh.getElementInfo(arrayEI.getReferenceElement(j));

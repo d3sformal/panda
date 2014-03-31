@@ -11,7 +11,7 @@ public class AssertRevisitedAtLeastWithValuationHandler extends AssertVisitedWit
     }
 
     @Override
-    protected  void update(VM vm, Instruction insn, PredicateValuation trackedValuation, PredicateValuation valuation, Integer limit) {
+    protected  void update(VM vm, Instruction insn, PredicateValuationMap trackedValuation, PredicateValuationMap valuation, Integer limit) {
         AssertStateMatchingContext.update(insn, getAssertionClass(), trackedValuation, valuation, limit);
     }
 
