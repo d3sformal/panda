@@ -1,9 +1,11 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-public class NativeAssertionTest extends FailingBaseTest {
+public class NativeAssertionTest extends BaseTest {
     public NativeAssertionTest() {
         config.add("+search.multiple_errors=true");
     }
+
+    @FailingTest
     public static void main(String[] args) {
         int x = 0;
 

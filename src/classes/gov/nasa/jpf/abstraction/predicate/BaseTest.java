@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.io.File;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Iterator;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -58,10 +59,17 @@ public class BaseTest {
 
         Class<? extends BaseTest> cls = this.getClass();
 
-        List<String> targetMethods = new LinkedList<String>();
+        List<String> targetEntries = new LinkedList<String>();
+        List<Boolean> targetShouldPass = new LinkedList<Boolean>();
 
         for (Method m : cls.getDeclaredMethods()) {
             Annotation t = m.getAnnotation(gov.nasa.jpf.abstraction.predicate.Test.class);
+            boolean pass = true;
+
+            if (t == null) {
+                t = m.getAnnotation(gov.nasa.jpf.abstraction.predicate.FailingTest.class);
+                pass = false;
+            }
 
             if (t != null) {
                 if (!Modifier.isStatic(m.getModifiers())) {
@@ -70,34 +78,55 @@ public class BaseTest {
                 if (!m.getReturnType().equals(Void.TYPE)) {
                     throw new RuntimeException("The test method `" + m.getName() + "` must return void.");
                 }
-                if (m.getParameterTypes().length > 0) {
-                    throw new RuntimeException("The test method `" + m.getName() + "` cannot have parameters.");
+
+                Class<?>[] params = m.getParameterTypes();
+
+                if (params.length == 0) {
+                    targetEntries.add(m.getName() + "()V");
+                } else if (params.length == 1) {
+                    if (params[0].equals(String.class)) {
+                        targetEntries.add(m.getName() + "(Ljava/lang/String;)V");
+                    } else if (params[0].isArray() && params[0].getComponentType().equals(String.class)) {
+                        targetEntries.add(m.getName() + "([Ljava/lang/String;)V");
+                    } else {
+                        throw new RuntimeException("The test method `" + m.getName() + "` takes a parameter of an unsupported type.");
+                    }
+                } else {
+                    throw new RuntimeException("The test method `" + m.getName() + "` takes unsupported number of parameters.");
                 }
-                targetMethods.add(m.getName() + "()V");
+
+                targetShouldPass.add(pass);
             }
         }
 
-        if (targetMethods.isEmpty()) {
-            targetMethods.add("main([Ljava/lang/String;)V");
+        if (targetEntries.isEmpty()) {
+            targetEntries.add("main([Ljava/lang/String;)V");
+            targetShouldPass.add(true);
         }
 
         boolean allPassed = true;
 
-        for (String entry : targetMethods) {
+        Iterator<String> entryIter = targetEntries.iterator();
+        Iterator<Boolean> passIter = targetShouldPass.iterator();
+
+        while (entryIter.hasNext()) {
+            String entry = entryIter.next();
+            Boolean expectedPass = passIter.next();
+
             config.setTargetEntry(entry);
 
             JPF jpf = new JPF(config);
 
             jpf.run();
 
-            allPassed = reducePassed(allPassed, checkPassed(jpf));
+            allPassed = reducePassed(allPassed, expectedPass, checkPassed(jpf));
         }
 
         assertTrue(allPassed);
     }
 
-    protected boolean reducePassed(boolean passedSoFar, boolean passedNext) {
-        return passedSoFar && passedNext;
+    protected boolean reducePassed(boolean passedSoFar, boolean expectedNext, boolean passedNext) {
+        return passedSoFar && (expectedNext == passedNext);
     }
 
     protected boolean checkPassed(JPF jpf) {

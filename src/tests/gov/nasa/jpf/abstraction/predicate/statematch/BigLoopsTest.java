@@ -33,7 +33,9 @@ public class BigLoopsTest extends StateMatchingTest {
             i++;
         }
 
-        //assertVisitedAtMost(10);
+        // The previous loop is re-entered 11 times
+        // There is 11 possibilities when to break the looping
+        assertVisitedAtMost(11);
         assertRevisitedAtLeastWithValuation(10, "i >= 100: true");
 
         int total = 0;

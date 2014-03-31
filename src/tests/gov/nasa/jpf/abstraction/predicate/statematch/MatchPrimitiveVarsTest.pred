@@ -1,7 +1,11 @@
-[method gov.nasa.jpf.abstraction.predicate.statematch.MatchPrimitiveVarsTest.main]
+[method gov.nasa.jpf.abstraction.predicate.statematch.MatchPrimitiveVarsTest.test1]
 
 // These predicates are necessary to distinguish states when concrete values differ
 // This is a temporary solution
 // Preferably these would be inferred automatically
+n = 0
+n = 1
+
+[method gov.nasa.jpf.abstraction.predicate.statematch.MatchPrimitiveVarsTest.test2]
 n = 0
 n = 1

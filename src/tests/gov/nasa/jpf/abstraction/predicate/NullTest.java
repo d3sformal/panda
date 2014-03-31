@@ -6,13 +6,14 @@ class NullTestDriver {
     }
 }
 
-public class NullTest extends FailingBaseTest {
+public class NullTest extends BaseTest {
 
 	public NullTest()
 	{
 		config.add("+search.multiple_errors=true");
 	}
 
+    @FailingTest
     public static void main(String[] args) {
         Object[] array = new Object[2];
         int i = 0;
