@@ -1,3 +1,11 @@
 [static]
 class(raxextended.Events).plan.count = 0
 class(raxextended.Events).plan.count >= class(raxextended.Events).plan.wrapCount
+
+[method raxextended.RAXextended.main]
+gc = 1
+
+[method raxextended.Environment.create]
+gc = 1
+i = 0
+i = 1

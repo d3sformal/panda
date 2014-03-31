@@ -170,12 +170,14 @@ class Environment {
 
 class RAXextended {
   public static void main(String[] args) {
-    int gc = 0;
+    int gc = 1;
     int wc = 2;
+    /*
     if (args != null && args.length == 2) {
       gc = Integer.parseInt(args[0]);
       wc = Integer.parseInt(args[1]);
     }
+    */
 
     Events.initialize(wc);
     Plan plan = new Plan();
