@@ -36,6 +36,10 @@ public class RunDetector {
 		String targetClass = vm.getJPF().getConfig().getTarget();
         String targetMethod = vm.getJPF().getConfig().getTargetEntry();
 
+        if (targetMethod == null) {
+            targetMethod = "main([Ljava/lang/String;)V";
+        }
+
 		if (execInsn instanceof InvokeInstruction) {
 			if (detectRunningMethod(targetClass, targetMethod, nextInsn.getMethodInfo())) {
 				running.enter();

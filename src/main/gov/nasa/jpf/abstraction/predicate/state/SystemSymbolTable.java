@@ -78,7 +78,7 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 		/**
 		 * Register new local variables
 		 */
-        StackFrame sf = threadInfo.getTopFrame();
+        StackFrame sf = threadInfo.getModifiableTopFrame();
 
 		/**
 		 * Handle main(String[] args)
@@ -89,10 +89,15 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 		String target = vm.getConfig().getTarget();
         String entry = vm.getConfig().getTargetEntry();
 
+        if (entry == null) {
+            entry = "main([Ljava/lang/String;)V";
+        }
+
         if (method.getFullName().equals(target + "." + entry)) {
+            method.setAttr(null);
+
             for (int i = 0; i < method.getNumberOfStackArguments(); ++i) {
                 ElementInfo ei = threadInfo.getElementInfo(sf.getLocalVariable(i));
-                LocalVarInfo arg = method.getArgumentLocalVars()[i];
 
                 AnonymousObject argExpr = null;
 
@@ -110,7 +115,6 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
                 method.addAttr(attr);
 
                 ret.addObject(argExpr);
-                ret.processObjectStore(argExpr, DefaultRoot.create(arg.getName(), i));
             }
 		}
 		
