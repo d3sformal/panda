@@ -216,7 +216,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 		if (RunDetector.isRunning()) {
 			// Copy of the current caller scope - to avoid modifications - may not be needed now, it is not different from .top() and it is not modified here
 			MethodFramePredicateValuation callerScope = scopes.get(currentThreadID).top();
-			
+
 			Map<Predicate, Predicate> replaced = new HashMap<Predicate, Predicate>();
             Set<Predicate> unknown = new HashSet<Predicate>();
             Set<AccessExpression> temporaryPathHolder = new HashSet<AccessExpression>();
@@ -713,19 +713,31 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
     @Override
     public void addThread(ThreadInfo threadInfo) {
-		PredicateValuationStack threadStack = new PredicateValuationStack();
-        threadStack.push("-- Dummy stop scope --", new MethodFramePredicateValuation(smt));
+        MethodFramePredicateValuation startScope = null;
+
+        // If this is not the creation of the main thread (which is created from nothing)
+        // then there is another thread running which is currently inside `start`
+        // therefore we shall steal the predicate valuation
+        if (!scopes.isEmpty()) {
+            startScope = scopes.get(currentThreadID).top();
+        }
+
+        PredicateValuationStack threadStack = new PredicateValuationStack();
+
+        MethodInfo runMethod = threadInfo.getThreadObject().getClassInfo().getMethod("run()V", true);
+        MethodFramePredicateValuation bottomScope = createDefaultScope(threadInfo, runMethod);
+
+        threadStack.push("-- Dummy stop scope --", bottomScope);
         scopes.put(threadInfo.getId(), threadStack);
-		
-		// Monitor static predicates in the special starting scope
-		// This allows to pass static predicates throw clinit/main...
-		for (Context context : predicateSet.contexts) {
-			if (context instanceof StaticContext) {
-				for (Predicate predicate : context.predicates) {
-					scopes.get(threadInfo.getId()).top().put(predicate, initialValuation.get(predicate));
-				}
-			}
-		}
+
+        if (startScope != null) {
+            Set<Predicate> predicates = bottomScope.getPredicates();
+            Map<Predicate, TruthValue> values = evaluatePredicates(predicates);
+
+            for (Predicate predicate : predicates) {
+                bottomScope.put(predicate, values.get(predicate));
+            }
+        }
     }
 
     @Override

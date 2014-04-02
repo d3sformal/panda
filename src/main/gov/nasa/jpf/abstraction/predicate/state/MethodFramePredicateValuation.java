@@ -476,52 +476,64 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             sharedSymbolCache.clear();
         }
     }
-	
+
     /**
      * Evaluate a single predicate regardless of a statement
      *
      * Used to detect tautologies in the initial phase.
      * Used to valuate branching conditions - a (possibly) new predicate whose value depends solely on current predicate valuation.
      */
-	@Override
-	public TruthValue evaluatePredicate(Predicate predicate) {
-		Set<Predicate> predicates = new HashSet<Predicate>();
-		
-		predicates.add(predicate);
-		
-		return evaluatePredicates(predicates).get(predicate);
-	}
-	
-	/**
-	 * Evaluate predicates regardless of a statement
+    @Override
+    public TruthValue evaluatePredicate(Predicate predicate) {
+        Set<Predicate> predicates = new HashSet<Predicate>();
+
+        predicates.add(predicate);
+
+        return evaluatePredicates(predicates).get(predicate);
+    }
+
+    /**
+     * Evaluate predicates regardless of a statement
      *
      * Batch variant of evaluatePredicate
-	 */
-	@Override
-	public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
-		if (predicates.isEmpty()) return Collections.emptyMap();
+     */
+    @Override
+    public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
+        if (predicates.isEmpty()) return Collections.emptyMap();
 
-		Map<Predicate, PredicateValueDeterminingInfo> input = new HashMap<Predicate, PredicateValueDeterminingInfo>();
+        Map<Predicate, PredicateValueDeterminingInfo> input = new HashMap<Predicate, PredicateValueDeterminingInfo>();
+        Set<Predicate> known = new HashSet<Predicate>();
 
         // This takes long
-		for (Predicate predicate : predicates) {
-			Predicate positiveWeakestPrecondition = predicate;
-			Predicate negativeWeakestPrecondition = Negation.create(predicate);
-	
-			Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
-				
-			for (Predicate determinant : computeDeterminantClosure(positiveWeakestPrecondition, valuations.keySet())) {
-				determinants.put(determinant, valuations.get(determinant));
-			}
-			for (Predicate determinant : computeDeterminantClosure(negativeWeakestPrecondition, valuations.keySet())) {
-				determinants.put(determinant, valuations.get(determinant));
-			}
-			
-			input.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
-		}
+        for (Predicate predicate : predicates) {
+            // Skip predicates whose value is directly known
+            if (containsKey(predicate)) {
+                known.add(predicate);
+            } else {
+                Predicate positiveWeakestPrecondition = predicate;
+                Predicate negativeWeakestPrecondition = Negation.create(predicate);
 
-		return smt.valuatePredicates(input);
-	}
+                Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+
+                for (Predicate determinant : computeDeterminantClosure(positiveWeakestPrecondition, valuations.keySet())) {
+                    determinants.put(determinant, valuations.get(determinant));
+                }
+                for (Predicate determinant : computeDeterminantClosure(negativeWeakestPrecondition, valuations.keySet())) {
+                    determinants.put(determinant, valuations.get(determinant));
+                }
+
+                input.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
+            }
+        }
+
+        Map<Predicate, TruthValue> ret = smt.valuatePredicates(input);
+
+        for (Predicate p : known) {
+            ret.put(p, get(p));
+        }
+
+        return ret;
+    }
 	
 	@Override
 	public int count() {

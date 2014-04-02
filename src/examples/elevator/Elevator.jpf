@@ -7,7 +7,7 @@ sourcepath=${jpf-abstraction}/src/examples
 
 abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/elevator/Elevator.pred
 
-listener=gov.nasa.jpf.abstraction.AbstractListener
+listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor
 
 vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer
 
