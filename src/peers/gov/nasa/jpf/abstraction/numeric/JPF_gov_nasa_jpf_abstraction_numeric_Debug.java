@@ -1,12 +1,14 @@
-package gov.nasa.jpf.abstraction;
+package gov.nasa.jpf.abstraction.numeric;
 
+import gov.nasa.jpf.abstraction.AbstractValue;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.annotation.MJI;
 import gov.nasa.jpf.vm.MJIEnv;
 import gov.nasa.jpf.vm.NativePeer;
 
-public class JPF_gov_nasa_jpf_abstraction_Debug extends NativePeer {
+public class JPF_gov_nasa_jpf_abstraction_numeric_Debug extends NativePeer {
 
 	@MJI
 	public static int getAbstractInteger__I__Ljava_lang_String_2(MJIEnv env, int objRef, int v) {

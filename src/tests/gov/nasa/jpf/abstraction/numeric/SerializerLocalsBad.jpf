@@ -1,6 +1,6 @@
 @using=jpf-abstraction
 
-target=gov.nasa.jpf.abstraction.SerializerTestFields
+target=gov.nasa.jpf.abstraction.numeric.SerializerTestLocals
 
 classpath=${jpf-abstraction}/build/tests
 
@@ -10,5 +10,5 @@ abstract.domain=SIGNS
 
 listener = gov.nasa.jpf.abstraction.AbstractListener
 
-vm.serializer.class = gov.nasa.jpf.abstraction.NumericAbstractionSerializer
+vm.serializer.class = gov.nasa.jpf.vm.serialize.CFSerializer 
 

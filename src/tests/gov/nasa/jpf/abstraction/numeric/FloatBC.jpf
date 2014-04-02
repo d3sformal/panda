@@ -1,6 +1,6 @@
 @using=jpf-abstraction
 
-target=gov.nasa.jpf.abstraction.LongBC
+target=gov.nasa.jpf.abstraction.numeric.FloatBC
 
 classpath=build/tests
 sourcepath=src/tests

@@ -1,6 +1,6 @@
 package prodcons.numeric;
 
-import gov.nasa.jpf.abstraction.Debug;
+import gov.nasa.jpf.abstraction.numeric.Debug;
 
 public class ProdConsEx {
 	public static final int DAILY_LIMIT = Debug.makeAbstractInteger(1000000);

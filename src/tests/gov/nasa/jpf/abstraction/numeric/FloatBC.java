@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction;
+package gov.nasa.jpf.abstraction.numeric;
 
 public class FloatBC {
 

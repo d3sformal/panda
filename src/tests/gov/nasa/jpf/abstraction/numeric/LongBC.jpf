@@ -1,12 +1,11 @@
 @using=jpf-abstraction
 
-target=gov.nasa.jpf.abstraction.IntBC
-target.args=noconversions
+target=gov.nasa.jpf.abstraction.numeric.LongBC
 
 classpath=build/tests
 sourcepath=src/tests
 
-abstract.domain=RANGE -2 3
+abstract.domain=SIGNS
 
 listener = gov.nasa.jpf.abstraction.AbstractListener
 

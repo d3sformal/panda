@@ -1,11 +1,11 @@
 @using=jpf-abstraction
 
-target=gov.nasa.jpf.abstraction.IntBC
+target=gov.nasa.jpf.abstraction.numeric.Container
 
 classpath=build/tests
 sourcepath=src/tests
 
-abstract.domain=SIGNS
+abstract.domain=SIGNS,EVENNESS
 
 listener = gov.nasa.jpf.abstraction.AbstractListener
 

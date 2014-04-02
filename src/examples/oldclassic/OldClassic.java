@@ -18,7 +18,7 @@
 //
 package oldclassic;
 
-import gov.nasa.jpf.abstraction.Debug;
+import gov.nasa.jpf.abstraction.numeric.Debug;
 
 /**
  * This example shows a deadlock that occurs as a result of a missed signal,
