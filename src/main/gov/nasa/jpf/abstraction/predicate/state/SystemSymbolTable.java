@@ -316,8 +316,17 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
     public void addThread(ThreadInfo threadInfo) {
         universe.add(threadInfo.getThreadObject(), threadInfo);
 
-		SymbolTableStack threadStack = new SymbolTableStack();
-        threadStack.push("-- Dummy stop scope --", new MethodFrameSymbolTable(universe, abstraction));
+        SymbolTableStack threadStack = new SymbolTableStack();
+
+        MethodFrameSymbolTable bottomScope;
+
+        if (!scopes.isEmpty()) {
+            bottomScope = new MethodFrameSymbolTable(scopes.get(currentThreadID).top());
+        } else {
+            bottomScope = new MethodFrameSymbolTable(universe, abstraction);
+        }
+
+        threadStack.push("-- Dummy stop scope --", bottomScope);
 
         scopes.put(threadInfo.getId(), threadStack);
     }

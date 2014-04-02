@@ -33,6 +33,8 @@ import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
 
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 
+import gov.nasa.jpf.abstraction.AliasingDumper;
+
 import gov.nasa.jpf.abstraction.assertions.AssertConjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertDisjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertExclusiveDisjunctionHandler;
@@ -58,12 +60,17 @@ import java.util.HashMap;
  * It informs the global abstraction about all the above mentioned events.
  */
 public class AbstractListener extends PropertyListenerAdapter {
+    private Map<String, ExecuteInstructionHandler> debugMethods = new HashMap<String, ExecuteInstructionHandler>();
     private Map<String, ExecuteInstructionHandler> testMethods = new HashMap<String, ExecuteInstructionHandler>();
 
+    private static String DebugClass = "gov.nasa.jpf.abstraction.predicate.Debug";
     private static String BaseTestClass = "gov.nasa.jpf.abstraction.predicate.BaseTest";
     private static String StateMatchingTestClass = "gov.nasa.jpf.abstraction.predicate.statematch.StateMatchingTest";
 
     public AbstractListener() {
+        // Debug
+        debugMethods.put(DebugClass + ".dumpAliasing(Ljava/lang/String;)V", new AliasingDumper());
+
         // Conjunction
         testMethods.put(BaseTestClass + ".assertConjunction([Ljava/lang/String;)V", new AssertConjunctionHandler());
 
@@ -124,16 +131,24 @@ public class AbstractListener extends PropertyListenerAdapter {
             InvokeInstruction invk = (InvokeInstruction) nextInsn;
             MethodInfo method = invk.getInvokedMethod();
 
-            if (method != null && testMethods.containsKey(method.getFullName())) {
-                // Do not perform this action, instead call the handler
-                // This is needed to avoid an artificial INVOKE / RETURN to appear in the execution
-                // INVOKE and RETURN may break things
-                ExecuteInstructionHandler handler = testMethods.get(method.getFullName());
+            if (method != null) {
+                if (debugMethods.containsKey(method.getFullName())) {
+                    ExecuteInstructionHandler handler = debugMethods.get(method.getFullName());
 
-                handler.executeInstruction(vm, curTh, nextInsn);
+                    handler.executeInstruction(vm, curTh, nextInsn);
 
-                if (!vm.getSearch().isErrorState() || vm.getConfig().getBoolean("search.multiple_errors")) {
                     curTh.skipInstruction(curTh.getPC().getNext());
+                } else if (testMethods.containsKey(method.getFullName())) {
+                    // Do not perform this action, instead call the handler
+                    // This is needed to avoid an artificial INVOKE / RETURN to appear in the execution
+                    // INVOKE and RETURN may break things
+                    ExecuteInstructionHandler handler = testMethods.get(method.getFullName());
+
+                    handler.executeInstruction(vm, curTh, nextInsn);
+
+                    if (!vm.getSearch().isErrorState() || vm.getConfig().getBoolean("search.multiple_errors")) {
+                        curTh.skipInstruction(curTh.getPC().getNext());
+                    }
                 }
             }
         }
