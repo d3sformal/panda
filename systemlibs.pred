@@ -45,3 +45,15 @@ local_1 < local_0.elementCount
 [assume pre method java.util.Vector.elementData]
 local_1 >= 0
 local_1 < alength(arrlen, local_0.elementData)
+
+[object java.util.Vector$Itr]
+local_0.cursor < local_0.this$0.elementCount
+
+[assume pre method java.util.Vector$Itr.checkForComodification]
+local_0.this$0.modCount = local_0.expectedModCount
+
+[assume pre method java.util.Vector$Itr.next]
+local_0.cursor < local_0.this$0.elementCount
+
+[method java.util.Vector$Itr.next]
+local_0.cursor = local_2

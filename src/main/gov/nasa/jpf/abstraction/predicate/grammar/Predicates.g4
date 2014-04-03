@@ -229,7 +229,7 @@ CONSTANT_TOKEN
 	;
 
 ID_TOKEN
-	: [a-zA-Z_][a-zA-Z0-9_]*
+	: [a-zA-Z_][a-zA-Z0-9_]*('$'[a-zA-Z0-9_]+)*
 	;
 
 COMMENT_TOKEN
