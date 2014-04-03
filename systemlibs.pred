@@ -31,9 +31,10 @@ local_0.elementCount > 0
 // initialCapacity >= 0
 local_1 >= 0
 
-[assume post method java.util.Vector.iterator]
-return.this$0 = local_0
-return.counter = 0
+// WARNING: THIS MAY BE CAUSING THE SLOWDOWN
+// [assume post method java.util.Vector.iterator]
+// return.this$0 = local_0
+// return.counter = 0
 
 [assume pre method java.util.Vector.grow]
 local_1 >= 0
