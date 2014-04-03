@@ -7,6 +7,7 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
@@ -19,10 +20,11 @@ public class RUNSTART extends gov.nasa.jpf.jvm.bytecode.RUNSTART {
 
         StackFrame sf = ti.getModifiableTopFrame();
 
-        AccessExpression thisExpr = DefaultRoot.create("this");
+        Root thisExpr = DefaultRoot.create("this");
         AccessExpression threadObjectExpr = AnonymousObject.create(new Reference(ti.getElementInfo(sf.peek())));
 
         // Do not update Predicate Valuation (that has been setup at .start()V)
+        ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0).addStructuredLocalVariable(thisExpr);
         ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().processObjectStore(threadObjectExpr, thisExpr);
 
         sf.setOperandAttr(new NonEmptyAttribute(null, thisExpr));

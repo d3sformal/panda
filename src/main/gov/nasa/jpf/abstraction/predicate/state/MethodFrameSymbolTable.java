@@ -415,15 +415,15 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
     // FromTable may have a different Locals/Statics sets
     public Set<AccessExpression> processObjectStore(Expression from, MethodFrameSymbolTable fromTable, AccessExpression to) {
         if (from == null) {
-            throw new RuntimeException("Undefined source encountered while processing store");
-        }
-
-        if (fromTable == null) {
-            throw new RuntimeException("Undefined source scope encountered while processing store");
+            throw new RuntimeException("Undefined source encountered while processing store to `" + to + "`");
         }
 
         if (to == null) {
-            throw new RuntimeException("Undefined destination encountered while processing store");
+            throw new RuntimeException("Undefined destination encountered while processing store from `" + from + "`");
+        }
+
+        if (fromTable == null) {
+            throw new RuntimeException("Undefined source scope encountered while processing store from `" + from + "` to `" + to + "`");
         }
 
         Set<AccessExpression> ret = new HashSet<AccessExpression>();

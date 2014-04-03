@@ -15,6 +15,8 @@ i = 0
 i = 1
 i = 2
 
+5 = alength(arrlen, this.controls.floors)
+
 [object elevator.Lift]
 this.firstFloor = 0
 this.firstFloor = 1
@@ -33,6 +35,8 @@ this.currentFloor = 1
 this.currentFloor = 2
 this.currentFloor = 3
 this.currentFloor = 4
+
+5 = alength(arrlen, this.controls.floors)
 
 [object java.lang.Thread]
 this.firstFloor = 0
@@ -53,8 +57,11 @@ this.currentFloor = 2
 this.currentFloor = 3
 this.currentFloor = 4
 
+5 = alength(arrlen, this.controls.floors)
+
 [method elevator.Lift.<init>]
 numFloors = 4
+5 = alength(arrlen, c.floors)
 
 [object elevator.Controls]
 5 = alength(arrlen, this.floors)
@@ -100,3 +107,10 @@ floor = 3
 floor = 4
 
 return = 0
+
+[method elevator.Controls.getUpPeople]
+floor = 0
+floor = 1
+floor = 2
+floor = 3
+floor = 4
