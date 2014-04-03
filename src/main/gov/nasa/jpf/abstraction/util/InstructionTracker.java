@@ -15,7 +15,7 @@ public class InstructionTracker extends ListenerAdapter {
             if (execInsn instanceof InvokeInstruction) {
                 InvokeInstruction invkInsn = (InvokeInstruction) execInsn;
 
-                System.out.print(" (" + invkInsn.getInvokedMethod(curTh).getFullName() + ")");
+                System.out.print(" (" + invkInsn.getInvokedMethodClassName() + "." + invkInsn.getInvokedMethodName() + ")");
             }
             System.out.println("\t" + source);
             System.out.println("\t in method: " + execInsn.getMethodInfo().getFullName());

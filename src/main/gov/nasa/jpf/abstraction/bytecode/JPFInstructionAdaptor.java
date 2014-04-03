@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.MethodInfo;
 
 /**
  * JPFInstructionAdaptor decouples our implementation of individual instructions from the implementation in jpf-core when it comes to aborting the execution
@@ -20,7 +21,15 @@ public class JPFInstructionAdaptor {
 
 	public static Instruction getStandardNextInstruction(gov.nasa.jpf.jvm.bytecode.VirtualInvocation curInsn, ThreadInfo curTh)
 	{
-		return curInsn.getInvokedMethod(curTh, curTh.getCalleeThis(curInsn.getArgSize())).getFirstInsn();
+		MethodInfo method = curInsn.getInvokedMethod(curTh, curTh.getCalleeThis(curInsn.getArgSize()));
+
+        // may happen if the target object is null
+        // we can return anything because super.execute in INVOKExxx fails anyway
+        if (method == null) {
+            return curInsn;
+        }
+
+        return method.getFirstInsn();
 	}
 
 	public static Instruction getStandardNextInstruction(gov.nasa.jpf.jvm.bytecode.DIRECTCALLRETURN curInsn, ThreadInfo curTh)
