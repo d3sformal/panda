@@ -66,6 +66,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 		Set<Predicate> predicates = new HashSet<Predicate>();
 
 		for (Context context : predicateSet.contexts) {
+            //if (context instanceof AssumeContext) continue;
+
 			predicates.addAll(context.predicates);
 		}
 		

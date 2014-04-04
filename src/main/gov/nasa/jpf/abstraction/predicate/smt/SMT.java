@@ -110,7 +110,7 @@ public class SMT {
 
         public String getSeparator() {
             switch (this) {
-                case NORMAL: return "";
+                case NORMAL: return "\n";
                 case DEBUG:  return "\n";
                 default:     return null;
             }
@@ -196,6 +196,7 @@ public class SMT {
 
     		    separator
             );
+
             in.flush();
 
 			InputStream outstream = mathsat.getInputStream();
@@ -353,16 +354,7 @@ public class SMT {
 		input.append(separator);
     }
 
-	private String prepareGetModelInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, Predicate predicate, String formula, InputType inputType) {
-        String separator = inputType.getSeparator();
-
-		StringBuilder input = new StringBuilder();
-
-        input.append("(push 1)"); input.append(separator);
-        appendClassDeclarations(classes, input, separator);
-        appendVariableDeclarations(vars, input, separator);
-        appendFieldDeclarations(fields, input, separator);
-		
+    private void appendFreshConstraints(Set<AccessExpression> objects, StringBuilder input, String separator) {
         Set<String> freshConstraints = new HashSet<String>();
 
 		for (AccessExpression object : objects) {
@@ -375,6 +367,17 @@ public class SMT {
             input.append(constraint);
         }
 		input.append(separator);
+    }
+
+	private String prepareGetModelInput(Set<String> classes, Set<String> vars, Set<String> fields, Predicate predicate, String formula, InputType inputType) {
+        String separator = inputType.getSeparator();
+
+		StringBuilder input = new StringBuilder();
+
+        input.append("(push 1)"); input.append(separator);
+        appendClassDeclarations(classes, input, separator);
+        appendVariableDeclarations(vars, input, separator);
+        appendFieldDeclarations(fields, input, separator);
 
         Boolean cachedValue = cache.get(formula).getSatisfiability();
         Integer cachedModel = cache.get(formula).getModel();
@@ -386,7 +389,7 @@ public class SMT {
 		return input.toString();
     }
 
-	private String prepareValuatePredicatesInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<Predicate> predicates, List<String> formulas, InputType inputType) {
+	private String prepareValuatePredicatesInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, boolean hasFresh, List<Predicate> predicates, List<String> formulas, InputType inputType) {
         String separator = inputType.getSeparator();
 
 		StringBuilder input = new StringBuilder();
@@ -396,18 +399,9 @@ public class SMT {
         appendVariableDeclarations(vars, input, separator);
         appendFieldDeclarations(fields, input, separator);
 		
-        Set<String> freshConstraints = new HashSet<String>();
-
-		for (AccessExpression object : objects) {
-			Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.create(DefaultFresh.create(), object)));
-			
-			freshConstraints.add("(assert " + convertToString(distinction) + ")" + separator);
-		}
-
-        for (String constraint : freshConstraints) {
-            input.append(constraint);
+        if (hasFresh) {
+            appendFreshConstraints(objects, input, separator);
         }
-		input.append(separator);
 
         Iterator<Predicate> predicatesIterator = predicates.iterator();
         Iterator<String> formulasIterator = formulas.iterator();
@@ -430,7 +424,7 @@ public class SMT {
 		return input.toString();
     }
 
-	private String prepareIsSatisfiableInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, List<Predicate> predicates, List<String> formulas, InputType inputType) {
+	private String prepareIsSatisfiableInput(Set<String> classes, Set<String> vars, Set<String> fields, List<Predicate> predicates, List<String> formulas, InputType inputType) {
         String separator = inputType.getSeparator();
 
         StringBuilder input = new StringBuilder();
@@ -439,19 +433,6 @@ public class SMT {
         appendClassDeclarations(classes, input, separator);
         appendVariableDeclarations(vars, input, separator);
         appendFieldDeclarations(fields, input, separator);
-
-        Set<String> freshConstraints = new HashSet<String>();
-
-        for (AccessExpression object : objects) {
-            Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.create(DefaultFresh.create(), object)));
-
-            freshConstraints.add("(assert " + convertToString(distinction) + ")" + separator);
-        }
-
-        for (String constraint : freshConstraints) {
-            input.append(constraint);
-        }
-        input.append(separator);
 
         Iterator<Predicate> predicatesIterator = predicates.iterator();
         Iterator<String> formulasIterator = formulas.iterator();
@@ -488,12 +469,11 @@ public class SMT {
 		Set<String> classes = collector.getClasses();
 		Set<String> variables = collector.getVars();
 		Set<String> fields = collector.getFields();
-		Set<AccessExpression> objects = Collections.emptySet();
 
         String formula = createFormula(valueConstraint, determinants, collector.getAdditionalPredicates(valueConstraint));
 
-        String input = prepareGetModelInput(classes, variables, fields, objects, valueConstraint, formula, InputType.NORMAL);
-        String debugInput = prepareGetModelInput(classes, variables, fields, objects, valueConstraint, formula, InputType.DEBUG);
+        String input = prepareGetModelInput(classes, variables, fields, valueConstraint, formula, InputType.NORMAL);
+        String debugInput = prepareGetModelInput(classes, variables, fields, valueConstraint, formula, InputType.DEBUG);
 
 		notifyGetModelInputGenerated(debugInput);
 
@@ -522,7 +502,6 @@ public class SMT {
 		Set<String> classes = collector.getClasses();
 		Set<String> variables = collector.getVars();
 		Set<String> fields = collector.getFields();
-		Set<AccessExpression> objects = Collections.emptySet();
 
         List<String> formulas = new ArrayList<String>(predicates.size());
 
@@ -530,8 +509,8 @@ public class SMT {
             formulas.add(convertToString(predicate));
         }
 
-        String input = prepareIsSatisfiableInput(classes, variables, fields, objects, predicates, formulas, InputType.NORMAL);
-        String debugInput = prepareIsSatisfiableInput(classes, variables, fields, objects, predicates, formulas, InputType.DEBUG);
+        String input = prepareIsSatisfiableInput(classes, variables, fields, predicates, formulas, InputType.NORMAL);
+        String debugInput = prepareIsSatisfiableInput(classes, variables, fields, predicates, formulas, InputType.DEBUG);
 
         notifyIsSatisfiableInputGenerated(debugInput);
 
@@ -593,9 +572,10 @@ public class SMT {
 		Set<String> vars = collector.getVars();
 		Set<String> fields = collector.getFields();
 		Set<AccessExpression> objects = collector.getObjects();
+        boolean hasFresh = collector.hasFresh();
 		
-		String input = prepareValuatePredicatesInput(classes, vars, fields, objects, predicatesList, formulasList, InputType.NORMAL);
-		String debugInput = prepareValuatePredicatesInput(classes, vars, fields, objects, predicatesList, formulasList, InputType.DEBUG);
+		String input = prepareValuatePredicatesInput(classes, vars, fields, objects, hasFresh, predicatesList, formulasList, InputType.NORMAL);
+		String debugInput = prepareValuatePredicatesInput(classes, vars, fields, objects, hasFresh, predicatesList, formulasList, InputType.DEBUG);
 
 		notifyValuatePredicatesInputGenerated(debugInput);
 		

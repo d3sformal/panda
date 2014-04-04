@@ -23,6 +23,7 @@ import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Equals;
@@ -42,29 +43,57 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 		
 		ret.append(")");
 	}
+
+    private void inlineConjunction(Predicate predicate) {
+        if (predicate.getClass().equals(Conjunction.class)) {
+            Conjunction c = (Conjunction) predicate;
+
+            inlineConjunction(c.a);
+
+            ret.append(" ");
+
+            inlineConjunction(c.b);
+        } else {
+            predicate.accept(this);
+        }
+    }
 	
 	@Override
 	public void visit(Conjunction predicate) {
 		ret.append("(and ");
 		
-		predicate.a.accept(this);
+		inlineConjunction(predicate.a);
 		
 		ret.append(" ");
 		
-		predicate.b.accept(this);
+		inlineConjunction(predicate.b);
 		
 		ret.append(")");
 	}
 	
+    private void inlineDisjunction(Predicate predicate) {
+        if (predicate.getClass().equals(Disjunction.class)) {
+            Disjunction d = (Disjunction) predicate;
+
+            inlineDisjunction(d.a);
+
+            ret.append(" ");
+
+            inlineDisjunction(d.b);
+        } else {
+            predicate.accept(this);
+        }
+    }
+
 	@Override
 	public void visit(Disjunction predicate) {
 		ret.append("(or ");
 		
-		predicate.a.accept(this);
+		inlineDisjunction(predicate.a);
 		
 		ret.append(" ");
 		
-		predicate.b.accept(this);
+		inlineDisjunction(predicate.b);
 		
 		ret.append(")");
 	}

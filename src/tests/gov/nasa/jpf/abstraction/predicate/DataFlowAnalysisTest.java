@@ -1,5 +1,11 @@
 package gov.nasa.jpf.abstraction.predicate;
 
+class Driver {
+    public static void main(String[] args) {
+        new DataFlowAnalysisTest().bootstrap();
+    }
+}
+
 public class DataFlowAnalysisTest extends BaseTest {
 	public static void main(String[] args)
 	{

@@ -69,6 +69,7 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 	private Set<String> vars = new HashSet<String>();
 	private Set<String> fields = new HashSet<String>();
 	private Set<Integer> fresh = new HashSet<Integer>();
+    private boolean hasFresh = false;
 	
 	private PredicatesComponentVisitable currentCollectable = null;
 	private Map<PredicatesComponentVisitable, Set<Predicate>> additionalPredicates = new HashMap<PredicatesComponentVisitable, Set<Predicate>>();
@@ -223,11 +224,13 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 	@Override
 	public void visit(AnonymousObject expression) {
 		fresh.add(expression.getReference().getReferenceNumber());
+        hasFresh = true;
 	}
 
 	@Override
 	public void visit(AnonymousArray expression) {
 		fresh.add(expression.getReference().getReferenceNumber());
+        hasFresh = true;
 		
 		expression.getArrayLength().accept(this);
 	}
@@ -255,6 +258,10 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 	public Set<Integer> getFresh() {
 		return fresh;
 	}
+
+    public boolean hasFresh() {
+        return hasFresh;
+    }
 	
 	public Set<AccessExpression> getObjects() {
 		return objects;
@@ -273,6 +280,7 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 
 	@Override
 	public void visit(Fresh expression) {	
+        hasFresh = true;
 	}
 
 	@Override
