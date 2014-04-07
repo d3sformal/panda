@@ -70,7 +70,9 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 				ArrayList<Integer> choiceCandidates = new ArrayList<Integer>();
 				boolean predicateAbstractionFailed = false;
 
-				for (int match : getMatches()) {
+                for (int i = 0; i < matches.length; i++) {
+                    int match = matches[i];
+
 					TruthValue pred = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(Equals.create(expr, Constant.create(match)));
 					
 					if (pred == TruthValue.UNDEFINED) {
@@ -79,7 +81,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 					}
 					
 					if (pred != TruthValue.FALSE) {
-						choiceCandidates.add(match);
+						choiceCandidates.add(i);
 					}
 				}
 				
@@ -123,7 +125,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 			int idx = ((IntChoiceFromList) cg).getNextChoice();
 			sf.pop();
 
-			if (idx == -1) {
+			if (idx == DEFAULT) {
 				return mi.getInstructionAt(target);
 			}
 
