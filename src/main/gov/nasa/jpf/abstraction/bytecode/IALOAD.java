@@ -26,6 +26,7 @@ import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
@@ -75,10 +76,19 @@ public class IALOAD extends gov.nasa.jpf.jvm.bytecode.IALOAD {
 
     @Override
     public void push (StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsExecutiveException {
+        Expression upperBound;
+
+        // Bultin static (constant-length) arrays
+        if (array instanceof ObjectFieldRead && ((ObjectFieldRead) array).getField().getName().startsWith("$SwitchMap")) {
+            upperBound = Constant.create(ei.arrayLength());
+        } else {
+            upperBound = DefaultArrayLengthRead.create(array);
+        }
+
         // i >= 0 && i < a.length
         Predicate inBounds = Conjunction.create(
             Negation.create(LessThan.create(index, Constant.create(0))),
-            LessThan.create(index, DefaultArrayLengthRead.create(array))
+            LessThan.create(index, upperBound)
         );
 
         TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
