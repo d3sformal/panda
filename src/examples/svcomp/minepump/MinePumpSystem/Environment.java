@@ -39,7 +39,7 @@ public class Environment {
 
     @Override
     public String toString() {
-        return "Env(Water:" + waterLevel + ",Meth:" + (methaneLevelCritical?"CRIT":"OK") + ")";
+        return "Env(Water :" + waterLevel + ", Meth: " + (methaneLevelCritical ? "CRIT" : "OK") + ")";
     }
 
     public WaterLevelEnum getWaterLevel() {

@@ -1,0 +1,64 @@
+[static]
+class(svcomp.minepump.MinePumpSystem.Environment$WaterLevelEnum).low.ordinal    = 0
+class(svcomp.minepump.MinePumpSystem.Environment$WaterLevelEnum).normal.ordinal = 1
+class(svcomp.minepump.MinePumpSystem.Environment$WaterLevelEnum).high.ordinal   = 2
+
+[object java.lang.Enum]
+local_0.ordinal = 0
+local_0.ordinal = 1
+local_0.ordinal = 2
+
+[method java.lang.Enum.<init>]
+local_2 = 0
+local_2 = 1
+local_2 = 2
+
+[method java.lang.Enum.ordinal]
+return = local_0.ordinal
+
+[object svcomp.minepump.MinePumpSystem.Environment$WaterLevelEnum]
+this.ordinal = 0
+this.ordinal = 1
+this.ordinal = 2
+
+[method svcomp.minepump.MinePumpSystem.Environment$WaterLevelEnum.<init>]
+local_2 = 0
+local_2 = 1
+local_2 = 2
+
+[object svcomp.minepump.MinePumpSystem.Environment]
+this.waterLevel.ordinal = 0
+this.waterLevel.ordinal = 1
+this.waterLevel.ordinal = 2
+this.methaneLevelCritical = 0
+
+[object svcomp.minepump.MinePumpSystem.MinePump]
+this.env.waterLevel.ordinal = 0
+this.env.waterLevel.ordinal = 1
+this.env.waterLevel.ordinal = 2
+this.env.methaneLevelCritical = 0
+
+this.pumpRunning = 0
+
+[method svcomp.minepump.MinePumpSystem.MinePump.<init>]
+env.waterLevel.ordinal = 0
+env.waterLevel.ordinal = 1
+env.waterLevel.ordinal = 2
+env.methaneLevelCritical = 0
+
+[object svcomp.minepump.Actions]
+this.env.waterLevel.ordinal = 0
+this.env.waterLevel.ordinal = 1
+this.env.waterLevel.ordinal = 2
+this.env.methaneLevelCritical = 0
+
+this.p.pumpRunning = 0
+this.env = this.p.env
+
+[method svcomp.minepump.Main.randomSequenceOfActions]
+a.env.waterLevel.ordinal = 0
+a.env.waterLevel.ordinal = 1
+a.env.waterLevel.ordinal = 2
+a.env.methaneLevelCritical = 0
+
+a.p.pumpRunning = 0
