@@ -86,7 +86,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 				for (Predicate predicate : predicates) {
 					// IF NOT A TAUTOLOGY OR CONTRADICTION
 					if (initialValuation.get(predicate) == TruthValue.UNKNOWN) {
-						initialValuation.put(predicate, TruthValue.UNDEFINED);
+						initialValuation.put(predicate, TruthValue.UNKNOWN);
 					} else {
 						initialValuation.put(predicate, initialValuation.get(predicate));
 					}
@@ -100,7 +100,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 		
 		if (initialValuation.isEmpty()) {
 			for (Predicate predicate : predicates) {
-				initialValuation.put(predicate, TruthValue.UNDEFINED);
+				initialValuation.put(predicate, TruthValue.UNKNOWN);
 			}
 		}
 	}
@@ -133,7 +133,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             } else if (context instanceof ObjectContext) {
                 ObjectContext objectContext = (ObjectContext) context;
             
-                if (method.isStatic()) {
+                if (method.isStatic() || method.isClinit()) {
                     continue;
                 }
             
