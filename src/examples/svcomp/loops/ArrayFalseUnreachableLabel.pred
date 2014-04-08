@@ -1,0 +1,8 @@
+[method svcomp.loops.ArrayFalseUnreachableLabel.main]
+SIZE = 1
+alength(arrlen, array) = SIZE
+j = 0
+j >= 0
+j < SIZE
+array[j] >= menor
+array[0] >= menor

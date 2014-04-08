@@ -1,0 +1,164 @@
+[static]
+class(svcomp.loops.Eureka01FalseUnreachableLabel).INFINITY >= 0
+
+[method svcomp.loops.Eureka01FalseUnreachableLabel.main]
+nodecount >= 0
+nodecount <= 5
+edgecount >= 0
+edgecount <= 20
+
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i >= 0
+i < edgecount
+
+j >= 0
+j < edgecount
+
+alength(arrlen, Source) >= edgecount
+alength(arrlen, Dest) >= edgecount
+alength(arrlen, Weight) >= edgecount
+alength(arrlen, distance) >= nodecount
+
+x >= 0
+x < nodecount
+
+y >= 0
+y < nodecount
+
+Source[0] >= 0
+Source[1] >= 0
+Source[2] >= 0
+Source[3] >= 0
+Source[4] >= 0
+Source[5] >= 0
+Source[6] >= 0
+Source[7] >= 0
+Source[8] >= 0
+Source[9] >= 0
+Source[10] >= 0
+Source[11] >= 0
+Source[12] >= 0
+Source[13] >= 0
+Source[14] >= 0
+Source[15] >= 0
+Source[16] >= 0
+Source[17] >= 0
+Source[18] >= 0
+Source[19] >= 0
+
+Dest[0] >= 0
+Dest[1] >= 0
+Dest[2] >= 0
+Dest[3] >= 0
+Dest[4] >= 0
+Dest[5] >= 0
+Dest[6] >= 0
+Dest[7] >= 0
+Dest[8] >= 0
+Dest[9] >= 0
+Dest[10] >= 0
+Dest[11] >= 0
+Dest[12] >= 0
+Dest[13] >= 0
+Dest[14] >= 0
+Dest[15] >= 0
+Dest[16] >= 0
+Dest[17] >= 0
+Dest[18] >= 0
+Dest[19] >= 0
+
+Weight[0] >= 0
+Weight[1] >= 0
+Weight[2] >= 0
+Weight[3] >= 0
+Weight[4] >= 0
+Weight[5] >= 0
+Weight[6] >= 0
+Weight[7] >= 0
+Weight[8] >= 0
+Weight[9] >= 0
+Weight[10] >= 0
+Weight[11] >= 0
+Weight[12] >= 0
+Weight[13] >= 0
+Weight[14] >= 0
+Weight[15] >= 0
+Weight[16] >= 0
+Weight[17] >= 0
+Weight[18] >= 0
+Weight[19] >= 0
+
+Source[0] < nodecount
+Source[1] < nodecount
+Source[2] < nodecount
+Source[3] < nodecount
+Source[4] < nodecount
+Source[5] < nodecount
+Source[6] < nodecount
+Source[7] < nodecount
+Source[8] < nodecount
+Source[9] < nodecount
+Source[10] < nodecount
+Source[11] < nodecount
+Source[12] < nodecount
+Source[13] < nodecount
+Source[14] < nodecount
+Source[15] < nodecount
+Source[16] < nodecount
+Source[17] < nodecount
+Source[18] < nodecount
+Source[19] < nodecount
+
+Dest[0] < nodecount
+Dest[1] < nodecount
+Dest[2] < nodecount
+Dest[3] < nodecount
+Dest[4] < nodecount
+Dest[5] < nodecount
+Dest[6] < nodecount
+Dest[7] < nodecount
+Dest[8] < nodecount
+Dest[9] < nodecount
+Dest[10] < nodecount
+Dest[11] < nodecount
+Dest[12] < nodecount
+Dest[13] < nodecount
+Dest[14] < nodecount
+Dest[15] < nodecount
+Dest[16] < nodecount
+Dest[17] < nodecount
+Dest[18] < nodecount
+Dest[19] < nodecount
+
+distance[0] >= 0
+distance[1] >= 0
+distance[2] >= 0
+distance[3] >= 0
+distance[4] >= 0
+
+k = 0
+k = 1
+k = 2
+k = 3
+k = 4
+k = 5
+k = 6
+k = 7
+k = 8
+k = 9
+k = 10
+k = 11
+k = 12
+k = 13
+k = 14
+k = 15
+k = 16
+k = 17
+k = 18
+k = 19
+k = 20
