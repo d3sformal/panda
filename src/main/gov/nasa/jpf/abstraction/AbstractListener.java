@@ -33,7 +33,7 @@ import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
 
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 
-import gov.nasa.jpf.abstraction.AliasingDumper;
+import gov.nasa.jpf.abstraction.inspection.AliasingDumper;
 
 import gov.nasa.jpf.abstraction.assertions.AssertConjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertDisjunctionHandler;

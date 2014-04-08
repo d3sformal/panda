@@ -123,9 +123,6 @@ class Lift extends Thread {
     private void doMoving() {
         currentFloor += (travelDir == UP) ? 1 : -1;
 
-        gov.nasa.jpf.abstraction.predicate.Debug.dumpAliasing("this");
-        gov.nasa.jpf.abstraction.predicate.Debug.dumpAliasing("this.travelDir");
-
         int oldDir = travelDir;
 
         if (travelDir == UP && currentFloor == lastFloor) travelDir = DOWN;

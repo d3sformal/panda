@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction;
+package gov.nasa.jpf.abstraction.inspection;
 
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -9,6 +9,7 @@ import gov.nasa.jpf.vm.ElementInfo;
 import java.util.Set;
 import java.util.HashSet;
 
+import gov.nasa.jpf.abstraction.ExecuteInstructionHandler;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.common.Notation;

@@ -24,6 +24,7 @@ public class InsertionSortTrueUnreachableLabel {
     }
 
     private static int unknown() {
-        return 0;
+        // Array length cannot be zero (if we plan to write to the array)
+        return 3;
     }
 }

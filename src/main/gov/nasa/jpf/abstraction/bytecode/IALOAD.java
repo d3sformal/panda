@@ -76,9 +76,11 @@ public class IALOAD extends gov.nasa.jpf.jvm.bytecode.IALOAD {
 
     @Override
     public void push (StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsExecutiveException {
+        // Upper bound on the index (= array length)
         Expression upperBound;
 
-        // Bultin static (constant-length) arrays
+        // Builtin static (constant-length) arrays
+        // such as SWITCHMAP for enum types
         if (array instanceof ObjectFieldRead && ((ObjectFieldRead) array).getField().getName().startsWith("$SwitchMap")) {
             upperBound = Constant.create(ei.arrayLength());
         } else {
