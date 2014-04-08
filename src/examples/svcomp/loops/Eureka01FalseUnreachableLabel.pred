@@ -22,13 +22,13 @@ j < edgecount
 alength(arrlen, Source) >= edgecount
 alength(arrlen, Dest) >= edgecount
 alength(arrlen, Weight) >= edgecount
-alength(arrlen, distance) >= nodecount
+alength(arrlen, distance) = 5
 
 x >= 0
-x < nodecount
+x < 5
 
 y >= 0
-y < nodecount
+y < 5
 
 Source[0] >= 0
 Source[1] >= 0
@@ -93,72 +93,50 @@ Weight[17] >= 0
 Weight[18] >= 0
 Weight[19] >= 0
 
-Source[0] < nodecount
-Source[1] < nodecount
-Source[2] < nodecount
-Source[3] < nodecount
-Source[4] < nodecount
-Source[5] < nodecount
-Source[6] < nodecount
-Source[7] < nodecount
-Source[8] < nodecount
-Source[9] < nodecount
-Source[10] < nodecount
-Source[11] < nodecount
-Source[12] < nodecount
-Source[13] < nodecount
-Source[14] < nodecount
-Source[15] < nodecount
-Source[16] < nodecount
-Source[17] < nodecount
-Source[18] < nodecount
-Source[19] < nodecount
+Source[0] < 5
+Source[1] < 5
+Source[2] < 5
+Source[3] < 5
+Source[4] < 5
+Source[5] < 5
+Source[6] < 5
+Source[7] < 5
+Source[8] < 5
+Source[9] < 5
+Source[10] < 5
+Source[11] < 5
+Source[12] < 5
+Source[13] < 5
+Source[14] < 5
+Source[15] < 5
+Source[16] < 5
+Source[17] < 5
+Source[18] < 5
+Source[19] < 5
 
-Dest[0] < nodecount
-Dest[1] < nodecount
-Dest[2] < nodecount
-Dest[3] < nodecount
-Dest[4] < nodecount
-Dest[5] < nodecount
-Dest[6] < nodecount
-Dest[7] < nodecount
-Dest[8] < nodecount
-Dest[9] < nodecount
-Dest[10] < nodecount
-Dest[11] < nodecount
-Dest[12] < nodecount
-Dest[13] < nodecount
-Dest[14] < nodecount
-Dest[15] < nodecount
-Dest[16] < nodecount
-Dest[17] < nodecount
-Dest[18] < nodecount
-Dest[19] < nodecount
+Dest[0] < 5
+Dest[1] < 5
+Dest[2] < 5
+Dest[3] < 5
+Dest[4] < 5
+Dest[5] < 5
+Dest[6] < 5
+Dest[7] < 5
+Dest[8] < 5
+Dest[9] < 5
+Dest[10] < 5
+Dest[11] < 5
+Dest[12] < 5
+Dest[13] < 5
+Dest[14] < 5
+Dest[15] < 5
+Dest[16] < 5
+Dest[17] < 5
+Dest[18] < 5
+Dest[19] < 5
 
 distance[0] >= 0
 distance[1] >= 0
 distance[2] >= 0
 distance[3] >= 0
 distance[4] >= 0
-
-k = 0
-k = 1
-k = 2
-k = 3
-k = 4
-k = 5
-k = 6
-k = 7
-k = 8
-k = 9
-k = 10
-k = 11
-k = 12
-k = 13
-k = 14
-k = 15
-k = 16
-k = 17
-k = 18
-k = 19
-k = 20

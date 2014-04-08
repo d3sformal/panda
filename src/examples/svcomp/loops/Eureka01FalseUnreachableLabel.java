@@ -16,11 +16,6 @@ public class Eureka01FalseUnreachableLabel {
         int[] Weight = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
         int[] distance = new int[5];
 
-        // Assume edges have their ends in range
-        for (int k = 0; k < edgecount; ++k) {
-            if (Source[k] >= nodecount || Dest[k] >= nodecount) return;
-        }
-
         for (int i = 0; i < nodecount; i++) {
             if (i == source) {
                 distance[i] = 0;
