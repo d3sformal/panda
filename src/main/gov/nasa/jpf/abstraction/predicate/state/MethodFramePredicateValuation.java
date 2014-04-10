@@ -40,7 +40,7 @@ import java.util.Collections;
  * A predicate valuation for a single scope
  */
 public class MethodFramePredicateValuation implements PredicateValuation, Scope {
-	private HashMap<Predicate, TruthValue> valuations = new HashMap<Predicate, TruthValue>();
+    private PredicateValuationMap valuations = new PredicateValuationMap();
     private HashMap<Predicate, Set<Predicate>> sharedSymbolCache = new HashMap<Predicate, Set<Predicate>>();
     private SMT smt;
 
@@ -103,112 +103,111 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         }
     }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public MethodFramePredicateValuation clone() {
-		MethodFramePredicateValuation clone = new MethodFramePredicateValuation(smt);
-		
-		clone.valuations = (HashMap<Predicate, TruthValue>)valuations.clone();
+    @Override
+    public MethodFramePredicateValuation clone() {
+        MethodFramePredicateValuation clone = new MethodFramePredicateValuation(smt);
+
+        clone.valuations = valuations.clone();
 
         /**
          * No need to memorize
          */
-		clone.sharedSymbolCache = new HashMap<Predicate, Set<Predicate>>();
-		
-		return clone;
-	}
-	
+        clone.sharedSymbolCache = new HashMap<Predicate, Set<Predicate>>();
+
+        return clone;
+    }
+
     /**
      * @param universe Universe of all predicates that may or may not determine the value of this predicate
      * @return A selection of those predicates from the universe that may directly determine the value of this predicate
      */
     private static void selectPredicatesSharingSymbols(Predicate predicate, Set<Predicate> universe, Set<Predicate> outPredicates) {
         Set<AccessExpression> paths = new HashSet<AccessExpression>();
-		Set<AccessExpression> candidatePaths = new HashSet<AccessExpression>();
+        Set<AccessExpression> candidatePaths = new HashSet<AccessExpression>();
         Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
 
         predicate.addAccessExpressionsToSet(paths);
-    	
+
         // filter all determinants from all the candidates
-    	for (Predicate candidate : universe) {
+        for (Predicate candidate : universe) {
             boolean alreadyAdded = false;
 
             candidate.addAccessExpressionsToSet(candidatePaths);
 
-	        for (AccessExpression path : paths) {
+            for (AccessExpression path : paths) {
                 // check shared access expressions between the candidate and the input predicate
                 // stop at first match
-			    for (AccessExpression candidatePath : candidatePaths) {
+                for (AccessExpression candidatePath : candidatePaths) {
                     candidatePath.addAllPrefixesToSet(prefixes);
 
-				    for (AccessExpression candidateSubPath : prefixes) {
-					    if (candidateSubPath.isSimilarToPrefixOf(path)) {
-						    outPredicates.add(candidate);
+                    for (AccessExpression candidateSubPath : prefixes) {
+                        if (candidateSubPath.isSimilarToPrefixOf(path)) {
+                            outPredicates.add(candidate);
 
                             alreadyAdded = true;
                             break;
-					    }
-				    }
+                        }
+                    }
 
                     prefixes.clear();
 
                     if (alreadyAdded) {
                         break;
                     }
-			    }
+                }
 
                 if (alreadyAdded) {
                     break;
                 }
-		    }
+            }
 
             candidatePaths.clear();
-	    }
+        }
     }
-    
+
     /**
      * Finds a transitive closure of all predicates that may infer the value of this one.
-     * 
+     *
      * @param universe Universe of all predicates that may or may not determine the value of this predicate
      * @return A selection of those predicates from the universe that may determine the value of this predicate
      */
-	private Set<Predicate> computeDeterminantClosure(Predicate predicate, Set<Predicate> universe) {
+    private Set<Predicate> computeDeterminantClosure(Predicate predicate, Set<Predicate> universe) {
         return computeSharedSymbolsClosure(predicate, universe);
     }
 
-	private Set<Predicate> computeAffectedClosure(Predicate predicate, Set<Predicate> universe) {
+    private Set<Predicate> computeAffectedClosure(Predicate predicate, Set<Predicate> universe) {
         return computeSharedSymbolsClosure(predicate, universe);
     }
 
-	private Set<Predicate> computeSharedSymbolsClosure(Predicate predicate, Set<Predicate> universe) {
+    private Set<Predicate> computeSharedSymbolsClosure(Predicate predicate, Set<Predicate> universe) {
         if (!sharedSymbolCache.containsKey(predicate)) {
-    		Set<Predicate> cur;
-	    	Set<Predicate> ret = new HashSet<Predicate>();
-            
+            Set<Predicate> cur;
+            Set<Predicate> ret = new HashSet<Predicate>();
+
             selectPredicatesSharingSymbols(predicate, universe, ret);
-		
-    		int prevSize = 0;
-		
-	    	while (prevSize != ret.size()) {
-		    	prevSize = ret.size();
 
-			    cur = new HashSet<Predicate>();
+            int prevSize = 0;
 
-    			for (Predicate p : ret) {
-	    			selectPredicatesSharingSymbols(p, universe, cur);
-		    	}
-			
+            while (prevSize != ret.size()) {
+                prevSize = ret.size();
+
+                cur = new HashSet<Predicate>();
+
+                for (Predicate p : ret) {
+                    selectPredicatesSharingSymbols(p, universe, cur);
+                }
+
                 // each `p` in `ret` is contained in `selectDet(p)` and therefore also in `cur`
                 // thus the following statement avoids unnecessary merge of the sets
-		    	ret = cur;
-    		}
+                ret = cur;
+            }
 
             sharedSymbolCache.put(predicate, ret);
         }
 
-		return sharedSymbolCache.get(predicate);
-	}
-	
+        return sharedSymbolCache.get(predicate);
+    }
+
     @Override
     public void checkConsistency(Predicate assumption, TruthValue value) {
         Set<Predicate> affected = computeAffectedClosure(assumption, valuations.keySet());
@@ -234,7 +233,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         List<Predicate> formulas = new ArrayList<Predicate>(affected.size());
 
         for (Predicate predicate : affected) {
-            switch (valuations.get(predicate)) {
+            switch (get(predicate)) {
                 case TRUE:
                     predicates.add(predicate);
                     formulas.add(Conjunction.create(formula, predicate));
@@ -250,13 +249,13 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         }
 
         satisfiable = smt.isSatisfiable(formulas);
-    
+
         for (int i = 0; i < predicates.size(); ++i) {
             if (!satisfiable[i]) {
                 inconsistent.add(predicates.get(i));
             }
         }
-        
+
         for (Predicate predicate : inconsistent) {
             System.out.println("Warning: forced value of `" + assumption + "` is inconsistent with `" + predicate + "`");
         }
@@ -266,19 +265,19 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         }
     }
 
-	/**
-	 * Force (create/overwrite) valuation of the given predicate to the given value
+    /**
+     * Force (create/overwrite) valuation of the given predicate to the given value
      *
      * precondition: the value must be consistent (it can only improve precision)
-	 */
+     */
     @Override
-	public void force(Predicate predicate, TruthValue value) {
-		Config config = VM.getVM().getJPF().getConfig();
-		String key = "abstract.branch.reevaluate_predicates";
+    public void force(Predicate predicate, TruthValue value) {
+        Config config = VM.getVM().getJPF().getConfig();
+        String key = "abstract.branch.reevaluate_predicates";
 
         put(predicate, value);
 
-		if (config.containsKey(key) && config.getBoolean(key)) {
+        if (config.containsKey(key) && config.getBoolean(key)) {
             Set<Predicate> affected = computeAffectedClosure(predicate, valuations.keySet());
 
             Map<Predicate, PredicateValueDeterminingInfo> predicateDeterminingInfos = new HashMap<Predicate, PredicateValueDeterminingInfo>();
@@ -290,7 +289,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             for (Predicate affectedPredicate : affected) {
 
                 // Improve precision of only imprecise predicates
-                if (valuations.get(affectedPredicate) != TruthValue.UNKNOWN) continue;
+                if (get(affectedPredicate) != TruthValue.UNKNOWN) continue;
 
                 Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 
@@ -301,86 +300,50 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                     // When affectedPredicate = determinantCandidate: we know that
                     // a) the value is either UNKNOWN (the determinant will be left out in the end)
                     // b) the value is consistent with the forced predicate's value, therefore we can use it
-                    determinants.put(determinantCandidate, valuations.get(determinantCandidate));
+                    determinants.put(determinantCandidate, get(determinantCandidate));
                 }
                 // Symmetric for negativeWeakestPrecondition ... no need to do it twice now (the symbols should be the same)
 
                 predicateDeterminingInfos.put(affectedPredicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
             }
 
-            valuations.putAll(smt.valuatePredicates(predicateDeterminingInfos));
-		}
-	}
-
-    private boolean rePut(Predicate predicate, TruthValue value) {
-        // Try looking for negation once (to avoid looping)
-        return rePutEquivalent(Negation.create(predicate), TruthValue.neg(value));
-    }
-
-    private boolean rePutEquivalent(Predicate predicate, TruthValue value) {
-        if (valuations.containsKey(predicate)) {
-            valuations.put(predicate, value);
-
-            return true;
-        } else if (predicate instanceof Negation) {
-            Negation n = (Negation) predicate;
-            Predicate p = n.predicate;
-            TruthValue pValue = TruthValue.neg(value);
-
-            if (rePutEquivalent(p, pValue)) {
-                return true;
-            }
-        } else if (predicate instanceof Equals) {
-            Equals e = (Equals) predicate;
-            Predicate eSym = Equals.create(e.b, e.a);
-
-            if (valuations.containsKey(eSym)) {
-                valuations.put(eSym, value);
-
-                return true;
-            }
+            putAll(smt.valuatePredicates(predicateDeterminingInfos));
         }
-
-        return false;
     }
 
     @Override
     public void put(Predicate predicate, TruthValue value) {
         // Change of the set of predicates -> need to recompute determinant sets
-        if (!valuations.containsKey(predicate)) {
+        if (!containsKey(predicate)) {
             sharedSymbolCache.clear();
         }
 
-        // To avoid creation of equivalent predicates that are only negation of predicates already present in the abstraction (or other symmetries)
-        if (!rePut(predicate, value)) {
-            // Putting a completely new (syntactically in-equivalent -- not even symmetric) mapping
-            valuations.put(predicate, value);
+        valuations.put(predicate, value);
+    }
+
+    /**
+     * Same as the above (for more predicates at once)
+     */
+    @Override
+    public void putAll(Map<Predicate, TruthValue> values) {
+        for (Predicate predicate : values.keySet()) {
+            put(predicate, values.get(predicate));
         }
     }
-	
-	/**
-	 * Same as the above (for more predicates at once)
-	 */
-	@Override
-	public void putAll(Map<Predicate, TruthValue> values) {
-		for (Predicate predicate : values.keySet()) {
-			put(predicate, values.get(predicate));
-		}
-	}
-	
-	@Override
-	public void remove(Predicate predicate) {
-		valuations.remove(predicate);
-	}
 
-	@Override
-	public TruthValue get(Predicate predicate) {
-		return valuations.get(predicate);
-	}
+    @Override
+    public void remove(Predicate predicate) {
+        valuations.remove(predicate);
+    }
 
-	@Override
-	public String toString() {	
-		StringBuilder ret = new StringBuilder();
+    @Override
+    public TruthValue get(Predicate predicate) {
+        return valuations.get(predicate);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder ret = new StringBuilder();
 
         Set<Predicate> sorted = new TreeSet<Predicate>(new Comparator<Predicate>() {
             @Override
@@ -390,101 +353,101 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         });
 
         sorted.addAll(valuations.keySet());
-		
-		for (Predicate p : sorted) {
-			String predicate = p.toString(Notation.DOT_NOTATION);
-			
-			ret.append(predicate);
-		    ret.append(" : ");
-			ret.append(valuations.get(p));
-			ret.append("\n");
-		}
-		
-		return ret.toString();
-	}
 
-	@Override
-	public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
-		Map<Predicate, PredicateValueDeterminingInfo> predicates = new HashMap<Predicate, PredicateValueDeterminingInfo>();
+        for (Predicate p : sorted) {
+            String predicate = p.toString(Notation.DOT_NOTATION);
+
+            ret.append(predicate);
+            ret.append(" : ");
+            ret.append(get(p));
+            ret.append("\n");
+        }
+
+        return ret.toString();
+    }
+
+    @Override
+    public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
+        Map<Predicate, PredicateValueDeterminingInfo> predicates = new HashMap<Predicate, PredicateValueDeterminingInfo>();
 
         Set<AccessExpression> paths = new HashSet<AccessExpression>();
 
-		for (Predicate predicate : valuations.keySet()) {
-			boolean affects = false;
+        for (Predicate predicate : valuations.keySet()) {
+            boolean affects = false;
 
-			/**
-			 * Affected may contain completely different paths:
-			 * 
-			 * assume a == b.c == d.e.f[ ? ]
-			 * then
-			 * 
-			 * a.x := 3
-			 * 
-			 * causes
-			 * 
-			 * a.x, b.c.x, d.e.f[ ? ].x
-			 * 
-			 * be affected paths, hence
-			 * 
-			 * a.x = 3
-			 * b.c.x + 2 = g + h
-			 * d.e.f[0].x / 3 = 4
-			 * d.e.f[1].x / 3 = 4
-			 * d.e.f[k + l * m].x / 3 = 4
-			 * 
-			 * are affected predicates
-			 */
+            /**
+             * Affected may contain completely different paths:
+             *
+             * assume a == b.c == d.e.f[ ? ]
+             * then
+             *
+             * a.x := 3
+             *
+             * causes
+             *
+             * a.x, b.c.x, d.e.f[ ? ].x
+             *
+             * be affected paths, hence
+             *
+             * a.x = 3
+             * b.c.x + 2 = g + h
+             * d.e.f[0].x / 3 = 4
+             * d.e.f[1].x / 3 = 4
+             * d.e.f[k + l * m].x / 3 = 4
+             *
+             * are affected predicates
+             */
 
             predicate.addAccessExpressionsToSet(paths);
 
             // Do not cycle through the collection if the other is empty
             if (!paths.isEmpty()) {
-    			for (AccessExpression path1 : resolvedAffected) {
-	    			for (AccessExpression path2 : paths) {
-		    			affects = affects || path1.isSimilarToPrefixOf(path2);
-			    	}
-			    }
+                for (AccessExpression path1 : resolvedAffected) {
+                    for (AccessExpression path2 : paths) {
+                        affects = affects || path1.isSimilarToPrefixOf(path2);
+                    }
+                }
             }
 
-			paths.clear();
+            paths.clear();
 
-			/**
-			 * If the predicate may be affected, compute preconditions and determinants and schedule the predicate for reevaluation
-			 */
-			if (affects) {
-				Predicate positiveWeakestPrecondition = predicate;
-				Predicate negativeWeakestPrecondition = Negation.create(predicate);
-					
-				if (expression != null) {
-					positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
-					negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
-				}
-				
-				Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
-				
-				for (Predicate determinant : computeDeterminantClosure(positiveWeakestPrecondition, valuations.keySet())) {
-					determinants.put(determinant, valuations.get(determinant));
-				}
-				for (Predicate determinant : computeDeterminantClosure(negativeWeakestPrecondition, valuations.keySet())) {
-					determinants.put(determinant, valuations.get(determinant));
-				}
-				
-				predicates.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
-			}
-		}
-		
-		/**
-		 * Save a void call to SMT
-		 */
-		if (predicates.isEmpty()) return;
-		
-		/**
-		 * Collective reevaluation
-		 */
-		Map<Predicate, TruthValue> newValuations = smt.valuatePredicates(predicates);
-			
-		valuations.putAll(newValuations);
-	}
+            /**
+             * If the predicate may be affected, compute preconditions and determinants and schedule the predicate for reevaluation
+             */
+            if (affects) {
+                Predicate positiveWeakestPrecondition = predicate;
+                Predicate negativeWeakestPrecondition = Negation.create(predicate);
+
+                if (expression != null) {
+                    positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
+                    negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
+                }
+
+                Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+
+                for (Predicate determinant : computeDeterminantClosure(positiveWeakestPrecondition, valuations.keySet())) {
+                    determinants.put(determinant, get(determinant));
+                }
+                for (Predicate determinant : computeDeterminantClosure(negativeWeakestPrecondition, valuations.keySet())) {
+                    determinants.put(determinant, get(determinant));
+                }
+
+                predicates.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
+            }
+        }
+
+        /**
+         * Save a void call to SMT
+         */
+        if (predicates.isEmpty()) return;
+
+        /**
+         * Collective reevaluation
+         */
+        Map<Predicate, TruthValue> newValuations = smt.valuatePredicates(predicates);
+
+        putAll(newValuations);
+    }
 
     @Override
     public void dropAllPredicatesSharingSymbolsWith(AccessExpression expr) {
@@ -504,7 +467,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         }
 
         for (Predicate p : toBeRemoved) {
-            valuations.remove(p);
+            remove(p);
         }
 
         // Change of the set of predicates -> need to recompute determinant sets
@@ -552,10 +515,10 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                 Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 
                 for (Predicate determinant : computeDeterminantClosure(positiveWeakestPrecondition, valuations.keySet())) {
-                    determinants.put(determinant, valuations.get(determinant));
+                    determinants.put(determinant, get(determinant));
                 }
                 for (Predicate determinant : computeDeterminantClosure(negativeWeakestPrecondition, valuations.keySet())) {
-                    determinants.put(determinant, valuations.get(determinant));
+                    determinants.put(determinant, get(determinant));
                 }
 
                 input.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
@@ -570,26 +533,26 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
         return ret;
     }
-	
-	@Override
-	public int count() {
-		return valuations.keySet().size();
-	}
 
-	@Override
-	public boolean containsKey(Predicate predicate) {
-		return valuations.containsKey(predicate);
-	}
+    @Override
+    public int count() {
+        return valuations.keySet().size();
+    }
 
-	@Override
-	public Set<Predicate> getPredicates() {
-		return valuations.keySet();
-	}
+    @Override
+    public boolean containsKey(Predicate predicate) {
+        return valuations.containsKey(predicate);
+    }
+
+    @Override
+    public Set<Predicate> getPredicates() {
+        return valuations.keySet();
+    }
 
     @Override
     public Integer evaluateExpression(Expression expression) {
         List<Pair<Predicate, TruthValue>> determinants = new LinkedList<Pair<Predicate, TruthValue>>();
-                
+
         // An auxiliary predicate used to get all determining predicates
         // Determinants are defined only for predicates, not expressions
         Predicate determinantSelector = Equals.create(expression, Constant.create(0));
@@ -616,5 +579,5 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
         return null;
     }
-	
+
 }

@@ -56,7 +56,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 	private Map<Integer, PredicateValuationStack> scopes = new HashMap<Integer, PredicateValuationStack>();
     
 	private Predicates predicateSet;
-	private Map<Predicate, TruthValue> initialValuation;
+	private PredicateValuationMap initialValuation = new PredicateValuationMap();
     private SMT smt = new SMT();
     private Integer currentThreadID;
 	
@@ -70,8 +70,6 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
 			predicates.addAll(context.predicates);
 		}
-		
-		initialValuation = new HashMap<Predicate, TruthValue>();
 
 		/**
 		 * Detect initial valuations of Tautologies and Contradictions
@@ -81,7 +79,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 		 */
 		if (!predicates.isEmpty()) {
 			try {
-				initialValuation = smt.valuatePredicates(predicates);
+				initialValuation.putAll(smt.valuatePredicates(predicates));
 			
 				for (Predicate predicate : predicates) {
 					// IF NOT A TAUTOLOGY OR CONTRADICTION
