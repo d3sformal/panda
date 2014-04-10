@@ -84,6 +84,18 @@ public enum TruthValue implements BranchingConditionInfo {
 		return create(a.ordinal() | b.ordinal());
 	}
 
+    /**
+     * Switches TRUE for FALSE
+     *
+     * 00 becomes 00
+     * 01 becomes 10
+     * 10 becomes 01
+     * 11 becomes 11
+     */
+    public static TruthValue neg(TruthValue a) {
+        return create(((a.ordinal() & 1) << 1) | ((a.ordinal() & 2) >> 1));
+    }
+
     @Override
     public BranchingConditionInfo combine(BranchingConditionInfo info) {
         if (info == BranchingConditionInfo.NONE) {

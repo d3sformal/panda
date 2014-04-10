@@ -312,14 +312,50 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 		}
 	}
 
+    private boolean rePut(Predicate predicate, TruthValue value) {
+        // Try looking for negation once (to avoid looping)
+        return rePutEquivalent(Negation.create(predicate), TruthValue.neg(value));
+    }
+
+    private boolean rePutEquivalent(Predicate predicate, TruthValue value) {
+        if (valuations.containsKey(predicate)) {
+            valuations.put(predicate, value);
+
+            return true;
+        } else if (predicate instanceof Negation) {
+            Negation n = (Negation) predicate;
+            Predicate p = n.predicate;
+            TruthValue pValue = TruthValue.neg(value);
+
+            if (rePutEquivalent(p, pValue)) {
+                return true;
+            }
+        } else if (predicate instanceof Equals) {
+            Equals e = (Equals) predicate;
+            Predicate eSym = Equals.create(e.b, e.a);
+
+            if (valuations.containsKey(eSym)) {
+                valuations.put(eSym, value);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public void put(Predicate predicate, TruthValue value) {
         // Change of the set of predicates -> need to recompute determinant sets
         if (!valuations.containsKey(predicate)) {
             sharedSymbolCache.clear();
         }
-		
-        valuations.put(predicate, value);
+
+        // To avoid creation of equivalent predicates that are only negation of predicates already present in the abstraction (or other symmetries)
+        if (!rePut(predicate, value)) {
+            // Putting a completely new (syntactically in-equivalent -- not even symmetric) mapping
+            valuations.put(predicate, value);
+        }
     }
 	
 	/**
