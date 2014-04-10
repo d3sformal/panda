@@ -10,7 +10,7 @@ public class BigLoopsTest extends StateMatchingTest {
 
         while (i < 100) {
             assertVisitedAtMostWithValuation(0, "pos < 0: true");
-            assertVisitedAtMostWithValuation(2, "pos = 0: true"); // The state is the same after executing for the second time (but no state matching yet)
+            assertVisitedAtMostWithValuation(1, "pos = 0: true");
             assertVisitedAtMostWithValuation(1, "pos = 1: true");
             assertVisitedAtMostWithValuation(1, "pos = 2: true");
             assertVisitedAtMostWithValuation(1, "pos = 3: true");
@@ -22,8 +22,8 @@ public class BigLoopsTest extends StateMatchingTest {
             assertVisitedAtMostWithValuation(1, "pos = 9: true");
             assertVisitedAtMostWithValuation(0, "pos > 9: true");
 
-            assertVisitedAtMost(11);
-            assertRevisitedAtLeast(10);
+            assertVisitedAtMost(10);
+            assertRevisitedAtLeast(9);
 
             data[pos] = i;
             pos++;
@@ -33,10 +33,10 @@ public class BigLoopsTest extends StateMatchingTest {
             i++;
         }
 
-        // The previous loop is re-entered 11 times
-        // There is 11 possibilities when to break the looping
-        assertVisitedAtMost(11);
-        assertRevisitedAtLeastWithValuation(10, "i >= 100: true");
+        // The previous loop condition is examined 10 times
+        // There is 10 possibilities when to break the looping
+        assertVisitedAtMost(10);
+        assertRevisitedAtLeastWithValuation(9, "i >= 100: true");
 
         int total = 0;
 
