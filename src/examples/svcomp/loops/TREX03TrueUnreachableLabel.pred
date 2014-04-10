@@ -1,0 +1,15 @@
+[method svcomp.loops.TREX03TrueUnreachableLabel.main]
+x1 > 0
+x2 > 0
+x3 > 0
+
+x1 >= 0
+x2 >= 0
+x3 >= 0
+
+d1 = 1
+d2 = 1
+d3 = 1
+
+c1 = 1
+c2 = 1

@@ -6,6 +6,8 @@ public class TREX03TrueUnreachableLabel {
         int x2 = unknownInt();
         int x3 = unknownInt();
 
+        if (x1 < 0 || x2 < 0 || x3 < 0) return;
+
         int d1 = 1;
         int d2 = 1;
         int d3 = 1;
