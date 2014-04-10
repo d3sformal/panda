@@ -1,0 +1,119 @@
+[static]
+class(svcomp.loops.VogalTrueUnreachableLabel).MAX = 5
+
+[method svcomp.loops.VogalTrueUnreachableLabel.main]
+alength(arrlen, inputString) = 5
+alength(arrlen, vogalArray) = 11
+
+inputString[class(svcomp.loops.VogalTrueUnreachableLabel).MAX - 1] = 0
+
+nCaracter >= 0
+nCaracter < class(svcomp.loops.VogalTrueUnreachableLabel).MAX
+
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+
+j = 0
+j = 1
+j = 2
+j = 3
+
+// No uniqueness of vogalArray element
+// Therefore for each letter in inputString there can be (vogalArray.length - 1)-times an increment of cont
+cont = 0
+cont = 1
+cont = 2
+cont = 3
+cont = 4
+cont = 5
+cont = 6
+cont = 7
+cont = 8
+cont = 9
+cont = 10
+cont = 11
+cont = 12
+cont = 13
+cont = 14
+cont = 15
+// ...
+
+contAux = 0
+contAux = 1
+contAux = 2
+contAux = 3
+contAux = 4
+contAux = 5
+contAux = 6
+contAux = 7
+contAux = 8
+contAux = 9
+contAux = 10
+contAux = 11
+contAux = 12
+contAux = 13
+contAux = 14
+contAux = 15
+// ...
+
+// The general form
+inputString[i] = vogalArray[j]
+
+inputString[0] = vogalArray[0]
+inputString[0] = vogalArray[1]
+inputString[0] = vogalArray[2]
+inputString[0] = vogalArray[3]
+// inputString[0] = vogalArray[4]
+// inputString[0] = vogalArray[6]
+// inputString[0] = vogalArray[7]
+// inputString[0] = vogalArray[8]
+// inputString[0] = vogalArray[9]
+// inputString[0] = vogalArray[10]
+
+inputString[1] = vogalArray[0]
+inputString[1] = vogalArray[1]
+inputString[1] = vogalArray[2]
+inputString[1] = vogalArray[3]
+// inputString[1] = vogalArray[4]
+// inputString[1] = vogalArray[6]
+// inputString[1] = vogalArray[7]
+// inputString[1] = vogalArray[8]
+// inputString[1] = vogalArray[9]
+// inputString[1] = vogalArray[10]
+
+inputString[2] = vogalArray[0]
+inputString[2] = vogalArray[1]
+inputString[2] = vogalArray[2]
+inputString[2] = vogalArray[3]
+// inputString[2] = vogalArray[4]
+// inputString[2] = vogalArray[6]
+// inputString[2] = vogalArray[7]
+// inputString[2] = vogalArray[8]
+// inputString[2] = vogalArray[9]
+// inputString[2] = vogalArray[10]
+
+inputString[3] = vogalArray[0]
+inputString[3] = vogalArray[1]
+inputString[3] = vogalArray[2]
+inputString[3] = vogalArray[3]
+// inputString[3] = vogalArray[4]
+// inputString[3] = vogalArray[6]
+// inputString[3] = vogalArray[7]
+// inputString[3] = vogalArray[8]
+// inputString[3] = vogalArray[9]
+// inputString[3] = vogalArray[10]
+
+inputString[4] = vogalArray[0]
+inputString[4] = vogalArray[1]
+inputString[4] = vogalArray[2]
+inputString[4] = vogalArray[3]
+// inputString[4] = vogalArray[4]
+// inputString[4] = vogalArray[6]
+// inputString[4] = vogalArray[7]
+// inputString[4] = vogalArray[8]
+// inputString[4] = vogalArray[9]
+// inputString[4] = vogalArray[10]
