@@ -1,0 +1,13 @@
+@using=jpf-abstraction
+
+target=svcomp.loops.InvertStringTrueUnreachableLabel
+
+classpath=${jpf-abstraction}/build/examples/
+Sourcepath=${jpf-abstraction}/src/examples/
+
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/loops/InvertStringTrueUnreachableLabel.pred
+
+listener=gov.nasa.jpf.abstraction.AbstractListener
+
+vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer
+
