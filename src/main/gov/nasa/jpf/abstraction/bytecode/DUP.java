@@ -20,14 +20,14 @@ public class DUP extends gov.nasa.jpf.jvm.bytecode.DUP {
         Attribute target = Attribute.ensureNotNull((Attribute) sf.getOperandAttr(0));
         Expression value = source.getExpression();
 
-        if (value instanceof AnonymousObject) {
-            AnonymousObject object = (AnonymousObject) value;
-
-            sf.setOperandAttr(new NonEmptyAttribute(target.getAbstractValue(), AnonymousObject.create(object.getReference(), true)));
-        } else if (value instanceof AnonymousArray) {
+        if (value instanceof AnonymousArray) {
             AnonymousArray array = (AnonymousArray) value;
 
             sf.setOperandAttr(new NonEmptyAttribute(target.getAbstractValue(), AnonymousArray.create(array.getReference(), array.getArrayLength(), true)));
+        } else if (value instanceof AnonymousObject) {
+            AnonymousObject object = (AnonymousObject) value;
+
+            sf.setOperandAttr(new NonEmptyAttribute(target.getAbstractValue(), AnonymousObject.create(object.getReference(), true)));
         }
 
         return ret;

@@ -388,6 +388,12 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 
                         liveRoots.addAll(var.getPossibleValues());
                     }
+
+                    for (ReturnValue retName : currentSymbolScope.getReturnValues()) {
+                        LocalVariable ret = currentSymbolScope.getReturnValue(retName);
+
+                        liveRoots.addAll(ret.getPossibleValues());
+                    }
                 }
 
                 // Anonymous objects on stacks are also live

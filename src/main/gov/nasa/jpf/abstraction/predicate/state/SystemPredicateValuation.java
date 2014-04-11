@@ -55,12 +55,14 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 	 */
 	private Map<Integer, PredicateValuationStack> scopes = new HashMap<Integer, PredicateValuationStack>();
     
+    private PredicateAbstraction abstraction;
 	private Predicates predicateSet;
 	private PredicateValuationMap initialValuation = new PredicateValuationMap();
     private SMT smt = new SMT();
     private Integer currentThreadID;
 	
 	public SystemPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
+        this.abstraction = abstraction;
 		this.predicateSet = predicateSet;
 		
 		Set<Predicate> predicates = new HashSet<Predicate>();
@@ -524,7 +526,46 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             // Usable predicates from callee with replaced occurences of formal parameters were collected
             // Select predicates that need to be updated (refer to an object that may have been modified by the callee: static, o.field, modified heap)
 
+            Set<AccessExpression> aliases = new HashSet<AccessExpression>();
             Set<Predicate> toBeUpdated = new HashSet<Predicate>();
+
+            // Maximal alias length
+            //
+            // method: m(A a) { a.x.y.z = ? }
+            //
+            // s.t = u.v.w
+            // m(s.t)
+            //
+            // affected:
+            //  s.t.x.y.z
+            //  u.v.w.x.y.z
+            //
+            // |u.v.w.x.y.z| = |u.v.w| + |a.x.y.z| - 1
+            int callerLength = 0;
+            int calleeLength = 0;
+
+            for (Predicate predicate : callerScope.getPredicates()) {
+                predicate.addAccessExpressionsToSet(temporaryPathsHolder);
+
+                for (AccessExpression ae : temporaryPathsHolder) {
+                    callerLength = Math.max(callerLength, ae.getLength());
+                }
+
+                temporaryPathsHolder.clear();
+            }
+
+            for (Predicate predicate : getPredicates()) {
+                predicate.addAccessExpressionsToSet(temporaryPathsHolder);
+
+                for (AccessExpression ae : temporaryPathsHolder) {
+                    calleeLength = Math.max(calleeLength, ae.getLength());
+                }
+
+                temporaryPathsHolder.clear();
+            }
+
+            // |x.y.z| = |x.y| + |a.z| - 1
+            int aliasLength = callerLength + calleeLength - 1;
 
             for (Predicate predicate : callerScope.getPredicates()) {
                 predicate.addAccessExpressionsToSet(temporaryPathsHolder);
@@ -553,35 +594,42 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                                 if (expr instanceof AccessExpression) {
                                     AccessExpression actualParameter = (AccessExpression) expr;
 
-                                    // reference-passed objects may have been affected by the method
-                                    if (actualParameter.isProperPrefixOf(path)) {
-                                        if (path.getRoot().isThis() && sameObject) {
-                                            // Constructors affect `this` only in scope of the class
-                                            // No further subclass fields may be modified by the constructor
-                                            // Therefore the initial valuation may stay intact after calling super constructor
-                                            if (method.isInit() && path.getLength() > 1) {
-                                                ObjectFieldRead fr = (ObjectFieldRead) path.get(2);
+                                    // Every predicate referring to an alias of the possibly modified parameter may be affected as well
+                                    abstraction.getSymbolTable().get(0).lookupAliases(path, aliasLength, aliases);
 
-                                                ClassInfo cls = method.getClassInfo();
+                                    for (AccessExpression alias : aliases) {
+                                        // reference-passed objects may have been affected by the method
+                                        if (actualParameter.isProperPrefixOf(alias)) {
+                                            if (alias.getRoot().isThis() && sameObject) {
+                                                // Constructors affect `this` only in scope of the class
+                                                // No further subclass fields may be modified by the constructor
+                                                // Therefore the initial valuation may stay intact after calling super constructor
+                                                if (method.isInit() && alias.getLength() > 1) {
+                                                    ObjectFieldRead fr = (ObjectFieldRead) alias.get(2);
 
-                                                while (cls != null && !canBeAffected) {
-                                                    for (FieldInfo field : cls.getInstanceFields()) {
-                                                        if (fr.getField().getName().equals(field.getName())) {
-                                                            canBeAffected = true;
+                                                    ClassInfo cls = method.getClassInfo();
 
-                                                            break;
+                                                    while (cls != null && !canBeAffected) {
+                                                        for (FieldInfo field : cls.getInstanceFields()) {
+                                                            if (fr.getField().getName().equals(field.getName())) {
+                                                                canBeAffected = true;
+
+                                                                break;
+                                                            }
                                                         }
-                                                    }
 
-                                                    cls = cls.getSuperClass();
+                                                        cls = cls.getSuperClass();
+                                                    }
+                                                } else {
+                                                    canBeAffected = true; // Not constructor
                                                 }
                                             } else {
-                                                canBeAffected = true; // Not constructor
+                                                canBeAffected = true; // Any non-this parameter
                                             }
-                                        } else {
-                                            canBeAffected = true; // Any non-this parameter
                                         }
                                     }
+
+                                    aliases.clear();
                                 }
                             }
                         }

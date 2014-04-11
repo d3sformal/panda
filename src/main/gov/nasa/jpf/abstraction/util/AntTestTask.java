@@ -26,19 +26,27 @@ public class AntTestTask extends JUnitTask {
             case JUnitTaskMirror.JUnitTestRunnerMirror.SUCCESS:
                 break;
             case JUnitTaskMirror.JUnitTestRunnerMirror.FAILURES:
-                failureTests.add(test.getName());
+                if (!failureTests.contains(test.getName())) {
+                   failureTests.add(test.getName());
+                }
                 break;
             case JUnitTaskMirror.JUnitTestRunnerMirror.ERRORS:
-                errorTests.add(test.getName());
+                if (!errorTests.contains(test.getName())) {
+                   errorTests.add(test.getName());
+                }
                 break;
         }
 
         if (result.timedOut) {
-            timedOutTests.add(test.getName());
+            if (!timedOutTests.contains(test.getName())) {
+                timedOutTests.add(test.getName());
+            }
         }
 
         if (result.crashed) {
-            crashedTests.add(test.getName());
+            if (!crashedTests.contains(test.getName())) {
+                crashedTests.add(test.getName());
+            }
         }
 
         super.actOnTestResult(result, test, name);

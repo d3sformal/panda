@@ -18,6 +18,8 @@ public abstract class AssertVisitedWithValuationHandler extends AssertHandler {
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
         StackFrame sf = curTh.getModifiableTopFrame();
 
+        gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker.notifyPopped(((gov.nasa.jpf.abstraction.Attribute) sf.getOperandAttr()).getExpression(), 1);
+
         ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
         int limit = sf.pop();
 

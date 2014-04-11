@@ -40,11 +40,17 @@ this.env.methaneLevelCritical = 0
 
 this.pumpRunning = 0
 
+[method svcomp.minepump.MinePumpSystem.MinePump.getEnv]
+return = this.env
+return.methaneLevelCritical = 0
+
 [method svcomp.minepump.MinePumpSystem.MinePump.<init>]
 env.waterLevel.ordinal = 0
 env.waterLevel.ordinal = 1
 env.waterLevel.ordinal = 2
 env.methaneLevelCritical = 0
+
+this.env = env
 
 [object svcomp.minepump.Actions]
 this.env.waterLevel.ordinal = 0
@@ -55,6 +61,10 @@ this.env.methaneLevelCritical = 0
 this.p.pumpRunning = 0
 this.env = this.p.env
 
+// An unfortunate necessity
+[assume post method svcomp.minepump.Actions.stopSystem]
+this.env = this.p.env
+
 [method svcomp.minepump.Main.randomSequenceOfActions]
 a.env.waterLevel.ordinal = 0
 a.env.waterLevel.ordinal = 1
@@ -62,3 +72,9 @@ a.env.waterLevel.ordinal = 2
 a.env.methaneLevelCritical = 0
 
 a.p.pumpRunning = 0
+
+a.env = a.p.env
+
+[method svcomp.minepump.Actions.Specification1]
+e = this.p.env
+e.methaneLevelCritical = 0

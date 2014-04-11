@@ -251,7 +251,26 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 		universe.add(elementInfo, ti);
 	}
 
-	public void addArray(ElementInfo array, Expression length) {
+    public void lookupAliases(AccessExpression expression, int length, Set<AccessExpression> outAliases) {
+        Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
+
+        lookupValues(expression, values);
+
+        for (UniverseIdentifier id : values) {
+            if (id != Universe.nullReference) {
+                valueToAccessExpressions(id, length, outAliases);
+            }
+        }
+
+        // Ensure presence of the access path in case that it is not a defined path
+        // Example:
+        //   expression = a.b.c.d
+        //   a.b.c -> NULL
+        //
+        //   values(a.b.c.d) = empty set
+        //
+        //   aliases(a.b.c.d) = { a.b.c.d }
+        outAliases.add(expression);
     }
 
 	/**

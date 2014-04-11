@@ -312,6 +312,12 @@ public class Universe {
                     for (UniverseSlot slot : value.getSlots().values()) {
                         nextOpen.addAll(slot.getPossibleValues());
                     }
+
+                    if (value instanceof UniverseArray) {
+                        UniverseArray array = (UniverseArray) value;
+
+                        nextOpen.addAll(array.getLengthSlot().getPossibleValues());
+                    }
                 }
             }
 
