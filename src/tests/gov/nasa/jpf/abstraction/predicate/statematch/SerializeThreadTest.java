@@ -2,6 +2,12 @@ package gov.nasa.jpf.abstraction.predicate.statematch;
 
 import gov.nasa.jpf.abstraction.predicate.BaseTest;
 
+class Driver {
+    public static void main(String[] args) {
+        new SerializeThreadTest().bootstrap();
+    }
+}
+
 public class SerializeThreadTest extends BaseTest {
     public static void main(String[] args) throws Exception {
         new SerializeThread().test();

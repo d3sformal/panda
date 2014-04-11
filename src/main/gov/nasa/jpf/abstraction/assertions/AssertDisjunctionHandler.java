@@ -6,6 +6,8 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ElementInfo;
 
+import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
@@ -27,6 +29,8 @@ public class AssertDisjunctionHandler extends AssertPredicateHandler {
     @Override
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
         StackFrame sf = curTh.getModifiableTopFrame();
+
+        AnonymousExpressionTracker.notifyPopped(((Attribute) sf.getOperandAttr()).getExpression(), 1);
 
         ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
 

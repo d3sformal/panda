@@ -7,6 +7,8 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ElementInfo;
 
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
@@ -24,6 +26,8 @@ public class AssertNumberOfPossibleValuesHandler extends AssertHandler {
         StackFrame sf = curTh.getModifiableTopFrame();
 
         int expectedNumber = sf.pop();
+
+        AnonymousExpressionTracker.notifyPopped(((Attribute) sf.getOperandAttr()).getExpression(), 1);
         ElementInfo ei = curTh.getElementInfo(sf.pop());
 
         AccessExpression expr = PredicatesFactory.createAccessExpressionFromString(new String(ei.getStringChars()));

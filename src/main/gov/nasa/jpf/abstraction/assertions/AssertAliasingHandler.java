@@ -7,6 +7,8 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ElementInfo;
 
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
@@ -18,6 +20,8 @@ public abstract class AssertAliasingHandler extends AssertHandler {
         MethodFrameSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
 
         StackFrame sf = curTh.getModifiableTopFrame();
+
+        AnonymousExpressionTracker.notifyPopped(((Attribute) sf.getOperandAttr()).getExpression(), 1);
 
         ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
 

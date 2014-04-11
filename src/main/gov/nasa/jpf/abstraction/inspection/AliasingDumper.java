@@ -11,6 +11,8 @@ import java.util.HashSet;
 
 import gov.nasa.jpf.abstraction.ExecuteInstructionHandler;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -21,6 +23,9 @@ public class AliasingDumper extends ExecuteInstructionHandler {
     @Override
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
         StackFrame sf = curTh.getModifiableTopFrame();
+
+        AnonymousExpressionTracker.notifyPopped(((Attribute) sf.getOperandAttr()).getExpression(), 1);
+
         ElementInfo ei = curTh.getElementInfo(sf.pop());
 
         AccessExpression ae = PredicatesFactory.createAccessExpressionFromString(ei.asString());

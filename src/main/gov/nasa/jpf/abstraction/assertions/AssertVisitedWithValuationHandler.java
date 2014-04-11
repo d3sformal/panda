@@ -7,6 +7,8 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ElementInfo;
 
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
@@ -18,7 +20,7 @@ public abstract class AssertVisitedWithValuationHandler extends AssertHandler {
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
         StackFrame sf = curTh.getModifiableTopFrame();
 
-        gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker.notifyPopped(((gov.nasa.jpf.abstraction.Attribute) sf.getOperandAttr()).getExpression(), 1);
+        AnonymousExpressionTracker.notifyPopped(((Attribute) sf.getOperandAttr()).getExpression(), 1);
 
         ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
         int limit = sf.pop();
