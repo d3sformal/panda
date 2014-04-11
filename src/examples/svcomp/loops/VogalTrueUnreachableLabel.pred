@@ -6,9 +6,17 @@ alength(arrlen, inputString) = 5
 alength(arrlen, vogalArray) = 11
 
 inputString[class(svcomp.loops.VogalTrueUnreachableLabel).MAX - 1] = 0
+inputString[3] = 0
+inputString[2] = 0
+inputString[1] = 0
+inputString[0] = 0
 
-nCaracter >= 0
-nCaracter < class(svcomp.loops.VogalTrueUnreachableLabel).MAX
+nCaracter = 0
+nCaracter = 1
+nCaracter = 2
+nCaracter = 3
+nCaracter = 4
+nCaracter = 5
 
 i = 0
 i = 1
@@ -67,53 +75,23 @@ inputString[0] = vogalArray[0]
 inputString[0] = vogalArray[1]
 inputString[0] = vogalArray[2]
 inputString[0] = vogalArray[3]
-// inputString[0] = vogalArray[4]
-// inputString[0] = vogalArray[6]
-// inputString[0] = vogalArray[7]
-// inputString[0] = vogalArray[8]
-// inputString[0] = vogalArray[9]
-// inputString[0] = vogalArray[10]
 
 inputString[1] = vogalArray[0]
 inputString[1] = vogalArray[1]
 inputString[1] = vogalArray[2]
 inputString[1] = vogalArray[3]
-// inputString[1] = vogalArray[4]
-// inputString[1] = vogalArray[6]
-// inputString[1] = vogalArray[7]
-// inputString[1] = vogalArray[8]
-// inputString[1] = vogalArray[9]
-// inputString[1] = vogalArray[10]
 
 inputString[2] = vogalArray[0]
 inputString[2] = vogalArray[1]
 inputString[2] = vogalArray[2]
 inputString[2] = vogalArray[3]
-// inputString[2] = vogalArray[4]
-// inputString[2] = vogalArray[6]
-// inputString[2] = vogalArray[7]
-// inputString[2] = vogalArray[8]
-// inputString[2] = vogalArray[9]
-// inputString[2] = vogalArray[10]
 
 inputString[3] = vogalArray[0]
 inputString[3] = vogalArray[1]
 inputString[3] = vogalArray[2]
 inputString[3] = vogalArray[3]
-// inputString[3] = vogalArray[4]
-// inputString[3] = vogalArray[6]
-// inputString[3] = vogalArray[7]
-// inputString[3] = vogalArray[8]
-// inputString[3] = vogalArray[9]
-// inputString[3] = vogalArray[10]
 
 inputString[4] = vogalArray[0]
 inputString[4] = vogalArray[1]
 inputString[4] = vogalArray[2]
 inputString[4] = vogalArray[3]
-// inputString[4] = vogalArray[4]
-// inputString[4] = vogalArray[6]
-// inputString[4] = vogalArray[7]
-// inputString[4] = vogalArray[8]
-// inputString[4] = vogalArray[9]
-// inputString[4] = vogalArray[10]

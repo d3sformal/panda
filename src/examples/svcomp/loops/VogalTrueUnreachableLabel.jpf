@@ -7,8 +7,6 @@ Sourcepath=${jpf-abstraction}/src/examples/
 
 abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/loops/VogalTrueUnreachableLabel.pred
 
-listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.listener.ExecTracker,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor
-#,gov.nasa.jpf.abstraction.predicate.util.SMTMonitor
+listener=gov.nasa.jpf.abstraction.AbstractListener
 
 vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer
-report.console.property_violation=error,snapshot
