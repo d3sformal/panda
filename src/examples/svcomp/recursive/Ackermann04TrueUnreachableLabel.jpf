@@ -1,0 +1,12 @@
+@using=jpf-abstraction
+
+target=svcomp.recursive.Ackermann01TrueUnreachableLabel
+
+classpath=${jpf-abstraction}/build/examples/
+Sourcepath=${jpf-abstraction}/src/examples/
+
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/recursive/Ackermann01TrueUnreachableLabel.pred
+
+listener=gov.nasa.jpf.abstraction.AbstractListener
+
+vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer
