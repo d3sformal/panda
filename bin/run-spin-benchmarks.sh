@@ -11,10 +11,7 @@ BENCHMARKS="
     svcomp.loops.TREX03TrueUnreachableLabel
     svcomp.loops.InvertStringTrueUnreachableLabel
 "
-ROOT="../jpf-abstraction"
-PATTERN='s/^.*\.\([A-Z]*[a-z]*\)[a-zA-Z0-9]*$/\1/'
-
-cd ${ROOT}
+PATTERN='s/^.*\.\([a-zA-Z0-9]\+\)*$/\1/'
 
 export max=0
 
@@ -45,6 +42,7 @@ do
         BEGIN {
             STATES=0;
             TIME=0;
+            ERROR=false;
         }
 
         /states/ {
@@ -57,9 +55,17 @@ do
             TIME=$3;
         }
 
-        END {
-            printf "	states: %s	time: ", STATES;
+        /=\+ error 1/ {
+            ERROR=true;
+        }
 
-            system("expr $(date -d " TIME " +%s) - $(date -d 00:00:00 +%s) | sed '\''s/$/ s/'\''");
+        END {
+            if (!ERROR) {
+                printf "	states: %s	time: ", STATES;
+
+                system("expr $(date -d " TIME " +%s) - $(date -d 00:00:00 +%s) | sed '\''s/$/ s/'\''");
+            } else {
+                print "error";
+            }
         }'
 done
