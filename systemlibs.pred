@@ -9,7 +9,6 @@ cur.group.destroyed = 0
 
 // Transfer group.destroyed knowledge over this getter
 [method java.lang.Thread.getThreadGroup]
-this.destroyed = 0
 this.group.destroyed = 0
 return = this.group
 
@@ -20,7 +19,6 @@ this.destroyed = 0
 
 // Assume that current thread cannot be destroyed
 [assume post method java.lang.Thread.currentThread]
-return.destroyed = 0
 return.group.destroyed = 0
 
 [object java.util.Vector]
