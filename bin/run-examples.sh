@@ -1,23 +1,14 @@
 #!/bin/sh
 
-BENCHMARKS="
-    dataflow.DataFlowAnalysis
-    cycling.CyclingRace
-    image.Image
-    scheduler.Scheduler
+EXAMPLES=$(find src/examples -name "*.jpf" | sed 's:^src/examples/\(.*\)\.jpf$:\1:')
 
-    svcomp.loops.ArrayTrueUnreachableLabel
-    svcomp.loops.Eureka01TrueUnreachableLabel
-    svcomp.loops.TREX03TrueUnreachableLabel
-    svcomp.loops.InvertStringTrueUnreachableLabel
-"
-PATTERN='s/^.*\.\([a-zA-Z0-9]\+\)*$/\1/'
+PATTERN='s:^.*/\([a-zA-Z0-9]\+\)*$:\1:'
 
-export max=0
+max=0
 
-for benchmark in $BENCHMARKS
+for example in ${EXAMPLES}
 do
-    name=$(echo ${benchmark} | sed ${PATTERN})
+    name=$(echo ${example} | sed ${PATTERN})
     len=$(echo ${name} | wc -m)
 
     if [ ${len} -gt ${max} ]
@@ -26,10 +17,9 @@ do
     fi
 done
 
-for benchmark in $BENCHMARKS
+for example in ${EXAMPLES}
 do
-    prefix=$(echo ${benchmark} | sed 's:\.:/:g')
-    name=$(echo ${benchmark} | sed ${PATTERN})
+    name=$(echo ${example} | sed ${PATTERN})
 
     printf "%s" ${name}
 
@@ -38,7 +28,7 @@ do
         printf " "
     done
 
-    bin/run.sh src/examples/${prefix}.jpf 2>&1 | awk '
+    bin/run.sh src/examples/${example}.jpf 2>&1 | awk '
         BEGIN {
             STATES=0;
             TIME=0;
