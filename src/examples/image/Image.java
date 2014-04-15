@@ -26,20 +26,41 @@ public class Image
 		Rectangle r1 = new Rectangle();
 		Rectangle r2 = new Rectangle();
 		
-		r1.top = 1;
-		r1.left = 1;
-		r1.right = 4;
-		r1.bottom = 2;
-		r1.color = 2;
+		r1.top = unknown();
+		r1.left = unknown();
+		r1.right = unknown();
+		r1.bottom = unknown();
+		r1.color = unknown();
+
+        crop(r1);
+
 		rectangles[0] = r1;
-		
-		r2.top = 0;
-		r2.left = 0;
-		r2.right = 3;
-		r2.bottom = 3;
-		r2.color = 3;
+
+		r2.top = unknown();
+		r2.left = unknown();
+		r2.right = unknown();
+		r2.bottom = unknown();
+		r2.color = unknown();
+
+        crop(r2);
+
 		rectangles[1] = r2;
 	}
+
+    public static void crop(Rectangle r) {
+        if (r.top < 0) r.top = 0;
+
+        if (r.bottom < 0) r.bottom = 0;
+
+        if (r.top > SIZE - 1) r.top = SIZE - 1;
+        if (r.bottom > SIZE - 1) r.bottom = SIZE - 1;
+
+        if (r.left < 0) r.left = 0;
+        if (r.right < 0) r.right = 0;
+
+        if (r.left > SIZE - 1) r.left = SIZE - 1;
+        if (r.right > SIZE - 1) r.right = SIZE - 1;
+    }
 
 	public void render() {
 		Rectangle rec = null;		
@@ -56,6 +77,10 @@ public class Image
 			}
 		}
 	}
+
+    public static int unknown() {
+        return 0;
+    }
 }
 
 class Rectangle

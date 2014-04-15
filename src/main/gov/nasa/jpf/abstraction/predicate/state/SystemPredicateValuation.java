@@ -400,7 +400,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             getArgumentSlotUsage(method, slotInUse);
             getArgumentSlotType(method, argIsPrimitive);
 
-            Iterator<Object> originalArgumentAttributes = method.attrIterator();
+            Iterator<Object> originalArgumentAttributes = before.frameAttrIterator();
 
             // Replace formal parameters with actual parameters
             for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
@@ -583,7 +583,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
                 // Reference arguments
                 for (AccessExpression path : temporaryPathsHolder) {
-                    Iterator<Object> originalActualParameters = method.attrIterator();
+                    Iterator<Object> originalActualParameters = before.frameAttrIterator();
 
                     for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments() && !canBeAffected; ++slotIndex) {
                         if (slotInUse[slotIndex]) {

@@ -94,7 +94,7 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
         }
 
         if (method.getFullName().equals(target + "." + entry)) {
-            method.setAttr(null);
+            sf.setFrameAttr(null);
 
             for (int i = 0; i < method.getNumberOfStackArguments(); ++i) {
                 ElementInfo ei = threadInfo.getElementInfo(sf.getLocalVariable(i));
@@ -112,7 +112,7 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
                 Attribute attr = new NonEmptyAttribute(null, argExpr);
 
                 sf.setLocalAttr(i, attr);
-                method.addAttr(attr);
+                sf.addFrameAttr(attr);
 
                 ret.addObject(argExpr);
             }

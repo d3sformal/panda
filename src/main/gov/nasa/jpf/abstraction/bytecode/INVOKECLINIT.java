@@ -55,7 +55,7 @@ public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
 			return actualNextInsn;
 		}
 		
-		after.getMethodInfo().setAttr(null);
+		after.setFrameAttr(null);
 		
         /**
          * Collect current symbolic arguments and store them as attributes of the method
@@ -67,7 +67,7 @@ public class INVOKECLINIT extends gov.nasa.jpf.jvm.bytecode.INVOKECLINIT {
 		for (int i = 0; i < after.getMethodInfo().getNumberOfStackArguments(); ++i) {
 			Attribute attr = Attribute.ensureNotNull((Attribute) before.getOperandAttr(i));
 			
-			after.getMethodInfo().addAttr(attr);
+			after.addFrameAttr(attr);
 		}
 		
         /**

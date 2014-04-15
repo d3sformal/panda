@@ -45,7 +45,7 @@ public class INVOKESPECIAL extends gov.nasa.jpf.jvm.bytecode.INVOKESPECIAL {
 			return actualNextInsn;
 		}
 		
-		after.getMethodInfo().setAttr(null);
+		after.setFrameAttr(null);
 		
         /**
          * Collect current symbolic arguments and store them as attributes of the method
@@ -59,7 +59,7 @@ public class INVOKESPECIAL extends gov.nasa.jpf.jvm.bytecode.INVOKESPECIAL {
 			
 			attr = Attribute.ensureNotNull(attr);
 			
-			after.getMethodInfo().addAttr(attr);
+			after.addFrameAttr(attr);
 		}
 				
 		GlobalAbstraction.getInstance().processMethodCall(ti, before, after);

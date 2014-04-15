@@ -48,7 +48,7 @@ public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
 			return actualNextInsn;
 		}
 		
-		after.getMethodInfo().setAttr(null);
+		after.setFrameAttr(null);
 		
         /**
          * Collect current symbolic arguments and store them as attributes of the method
@@ -62,7 +62,7 @@ public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
 			
 			attr = Attribute.ensureNotNull(attr);
 			
-			after.getMethodInfo().addAttr(attr);
+			after.addFrameAttr(attr);
 		}
 		
         /**
