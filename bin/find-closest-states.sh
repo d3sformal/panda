@@ -1,5 +1,15 @@
 #!/bin/sh
 
+OFFSET=0
+LIMIT=50
+PREVIEW=100
+
+while [ $# -gt 1 ]
+do
+    shift 1
+    eval ${1}
+done
+
 if [ ${THREAD} ]
 then
     THREADSELECTIONINIT='
@@ -71,10 +81,6 @@ else
     FILTER='END {print FILENAME}'
 fi
 
-OFFSET=50
-LIMIT=50
-PREVIEW=100
-
 # Collect states where a thread entered the target method
 STATES=$(find tmp -name "*.0" -exec awk "${FILTER}" {} \; | sort -t. -k 2n | tail -n +${OFFSET} | head -n ${LIMIT})
 
@@ -116,8 +122,15 @@ done | sort -s -k 3n
 
 )
 
+if [ -z "${DIFFS}" ]
+then
+    DIFFCOUNT=0
+else
+    DIFFCOUNT=$(echo "${DIFFS}" | wc -l)
+fi
+
 echo
-echo "Found " $(echo "${DIFFS}" | wc -l) " interesting differences."
+echo "Found " ${DIFFCOUNT} " interesting differences."
 echo
 
 if [ -t 1 ]
