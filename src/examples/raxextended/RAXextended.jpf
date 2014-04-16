@@ -10,3 +10,5 @@ abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/raxextended/RAXextend
 listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker
 
 vm.serializer.class = gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer
+
+vm.storage.class = gov.nasa.jpf.abstraction.predicate.DebugCopyPreservingStateSet
