@@ -6,9 +6,9 @@ public class Scheduler
 		ThreadInfo[] id2thread = new ThreadInfo[3];
 
         // prepare a few threads
-        id2thread[0] = new ThreadInfo(5);
-        id2thread[1] = new ThreadInfo(18);
-        id2thread[2] = new ThreadInfo(10);
+        id2thread[0] = new ThreadInfo(unknown());
+        id2thread[1] = new ThreadInfo(unknown());
+        id2thread[2] = new ThreadInfo(unknown());
 
 
 		// some threads are put into the active state
@@ -49,6 +49,10 @@ public class Scheduler
 			}
 		}
 	}
+
+    public static int unknown() {
+        return 0;
+    }
 }
 
 class SchedulerConfig {
