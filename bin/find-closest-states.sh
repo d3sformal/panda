@@ -141,7 +141,7 @@ then
             s1=$(echo ${pair} | cut -d":" -f1)
             s2=$(echo ${pair} | cut -d":" -f2)
 
-            sh -x -c "diff -C3 ${s1} ${s2}"
+            sh -x -c "diff -y --suppress-common-lines ${s1} ${s2}"
             read
         done
     )
