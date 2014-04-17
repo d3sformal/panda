@@ -61,7 +61,7 @@ public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSer
 
         StructuredValue object = universe.get(value);
 
-        for (UniverseSlotKey key : object.getSlots().keySet()) {
+        for (UniverseSlotKey key : new TreeSet<UniverseSlotKey>(object.getSlots().keySet())) {
             UniverseSlot slot = object.getSlot(key);
 
             if (slot instanceof StructuredValueSlot) {
