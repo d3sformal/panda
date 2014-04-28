@@ -3,7 +3,7 @@
 target=svcomp.loops.Eureka01FalseUnreachableLabel
 
 classpath=${jpf-abstraction}/build/examples/
-Sourcepath=${jpf-abstraction}/src/examples/
+sourcepath=${jpf-abstraction}/src/examples/
 
 abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/loops/Eureka01FalseUnreachableLabel.pred
 

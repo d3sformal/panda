@@ -3,7 +3,7 @@
 target=svcomp.loops.TREX03TrueUnreachableLabel
 
 classpath=${jpf-abstraction}/build/examples/
-Sourcepath=${jpf-abstraction}/src/examples/
+sourcepath=${jpf-abstraction}/src/examples/
 
 abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/loops/TREX03TrueUnreachableLabel.pred
 
