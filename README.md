@@ -3,12 +3,13 @@ Abstract Pathfinder supports predicate abstraction and various basic abstraction
 
 The project was started as a Google Summer of Code (GSoC) project in 2012 [\[2\]](https://bitbucket.org/artkhyzha/jpf-abstraction) with the goal to implement basic abstractions of numeric data domains. Support for predicate abstraction was added in the scope of another GSoC project in 2013 [\[3\]](https://bitbucket.org/jd823592/jpf-abstraction).
 
-# Authors #
-* Jakub Daniel (http://d3s.mff.cuni.cz/~daniel)
+
+## Authors: ##
+
+* Jakub Daniel
 * Pavel Parizek (http://d3s.mff.cuni.cz/~parizek)
 * Corina Pasareanu
 
-# Installation #
 
 ## Prerequisites ##
 
@@ -20,7 +21,8 @@ You can download the JDK 7 directly from the [Oracle web site](http://www.oracle
 Currently only the Linux x86-64 binaries of MathSAT are included within the project repository.
 For platforms other than Linux x86-64, you also need to obtain the appropriate binary of MathSAT 5 at the [MathSAT web site](http://mathsat.fbk.eu/download.html).
 
-## Installing Abstract Pathfinder ##
+
+## Installation ##
 
 The installation guide is mostly specific to Linux/Unix. Modify the commands appropriately for other platforms (Windows, Mac OS).
 
@@ -42,9 +44,9 @@ ant clean build
 
 Make sure that ``bin/mathsat`` is executable on your platform before continuing.
 
-# Usage #
 
 ## Configuration ##
+
 To perform abstract execution of a target program, it is necessary to provide a configuration file (``.jpf``). Assuming that the target class is ``target.Target`` and that it is stored in ``src/examples``, then the content of the file ``Target.jpf`` (typically in the same directory) would look like:
 ```
 @using=jpf-abstraction
@@ -81,7 +83,8 @@ It is necessary to set this option to ``gov.nasa.jpf.abstraction.predicate.Predi
 
 More configuration options are described on the [_jpf-core_ configuration page](http://babelfish.arc.nasa.gov/trac/jpf/wiki/user/config).
 
-## Input predicate file ##
+
+## Input predicates ##
 
 The file with input predicates (usually having the suffix ``.pred``) is divided into sections that we call _contexts_.
 ```
@@ -102,6 +105,7 @@ The number and order of occurrences of the sections is not limited in any way.
 Each of the sections may contain an arbitrary number of predicates.
 
 ### Predicates ###
+
 The predicates must be defined in the form of equalities and inequalities of arithmetic expressions over numeric constants and access expressions.
 
 For example:
@@ -133,14 +137,19 @@ There are two notations for specifying the predicates:
 Method context may define predicates over the keyword ``return``, which are used for propagation of truth values of predicates over method call boundaries.
 
 ## Running ##
+
+To run Abstract Pathfinder, simply issue the following command within the directory containing _apf_.
+
 ```
-bin/run.sh src/examples/Target.jpf
+bin/run.sh _path-to-a-jpf-file_
 ```
 
-# Example #
+## Example ##
+
 The following example can be found in the project repository and can be run using the command mentioned below. The example consists of three files.
 
 ### Source program ``src/example/arraylength/ALength.java`` ###
+
 ```
 package arraylength;
 
@@ -153,6 +162,7 @@ public class ALength {
 ```
 
 ### File with input predicates ``src/example/arraylength/ALength.pred`` ###
+
 ```
 [method arraylength.ALength.main]
 alength(arrlen, a) = -1
@@ -162,6 +172,7 @@ i = 3
 ```
 
 ### Configuration file of JPF ``src/example/arraylength/ALength.jpf`` ###
+
 ```
 @using=jpf-abstraction
 
@@ -176,15 +187,17 @@ listener=gov.nasa.jpf.abstraction.AbstractListener
 ```
 
 For the purpose of this example, we omitted some of the non-essential listeners, which print only debugging information. 
+### Running ###
 
-## Running ##
 To run the example, simply issue the following command within the directory containing _apf_.
 ```
 bin/run.sh src/examples/arraylength/ALength.jpf
 ```
 
-## Output ##
+### Output ###
+
 The output of the command should look like this:
+
 ```
 Running Abstract PathFinder ...
 [method arraylength.ALength.main]
