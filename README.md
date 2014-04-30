@@ -12,7 +12,7 @@ The project was started as Google Summer of Code 2013 project [\[4\]](https://si
 # Contacts #
 * student: Jakub Daniel ([jd823592](/jd823592))
 * mentor: Pavel Parizek ([pparizek](/pparizek))
-* co-mentor: Corina Pasareanu (corina)
+* co-mentor: Corina Pasareanu
 
 # Installation #
 
