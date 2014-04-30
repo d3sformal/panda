@@ -5,16 +5,16 @@ The aim of this project is to extend Abstract Pathfinder with support for predic
 The project was started as Google Summer of Code 2013 project [\[4\]](https://sites.google.com/site/jpfgsoc2013projects).
 
 # Content #
-1. [Installation](#Installation)
-2. [Usage](#Usage)
-3. [Example](#Example)
+1. [Installation](#installation)
+2. [Usage](#usage)
+3. [Example](#example)
 
 # Contacts #
 * student: Jakub Daniel ([jd823592](/jd823592))
 * mentor: Pavel Parizek ([pparizek](/pparizek))
 * co-mentor: Corina Pasareanu
 
-# <span name="Instalation">Installation</span> #
+# Installation #
 
 ## Prerequisites ##
 
@@ -48,7 +48,7 @@ ant clean build
 
 Make sure that ``bin/mathsat`` is executable on your platform before continuing.
 
-# <span name="#Usage">Usage</span> #
+# Usage #
 
 ## Configuration ##
 To perform abstract execution of a target program, it is necessary to provide a configuration file (``.jpf``). Assuming that the target class is ``target.Target`` and that it is stored in ``src/examples``, then the content of the file ``Target.jpf`` (typically in the same directory) would look like:
@@ -144,7 +144,7 @@ Method context may define predicates over the keyword ``return``, which are used
 java -jar ../jpf-core/build/RunJPF.jar src/examples/Target.jpf
 ```
 
-# <span name="#Example">Example</span> #
+# Example #
 The following example can be found in the project repository and can be run using the command mentioned below. The example consists of three files.
 
 ### Source program ``src/example/arraylength/ALength.java`` ###
