@@ -2,7 +2,7 @@
 Abstract Pathfinder supports various abstractions for numeric data, such as signs and intervals, which can be arbitrarily combined together.
 
 The aim of this project is to extend Abstract Pathfinder with support for predicate abstraction.
-The project was started as Google Summer of Code 2013 project[\[4\]](https://sites.google.com/site/jpfgsoc2013projects).
+The project was started as Google Summer of Code 2013 project [\[4\]](https://sites.google.com/site/jpfgsoc2013projects).
 
 # Content #
 1. [Installation](Installation)
