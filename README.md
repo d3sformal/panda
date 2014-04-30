@@ -17,7 +17,7 @@ The project was started as a Google Summer of Code (GSoC) project in 2012 [\[2\]
 To be able to run Abstract Pathfinder with predicate abstraction, it is necessary to have JDK 7 installed on your system.
 You can download the JDK 7 directly from the [Oracle web site](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html).
 
-2. **MathSAT 5**
+2. **MathSAT 5**  
 Currently only the Linux x86-64 binaries of MathSAT are included within the project repository.
 For platforms other than Linux x86-64, you also need to obtain the appropriate binary of MathSAT 5 at the [MathSAT web site](http://mathsat.fbk.eu/download.html).
 
@@ -138,7 +138,10 @@ Method context may define predicates over the keyword ``return``, which are used
 
 ## Running ##
 
-To run Abstract Pathfinder, simply issue the following command within the directory containing _apf_: ``bin/run.sh`` _path-to-a-jpf-file_
+To run Abstract Pathfinder, simply issue the following command within the directory containing _apf_ 
+```
+bin/run.sh {path-to-a-jpf-file}
+```
 
 ## Example ##
 
