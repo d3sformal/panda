@@ -1,25 +1,17 @@
-**Abstract Pathfinder** (APF) is an extension for **Java Pathfinder** [\[1\]](http://babelfish.arc.nasa.gov/trac/jpf), which introduces support for data abstraction.
-Abstract Pathfinder supports predicate abstraction and various basic abstractions for numeric data domains, such as signs and intervals.
+**Abstract Pathfinder** (APF) is an extension for **Java Pathfinder** [\[1\]](http://babelfish.arc.nasa.gov/trac/jpf), which introduces support for predicate abstraction and various other abstractions of numeric data domains, such as signs and intervals.
 
 The project was started as a Google Summer of Code (GSoC) project in 2012 [\[2\]](https://bitbucket.org/artkhyzha/jpf-abstraction) with the goal to implement basic abstractions of numeric data domains. Support for predicate abstraction was added in the scope of another GSoC project in 2013 [\[3\]](https://bitbucket.org/jd823592/jpf-abstraction).
-
-
-### Authors: ###
-
-* Jakub Daniel
-* Pavel Parizek (http://d3s.mff.cuni.cz/~parizek)
-* Corina Pasareanu
 
 
 ## Prerequisites ##
 
 1. **Java 7**  
-To be able to run Abstract Pathfinder with predicate abstraction, it is necessary to have JDK 7 installed on your system.
+To be able to run Abstract Pathfinder, it is necessary to have JDK 7 installed on your system.
 You can download the JDK 7 directly from the [Oracle web site](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html).
 
 2. **MathSAT 5**  
 Currently only the Linux x86-64 binaries of MathSAT are included within the project repository.
-For platforms other than Linux x86-64, you also need to obtain the appropriate binary of MathSAT 5 at the [MathSAT web site](http://mathsat.fbk.eu/download.html).
+For platforms other than Linux x86-64, you also need to obtain the appropriate binary at the [MathSAT web site](http://mathsat.fbk.eu/download.html).
 
 
 ## Installation ##
@@ -31,12 +23,12 @@ Create an empty directory (e.g. ``~/workspace``) where you would like to install
 mkdir -p ~/workspace
 ```
 
-Obtain the latest _apf_
+Obtain the latest APF
 ```
 git clone https://github.com/d3sformal/apf.git
 ```
 
-Build _apf_
+Build it using Ant
 ```
 cd ~/workspace/apf
 ant clean build
@@ -47,16 +39,16 @@ Make sure that ``bin/mathsat`` is executable on your platform before continuing.
 
 ## Configuration ##
 
-To perform abstract execution of a target program, it is necessary to provide a configuration file (``.jpf``). Assuming that the target class is ``target.Target`` and that it is stored in ``src/examples``, then the content of the file ``Target.jpf`` (typically in the same directory) would look like:
+To perform verification of a target program, it is necessary to provide a configuration file (``.jpf``). Assuming that the main class of a target program is ``target.Target`` and that it is stored in ``src/examples``, then the content of the file ``Target.jpf`` (typically in the same directory) would look like:
 ```
 @using=jpf-abstraction
 
 target=target.Target
 
-classpath=build/examples
-sourcepath=src/examples
+classpath=${jpf-abstraction}/build/examples
+sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES src/examples/target/Target.pred
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/target/Target.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 ```
@@ -81,7 +73,7 @@ It is also possible to specify additional listeners to get more verbose output:
 4. **vm.serializer.class**  
 It is necessary to set this option to ``gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer`` to enable abstract state matching.
 
-More configuration options are described on the [_jpf-core_ configuration page](http://babelfish.arc.nasa.gov/trac/jpf/wiki/user/config).
+Additional configuration options are described on the [JPF-core configuration page](http://babelfish.arc.nasa.gov/trac/jpf/wiki/user/config).
 
 
 ## Input predicates ##
@@ -115,7 +107,7 @@ a.b = c + d - 1
 
 ### Access Expressions ###
 
-An access expression can be a local variable, static field, an object field, or array element access.
+An access expression can be a local variable, a static field, an object field, or array element access.
 ```
 o
 o.f
@@ -126,7 +118,7 @@ alength(arrlen, a)
 
 Here, the ``class(...)`` symbol distinguishes static field access from an object field access. The expression wrapped in ``class(...)`` must refer to a Java class name. The ``alength(arrlen, ...)`` symbol is a special accessor for array length that distinguishes it from a field access. These special symbols are needed because the predicate language is not typed and has no information about runtime classes.
 
-There are two notations for specifying the predicates:
+There are two notations for specifying the access expressions:
 
 1. Java-like dot notation demonstrated above
 2. Function notation:
@@ -134,11 +126,11 @@ There are two notations for specifying the predicates:
     * ``fread(f, o)`` for ``o.f``
     * ``aread(arr, a, i)`` for ``a[i]``
 
-Method context may define predicates over the keyword ``return``, which are used for propagation of truth values of predicates over method call boundaries.
+In a method context, you may define predicates over the keyword ``return``, which are used for propagation of truth values of predicates over method call boundaries.
 
 ## Running ##
 
-To run Abstract Pathfinder, simply issue the following command within the directory containing _apf_ 
+To run Abstract Pathfinder, simply issue the following command within the directory containing APF.
 ```
 bin/run.sh {path-to-a-jpf-file}
 ```
@@ -160,7 +152,7 @@ public class ALength {
 }
 ```
 
-### File with input predicates ``src/example/arraylength/ALength.pred`` ###
+### Input predicates ``src/example/arraylength/ALength.pred`` ###
 
 ```
 [method arraylength.ALength.main]
@@ -170,17 +162,17 @@ alength(arrlen, a) = 3
 i = 3
 ```
 
-### Configuration file of JPF ``src/example/arraylength/ALength.jpf`` ###
+### Configuration of APF ``src/example/arraylength/ALength.jpf`` ###
 
 ```
 @using=jpf-abstraction
 
 target=arraylength.ALength
 
-classpath=build/examples
-sourcepath=src/examples
+classpath=${jpf-abstraction}/build/examples
+sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES src/examples/arraylength/ALength.pred
+abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/arraylength/ALength.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 ```
@@ -188,7 +180,7 @@ listener=gov.nasa.jpf.abstraction.AbstractListener
 For the purpose of this example, we omitted some of the non-essential listeners, which print only debugging information. 
 ### Running ###
 
-To run the example, simply issue the following command within the directory containing _apf_.
+To run the example, simply issue the following command within the directory containing APF.
 ```
 bin/run.sh src/examples/arraylength/ALength.jpf
 ```
@@ -229,7 +221,7 @@ loaded code:        classes=56, methods=1112
 ====================================================== search finished: 20/09/13 16:39
 ```
 
-Abstract Pathfinder parses the input file and prints all the collected predicates in the default function notation. If some other listeners were added, then a lot of output may follow. In the end, there is the expected statement ``no errors detected`` and statistics provided by _jpf-core_ (number of choices, etc).
+Abstract Pathfinder parses the input file and prints all the collected predicates in the default function notation. If some other listeners were added, then a lot of output may follow. In the end, there is the expected statement ``no errors detected`` and statistics provided by JPF-core (number of choices, etc).
 
 # Links #
 1. http://babelfish.arc.nasa.gov/trac/jpf
