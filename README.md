@@ -1,18 +1,12 @@
-**Abstract Pathfinder** [\[1\]](http://babelfish.arc.nasa.gov/trac/jpf/wiki/projects/jpf-abstraction) [\[2\]](https://bitbucket.org/artkhyzha/jpf-abstraction) is an extension for **Java Pathfinder** [\[3\]](http://babelfish.arc.nasa.gov/trac/jpf), which introduces support for data abstraction.
-Abstract Pathfinder supports various abstractions for numeric data, such as signs and intervals, which can be arbitrarily combined together.
+**Abstract Pathfinder** (APF) is an extension for **Java Pathfinder** [\[1\]](http://babelfish.arc.nasa.gov/trac/jpf), which introduces support for data abstraction.
+Abstract Pathfinder supports predicate abstraction and various basic abstractions for numeric data domains, such as signs and intervals.
 
-The aim of this project is to extend Abstract Pathfinder with support for predicate abstraction.
-The project was started as Google Summer of Code 2013 project [\[4\]](https://sites.google.com/site/jpfgsoc2013projects).
+The project was started as a Google Summer of Code (GSoC) project in 2012 [\[2\]](https://bitbucket.org/artkhyzha/jpf-abstraction) with the goal to implement basic abstractions of numeric data domains. Support for predicate abstraction was added in the scope of another GSoC project in 2013 [\[3\]](https://bitbucket.org/jd823592/jpf-abstraction).
 
-# Content #
-1. [Installation](#installation)
-2. [Usage](#usage)
-3. [Example](#example)
-
-# Contacts #
-* student: Jakub Daniel ([jd823592](/jd823592))
-* mentor: Pavel Parizek ([pparizek](/pparizek))
-* co-mentor: Corina Pasareanu
+# Authors #
+* Jakub Daniel (http://d3s.mff.cuni.cz/~daniel)
+* Pavel Parizek (http://d3s.mff.cuni.cz/~parizek)
+* Corina Pasareanu
 
 # Installation #
 
@@ -85,7 +79,6 @@ It is also possible to specify additional listeners to get more verbose output:
 4. **vm.serializer.class**  
 It is necessary to set this option to ``gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer`` to enable abstract state matching.
 
-
 More configuration options are described on the [_jpf-core_ configuration page](http://babelfish.arc.nasa.gov/trac/jpf/wiki/user/config).
 
 ## Input predicate file ##
@@ -127,7 +120,7 @@ class(pkg.Class).f
 alength(arrlen, a)
 ```
 
-Here, the ``class(...)`` symbol distinguishes static field access from an object field access. The expression wrapped in ``class(...)`` needs to refer to a Java class name. The ``alength(arrlen, ...)`` symbol is a special accessor for array length that distinguishes it from a field access. These special symbols are needed because the predicate language is not typed and has no information about runtime classes.
+Here, the ``class(...)`` symbol distinguishes static field access from an object field access. The expression wrapped in ``class(...)`` must refer to a Java class name. The ``alength(arrlen, ...)`` symbol is a special accessor for array length that distinguishes it from a field access. These special symbols are needed because the predicate language is not typed and has no information about runtime classes.
 
 There are two notations for specifying the predicates:
 
@@ -139,9 +132,9 @@ There are two notations for specifying the predicates:
 
 Method context may define predicates over the keyword ``return``, which are used for propagation of truth values of predicates over method call boundaries.
 
-## Invocation ##
+## Running ##
 ```
-java -jar ../jpf-core/build/RunJPF.jar src/examples/Target.jpf
+bin/run.sh src/examples/Target.jpf
 ```
 
 # Example #
@@ -184,7 +177,7 @@ listener=gov.nasa.jpf.abstraction.AbstractListener
 
 For the purpose of this example, we omitted some of the non-essential listeners, which print only debugging information. 
 
-## Execution ##
+## Running ##
 To run the example, simply issue the following command within the directory containing _apf_.
 ```
 bin/run.sh src/examples/arraylength/ALength.jpf
@@ -227,9 +220,6 @@ loaded code:        classes=56, methods=1112
 Abstract Pathfinder parses the input file and prints all the collected predicates in the default function notation. If some other listeners were added, then a lot of output may follow. In the end, there is the expected statement ``no errors detected`` and statistics provided by _jpf-core_ (number of choices, etc).
 
 # Links #
-1. http://babelfish.arc.nasa.gov/trac/jpf/wiki/projects/jpf-abstraction
+1. http://babelfish.arc.nasa.gov/trac/jpf
 2. https://bitbucket.org/artkhyzha/jpf-abstraction
-3. http://babelfish.arc.nasa.gov/trac/jpf
-4. https://sites.google.com/site/jpfgsoc2013projects
-5. http://babelfish.arc.nasa.gov/trac/jpf/wiki/summer-projects/2013-abstract
-6. http://babelfish.arc.nasa.gov/trac/jpf/wiki/install/start
+3. https://bitbucket.org/jd823592/jpf-abstraction
