@@ -57,19 +57,15 @@ Notable configuration attributes are:
 
 1. **target**  
 The target program (Java class with the ``main`` method).
-
 2. **abstract.domain**  
 The abstraction to be used - in our case ``PREDICATES`` - followed by a path to the file with input predicates. Other supported abstractions are described [here](https://bitbucket.org/artkhyzha/jpf-abstraction/wiki/Running_Abstract_Pathfinder).
-
 3. **listener**  
 The ``gov.nasa.jpf.abstraction.AbstractListener`` listener is mandatory for the predicate abstraction to work properly. 
 It is also possible to specify additional listeners to get more verbose output:
-    * ``gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor``  
+ - ``gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor``  
     prints the values of all predicates after each instruction.
-
-    * ``gov.nasa.jpf.listener.ExecTracker`` or ``gov.nasa.jpf.abstraction.util.InstructionTracker``  
+ - ``gov.nasa.jpf.listener.ExecTracker`` or ``gov.nasa.jpf.abstraction.util.InstructionTracker``  
     to put the output of other listeners into the context of executed bytecode instructions.
-
 4. **vm.serializer.class**  
 It is necessary to set this option to ``gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer`` to enable abstract state matching.
 
