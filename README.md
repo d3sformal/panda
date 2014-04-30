@@ -4,7 +4,7 @@ Abstract Pathfinder supports predicate abstraction and various basic abstraction
 The project was started as a Google Summer of Code (GSoC) project in 2012 [\[2\]](https://bitbucket.org/artkhyzha/jpf-abstraction) with the goal to implement basic abstractions of numeric data domains. Support for predicate abstraction was added in the scope of another GSoC project in 2013 [\[3\]](https://bitbucket.org/jd823592/jpf-abstraction).
 
 
-## Authors: ##
+### Authors: ###
 
 * Jakub Daniel
 * Pavel Parizek (http://d3s.mff.cuni.cz/~parizek)
@@ -138,11 +138,7 @@ Method context may define predicates over the keyword ``return``, which are used
 
 ## Running ##
 
-To run Abstract Pathfinder, simply issue the following command within the directory containing _apf_.
-
-```
-bin/run.sh _path-to-a-jpf-file_
-```
+To run Abstract Pathfinder, simply issue the following command within the directory containing _apf_: ``bin/run.sh`` _path-to-a-jpf-file_
 
 ## Example ##
 
