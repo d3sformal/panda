@@ -1,6 +1,6 @@
 **Abstract Pathfinder** (APF) is an extension for **Java Pathfinder** [\[1\]](http://babelfish.arc.nasa.gov/trac/jpf), which introduces support for predicate abstraction and various other abstractions of numeric data domains, such as signs and intervals.
 
-The project was started as a Google Summer of Code (GSoC) project in 2012 [\[2\]](https://bitbucket.org/artkhyzha/jpf-abstraction) with the goal to implement basic abstractions of numeric data domains. Support for predicate abstraction was added in the scope of another GSoC project in 2013 [\[3\]](https://bitbucket.org/jd823592/jpf-abstraction).
+It started as a Google Summer of Code (GSoC) project in 2012 [\[2\]](https://bitbucket.org/artkhyzha/jpf-abstraction) with the goal to implement basic abstractions of numeric data domains. Support for predicate abstraction was added in the scope of another GSoC project in 2013 [\[3\]](https://bitbucket.org/jd823592/jpf-abstraction).
 
 
 ## Prerequisites ##
@@ -112,7 +112,7 @@ class(pkg.Class).f
 alength(arrlen, a)
 ```
 
-Here, the ``class(...)`` symbol distinguishes static field access from an object field access. The expression wrapped in ``class(...)`` must refer to a Java class name. The ``alength(arrlen, ...)`` symbol is a special accessor for array length that distinguishes it from a field access. These special symbols are needed because the predicate language is not typed and has no information about runtime classes.
+Here, the ``class(...)`` symbol distinguishes a static field access from an object field access. The expression wrapped in ``class(...)`` must refer to a Java class name. The ``alength(arrlen, ...)`` symbol is a special accessor for array length that distinguishes it from a field access. These special symbols are needed because the predicate language is not typed and has no information about runtime classes.
 
 There are two notations for specifying the access expressions:
 
@@ -128,7 +128,7 @@ In a method context, you may define predicates over the keyword ``return``, whic
 
 To run Abstract Pathfinder, simply issue the following command within the directory containing APF.
 ```
-bin/run.sh {path-to-a-jpf-file}
+bin/run.sh <path-to-a-jpf-file>
 ```
 
 ## Example ##
