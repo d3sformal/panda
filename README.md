@@ -1,7 +1,7 @@
 **Abstract Pathfinder** (APF) is an extension for **Java Pathfinder** [\[1\]](http://babelfish.arc.nasa.gov/trac/jpf), which introduces support for predicate abstraction and various other abstractions of numeric data domains, such as signs and intervals.
 
 It started as a Google Summer of Code (GSoC) project in 2012 [\[2\]](https://bitbucket.org/artkhyzha/jpf-abstraction) with the goal to implement basic abstractions of numeric data domains. Support for predicate abstraction was added in the scope of another GSoC project in 2013 [\[3\]](https://bitbucket.org/jd823592/jpf-abstraction).
-Currently, we focus on automated generation of predicates, modeling collections, and support for concurrency (threads).
+Currently, we focus on automated generation of predicates, modeling Java collections, and support for concurrency (multiple threads).
 
 
 ## Prerequisites ##
