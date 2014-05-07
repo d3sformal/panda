@@ -26,7 +26,7 @@ do
     SELECTED=$(echo "${STATES}" | tail -n +$(expr ${OFFSET} + 1) | head -n $WINDOW)
     OFFSET=$(expr ${OFFSET} + ${WINDOW})
 
-    if [ $(printf "%s" "${STATES}" | wc -l) -eq 0 ]
+    if [ $(printf "%s" "${SELECTED}" | wc -l) -eq 0 ]
     then
         exit 0
     fi

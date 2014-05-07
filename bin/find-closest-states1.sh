@@ -142,7 +142,9 @@ then
             s2=$(echo ${pair} | cut -d":" -f2)
 
             sh -x -c "diff -y --suppress-common-lines ${s1} ${s2}"
-            read
+
+            #read
+            echo
         done
     )
 else
