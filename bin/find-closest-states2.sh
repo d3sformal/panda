@@ -1,10 +1,19 @@
 #!/bin/bash
 
+# takes all pairs of states with identical call stacks of program threads, and then it prints "diffs" for the states that are not equivalent 
+# arguments: OFFSET=<n> WINDOW=<n>
+
 OFFSET=0
 WINDOW=50
 IGNOREROW="" #"RUNNING\|BLOCKED"
 
-# Collect states where a thread entered the target method
+while [ $# -gt 0 ]
+do
+    eval ${1}
+    shift 1
+done
+
+
 STATES=$(find tmp -name "*.0" | sort -t. -k 2n)
 METHODCALLFILTER='/^\Wid: [0-9]+$/ || /^\W\Wpc:/ {print $2}'
 

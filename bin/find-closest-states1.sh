@@ -1,13 +1,16 @@
 #!/bin/sh
 
+# takes all program states where some thread is just executing the given method, and then performs a diff over each pair of states with the same program counters
+# arguments: METHOD=<package>.<class>.<method name> OFFSET=<n> LIMIT=<n>
+
 OFFSET=0
 LIMIT=50
 PREVIEW=100
 
-while [ $# -gt 1 ]
+while [ $# -gt 0 ]
 do
-    shift 1
     eval ${1}
+    shift 1
 done
 
 if [ ${THREAD} ]
