@@ -283,4 +283,24 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         ++depth;
 	}
 
+    @Override
+    protected void serializeThreadState(ThreadInfo ti)
+    {
+        buf.add(ti.getId());
+
+        // we serialize the same integer value for the following thread states: RUNNING, UNBLOCKED (they are semantically equivalent)
+        if (ti.isRunnable()) buf.add(ThreadInfo.State.RUNNING.ordinal());
+        else buf.add(ti.getState().ordinal());
+
+        buf.add(ti.getStackDepth());
+    
+        // see the corresponding method in the superclass for additional comments
+    	
+        // the object we are waiting for
+        ElementInfo eiLock = ti.getLockObject();
+        if (eiLock != null) buf.add(getSerializedReferenceValue(eiLock));
+    
+        // the objects we hold locks for 
+        serializeLockedObjects(ti.getLockedObjects());
+    }
 }
