@@ -58,8 +58,7 @@ public class DataFlowAnalysis
                 newFacts[k] = oldFacts[k];
             }
 
-			newFacts[newFacts.length - 1] = queue.length + i - j;
-			if (newFacts[newFacts.length - 1] >= queue.length) newFacts[newFacts.length - 1] = 0;
+			newFacts[newFacts.length - 1] = unknown();
 			
 			cfg[cfnodeID].facts = newFacts;
 
@@ -79,15 +78,22 @@ public class DataFlowAnalysis
 			}
 		}
 	}
+	
+	public static int unknown()
+	{
+		return 0;
+	}
 }
+
 
 class NodeInfo
 {
-  int[] successors;
-  int[] facts;
+	int[] successors;
+	int[] facts;
 
-  NodeInfo(int[] successors) {
-    this.facts = new int[1];
-    this.successors = successors;
-  }
+	NodeInfo(int[] successors) 
+	{
+		this.facts = new int[1];
+		this.successors = successors;
+	}
 }
