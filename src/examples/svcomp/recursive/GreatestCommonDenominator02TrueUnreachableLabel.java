@@ -1,5 +1,7 @@
 package svcomp.recursive;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
 public class GreatestCommonDenominator02TrueUnreachableLabel {
     private static int gcd(int y1, int y2) {
         assert y1 > 0 && y2 > 0;
@@ -24,8 +26,8 @@ public class GreatestCommonDenominator02TrueUnreachableLabel {
     }
 
     public static void main(String[] args) {
-        int m = unknown();
-        int n = unknown();
+        int m = Verifier.unknownInt();
+        int n = Verifier.unknownInt();
 
         if (m <= 0 || m > 2147483647) return;
         if (n <= 0 || n > 2147483647) return;
@@ -35,7 +37,4 @@ public class GreatestCommonDenominator02TrueUnreachableLabel {
         assert divides(z, m);
     }
 
-    private static int unknown() {
-        return 0;
-    }
 }

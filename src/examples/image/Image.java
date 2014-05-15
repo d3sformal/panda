@@ -1,5 +1,7 @@
 package image;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
 public class Image {
     private static int SIZE = 6;
     private Rectangle[] rectangles;
@@ -25,21 +27,21 @@ public class Image {
         Rectangle r1 = new Rectangle();
         Rectangle r2 = new Rectangle();
 
-        r1.top = unknown();
-        r1.left = unknown();
-        r1.right = unknown();
-        r1.bottom = unknown();
-        r1.color = unknown();
+        r1.top = Verifier.unknownInt();
+        r1.left = Verifier.unknownInt();
+        r1.right = Verifier.unknownInt();
+        r1.bottom = Verifier.unknownInt();
+        r1.color = Verifier.unknownInt();
 
         crop(r1);
 
         rectangles[0] = r1;
 
-        r2.top = unknown();
-        r2.left = unknown();
-        r2.right = unknown();
-        r2.bottom = unknown();
-        r2.color = unknown();
+        r2.top = Verifier.unknownInt();
+        r2.left = Verifier.unknownInt();
+        r2.right = Verifier.unknownInt();
+        r2.bottom = Verifier.unknownInt();
+        r2.color = Verifier.unknownInt();
 
         crop(r2);
 
@@ -77,9 +79,6 @@ public class Image {
         }
     }
 
-    public static int unknown() {
-        return 0;
-    }
 }
 
 class Rectangle {

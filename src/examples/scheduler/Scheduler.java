@@ -1,14 +1,16 @@
 package scheduler;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
 public class Scheduler 
 {
 	public static void main(String[] args) {
 		ThreadInfo[] id2thread = new ThreadInfo[3];
 
         // prepare a few threads
-        id2thread[0] = new ThreadInfo(unknown());
-        id2thread[1] = new ThreadInfo(unknown());
-        id2thread[2] = new ThreadInfo(unknown());
+        id2thread[0] = new ThreadInfo(Verifier.unknownInt());
+        id2thread[1] = new ThreadInfo(Verifier.unknownInt());
+        id2thread[2] = new ThreadInfo(Verifier.unknownInt());
 
 
 		// some threads are put into the active state
@@ -50,9 +52,6 @@ public class Scheduler
 		}
 	}
 
-    public static int unknown() {
-        return 0;
-    }
 }
 
 class SchedulerConfig {

@@ -1,5 +1,7 @@
 package svcomp.loops;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
 public class InvertStringTrueUnreachableLabel {
     public static void main(String[] args) {
         int MAX = 5;
@@ -7,7 +9,7 @@ public class InvertStringTrueUnreachableLabel {
         char[] str2 = new char[MAX];
 
         for (int i = 0; i < MAX; i++) {
-            str1[i] = unknownChar();
+            str1[i] = Verifier.unknownChar();
         }
 
         str1[MAX - 1] = '\0';
@@ -28,7 +30,4 @@ public class InvertStringTrueUnreachableLabel {
         }
     }
 
-    private static char unknownChar() {
-        return 0;
-    }
 }

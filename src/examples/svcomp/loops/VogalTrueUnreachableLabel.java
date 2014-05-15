@@ -1,5 +1,7 @@
 package svcomp.loops;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
 public class VogalTrueUnreachableLabel {
     private static int MAX = 5;
 
@@ -8,7 +10,7 @@ public class VogalTrueUnreachableLabel {
         char[] vogalArray = new char[] {'a', 'A', 'e', 'E', 'i', 'I', 'o', 'O', 'u', 'U', '\0'};
 
         for (int i = 0; i < MAX; i++) {
-            inputString[i] = unknown();
+            inputString[i] = Verifier.unknownChar();
         }
 
         if (inputString[MAX - 1] != '\0') return;
@@ -45,8 +47,5 @@ public class VogalTrueUnreachableLabel {
         assert contAux == cont;
     }
 
-    private static char unknown() {
-        return 0;
-    }
 }
 

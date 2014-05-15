@@ -1,5 +1,8 @@
 package cycling;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
+
 public class CyclingRace
 {
 	public static void main(String[] args)
@@ -11,19 +14,19 @@ public class CyclingRace
 		// insert raw data for cyclists
 		
 		cl = new Cyclist();
-		cl.idnum = unknown(); // not relevant
+		cl.idnum = Verifier.unknownInt(); // not relevant
 		cl.time = 3725;
 		cl.bonus = 5;
 		cyclists[0] = cl;
 		
 		cl = new Cyclist();
-		cl.idnum = unknown(); // not relevant
+		cl.idnum = Verifier.unknownInt(); // not relevant
 		cl.time = 3569;
 		cl.bonus = 10;
 		cyclists[1] = cl;
 		
 		cl = new Cyclist();
-		cl.idnum = unknown(); // not relevant
+		cl.idnum = Verifier.unknownInt(); // not relevant
 		cl.time = 3766;
 		cl.bonus = 50;
 		cyclists[2] = cl;
@@ -53,15 +56,11 @@ public class CyclingRace
         diffs[0] = bestTime;
 		for (int i = 1; i < results.length; ++i) {
 			cl = results[i];
-			int diff = unknown(); // cl.time - cl.bonus - bestTime;
+			int diff = Verifier.unknownInt(); // cl.time - cl.bonus - bestTime;
             diffs[i] = diff;
 		}
 	}
 
-	public static int unknown()
-	{
-		return 0;
-	}
 }
 
 class Cyclist 

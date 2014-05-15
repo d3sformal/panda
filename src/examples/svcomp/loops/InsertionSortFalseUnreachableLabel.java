@@ -1,8 +1,10 @@
 package svcomp.loops;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
 public class InsertionSortFalseUnreachableLabel {
     public static void main(String[] args) {
-        int SIZE = unknown();
+        int SIZE = Verifier.unknownPositiveInt();
         int[] v = new int[SIZE];
 
         for (int j = 1; j < SIZE; j++) {
@@ -21,9 +23,5 @@ public class InsertionSortFalseUnreachableLabel {
         for (int k = 1; k < SIZE; k++) {
             assert v[k - 1] <= v[k];
         }
-    }
-
-    private static int unknown() {
-        return 0;
     }
 }

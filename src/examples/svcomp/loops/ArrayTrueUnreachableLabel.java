@@ -1,13 +1,15 @@
 package svcomp.loops;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
 public class ArrayTrueUnreachableLabel {
     public static void main(String[] args) {
         int SIZE = 1;
         int[] array = new int[SIZE];
-        int menor = unknown();
+        int menor = Verifier.unknownInt();
 
         for (int j = 0; j < SIZE; ++j) {
-            array[j] = unknown();
+            array[j] = Verifier.unknownInt();
 
             if (array[j] <= menor) {
                 menor = array[j];
@@ -17,7 +19,4 @@ public class ArrayTrueUnreachableLabel {
         assert array[0] >= menor;
     }
 
-    public static int unknown() {
-        return 0;
-    }
 }

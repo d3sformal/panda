@@ -1,5 +1,7 @@
 package svcomp.recursive;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
 public class Ackermann04TrueUnreachableLabel {
     private static int ackermann(int m, int n) {
         if (m == 0) {
@@ -12,8 +14,8 @@ public class Ackermann04TrueUnreachableLabel {
     }
 
     public static void main(String[] args) {
-        int m = unknown();
-        int n = unknown();
+        int m = Verifier.unknownInt();
+        int n = Verifier.unknownInt();
 
         if (m < 0 || m > 3) return;
         if (n < 0 || n > 23) return;
@@ -23,7 +25,4 @@ public class Ackermann04TrueUnreachableLabel {
         assert m < 2 || n < 2 || result >= 7;
     }
 
-    private static int unknown() {
-        return 0;
-    }
 }

@@ -1,5 +1,7 @@
 package svcomp.recursive;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
 public class Addition03FalseUnreachableLabel {
     private static int addition(int m, int n) {
         if (n == 0) {
@@ -12,15 +14,12 @@ public class Addition03FalseUnreachableLabel {
     }
 
     public static void main(String[] args) {
-        int m = unknown();
-        int n = unknown();
+        int m = Verifier.unknownInt();
+        int n = Verifier.unknownInt();
 
         int result = addition(m, n);
 
         assert m < 100 || n < 100 || result >= 200;
     }
 
-    private static int unknown() {
-        return 0;
-    }
 }

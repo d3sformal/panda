@@ -1,11 +1,13 @@
 package svcomp.loops;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
 public class Eureka01FalseUnreachableLabel {
     private static int INFINITY = 899;
 
     public static void main(String[] args) {
-        int nodecount = unknown();
-        int edgecount = unknown();
+        int nodecount = Verifier.unknownInt();
+        int edgecount = Verifier.unknownInt();
 
         if (0 > nodecount || nodecount > 5) return;
         if (0 > edgecount || edgecount > 20) return;
@@ -49,8 +51,5 @@ public class Eureka01FalseUnreachableLabel {
         }
     }
 
-    private static int unknown() {
-        return 0;
-    }
 }
 

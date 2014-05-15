@@ -1,5 +1,7 @@
 package dataflow;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
 public class DataFlowAnalysis
 {
 	public static void main(String[] args)
@@ -58,7 +60,7 @@ public class DataFlowAnalysis
                 newFacts[k] = oldFacts[k];
             }
 
-			newFacts[newFacts.length - 1] = unknown();
+			newFacts[newFacts.length - 1] = Verifier.unknownInt();
 			
 			cfg[cfnodeID].facts = newFacts;
 
@@ -78,11 +80,6 @@ public class DataFlowAnalysis
 			}
 		}
 	}
-	
-	public static int unknown()
-	{
-		return 0;
-	}
 }
 
 
@@ -94,6 +91,7 @@ class NodeInfo
 	NodeInfo(int[] successors) 
 	{
 		this.facts = new int[1];
+		this.facts[0] = Verifier.unknownInt();
 		this.successors = successors;
 	}
 }

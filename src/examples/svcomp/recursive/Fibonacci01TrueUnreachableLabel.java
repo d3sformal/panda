@@ -1,5 +1,7 @@
 package svcomp.recursive;
 
+import gov.nasa.jpf.abstraction.Verifier;
+
 public class Fibonacci01TrueUnreachableLabel {
     private static int fibonacci(int n) {
         if (n < 1) {
@@ -12,7 +14,7 @@ public class Fibonacci01TrueUnreachableLabel {
     }
 
     public static void main(String[] args) {
-        int x = unknown();
+        int x = Verifier.unknownInt();
 
         if (x > 46 || x == -2147483648) return;
 
@@ -21,7 +23,4 @@ public class Fibonacci01TrueUnreachableLabel {
         assert result >= x - 1;
     }
 
-    private static int unknown() {
-        return 0;
-    }
 }
