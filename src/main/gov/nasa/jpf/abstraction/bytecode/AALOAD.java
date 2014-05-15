@@ -23,6 +23,7 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.LessThan;
+import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -141,6 +142,14 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
             ChoiceGenerator<?> indexChoice = ss.getCurrentChoiceGenerator(INDEX_CHOICE_ID, IntIntervalGenerator.class);
 
             selectedIndex = ((IntIntervalGenerator) indexChoice).getNextChoice();
+
+            Predicate assumption = Equals.create(index, Constant.create(selectedIndex));
+
+            if (abs.getPredicateValuation().checkConsistency(assumption, TruthValue.TRUE).isEmpty()) {
+                abs.getPredicateValuation().force(assumption, TruthValue.TRUE);
+            } else {
+                ss.setIgnored(true);
+            }
         }
 
         return false;

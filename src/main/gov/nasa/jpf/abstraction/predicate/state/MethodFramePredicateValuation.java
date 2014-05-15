@@ -209,7 +209,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
     }
 
     @Override
-    public void checkConsistency(Predicate assumption, TruthValue value) {
+    public Set<Predicate> checkConsistency(Predicate assumption, TruthValue value) {
         Set<Predicate> affected = computeAffectedClosure(assumption, valuations.keySet());
 
         Set<Predicate> inconsistent = new HashSet<Predicate>();
@@ -256,13 +256,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             }
         }
 
-        for (Predicate predicate : inconsistent) {
-            System.out.println("Warning: forced value of `" + assumption + "` is inconsistent with `" + predicate + "`");
-        }
-
-        if (!inconsistent.isEmpty()) {
-            throw new RuntimeException("Trying to make an inconsistent assumption");
-        }
+        return inconsistent;
     }
 
     /**
