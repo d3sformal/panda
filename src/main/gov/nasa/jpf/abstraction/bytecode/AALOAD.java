@@ -145,6 +145,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 
             Predicate assumption = Equals.create(index, Constant.create(selectedIndex));
 
+            // This is inefficient - a lot of infeasible choices are explored (immediate backtracking)
             if (abs.getPredicateValuation().checkConsistency(assumption, TruthValue.TRUE).isEmpty()) {
                 abs.getPredicateValuation().force(assumption, TruthValue.TRUE);
             } else {
