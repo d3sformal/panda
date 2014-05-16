@@ -13,6 +13,7 @@ import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
 
 import gov.nasa.jpf.Config;
+import gov.nasa.jpf.JPFConfigException;
 
 /**
  * A factory used to produce predicate abstraction instances from definition in an input file whose name is the first element of the @param args parameter
@@ -49,13 +50,13 @@ public class PredicateAbstractionFactory extends AbstractionFactory {
 			return new PredicateAbstraction(predicates);
 		} catch (IOException e) {
 			System.err.println("Could not read input file '" + filename + "'");
+
+            throw new JPFConfigException("Could not read input file '" + filename + "'");
 		} catch (Exception e) {
 			e.printStackTrace();
 
 			throw e;
 		}
-		
-		return null;
 	}
 
 }
