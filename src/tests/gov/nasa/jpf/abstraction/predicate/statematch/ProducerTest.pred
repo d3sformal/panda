@@ -1,0 +1,13 @@
+[static]
+// Substituted by a constant
+// class(gov.nasa.jpf.abstraction.predicate.statematch.Producer).SIZE = 8
+
+[method gov.nasa.jpf.abstraction.predicate.statematch.ProducerTest.main]
+alength(arrlen, p.buffer) = 8
+
+[object gov.nasa.jpf.abstraction.predicate.statematch.Producer]
+alength(arrlen, this.buffer) = 8
+
+pos >= 0
+// pos >= class(gov.nasa.jpf.abstraction.predicate.statematch.Producer).SIZE
+pos >= 8
