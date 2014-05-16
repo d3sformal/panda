@@ -4,12 +4,11 @@ public class RevisitedAtLeastAssertion implements LocationAssertion {
     private int limit;
     private int visits = 0;
 
-    @Override
-    public void update(Object... o) {
-        if (o[0] instanceof Integer) {
-            limit = 1 + (Integer) o[0];
-            ++visits;
-        }
+    public RevisitedAtLeastAssertion update(Integer count) {
+        limit = 1 + count;
+        ++visits;
+
+        return this;
     }
 
     @Override

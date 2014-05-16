@@ -14,7 +14,7 @@ public class AssertRevisitedAtLeastHandler extends AssertHandler {
 
         int limit = sf.pop();
 
-        AssertStateMatchingContext.update(insn, RevisitedAtLeastAssertion.class, new Integer(limit));
+        AssertStateMatchingContext.getAssertion(insn, RevisitedAtLeastAssertion.class).update(new Integer(limit));
     }
 
     @Override

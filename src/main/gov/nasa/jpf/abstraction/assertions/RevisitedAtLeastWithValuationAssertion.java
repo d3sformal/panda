@@ -5,17 +5,14 @@ public class RevisitedAtLeastWithValuationAssertion implements LocationAssertion
     private int limit = 0;
     private int visits = 0;
 
-    @Override
-    public void update(Object... o) {
-        if (o[0] instanceof PredicateValuationMap && o[1] instanceof PredicateValuationMap && o[2] instanceof Integer) {
-            valuation = (PredicateValuationMap) o[0];
+    public RevisitedAtLeastWithValuationAssertion update(PredicateValuationMap valuationReference, PredicateValuationMap currentValuation, Integer count) {
+        limit = 1 + count;
 
-            limit = 1 + (Integer) o[2];
-
-            if (valuation.equals((PredicateValuationMap) o[1])) {
-                ++visits;
-            }
+        if (valuationReference.equals(currentValuation)) {
+            ++visits;
         }
+
+        return this;
     }
 
     @Override

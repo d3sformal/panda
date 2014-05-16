@@ -6,15 +6,12 @@ import java.util.HashSet;
 public class SameValuationOnEveryVisitAssertion implements LocationAssertion {
     private Set<PredicateValuationMap> valuations = new HashSet<PredicateValuationMap>();
 
-    @Override
-    public void update(Object... o) {
-        if (o[0] instanceof PredicateValuationMap) {
-            PredicateValuationMap valuation = (PredicateValuationMap) o[0];
-
-            if (!valuations.contains(valuation)) {
-                valuations.add(valuation);
-            }
+    public SameValuationOnEveryVisitAssertion update(PredicateValuationMap valuation) {
+        if (!valuations.contains(valuation)) {
+            valuations.add(valuation);
         }
+
+        return this;
     }
 
     @Override

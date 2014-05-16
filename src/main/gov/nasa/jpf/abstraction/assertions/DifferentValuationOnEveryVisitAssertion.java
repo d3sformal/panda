@@ -7,17 +7,14 @@ public class DifferentValuationOnEveryVisitAssertion implements LocationAssertio
     private Set<PredicateValuationMap> valuations = new HashSet<PredicateValuationMap>();
     private Set<PredicateValuationMap> duplicateValuations = new HashSet<PredicateValuationMap>();
 
-    @Override
-    public void update(Object... o) {
-        if (o[0] instanceof PredicateValuationMap) {
-            PredicateValuationMap valuation = (PredicateValuationMap) o[0];
-
-            if (valuations.contains(valuation)) {
-                duplicateValuations.add(valuation);
-            }
-
-            valuations.add(valuation);
+    public DifferentValuationOnEveryVisitAssertion update(PredicateValuationMap valuation) {
+        if (valuations.contains(valuation)) {
+            duplicateValuations.add(valuation);
         }
+
+        valuations.add(valuation);
+
+        return this;
     }
 
     @Override

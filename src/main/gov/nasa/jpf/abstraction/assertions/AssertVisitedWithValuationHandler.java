@@ -54,8 +54,6 @@ public abstract class AssertVisitedWithValuationHandler extends AssertHandler {
         update(vm, nextInsn, trackedValuation, valuation, new Integer(limit));
     }
 
-    protected abstract Class<? extends LocationAssertion> getAssertionClass();
-
     protected abstract void update(VM vm, Instruction insn, PredicateValuationMap trackedValuation, PredicateValuationMap valuation, Integer limit);
 
     protected void reportError(VM vm, Instruction nextInsn) {

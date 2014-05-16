@@ -37,12 +37,10 @@ public abstract class AssertValuationOnEveryVisitHandler extends AssertHandler {
             valuation.put(predicate, value);
         }
 
-        if (!AssertStateMatchingContext.update(nextInsn, getAssertionClass(), valuation)) {
-            reportError(vm, nextInsn);
-        }
+        assertValuation(valuation, vm, nextInsn);
     }
 
-    protected abstract Class<? extends LocationAssertion> getAssertionClass();
+    protected abstract void assertValuation(PredicateValuationMap valuation, VM vm, Instruction nextInsn);
 
     protected void reportError(VM vm, Instruction nextInsn) {
         reportError(vm, nextInsn.getLineNumber(), AssertStateMatchingContext.get(nextInsn).getError());

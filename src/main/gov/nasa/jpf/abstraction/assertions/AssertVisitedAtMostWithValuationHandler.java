@@ -6,13 +6,8 @@ import gov.nasa.jpf.vm.Instruction;
 public class AssertVisitedAtMostWithValuationHandler extends AssertVisitedWithValuationHandler {
 
     @Override
-    protected Class<? extends LocationAssertion> getAssertionClass() {
-        return VisitedAtMostWithValuationAssertion.class;
-    }
-
-    @Override
     protected  void update(VM vm, Instruction insn, PredicateValuationMap trackedValuation, PredicateValuationMap valuation, Integer limit) {
-        if (!AssertStateMatchingContext.update(insn, getAssertionClass(), trackedValuation, valuation, limit)) {
+        if (AssertStateMatchingContext.getAssertion(insn, VisitedAtMostWithValuationAssertion.class).update(trackedValuation, valuation, limit).isViolated()) {
             reportError(vm, insn);
         }
     }

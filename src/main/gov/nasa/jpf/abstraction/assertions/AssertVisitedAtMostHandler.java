@@ -12,7 +12,7 @@ public class AssertVisitedAtMostHandler extends AssertHandler {
 
         int limit = sf.pop();
 
-        if (!AssertStateMatchingContext.update(insn, VisitedAtMostAssertion.class, new Integer(limit))) {
+        if (AssertStateMatchingContext.getAssertion(insn, VisitedAtMostAssertion.class).update(new Integer(limit)).isViolated()) {
             reportError(vm, insn.getLineNumber(), AssertStateMatchingContext.get(insn).getError());
         }
     }

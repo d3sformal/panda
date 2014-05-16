@@ -6,13 +6,8 @@ import gov.nasa.jpf.vm.Instruction;
 public class AssertRevisitedAtLeastWithValuationHandler extends AssertVisitedWithValuationHandler {
 
     @Override
-    protected Class<? extends LocationAssertion> getAssertionClass() {
-        return RevisitedAtLeastWithValuationAssertion.class;
-    }
-
-    @Override
     protected  void update(VM vm, Instruction insn, PredicateValuationMap trackedValuation, PredicateValuationMap valuation, Integer limit) {
-        AssertStateMatchingContext.update(insn, getAssertionClass(), trackedValuation, valuation, limit);
+        AssertStateMatchingContext.getAssertion(insn, RevisitedAtLeastWithValuationAssertion.class).update(trackedValuation, valuation, limit);
     }
 
     @Override

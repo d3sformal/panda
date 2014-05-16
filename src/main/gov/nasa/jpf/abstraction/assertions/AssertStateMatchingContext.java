@@ -9,7 +9,7 @@ import gov.nasa.jpf.vm.Instruction;
 public class AssertStateMatchingContext {
     public static Map<Instruction, LocationAssertion> assertions = new HashMap<Instruction, LocationAssertion>();
 
-    public static boolean update(Instruction pc, Class<? extends LocationAssertion> assertionClass, Object... o) {
+    public static <T extends LocationAssertion> T getAssertion(Instruction pc, Class<T> assertionClass) {
         if (!assertions.containsKey(pc)) {
             try {
                 assertions.put(pc, assertionClass.newInstance());
@@ -18,11 +18,19 @@ public class AssertStateMatchingContext {
             }
         }
 
-        LocationAssertion locationAssertion = assertions.get(pc);
+        return cast(assertions.get(pc), assertionClass);
+    }
 
-        locationAssertion.update(o);
+    private static <T> T cast(Object instance, Class<T> cls) {
+        if (cls.isAssignableFrom(instance.getClass())) {
 
-        return !locationAssertion.isViolated();
+            @SuppressWarnings("unchecked")
+            T tInstance = (T) instance;
+
+            return tInstance;
+        }
+
+        return null;
     }
 
     public static Set<Instruction> getLocations() {
