@@ -41,6 +41,7 @@ import gov.nasa.jpf.abstraction.assertions.AssertExclusiveDisjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertKnownValuationHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertAliasedHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertNotAliasedHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertMayBeAliasedHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertNumberOfPossibleValuesHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertRevisitedAtLeastHandler;
@@ -48,6 +49,7 @@ import gov.nasa.jpf.abstraction.assertions.AssertSameValuationOnEveryVisitHandle
 import gov.nasa.jpf.abstraction.assertions.AssertDifferentValuationOnEveryVisitHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostWithValuationHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertRevisitedAtLeastWithValuationHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertSameAliasingOnEveryVisitHandler;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -91,6 +93,9 @@ public class AbstractListener extends PropertyListenerAdapter {
         // Not aliased
         testMethods.put(BaseTestClass + ".assertNotAliased([Ljava/lang/String;)V", new AssertNotAliasedHandler());
 
+        // May be aliased
+        testMethods.put(BaseTestClass + ".assertMayBeAliased([Ljava/lang/String;)V", new AssertMayBeAliasedHandler());
+
         // Number of possible values
         testMethods.put(BaseTestClass + ".assertNumberOfPossibleValues(Ljava/lang/String;I)V", new AssertNumberOfPossibleValuesHandler());
 
@@ -105,6 +110,9 @@ public class AbstractListener extends PropertyListenerAdapter {
         // Number of visits with a specific valuation
         testMethods.put(StateMatchingTestClass + ".assertVisitedAtMostWithValuation(I[Ljava/lang/String;)V", new AssertVisitedAtMostWithValuationHandler());
         testMethods.put(StateMatchingTestClass + ".assertRevisitedAtLeastWithValuation(I[Ljava/lang/String;)V", new AssertRevisitedAtLeastWithValuationHandler());
+
+        // Aliasing
+        testMethods.put(StateMatchingTestClass + ".assertSameAliasingOnEveryVisit([Ljava/lang/String;)V", new AssertSameAliasingOnEveryVisitHandler());
     }
 
 	@Override

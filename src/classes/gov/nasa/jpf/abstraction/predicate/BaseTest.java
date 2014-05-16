@@ -31,6 +31,7 @@ public class BaseTest {
 
     native public static void assertAliased(String... aliases);
     native public static void assertNotAliased(String... aliases);
+    native public static void assertMayBeAliased(String... accessExpressions);
 
     native public static void assertNumberOfPossibleValues(String expression, int expectedNumber);
 
