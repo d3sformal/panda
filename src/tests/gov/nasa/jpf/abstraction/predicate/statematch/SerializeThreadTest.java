@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.statematch;
 
-import gov.nasa.jpf.abstraction.predicate.BaseTest;
+import static gov.nasa.jpf.abstraction.predicate.statematch.StateMatchingTest.*;
 
 class Driver {
     public static void main(String[] args) {
@@ -8,7 +8,11 @@ class Driver {
     }
 }
 
-public class SerializeThreadTest extends BaseTest {
+public class SerializeThreadTest extends StateMatchingTest {
+    public SerializeThreadTest() {
+        config.add("+vm.por=false");
+    }
+
     public static void main(String[] args) throws Exception {
         new SerializeThread().test();
     }
@@ -22,7 +26,9 @@ class SerializeThread {
             @Override
             public void run() {
                 synchronized (lockObject) {
-                    // MAYBE DO SOMETHING
+                    // << POINT B >>
+                    assertVisitedAtMost(4);
+                    assertRevisitedAtLeast(3);
                 }
             }
         });
@@ -30,9 +36,58 @@ class SerializeThread {
         t.start();
 
         synchronized (lockObject) {
-            // MAYBE DO SOMETHING
+            // << POINT A >>
+            assertVisitedAtMost(4);
+            assertRevisitedAtLeast(3);
         }
 
         t.join();
     }
 }
+
+/*
+ * PASSES:
+ *
+ * t1: start
+ * t1: monitor
+ * t1: <<POINT A>>
+ * t1: join
+ * t2: run
+ * t2: monitor
+ * t2: <<POINT B>>
+ * t2: terminate
+ * t1: terminate
+ *
+ *
+ * t1: start
+ * t2: run
+ * t2: monitor
+ * t1: monitor
+ * t1: <<POINT A>>
+ * t1: join
+ * t2: <<POINT B>>
+ * t2: terminate
+ * t1: terminate
+ *
+ *
+ * t1: start
+ * t2: run
+ * t2: monitor
+ * t1: monitor
+ * t2: <<POINT B>>
+ * t2: terminate
+ * t1: <<POINT A>>
+ * t1: join
+ * t1: terminate
+ *
+ *
+ * t1: start
+ * t2: run
+ * t2: monitor
+ * t2: <<POINT B>>
+ * t2: terminate
+ * t1: monitor
+ * t1: <<POINT A>>
+ * t1: join
+ * t1: terminate
+ */
