@@ -80,18 +80,18 @@ public class DataFlowAnalysis
 			}
 		}
 	}
-}
 
 
-class NodeInfo
-{
-	int[] successors;
-	int[] facts;
+    static class NodeInfo
+    {
+        int[] successors;
+        int[] facts;
 
-	NodeInfo(int[] successors) 
-	{
-		this.facts = new int[1];
-		this.facts[0] = Verifier.unknownInt();
-		this.successors = successors;
-	}
+        NodeInfo(int[] successors)
+        {
+            this.facts = new int[1];
+            this.facts[0] = Verifier.unknownInt();
+            this.successors = successors;
+        }
+    }
 }

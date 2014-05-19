@@ -139,7 +139,7 @@ cfg[4].successors[1] = 2
 cfg[4].successors[1] = 3
 cfg[4].successors[1] = 4
 
-[object dataflow.NodeInfo]
+[object dataflow.DataFlowAnalysis$NodeInfo]
 alength(arrlen, this.facts) = 0
 alength(arrlen, this.facts) = 1
 alength(arrlen, this.successors) = 0
