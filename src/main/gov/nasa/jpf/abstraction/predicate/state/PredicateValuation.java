@@ -65,4 +65,5 @@ public interface PredicateValuation {
 	public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates);
 
     public Integer evaluateExpression(Expression expression);
+    public int[] evaluateExpressionInRange(Expression expression, int lowerBound, int upperBound);
 }

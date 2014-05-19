@@ -84,6 +84,10 @@ public class PredicateAbstraction extends Abstraction {
     public Integer computePreciseExpressionValue(Expression expression) {
         return predicateValuation.evaluateExpression(expression);
     }
+
+    public int[] computeAllExpressionValuesInRange(Expression expression, int lowerBound, int upperBound) {
+        return predicateValuation.evaluateExpressionInRange(expression, lowerBound, upperBound);
+    }
 	
 	@Override
 	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {

@@ -211,21 +211,6 @@ public class Universe {
             ObjectFieldRead fieldRead = (ObjectFieldRead) read;
 
             fName = new FieldName(fieldRead.getField().getName());
-        } else if (read instanceof ArrayElementRead) {
-            ArrayElementRead aeRead = (ArrayElementRead) read;
-
-            // Get the exact element in case of a constant index
-            if (aeRead.getIndex() instanceof Constant) {
-                int i = ((Constant) aeRead.getIndex()).value.intValue();
-
-                eIndex = new ElementIndex(i);
-            } else {
-               Integer i = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).computePreciseExpressionValue(aeRead.getIndex());
-
-               if (i != null) {
-                   eIndex = new ElementIndex(i);
-               }
-            }
         }
 
         Set<UniverseIdentifier> parents = new HashSet<UniverseIdentifier>();
@@ -248,14 +233,18 @@ public class Universe {
                 ArrayElementRead aeRead = (ArrayElementRead) read;
 
                 // Get the exact element in case of a constant index
-                if (eIndex != null) {
-					if (eIndex.getIndex().intValue() >= array.getLength()) continue;
+                int[] indices = null;
 
-                    outValues.addAll(array.getElement(eIndex).getPossibleValues());
+                if (aeRead.getIndex() instanceof Constant) {
+                    indices = new int[] {((Constant) aeRead.getIndex()).value.intValue()};
+
+                    if (indices[0] >= array.getLength()) continue;
                 } else {
-                    for (int i = 0; i < array.getLength(); ++i) {
-                        outValues.addAll(array.getElement(new ElementIndex(i)).getPossibleValues());
-                    }
+                   indices = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).computeAllExpressionValuesInRange(aeRead.getIndex(), 0, array.getLength());
+                }
+
+                for (int i : indices) {
+                    outValues.addAll(array.getElement(new ElementIndex(i)).getPossibleValues());
                 }
             } else if (read instanceof ArrayLengthRead) {
                 if (parentObject instanceof UniverseNull) continue;

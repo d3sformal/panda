@@ -734,6 +734,11 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
     public Integer evaluateExpression(Expression expression) {
         return scopes.get(currentThreadID).top().evaluateExpression(expression);
     }
+
+    @Override
+    public int[] evaluateExpressionInRange(Expression expression, int lowerBound, int upperBound) {
+        return scopes.get(currentThreadID).top().evaluateExpressionInRange(expression, lowerBound, upperBound);
+    }
 	
 	@Override
 	public int count() {

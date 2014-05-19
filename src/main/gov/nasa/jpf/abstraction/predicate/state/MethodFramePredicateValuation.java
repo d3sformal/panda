@@ -13,6 +13,7 @@ import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
@@ -574,4 +575,42 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return null;
     }
 
+    @Override
+    public int[] evaluateExpressionInRange(Expression expression, int lowerBound, int upperBound) {
+        List<Integer> models = new LinkedList<Integer>();
+        List<Pair<Predicate, TruthValue>> determinants = new LinkedList<Pair<Predicate, TruthValue>>();
+
+        // An auxiliary predicate used to get all determining predicates
+        // Determinants are defined only for predicates, not expressions
+        Predicate determinantSelector = Equals.create(expression, Constant.create(0));
+
+        // Collect determinant valuations
+        for (Predicate predicate : computeDeterminantClosure(determinantSelector, getPredicates())) {
+            determinants.add(new Pair<Predicate, TruthValue>(predicate, get(predicate)));
+        }
+
+        determinants.add(new Pair<Predicate, TruthValue>(LessThan.create(expression, Constant.create(lowerBound)), TruthValue.FALSE)); // inclusive
+        determinants.add(new Pair<Predicate, TruthValue>(LessThan.create(expression, Constant.create(upperBound)), TruthValue.TRUE)); // exlusive
+
+        // Query any model
+        Integer model = smt.getModel(expression, determinants);
+
+        while (model != null) {
+            models.add(model);
+
+            determinants.add(new Pair<Predicate, TruthValue>(Equals.create(expression, Constant.create(model)), TruthValue.FALSE));
+
+            model = smt.getModel(expression, determinants);
+        }
+
+        int i = 0;
+        int[] ret = new int[models.size()];
+
+        for (Integer m : models) {
+            ret[i] = m;
+            ++i;
+        }
+
+        return ret;
+    }
 }
