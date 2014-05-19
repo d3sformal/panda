@@ -39,16 +39,19 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
             Expression lengthExpression = attr.getExpression();
             Integer lengthValue = abs.computePreciseExpressionValue(lengthExpression);
 
+            // Determine the unambiguous concrete array length from predicates
             if (lengthValue == null) {
                 return ti.createAndThrowException("java.lang.IllegalArgumentException", "predicates do not specify exact array length");
             }
 
+            // Check validity of the array length
             Predicate negative = LessThan.create(lengthExpression, Constant.create(0));
             TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(negative);
 
             if (value != TruthValue.FALSE) {
                 return ti.createAndThrowException("java.lang.NegativeArraySizeException");
             } else {
+                // Replace the original concrete value (possibly inconsistent with the abstraction) with the value derived from the abstraction
                 sf.pop();
                 sf.push(lengthValue);
             }
