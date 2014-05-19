@@ -1,10 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate;
 
 public class LogicalOperationsTest extends BaseTest {
-    public LogicalOperationsTest() {
-        config.add("+listener+=,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor");
-    }
-
     @FailingTest
     public static void testAND1() {
         int o = 1;

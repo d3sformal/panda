@@ -1,11 +1,5 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-class Driver {
-    public static void main(String[] args) {
-        new NestedClassTest().bootstrap();
-    }
-}
-
 public class NestedClassTest extends BaseTest {
     static class Class {
         static class NestedClass {
@@ -16,7 +10,7 @@ public class NestedClassTest extends BaseTest {
     }
 
     @Test
-    public static void Test() {
+    public static void test() {
         Class.NestedClass i = new Class.NestedClass();
 
         if (i.f) {
