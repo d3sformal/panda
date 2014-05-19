@@ -209,7 +209,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
     }
 
     @Override
-    public Set<Predicate> checkConsistency(Predicate assumption, TruthValue value) {
+    public Set<Predicate> getPredicatesInconsistentWith(Predicate assumption, TruthValue value) {
         Set<Predicate> affected = computeAffectedClosure(assumption, valuations.keySet());
 
         Set<Predicate> inconsistent = new HashSet<Predicate>();

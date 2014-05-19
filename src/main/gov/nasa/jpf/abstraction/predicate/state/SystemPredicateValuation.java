@@ -151,8 +151,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 	}
 
 	@Override
-	public Set<Predicate> checkConsistency(Predicate predicate, TruthValue value) {
-		return scopes.get(currentThreadID).top().checkConsistency(predicate, value);
+	public Set<Predicate> getPredicatesInconsistentWith(Predicate predicate, TruthValue value) {
+		return scopes.get(currentThreadID).top().getPredicatesInconsistentWith(predicate, value);
 	}
 
 	@Override
@@ -199,7 +199,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
     			}
 
                 for (Predicate predicate : context.predicates) {
-                    Set<Predicate> inconsistent = valuation.checkConsistency(predicate, TruthValue.TRUE);
+                    Set<Predicate> inconsistent = valuation.getPredicatesInconsistentWith(predicate, TruthValue.TRUE);
 
                     for (Predicate inconsistentPredicate : inconsistent) {
                         System.out.println("Warning: forced value of `" + predicate + "` is inconsistent with `" + inconsistentPredicate + "`");
