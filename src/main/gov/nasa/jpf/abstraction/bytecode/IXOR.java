@@ -30,6 +30,13 @@ import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Subtract;
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Disjunction;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 
 /**
  * Xor integer
@@ -55,7 +62,26 @@ public class IXOR extends gov.nasa.jpf.jvm.bytecode.IXOR implements AbstractBina
 
         Expression a = attr1.getExpression();
         Expression b = attr2.getExpression();
-		
+
+        if (RunDetector.isRunning()) {
+            Predicate inSupportedDomain = Conjunction.create(
+                Disjunction.create(
+                    Equals.create(a, Constant.create(0)),
+                    Equals.create(a, Constant.create(1))
+                ),
+                Disjunction.create(
+                    Equals.create(b, Constant.create(0)),
+                    Equals.create(b, Constant.create(1))
+                )
+            );
+
+            TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inSupportedDomain);
+
+            if (value != TruthValue.TRUE) {
+                throw new IllegalArgumentException("logical & bitwise operations over values other than {0, 1} are unsupported");
+            }
+        }
+
 		/**
 		 * Performs the adequate operation over abstractions
 		 */

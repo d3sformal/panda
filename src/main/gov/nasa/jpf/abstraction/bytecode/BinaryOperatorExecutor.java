@@ -52,7 +52,13 @@ public abstract class BinaryOperatorExecutor<T> {
 		T v2 = getRightOperand(sf);
 
 		// Create symbolic value (predicate abstraction), abstract value (numeric abstraction)
-		Attribute result = op.getResult(v1, attr1, v2, attr2);
+        Attribute result;
+
+        try {
+            result = op.getResult(v1, attr1, v2, attr2);
+        } catch (RuntimeException e) {
+            return ti.createAndThrowException(e.getClass().getName(), e.getMessage());
+        }
 
 		// Concrete execution
 		if (abs_v1 == null && abs_v2 == null) {

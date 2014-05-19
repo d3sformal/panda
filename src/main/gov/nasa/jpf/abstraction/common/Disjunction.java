@@ -50,7 +50,7 @@ public class Disjunction extends Formula {
 			return a;
 		}
 
-		return new Conjunction(a, b);
+		return new Disjunction(a, b);
 	}
 	
 	@Override
