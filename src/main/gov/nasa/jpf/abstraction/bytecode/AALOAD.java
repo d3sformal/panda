@@ -131,7 +131,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
 
                     Indexed arrayObject = (Indexed) universe.get(values.iterator().next());
 
-                    ChoiceGenerator<?> indexChoice = new IntIntervalGenerator(INDEX_CHOICE_ID, 0, arrayObject.getLength());
+                    ChoiceGenerator<?> indexChoice = new IntIntervalGenerator(INDEX_CHOICE_ID, 0, arrayObject.getLength() - 1);
 
                     ss.setNextChoiceGenerator(indexChoice);
 
