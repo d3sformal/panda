@@ -474,11 +474,6 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
             }
         }
 
-        // If there are either
-        //
-        // 1) more objects we are writing to
-        boolean ambiguous = destinations.size() > 1;
-
         // For each new parent (object whose field/element is being set, or a local var ...)
         // Add the objects into the field/element or rewrite a local variable
         for (UniverseIdentifier destination : destinations) {
@@ -508,6 +503,8 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
                 }
 
                 Associative associative = (Associative) parentObject;
+
+                boolean ambiguous = destinations.size() > 1;
 
                 if (!ambiguous) {
                     // In case of complete overwrite of the field
@@ -579,6 +576,10 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
                 int[] indices = null;
 
+                // Writing to more possible destinations requires a weak update
+                boolean ambiguous = destinations.size() > 1;
+
+                // Compute all feasible target indices (indices of elements being written to)
                 if (iExpr instanceof Constant) {
                     indices = new int[] {((Constant) iExpr).value.intValue()};
                 } else {
@@ -589,6 +590,7 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
                     }
                 }
 
+                // Write to all feasible indices
                 for (int i : indices) {
                     ElementIndex eIndex = new ElementIndex(i);
 
@@ -685,6 +687,8 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
                 }
 
                 ret.add(parent.getAccessExpression());
+
+                boolean ambiguous = destinations.size() > 1;
 
                 if (!ambiguous) {
                     // In case of complete overwrite of the variable
