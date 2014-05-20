@@ -575,6 +575,12 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return null;
     }
 
+    /**
+     * returns an array of all distinct admissible values of the given expression in the range from lowerBound (inclusive) to upperBound (exclusive)
+     * the current state is taken into account when ruling out inadmissible values
+     *
+     * uses SMT to compute values of the expression
+     */
     @Override
     public int[] evaluateExpressionInRange(Expression expression, int lowerBound, int upperBound) {
         List<Integer> models = new LinkedList<Integer>();
