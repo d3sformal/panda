@@ -25,7 +25,7 @@ public class LCONST extends gov.nasa.jpf.jvm.bytecode.LCONST {
         /**
          * Symbolic execution
          */
-		sf.setOperandAttr(new NonEmptyAttribute(null, Constant.create(getValue())));
+		sf.setLongOperandAttr(new NonEmptyAttribute(null, Constant.create(getValue())));
 		
 		return ret;
 	}

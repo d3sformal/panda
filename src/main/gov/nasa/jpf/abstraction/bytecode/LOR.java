@@ -55,6 +55,8 @@ public class LOR extends gov.nasa.jpf.jvm.bytecode.LOR implements AbstractBinary
         Expression a = attr1.getExpression();
         Expression b = attr2.getExpression();
 
+        LogicalOperandChecker.check(a, b);
+
 		/**
 		 * Performs the adequate operation over abstractions
 		 */

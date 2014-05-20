@@ -53,6 +53,8 @@ public class LAND extends gov.nasa.jpf.jvm.bytecode.LAND implements AbstractBina
         Expression a = attr1.getExpression();
         Expression b = attr2.getExpression();
 
+        LogicalOperandChecker.check(a, b);
+
 		/**
 		 * Performs the adequate operation over abstractions
 		 */
