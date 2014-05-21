@@ -140,7 +140,9 @@ public class ImprovedPrecisionTest extends BaseTest {
         r = testCasesM1(p);
 
         // establishes aliasing between a and b
+        assertKnownValuation("a = b: false");
         b = r;
+        assertKnownValuation("a = b: true");
 
         // makes the following predicates unknown: b.f > 0 and also r.f = 10
         b.f = identity(b.f);
