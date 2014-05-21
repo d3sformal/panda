@@ -44,6 +44,15 @@ data[2].f > 5
 i < 2
 i >= 0
 
+[method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCase7]
+b.f > 0
+a.f = 10
+a = p
+p.f = 10
+b = r
+r.f = 10
+a = b
+
 [method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCasesM1]
 v.f = 10
 v.f > 0

@@ -673,6 +673,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             for (Predicate predicate : calleeReturns.keySet()) {
                 callerScope.put(predicate, calleeReturns.get(predicate));
             }
+
+            callerScope.improvePrecisionOfAliasingPredicates();
         }
 
         scopes.get(currentThreadID).pop();

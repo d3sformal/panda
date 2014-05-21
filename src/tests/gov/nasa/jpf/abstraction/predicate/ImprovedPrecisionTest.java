@@ -128,6 +128,28 @@ public class ImprovedPrecisionTest extends BaseTest {
         }
     }
 
+    @Test
+    public static void testCase7() {
+        Data a = new Data();
+        a.f = 10;
+
+        Data p,r,b;
+
+        p = a;
+
+        r = testCasesM1(p);
+
+        // establishes aliasing between a and b
+        b = r;
+
+        // makes the following predicates unknown: b.f > 0 and also r.f = 10
+        b.f = identity(b.f);
+
+        if (a.f > 0) {
+            assertKnownValuation("b.f > 0: true");
+        }
+    }
+
     private static Data testCasesM1(Data v) {
         v.g = 0;
         return v;

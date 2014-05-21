@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.util.Pair;
+import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
@@ -18,8 +19,10 @@ import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateValueDeterminingInfo;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.FieldInfo;
@@ -442,6 +445,92 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         Map<Predicate, TruthValue> newValuations = smt.valuatePredicates(predicates);
 
         putAll(newValuations);
+
+        improvePrecisionOfAliasingPredicates();
+    }
+
+    private static boolean isAliasingPredicate(Predicate p, MethodFrameSymbolTable sym) {
+        while (p instanceof Negation) {
+            p = ((Negation) p).predicate;
+        }
+
+        if (p instanceof Equals) {
+            Expression a = ((Equals) p).a;
+            Expression b = ((Equals) p).b;
+
+            if (a instanceof AccessExpression && b instanceof AccessExpression) {
+                if (sym.isObject((AccessExpression) a) && sym.isObject((AccessExpression) b)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static AccessExpression getLeftHand(Predicate p) {
+        while (p instanceof Negation) {
+            p = ((Negation) p).predicate;
+        }
+
+        return (AccessExpression) ((Equals) p).a;
+    }
+
+    private static AccessExpression getRightHand(Predicate p) {
+        while (p instanceof Negation) {
+            p = ((Negation) p).predicate;
+        }
+
+        return (AccessExpression) ((Equals) p).b;
+    }
+
+    private static boolean areSingleton(Set<UniverseIdentifier> a, Set<UniverseIdentifier> b) {
+        return a.size() == 1 && a.equals(b);
+    }
+
+    private static boolean overlap(Set<UniverseIdentifier> a, Set<UniverseIdentifier> b) {
+        if (a.size() > b.size()) {
+            Set<UniverseIdentifier> swap = a;
+
+            a = b;
+            b = swap;
+        }
+
+        for (UniverseIdentifier id : a) {
+            if (b.contains(id)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void improvePrecisionOfAliasingPredicates() {
+        MethodFrameSymbolTable sym = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
+        Map<Predicate, TruthValue> improved = new HashMap<Predicate, TruthValue>();
+
+        for (Predicate p : getPredicates()) {
+            if (isAliasingPredicate(p, sym) && get(p) == TruthValue.UNKNOWN) {
+                TruthValue aliased = p instanceof Equals ? TruthValue.TRUE : TruthValue.FALSE;
+
+                AccessExpression a = getLeftHand(p);
+                AccessExpression b = getRightHand(p);
+
+                Set<UniverseIdentifier> valuesA = new HashSet<UniverseIdentifier>();
+                Set<UniverseIdentifier> valuesB = new HashSet<UniverseIdentifier>();
+
+                sym.lookupValues(a, valuesA);
+                sym.lookupValues(b, valuesB);
+
+                if (areSingleton(valuesA, valuesB)) {
+                    improved.put(p, aliased);
+                } else if (!overlap(valuesA, valuesB)) {
+                    improved.put(p, TruthValue.neg(aliased));
+                }
+            }
+        }
+
+        putAll(improved);
     }
 
     @Override
