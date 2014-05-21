@@ -19,14 +19,14 @@ public class PredicatesFactory {
     }
 
     public static Predicate createPredicateFromString(String definition) {
-		return createFromString(definition).predicate().val;
+		return createFromString(definition).predicate().val[0];
 	}
 
     public static AccessExpression createAccessExpressionFromString(String definition) {
-		return createFromString(definition).standalonepath().val;
+		return createFromString(definition).standalonepath().val[0];
     }
 
     public static Expression createExpressionFromString(String definition) {
-        return createFromString(definition).expression().val;
+        return createFromString(definition).expression().val[0];
     }
 }
