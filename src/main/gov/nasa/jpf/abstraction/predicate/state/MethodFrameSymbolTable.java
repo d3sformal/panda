@@ -251,6 +251,26 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 		universe.add(elementInfo, ti);
 	}
 
+    public Aliasing getAliasingForOperands(Expression from, AccessExpression to) {
+        Aliasing ret = new Aliasing();
+
+        Set<AccessExpression> exprs = new HashSet<AccessExpression>();
+        Set<UniverseIdentifier> vals = new HashSet<UniverseIdentifier>();
+
+        to.addAccessExpressionsToSet(exprs);
+        from.addAccessExpressionsToSet(exprs);
+
+        for (AccessExpression expr : exprs) {
+            lookupValues(expr, vals);
+
+            ret.add(expr, vals);
+
+            vals.clear();
+        }
+
+        return ret;
+    }
+
     public void lookupAliases(AccessExpression expression, int length, Set<AccessExpression> outAliases) {
         Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
 
