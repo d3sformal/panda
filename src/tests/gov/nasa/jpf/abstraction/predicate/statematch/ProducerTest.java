@@ -4,11 +4,6 @@ package gov.nasa.jpf.abstraction.predicate.statematch;
 // both semantically equivalent and semantically different objects
 
 public class ProducerTest extends StateMatchingTest {
-    public ProducerTest() {
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor");
-    }
-
     public static void main(String[] args) {
         Producer p = new Producer();
 

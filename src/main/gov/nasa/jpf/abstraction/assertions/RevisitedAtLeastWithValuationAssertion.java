@@ -8,7 +8,9 @@ public class RevisitedAtLeastWithValuationAssertion implements LocationAssertion
     public RevisitedAtLeastWithValuationAssertion update(PredicateValuationMap valuationReference, PredicateValuationMap currentValuation, Integer count) {
         limit = 1 + count;
 
-        if (valuationReference.equals(currentValuation)) {
+        valuation = valuationReference;
+
+        if (valuation.equals(currentValuation)) {
             ++visits;
         }
 

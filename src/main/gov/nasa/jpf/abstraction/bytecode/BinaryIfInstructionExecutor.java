@@ -43,7 +43,10 @@ public class BinaryIfInstructionExecutor {
 		AbstractBoolean abs_condition = null;
 		
 		boolean conditionValue;
-		
+
+        int v1 = sf.peek(1);
+        int v2 = sf.peek(0);
+
 		/**
 		 * First we check whether there is no choice generator present
 		 * If not we evaluate the branching condition
@@ -74,14 +77,10 @@ public class BinaryIfInstructionExecutor {
 	
 			// IF THE abs_condition COULD NOT BE DERIVED BY PREDICATE ABSTRACTION (IT IS NOT ACTIVE)
 			if (abs_condition == null) {
-				
 				if (abs_v1 == null && abs_v2 == null) { // the condition is concrete
 	                return br.executeConcrete(ti);
 				}
 	        
-				int v1 = sf.peek(0);
-				int v2 = sf.peek(1);
-			
 				// the condition is abstract
 	
 				// NUMERIC ABSTRACTION
@@ -106,17 +105,21 @@ public class BinaryIfInstructionExecutor {
 			assert (cg instanceof AbstractChoiceGenerator) : "expected AbstractChoiceGenerator, got: " + cg;
 			
 			conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
-			
+
 			if (expr1 != null && expr2 != null) {
 				Predicate predicate = br.createPredicate(expr1, expr2);
-			
 				GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)));
 			}
 		}
 		
 		sf.pop();
 		sf.pop();
-		
+
+        if (br.getConcreteBranch(v1, v2) != TruthValue.create(conditionValue)) {
+            System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + br.createPredicate(expr1, expr2));
+            ss.setIgnored(true);
+        }
+
 		return (conditionValue ? br.getTarget() : br.getNext(ti));
 	}
 }

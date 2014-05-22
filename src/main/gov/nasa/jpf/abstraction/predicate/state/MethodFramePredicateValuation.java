@@ -609,7 +609,13 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             }
         }
 
-        Map<Predicate, TruthValue> ret = smt.valuatePredicates(input);
+        Map<Predicate, TruthValue> ret;
+
+        if (input.isEmpty()) {
+            ret = new HashMap<Predicate, TruthValue>();
+        } else {
+            ret = smt.valuatePredicates(input);
+        }
 
         for (Predicate p : known) {
             ret.put(p, get(p));

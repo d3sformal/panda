@@ -47,7 +47,10 @@ public class UnaryIfInstructionExecutor {
 		AbstractBoolean abs_condition = null;
 		
 		boolean conditionValue;
-		
+
+        int v1 = sf.peek(0);
+        int v2 = constant.value.intValue();
+
 		/**
 		 * First we check whether there is no choice generator present
 		 * If not we evaluate the branching condition
@@ -108,14 +111,18 @@ public class UnaryIfInstructionExecutor {
 			conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
 			
 			if (expr != null) {
-				Predicate predicate = br.createPredicate(expr, Constant.create(0));
-			
+				Predicate predicate = br.createPredicate(expr, constant);
 				GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)));
 			}
 		}
 		
 		sf.pop();
-		
+
+        if (br.getConcreteBranch(v1, constant.value.intValue()) != TruthValue.create(conditionValue)) {
+            System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + br.createPredicate(expr, constant));
+            ss.setIgnored(true);
+        }
+
 		return (conditionValue ? br.getTarget() : br.getNext(ti));
 	}
 }

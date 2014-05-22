@@ -29,6 +29,7 @@ import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MJIEnv;
@@ -73,6 +74,11 @@ public class IFNULL extends gov.nasa.jpf.jvm.bytecode.IFNULL implements Abstract
 	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
 		return Abstraction._eq(v1, abs_v1, MJIEnv.NULL, null);
 	}
+
+    @Override
+    public TruthValue getConcreteBranch(int v1, int v2) {
+        return TruthValue.create(v1 == MJIEnv.NULL);
+    }
 
 	@Override
 	public Predicate createPredicate(Expression expr1, Expression expr2) {

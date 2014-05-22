@@ -1,15 +1,15 @@
 package gov.nasa.jpf.abstraction.predicate;
 
+import gov.nasa.jpf.vm.Verify;
+
 public class MultipleErrorsTest extends BaseTest {
     public MultipleErrorsTest() {
         config.add("+search.multiple_errors=true");
     }
 
-    public static boolean unknown = true;
-
     @FailingTest
     public static void standardAssertionErrors() {
-        if (unknown) {
+        if (Verify.getBoolean()) {
             assert false : "Error #1";
         } else {
             assert false : "Error #2";
@@ -18,7 +18,7 @@ public class MultipleErrorsTest extends BaseTest {
 
     @FailingTest
     public static void predicateAbstractionAssertionErrors() {
-        if (unknown) {
+        if (Verify.getBoolean()) {
             assertConjunction("x = 0: true");
         } else {
             assertNumberOfPossibleValues("x", 1);

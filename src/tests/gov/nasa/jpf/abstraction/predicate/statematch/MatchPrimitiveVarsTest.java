@@ -7,58 +7,37 @@ public class MatchPrimitiveVarsTest extends StateMatchingTest {
 
     @FailingTest
     public static void test1() {
-        boolean b = true, c = true;
-        int n;
+        boolean c = false;
 
-        if (b) {
-            n = 1;
-        } else {
-            n = 0;
+        for (int n = 1; n >= 0; --n) {
+            while (c) {} // Force state-matching
 
-            b = true;
+            int[] array = new int[n];
+
+            array[0] = 42;
         }
-
-        while (c) {} // Force state-matching
-
-        int[] array = new int[n];
-
-        array[0] = 42;
     }
 
     @Test
     public static void test2() {
-        boolean b = true, c = true;
-        int n;
+        boolean c = false;
 
-        if (b) {
-            n = 1;
-        } else {
-            n = 0;
+        for (int n = 1; n >= 0; --n) {
+            while (c) {} // Force state-matching
 
-            b = true;
+            assertRevisitedAtLeast(1);
         }
-
-        while (c) {} // Force state-matching
-
-        assertRevisitedAtLeast(1);
     }
 
     @Test
     public static void test3() {
-        boolean b = true, c = true;
-        int n;
+        boolean c = false;
 
-        if (b) {
-            n = 1;
-        } else {
-            n = 0;
+        for (int n = 1; n >= 0; --n) {
+            while (c) {} // Force state-matching
 
-            b = true;
+            assertVisitedAtMost(1);
         }
-
-        while (c) {} // Force state-matching
-
-        assertVisitedAtMost(1);
     }
 
 }

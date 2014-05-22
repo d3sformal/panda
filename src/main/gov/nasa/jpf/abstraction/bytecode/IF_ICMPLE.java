@@ -25,6 +25,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
@@ -59,7 +60,12 @@ public class IF_ICMPLE extends gov.nasa.jpf.jvm.bytecode.IF_ICMPLE implements Ab
 	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
 		return Abstraction._le(v1, abs_v1, v2, abs_v2);
 	}
-	
+
+    @Override
+    public TruthValue getConcreteBranch(int v1, int v2) {
+        return TruthValue.create(v1 <= v2);
+    }
+
 	@Override
 	public Predicate createPredicate(Expression expr1, Expression expr2) {
 		return Negation.create(LessThan.create(expr2, expr1));

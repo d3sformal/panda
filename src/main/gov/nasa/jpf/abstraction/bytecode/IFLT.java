@@ -25,6 +25,7 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Instruction;
 
@@ -59,6 +60,11 @@ public class IFLT extends gov.nasa.jpf.jvm.bytecode.IFLT implements AbstractBran
 	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
 		return Abstraction._lt(v1, abs_v1, 0, null);
 	}
+
+    @Override
+    public TruthValue getConcreteBranch(int v1, int v2) {
+        return TruthValue.create(v1 < v2);
+    }
 
 	@Override
 	public Predicate createPredicate(Expression expr1, Expression expr2) {
