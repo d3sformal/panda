@@ -1,0 +1,6 @@
+[static]
+class(gov.nasa.jpf.abstraction.predicate.ProdConsTest).DAILY_LIMIT = 1000000
+
+[method gov.nasa.jpf.abstraction.predicate.ProdConsTest$Producer.run]
+remaining = 1000000
+remaining > 0
