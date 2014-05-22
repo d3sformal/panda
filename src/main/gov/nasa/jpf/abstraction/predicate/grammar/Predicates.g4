@@ -196,6 +196,12 @@ predicate returns [Predicate[] val]
     }
     ;
 
+standaloneexpression returns [Expression[] val]
+    : e=expression {
+        $ctx.val = $e.val;
+    }
+    ;
+
 expression returns [Expression[] val] locals [List<Expression> expressions = new LinkedList<Expression>()]
     : t=term {
         $ctx.val = $t.val;
@@ -218,37 +224,7 @@ expression returns [Expression[] val] locals [List<Expression> expressions = new
             }
         }
     }
-    | '[' es=expressionlist ']' {
-        $ctx.val = $es.val;
-    }
-    ;
-
-standaloneexpressionlist returns [Expression[] val]
-    : e=expressionlist {
-        $ctx.val = $e.val;
-    }
-    ;
-
-expressionlist returns [Expression[] val]
-    : e=expression {
-        $ctx.val = $e.val;
-    }
-    | a=CONSTANT_TOKEN '..' b=CONSTANT_TOKEN {
-        int a = Integer.parseInt($a.text);
-        int b = Integer.parseInt($b.text);
-
-        int i = 0;
-        int step = a < b ? +1 : -1;
-
-        $ctx.val = new Expression[Math.abs(a - b - step)];
-
-        while (a != b + step) {
-            $ctx.val[i] = Constant.create(a);
-            a += step;
-            ++i;
-        }
-    }
-    | e1=expressionlist ',' e2=expressionlist {
+    | e1=expression ',' e2=expression {
         $ctx.val = new Expression[$e1.val.length + $e2.val.length];
 
         for (int i = 0; i < $e1.val.length; ++i) {
@@ -256,7 +232,7 @@ expressionlist returns [Expression[] val]
         }
 
         for (int i = 0; i < $e2.val.length; ++i) {
-            $ctx.val[$e2.val.length + i] = $e2.val[i];
+            $ctx.val[$e1.val.length + i] = $e2.val[i];
         }
     }
     ;
@@ -288,6 +264,21 @@ term returns [Expression[] val]
 factor returns [Expression[] val]
     : CONSTANT_TOKEN {
         $ctx.val = new Expression[] {Constant.create(Integer.parseInt($CONSTANT_TOKEN.text))};
+    }
+    | c=CONSTANT_TOKEN '..' d=CONSTANT_TOKEN {
+        int a = Integer.parseInt($c.text);
+        int b = Integer.parseInt($d.text);
+
+        int i = 0;
+        int step = a < b ? +1 : -1;
+
+        $ctx.val = new Expression[Math.abs(a - b - step)];
+
+        while (a != b + step) {
+            $ctx.val[i] = Constant.create(a);
+            a += step;
+            ++i;
+        }
     }
     | ALENGTH_TOKEN '(' ARRLEN_TOKEN ',' p=path ')' {
         $ctx.val = new Expression[$p.val.length];

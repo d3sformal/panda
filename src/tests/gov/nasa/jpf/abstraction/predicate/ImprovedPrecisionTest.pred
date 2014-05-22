@@ -38,9 +38,7 @@ r = p
 [method gov.nasa.jpf.abstraction.predicate.ImprovedPrecisionTest.testCase6]
 alength(arrlen,data) = 3
 data[0].f > 0
-data[0].f > 5
-data[1].f > 5
-data[2].f > 5
+data[0..2].f > 5
 i < 2
 i >= 0
 

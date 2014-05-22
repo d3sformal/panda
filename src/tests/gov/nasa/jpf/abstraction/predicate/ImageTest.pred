@@ -1,23 +1,23 @@
 [static]
-k = [0..2]
+k = 0..2
 class(gov.nasa.jpf.abstraction.predicate.Image).SIZE >= 0
 class(gov.nasa.jpf.abstraction.predicate.Image).SIZE = 6
 
 [object gov.nasa.jpf.abstraction.predicate.Image]
 alength(arrlen, this.pixels) = class(gov.nasa.jpf.abstraction.predicate.Image).SIZE
-alength(arrlen, this.pixels[[0..1]]) = class(gov.nasa.jpf.abstraction.predicate.Image).SIZE
+alength(arrlen, this.pixels[0..1]) = class(gov.nasa.jpf.abstraction.predicate.Image).SIZE
 
 alength(arrlen, this.pixels) = 6
-alength(arrlen, this.pixels[[0..1]]) = 6
+alength(arrlen, this.pixels[0..1]) = 6
 
 alength(arrlen, this.rectangles) = 2
 
 this.rectangles[0] = this.rectangles[1]
 
-this.rectangles[[0..1]].left = [0..6]
-this.rectangles[[0..1]].right = [0..6]
-this.rectangles[[0..1]].top = [0..6]
-this.rectangles[[0..1]].bottom = [0..6]
+this.rectangles[0..1].left = 0..6
+this.rectangles[0..1].right = 0..6
+this.rectangles[0..1].top = 0..6
+this.rectangles[0..1].bottom = 0..6
 
 this.rectangles[1].top < this.rectangles[0].top
 this.rectangles[0].bottom < this.rectangles[1].bottom
@@ -29,40 +29,40 @@ this.top < this.bottom
 this.left < this.right
 
 [method gov.nasa.jpf.abstraction.predicate.Image.load]
-r1.left = [0..6]
-r1.right = [0..6]
-r1.top = [0..6]
-r1.bottom = [0..6]
+r1.left = 0..6
+r1.right = 0..6
+r1.top = 0..6
+r1.bottom = 0..6
 
-r2.left = [0..6]
-r2.right = [0..6]
-r2.top = [0..6]
-r2.bottom = [0..6]
+r2.left = 0..6
+r2.right = 0..6
+r2.top = 0..6
+r2.bottom = 0..6
 
 [method gov.nasa.jpf.abstraction.predicate.Image.render]
-k = [0..2]
-i = [0..6]
-j = [0..6]
+k = 0..2
+i = 0..6
+j = 0..6
 
-rec.left = [0..6]
-rec.right = [0..6]
-rec.top = [0..6]
-rec.bottom = [0..6]
+rec.left = 0..6
+rec.right = 0..6
+rec.top = 0..6
+rec.bottom = 0..6
 
-rec = this.rectangles[[0..1]]
+rec = this.rectangles[0..1]
 
 [method gov.nasa.jpf.abstraction.predicate.ImageTest.main]
-img.rectangles[[0..1]].left = [0..6]
-img.rectangles[[0..1]].right = [0..6]
-img.rectangles[[0..1]].top = [0..6]
-img.rectangles[[0..1]].bottom = [0..6]
+img.rectangles[0..1].left = 0..6
+img.rectangles[0..1].right = 0..6
+img.rectangles[0..1].top = 0..6
+img.rectangles[0..1].bottom = 0..6
 
 alength(arrlen, img.rectangles) = 2
 alength(arrlen, img.pixels) = class(gov.nasa.jpf.abstraction.predicate.Image).SIZE
-alength(arrlen, img.pixels[[0..1]]) = class(gov.nasa.jpf.abstraction.predicate.Image).SIZE
+alength(arrlen, img.pixels[0..1]) = class(gov.nasa.jpf.abstraction.predicate.Image).SIZE
 
 alength(arrlen, img.pixels) = 6
-alength(arrlen, img.pixels[[0..1]]) = 6
+alength(arrlen, img.pixels[0..1]) = 6
 
 [method gov.nasa.jpf.abstraction.predicate.Image.<init>]
-i = [0..6]
+i = 0..6
