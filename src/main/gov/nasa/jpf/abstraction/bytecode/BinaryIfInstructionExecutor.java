@@ -115,9 +115,11 @@ public class BinaryIfInstructionExecutor {
 		sf.pop();
 		sf.pop();
 
-        if (br.getConcreteBranch(v1, v2) != TruthValue.create(conditionValue)) {
-            System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + br.createPredicate(expr1, expr2));
-            ss.setIgnored(true);
+        if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.pruning")) {
+            if (br.getConcreteBranch(v1, v2) != TruthValue.create(conditionValue)) {
+                System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + br.createPredicate(expr1, expr2));
+                ss.setIgnored(true);
+            }
         }
 
 		return (conditionValue ? br.getTarget() : br.getNext(ti));

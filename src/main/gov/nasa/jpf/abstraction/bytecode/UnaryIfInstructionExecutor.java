@@ -118,9 +118,11 @@ public class UnaryIfInstructionExecutor {
 		
 		sf.pop();
 
-        if (br.getConcreteBranch(v1, constant.value.intValue()) != TruthValue.create(conditionValue)) {
-            System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + br.createPredicate(expr, constant));
-            ss.setIgnored(true);
+        if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.pruning")) {
+            if (br.getConcreteBranch(v1, constant.value.intValue()) != TruthValue.create(conditionValue)) {
+                System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + br.createPredicate(expr, constant));
+                ss.setIgnored(true);
+            }
         }
 
 		return (conditionValue ? br.getTarget() : br.getNext(ti));

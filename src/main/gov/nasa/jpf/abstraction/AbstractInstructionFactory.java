@@ -64,7 +64,7 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 		
 		List<Abstraction> abs_list = new ArrayList<Abstraction>();
 
-		String[] abs_str = conf.getStringArray("abstract.domain");
+		String[] abs_str = conf.getStringArray("apf.abstract_domain");
 		
 		for (String s : abs_str) {
 			String[] args = s.split(" ");

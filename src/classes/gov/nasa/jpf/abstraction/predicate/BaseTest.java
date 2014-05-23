@@ -42,8 +42,8 @@ public class BaseTest {
         // why: test driver would not skip calls to native assert methods
         config.add("+classpath=build/tests");
         config.add("+sourcepath=src/tests");
-        config.add("+abstract.domain=PREDICATES src/tests/" + getClass().getName().replace(".", "/") + ".pred");
-        config.add("+abstract.verbose=false");
+        config.add("+apf.abstract_domain=PREDICATES src/tests/" + getClass().getName().replace(".", "/") + ".pred");
+        config.add("+apf.verbose=false");
         config.add("+listener=gov.nasa.jpf.abstraction.AbstractListener");
         config.add("+vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer");
         config.add("+report.console.property_violation=error,snapshot");
@@ -52,6 +52,14 @@ public class BaseTest {
 
     private String[] getConfig() {
         return config.toArray(new String[config.size()]);
+    }
+
+    public void enableBranchPruning() {
+        config.add("+apf.branch.pruning=true");
+    }
+
+    public void disableStateMatching() {
+        config.add("+vm.storage.class=");
     }
 
     @Test

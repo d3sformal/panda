@@ -271,7 +271,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
     @Override
     public void force(Predicate predicate, TruthValue value) {
         Config config = VM.getVM().getJPF().getConfig();
-        String key = "abstract.branch.reevaluate_predicates";
+        String key = "apf.branch.reevaluate_predicates";
 
         put(predicate, value);
 
