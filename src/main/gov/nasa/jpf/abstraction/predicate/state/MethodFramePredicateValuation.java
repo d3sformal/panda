@@ -121,6 +121,28 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return clone;
     }
 
+    private static boolean shareSymbols(Predicate candidate, Set<AccessExpression> paths, Set<AccessExpression> candidatePaths, Set<AccessExpression> prefixes) {
+        candidatePaths.clear();
+        candidate.addAccessExpressionsToSet(candidatePaths);
+
+        for (AccessExpression path : paths) {
+            // check shared access expressions between the candidate and the input predicate
+            // stop at first match
+            for (AccessExpression candidatePath : candidatePaths) {
+                prefixes.clear();
+                candidatePath.addAllPrefixesToSet(prefixes);
+
+                for (AccessExpression candidateSubPath : prefixes) {
+                    if (candidateSubPath.isSimilarToPrefixOf(path)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @param universe Universe of all predicates that may or may not determine the value of this predicate
      * @return A selection of those predicates from the universe that may directly determine the value of this predicate
@@ -134,38 +156,9 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
         // filter all determinants from all the candidates
         for (Predicate candidate : universe) {
-            boolean alreadyAdded = false;
-
-            candidate.addAccessExpressionsToSet(candidatePaths);
-
-            for (AccessExpression path : paths) {
-                // check shared access expressions between the candidate and the input predicate
-                // stop at first match
-                for (AccessExpression candidatePath : candidatePaths) {
-                    candidatePath.addAllPrefixesToSet(prefixes);
-
-                    for (AccessExpression candidateSubPath : prefixes) {
-                        if (candidateSubPath.isSimilarToPrefixOf(path)) {
-                            outPredicates.add(candidate);
-
-                            alreadyAdded = true;
-                            break;
-                        }
-                    }
-
-                    prefixes.clear();
-
-                    if (alreadyAdded) {
-                        break;
-                    }
-                }
-
-                if (alreadyAdded) {
-                    break;
-                }
+            if (shareSymbols(candidate, paths, candidatePaths, prefixes)) {
+                outPredicates.add(candidate);
             }
-
-            candidatePaths.clear();
         }
     }
 
@@ -186,27 +179,30 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
     private Set<Predicate> computeSharedSymbolsClosure(Predicate predicate, Set<Predicate> universe) {
         if (!sharedSymbolCache.containsKey(predicate)) {
             Set<Predicate> cur;
-            Set<Predicate> ret = new HashSet<Predicate>();
+            Set<Predicate> all = new HashSet<Predicate>();
+            Set<Predicate> open = new HashSet<Predicate>();
 
-            selectPredicatesSharingSymbols(predicate, universe, ret);
+            selectPredicatesSharingSymbols(predicate, universe, open);
+            all.addAll(open);
 
-            int prevSize = 0;
-
-            while (prevSize != ret.size()) {
-                prevSize = ret.size();
-
+            while (!open.isEmpty()) {
                 cur = new HashSet<Predicate>();
 
-                for (Predicate p : ret) {
+                for (Predicate p : open) {
                     selectPredicatesSharingSymbols(p, universe, cur);
                 }
 
-                // each `p` in `ret` is contained in `selectDet(p)` and therefore also in `cur`
-                // thus the following statement avoids unnecessary merge of the sets
-                ret = cur;
+                open.clear();
+
+                for (Predicate p : cur) {
+                    if (!all.contains(p)) {
+                        open.add(p);
+                    }
+                    all.add(p);
+                }
             }
 
-            sharedSymbolCache.put(predicate, ret);
+            sharedSymbolCache.put(predicate, all);
         }
 
         return sharedSymbolCache.get(predicate);
@@ -313,7 +309,32 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
     public void put(Predicate predicate, TruthValue value) {
         // Change of the set of predicates -> need to recompute determinant sets
         if (!containsKey(predicate)) {
-            sharedSymbolCache.clear();
+            // Least effort
+            //sharedSymbolCache.clear();
+
+            // Most effort
+            Set<AccessExpression> paths = new HashSet<AccessExpression>();
+            Set<AccessExpression> candidatePaths = new HashSet<AccessExpression>();
+            Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
+            Set<Predicate> toBeAdded = new HashSet<Predicate>();
+
+            for (Predicate p : sharedSymbolCache.keySet()) {
+                paths.clear();
+                p.addAccessExpressionsToSet(paths);
+                if (shareSymbols(predicate, paths, candidatePaths, prefixes)) {
+                    sharedSymbolCache.get(p).add(predicate);
+                } else {
+                    toBeAdded.clear();
+                    for (Predicate q : sharedSymbolCache.get(p)) {
+                        paths.clear();
+                        q.addAccessExpressionsToSet(paths);
+                        if (shareSymbols(predicate, paths, candidatePaths, prefixes)) {
+                            toBeAdded.add(predicate);
+                        }
+                    }
+                    sharedSymbolCache.get(p).addAll(toBeAdded);
+                }
+            }
         }
 
         valuations.put(predicate, value);
@@ -446,7 +467,10 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
         putAll(newValuations);
 
-        improvePrecisionOfAliasingPredicates();
+        MethodFrameSymbolTable sym = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
+        if (!sym.isPrimitive(affected)) {
+            improvePrecisionOfAliasingPredicates();
+        }
     }
 
     private static boolean isAliasingPredicate(Predicate p, MethodFrameSymbolTable sym) {
