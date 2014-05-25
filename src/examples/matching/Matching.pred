@@ -1,12 +1,2 @@
 [method matching.Matching.wasteTime]
-ever = 0
-ever = 1
-ever = 2
-ever = 3
-ever = 4
-ever = 5
-ever = 6
-ever = 7
-ever = 8
-ever = 9
-ever = 10
+ever = 0..10

@@ -35,11 +35,11 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
         Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
         if (RunDetector.isRunning()) {
+            // Determine the unambiguous concrete array length from predicates
             PredicateAbstraction abs = (PredicateAbstraction) GlobalAbstraction.getInstance().get();
             Expression lengthExpression = attr.getExpression();
             Integer lengthValue = abs.computePreciseExpressionValue(lengthExpression);
 
-            // Determine the unambiguous concrete array length from predicates
             if (lengthValue == null) {
                 return ti.createAndThrowException("java.lang.IllegalArgumentException", "predicates do not specify exact array length");
             }

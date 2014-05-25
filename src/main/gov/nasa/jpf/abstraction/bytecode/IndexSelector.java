@@ -64,10 +64,10 @@ public class IndexSelector {
 
             Predicate assumption = Equals.create(index, Constant.create(selectedIndex));
 
-            // This is inefficient - a lot of infeasible choices are explored (immediate backtracking)
-            // We are performing non-det choice over all indices to an array
-            // However, only some concrete indices satisfy constraints given in the current state (predicates over index expression)
-            // Prune the infeasible choices
+            // This is inefficient: many infeasible choices are created and then immediately pruned (when APF starts their exploration)
+            // We are performing non-deterministic choice over all indices to an array
+            // However, only some concrete indices satisfy constraints given in the current abstract state (predicates over index expression)
+            // We prune the infeasible choices
             if (abs.getPredicateValuation().getPredicatesInconsistentWith(assumption, TruthValue.TRUE).isEmpty()) {
                 abs.getPredicateValuation().force(assumption, TruthValue.TRUE);
             } else {

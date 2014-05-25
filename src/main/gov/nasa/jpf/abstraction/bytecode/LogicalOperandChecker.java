@@ -27,7 +27,7 @@ public class LogicalOperandChecker {
             TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inSupportedDomain);
 
             if (value != TruthValue.TRUE) {
-                throw new IllegalArgumentException("logical & bitwise operations over values other than {0, 1} are unsupported");
+                throw new IllegalArgumentException("logical and bitwise operations over values other than {0, 1} are not supported");
             }
         }
     }

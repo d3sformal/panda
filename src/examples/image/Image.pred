@@ -15,34 +15,18 @@ alength(arrlen, this.rectangles) = 2
 
 this.rectangles[0] = this.rectangles[1]
 
-this.rectangles[0].left >= 0
-this.rectangles[0].right >= 0
-this.rectangles[0].top >= 0
-this.rectangles[0].bottom >= 0
+this.rectangles[0..1].left >= 0
+this.rectangles[0..1].right >= 0
+this.rectangles[0..1].top >= 0
+this.rectangles[0..1].bottom >= 0
 
-this.rectangles[1].left >= 0
-this.rectangles[1].right >= 0
-this.rectangles[1].top >= 0
-this.rectangles[1].bottom >= 0
-
-this.rectangles[0].left < 6
-this.rectangles[0].right < 6
-this.rectangles[0].top < 6
-this.rectangles[0].bottom < 6
-
-this.rectangles[1].left < 6
-this.rectangles[1].right < 6
-this.rectangles[1].top < 6
-this.rectangles[1].bottom < 6
+this.rectangles[0..1].left < 6
+this.rectangles[0..1].right < 6
+this.rectangles[0..1].top < 6
+this.rectangles[0..1].bottom < 6
 
 [method image.Image.<init>]
-i = 0
-i = 1
-i = 2
-i = 3
-i = 4
-i = 5
-i = 6
+i = 0..6
 
 [method image.Image.load]
 r1.left >= 0
@@ -77,9 +61,7 @@ r.right < class(image.Image).SIZE
 r.bottom < class(image.Image).SIZE
 
 [method image.Image.render]
-k = 0
-k = 1
-k = 2
+k = 0..2
 
 i >= 0
 i < 6
@@ -101,25 +83,15 @@ rec = this.rectangles[0]
 rec = this.rectangles[1]
 
 [method image.Image.main]
-img.rectangles[0].left >= 0
-img.rectangles[0].right >= 0
-img.rectangles[0].top >= 0
-img.rectangles[0].bottom >= 0
+img.rectangles[0..1].left >= 0
+img.rectangles[0..1].right >= 0
+img.rectangles[0..1].top >= 0
+img.rectangles[0..1].bottom >= 0
 
-img.rectangles[1].left >= 0
-img.rectangles[1].right >= 0
-img.rectangles[1].top >= 0
-img.rectangles[1].bottom >= 0
-
-img.rectangles[0].left < class(image.Image).SIZE
-img.rectangles[0].right < class(image.Image).SIZE
-img.rectangles[0].top < class(image.Image).SIZE
-img.rectangles[0].bottom < class(image.Image).SIZE
-
-img.rectangles[1].left < class(image.Image).SIZE
-img.rectangles[1].right < class(image.Image).SIZE
-img.rectangles[1].top < class(image.Image).SIZE
-img.rectangles[1].bottom < class(image.Image).SIZE
+img.rectangles[0..1].left < class(image.Image).SIZE
+img.rectangles[0..1].right < class(image.Image).SIZE
+img.rectangles[0..1].top < class(image.Image).SIZE
+img.rectangles[0..1].bottom < class(image.Image).SIZE
 
 alength(arrlen, img.rectangles) = 2
 alength(arrlen, img.pixels) = class(image.Image).SIZE
