@@ -28,7 +28,7 @@ class Producer {
     public void doIt() {
         int pos = 0;
 
-        while (true) {
+        for (int i = 0; i < 4; ++i) {
             // simulate modulo by 3
             int v = pos + pos + 1;
             while (v >= 3) v = v - 3;
