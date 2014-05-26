@@ -467,6 +467,10 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
         putAll(newValuations);
 
+        /**
+         * Aliasing cannot be changed when only primitive data is affected
+         * It is not necessary to update predicates expressing the aliasing
+         */
         MethodFrameSymbolTable sym = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
         if (!sym.isPrimitive(affected)) {
             improvePrecisionOfAliasingPredicates();
