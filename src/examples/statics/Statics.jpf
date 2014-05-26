@@ -5,6 +5,6 @@ target=statics.Statics
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/statics/Statics.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/statics/Statics.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor

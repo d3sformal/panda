@@ -5,7 +5,7 @@ target=cycling.CyclingRace
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/cycling/CyclingRace.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/cycling/CyclingRace.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 

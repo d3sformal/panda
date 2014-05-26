@@ -5,7 +5,7 @@ target=svcomp.loops.VogalTrueUnreachableLabel
 classpath=${jpf-abstraction}/build/examples/
 sourcepath=${jpf-abstraction}/src/examples/
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/loops/VogalTrueUnreachableLabel.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/loops/VogalTrueUnreachableLabel.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 

@@ -5,8 +5,8 @@ target=loop.Loop
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/loop/Loop.pred
-abstract.branch.reevaluate_predicates=true
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/loop/Loop.pred
+apf.branch.reevaluate_predicates=true
 
 listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.listener.ExecTracker,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.predicate.util.StackExpressionMonitor
 et.skip_init=false

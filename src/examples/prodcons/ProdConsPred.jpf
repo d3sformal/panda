@@ -5,7 +5,7 @@ target=prodcons.predicate.ProdConsEx
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/prodcons/predicate/ProdConsEx.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/prodcons/predicate/ProdConsEx.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.predicate.util.StackExpressionMonitor,gov.nasa.jpf.abstraction.predicate.util.UniverseMonitor
 

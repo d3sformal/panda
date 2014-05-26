@@ -5,7 +5,7 @@ target=scheduler.Scheduler
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/scheduler/Scheduler.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/scheduler/Scheduler.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 

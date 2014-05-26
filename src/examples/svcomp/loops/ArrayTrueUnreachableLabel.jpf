@@ -5,7 +5,7 @@ target=svcomp.loops.ArrayTrueUnreachableLabel
 classpath=${jpf-abstraction}/build/examples/
 sourcepath=${jpf-abstraction}/src/examples/
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/loops/ArrayTrueUnreachableLabel.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/loops/ArrayTrueUnreachableLabel.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 

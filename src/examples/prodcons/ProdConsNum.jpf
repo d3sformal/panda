@@ -5,7 +5,7 @@ target=prodcons.numeric.ProdConsEx
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=SIGNS
+apf.abstract_domain=SIGNS
 
 listener = gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.DebugMonitor
 

@@ -5,7 +5,7 @@ target=compare.Compare
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/compare/Compare.pred
-abstract.branch.reevaluate_predicates=true
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/compare/Compare.pred
+apf.branch.reevaluate_predicates=true
 
 listener=gov.nasa.jpf.listener.ExecTracker,gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor

@@ -5,7 +5,7 @@ target=wp.WP
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/wp/WP.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/wp/WP.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.SMTMonitor
 

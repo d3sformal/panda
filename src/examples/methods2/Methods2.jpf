@@ -5,7 +5,7 @@ target=methods2.Methods2
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/methods2/Methods2.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/methods2/Methods2.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor
 #,gov.nasa.jpf.abstraction.util.StaticClassObjectTracker

@@ -5,7 +5,7 @@ target=svcomp.minepump.Main
 classpath=${jpf-abstraction}/build/examples/
 sourcepath=${jpf-abstraction}/src/examples/
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/minepump/MinePump.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/minepump/MinePump.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 

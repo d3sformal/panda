@@ -5,7 +5,7 @@ target=svcomp.recursive.Ackermann01TrueUnreachableLabel
 classpath=${jpf-abstraction}/build/examples/
 sourcepath=${jpf-abstraction}/src/examples/
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/recursive/Ackermann01TrueUnreachableLabel.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/recursive/Ackermann01TrueUnreachableLabel.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 

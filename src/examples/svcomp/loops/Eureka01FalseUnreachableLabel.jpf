@@ -5,7 +5,7 @@ target=svcomp.loops.Eureka01FalseUnreachableLabel
 classpath=${jpf-abstraction}/build/examples/
 sourcepath=${jpf-abstraction}/src/examples/
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/loops/Eureka01FalseUnreachableLabel.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/loops/Eureka01FalseUnreachableLabel.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 
