@@ -49,77 +49,42 @@ import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ArrayIndexOutOfBoundsExecutiveException;
+import gov.nasa.jpf.jvm.bytecode.ArrayElementInstruction;
 
 import java.util.Set;
 import java.util.HashSet;
 
-public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
-
-    private AccessExpression array;
-    private Expression index;
-    private AccessExpression path;
+public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD implements ArrayLoadInstruction {
 
     private ElementSelector elementSelector = new ElementSelector();
-    private static final String ARRAY_INDEX_OUT_OF_BOUNDS = "java.lang.ArrayIndexOutOfBoundsException";
+    private ArrayLoadExecutor executor = new ArrayLoadExecutor(elementSelector);
 
     @Override
     public Instruction execute(ThreadInfo ti) {
-        StackFrame sf = ti.getTopFrame();
-        Attribute arrayAttr = (Attribute) sf.getOperandAttr(1);
-        Attribute indexAttr = (Attribute) sf.getOperandAttr(0);
+        return executor.execute(this, ti);
+    }
 
-        arrayAttr = Attribute.ensureNotNull(arrayAttr);
-        indexAttr = Attribute.ensureNotNull(indexAttr);
-
-        array = (AccessExpression) arrayAttr.getExpression();
-        index = indexAttr.getExpression();
-        path = DefaultArrayElementRead.create(array, index);
-
-        Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
-
-        SystemState ss = ti.getVM().getSystemState();
-
-        if (RunDetector.isRunning()) {
-            PredicateAbstraction abs = ((PredicateAbstraction) GlobalAbstraction.getInstance().get());
-            MethodFrameSymbolTable sym = abs.getSymbolTable().get(0);
-
-            if (elementSelector.selectElementRef(ti, ss, abs, sym, array, index)) {
-                return this;
-            }
-        }
-
-        Instruction actualNextInsn = super.execute(ti);
-
-        if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
-            return actualNextInsn;
-        }
-
-        Attribute attribute = new NonEmptyAttribute(null, path);
-
-        sf = ti.getModifiableTopFrame();
-        sf.setOperandAttr(attribute);
-
-        return actualNextInsn;
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
+        return super.execute(ti);
     }
 
     @Override
     public void push(StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsExecutiveException {
+        executor.push(this, sf, ei, someIndex);
+    }
+
+    @Override
+    public void pushConcrete(StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsExecutiveException {
         if (RunDetector.isRunning()) {
-            // i >= 0 && i < a.length
-            Predicate inBounds = Conjunction.create(
-                Negation.create(LessThan.create(index, Constant.create(0))),
-                LessThan.create(index, DefaultArrayLengthRead.create(array))
-            );
-
-            TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
-
-            if (value != TruthValue.TRUE) {
-                throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds));
-            }
-
             sf.push(elementSelector.getElementRef().intValue());
         } else {
             super.push(sf, ei, someIndex);
         }
+    }
+
+    @Override
+    public ArrayElementInstruction getSelf() {
+        return this;
     }
 }

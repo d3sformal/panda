@@ -40,8 +40,12 @@ public class ArrayLoadExecutor {
     private Expression index;
     private AccessExpression path;
 
-    private IndexSelector indexSelector = new IndexSelector();
+    private IndexSelector indexSelector;
     private static final String ARRAY_INDEX_OUT_OF_BOUNDS = "java.lang.ArrayIndexOutOfBoundsException";
+
+    public ArrayLoadExecutor(IndexSelector indexSelector) {
+        this.indexSelector = indexSelector;
+    }
 
     public Instruction execute(ArrayLoadInstruction load, ThreadInfo ti) {
         StackFrame sf = ti.getModifiableTopFrame();
@@ -64,7 +68,7 @@ public class ArrayLoadExecutor {
             PredicateAbstraction abs = ((PredicateAbstraction) GlobalAbstraction.getInstance().get());
             MethodFrameSymbolTable sym = abs.getSymbolTable().get(0);
 
-            if (indexSelector.selectIndex(ti, ss, abs, sym, array, index)) {
+            if (indexSelector.makeChoices(ti, ss, abs, sym, array, index)) {
                 return load.getSelf();
             }
 
@@ -85,23 +89,22 @@ public class ArrayLoadExecutor {
         return actualNextInsn;
     }
 
+    protected Expression getUpperBound(ElementInfo ei, AccessExpression array) {
+        // Builtin static (constant-length) arrays
+        // such as SWITCHMAP for enum types
+        if (array instanceof ObjectFieldRead && ((ObjectFieldRead) array).getField().getName().startsWith("$SwitchMap")) {
+            return Constant.create(ei.arrayLength());
+        } else {
+            return DefaultArrayLengthRead.create(array);
+        }
+    }
+
     public void push(ArrayLoadInstruction load, StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsExecutiveException {
         if (RunDetector.isRunning()) {
-            // Upper bound on the index (= array length)
-            Expression upperBound;
-
-            // Builtin static (constant-length) arrays
-            // such as SWITCHMAP for enum types
-            if (array instanceof ObjectFieldRead && ((ObjectFieldRead) array).getField().getName().startsWith("$SwitchMap")) {
-                upperBound = Constant.create(ei.arrayLength());
-            } else {
-                upperBound = DefaultArrayLengthRead.create(array);
-            }
-
             // i >= 0 && i < a.length
             Predicate inBounds = Conjunction.create(
                 Negation.create(LessThan.create(index, Constant.create(0))),
-                LessThan.create(index, upperBound)
+                LessThan.create(index, getUpperBound(ei, array))
             );
 
             TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);

@@ -57,7 +57,7 @@ import java.util.HashSet;
 
 public class SALOAD extends gov.nasa.jpf.jvm.bytecode.SALOAD implements ArrayLoadInstruction {
 
-    private ArrayLoadExecutor executor = new ArrayLoadExecutor();
+    private ArrayLoadExecutor executor = new ArrayLoadExecutor(new IndexSelector());
 
     @Override
     public Instruction execute(ThreadInfo ti) {

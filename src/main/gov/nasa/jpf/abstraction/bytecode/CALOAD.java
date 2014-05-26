@@ -57,7 +57,7 @@ import java.util.HashSet;
 
 public class CALOAD extends gov.nasa.jpf.jvm.bytecode.CALOAD implements ArrayLoadInstruction {
 
-    private ArrayLoadExecutor executor = new ArrayLoadExecutor();
+    private ArrayLoadExecutor executor = new ArrayLoadExecutor(new IndexSelector());
 
     @Override
     public Instruction execute(ThreadInfo ti) {

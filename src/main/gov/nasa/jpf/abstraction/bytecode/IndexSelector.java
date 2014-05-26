@@ -30,6 +30,10 @@ public class IndexSelector {
     private Integer selectedIndex = null;
     private static final String INDEX_CHOICE_ID = "abstractArrayElementLoadChooseIndex";
 
+    public boolean makeChoices(ThreadInfo ti, SystemState ss, PredicateAbstraction abs, MethodFrameSymbolTable sym, AccessExpression array, Expression index) {
+        return selectIndex(ti, ss, abs, sym, array, index);
+    }
+
     public boolean selectIndex(ThreadInfo ti, SystemState ss, PredicateAbstraction abs, MethodFrameSymbolTable sym, AccessExpression array, Expression index) {
         if (!isIndexChoiceFirstStep(ti, ss)) {
 
