@@ -674,6 +674,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                 callerScope.put(predicate, calleeReturns.get(predicate));
             }
 
+            // Predicates may be reevaluated to UNKNOWN at return from method (especially aliasing predicates)
+            // To restore precision we may update the aliasing predicates using the symbol table
             callerScope.improvePrecisionOfAliasingPredicates();
         }
 
