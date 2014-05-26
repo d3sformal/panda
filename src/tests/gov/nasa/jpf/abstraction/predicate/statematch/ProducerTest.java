@@ -3,6 +3,8 @@ package gov.nasa.jpf.abstraction.predicate.statematch;
 // small test for matching predicates together with abstract heap
 // both semantically equivalent and semantically different objects
 
+import static gov.nasa.jpf.abstraction.predicate.BaseTest.*;
+
 public class ProducerTest extends StateMatchingTest {
     public ProducerTest() {
         disableStateMatching();
@@ -33,6 +35,8 @@ class Producer {
             int v = pos + pos + 1;
             while (v >= 3) v = v - 3;
 
+            assertConjunction("v < 3: true");
+
             Data d = new Data();
             d.val = v;
 
@@ -42,6 +46,8 @@ class Producer {
                 pos = pos + pos + pos + 1;
                 while (pos >= SIZE) pos = pos - SIZE;
 
+                assertConjunction("pos < 8: true");
+
                 if (pos == oldPos) break;
             }
 
@@ -49,5 +55,7 @@ class Producer {
 
             buffer[pos] = d;
         }
+
+        assertConjunction("i >= 4: true");
     }
 }

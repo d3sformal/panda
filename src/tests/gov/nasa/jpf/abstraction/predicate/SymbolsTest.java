@@ -15,13 +15,10 @@ public class SymbolsTest extends BaseTest {
 		SymbA l[] = new SymbA[1];
 		SymbA m = new SymbA();
 		SymbA n = new SymbA();
-		SymbA o[][] = new SymbA[2][2];
 		
 		k[0] = new SymbA();
 		k[1] = new SymbA();
 
-		o[0] = k;
-		
 		k[0].b = new SymbB();
 		k[0].b.i = 1;
 		
