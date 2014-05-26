@@ -178,8 +178,13 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
     private Set<Predicate> computeSharedSymbolsClosure(Predicate predicate, Set<Predicate> universe) {
         if (!sharedSymbolCache.containsKey(predicate)) {
+            // Currently discovered elements of the closure
             Set<Predicate> cur;
+
+            // All will eventually contain the entire closure
             Set<Predicate> all = new HashSet<Predicate>();
+
+            // Elements of the closure that have not yet been processed to obtain other elements
             Set<Predicate> open = new HashSet<Predicate>();
 
             selectPredicatesSharingSymbols(predicate, universe, open);
@@ -195,6 +200,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                 open.clear();
 
                 for (Predicate p : cur) {
+                    // Continue exploring only new elements (avoid redundant computations)
                     if (!all.contains(p)) {
                         open.add(p);
                     }
@@ -310,9 +316,11 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         // Change of the set of predicates -> need to recompute determinant sets
         if (!containsKey(predicate)) {
             // Least effort
+            //  - It is sufficient to "invalidate" the cache, let it be recomputed next time an element is requested
             //sharedSymbolCache.clear();
 
             // Most effort
+            //  - An alternative approach - extend all cached sets if they should also contain the newly added predicate
             Set<AccessExpression> paths = new HashSet<AccessExpression>();
             Set<AccessExpression> candidatePaths = new HashSet<AccessExpression>();
             Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
@@ -496,7 +504,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return false;
     }
 
-    private static AccessExpression getLeftHand(Predicate p) {
+    private static AccessExpression getLeftHandSide(Predicate p) {
         while (p instanceof Negation) {
             p = ((Negation) p).predicate;
         }
@@ -504,7 +512,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return (AccessExpression) ((Equals) p).a;
     }
 
-    private static AccessExpression getRightHand(Predicate p) {
+    private static AccessExpression getRightHandSide(Predicate p) {
         while (p instanceof Negation) {
             p = ((Negation) p).predicate;
         }
@@ -512,11 +520,11 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return (AccessExpression) ((Equals) p).b;
     }
 
-    private static boolean areSingleton(Set<UniverseIdentifier> a, Set<UniverseIdentifier> b) {
+    private static boolean areEquivalentSingletonSets(Set<UniverseIdentifier> a, Set<UniverseIdentifier> b) {
         return a.size() == 1 && a.equals(b);
     }
 
-    private static boolean overlap(Set<UniverseIdentifier> a, Set<UniverseIdentifier> b) {
+    private static boolean areOverlappingSets(Set<UniverseIdentifier> a, Set<UniverseIdentifier> b) {
         if (a.size() > b.size()) {
             Set<UniverseIdentifier> swap = a;
 
@@ -541,8 +549,8 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             if (isAliasingPredicate(p, sym) && get(p) == TruthValue.UNKNOWN) {
                 TruthValue aliased = p instanceof Equals ? TruthValue.TRUE : TruthValue.FALSE;
 
-                AccessExpression a = getLeftHand(p);
-                AccessExpression b = getRightHand(p);
+                AccessExpression a = getLeftHandSide(p);
+                AccessExpression b = getRightHandSide(p);
 
                 Set<UniverseIdentifier> valuesA = new HashSet<UniverseIdentifier>();
                 Set<UniverseIdentifier> valuesB = new HashSet<UniverseIdentifier>();
@@ -550,9 +558,9 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                 sym.lookupValues(a, valuesA);
                 sym.lookupValues(b, valuesB);
 
-                if (areSingleton(valuesA, valuesB)) {
+                if (areEquivalentSingletonSets(valuesA, valuesB)) {
                     improved.put(p, aliased);
-                } else if (!overlap(valuesA, valuesB)) {
+                } else if (!areOverlappingSets(valuesA, valuesB)) {
                     improved.put(p, TruthValue.neg(aliased));
                 }
             }
