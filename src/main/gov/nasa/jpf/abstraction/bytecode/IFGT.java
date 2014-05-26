@@ -62,7 +62,7 @@ public class IFGT extends gov.nasa.jpf.jvm.bytecode.IFGT implements AbstractBran
 	}
 
     @Override
-    public TruthValue getConcreteBranch(int v1, int v2) {
+    public TruthValue getConcreteBranchValue(int v1, int v2) {
         return TruthValue.create(v1 > v2);
     }
 

@@ -19,7 +19,7 @@ public interface AbstractBranching {
 	
 	public Predicate createPredicate(Expression expr1, Expression expr2);
 	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2);
-	public TruthValue getConcreteBranch(int v1, int v2);
+	public TruthValue getConcreteBranchValue(int v1, int v2);
 	
 	public Instruction getTarget();
 	public Instruction getNext(ThreadInfo ti);

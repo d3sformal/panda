@@ -116,7 +116,7 @@ public class BinaryIfInstructionExecutor {
 		sf.pop();
 
         if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.pruning")) {
-            if (br.getConcreteBranch(v1, v2) != TruthValue.create(conditionValue)) {
+            if (br.getConcreteBranchValue(v1, v2) != TruthValue.create(conditionValue)) {
                 System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + br.createPredicate(expr1, expr2));
                 ss.setIgnored(true);
             }
