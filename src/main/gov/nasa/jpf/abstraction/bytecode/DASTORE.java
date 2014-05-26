@@ -43,6 +43,8 @@ public class DASTORE extends gov.nasa.jpf.jvm.bytecode.DASTORE {
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
+        // Here we may write into a different index than those corresponding to abstract state
+        // Only if we do not apply pruning of infeasible paths (inconsistent concrete/abstract state)
 		Instruction actualNextInsn = super.execute(ti);
 		
 		if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
@@ -58,6 +60,7 @@ public class DASTORE extends gov.nasa.jpf.jvm.bytecode.DASTORE {
 			element = DefaultArrayElementRead.create(to, index.getExpression());
 		}
 
+        // Element indices are derived from predicates in this method call
 		GlobalAbstraction.getInstance().processPrimitiveStore(from, element);
 		
         AnonymousExpressionTracker.notifyPopped(to);

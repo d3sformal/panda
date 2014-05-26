@@ -46,11 +46,10 @@ public class SASTORE extends gov.nasa.jpf.jvm.bytecode.SASTORE {
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
+        // Here we may write into a different index than those corresponding to abstract state
+        // Only if we do not apply pruning of infeasible paths (inconsistent concrete/abstract state)
 		Instruction actualNextInsn = super.execute(ti);
 		
-        /**
-         * Do not inform abstractions about this event if the instruction did not execute successfully
-         */
 		if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
 			return actualNextInsn;
 		} 
@@ -64,9 +63,7 @@ public class SASTORE extends gov.nasa.jpf.jvm.bytecode.SASTORE {
 			element = DefaultArrayElementRead.create(to, index.getExpression());
 		}
 
-        /**
-         * Inform abstractions about the write to the array
-         */
+        // Element indices are derived from predicates in this method call
 		GlobalAbstraction.getInstance().processPrimitiveStore(from, element);
 		
         AnonymousExpressionTracker.notifyPopped(to);
