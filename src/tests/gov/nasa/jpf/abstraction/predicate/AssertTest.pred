@@ -1,2 +1,2 @@
-[method gov.nasa.jpf.abstraction.predicate.AssertTest.main]
+[method gov.nasa.jpf.abstraction.predicate.AssertTest.test1]
 x = 3

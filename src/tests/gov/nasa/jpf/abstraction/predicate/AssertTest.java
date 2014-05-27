@@ -1,7 +1,5 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-import org.junit.Test;
-
 // An example of a test driver replacing Junit automatic invocation
 // Completely optional
 class AssertTestDriver {
@@ -15,7 +13,8 @@ public class AssertTest extends BaseTest {
         //config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
     }
 
-    public static void main(String[] args) {
+    @Test
+    public static void test1() {
         int x = 3;
         int y = 5;
 
