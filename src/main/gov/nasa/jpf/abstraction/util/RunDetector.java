@@ -5,6 +5,8 @@ import java.util.Stack;
 import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ReturnInstruction;
 import gov.nasa.jpf.vm.VM;
 
@@ -69,4 +71,14 @@ public class RunDetector {
 	public static boolean isRunning() {
 		return running.hasBeenRunning();
 	}
+
+    public static boolean isInLibrary(ThreadInfo ti) {
+        for (StackFrame sf : ti) {
+            if (sf.getMethodInfo().getFullName().startsWith("java.")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

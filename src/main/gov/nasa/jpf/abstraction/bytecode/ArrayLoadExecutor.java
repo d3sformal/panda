@@ -100,7 +100,7 @@ public class ArrayLoadExecutor {
     }
 
     public void push(ArrayLoadInstruction load, StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsExecutiveException {
-        if (RunDetector.isRunning()) {
+        if (RunDetector.isRunning() && !RunDetector.isInLibrary(ThreadInfo.getCurrentThread())) {
             // i >= 0 && i < a.length
             Predicate inBounds = Conjunction.create(
                 Negation.create(LessThan.create(index, Constant.create(0))),

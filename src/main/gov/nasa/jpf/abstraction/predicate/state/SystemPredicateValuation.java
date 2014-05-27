@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
@@ -608,7 +609,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
                                     for (AccessExpression alias : aliases) {
                                         // reference-passed objects may have been affected by the method
-                                        if (actualParameter.isProperPrefixOf(alias)) {
+                                        // except array lengths (those cannot change after passing a reference to the array)
+                                        if (actualParameter.isProperPrefixOf(alias) && !(alias instanceof ArrayLengthRead && alias.getLength() == actualParameter.getLength() + 1)) {
                                             if (alias.getRoot().isThis() && sameObject) {
                                                 // Constructors affect `this` only in scope of the class
                                                 // No further subclass fields may be modified by the constructor

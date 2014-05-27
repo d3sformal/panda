@@ -20,16 +20,27 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.LessThan;
+import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
 import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.ArrayIndexOutOfBoundsExecutiveException;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 
 public class LASTORE extends gov.nasa.jpf.jvm.bytecode.LASTORE {
 	
+    private static final String ARRAY_INDEX_OUT_OF_BOUNDS = "java.lang.ArrayIndexOutOfBoundsException";
+
 	@Override
 	public Instruction execute(ThreadInfo ti) {
 		StackFrame sf = ti.getTopFrame();
@@ -42,6 +53,19 @@ public class LASTORE extends gov.nasa.jpf.jvm.bytecode.LASTORE {
 		destination = Attribute.ensureNotNull(destination);
 
 		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+        if (RunDetector.isRunning() && !RunDetector.isInLibrary(ti)) {
+            Predicate inBounds = Conjunction.create(
+                Negation.create(LessThan.create(index.getExpression(), Constant.create(0))),
+                LessThan.create(index.getExpression(), DefaultArrayLengthRead.create((AccessExpression) destination.getExpression()))
+            );
+
+            TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
+
+            if (value != TruthValue.TRUE) {
+                throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds));
+            }
+        }
 
         // Here we may write into a different index than those corresponding to abstract state
         // Only if we do not apply pruning of infeasible paths (inconsistent concrete/abstract state)

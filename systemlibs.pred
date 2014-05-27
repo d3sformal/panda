@@ -12,10 +12,20 @@ cur.group.destroyed = 0
 this.group.destroyed = 0
 return = this.group
 
+[object java.lang.ThreadGroup]
+this.nthreads = 0
+
 // Track these to allow precise exception handling
 [method java.lang.ThreadGroup.add]
 cur.destroyed = 0
 this.destroyed = 0
+this.nthreads < alength(arrlen, nt)
+this.nthreads + 1 = alength(arrlen, nt)
+this.threads = nt
+
+[assume pre method java.lang.ThreadGroup.add]
+this.nthreads >= 0
+this.nthreads < alength(arrlen, this.threads)
 
 // Assume that current thread cannot be destroyed
 [assume post method java.lang.Thread.currentThread]
