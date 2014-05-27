@@ -20,7 +20,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
 import gov.nasa.jpf.abstraction.numeric.SignsValue;
 import gov.nasa.jpf.vm.StackFrame;
@@ -31,57 +30,57 @@ import gov.nasa.jpf.vm.StackFrame;
  */
 public class LongComparatorExecutor extends BinaryComparatorExecutor<Long> {
 
-	private static LongComparatorExecutor instance;
+    private static LongComparatorExecutor instance;
 
-	public static LongComparatorExecutor getInstance() {
-		if (instance == null) {
-			instance = new LongComparatorExecutor();
-		}
-		
-		return instance;
-	}
+    public static LongComparatorExecutor getInstance() {
+        if (instance == null) {
+            instance = new LongComparatorExecutor();
+        }
 
-	@Override
-	protected Attribute getLeftAttribute(StackFrame sf) {
-		return getAttribute(sf, 1);
-	}
+        return instance;
+    }
 
-	@Override
-	protected Attribute getRightAttribute(StackFrame sf) {
-		return getAttribute(sf, 3);
-	}
+    @Override
+    protected Attribute getLeftAttribute(StackFrame sf) {
+        return getAttribute(sf, 1);
+    }
 
-	@Override
-	final protected Long getLeftOperand(StackFrame sf) {
-		return sf.peekLong(0);
-	}
+    @Override
+    protected Attribute getRightAttribute(StackFrame sf) {
+        return getAttribute(sf, 3);
+    }
 
-	@Override
-	final protected Long getRightOperand(StackFrame sf) {
-		return sf.peekLong(2);
-	}
-	
-	@Override
-	protected void storeAttribute(Attribute result, StackFrame sf) {
-	}
+    @Override
+    final protected Long getLeftOperand(StackFrame sf) {
+        return sf.peekLong(0);
+    }
 
-	@Override
-	final protected void storeResult(Attribute result, StackFrame sf) {
-		sf.popLong();
-		sf.popLong();
-		
-		SignsValue s_result = (SignsValue) result.getAbstractValue();
+    @Override
+    final protected Long getRightOperand(StackFrame sf) {
+        return sf.peekLong(2);
+    }
 
-		if (s_result == SignsAbstraction.NEG) {
-			sf.push(-1);
-			sf.setOperandAttr(new NonEmptyAttribute(null, Constant.create(-1)));
-		} else if (s_result == SignsAbstraction.POS) {
-			sf.push(+1);
-			sf.setOperandAttr(new NonEmptyAttribute(null, Constant.create(+1)));
-		} else {
-			sf.push(0);
-			sf.setOperandAttr(new NonEmptyAttribute(null, Constant.create( 0)));
-		}
-	}
+    @Override
+    protected void storeAttribute(Attribute result, StackFrame sf) {
+    }
+
+    @Override
+    final protected void storeResult(Attribute result, StackFrame sf) {
+        sf.popLong();
+        sf.popLong();
+
+        SignsValue s_result = (SignsValue) Attribute.getAbstractValue(result);
+
+        if (s_result == SignsAbstraction.NEG) {
+            sf.push(-1);
+            sf.setOperandAttr(new Attribute(null, Constant.create(-1)));
+        } else if (s_result == SignsAbstraction.POS) {
+            sf.push(+1);
+            sf.setOperandAttr(new Attribute(null, Constant.create(+1)));
+        } else {
+            sf.push(0);
+            sf.setOperandAttr(new Attribute(null, Constant.create( 0)));
+        }
+    }
 
 }

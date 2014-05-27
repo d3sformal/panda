@@ -7,8 +7,6 @@ import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
-import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.ArrayFields;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -59,7 +57,7 @@ public class MULTIANEWARRAY extends gov.nasa.jpf.jvm.bytecode.MULTIANEWARRAY {
         GlobalAbstraction.getInstance().processNewObject(expression);
 
         sf = ti.getModifiableTopFrame();
-        sf.setOperandAttr(new NonEmptyAttribute(null, expression));
+        sf.setOperandAttr(new Attribute(null, expression));
 
         // ALL ELEMENTS ARE NULL
         setArrayAttributes(ti, array, attrs);

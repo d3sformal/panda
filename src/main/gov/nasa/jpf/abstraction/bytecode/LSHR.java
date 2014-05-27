@@ -21,7 +21,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -36,24 +35,24 @@ import gov.nasa.jpf.abstraction.common.UninterpretedShiftRight;
  */
 public class LSHR extends gov.nasa.jpf.jvm.bytecode.LSHR implements AbstractBinaryOperator<Long> {
 
-	LongBinaryOperatorExecutor executor = LongBinaryOperatorExecutor.getInstance();
-	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		
-		/**
-		 * Delegates the call to a shared object that does all the heavy lifting
-		 */
-		return executor.execute(this, ti);
-	}
+    LongBinaryOperatorExecutor executor = LongBinaryOperatorExecutor.getInstance();
 
-	@Override
-	public NonEmptyAttribute getResult(Long v1, Attribute attr1, Long v2, Attribute attr2) {
-		AbstractValue abs_v1 = attr1.getAbstractValue();
-		AbstractValue abs_v2 = attr2.getAbstractValue();
+    @Override
+    public Instruction execute(ThreadInfo ti) {
 
-        Expression a = attr1.getExpression();
-        Expression b = attr2.getExpression();
+        /**
+         * Delegates the call to a shared object that does all the heavy lifting
+         */
+        return executor.execute(this, ti);
+    }
+
+    @Override
+    public Attribute getResult(Long v1, Attribute attr1, Long v2, Attribute attr2) {
+        AbstractValue abs_v1 = Attribute.getAbstractValue(attr1);
+        AbstractValue abs_v2 = Attribute.getAbstractValue(attr2);
+
+        Expression a = Attribute.getExpression(attr1);
+        Expression b = Attribute.getExpression(attr2);
 
         Expression e;
 
@@ -67,28 +66,28 @@ public class LSHR extends gov.nasa.jpf.jvm.bytecode.LSHR implements AbstractBina
             e = UninterpretedShiftRight.create(a, b);
         }
 
-		/**
-		 * Performs the adequate operation over abstractions
-		 */
-		return new NonEmptyAttribute(Abstraction._shr(v1, abs_v1, v2, abs_v2), e);
-	}
+        /**
+         * Performs the adequate operation over abstractions
+         */
+        return new Attribute(Abstraction._shr(v1, abs_v1, v2, abs_v2), e);
+    }
 
-	@Override
-	public Instruction executeConcrete(ThreadInfo ti) {
-		
-		/**
-		 * Ensures execution of the original instruction
-		 */
-		return super.execute(ti);
-	}
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
 
-	@Override
-	public Instruction getSelf() {
-		
-		/**
-		 * Ensures translation into an ordinary instruction
-		 */
-		return this;
-	}
+        /**
+         * Ensures execution of the original instruction
+         */
+        return super.execute(ti);
+    }
+
+    @Override
+    public Instruction getSelf() {
+
+        /**
+         * Ensures translation into an ordinary instruction
+         */
+        return this;
+    }
 
 }

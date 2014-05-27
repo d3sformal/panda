@@ -28,8 +28,6 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
-import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
@@ -43,59 +41,55 @@ import gov.nasa.jpf.vm.Instruction;
  */
 public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
 
-	public IINC(int localVarIndex, int increment) {
-		super(localVarIndex, increment);
-	}
+    public IINC(int localVarIndex, int increment) {
+        super(localVarIndex, increment);
+    }
 
-	public Instruction execute(ThreadInfo ti) {
+    public Instruction execute(ThreadInfo ti) {
 
-		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getModifiableTopFrame();
-		Attribute attr = (Attribute) sf.getLocalAttr(index);
-		
-		attr = Attribute.ensureNotNull(attr);
-		
-		AbstractValue abs_v = attr.getAbstractValue();
-		
-		AccessExpression path = null;
-		Expression expression = null;
-		
-		path = DefaultRoot.create(sf.getLocalVarInfo(getIndex()) == null ? null : sf.getLocalVarInfo(getIndex()).getName(), getIndex());
-		expression = Add.create(path, Constant.create(increment));
-			
-		if (abs_v == null) {
-			Attribute result = new NonEmptyAttribute(null, expression);
-	
-			sf.setLocalAttr(index, result);
-			sf.setLocalVariable(index, sf.getLocalVariable(index) + increment, false);
-		} else {
-			Attribute result = new NonEmptyAttribute(Abstraction._add(0, abs_v, increment, null), expression);
+        SystemState ss = ti.getVM().getSystemState();
+        StackFrame sf = ti.getModifiableTopFrame();
+        AbstractValue abs_v = Attribute.getAbstractValue(sf.getLocalAttr(index));
 
-			if (result.getAbstractValue().isComposite()) {	
-				if (!ti.isFirstStepInsn()) { // first time around
-					int size = result.getAbstractValue().getTokensNumber();
-										
-					ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
-					ss.setNextChoiceGenerator(cg);
-					
-					return this;
-				} else { // this is what really returns results
-					ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-					
-					assert (cg instanceof FocusAbstractChoiceGenerator);
-					
-					int key = (Integer) cg.getNextChoice();
-					result.setAbstractValue(result.getAbstractValue().getToken(key));
-				}
-			}
-			
-			sf.setLocalAttr(index, result);
-			sf.setLocalVariable(index, 0, false);
-		}
-			
-		GlobalAbstraction.getInstance().processPrimitiveStore(expression, path);
+        AccessExpression path = null;
+        Expression expression = null;
 
-		return getNext(ti);
-	}
+        path = DefaultRoot.create(sf.getLocalVarInfo(getIndex()) == null ? null : sf.getLocalVarInfo(getIndex()).getName(), getIndex());
+        expression = Add.create(path, Constant.create(increment));
+
+        if (abs_v == null) {
+            Attribute result = new Attribute(null, expression);
+
+            sf.setLocalAttr(index, result);
+            sf.setLocalVariable(index, sf.getLocalVariable(index) + increment, false);
+        } else {
+            Attribute result = new Attribute(Abstraction._add(0, abs_v, increment, null), expression);
+
+            if (Attribute.getAbstractValue(result).isComposite()) {
+                if (!ti.isFirstStepInsn()) { // first time around
+                    int size = Attribute.getAbstractValue(result).getTokensNumber();
+
+                    ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
+                    ss.setNextChoiceGenerator(cg);
+
+                    return this;
+                } else { // this is what really returns results
+                    ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+
+                    assert (cg instanceof FocusAbstractChoiceGenerator);
+
+                    int key = (Integer) cg.getNextChoice();
+                    Attribute.setAbstractValue(result, Attribute.getAbstractValue(result).getToken(key));
+                }
+            }
+
+            sf.setLocalAttr(index, result);
+            sf.setLocalVariable(index, 0, false);
+        }
+
+        GlobalAbstraction.getInstance().processPrimitiveStore(expression, path);
+
+        return getNext(ti);
+    }
 
 }

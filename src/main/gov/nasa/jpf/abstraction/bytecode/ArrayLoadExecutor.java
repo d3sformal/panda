@@ -12,7 +12,6 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
@@ -50,14 +49,8 @@ public class ArrayLoadExecutor {
     public Instruction execute(ArrayLoadInstruction load, ThreadInfo ti) {
         StackFrame sf = ti.getModifiableTopFrame();
 
-        Attribute arrayAttr = (Attribute) sf.getOperandAttr(1);
-        Attribute indexAttr = (Attribute) sf.getOperandAttr(0);
-
-        arrayAttr = Attribute.ensureNotNull(arrayAttr);
-        indexAttr = Attribute.ensureNotNull(indexAttr);
-
-        array = (AccessExpression) arrayAttr.getExpression();
-        index = indexAttr.getExpression();
+        array = Attribute.getAccessExpression(sf.getOperandAttr(1));
+        index = Attribute.getExpression(sf.getOperandAttr(0));
         path = DefaultArrayElementRead.create(array, index);
 
         Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(load.getSelf(), ti);
@@ -82,7 +75,7 @@ public class ArrayLoadExecutor {
             return actualNextInsn;
         }
 
-        Attribute attribute = new NonEmptyAttribute(null, path);
+        Attribute attribute = new Attribute(null, path);
 
         sf.setOperandAttr(attribute);
 

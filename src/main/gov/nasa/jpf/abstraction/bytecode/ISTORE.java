@@ -10,28 +10,26 @@ import gov.nasa.jpf.vm.ThreadInfo;
 
 public class ISTORE extends gov.nasa.jpf.jvm.bytecode.ISTORE {
 
-	public ISTORE(int index) {
-		super(index);
-	}
-	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		StackFrame sf = ti.getTopFrame();
-        Attribute source = (Attribute) sf.getOperandAttr(0);
-        
-        source = Attribute.ensureNotNull(source);
+    public ISTORE(int index) {
+        super(index);
+    }
 
-		Instruction actualNextInsn = super.execute(ti);
-        
-		Expression from = source.getExpression();
-		DefaultRoot to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
+    @Override
+    public Instruction execute(ThreadInfo ti) {
+        StackFrame sf = ti.getTopFrame();
+        Attribute source = Attribute.getAttribute(sf.getOperandAttr());
 
-		sf = ti.getModifiableTopFrame();
-		sf.setLocalAttr(getLocalVariableIndex(), source);
+        Instruction actualNextInsn = super.execute(ti);
+
+        Expression from = Attribute.getExpression(source);
+        DefaultRoot to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
+
+        sf = ti.getModifiableTopFrame();
+        sf.setLocalAttr(getLocalVariableIndex(), source);
 
         GlobalAbstraction.getInstance().informAboutPrimitiveLocalVariable(to);
-		GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
-		
-		return actualNextInsn;
-	}
+        GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
+
+        return actualNextInsn;
+    }
 }

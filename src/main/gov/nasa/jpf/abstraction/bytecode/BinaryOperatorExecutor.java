@@ -32,26 +32,23 @@ import gov.nasa.jpf.vm.ThreadInfo;
  */
 public abstract class BinaryOperatorExecutor<T> {
 
-	final public Instruction execute(AbstractBinaryOperator<T> op, ThreadInfo ti) {
-		
-		String name = op.getClass().getSimpleName();
-		
-		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getModifiableTopFrame();
+    final public Instruction execute(AbstractBinaryOperator<T> op, ThreadInfo ti) {
 
-		Attribute attr1 = getLeftAttribute(sf);
-		Attribute attr2 = getRightAttribute(sf);
-		
-		attr1 = Attribute.ensureNotNull(attr1);
-		attr2 = Attribute.ensureNotNull(attr2);
+        String name = op.getClass().getSimpleName();
 
-		AbstractValue abs_v1 = attr1.getAbstractValue();
-		AbstractValue abs_v2 = attr2.getAbstractValue();
-		
-		T v1 = getLeftOperand(sf);
-		T v2 = getRightOperand(sf);
+        SystemState ss = ti.getVM().getSystemState();
+        StackFrame sf = ti.getModifiableTopFrame();
 
-		// Create symbolic value (predicate abstraction), abstract value (numeric abstraction)
+        Attribute attr1 = getLeftAttribute(sf);
+        Attribute attr2 = getRightAttribute(sf);
+
+        AbstractValue abs_v1 = Attribute.getAbstractValue(attr1);
+        AbstractValue abs_v2 = Attribute.getAbstractValue(attr2);
+
+        T v1 = getLeftOperand(sf);
+        T v2 = getRightOperand(sf);
+
+        // Create symbolic value (predicate abstraction), abstract value (numeric abstraction)
         Attribute result;
 
         try {
@@ -60,45 +57,45 @@ public abstract class BinaryOperatorExecutor<T> {
             return ti.createAndThrowException(e.getClass().getName(), e.getMessage());
         }
 
-		// Concrete execution
-		if (abs_v1 == null && abs_v2 == null) {
-			Instruction ret = op.executeConcrete(ti);
-			
-			storeAttribute(result, sf);
-			
-			return ret;
-		}
+        // Concrete execution
+        if (abs_v1 == null && abs_v2 == null) {
+            Instruction ret = op.executeConcrete(ti);
 
-		if (result.getAbstractValue().isComposite()) {
-			if (!ti.isFirstStepInsn()) { // first time around
-				int size = result.getAbstractValue().getTokensNumber();
-				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
-				ss.setNextChoiceGenerator(cg);
+            storeAttribute(result, sf);
 
-				return op.getSelf();
-			} else { // this is what really returns results
-				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+            return ret;
+        }
 
-				assert (cg instanceof FocusAbstractChoiceGenerator);
+        if (Attribute.getAbstractValue(result).isComposite()) {
+            if (!ti.isFirstStepInsn()) { // first time around
+                int size = Attribute.getAbstractValue(result).getTokensNumber();
+                ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
+                ss.setNextChoiceGenerator(cg);
 
-				int key = (Integer) cg.getNextChoice();
-				result.setAbstractValue(result.getAbstractValue().getToken(key));
-			}
-		}
+                return op.getSelf();
+            } else { // this is what really returns results
+                ChoiceGenerator<?> cg = ss.getChoiceGenerator();
 
-		storeResult(result, sf);
+                assert (cg instanceof FocusAbstractChoiceGenerator);
 
-		return op.getNext(ti);
-	}
-	
-	protected Attribute getAttribute(StackFrame sf, int index) {
-		return (Attribute)sf.getOperandAttr(index);
-	}
+                int key = (Integer) cg.getNextChoice();
+                Attribute.setAbstractValue(result, Attribute.getAbstractValue(result).getToken(key));
+            }
+        }
 
-	abstract protected Attribute getLeftAttribute(StackFrame sf);
-	abstract protected Attribute getRightAttribute(StackFrame sf);
-	abstract protected T getLeftOperand(StackFrame sf);
-	abstract protected T getRightOperand(StackFrame sf);
-	abstract protected void storeAttribute(Attribute result, StackFrame sf);
-	abstract protected void storeResult(Attribute result, StackFrame sf);
+        storeResult(result, sf);
+
+        return op.getNext(ti);
+    }
+
+    protected Attribute getAttribute(StackFrame sf, int index) {
+        return (Attribute)sf.getOperandAttr(index);
+    }
+
+    abstract protected Attribute getLeftAttribute(StackFrame sf);
+    abstract protected Attribute getRightAttribute(StackFrame sf);
+    abstract protected T getLeftOperand(StackFrame sf);
+    abstract protected T getRightOperand(StackFrame sf);
+    abstract protected void storeAttribute(Attribute result, StackFrame sf);
+    abstract protected void storeResult(Attribute result, StackFrame sf);
 }

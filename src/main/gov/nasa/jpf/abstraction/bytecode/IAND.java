@@ -21,7 +21,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -34,54 +33,54 @@ import gov.nasa.jpf.abstraction.common.Multiply;
  */
 public class IAND extends gov.nasa.jpf.jvm.bytecode.IAND implements AbstractBinaryOperator<Integer> {
 
-	IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
-	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		
-		/**
-		 * Delegates the call to a shared object that does all the heavy lifting
-		 */
-		return executor.execute(this, ti);
-	}
+    IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 
-	@Override
-	public NonEmptyAttribute getResult(Integer v1, Attribute attr1, Integer v2, Attribute attr2) {
-		AbstractValue abs_v1 = attr1.getAbstractValue();
-		AbstractValue abs_v2 = attr2.getAbstractValue();
+    @Override
+    public Instruction execute(ThreadInfo ti) {
 
-        Expression a = attr1.getExpression();
-        Expression b = attr2.getExpression();
+        /**
+         * Delegates the call to a shared object that does all the heavy lifting
+         */
+        return executor.execute(this, ti);
+    }
+
+    @Override
+    public Attribute getResult(Integer v1, Attribute attr1, Integer v2, Attribute attr2) {
+        AbstractValue abs_v1 = Attribute.getAbstractValue(attr1);
+        AbstractValue abs_v2 = Attribute.getAbstractValue(attr2);
+
+        Expression a = Attribute.getExpression(attr1);
+        Expression b = Attribute.getExpression(attr2);
 
         LogicalOperandChecker.check(a, b);
 
-		/**
-		 * Performs the adequate operation over abstractions
-		 */
+        /**
+         * Performs the adequate operation over abstractions
+         */
         // Assume input values to be either 0 or 1 (logical)
         // Other values will result in errors (bitwise)
         //
         // Therefore:
         // MUL(a, b) = AND(a, b)
-		return new NonEmptyAttribute(Abstraction._and(v1, abs_v1, v2, abs_v2), Multiply.create(a, b));
-	}
+        return new Attribute(Abstraction._and(v1, abs_v1, v2, abs_v2), Multiply.create(a, b));
+    }
 
-	@Override
-	public Instruction executeConcrete(ThreadInfo ti) {
-		
-		/**
-		 * Ensures execution of the original instruction
-		 */
-		return super.execute(ti);
-	}
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
 
-	@Override
-	public Instruction getSelf() {
-		
-		/**
-		 * Ensures translation into an ordinary instruction
-		 */
-		return this;
-	}
+        /**
+         * Ensures execution of the original instruction
+         */
+        return super.execute(ti);
+    }
+
+    @Override
+    public Instruction getSelf() {
+
+        /**
+         * Ensures translation into an ordinary instruction
+         */
+        return this;
+    }
 
 }

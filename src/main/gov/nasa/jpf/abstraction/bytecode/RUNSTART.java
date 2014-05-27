@@ -9,9 +9,10 @@ import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+
+import gov.nasa.jpf.abstraction.Attribute;
 
 public class RUNSTART extends gov.nasa.jpf.jvm.bytecode.RUNSTART {
     @Override
@@ -27,7 +28,7 @@ public class RUNSTART extends gov.nasa.jpf.jvm.bytecode.RUNSTART {
         ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0).addStructuredLocalVariable(thisExpr);
         ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().processObjectStore(threadObjectExpr, thisExpr);
 
-        sf.setOperandAttr(new NonEmptyAttribute(null, thisExpr));
+        sf.setOperandAttr(new Attribute(null, thisExpr));
 
         return ret;
     }

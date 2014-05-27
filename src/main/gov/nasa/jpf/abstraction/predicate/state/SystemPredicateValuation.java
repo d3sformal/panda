@@ -11,7 +11,6 @@ import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Context;
@@ -51,78 +50,78 @@ import java.util.Set;
  */
 public class SystemPredicateValuation extends CallAnalyzer implements PredicateValuation, Scoped {
 
-	/**
-	 * Stacks of scopes (pushed by invoke, poped by return) separately for all threads
-	 */
-	private Map<Integer, PredicateValuationStack> scopes = new HashMap<Integer, PredicateValuationStack>();
-    
+    /**
+     * Stacks of scopes (pushed by invoke, poped by return) separately for all threads
+     */
+    private Map<Integer, PredicateValuationStack> scopes = new HashMap<Integer, PredicateValuationStack>();
+
     private PredicateAbstraction abstraction;
-	private Predicates predicateSet;
-	private PredicateValuationMap initialValuation = new PredicateValuationMap();
+    private Predicates predicateSet;
+    private PredicateValuationMap initialValuation = new PredicateValuationMap();
     private SMT smt = new SMT();
     private Integer currentThreadID;
-	
-	public SystemPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
-        this.abstraction = abstraction;
-		this.predicateSet = predicateSet;
-		
-		Set<Predicate> predicates = new HashSet<Predicate>();
 
-		for (Context context : predicateSet.contexts) {
+    public SystemPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
+        this.abstraction = abstraction;
+        this.predicateSet = predicateSet;
+
+        Set<Predicate> predicates = new HashSet<Predicate>();
+
+        for (Context context : predicateSet.contexts) {
             if (context instanceof AssumeContext) continue;
 
-			predicates.addAll(context.predicates);
-		}
+            predicates.addAll(context.predicates);
+        }
 
-		/**
-		 * Detect initial valuations of Tautologies and Contradictions
-		 * 
-		 * This is called once and increases comprehensibility of the valuation
-		 * It could confuse the user to see that a=a is UNKNOWN
-		 */
-		if (!predicates.isEmpty()) {
-			try {
-				initialValuation.putAll(smt.valuatePredicates(predicates));
-			
-				for (Predicate predicate : predicates) {
-					// IF NOT A TAUTOLOGY OR CONTRADICTION
-					if (initialValuation.get(predicate) == TruthValue.UNKNOWN) {
-						initialValuation.put(predicate, TruthValue.UNKNOWN);
-					} else {
-						initialValuation.put(predicate, initialValuation.get(predicate));
-					}
-				}
-			} catch (SMTException e) {
-				e.printStackTrace();
-				
-				throw e;
-			}
-		}
-		
-		if (initialValuation.isEmpty()) {
-			for (Predicate predicate : predicates) {
-				initialValuation.put(predicate, TruthValue.UNKNOWN);
-			}
-		}
-	}
+        /**
+         * Detect initial valuations of Tautologies and Contradictions
+         *
+         * This is called once and increases comprehensibility of the valuation
+         * It could confuse the user to see that a=a is UNKNOWN
+         */
+        if (!predicates.isEmpty()) {
+            try {
+                initialValuation.putAll(smt.valuatePredicates(predicates));
+
+                for (Predicate predicate : predicates) {
+                    // IF NOT A TAUTOLOGY OR CONTRADICTION
+                    if (initialValuation.get(predicate) == TruthValue.UNKNOWN) {
+                        initialValuation.put(predicate, TruthValue.UNKNOWN);
+                    } else {
+                        initialValuation.put(predicate, initialValuation.get(predicate));
+                    }
+                }
+            } catch (SMTException e) {
+                e.printStackTrace();
+
+                throw e;
+            }
+        }
+
+        if (initialValuation.isEmpty()) {
+            for (Predicate predicate : predicates) {
+                initialValuation.put(predicate, TruthValue.UNKNOWN);
+            }
+        }
+    }
 
     public void close() {
         smt.close();
     }
-	
-	/**
-	 * Collect predicates targeted at the given method and store them in the upcoming scope
-	 */
-	@Override
-	public MethodFramePredicateValuation createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-		MethodFramePredicateValuation valuation = new MethodFramePredicateValuation(smt);
-		
-		if (method == null) return valuation;
-		
+
+    /**
+     * Collect predicates targeted at the given method and store them in the upcoming scope
+     */
+    @Override
+    public MethodFramePredicateValuation createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
+        MethodFramePredicateValuation valuation = new MethodFramePredicateValuation(smt);
+
+        if (method == null) return valuation;
+
         // Collect relevant contexts and predicates stored in them
         // Match context method with actual method
         // Match context object with actual object
-		for (Context context : predicateSet.contexts) {
+        for (Context context : predicateSet.contexts) {
             if (context instanceof AssumeContext) continue;
 
             if (context instanceof MethodContext) {
@@ -133,11 +132,11 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                 }
             } else if (context instanceof ObjectContext) {
                 ObjectContext objectContext = (ObjectContext) context;
-            
+
                 if (method.isStatic() || method.isClinit()) {
                     continue;
                 }
-            
+
                 if (!objectContext.getPackageAndClass().toString().equals(method.getClassName())) {
                     continue;
                 }
@@ -146,58 +145,58 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             for (Predicate predicate : context.predicates) {
                 valuation.put(predicate, initialValuation.get(predicate));
             }
-		}
+        }
 
-		return valuation;
-	}
+        return valuation;
+    }
 
-	@Override
-	public Set<Predicate> getPredicatesInconsistentWith(Predicate predicate, TruthValue value) {
-		return scopes.get(currentThreadID).top().getPredicatesInconsistentWith(predicate, value);
-	}
+    @Override
+    public Set<Predicate> getPredicatesInconsistentWith(Predicate predicate, TruthValue value) {
+        return scopes.get(currentThreadID).top().getPredicatesInconsistentWith(predicate, value);
+    }
 
-	@Override
-	public void force(Predicate predicate, TruthValue value) {
-		scopes.get(currentThreadID).top().force(predicate, value);
-	}
+    @Override
+    public void force(Predicate predicate, TruthValue value) {
+        scopes.get(currentThreadID).top().force(predicate, value);
+    }
 
-	@Override
-	public void put(Predicate predicate, TruthValue value) {
-		scopes.get(currentThreadID).top().put(predicate, value);
-	}
+    @Override
+    public void put(Predicate predicate, TruthValue value) {
+        scopes.get(currentThreadID).top().put(predicate, value);
+    }
 
-	@Override
-	public void putAll(Map<Predicate, TruthValue> values) {
-		scopes.get(currentThreadID).top().putAll(values);
-	}
-	
-	@Override
-	public void remove(Predicate predicate) {
-		scopes.get(currentThreadID).top().remove(predicate);
-	}
+    @Override
+    public void putAll(Map<Predicate, TruthValue> values) {
+        scopes.get(currentThreadID).top().putAll(values);
+    }
 
-	@Override
-	public TruthValue get(Predicate predicate) {
-		return scopes.get(currentThreadID).top().get(predicate);
-	}
-	
+    @Override
+    public void remove(Predicate predicate) {
+        scopes.get(currentThreadID).top().remove(predicate);
+    }
+
+    @Override
+    public TruthValue get(Predicate predicate) {
+        return scopes.get(currentThreadID).top().get(predicate);
+    }
+
     private void overrideWithAssumedPreValuation(PredicateValuation valuation, MethodInfo method) {
         overrideWithAssumedValuation(valuation, method, MethodAssumePreContext.class);
     }
-	
+
     private void overrideWithAssumedPostValuation(PredicateValuation valuation, MethodInfo method) {
         overrideWithAssumedValuation(valuation, method, MethodAssumePostContext.class);
     }
-	
+
     private void overrideWithAssumedValuation(PredicateValuation valuation, MethodInfo method, Class<? extends AssumeContext> assumedClass) {
         // Override with assumed valuation
-		for (Context context : predicateSet.contexts) {
+        for (Context context : predicateSet.contexts) {
             if (context.getClass().isAssignableFrom(assumedClass)) {
-	    		AbstractMethodContext methodContext = (AbstractMethodContext) context;
+                AbstractMethodContext methodContext = (AbstractMethodContext) context;
 
-		    	if (!methodContext.getMethod().toString().equals(method.getBaseName())) {
-		    		continue;
-    			}
+                if (!methodContext.getMethod().toString().equals(method.getBaseName())) {
+                    continue;
+                }
 
                 for (Predicate predicate : context.predicates) {
                     Set<Predicate> inconsistent = valuation.getPredicatesInconsistentWith(predicate, TruthValue.TRUE);
@@ -216,28 +215,28 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
         }
     }
 
-	@Override
-	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		MethodInfo method = after.getMethodInfo();
-		
-		// Scope to be added as the callee scope
-		MethodFramePredicateValuation calleeScope = createDefaultScope(threadInfo, method);
-		
-		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
+    @Override
+    public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+        MethodInfo method = after.getMethodInfo();
 
-		if (RunDetector.isRunning()) {
-			// Copy of the current caller scope - to avoid modifications - may not be needed now, it is not different from .top() and it is not modified here
-			MethodFramePredicateValuation callerScope = scopes.get(currentThreadID).top();
+        // Scope to be added as the callee scope
+        MethodFramePredicateValuation calleeScope = createDefaultScope(threadInfo, method);
 
-			Map<Predicate, Predicate> replaced = new HashMap<Predicate, Predicate>();
+        RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
+
+        if (RunDetector.isRunning()) {
+            // Copy of the current caller scope - to avoid modifications - may not be needed now, it is not different from .top() and it is not modified here
+            MethodFramePredicateValuation callerScope = scopes.get(currentThreadID).top();
+
+            Map<Predicate, Predicate> replaced = new HashMap<Predicate, Predicate>();
             Set<Predicate> unknown = new HashSet<Predicate>();
             Set<AccessExpression> temporaryPathHolder = new HashSet<AccessExpression>();
-			
-			/**
-			 * Take predicates from the callee that describe formal parameters
-			 * Replace formal parameters with the concrete assignment
-			 * Reason about the value of the predicates using known values of predicates in the caller
-			 */
+
+            /**
+             * Take predicates from the callee that describe formal parameters
+             * Replace formal parameters with the concrete assignment
+             * Reason about the value of the predicates using known values of predicates in the caller
+             */
             boolean[] slotInUse = new boolean[method.getNumberOfStackArguments()];
 
             getArgumentSlotUsage(method, slotInUse);
@@ -249,14 +248,14 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
                 if (slotInUse[slotIndex]) {
                     // Actual symbolic parameter
-                    Attribute attr = Attribute.ensureNotNull((Attribute) after.getSlotAttr(slotIndex));
+                    Attribute attr = Attribute.getAttribute(after.getSlotAttr(slotIndex));
 
                     LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
                     String name = arg == null ? null : arg.getName();
 
                     AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
 
-                    replacements.put(formalArgument, attr.getExpression());
+                    replacements.put(formalArgument, Attribute.getExpression(attr));
                     argumentSymbols.add(formalArgument);
                 }
             }
@@ -298,22 +297,22 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             for (Predicate predicate : unknown) {
                 calleeScope.put(predicate, initialValuation.get(predicate));
             }
-		
-            overrideWithAssumedPreValuation(calleeScope, method);
-		}
 
-		scopes.get(currentThreadID).push(method.getFullName(), calleeScope);
-	}
-	
-	private static boolean isPredicateOverReturn(Predicate predicate) {
-		if (predicate instanceof Negation) {
-			Negation n = (Negation) predicate;
-			
-			return isPredicateOverReturn(n.predicate);
-		}
-		
-		if (predicate instanceof Comparison) {
-			Comparison c = (Comparison) predicate;
+            overrideWithAssumedPreValuation(calleeScope, method);
+        }
+
+        scopes.get(currentThreadID).push(method.getFullName(), calleeScope);
+    }
+
+    private static boolean isPredicateOverReturn(Predicate predicate) {
+        if (predicate instanceof Negation) {
+            Negation n = (Negation) predicate;
+
+            return isPredicateOverReturn(n.predicate);
+        }
+
+        if (predicate instanceof Comparison) {
+            Comparison c = (Comparison) predicate;
 
             Expression a = c.a;
             Expression b = c.b;
@@ -325,7 +324,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                     return true;
                 }
             }
-			
+
             if (b instanceof AccessExpression) {
                 AccessExpression ae = (AccessExpression) b;
 
@@ -333,58 +332,58 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                     return true;
                 }
             }
-		}
-		
-		return false;
-	}
+        }
 
-	@Override
-	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
+        return false;
+    }
 
-		Attribute attr = Attribute.ensureNotNull((Attribute) after.getResultAttr());
+    @Override
+    public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+        RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
+
+        Attribute attr = Attribute.getAttribute(after.getResultAttr());
 
         if (RunDetector.isRunning()) {
-			MethodFramePredicateValuation scope;
-			
-			scope = scopes.get(currentThreadID).top(1);
-			
-			Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
-			Set<Predicate> determinants = new HashSet<Predicate>();
-			
-			/**
-			 * Determine values of predicates over the return value based on the concrete symbolic expression being returned
-			 */
-			for (Predicate predicate : getPredicates()) {
-				if (isPredicateOverReturn(predicate)) {
-					Predicate determinant = predicate.replace(DefaultReturnValue.create(), attr.getExpression());
+            MethodFramePredicateValuation scope;
 
-					predicates.put(determinant, predicate);
-					determinants.add(determinant);
-				}
-			}
-			
+            scope = scopes.get(currentThreadID).top(1);
+
+            Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
+            Set<Predicate> determinants = new HashSet<Predicate>();
+
+            /**
+             * Determine values of predicates over the return value based on the concrete symbolic expression being returned
+             */
+            for (Predicate predicate : getPredicates()) {
+                if (isPredicateOverReturn(predicate)) {
+                    Predicate determinant = predicate.replace(DefaultReturnValue.create(), Attribute.getExpression(attr));
+
+                    predicates.put(determinant, predicate);
+                    determinants.add(determinant);
+                }
+            }
+
             // Valuate predicates over `return` access expression using the return expression
             // Predicate: return < 3
             // Statement: return 2
             //
             // return < 3 is determined by 2 < 3
-			Map<Predicate, TruthValue> valuation = evaluatePredicates(determinants);
-			
-			for (Predicate determinant : valuation.keySet()) {
-				put(predicates.get(determinant), valuation.get(determinant));
-			}
+            Map<Predicate, TruthValue> valuation = evaluatePredicates(determinants);
+
+            for (Predicate determinant : valuation.keySet()) {
+                put(predicates.get(determinant), valuation.get(determinant));
+            }
 
             // The actual write through of the return value performed by processVoidMethodReturn
         }
-			
-		ReturnValue returnValueSpecific = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
-		after.setOperandAttr(new NonEmptyAttribute(attr.getAbstractValue(), returnValueSpecific));
-		
+
+        ReturnValue returnValueSpecific = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
+        after.setOperandAttr(new Attribute(Attribute.getAbstractValue(attr), returnValueSpecific));
+
         // The rest is the same as if no return happend
-		processVoidMethodReturn(threadInfo, before, after);
-	}
-	
+        processVoidMethodReturn(threadInfo, before, after);
+    }
+
     @Override
     public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         if (RunDetector.isRunning()) {
@@ -416,7 +415,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
                 if (slotInUse[slotIndex]) {
                     // Actual symbolic parameter
-                    Attribute attr = Attribute.ensureNotNull((Attribute) before.getSlotAttr(slotIndex));
+                    Attribute attr = Attribute.getAttribute(before.getSlotAttr(slotIndex));
 
                     LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
                     String name = arg == null ? null : arg.getName();
@@ -428,8 +427,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                         referenceArgs.add(l);
                     }
 
-                    Expression originalExpr = Attribute.ensureNotNull((Attribute) originalArgumentAttributes.next()).getExpression();
-                    Expression actualExpr = Attribute.ensureNotNull((Attribute) before.getLocalAttr(slotIndex)).getExpression();
+                    Expression originalExpr = Attribute.getExpression(originalArgumentAttributes.next());
+                    Expression actualExpr = Attribute.getExpression(before.getLocalAttr(slotIndex));
 
                     boolean different = false;
 
@@ -472,7 +471,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             Set<AccessExpression> temporaryPathsHolder = new HashSet<AccessExpression>();
 
             ReturnValue returnValue = DefaultReturnValue.create();
-    		ReturnValue returnValueSpecific = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
+            ReturnValue returnValueSpecific = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
 
             Map<Predicate, TruthValue> calleeReturns = new HashMap<Predicate, TruthValue>();
 
@@ -485,7 +484,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                         LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
                         String name = arg == null ? null : arg.getName();
 
-                        Expression actualExpr = Attribute.ensureNotNull((Attribute) before.getLocalAttr(slotIndex)).getExpression();
+                        Expression actualExpr = Attribute.getExpression(before.getLocalAttr(slotIndex));
                         AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
 
                         replacements.put(formalArgument, actualExpr);
@@ -523,13 +522,13 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                     if (isAnonymous) {
                         callerScope.put(predicate, value);
                     }
-                
+
                     // Write predicates over return through (this is useful when called from processMethodReturn)
-        			if (isPredicateOverReturn(predicate)) {
+                    if (isPredicateOverReturn(predicate)) {
                         calleeReturns.put(predicate.replace(returnValue, returnValueSpecific), value);
                     }
                 }
-                
+
                 temporaryPathsHolder.clear();
             }
 
@@ -597,7 +596,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
                     for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments() && !canBeAffected; ++slotIndex) {
                         if (slotInUse[slotIndex]) {
-                            Expression expr = Attribute.ensureNotNull((Attribute) originalActualParameters.next()).getExpression();
+                            Expression expr = Attribute.getExpression(originalActualParameters.next());
 
                             if (!argIsPrimitive[slotIndex]) {
                                 // Could be null / access expression
@@ -683,8 +682,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
         scopes.get(currentThreadID).pop();
     }
-	
-	@Override
+
+    @Override
     public void restore(Map<Integer, ? extends Scopes> scopes) {
         this.scopes.clear();
         for (Integer threadId : scopes.keySet()) {
@@ -699,42 +698,42 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             }
         }
     }
-    
+
     @Override
     public Map<Integer, PredicateValuationStack> memorize() {
         Map<Integer, PredicateValuationStack> scopesClone = new HashMap<Integer, PredicateValuationStack>();
-        
+
         for (Integer threadId : scopes.keySet()) {
             scopesClone.put(threadId, scopes.get(threadId).clone());
         }
 
         return scopesClone;
     }
-    
-	@Override
-	public String toString() {
-		return scopes.get(currentThreadID).count() > 0 ? scopes.get(currentThreadID).top().toString() : "";
-	}
 
-	@Override
-	public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
-		scopes.get(currentThreadID).top().reevaluate(affected, resolvedAffected, expression);
-	}
+    @Override
+    public String toString() {
+        return scopes.get(currentThreadID).count() > 0 ? scopes.get(currentThreadID).top().toString() : "";
+    }
+
+    @Override
+    public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
+        scopes.get(currentThreadID).top().reevaluate(affected, resolvedAffected, expression);
+    }
 
     @Override
     public void dropAllPredicatesSharingSymbolsWith(AccessExpression expr) {
         scopes.get(currentThreadID).top().dropAllPredicatesSharingSymbolsWith(expr);
     }
-	
-	@Override
-	public TruthValue evaluatePredicate(Predicate predicate) {
-		return scopes.get(currentThreadID).top().evaluatePredicate(predicate);
-	}
-	
-	@Override
-	public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
-		return scopes.get(currentThreadID).top().evaluatePredicates(predicates);
-	}
+
+    @Override
+    public TruthValue evaluatePredicate(Predicate predicate) {
+        return scopes.get(currentThreadID).top().evaluatePredicate(predicate);
+    }
+
+    @Override
+    public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
+        return scopes.get(currentThreadID).top().evaluatePredicates(predicates);
+    }
 
     @Override
     public Integer evaluateExpression(Expression expression) {
@@ -745,30 +744,30 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
     public int[] evaluateExpressionInRange(Expression expression, int lowerBound, int upperBound) {
         return scopes.get(currentThreadID).top().evaluateExpressionInRange(expression, lowerBound, upperBound);
     }
-	
-	@Override
-	public int count() {
-		return scopes.get(currentThreadID).count() > 0 ? scopes.get(currentThreadID).top().count() : 0;
-	}
 
-	@Override
-	public int depth() {
+    @Override
+    public int count() {
+        return scopes.get(currentThreadID).count() > 0 ? scopes.get(currentThreadID).top().count() : 0;
+    }
+
+    @Override
+    public int depth() {
         return scopes.get(currentThreadID).count();
-	}
+    }
 
-	@Override
-	public boolean containsKey(Predicate predicate) {
-		return scopes.get(currentThreadID).top().containsKey(predicate);
-	}
+    @Override
+    public boolean containsKey(Predicate predicate) {
+        return scopes.get(currentThreadID).top().containsKey(predicate);
+    }
 
-	@Override
-	public Set<Predicate> getPredicates() {
-		return getPredicates(0);
-	}
-	
-	public Set<Predicate> getPredicates(int i) {
-		return scopes.get(currentThreadID).top(i).getPredicates();
-	}
+    @Override
+    public Set<Predicate> getPredicates() {
+        return getPredicates(0);
+    }
+
+    public Set<Predicate> getPredicates(int i) {
+        return scopes.get(currentThreadID).top(i).getPredicates();
+    }
 
     @Override
     public MethodFramePredicateValuation get(int depth) {

@@ -24,7 +24,7 @@ public class AliasingDumper extends ExecuteInstructionHandler {
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
         StackFrame sf = curTh.getModifiableTopFrame();
 
-        AnonymousExpressionTracker.notifyPopped(((Attribute) sf.getOperandAttr()).getExpression(), 1);
+        AnonymousExpressionTracker.notifyPopped(Attribute.getExpression(sf.getOperandAttr()), 1);
 
         ElementInfo ei = curTh.getElementInfo(sf.pop());
 

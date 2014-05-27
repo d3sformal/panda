@@ -27,7 +27,7 @@ public class AssertNumberOfPossibleValuesHandler extends AssertHandler {
 
         int expectedNumber = sf.pop();
 
-        AnonymousExpressionTracker.notifyPopped(((Attribute) sf.getOperandAttr()).getExpression(), 1);
+        AnonymousExpressionTracker.notifyPopped(Attribute.getExpression(sf.getOperandAttr()), 1);
         ElementInfo ei = curTh.getElementInfo(sf.pop());
 
         AccessExpression expr = PredicatesFactory.createAccessExpressionFromString(new String(ei.getStringChars()));

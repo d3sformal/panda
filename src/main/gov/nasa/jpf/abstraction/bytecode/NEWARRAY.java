@@ -12,8 +12,6 @@ import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
-import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -28,16 +26,13 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
     @Override
     public Instruction execute(ThreadInfo ti) {
         StackFrame sf = ti.getTopFrame();
-        Attribute attr = (Attribute) sf.getOperandAttr();
-
-        attr = Attribute.ensureNotNull(attr);
+        Expression lengthExpression = Attribute.getExpression(sf.getOperandAttr());
 
         Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
         if (RunDetector.isRunning()) {
             // Determine the unambiguous concrete array length from predicates
             PredicateAbstraction abs = (PredicateAbstraction) GlobalAbstraction.getInstance().get();
-            Expression lengthExpression = attr.getExpression();
             Integer lengthValue = abs.computePreciseExpressionValue(lengthExpression);
 
             if (lengthValue == null) {
@@ -64,12 +59,12 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
         }
 
         ElementInfo array = ti.getElementInfo(sf.peek());
-        AnonymousArray expression = AnonymousArray.create(new Reference(array), attr.getExpression());
+        AnonymousArray expression = AnonymousArray.create(new Reference(array), lengthExpression);
 
         GlobalAbstraction.getInstance().processNewObject(expression);
 
         sf = ti.getModifiableTopFrame();
-        sf.setOperandAttr(new NonEmptyAttribute(null, expression));
+        sf.setOperandAttr(new Attribute(null, expression));
 
         return actualNextInsn;
     }

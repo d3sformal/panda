@@ -2,12 +2,12 @@
 // Copyright (C) 2012 United States Government as represented by the
 // Administrator of the National Aeronautics and Space Administration
 // (NASA).  All Rights Reserved.
-// 
+//
 // This software is distributed under the NASA Open Source Agreement
 // (NOSA), version 1.3.  The NOSA has been approved by the Open Source
 // Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
 // directory tree for the complete NOSA document.
-// 
+//
 // THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
 // KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
 // LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
@@ -21,34 +21,35 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.Attribute;
+
 public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
-	
-	public GETSTATIC(String fieldName, String classType, String fieldDescriptor) {
-		super(fieldName, classType, fieldDescriptor);
-	}
 
-	@Override
-	public Instruction execute(ThreadInfo ti) {
+    public GETSTATIC(String fieldName, String classType, String fieldDescriptor) {
+        super(fieldName, classType, fieldDescriptor);
+    }
 
-		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+    @Override
+    public Instruction execute(ThreadInfo ti) {
 
-		Instruction actualNextInsn = super.execute(ti);
-		
-		if (JPFInstructionAdaptor.testFieldInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
-			return actualNextInsn;
-		} 
-		
+        Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+        Instruction actualNextInsn = super.execute(ti);
+
+        if (JPFInstructionAdaptor.testFieldInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+            return actualNextInsn;
+        }
+
         AccessExpression path = DefaultPackageAndClass.create(getClassName());
         path = DefaultObjectFieldRead.create(path, getFieldName());
-		
-		StackFrame sf = ti.getModifiableTopFrame();
-		sf.setOperandAttr(new NonEmptyAttribute(null, path));
-		
-		return actualNextInsn;
-	}
+
+        StackFrame sf = ti.getModifiableTopFrame();
+        sf.setOperandAttr(new Attribute(null, path));
+
+        return actualNextInsn;
+    }
 }

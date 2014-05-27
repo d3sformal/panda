@@ -23,7 +23,6 @@ import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -33,46 +32,46 @@ import gov.nasa.jpf.vm.ThreadInfo;
  */
 public class IADD extends gov.nasa.jpf.jvm.bytecode.IADD implements AbstractBinaryOperator<Integer> {
 
-	IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
-	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		
-		/**
-		 * Delegates the call to a shared object that does all the heavy lifting
-		 */
-		return executor.execute(this, ti);
-	}
+    IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 
-	@Override
-	public NonEmptyAttribute getResult(Integer v1, Attribute attr1, Integer v2, Attribute attr2) {
-		AbstractValue abs_v1 = attr1.getAbstractValue();
-		AbstractValue abs_v2 = attr2.getAbstractValue();
-		Expression expr1 = attr1.getExpression();
-		Expression expr2 = attr2.getExpression();
-				
-		/**
-		 * Performs the adequate operation over abstractions
-		 */
-		return new NonEmptyAttribute(Abstraction._add(v1, abs_v1, v2, abs_v2), Add.create(expr1, expr2));
-	}
+    @Override
+    public Instruction execute(ThreadInfo ti) {
 
-	@Override
-	public Instruction executeConcrete(ThreadInfo ti) {
-		
-		/**
-		 * Ensures execution of the original instruction
-		 */
-		return super.execute(ti);
-	}
+        /**
+         * Delegates the call to a shared object that does all the heavy lifting
+         */
+        return executor.execute(this, ti);
+    }
 
-	@Override
-	public Instruction getSelf() {
-		
-		/**
-		 * Ensures translation into an ordinary instruction
-		 */
-		return this;
-	}
+    @Override
+    public Attribute getResult(Integer v1, Attribute attr1, Integer v2, Attribute attr2) {
+        AbstractValue abs_v1 = Attribute.getAbstractValue(attr1);
+        AbstractValue abs_v2 = Attribute.getAbstractValue(attr2);
+        Expression expr1 = Attribute.getExpression(attr1);
+        Expression expr2 = Attribute.getExpression(attr2);
+
+        /**
+         * Performs the adequate operation over abstractions
+         */
+        return new Attribute(Abstraction._add(v1, abs_v1, v2, abs_v2), Add.create(expr1, expr2));
+    }
+
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
+
+        /**
+         * Ensures execution of the original instruction
+         */
+        return super.execute(ti);
+    }
+
+    @Override
+    public Instruction getSelf() {
+
+        /**
+         * Ensures translation into an ordinary instruction
+         */
+        return this;
+    }
 
 }

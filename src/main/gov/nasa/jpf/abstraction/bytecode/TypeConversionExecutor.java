@@ -16,22 +16,22 @@ public class TypeConversionExecutor {
         this.target = target;
     }
 
-	public Instruction execute(ThreadInfo ti, TypeConvertor ins) {
-		StackFrame sf = ti.getModifiableTopFrame();
-		Attribute attr = Attribute.ensureNotNull(source.getAttribute(sf));
-		AbstractValue abs_val = attr.getAbstractValue();
+    public Instruction execute(ThreadInfo ti, TypeConvertor ins) {
+        StackFrame sf = ti.getModifiableTopFrame();
+        Attribute attr = Attribute.getAttribute(source.getAttribute(sf));
+        AbstractValue abs_val = Attribute.getAbstractValue(attr);
         Instruction ret;
-		
-		if (abs_val == null) {
-			ret = ins.executeConcrete(ti);
-		} else {
-		    source.pop(sf);
+
+        if (abs_val == null) {
+            ret = ins.executeConcrete(ti);
+        } else {
+            source.pop(sf);
             target.push(sf, 0);
             ret = ins.getNext(ti);
         }
-		target.setAttribute(sf, attr);
+        target.setAttribute(sf, attr);
 
-		return ret;
-	}
+        return ret;
+    }
 
 }

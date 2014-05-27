@@ -10,28 +10,26 @@ import gov.nasa.jpf.vm.ThreadInfo;
 
 public class LSTORE extends gov.nasa.jpf.jvm.bytecode.LSTORE {
 
-	public LSTORE(int index) {
-		super(index);
-	}
-	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		StackFrame sf = ti.getTopFrame();
-        Attribute source = (Attribute) sf.getOperandAttr(1);
-        
-        source = Attribute.ensureNotNull(source);
+    public LSTORE(int index) {
+        super(index);
+    }
 
-		Instruction actualNextInsn = super.execute(ti);
-        
-		Expression from = source.getExpression();
-		DefaultRoot to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
-		
-		sf = ti.getModifiableTopFrame();
-		sf.setLocalAttr(getLocalVariableIndex(), source);
+    @Override
+    public Instruction execute(ThreadInfo ti) {
+        StackFrame sf = ti.getTopFrame();
+        Attribute source = Attribute.getAttribute(sf.getLongOperandAttr());
+
+        Instruction actualNextInsn = super.execute(ti);
+
+        Expression from = Attribute.getExpression(source);
+        DefaultRoot to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
+
+        sf = ti.getModifiableTopFrame();
+        sf.setLocalAttr(getLocalVariableIndex(), source);
 
         GlobalAbstraction.getInstance().informAboutPrimitiveLocalVariable(to);
-		GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
-		
-		return actualNextInsn;
-	}
+        GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
+
+        return actualNextInsn;
+    }
 }

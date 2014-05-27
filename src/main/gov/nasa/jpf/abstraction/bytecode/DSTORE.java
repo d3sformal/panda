@@ -13,35 +13,33 @@ import gov.nasa.jpf.vm.ThreadInfo;
  */
 public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
 
-	public DSTORE(int index) {
-		super(index);
-	}
-	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		StackFrame sf = ti.getTopFrame();
-        Attribute source = (Attribute) sf.getOperandAttr(1);
-        
-        source = Attribute.ensureNotNull(source);
+    public DSTORE(int index) {
+        super(index);
+    }
 
-		Instruction actualNextInsn = super.execute(ti);
-		
-		Expression from = source.getExpression();
-		DefaultRoot to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
-		
-		sf = ti.getModifiableTopFrame();
+    @Override
+    public Instruction execute(ThreadInfo ti) {
+        StackFrame sf = ti.getTopFrame();
+        Attribute source = Attribute.getAttribute(sf.getLongOperandAttr());
+
+        Instruction actualNextInsn = super.execute(ti);
+
+        Expression from = Attribute.getExpression(source);
+        DefaultRoot to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
+
+        sf = ti.getModifiableTopFrame();
 
         /**
          * Remember what has been stored here
          */
-		sf.setLocalAttr(getLocalVariableIndex(), source);
+        sf.setLocalAttr(getLocalVariableIndex(), source);
 
         /**
          * Inform the abstractions that a primitive value of a local variable may have changed
          */
         GlobalAbstraction.getInstance().informAboutPrimitiveLocalVariable(to);
-		GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
-		
-		return actualNextInsn;
-	}
+        GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
+
+        return actualNextInsn;
+    }
 }

@@ -30,34 +30,34 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
-import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.ArrayIndexOutOfBoundsExecutiveException;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 
+/**
+ * Stores a short value into an array
+ */
 public class IASTORE extends gov.nasa.jpf.jvm.bytecode.IASTORE {
-	
+
     private static final String ARRAY_INDEX_OUT_OF_BOUNDS = "java.lang.ArrayIndexOutOfBoundsException";
 
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		StackFrame sf = ti.getTopFrame();
-		Attribute source = (Attribute) sf.getOperandAttr(0);
-		Attribute index = (Attribute) sf.getOperandAttr(1);
-		Attribute destination = (Attribute) sf.getOperandAttr(2);
-		
-		source = Attribute.ensureNotNull(source);
-		index = Attribute.ensureNotNull(index);
-		destination = Attribute.ensureNotNull(destination);
+    @Override
+    public Instruction execute(ThreadInfo ti) {
+        StackFrame sf = ti.getTopFrame();
+        Expression from = Attribute.getExpression(sf.getOperandAttr(0));
+        Expression index = Attribute.getExpression(sf.getOperandAttr(1));
+        AccessExpression to = Attribute.getAccessExpression(sf.getOperandAttr(2));
+        AccessExpression element = DefaultArrayElementRead.create(to, index);
+        AccessExpression length = DefaultArrayLengthRead.create(to);
 
-		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+        Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
         if (RunDetector.isRunning() && !RunDetector.isInLibrary(ti)) {
             Predicate inBounds = Conjunction.create(
-                Negation.create(LessThan.create(index.getExpression(), Constant.create(0))),
-                LessThan.create(index.getExpression(), DefaultArrayLengthRead.create((AccessExpression) destination.getExpression()))
+                Negation.create(LessThan.create(index, Constant.create(0))),
+                LessThan.create(index, length)
             );
 
             TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
@@ -69,26 +69,17 @@ public class IASTORE extends gov.nasa.jpf.jvm.bytecode.IASTORE {
 
         // Here we may write into a different index than those corresponding to abstract state
         // Only if we do not apply pruning of infeasible paths (inconsistent concrete/abstract state)
-		Instruction actualNextInsn = super.execute(ti);
-		
-		if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
-			return actualNextInsn;
-		} 
-		
-		Expression from = source.getExpression();
-		AccessExpression to = null;
-		AccessExpression element = null;
-		
-		if (destination.getExpression() instanceof AccessExpression) {
-			to = (AccessExpression) destination.getExpression();
-			element = DefaultArrayElementRead.create(to, index.getExpression());
-		}
+        Instruction actualNextInsn = super.execute(ti);
+
+        if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+            return actualNextInsn;
+        }
 
         // Element indices are derived from predicates in this method call
-		GlobalAbstraction.getInstance().processPrimitiveStore(from, element);
-		
+        GlobalAbstraction.getInstance().processPrimitiveStore(from, element);
+
         AnonymousExpressionTracker.notifyPopped(to);
 
-		return actualNextInsn;
-	}
+        return actualNextInsn;
+    }
 }

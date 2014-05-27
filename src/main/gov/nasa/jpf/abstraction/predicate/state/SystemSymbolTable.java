@@ -1,7 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
@@ -56,37 +55,37 @@ import java.util.HashMap;
 public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scoped {
     private Universe universe = new Universe();
 
-	/**
-	 * Stacks of scopes (pushed by invoke, poped by return) separately for all threads
-	 */
-	private Map<Integer, SymbolTableStack> scopes = new HashMap<Integer, SymbolTableStack>();
+    /**
+     * Stacks of scopes (pushed by invoke, poped by return) separately for all threads
+     */
+    private Map<Integer, SymbolTableStack> scopes = new HashMap<Integer, SymbolTableStack>();
 
-	private PredicateAbstraction abstraction;
+    private PredicateAbstraction abstraction;
     private Integer currentThreadID = 0;
-	
-	public SystemSymbolTable(PredicateAbstraction abstraction) {
-		this.abstraction = abstraction;
-	}
 
-	/**
-	 * Create a scope for a given method
-	 */
-	@Override
-	public MethodFrameSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-		MethodFrameSymbolTable ret = new MethodFrameSymbolTable(scopes.get(currentThreadID).top());
+    public SystemSymbolTable(PredicateAbstraction abstraction) {
+        this.abstraction = abstraction;
+    }
 
-		/**
-		 * Register new local variables
-		 */
+    /**
+     * Create a scope for a given method
+     */
+    @Override
+    public MethodFrameSymbolTable createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
+        MethodFrameSymbolTable ret = new MethodFrameSymbolTable(scopes.get(currentThreadID).top());
+
+        /**
+         * Register new local variables
+         */
         StackFrame sf = threadInfo.getModifiableTopFrame();
 
-		/**
-		 * Handle main(String[] args)
+        /**
+         * Handle main(String[] args)
          *
          * it is necessary to initialize the arguments
-		 */
-		VM vm = threadInfo.getVM();
-		String target = vm.getConfig().getTarget();
+         */
+        VM vm = threadInfo.getVM();
+        String target = vm.getConfig().getTarget();
         String entry = vm.getConfig().getTargetEntry();
 
         if (entry == null) {
@@ -109,28 +108,28 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
                     argExpr = AnonymousObject.create(new Reference(ei));
                 }
 
-                Attribute attr = new NonEmptyAttribute(null, argExpr);
+                Attribute attr = new Attribute(null, argExpr);
 
                 sf.setLocalAttr(i, attr);
                 sf.addFrameAttr(attr);
 
                 ret.addObject(argExpr);
             }
-		}
-		
-		return ret;
-	}
-	
-	@Override
-	public Set<AccessExpression> processPrimitiveStore(Expression from, AccessExpression to) {
-		return scopes.get(currentThreadID).top().processPrimitiveStore(from, to);
-	}
-	
-	@Override
-	public Set<AccessExpression> processObjectStore(Expression from, AccessExpression to) {
-		return scopes.get(currentThreadID).top().processObjectStore(from, to);
-	}
-	
+        }
+
+        return ret;
+    }
+
+    @Override
+    public Set<AccessExpression> processPrimitiveStore(Expression from, AccessExpression to) {
+        return scopes.get(currentThreadID).top().processPrimitiveStore(from, to);
+    }
+
+    @Override
+    public Set<AccessExpression> processObjectStore(Expression from, AccessExpression to) {
+        return scopes.get(currentThreadID).top().processObjectStore(from, to);
+    }
+
     /**
      * At a method call it is necessary to change the scope correspondingly
      */
@@ -155,34 +154,33 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 
             for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
                 if (slotInUse[slotIndex]) {
-                    Attribute attr = Attribute.ensureNotNull((Attribute) after.getLocalAttr(slotIndex));
+                    Expression expr = Attribute.getExpression(after.getLocalAttr(slotIndex));
 
                     LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
                     String name = arg == null ? null : arg.getName();
 
                     if (localVarIsPrimitive[slotIndex]) {
                         newScope.addPrimitiveLocalVariable(DefaultRoot.create(name, slotIndex));
-                        newScope.processPrimitiveStore(attr.getExpression(), originalScope, DefaultRoot.create(name, slotIndex));
+                        newScope.processPrimitiveStore(expr, originalScope, DefaultRoot.create(name, slotIndex));
                     } else {
                         newScope.addStructuredLocalVariable(DefaultRoot.create(name, slotIndex));
-                        newScope.processObjectStore(attr.getExpression(), originalScope, DefaultRoot.create(name, slotIndex));
+                        newScope.processObjectStore(expr, originalScope, DefaultRoot.create(name, slotIndex));
                     }
                 }
             }
         }
     }
-	
-	@Override
-	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		ReturnValue calleeReturnValue = DefaultReturnValue.create();
-		ReturnValue callerReturnValue = DefaultReturnValue.create(threadInfo.getPC(), before.getMethodInfo().isReferenceReturnType());
 
-		Attribute attr = Attribute.ensureNotNull((Attribute) after.getOperandAttr());
-		Expression returnExpression = attr.getExpression();
-		//after.setOperandAttr(new NonEmptyAttribute(null, callerReturnValue)); // This is performed by the predicate valuation after it uses the original expression
+    @Override
+    public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+        ReturnValue calleeReturnValue = DefaultReturnValue.create();
+        ReturnValue callerReturnValue = DefaultReturnValue.create(threadInfo.getPC(), before.getMethodInfo().isReferenceReturnType());
 
-		/**
-		 * Register the return value
+        Expression returnExpression = Attribute.getExpression(after.getOperandAttr());
+        //after.setOperandAttr(new Attribute(null, callerReturnValue)); // This is performed by the predicate valuation after it uses the original expression
+
+        /**
+         * Register the return value
          *
          * top()  ... before return
          * top(1) ... after return (previous stack frame)
@@ -191,35 +189,35 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
          * 2) write the actual return value into the container (still in callee)
          * 3) create a specific unique return container in the caller
          * 4) write callee return into caller return
-		 */
-		if (before.getMethodInfo().isReferenceReturnType()) {
-			scopes.get(currentThreadID).top().addStructuredReturn(calleeReturnValue);
-			scopes.get(currentThreadID).top().processObjectStore(returnExpression, calleeReturnValue);
-			scopes.get(currentThreadID).top(1).addStructuredReturn(callerReturnValue);
-			scopes.get(currentThreadID).top(1).processObjectStore(calleeReturnValue, scopes.get(currentThreadID).top(), callerReturnValue);
-		} else {
-			scopes.get(currentThreadID).top().addPrimitiveReturn(calleeReturnValue);
-			scopes.get(currentThreadID).top().processPrimitiveStore(returnExpression, calleeReturnValue);
-			scopes.get(currentThreadID).top(1).addPrimitiveReturn(callerReturnValue);
-			scopes.get(currentThreadID).top(1).processPrimitiveStore(calleeReturnValue, scopes.get(currentThreadID).top(), callerReturnValue);
-		}
+         */
+        if (before.getMethodInfo().isReferenceReturnType()) {
+            scopes.get(currentThreadID).top().addStructuredReturn(calleeReturnValue);
+            scopes.get(currentThreadID).top().processObjectStore(returnExpression, calleeReturnValue);
+            scopes.get(currentThreadID).top(1).addStructuredReturn(callerReturnValue);
+            scopes.get(currentThreadID).top(1).processObjectStore(calleeReturnValue, scopes.get(currentThreadID).top(), callerReturnValue);
+        } else {
+            scopes.get(currentThreadID).top().addPrimitiveReturn(calleeReturnValue);
+            scopes.get(currentThreadID).top().processPrimitiveStore(returnExpression, calleeReturnValue);
+            scopes.get(currentThreadID).top(1).addPrimitiveReturn(callerReturnValue);
+            scopes.get(currentThreadID).top(1).processPrimitiveStore(calleeReturnValue, scopes.get(currentThreadID).top(), callerReturnValue);
+        }
 
         /**
          * Handle the rest as if there were no return values
          */
-		processVoidMethodReturn(threadInfo, before, after);
-	}
-	
-	@Override
-	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+        processVoidMethodReturn(threadInfo, before, after);
+    }
+
+    @Override
+    public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         /**
          * Drop callee scope
          */
-		scopes.get(currentThreadID).pop();
-	}
-	
-	@Override
-	public void restore(Map<Integer, ? extends Scopes> scopes) {
+        scopes.get(currentThreadID).pop();
+    }
+
+    @Override
+    public void restore(Map<Integer, ? extends Scopes> scopes) {
         this.scopes.clear();
 
         if (!scopes.isEmpty()) {
@@ -233,7 +231,7 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
         for (Integer threadId : scopes.keySet()) {
             Scopes threadScopes = scopes.get(threadId);
 
-		    if (threadScopes instanceof SymbolTableStack) {
+            if (threadScopes instanceof SymbolTableStack) {
                 SymbolTableStack threadSymbolTableScopes = (SymbolTableStack) threadScopes;
 
                 this.scopes.put(threadId, threadSymbolTableScopes.clone());
@@ -241,14 +239,14 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
                 for (MethodFrameSymbolTable scope : this.scopes.get(threadId)) {
                     scope.setUniverse(this.universe);
                 }
-		    } else {
-        		throw new RuntimeException("Invalid scopes type being restored!");
-		    }
+            } else {
+                throw new RuntimeException("Invalid scopes type being restored!");
+            }
         }
-	}
-	
-	@Override
-	public Map<Integer, SymbolTableStack> memorize() {
+    }
+
+    @Override
+    public Map<Integer, SymbolTableStack> memorize() {
         Map<Integer, SymbolTableStack> scopesClone = new HashMap<Integer, SymbolTableStack>();
 
         Universe universeClone = universe.clone();
@@ -261,47 +259,47 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
             }
         }
 
-		return scopesClone;
-	}
-	
-	@Override
-	public String toString() {
-		return scopes.get(currentThreadID).count() > 0 ? scopes.get(currentThreadID).top().toString() : "";
-	}
+        return scopesClone;
+    }
 
-	@Override
-	public boolean isArray(AccessExpression path) {
-		return scopes.get(currentThreadID).top().isArray(path);
-	}
+    @Override
+    public String toString() {
+        return scopes.get(currentThreadID).count() > 0 ? scopes.get(currentThreadID).top().toString() : "";
+    }
 
-	@Override
-	public boolean isObject(AccessExpression path) {
-		return scopes.get(currentThreadID).top().isObject(path);
-	}
+    @Override
+    public boolean isArray(AccessExpression path) {
+        return scopes.get(currentThreadID).top().isArray(path);
+    }
 
-	@Override
-	public boolean isPrimitive(AccessExpression path) {
-		return scopes.get(currentThreadID).top().isPrimitive(path);
-	}
+    @Override
+    public boolean isObject(AccessExpression path) {
+        return scopes.get(currentThreadID).top().isObject(path);
+    }
 
-	@Override
-	public Universe getUniverse() {
-		return universe;
-	}
+    @Override
+    public boolean isPrimitive(AccessExpression path) {
+        return scopes.get(currentThreadID).top().isPrimitive(path);
+    }
 
-	@Override
-	public int count() {
-		return scopes.get(currentThreadID).count() > 0 ? scopes.get(currentThreadID).top().count() : 0;
-	}
+    @Override
+    public Universe getUniverse() {
+        return universe;
+    }
 
-	@Override
-	public int depth() {
+    @Override
+    public int count() {
+        return scopes.get(currentThreadID).count() > 0 ? scopes.get(currentThreadID).top().count() : 0;
+    }
+
+    @Override
+    public int depth() {
         return depth(currentThreadID);
-	}
+    }
 
-	public int depth(int threadID) {
+    public int depth(int threadID) {
         return scopes.get(threadID).count();
-	}
+    }
 
     @Override
     public MethodFrameSymbolTable get(int depth) {
@@ -345,7 +343,7 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
     public void print() {
         scopes.get(currentThreadID).print();
     }
-	
+
     public void collectGarbage(VM vm, ThreadInfo ti) {
         KernelState ks = vm.getKernelState();
 
@@ -399,8 +397,7 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
                 // Anonymous objects on stacks are also live
                 for (StackFrame frame = thread.getTopFrame(); frame != null; frame = frame.getPrevious()) {
                     for (int i = 0; i < frame.getTopPos() - frame.getLocalVariableCount(); ++i) {
-                        Attribute attr = Attribute.ensureNotNull((Attribute) frame.getOperandAttr(i));
-                        Expression expr = attr.getExpression();
+                        Expression expr = Attribute.getExpression(frame.getOperandAttr(i));
 
                         if (expr instanceof AnonymousExpression) {
                             AnonymousExpression ae = (AnonymousExpression) expr;

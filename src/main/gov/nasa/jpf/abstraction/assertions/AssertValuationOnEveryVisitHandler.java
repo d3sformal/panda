@@ -20,7 +20,7 @@ public abstract class AssertValuationOnEveryVisitHandler extends AssertHandler {
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
         StackFrame sf = curTh.getModifiableTopFrame();
 
-        AnonymousExpressionTracker.notifyPopped(((Attribute) sf.getOperandAttr()).getExpression(), 1);
+        AnonymousExpressionTracker.notifyPopped(Attribute.getExpression(sf.getOperandAttr()), 1);
 
         ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
 

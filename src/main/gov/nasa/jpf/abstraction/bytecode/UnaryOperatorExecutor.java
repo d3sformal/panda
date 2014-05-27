@@ -32,61 +32,59 @@ import gov.nasa.jpf.vm.ThreadInfo;
  */
 public abstract class UnaryOperatorExecutor<T> {
 
-	final public Instruction execute(AbstractUnaryOperator<T> op, ThreadInfo ti) {
+    final public Instruction execute(AbstractUnaryOperator<T> op, ThreadInfo ti) {
 
-		String name = op.getClass().getSimpleName();
-		
-		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getModifiableTopFrame();
+        String name = op.getClass().getSimpleName();
 
-		Attribute attr = getAttribute(sf);
+        SystemState ss = ti.getVM().getSystemState();
+        StackFrame sf = ti.getModifiableTopFrame();
 
-		AbstractValue abs_v = null;
-		
-		attr = Attribute.ensureNotNull(attr);
-		
-		abs_v = attr.getAbstractValue();
-		
-		T v = getOperand(sf);
+        Attribute attr = getAttribute(sf);
 
-		Attribute result = op.getResult(v, attr);
+        AbstractValue abs_v = null;
 
-		if (abs_v == null) {
-			Instruction ret = op.executeConcrete(ti);
-			
-			storeAttribute(result, sf);
-			
-			return ret;
-		}
+        abs_v = Attribute.getAbstractValue(attr);
 
-		if (result.getAbstractValue().isComposite()) {
-			if (!ti.isFirstStepInsn()) { // first time around
-				int size = result.getAbstractValue().getTokensNumber();
-				ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
-				ss.setNextChoiceGenerator(cg);
+        T v = getOperand(sf);
 
-				return op.getSelf();
-			} else { // this is what really returns results
-				ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+        Attribute result = op.getResult(v, attr);
 
-				assert (cg instanceof FocusAbstractChoiceGenerator);
+        if (abs_v == null) {
+            Instruction ret = op.executeConcrete(ti);
 
-				int key = (Integer) cg.getNextChoice();
-				result.setAbstractValue(result.getAbstractValue().getToken(key));
-			}
-		}
+            storeAttribute(result, sf);
 
-		storeResult(result, sf);
+            return ret;
+        }
 
-		return op.getNext(ti);
-	}
-	
-	protected Attribute getAttribute(StackFrame sf, int index) {
-		return (Attribute)sf.getOperandAttr(index);
-	}
-	
-	abstract protected Attribute getAttribute(StackFrame sf);
-	abstract protected T getOperand(StackFrame sf);
-	abstract protected void storeAttribute(Attribute result, StackFrame sf);
-	abstract protected void storeResult(Attribute result, StackFrame sf);
+        if (Attribute.getAbstractValue(result).isComposite()) {
+            if (!ti.isFirstStepInsn()) { // first time around
+                int size = Attribute.getAbstractValue(result).getTokensNumber();
+                ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
+                ss.setNextChoiceGenerator(cg);
+
+                return op.getSelf();
+            } else { // this is what really returns results
+                ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+
+                assert (cg instanceof FocusAbstractChoiceGenerator);
+
+                int key = (Integer) cg.getNextChoice();
+                Attribute.setAbstractValue(result, Attribute.getAbstractValue(result).getToken(key));
+            }
+        }
+
+        storeResult(result, sf);
+
+        return op.getNext(ti);
+    }
+
+    protected Attribute getAttribute(StackFrame sf, int index) {
+        return Attribute.getAttribute(sf.getOperandAttr(index));
+    }
+
+    abstract protected Attribute getAttribute(StackFrame sf);
+    abstract protected T getOperand(StackFrame sf);
+    abstract protected void storeAttribute(Attribute result, StackFrame sf);
+    abstract protected void storeResult(Attribute result, StackFrame sf);
 }

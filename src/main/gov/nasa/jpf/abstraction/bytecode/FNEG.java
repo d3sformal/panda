@@ -24,7 +24,6 @@ import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Subtract;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -34,44 +33,44 @@ import gov.nasa.jpf.vm.ThreadInfo;
  */
 public class FNEG extends gov.nasa.jpf.jvm.bytecode.FNEG implements AbstractUnaryOperator<Float> {
 
-	FloatUnaryOperatorExecutor executor = FloatUnaryOperatorExecutor.getInstance();
-	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		
-		/**
-		 * Delegates the call to a shared object that does all the heavy lifting
-		 */
-		return executor.execute(this, ti);
-	}
+    FloatUnaryOperatorExecutor executor = FloatUnaryOperatorExecutor.getInstance();
 
-	@Override
-	public Attribute getResult(Float v, Attribute attr) {
-		AbstractValue abs_v = attr.getAbstractValue();
-		Expression expr = attr.getExpression();
-		
-		/**
-		 * Performs the adequate operation over abstractions
-		 */
-		return new NonEmptyAttribute(Abstraction._neg(abs_v), Subtract.create(Constant.create(0), expr));
-	}
+    @Override
+    public Instruction execute(ThreadInfo ti) {
 
-	@Override
-	public Instruction executeConcrete(ThreadInfo ti) {
-		
-		/**
-		 * Ensures execution of the original instruction
-		 */
-		return super.execute(ti);
-	}
+        /**
+         * Delegates the call to a shared object that does all the heavy lifting
+         */
+        return executor.execute(this, ti);
+    }
 
-	@Override
-	public Instruction getSelf() {
-		
-		/**
-		 * Ensures translation into an ordinary instruction
-		 */
-		return this;
-	}
+    @Override
+    public Attribute getResult(Float v, Attribute attr) {
+        AbstractValue abs_v = Attribute.getAbstractValue(attr);
+        Expression expr = Attribute.getExpression(attr);
+
+        /**
+         * Performs the adequate operation over abstractions
+         */
+        return new Attribute(Abstraction._neg(abs_v), Subtract.create(Constant.create(0), expr));
+    }
+
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
+
+        /**
+         * Ensures execution of the original instruction
+         */
+        return super.execute(ti);
+    }
+
+    @Override
+    public Instruction getSelf() {
+
+        /**
+         * Ensures translation into an ordinary instruction
+         */
+        return this;
+    }
 
 }

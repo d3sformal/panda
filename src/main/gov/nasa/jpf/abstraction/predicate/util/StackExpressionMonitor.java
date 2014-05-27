@@ -16,26 +16,26 @@ import gov.nasa.jpf.vm.VM;
  * Prints the current state of the symbolic stack after each instruction in the target program
  */
 public class StackExpressionMonitor extends ListenerAdapter {
-	
-	@Override
-	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
-		if (RunDetector.isRunning()) {
-			StackFrame sf = curTh.getTopFrame();
-            if (sf != null) {
-    			inspect(sf);
-            }
-		}
-	}
 
-	public static void inspect(StackFrame sf) {
-		System.out.println("--EXPRESSIONS --");
-		for (int i = 0; i <= (sf.getTopPos() - sf.getLocalVariableCount()); i++)
-		{
-			Attribute attr = (Attribute) sf.getOperandAttr(i);
-			if ((attr != null) && (attr.getExpression() != null)) System.out.println("["+i+"]: " + attr.getExpression().toString());
-			else System.out.println("["+i+"]: null");
-		}
-		System.out.println("--------------");
-	}
+    @Override
+    public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
+        //if (RunDetector.isRunning()) {
+            StackFrame sf = curTh.getTopFrame();
+            if (sf != null) {
+                inspect(sf);
+            }
+        //}
+    }
+
+    public static void inspect(StackFrame sf) {
+        System.out.println("--EXPRESSIONS --");
+        for (int i = 0; i <= (sf.getTopPos() - sf.getLocalVariableCount()); i++)
+        {
+            Attribute attr = Attribute.getAttribute(sf.getOperandAttr(i));
+            if ((attr != null) && (Attribute.getExpression(attr) != null)) System.out.println("["+i+"]: " + Attribute.getExpression(attr).toString());
+            else System.out.println("["+i+"]: null");
+        }
+        System.out.println("--------------");
+    }
 }
 

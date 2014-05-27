@@ -324,7 +324,6 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             Set<AccessExpression> paths = new HashSet<AccessExpression>();
             Set<AccessExpression> candidatePaths = new HashSet<AccessExpression>();
             Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
-            Set<Predicate> toBeAdded = new HashSet<Predicate>();
 
             for (Predicate p : sharedSymbolCache.keySet()) {
                 paths.clear();
@@ -332,15 +331,17 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                 if (shareSymbols(predicate, paths, candidatePaths, prefixes)) {
                     sharedSymbolCache.get(p).add(predicate);
                 } else {
-                    toBeAdded.clear();
+                    boolean shouldBeAdded = false;
                     for (Predicate q : sharedSymbolCache.get(p)) {
                         paths.clear();
                         q.addAccessExpressionsToSet(paths);
                         if (shareSymbols(predicate, paths, candidatePaths, prefixes)) {
-                            toBeAdded.add(predicate);
+                            shouldBeAdded = true;
                         }
                     }
-                    sharedSymbolCache.get(p).addAll(toBeAdded);
+                    if (shouldBeAdded) {
+                        sharedSymbolCache.get(p).add(predicate);
+                    }
                 }
             }
         }

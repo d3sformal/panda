@@ -2,12 +2,12 @@
 // Copyright (C) 2012 United States Government as represented by the
 // Administrator of the National Aeronautics and Space Administration
 // (NASA).  All Rights Reserved.
-// 
+//
 // This software is distributed under the NASA Open Source Agreement
 // (NOSA), version 1.3.  The NOSA has been approved by the Open Source
 // Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
 // directory tree for the complete NOSA document.
-// 
+//
 // THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
 // KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
 // LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
@@ -30,7 +30,6 @@ import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
-import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ArrayFields;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -40,33 +39,30 @@ import gov.nasa.jpf.vm.ArrayIndexOutOfBoundsExecutiveException;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 
 public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
-	
+
     private static final String ARRAY_INDEX_OUT_OF_BOUNDS = "java.lang.ArrayIndexOutOfBoundsException";
 
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		StackFrame sf = ti.getTopFrame();
-		Attribute source = (Attribute) sf.getOperandAttr(0);
-		Attribute index = (Attribute) sf.getOperandAttr(1);
-		Attribute destination = (Attribute) sf.getOperandAttr(2);
-		
-		source = Attribute.ensureNotNull(source);
-		index = Attribute.ensureNotNull(index);
-		destination = Attribute.ensureNotNull(destination);
+    @Override
+    public Instruction execute(ThreadInfo ti) {
+        StackFrame sf = ti.getTopFrame();
+        Attribute source = Attribute.getAttribute(sf.getOperandAttr(0));
+        Expression from = Attribute.getExpression(source);
+        Expression index = Attribute.getExpression(sf.getOperandAttr(1));
+        AccessExpression to = Attribute.getAccessExpression(sf.getOperandAttr(2));
 
-		ElementInfo ei = ti.getElementInfo(sf.peek(2));
-		ArrayFields fields = ei.getArrayFields();
-		
-		for (int i = 0; i < fields.arrayLength(); ++i) {
-			fields.addFieldAttr(fields.arrayLength(), i, source);
-		}
+        ElementInfo ei = ti.getElementInfo(sf.peek(2));
+        ArrayFields fields = ei.getArrayFields();
 
-		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+        for (int i = 0; i < fields.arrayLength(); ++i) {
+            fields.addFieldAttr(fields.arrayLength(), i, source);
+        }
+
+        Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
         if (RunDetector.isRunning() && !RunDetector.isInLibrary(ti)) {
             Predicate inBounds = Conjunction.create(
-                Negation.create(LessThan.create(index.getExpression(), Constant.create(0))),
-                LessThan.create(index.getExpression(), DefaultArrayLengthRead.create((AccessExpression) destination.getExpression()))
+                Negation.create(LessThan.create(index, Constant.create(0))),
+                LessThan.create(index, DefaultArrayLengthRead.create(to))
             );
 
             TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
@@ -78,23 +74,20 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 
         // Here we may write into a different index than those corresponding to abstract state
         // Only if we do not apply pruning of infeasible paths (inconsistent concrete/abstract state)
-		Instruction actualNextInsn = super.execute(ti);
-		
-		if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
-			return actualNextInsn;
-		} 
-		
-		Expression from = source.getExpression();
-		AccessExpression to = (AccessExpression) destination.getExpression();
+        Instruction actualNextInsn = super.execute(ti);
 
-		AccessExpression element = DefaultArrayElementRead.create(to, index.getExpression());
+        if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+            return actualNextInsn;
+        }
+
+        AccessExpression element = DefaultArrayElementRead.create(to, index);
 
         // Element indices are derived from predicates in this method call
-		GlobalAbstraction.getInstance().processObjectStore(from, element);
+        GlobalAbstraction.getInstance().processObjectStore(from, element);
 
         AnonymousExpressionTracker.notifyPopped(from);
         AnonymousExpressionTracker.notifyPopped(to);
 
-		return actualNextInsn;
-	}
+        return actualNextInsn;
+    }
 }

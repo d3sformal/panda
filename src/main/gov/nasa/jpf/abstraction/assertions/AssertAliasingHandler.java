@@ -21,7 +21,7 @@ public abstract class AssertAliasingHandler extends AssertHandler {
 
         StackFrame sf = curTh.getModifiableTopFrame();
 
-        AnonymousExpressionTracker.notifyPopped(((Attribute) sf.getOperandAttr()).getExpression(), 1);
+        AnonymousExpressionTracker.notifyPopped(Attribute.getExpression(sf.getOperandAttr()), 1);
 
         ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
 

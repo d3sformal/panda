@@ -27,8 +27,6 @@ import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
-import gov.nasa.jpf.abstraction.impl.NonEmptyAttribute;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
@@ -46,95 +44,93 @@ import gov.nasa.jpf.vm.choice.IntChoiceFromList;
  */
 public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.SwitchInstruction {
 
-	protected SwitchInstruction(int defaultTarget, int numberOfTargets) {
-		super(defaultTarget, numberOfTargets);
-	}
+    protected SwitchInstruction(int defaultTarget, int numberOfTargets) {
+        super(defaultTarget, numberOfTargets);
+    }
 
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		
-		SystemState ss = ti.getVM().getSystemState();
-		StackFrame sf = ti.getModifiableTopFrame();
-		Attribute attr = (Attribute) sf.getOperandAttr(0);
-		
-		attr = Attribute.ensureNotNull(attr);
-		
-		AbstractValue abs_v = attr.getAbstractValue();
-		Expression expr = attr.getExpression();
-		
-		if (!ti.isFirstStepInsn()) {
+    @Override
+    public Instruction execute(ThreadInfo ti) {
 
-			ArrayList<Integer> choices = null;
-			
-			if (expr != null && RunDetector.isRunning()) {				
-				ArrayList<Integer> choiceCandidates = new ArrayList<Integer>();
-				boolean predicateAbstractionFailed = false;
+        SystemState ss = ti.getVM().getSystemState();
+        StackFrame sf = ti.getModifiableTopFrame();
+        Attribute attr = Attribute.getAttribute(sf.getOperandAttr());
+
+        AbstractValue abs_v = Attribute.getAbstractValue(attr);
+        Expression expr = Attribute.getExpression(attr);
+
+        if (!ti.isFirstStepInsn()) {
+
+            ArrayList<Integer> choices = null;
+
+            if (expr != null && RunDetector.isRunning()) {
+                ArrayList<Integer> choiceCandidates = new ArrayList<Integer>();
+                boolean predicateAbstractionFailed = false;
 
                 for (int i = 0; i < matches.length; i++) {
                     int match = matches[i];
 
-					TruthValue pred = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(Equals.create(expr, Constant.create(match)));
-					
-					if (pred == TruthValue.UNDEFINED) {
-						predicateAbstractionFailed = true;
-						break;
-					}
-					
-					if (pred != TruthValue.FALSE) {
-						choiceCandidates.add(i);
-					}
-				}
-				
-				if (!predicateAbstractionFailed) {
-					choices = choiceCandidates;
-				}
-			}
+                    TruthValue pred = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(Equals.create(expr, Constant.create(match)));
 
-			if (choices == null) {
-				if (abs_v == null) {
-					return super.execute(ti);
-				}
-				
-				choices = new ArrayList<Integer>();
+                    if (pred == TruthValue.UNDEFINED) {
+                        predicateAbstractionFailed = true;
+                        break;
+                    }
 
-				lastIdx = DEFAULT;
-				int value = sf.peek(0);
+                    if (pred != TruthValue.FALSE) {
+                        choiceCandidates.add(i);
+                    }
+                }
 
-				for (int i = 0, l = matches.length; i < l; i++) {
-					AbstractBoolean result = Abstraction._eq(value, abs_v, matches[i], null);
-				
-					if (result != AbstractBoolean.FALSE) {
-						choices.add(i);
-					}
-				}
-			}
-			
-			if (choices.size() > 0) {
-				int[] param = new int[choices.size()];
-				for (int i = 0; i < choices.size(); ++i)
-					param[i] = choices.get(i);
-				ChoiceGenerator<?> cg = new IntChoiceFromList("abstractSwitchAll", param);
-				ss.setNextChoiceGenerator(cg);
-				return this;
-			} else {
-				sf.pop();
-				return mi.getInstructionAt(target);
-			}
-		} else {
-			ChoiceGenerator<?> cg = ss.getCurrentChoiceGenerator("abstractSwitchAll", IntChoiceFromList.class);
-			int idx = ((IntChoiceFromList) cg).getNextChoice();
-			sf.pop();
+                if (!predicateAbstractionFailed) {
+                    choices = choiceCandidates;
+                }
+            }
 
-			if (idx == DEFAULT) {
-				return mi.getInstructionAt(target);
-			}
+            if (choices == null) {
+                if (abs_v == null) {
+                    return super.execute(ti);
+                }
 
-			lastIdx = idx;
-            
+                choices = new ArrayList<Integer>();
+
+                lastIdx = DEFAULT;
+                int value = sf.peek(0);
+
+                for (int i = 0, l = matches.length; i < l; i++) {
+                    AbstractBoolean result = Abstraction._eq(value, abs_v, matches[i], null);
+
+                    if (result != AbstractBoolean.FALSE) {
+                        choices.add(i);
+                    }
+                }
+            }
+
+            if (choices.size() > 0) {
+                int[] param = new int[choices.size()];
+                for (int i = 0; i < choices.size(); ++i)
+                    param[i] = choices.get(i);
+                ChoiceGenerator<?> cg = new IntChoiceFromList("abstractSwitchAll", param);
+                ss.setNextChoiceGenerator(cg);
+                return this;
+            } else {
+                sf.pop();
+                return mi.getInstructionAt(target);
+            }
+        } else {
+            ChoiceGenerator<?> cg = ss.getCurrentChoiceGenerator("abstractSwitchAll", IntChoiceFromList.class);
+            int idx = ((IntChoiceFromList) cg).getNextChoice();
+            sf.pop();
+
+            if (idx == DEFAULT) {
+                return mi.getInstructionAt(target);
+            }
+
+            lastIdx = idx;
+
             GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(Equals.create(expr, Constant.create(matches[idx])), TruthValue.TRUE));
-			
-			return mi.getInstructionAt(targets[idx]);
-		}
-	}
+
+            return mi.getInstructionAt(targets[idx]);
+        }
+    }
 
 }

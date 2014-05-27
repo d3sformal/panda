@@ -2,12 +2,12 @@
 // Copyright (C) 2012 United States Government as represented by the
 // Administrator of the National Aeronautics and Space Administration
 // (NASA).  All Rights Reserved.
-// 
+//
 // This software is distributed under the NASA Open Source Agreement
 // (NOSA), version 1.3.  The NOSA has been approved by the Open Source
 // Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
 // directory tree for the complete NOSA document.
-// 
+//
 // THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
 // KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
 // LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
@@ -23,7 +23,6 @@ import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
-import gov.nasa.jpf.abstraction.impl.EmptyAttribute;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -32,20 +31,18 @@ import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Types;
 
 public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
-	
-	public PUTFIELD(String fieldName, String classType, String fieldDescriptor) {
-		super(fieldName, classType, fieldDescriptor);
-	}
 
-	@Override
-	public Instruction execute(ThreadInfo ti) {		
-		StackFrame sf = ti.getTopFrame();
+    public PUTFIELD(String fieldName, String classType, String fieldDescriptor) {
+        super(fieldName, classType, fieldDescriptor);
+    }
+
+    @Override
+    public Instruction execute(ThreadInfo ti) {
+        StackFrame sf = ti.getTopFrame();
         Attribute source = null;
-		Attribute destination = (Attribute) sf.getOperandAttr(1);
-		
-		destination = Attribute.ensureNotNull(destination);
-		
-		ElementInfo ei = ti.getModifiableElementInfo(sf.peek(1));
+        Attribute destination = null;
+        ElementInfo ei = null;
+
         FieldInfo fi = getFieldInfo();
 
         switch (fi.getTypeCode()) {
@@ -57,37 +54,34 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
             case Types.T_SHORT:
             case Types.T_INT:
             case Types.T_FLOAT:
-                source = (Attribute) sf.getOperandAttr();
+                source = Attribute.getAttribute(sf.getOperandAttr());
+                destination = Attribute.getAttribute(sf.getOperandAttr(1));
+                ei = ti.getModifiableElementInfo(sf.peek(1));
                 break;
 
             case Types.T_LONG:
             case Types.T_DOUBLE:
-                source = (Attribute) sf.getLongOperandAttr();
+                source = Attribute.getAttribute(sf.getLongOperandAttr());
+                destination = Attribute.getAttribute(sf.getOperandAttr(2));
+                ei = ti.getModifiableElementInfo(sf.peek(2));
                 break;
 
             default:
         }
 
-		source = Attribute.ensureNotNull(source);
-        
-		ei.setFieldAttr(fi, source);
-		
-		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+        Expression from = Attribute.getExpression(source);
+        AccessExpression to = Attribute.getAccessExpression(destination);
+        AccessExpression field = DefaultObjectFieldRead.create(to, getFieldName());
 
-		Instruction actualNextInsn = super.execute(ti);
-		
-		if (JPFInstructionAdaptor.testFieldInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
-			return actualNextInsn;
-		}
-		
-		Expression from = source.getExpression();
-		AccessExpression to = null;
-		AccessExpression field = null;
+        ei.setFieldAttr(fi, source);
 
-		if (destination.getExpression() instanceof AccessExpression) {
-			to = (AccessExpression) destination.getExpression();
-			field = DefaultObjectFieldRead.create(to, getFieldName());
-		}
+        Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+        Instruction actualNextInsn = super.execute(ti);
+
+        if (JPFInstructionAdaptor.testFieldInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+            return actualNextInsn;
+        }
 
         if (ei.getFieldValueObject(getFieldName()) == null) {
             GlobalAbstraction.getInstance().processObjectStore(from, field);
@@ -99,7 +93,7 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 
         AnonymousExpressionTracker.notifyPopped(from);
         AnonymousExpressionTracker.notifyPopped(to);
-        
+
         return actualNextInsn;
-	}
+    }
 }
