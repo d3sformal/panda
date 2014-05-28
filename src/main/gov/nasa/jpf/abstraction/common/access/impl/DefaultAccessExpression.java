@@ -65,6 +65,10 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
         if (o instanceof AccessExpression) {
             AccessExpression ae = (AccessExpression) o;
 
+            if (hashCode() != o.hashCode()) {
+                return false;
+            }
+
             return isEqualTo(ae);
         }
 

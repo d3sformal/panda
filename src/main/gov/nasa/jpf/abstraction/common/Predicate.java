@@ -80,6 +80,10 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
 		if (o instanceof Predicate) {
 			Predicate p = (Predicate) o;
 
+            if (hashCode() != p.hashCode()) {
+                return false;
+            }
+
 			return getStringRep().equals(p.getStringRep());
 		}
 		
