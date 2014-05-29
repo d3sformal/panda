@@ -43,9 +43,11 @@ public class SMT {
 
     private static boolean USE_CACHE = true;
     private static List<SMTListener> listeners = new LinkedList<SMTListener>();
+    private static SMTCache cache = new SMTCache();
 
     public static void registerListener(SMTListener listener) {
         listeners.add(listener);
+        listener.registerCache(cache);
     }
 
     // Notify about invocations
@@ -149,11 +151,19 @@ public class SMT {
         public Integer getModel() {
             return model;
         }
+
+        @Override
+        public String toString() {
+            if (satisfiable == null) {
+                return "NULL";
+            }
+
+            return (satisfiable ? "SAT" : "UNSAT") + (model == null ? "" : " Model: " + model);
+        }
     }
 
     private BufferedWriter in = null;
     private BufferedReader out = null;
-    private SMTCache cache = new SMTCache();
 
     public SMT() throws SMTException {
         try {
@@ -644,6 +654,14 @@ public class SMT {
 
     private static String createFormula(Predicate valueConstraint, List<Pair<Predicate, TruthValue>> determinants, Set<Predicate> additionalClauses) {
         Predicate formula = valueConstraint;
+
+        /*
+        java.util.Collections.sort(determinants, new java.util.Comparator<Pair<Predicate, TruthValue>>() {
+            public int compare(Pair<Predicate, TruthValue> p1, Pair<Predicate, TruthValue> p2) {
+                return p1.getFirst().toString().compareTo(p2.getFirst().toString());
+            }
+        });
+        */
 
         for (Pair<Predicate, TruthValue> pair : determinants) {
             Predicate determinant = pair.getFirst();

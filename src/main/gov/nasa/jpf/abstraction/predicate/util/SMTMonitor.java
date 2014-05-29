@@ -10,6 +10,7 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateValueDeterminingInfo;
 import gov.nasa.jpf.abstraction.predicate.smt.SMTListener;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
+import gov.nasa.jpf.abstraction.predicate.smt.SMTCache;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.Pair;
 
@@ -136,6 +137,13 @@ public class SMTMonitor extends SMTListener {
     @Override
     public void searchFinished(Search search) {
         System.out.println("SMT Number of queries: " + SMT.getQueryCountTotal() + " (New: " + SMT.getQueryCount() + ", Cached: " + SMT.getCacheHitCount() + ")");
+        for (SMTCache cache : caches) {
+            System.out.println();
+            System.out.println("SMT Cache:");
+            for (String query : cache.getQueries()) {
+                System.out.println("\t" + query + " " + cache.get(query));
+            }
+        }
     }
 
 }

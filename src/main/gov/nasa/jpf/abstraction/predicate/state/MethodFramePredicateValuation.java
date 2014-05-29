@@ -13,6 +13,7 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
@@ -394,9 +395,118 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return ret.toString();
     }
 
+    private boolean determinesConcreteValueOfAccessExpression(Predicate predicate) {
+        TruthValue valuation = TruthValue.TRUE;
+
+        while (predicate instanceof Negation) {
+            predicate = ((Negation) predicate).predicate;
+
+            valuation = TruthValue.neg(valuation);
+        }
+
+        if (predicate instanceof Equals && valuations.get(predicate) == valuation) {
+            Equals e = (Equals) predicate;
+
+            Expression a = e.a;
+            Expression b = e.b;
+
+            if (a instanceof AccessExpression && b instanceof Constant) {
+                return true;
+            }
+            if (a instanceof Constant && b instanceof AccessExpression) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Assumes predicate to be comparison (possibly negated) of an access expression and a constant
+    private static AccessExpression getAccessExpression(Predicate predicate) {
+        while (predicate instanceof Negation) {
+            predicate = ((Negation) predicate).predicate;
+        }
+
+        Comparison c = (Comparison) predicate;
+
+        Expression a = c.a;
+        Expression b = c.b;
+
+        if (a instanceof AccessExpression) {
+            return (AccessExpression) a;
+        } else {
+            return (AccessExpression) b;
+        }
+    }
+
+    private boolean forbidsConcreteValueOfAccessExpression(Predicate predicate) {
+        TruthValue valuation = TruthValue.FALSE;
+
+        while (predicate instanceof Negation) {
+            predicate = ((Negation) predicate).predicate;
+
+            valuation = TruthValue.neg(valuation);
+        }
+
+        if ((predicate instanceof Equals && valuations.get(predicate) == valuation) || predicate instanceof LessThan) {
+            Comparison c = (Comparison) predicate;
+
+            Expression a = c.a;
+            Expression b = c.b;
+
+            if (a instanceof AccessExpression && b instanceof Constant) {
+                return true;
+            }
+
+            if (a instanceof Constant && b instanceof AccessExpression) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void collectDeterminants(Predicate predicate, Map<Predicate, TruthValue> determinants, Map<AccessExpression, Predicate> equalities, Map<AccessExpression, Set<Predicate>> inequalities) {
+        for (Predicate determinant : computeDeterminantClosure(predicate, valuations.keySet())) {
+            if (determinesConcreteValueOfAccessExpression(determinant)) {
+                AccessExpression expression = getAccessExpression(determinant);
+
+                equalities.put(expression, determinant);
+            } else if (forbidsConcreteValueOfAccessExpression(determinant)) {
+                AccessExpression expression = getAccessExpression(determinant);
+
+                if (!inequalities.containsKey(expression)) {
+                    inequalities.put(expression, new HashSet<Predicate>());
+                }
+
+                inequalities.get(expression).add(determinant);
+            } else {
+                determinants.put(determinant, get(determinant));
+            }
+        }
+
+        for (AccessExpression expr : inequalities.keySet()) {
+            if (!equalities.containsKey(expr)) {
+                for (Predicate inequality : inequalities.get(expr)) {
+                    determinants.put(inequality, valuations.get(inequality));
+                }
+            }
+        }
+
+        for (Predicate equality : equalities.values()) {
+            determinants.put(equality, valuations.get(equality));
+        }
+
+        equalities.clear();
+        inequalities.clear();
+    }
+
     @Override
     public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
         Map<Predicate, PredicateValueDeterminingInfo> predicates = new HashMap<Predicate, PredicateValueDeterminingInfo>();
+
+        Map<AccessExpression, Predicate> equalities = new HashMap<AccessExpression, Predicate>();
+        Map<AccessExpression, Set<Predicate>> inequalities = new HashMap<AccessExpression, Set<Predicate>>();
 
         Set<AccessExpression> paths = new HashSet<AccessExpression>();
 
@@ -452,13 +562,11 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                 }
 
                 Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+                Map<Predicate, TruthValue> determinantsOrig = new HashMap<Predicate, TruthValue>();
 
-                for (Predicate determinant : computeDeterminantClosure(positiveWeakestPrecondition, valuations.keySet())) {
-                    determinants.put(determinant, get(determinant));
-                }
-                for (Predicate determinant : computeDeterminantClosure(negativeWeakestPrecondition, valuations.keySet())) {
-                    determinants.put(determinant, get(determinant));
-                }
+                collectDeterminants(positiveWeakestPrecondition, determinants, equalities, inequalities);
+                // SHOULD NOT BE NECESSARY
+                //collectDeterminants(negativeWeakestPrecondition, determinants, equalities, inequalities);
 
                 predicates.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
             }
@@ -623,6 +731,8 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
         Map<Predicate, PredicateValueDeterminingInfo> input = new HashMap<Predicate, PredicateValueDeterminingInfo>();
         Set<Predicate> known = new HashSet<Predicate>();
+        Map<AccessExpression, Predicate> equalities = new HashMap<AccessExpression, Predicate>();
+        Map<AccessExpression, Set<Predicate>> inequalities = new HashMap<AccessExpression, Set<Predicate>>();
 
         // This takes long
         for (Predicate predicate : predicates) {
@@ -635,12 +745,9 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
                 Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 
-                for (Predicate determinant : computeDeterminantClosure(positiveWeakestPrecondition, valuations.keySet())) {
-                    determinants.put(determinant, get(determinant));
-                }
-                for (Predicate determinant : computeDeterminantClosure(negativeWeakestPrecondition, valuations.keySet())) {
-                    determinants.put(determinant, get(determinant));
-                }
+                collectDeterminants(positiveWeakestPrecondition, determinants, equalities, inequalities);
+                // SHOULD NOT BE NECESSARY
+                //collectDeterminants(negativeWeakestPrecondition, determinants, equalities, inequalities);
 
                 input.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
             }

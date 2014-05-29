@@ -9,27 +9,34 @@ import gov.nasa.jpf.abstraction.util.Pair;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * A special listener that JPF can instantiate as a common listener which also listens to SMT events
  */
 public abstract class SMTListener extends ListenerAdapter {
-	
-	public SMTListener() {
-		SMT.registerListener(this);
-	}
-	
+
+    protected List<SMTCache> caches = new LinkedList<SMTCache>();
+
+    public SMTListener() {
+        SMT.registerListener(this);
+    }
+
+    public void registerCache(SMTCache cache) {
+        caches.add(cache);
+    }
+
     public void isSatisfiableInvoked(List<Predicate> formulas) {}
-	public void valuatePredicatesInvoked(Map<Predicate, PredicateValueDeterminingInfo> predicates) {}
-	public void valuatePredicatesInvoked(Set<Predicate> predicates) {}
-	public void getModelInvoked(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {}
+    public void valuatePredicatesInvoked(Map<Predicate, PredicateValueDeterminingInfo> predicates) {}
+    public void valuatePredicatesInvoked(Set<Predicate> predicates) {}
+    public void getModelInvoked(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {}
 
     public void isSatisfiableInputGenerated(String input) {}
-	public void valuatePredicatesInputGenerated(String input) {}
-	public void getModelInputGenerated(String input) {}
+    public void valuatePredicatesInputGenerated(String input) {}
+    public void getModelInputGenerated(String input) {}
 
-	public void isSatisfiableExecuted(List<Predicate> formulas, boolean[] satisfiable) {}
-	public void valuatePredicatesExecuted(Map<Predicate, TruthValue> valuation) {}
-	public void getModelExecuted(Boolean satisfiability, Integer model) {}
+    public void isSatisfiableExecuted(List<Predicate> formulas, boolean[] satisfiable) {}
+    public void valuatePredicatesExecuted(Map<Predicate, TruthValue> valuation) {}
+    public void getModelExecuted(Boolean satisfiability, Integer model) {}
 
 }

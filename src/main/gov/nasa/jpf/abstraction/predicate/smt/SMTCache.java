@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
+import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -18,5 +19,9 @@ public class SMTCache {
         }
 
         return emptyResponse;
+    }
+
+    public Set<String> getQueries() {
+        return responses.keySet();
     }
 }
