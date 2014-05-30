@@ -270,19 +270,25 @@ public class SMT {
                     if (satisfiable) {
                         output = out.readLine();
 
-                        Pattern pattern = Pattern.compile("^\\( \\(value (?<value>[0-9]*)\\) \\)$");
+                        Pattern pattern = Pattern.compile("^\\( \\(value ((?<positivevalue>[0-9]*)|\\(- (?<negativevalue>[0-9]*)\\))\\) \\)$");
                         Matcher matcher = pattern.matcher(output);
 
                         if (matcher.matches()) {
-                            String value = matcher.group("value");
+                            String positivevalue = matcher.group("positivevalue");
+                            String negativevalue = matcher.group("negativevalue");
+
                             try {
-                                model = Integer.valueOf(value);
+                                if (positivevalue != null) {
+                                    model = Integer.valueOf(positivevalue);
+                                } else {
+                                    model = -Integer.valueOf(negativevalue);
+                                }
                             } catch (Exception e) {
                                 model = null; // Could not decode integer - probably the number is too large
                             }
                         }
                     } else {
-                        out.readLine();
+                        output = out.readLine();
                     }
                 }
 
@@ -484,6 +490,49 @@ public class SMT {
         input.append("(pop 1)"); input.append(separator);
 
         return input.toString();
+    }
+
+    // TODO use cache
+    public int[] getModels(Predicate state, AccessExpression[] expressions) {
+        String separator = InputType.NORMAL.getSeparator();
+        StringBuilder input = new StringBuilder();
+        int[] ret = new int[expressions.length];
+
+        PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
+
+        collector.collect(state);
+
+        Set<String> classes = collector.getClasses();
+        Set<String> variables = collector.getVars();
+        Set<String> fields = collector.getFields();
+
+        input.append("(push 1)"); input.append(separator);
+        appendClassDeclarations(classes, input, separator);
+        appendVariableDeclarations(variables, input, separator);
+        appendFieldDeclarations(fields, input, separator);
+
+        input.append("(assert "); input.append(convertToString(state)); input.append(")"); input.append(separator);
+
+        for (AccessExpression expr : expressions) {
+            input.append("(push 1)"); input.append(separator);
+
+            Predicate valueConstraint = Equals.create(SpecialVariable.create("value"), expr);
+
+            input.append("(assert "); input.append(convertToString(valueConstraint)); input.append(")"); input.append(separator);
+
+            input.append("(check-sat)"); input.append(separator);
+            input.append("(get-value (value))"); input.append(separator);
+            input.append("(pop 1)"); input.append(separator);
+        }
+
+        input.append("(pop 1)"); input.append(separator);
+
+        QueryResponse[] responses = isSatisfiable(expressions.length, input.toString(), true);
+        for (int i = 0; i < responses.length; ++i) {
+            ret[i] = responses[i].getModel();
+        }
+
+        return ret;
     }
 
     public Integer getModel(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {

@@ -4,6 +4,7 @@ import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.Tautology;
@@ -341,7 +342,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                     for (Predicate q : sharedSymbolCache.get(p)) {
                         paths.clear();
                         q.addAccessExpressionsToSet(paths);
-                        if (UhareSymbols(predicate, paths, candidatePaths, prefixes)) {
+                        if (shareSymbols(predicate, paths, candidatePaths, prefixes)) {
                             shouldBeAdded = true;
                             break;
                         }
@@ -861,6 +862,46 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         for (Integer m : models) {
             ret[i] = m;
             ++i;
+        }
+
+        return ret;
+    }
+
+    public Map<AccessExpression, Integer> getConcreteState() {
+        Map<AccessExpression, Integer> ret = new HashMap<AccessExpression, Integer>();
+
+        Predicate state = Tautology.create();
+
+        for (Predicate p : valuations.keySet()) {
+            switch (valuations.get(p)) {
+                case TRUE:
+                    state = Conjunction.create(state, p);
+                    break;
+                case FALSE:
+                    state = Conjunction.create(state, Negation.create(p));
+                    break;
+            }
+        }
+
+        // COULD BE CACHED
+        // CACHE NEEDS TO BE UPDATED UPON "PUT" AND "DELETE"
+        Set<AccessExpression> allExprs = new HashSet<AccessExpression>();
+        Set<AccessExpression> primitiveExprs = new HashSet<AccessExpression>();
+        state.addAccessExpressionsToSet(allExprs);
+
+        for (AccessExpression expr : allExprs) {
+            // WE CARE ABOUT VALUES OF PRIMITIVE VARIABLES/FIELDS/ELEMENTS ONLY
+            // WE ALSO DO NOT CARE ABOUT ARRAY LENGTH AS THOSE ARE FIXED (CANNOT BE CHANGED, THEY ARE DETERMINED BY SYMBOL TABLE)
+            if (((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0).isPrimitive(expr) && !(expr instanceof ArrayLengthRead)) {
+                primitiveExprs.add(expr);
+            }
+        }
+
+        AccessExpression[] exprArray = primitiveExprs.toArray(new AccessExpression[primitiveExprs.size()]);
+        int[] models = smt.getModels(state, exprArray);
+
+        for (int i = 0; i < exprArray.length; ++i) {
+            ret.put(exprArray[i], models[i]);
         }
 
         return ret;

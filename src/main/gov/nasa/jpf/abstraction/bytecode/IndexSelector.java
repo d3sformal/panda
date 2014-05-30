@@ -39,7 +39,7 @@ public class IndexSelector {
 
             // There is an elementChoice but not the indexChoice
             // Leave the selectedIndex untouched, no need to recompute it
-            if (!ti.isFirstStepInsn()) {
+            if (!ti.isFirstStepInsn() || selectedIndex == null) {
                 if (index instanceof Constant) {
                     selectedIndex = ((Constant) index).value.intValue();
                 } else {

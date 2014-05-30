@@ -5,12 +5,8 @@ package gov.nasa.jpf.abstraction.predicate.statematch;
 
 import static gov.nasa.jpf.abstraction.predicate.BaseTest.*;
 
+class D{public static void main(String[] args) {new ProducerTest().bootstrap();}}
 public class ProducerTest extends StateMatchingTest {
-    public ProducerTest() {
-        disableStateMatching();
-        enableBranchPruning();
-    }
-
     public static void main(String[] args) {
         Producer p = new Producer();
 
@@ -40,16 +36,11 @@ class Producer {
             Data d = new Data();
             d.val = v;
 
-            int oldPos = pos;
-            while (buffer[pos] != null) {
-                // simulate modulo
-                pos = pos + pos + pos + 1;
-                while (pos >= SIZE) pos = pos - SIZE;
+            // simulate modulo
+            pos = pos + 1;
+            if (pos >= SIZE) pos = 0;
 
-                assertConjunction("pos < 8: true");
-
-                if (pos == oldPos) break;
-            }
+            assertConjunction("pos < 8: true");
 
             System.out.println("P: d.val = " + d.val);
 

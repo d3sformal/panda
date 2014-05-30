@@ -9,8 +9,7 @@ alength(arrlen, p.buffer) = 8
 alength(arrlen, this.buffer) = 8
 
 [method gov.nasa.jpf.abstraction.predicate.statematch.Producer.doIt]
-i >= 0
-i < 10
+i = 0..4
 pos >= 0
 // pos >= class(gov.nasa.jpf.abstraction.predicate.statematch.Producer).SIZE
 pos >= 8
