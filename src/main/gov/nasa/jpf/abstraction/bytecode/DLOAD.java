@@ -2,12 +2,12 @@
 // Copyright (C) 2012 United States Government as represented by the
 // Administrator of the National Aeronautics and Space Administration
 // (NASA).  All Rights Reserved.
-// 
+//
 // This software is distributed under the NASA Open Source Agreement
 // (NOSA), version 1.3.  The NOSA has been approved by the Open Source
 // Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
 // directory tree for the complete NOSA document.
-// 
+//
 // THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
 // KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
 // LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
@@ -27,22 +27,22 @@ import gov.nasa.jpf.vm.ThreadInfo;
 
 public class DLOAD extends gov.nasa.jpf.jvm.bytecode.DLOAD {
 
-	public DLOAD(int index) {
-		super(index);
-	}
-	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		Instruction actualNextInsn = super.execute(ti);
-		
-		DefaultRoot path = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
-		Attribute attribute = new Attribute(null, path);
-			
-		StackFrame sf = ti.getModifiableTopFrame();
-		sf.setLongOperandAttr(attribute);
+    public DLOAD(int index) {
+        super(index);
+    }
+
+    @Override
+    public Instruction execute(ThreadInfo ti) {
+        Instruction actualNextInsn = super.execute(ti);
+
+        DefaultRoot path = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
+        Attribute attribute = new Attribute(null, path);
+
+        StackFrame sf = ti.getModifiableTopFrame();
+        sf.setLongOperandAttr(attribute);
 
         GlobalAbstraction.getInstance().informAboutPrimitiveLocalVariable(path);
 
-		return actualNextInsn;
-	}
+        return actualNextInsn;
+    }
 }

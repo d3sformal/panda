@@ -27,38 +27,38 @@ import gov.nasa.jpf.vm.StackFrame;
  */
 public class FloatUnaryOperatorExecutor extends UnaryOperatorExecutor<Float> {
 
-	private static FloatUnaryOperatorExecutor instance;
+    private static FloatUnaryOperatorExecutor instance;
 
-	public static FloatUnaryOperatorExecutor getInstance() {
-		if (instance == null) {
-			instance = new FloatUnaryOperatorExecutor();
-		}
-		
-		return instance;
-	}
+    public static FloatUnaryOperatorExecutor getInstance() {
+        if (instance == null) {
+            instance = new FloatUnaryOperatorExecutor();
+        }
 
-	@Override
-	protected Attribute getAttribute(StackFrame sf) {
-		return getAttribute(sf, 1);
-	}
+        return instance;
+    }
+
+    @Override
+    protected Attribute getAttribute(StackFrame sf) {
+        return getAttribute(sf, 1);
+    }
 
 
-	@Override
-	final protected Float getOperand(StackFrame sf) {
-		return sf.peekFloat(0);
-	}
-	
-	@Override
-	final protected void storeAttribute(Attribute result, StackFrame sf) {
-		sf.setOperandAttr(result);
-	}
+    @Override
+    final protected Float getOperand(StackFrame sf) {
+        return sf.peekFloat(0);
+    }
 
-	@Override
-	final protected void storeResult(Attribute result, StackFrame sf) {
-		sf.popFloat();
-		
-		sf.pushFloat(0);
-		storeAttribute(result, sf);
-	}
+    @Override
+    final protected void storeAttribute(Attribute result, StackFrame sf) {
+        sf.setOperandAttr(result);
+    }
+
+    @Override
+    final protected void storeResult(Attribute result, StackFrame sf) {
+        sf.popFloat();
+
+        sf.pushFloat(0);
+        storeAttribute(result, sf);
+    }
 
 }

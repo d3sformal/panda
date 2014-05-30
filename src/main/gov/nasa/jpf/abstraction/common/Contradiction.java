@@ -13,36 +13,36 @@ import java.util.Map;
 public class Contradiction extends Predicate {
 
     private static Contradiction instance;
-	
-	protected Contradiction() {
-	}
 
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		visitor.visit(this);
-	}
+    protected Contradiction() {
+    }
 
-	@Override
-	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
-	}
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        visitor.visit(this);
+    }
 
-	@Override
-	public Predicate replace(Map<AccessExpression, Expression> replacements) {
-		return this;
-	}
-	
-	public static Predicate create() {
-		//return new Contradiction();
+    @Override
+    public void addAccessExpressionsToSet(Set<AccessExpression> out) {
+    }
+
+    @Override
+    public Predicate replace(Map<AccessExpression, Expression> replacements) {
+        return this;
+    }
+
+    public static Predicate create() {
+        //return new Contradiction();
         if (instance == null) {
             instance = new Contradiction();
         }
 
         return instance;
-	}
-	
-	@Override
-	public Predicate update(AccessExpression expression, Expression newExpression) {
-		return this;
-	}
+    }
+
+    @Override
+    public Predicate update(AccessExpression expression, Expression newExpression) {
+        return this;
+    }
 
 }

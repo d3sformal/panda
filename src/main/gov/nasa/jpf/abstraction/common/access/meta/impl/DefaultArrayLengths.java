@@ -12,29 +12,29 @@ import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
 public class DefaultArrayLengths implements ArrayLengths {
     private static DefaultArrayLengths instance;
 
-	public static DefaultArrayLengths create() {
+    public static DefaultArrayLengths create() {
         if (instance == null) {
             instance = new DefaultArrayLengths();
         }
 
         return instance;
-	}
+    }
 
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		visitor.visit(this);
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof DefaultArrayLengths) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
-	}
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof DefaultArrayLengths) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
+    }
 }

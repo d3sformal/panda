@@ -3,7 +3,7 @@ package elevator;
 /*
  * Copyright (C) 2000 by ETHZ/INF/CS
  * All rights reserved
- * 
+ *
  * @version $Id$
  * @author Roger Karrer
  */
@@ -13,7 +13,7 @@ import java.util.Vector;
 // class of the shared control object
 class Controls {
     private Floor[] floors;
-  
+
     public Controls(int numFloors) {
         floors = new Floor[numFloors+1];
         for(int i = 0; i <= numFloors; i++) floors[i] = new Floor();
@@ -74,7 +74,7 @@ class Controls {
     }
 
     // An elevator calls this to see if an up call has occured on the given
-    // floor.  If another elevator has already claimed the up call on the 
+    // floor.  If another elevator has already claimed the up call on the
     // floor, checkUp() will return false.  This prevents an elevator from
     // wasting its time trying to claim a call that has already been claimed
     public boolean checkUp(int floor) {
@@ -86,7 +86,7 @@ class Controls {
     }
 
     // An elevator calls this to see if a down call has occured on the given
-    // floor.  If another elevator has already claimed the down call on the 
+    // floor.  If another elevator has already claimed the down call on the
     // floor, checkUp() will return false.  This prevents an elevator from
     // wasting its time trying to claim a call that has already been claimed
     public boolean checkDown(int floor) {

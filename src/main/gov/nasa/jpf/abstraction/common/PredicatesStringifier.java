@@ -24,246 +24,246 @@ import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 
 /**
  * A special visitor of the hierarchy:
- * 
+ *
  * predicates
  *   -> context
  *     -> predicate
  *       -> expression
- *       
+ *
  * to be used to produce a string representation of the captured hierarchy.
  */
 public abstract class PredicatesStringifier implements PredicatesComponentVisitor {
-	
-	protected StringBuilder ret = new StringBuilder();
-	
-	public String getString() {
-		return ret.toString();
-	}
 
-	@Override
-	public void visit(Predicates predicates) {		
-		for (Context c : predicates.contexts) {
-			c.accept(this);
-			ret.append("\n");
-		}
-	}
+    protected StringBuilder ret = new StringBuilder();
 
-	@Override
-	public void visit(ObjectContext context) {
-		ret.append("[object ");
-		
-		context.getPackageAndClass().accept(this);
-		
-		ret.append("]\n");
+    public String getString() {
+        return ret.toString();
+    }
 
-		for (Predicate p : context.predicates) {
-			p.accept(this);
-			ret.append("\n");
-		}
-	}
+    @Override
+    public void visit(Predicates predicates) {
+        for (Context c : predicates.contexts) {
+            c.accept(this);
+            ret.append("\n");
+        }
+    }
 
-	@Override
-	public void visit(MethodContext context) {
-		ret.append("[method ");
-		
-		context.getMethod().accept(this);
-		
-		ret.append("]\n");
+    @Override
+    public void visit(ObjectContext context) {
+        ret.append("[object ");
 
-		for (Predicate p : context.predicates) {
-			p.accept(this);
-			ret.append("\n");
-		}
-	}
+        context.getPackageAndClass().accept(this);
 
-	@Override
-	public void visit(MethodAssumePreContext context) {
-		ret.append("[method assume pre ");
+        ret.append("]\n");
 
-		context.getMethod().accept(this);
+        for (Predicate p : context.predicates) {
+            p.accept(this);
+            ret.append("\n");
+        }
+    }
 
-		ret.append("]\n");
+    @Override
+    public void visit(MethodContext context) {
+        ret.append("[method ");
 
-		for (Predicate p : context.predicates) {
-			p.accept(this);
-			ret.append("\n");
-		}
-	}
+        context.getMethod().accept(this);
 
-	@Override
-	public void visit(MethodAssumePostContext context) {
-		ret.append("[method assume post ");
+        ret.append("]\n");
 
-		context.getMethod().accept(this);
+        for (Predicate p : context.predicates) {
+            p.accept(this);
+            ret.append("\n");
+        }
+    }
 
-		ret.append("]\n");
+    @Override
+    public void visit(MethodAssumePreContext context) {
+        ret.append("[method assume pre ");
 
-		for (Predicate p : context.predicates) {
-			p.accept(this);
-			ret.append("\n");
-		}
-	}
+        context.getMethod().accept(this);
 
-	@Override
-	public void visit(StaticContext context) {
-		ret.append("[static]\n");
+        ret.append("]\n");
 
-		for (Predicate p : context.predicates) {
-			p.accept(this);
-			ret.append("\n");
-		}
-	}
+        for (Predicate p : context.predicates) {
+            p.accept(this);
+            ret.append("\n");
+        }
+    }
 
-	@Override
-	public void visit(Negation predicate) {
-		ret.append("not(");
-		
-		predicate.predicate.accept(this);
-		
-		ret.append(")");
-	}
+    @Override
+    public void visit(MethodAssumePostContext context) {
+        ret.append("[method assume post ");
 
-	@Override
-	public void visit(LessThan predicate) {
-		predicate.a.accept(this);
-		
-		ret.append(" < ");
-		
-		predicate.b.accept(this);
-	}
+        context.getMethod().accept(this);
 
-	@Override
-	public void visit(Equals predicate) {
-		predicate.a.accept(this);
-		
-		ret.append(" = ");
-		
-		predicate.b.accept(this);
-	}
-	
-	@Override
-	public void visit(Tautology predicate) {
-		ret.append("true");
-	}
-	
-	@Override
-	public void visit(Contradiction predicate) {
-		ret.append("false");
-	}
-	
-	@Override
-	public void visit(Conjunction predicate) {
-		ret.append("(");
-		
-		predicate.a.accept(this);
+        ret.append("]\n");
 
-		ret.append(" and ");
-		
-		predicate.b.accept(this);
-		
-		ret.append(")");
-	}
-	
-	@Override
-	public void visit(Disjunction predicate) {
-		ret.append("(");
-		
-		predicate.a.accept(this);
+        for (Predicate p : context.predicates) {
+            p.accept(this);
+            ret.append("\n");
+        }
+    }
 
-		ret.append(" or ");
-		
-		predicate.b.accept(this);
-		
-		ret.append(")");
-	}
-	
-	@Override
-	public void visit(Implication predicate) {
-		ret.append("(");
-		
-		predicate.a.accept(this);
+    @Override
+    public void visit(StaticContext context) {
+        ret.append("[static]\n");
 
-		ret.append(" => ");
-		
-		predicate.b.accept(this);
-		
-		ret.append(")");
-	}
+        for (Predicate p : context.predicates) {
+            p.accept(this);
+            ret.append("\n");
+        }
+    }
 
-	@Override
-	public void visit(EmptyExpression expression) {
-		ret.append(" ? ");
-	}
-	
-	@Override
-	public void visit(NullExpression expression) {
-		ret.append("null");
-	}
+    @Override
+    public void visit(Negation predicate) {
+        ret.append("not(");
 
-	@Override
-	public void visit(Add expression) {
-		ret.append("(");
-		
-		expression.a.accept(this);
-		
-		ret.append(" + ");
-		
-		expression.b.accept(this);
-		
-		ret.append(")");
-	}
+        predicate.predicate.accept(this);
 
-	@Override
-	public void visit(Subtract expression) {
-		ret.append("(");
-		
-		expression.a.accept(this);
-		
-		ret.append(" - ");
-		
-		expression.b.accept(this);
-		
-		ret.append(")");
-	}
+        ret.append(")");
+    }
 
-	@Override
-	public void visit(Multiply expression) {
-		ret.append("(");
-		
-		expression.a.accept(this);
-		
-		ret.append(" * ");
-		
-		expression.b.accept(this);
-		
-		ret.append(")");
-	}
+    @Override
+    public void visit(LessThan predicate) {
+        predicate.a.accept(this);
 
-	@Override
-	public void visit(Divide expression) {
-		ret.append("(");
-		
-		expression.a.accept(this);
-		
-		ret.append(" / ");
-		
-		expression.b.accept(this);
-		
-		ret.append(")");
-	}
+        ret.append(" < ");
 
-	@Override
-	public void visit(Modulo expression) {
-		ret.append("(");
-		
-		expression.a.accept(this);
-		
-		ret.append(" % ");
-		
-		expression.b.accept(this);
-		
-		ret.append(")");
-	}
+        predicate.b.accept(this);
+    }
+
+    @Override
+    public void visit(Equals predicate) {
+        predicate.a.accept(this);
+
+        ret.append(" = ");
+
+        predicate.b.accept(this);
+    }
+
+    @Override
+    public void visit(Tautology predicate) {
+        ret.append("true");
+    }
+
+    @Override
+    public void visit(Contradiction predicate) {
+        ret.append("false");
+    }
+
+    @Override
+    public void visit(Conjunction predicate) {
+        ret.append("(");
+
+        predicate.a.accept(this);
+
+        ret.append(" and ");
+
+        predicate.b.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(Disjunction predicate) {
+        ret.append("(");
+
+        predicate.a.accept(this);
+
+        ret.append(" or ");
+
+        predicate.b.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(Implication predicate) {
+        ret.append("(");
+
+        predicate.a.accept(this);
+
+        ret.append(" => ");
+
+        predicate.b.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(EmptyExpression expression) {
+        ret.append(" ? ");
+    }
+
+    @Override
+    public void visit(NullExpression expression) {
+        ret.append("null");
+    }
+
+    @Override
+    public void visit(Add expression) {
+        ret.append("(");
+
+        expression.a.accept(this);
+
+        ret.append(" + ");
+
+        expression.b.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(Subtract expression) {
+        ret.append("(");
+
+        expression.a.accept(this);
+
+        ret.append(" - ");
+
+        expression.b.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(Multiply expression) {
+        ret.append("(");
+
+        expression.a.accept(this);
+
+        ret.append(" * ");
+
+        expression.b.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(Divide expression) {
+        ret.append("(");
+
+        expression.a.accept(this);
+
+        ret.append(" / ");
+
+        expression.b.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(Modulo expression) {
+        ret.append("(");
+
+        expression.a.accept(this);
+
+        ret.append(" % ");
+
+        expression.b.accept(this);
+
+        ret.append(")");
+    }
 
     @Override
     public void visit(UninterpretedShiftLeft expression) {
@@ -291,39 +291,39 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
         ret.append(")");
     }
 
-	@Override
-	public void visit(Constant expression) {
-		ret.append(expression.value);
-	}
-	
-	@Override
-	public void visit(DefaultArrayLengths meta) {
-		ret.append("arrlen");
-	}
-	
-	@Override
-	public void visit(Undefined expression) {
-		ret.append("<<UNDEFINED>>");
-	}
-	
-	@Override
-	public void visit(UpdatedPredicate predicate) {
-		predicate.apply().accept(this);
-	}
-	
-	@Override
-	public void visit(PackageAndClass packageAndClass) {
-		ret.append(packageAndClass.getName());
-	}
-	
-	@Override
-	public void visit(Method method) {
-		method.getPackageAndClass().accept(this);
-		
-		ret.append(".");
-		
-		ret.append(method.getName());
-	}
+    @Override
+    public void visit(Constant expression) {
+        ret.append(expression.value);
+    }
+
+    @Override
+    public void visit(DefaultArrayLengths meta) {
+        ret.append("arrlen");
+    }
+
+    @Override
+    public void visit(Undefined expression) {
+        ret.append("<<UNDEFINED>>");
+    }
+
+    @Override
+    public void visit(UpdatedPredicate predicate) {
+        predicate.apply().accept(this);
+    }
+
+    @Override
+    public void visit(PackageAndClass packageAndClass) {
+        ret.append(packageAndClass.getName());
+    }
+
+    @Override
+    public void visit(Method method) {
+        method.getPackageAndClass().accept(this);
+
+        ret.append(".");
+
+        ret.append(method.getName());
+    }
 
     @Override
     public void visit(SpecialVariable expression) {

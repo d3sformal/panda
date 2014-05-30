@@ -7,13 +7,13 @@ import java.util.List;
 
 public class MethodAssumePreContext extends AbstractMethodContext implements AssumeContext {
 
-	public MethodAssumePreContext(Method method, List<Predicate> predicates) {
-		super(method, predicates);
-	}
+    public MethodAssumePreContext(Method method, List<Predicate> predicates) {
+        super(method, predicates);
+    }
 
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		visitor.visit(this);
-	}
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        visitor.visit(this);
+    }
 
 }

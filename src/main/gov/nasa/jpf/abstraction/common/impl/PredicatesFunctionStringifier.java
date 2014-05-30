@@ -17,141 +17,141 @@ import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 
 /**
  * Used to transform predicates into string representation in function notation
- *  
+ *
  * @see gov.nasa.jpf.abstraction.common.Notation
  */
 public class PredicatesFunctionStringifier extends PredicatesStringifier {
 
-	@Override
-	public void visit(Root expression) {
-		ret.append(expression.getName());
-	}
+    @Override
+    public void visit(Root expression) {
+        ret.append(expression.getName());
+    }
 
-	@Override
-	public void visit(Fresh expression) {
-		ret.append(expression.getName());
-	}
+    @Override
+    public void visit(Fresh expression) {
+        ret.append(expression.getName());
+    }
 
-	@Override
-	public void visit(ObjectFieldRead expression) {
-		boolean isStatic = expression.getObject() instanceof PackageAndClass;
-		
-		ret.append((isStatic ? "sfread" : "fread") + "(");
-		
-		expression.getField().accept(this);
-		
-		ret.append(", ");
-		
-		expression.getObject().accept(this);
-		
-		ret.append(")");
-	}
+    @Override
+    public void visit(ObjectFieldRead expression) {
+        boolean isStatic = expression.getObject() instanceof PackageAndClass;
 
-	@Override
-	public void visit(ObjectFieldWrite expression) {
-		boolean isStatic = expression.getObject() instanceof PackageAndClass;
-		
-		ret.append((isStatic ? "sfwrite" : "fwrite") + "(");
-		
-		ret.append(expression.getName());
-		
-		ret.append(", ");
-		
-		expression.getObject().accept(this);
-		
-		ret.append(", ");
-		
-		expression.getNewValue().accept(this);
-		
-		ret.append(")");
-	}
+        ret.append((isStatic ? "sfread" : "fread") + "(");
 
-	@Override
-	public void visit(ArrayElementRead expression) {
-		ret.append("aread(");
-		
-		ret.append("arr");
-		
-		ret.append(", ");
-		
-		expression.getArray().accept(this);
-		
-		ret.append(", ");
-		
-		expression.getIndex().accept(this);
-		
-		ret.append(")");
-	}
+        expression.getField().accept(this);
 
-	@Override
-	public void visit(ArrayElementWrite expression) {
-		ret.append("awrite(");
-		
-		ret.append("arr");
-		
-		ret.append(", ");
-		
-		expression.getArray().accept(this);
-		
-		ret.append(", ");
-		
-		expression.getIndex().accept(this);
-		
-		ret.append(", ");
-		
-		expression.getNewValue().accept(this);
-		
-		ret.append(")");
-	}
+        ret.append(", ");
 
-	@Override
-	public void visit(ArrayLengthRead expression) {
-		ret.append("alength(");
-		
-		expression.getArrayLengths().accept(this);
-		
-		ret.append(", ");
-		
-		expression.getArray().accept(this);
-		
-		ret.append(")");
-	}
+        expression.getObject().accept(this);
 
-	@Override
-	public void visit(ArrayLengthWrite expression) {
-		ret.append("alengthupdate(");
-		
-		expression.getArrayLengths().accept(this);
-		
-		ret.append(", ");
-		
-		expression.getArray().accept(this);
-		
-		ret.append(", ");
-		
-		expression.getNewValue().accept(this);
-		
-		ret.append(")");
-	}
+        ret.append(")");
+    }
 
-	@Override
-	public void visit(AnonymousObject expression) {
-		ret.append("object(" + expression.getReference() + ")");
-	}
+    @Override
+    public void visit(ObjectFieldWrite expression) {
+        boolean isStatic = expression.getObject() instanceof PackageAndClass;
 
-	@Override
-	public void visit(AnonymousArray expression) {
-		ret.append("array(" + expression.getReference() + ")");
-	}
-	
-	@Override
-	public void visit(DefaultArrays meta) {
-		ret.append("arr");
-	}
-	
-	@Override
-	public void visit(DefaultField meta) {
-		ret.append(meta.getName());
-	}
-	
+        ret.append((isStatic ? "sfwrite" : "fwrite") + "(");
+
+        ret.append(expression.getName());
+
+        ret.append(", ");
+
+        expression.getObject().accept(this);
+
+        ret.append(", ");
+
+        expression.getNewValue().accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(ArrayElementRead expression) {
+        ret.append("aread(");
+
+        ret.append("arr");
+
+        ret.append(", ");
+
+        expression.getArray().accept(this);
+
+        ret.append(", ");
+
+        expression.getIndex().accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(ArrayElementWrite expression) {
+        ret.append("awrite(");
+
+        ret.append("arr");
+
+        ret.append(", ");
+
+        expression.getArray().accept(this);
+
+        ret.append(", ");
+
+        expression.getIndex().accept(this);
+
+        ret.append(", ");
+
+        expression.getNewValue().accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(ArrayLengthRead expression) {
+        ret.append("alength(");
+
+        expression.getArrayLengths().accept(this);
+
+        ret.append(", ");
+
+        expression.getArray().accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(ArrayLengthWrite expression) {
+        ret.append("alengthupdate(");
+
+        expression.getArrayLengths().accept(this);
+
+        ret.append(", ");
+
+        expression.getArray().accept(this);
+
+        ret.append(", ");
+
+        expression.getNewValue().accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(AnonymousObject expression) {
+        ret.append("object(" + expression.getReference() + ")");
+    }
+
+    @Override
+    public void visit(AnonymousArray expression) {
+        ret.append("array(" + expression.getReference() + ")");
+    }
+
+    @Override
+    public void visit(DefaultArrays meta) {
+        ret.append("arr");
+    }
+
+    @Override
+    public void visit(DefaultField meta) {
+        ret.append(meta.getName());
+    }
+
 }

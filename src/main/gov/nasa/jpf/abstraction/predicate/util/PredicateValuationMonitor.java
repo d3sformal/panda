@@ -20,30 +20,30 @@ import gov.nasa.jpf.vm.VM;
  * Prints the current predicate valuation after each instruction in the target program
  */
 public class PredicateValuationMonitor extends ListenerAdapter {
-	
-	@Override
-	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {		
-		if (RunDetector.isRunning()) {
-			inspect(GlobalAbstraction.getInstance().get());
-		}
-	}
 
-	private void inspect(Abstraction abs) {
-		if (abs instanceof ContainerAbstraction) {
-			ContainerAbstraction container = (ContainerAbstraction) abs;
-			
-			for (Abstraction subAbs : container.getAbstractionsList()) {
-				inspect(subAbs);
-			}
-		} else if (abs instanceof PredicateAbstraction) {
-			PredicateAbstraction predicate = (PredicateAbstraction) abs;
-			String table = predicate.getPredicateValuation().toString();
-			System.out.println(
-				"--PREDICATES " + predicate.getPredicateValuation().count() + " --\n" +
-				table +
-				"--------------"
-			);
-			System.out.flush();
-		}		
-	}
+    @Override
+    public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
+        if (RunDetector.isRunning()) {
+            inspect(GlobalAbstraction.getInstance().get());
+        }
+    }
+
+    private void inspect(Abstraction abs) {
+        if (abs instanceof ContainerAbstraction) {
+            ContainerAbstraction container = (ContainerAbstraction) abs;
+
+            for (Abstraction subAbs : container.getAbstractionsList()) {
+                inspect(subAbs);
+            }
+        } else if (abs instanceof PredicateAbstraction) {
+            PredicateAbstraction predicate = (PredicateAbstraction) abs;
+            String table = predicate.getPredicateValuation().toString();
+            System.out.println(
+                "--PREDICATES " + predicate.getPredicateValuation().count() + " --\n" +
+                table +
+                "--------------"
+            );
+            System.out.flush();
+        }
+    }
 }

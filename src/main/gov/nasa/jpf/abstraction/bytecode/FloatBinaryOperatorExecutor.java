@@ -27,48 +27,48 @@ import gov.nasa.jpf.vm.StackFrame;
  */
 public class FloatBinaryOperatorExecutor extends BinaryOperatorExecutor<Float> {
 
-	private static FloatBinaryOperatorExecutor instance;
+    private static FloatBinaryOperatorExecutor instance;
 
-	public static FloatBinaryOperatorExecutor getInstance() {
-		if (instance == null) {
-			instance = new FloatBinaryOperatorExecutor();
-		}
-		
-		return instance;
-	}
-	
-	@Override
-	protected Attribute getLeftAttribute(StackFrame sf) {
-		return getAttribute(sf, 1);
-	}
+    public static FloatBinaryOperatorExecutor getInstance() {
+        if (instance == null) {
+            instance = new FloatBinaryOperatorExecutor();
+        }
 
-	@Override
-	protected Attribute getRightAttribute(StackFrame sf) {
-		return getAttribute(sf, 0);
-	}
-	
-	@Override
-	final protected Float getLeftOperand(StackFrame sf) {
-		return sf.peekFloat(1);
-	}
+        return instance;
+    }
 
-	@Override
-	final protected Float getRightOperand(StackFrame sf) {
-		return sf.peekFloat(0);
-	}
-	
-	@Override
-	final protected void storeAttribute(Attribute result, StackFrame sf) {
-		sf.setOperandAttr(result);
-	}
+    @Override
+    protected Attribute getLeftAttribute(StackFrame sf) {
+        return getAttribute(sf, 1);
+    }
 
-	@Override
-	final protected void storeResult(Attribute result, StackFrame sf) {
-		sf.popFloat();
-		sf.popFloat();
-		
-		sf.pushFloat(0);
-		storeAttribute(result, sf);
-	}
+    @Override
+    protected Attribute getRightAttribute(StackFrame sf) {
+        return getAttribute(sf, 0);
+    }
+
+    @Override
+    final protected Float getLeftOperand(StackFrame sf) {
+        return sf.peekFloat(1);
+    }
+
+    @Override
+    final protected Float getRightOperand(StackFrame sf) {
+        return sf.peekFloat(0);
+    }
+
+    @Override
+    final protected void storeAttribute(Attribute result, StackFrame sf) {
+        sf.setOperandAttr(result);
+    }
+
+    @Override
+    final protected void storeResult(Attribute result, StackFrame sf) {
+        sf.popFloat();
+        sf.popFloat();
+
+        sf.pushFloat(0);
+        storeAttribute(result, sf);
+    }
 
 }

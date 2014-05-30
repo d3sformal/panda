@@ -26,25 +26,25 @@ import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
 
 public class FocusAbstractChoiceGenerator extends IntIntervalGenerator {
 
-	boolean isReverseOrder;
+    boolean isReverseOrder;
 
-	// # choices = # elements in the abstract domain
-	public FocusAbstractChoiceGenerator(int num_tokens) {
-		super("focus", 0, num_tokens - 1, 1);
-		isReverseOrder = false;
-	}
+    // # choices = # elements in the abstract domain
+    public FocusAbstractChoiceGenerator(int num_tokens) {
+        super("focus", 0, num_tokens - 1, 1);
+        isReverseOrder = false;
+    }
 
-	/*
-	 * If reverseOrder is true, the ChoiceGenerator explores paths in the
-	 * opposite order used by the default constructor. If reverseOrder is false
-	 * the usual behavior is used.
-	 */
-	public FocusAbstractChoiceGenerator(int num_tokens, boolean reverseOrder) {
-		super("focus", 0, num_tokens - 1, reverseOrder ? -1 : 1);
-		isReverseOrder = reverseOrder;
-	}
+    /*
+     * If reverseOrder is true, the ChoiceGenerator explores paths in the
+     * opposite order used by the default constructor. If reverseOrder is false
+     * the usual behavior is used.
+     */
+    public FocusAbstractChoiceGenerator(int num_tokens, boolean reverseOrder) {
+        super("focus", 0, num_tokens - 1, reverseOrder ? -1 : 1);
+        isReverseOrder = reverseOrder;
+    }
 
-	public void setNextChoice(int nextChoice) {
-		super.next = nextChoice;
-	}
+    public void setNextChoice(int nextChoice) {
+        super.next = nextChoice;
+    }
 }

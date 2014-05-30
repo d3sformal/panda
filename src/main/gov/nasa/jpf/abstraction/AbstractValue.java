@@ -21,66 +21,66 @@ import java.util.Set;
 
 /**
  * An abstract value is an element of an abstract domain (depending on abstraction in question)
- * 
+ *
  * e.g. abstract value associated with a concrete value -1 may be:
- * 
+ *
  * 1) NEGATIVE ... in case of signs abstraction
  * 2) ODD      ... in case of evenness abstraction
- * 
+ *
  * @see gov.nasa.jpf.abstraction.numeric for individual implementations
  */
 public abstract class AbstractValue {
-	protected int key;
-	public Abstraction abs;
+    protected int key;
+    public Abstraction abs;
 
-	/**
-	 * This constructor is here to force all AbstractValues to call set_key. It is
-	 * important, because keys are used to distinguish different abstract values
-	 * during serialization.
-	 * 
-	 * @param key
-	 *            An integer which bijectively defines a particular abstract
-	 *            value
-	 * @see #setKey
-	 */
-	protected AbstractValue(int key) {
-		setKey(key);
-	}
+    /**
+     * This constructor is here to force all AbstractValues to call set_key. It is
+     * important, because keys are used to distinguish different abstract values
+     * during serialization.
+     *
+     * @param key
+     *            An integer which bijectively defines a particular abstract
+     *            value
+     * @see #setKey
+     */
+    protected AbstractValue(int key) {
+        setKey(key);
+    }
 
-	public int getKey() {
-		return key;
-	}
+    public int getKey() {
+        return key;
+    }
 
-	public void setKey(int key) {
-		this.key = key;
-	}
-	
-	// returns the abstract token corresponding to the key
-	public AbstractValue getToken(int key) {
-		throw new RuntimeException("get_token not implemented");
-	}
+    public void setKey(int key) {
+        this.key = key;
+    }
 
-	/**
-	 * 
-	 * @return The set of possible abstract values.
-	 */
-	public Set<AbstractValue> getTokens() {
-		throw new RuntimeException("get_tokens not implemented");
-	}
+    // returns the abstract token corresponding to the key
+    public AbstractValue getToken(int key) {
+        throw new RuntimeException("get_token not implemented");
+    }
 
-	/**
-	 * 
-	 * @return The number of possible abstract values.
-	 */
-	public int getTokensNumber() {
-		throw new RuntimeException("get_num_tokens not implemented");
-	}
-	
-	/**
-	 * @return true, if this abstraction is a single value from the domain;
-	 * false, if this abstraction represents a set of values from the domain.
-	 */
-	public boolean isComposite() {
-		return getTokensNumber() > 1;
-	}
+    /**
+     *
+     * @return The set of possible abstract values.
+     */
+    public Set<AbstractValue> getTokens() {
+        throw new RuntimeException("get_tokens not implemented");
+    }
+
+    /**
+     *
+     * @return The number of possible abstract values.
+     */
+    public int getTokensNumber() {
+        throw new RuntimeException("get_num_tokens not implemented");
+    }
+
+    /**
+     * @return true, if this abstraction is a single value from the domain;
+     * false, if this abstraction represents a set of values from the domain.
+     */
+    public boolean isComposite() {
+        return getTokensNumber() > 1;
+    }
 }

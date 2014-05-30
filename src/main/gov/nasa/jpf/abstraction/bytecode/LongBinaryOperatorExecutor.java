@@ -27,48 +27,48 @@ import gov.nasa.jpf.vm.StackFrame;
  */
 public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
 
-	private static LongBinaryOperatorExecutor instance;
+    private static LongBinaryOperatorExecutor instance;
 
-	public static LongBinaryOperatorExecutor getInstance() {
-		if (instance == null) {
-			instance = new LongBinaryOperatorExecutor();
-		}
-		
-		return instance;
-	}
-	
-	@Override
-	protected Attribute getLeftAttribute(StackFrame sf) {
-		return getAttribute(sf, 3);
-	}
+    public static LongBinaryOperatorExecutor getInstance() {
+        if (instance == null) {
+            instance = new LongBinaryOperatorExecutor();
+        }
 
-	@Override
-	protected Attribute getRightAttribute(StackFrame sf) {
-		return getAttribute(sf, 1);
-	}
+        return instance;
+    }
 
-	@Override
-	protected Long getLeftOperand(StackFrame sf) {
-		return sf.peekLong(2);
-	}
+    @Override
+    protected Attribute getLeftAttribute(StackFrame sf) {
+        return getAttribute(sf, 3);
+    }
 
-	@Override
-	protected Long getRightOperand(StackFrame sf) {
-		return sf.peekLong(0);
-	}
-	
-	@Override
-	final protected void storeAttribute(Attribute result, StackFrame sf) {
-		sf.setLongOperandAttr(result);
-	}
+    @Override
+    protected Attribute getRightAttribute(StackFrame sf) {
+        return getAttribute(sf, 1);
+    }
 
-	@Override
-	protected void storeResult(Attribute result, StackFrame sf) {
-		sf.popLong();
-		sf.popLong();
-		
-		sf.pushLong(0);
-		storeAttribute(result, sf);
-	}
+    @Override
+    protected Long getLeftOperand(StackFrame sf) {
+        return sf.peekLong(2);
+    }
+
+    @Override
+    protected Long getRightOperand(StackFrame sf) {
+        return sf.peekLong(0);
+    }
+
+    @Override
+    final protected void storeAttribute(Attribute result, StackFrame sf) {
+        sf.setLongOperandAttr(result);
+    }
+
+    @Override
+    protected void storeResult(Attribute result, StackFrame sf) {
+        sf.popLong();
+        sf.popLong();
+
+        sf.pushLong(0);
+        storeAttribute(result, sf);
+    }
 
 }

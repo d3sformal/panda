@@ -15,85 +15,85 @@ import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
  * Wrapper which marks expressions as Object Expressions @see gov.nasa.jpf.abstraction.common.ObjectExpression
  */
 public class ObjectExpressionDecorator extends DefaultObjectExpression {
-	protected Expression expression;
-	
-	protected ObjectExpressionDecorator(Expression expression) {
-		this.expression = expression;
-	}
-	
-	public static ObjectExpression wrap(Expression expression, SymbolTable symbols) {
-		if (expression instanceof ObjectExpression) {
-			return (ObjectExpression) expression;
-		}
-		
-		if (expression instanceof AccessExpression) {
-			AccessExpression path = (AccessExpression) expression;
-			
-			if (path instanceof ReturnValue) {
-				ReturnValue r = (ReturnValue) path;
-				
-				if (r.isReference()) {
-					return ObjectExpressionDecorator.create(path);
-				}
-			}
-			if (symbols.isObject(path)) {
-				if (symbols.isArray(path)) {
-					return ArrayExpressionDecorator.create(path);
-				}
-				
-				return ObjectExpressionDecorator.create(path);
-			}
-		}
-		
-		throw new RuntimeException("Invalid cast to Object Expression " + expression + " " + (expression == null ? "null" : expression.getClass().getSimpleName()));
-	}
-	
-	public static ObjectExpressionDecorator create(Expression expression) {
-		if (expression == null) {
-			return null;
-		}
-		
-		return new ObjectExpressionDecorator(expression);
-	}
+    protected Expression expression;
 
-	@Override
-	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
-		expression.addAccessExpressionsToSet(out);
-	}
-	
-	@Override
-	public Expression replace(Map<AccessExpression, Expression> replacements) {
-		Expression newE = this.expression.replace(replacements);
-		
-		if (newE == this.expression) return this;
-		else return create(newE);
-	}
+    protected ObjectExpressionDecorator(Expression expression) {
+        this.expression = expression;
+    }
 
-	@Override
-	public Expression update(AccessExpression expression, Expression newExpression) {
-		Expression newE = this.expression.update(expression, newExpression);
+    public static ObjectExpression wrap(Expression expression, SymbolTable symbols) {
+        if (expression instanceof ObjectExpression) {
+            return (ObjectExpression) expression;
+        }
 
-		if (newE == this.expression) return this;
-		else return create(newE);
-	}
+        if (expression instanceof AccessExpression) {
+            AccessExpression path = (AccessExpression) expression;
 
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		expression.accept(visitor);
-	}
+            if (path instanceof ReturnValue) {
+                ReturnValue r = (ReturnValue) path;
 
-	@Override
-	public Predicate getPreconditionForBeingFresh() {
-		return expression.getPreconditionForBeingFresh();
-	}
-	
-	@Override
-	public boolean equals(java.lang.Object o) {
-		return expression.equals(o);
-	}
-	
-	@Override
-	public int hashCode() {
-		return expression.hashCode();
-	}
+                if (r.isReference()) {
+                    return ObjectExpressionDecorator.create(path);
+                }
+            }
+            if (symbols.isObject(path)) {
+                if (symbols.isArray(path)) {
+                    return ArrayExpressionDecorator.create(path);
+                }
+
+                return ObjectExpressionDecorator.create(path);
+            }
+        }
+
+        throw new RuntimeException("Invalid cast to Object Expression " + expression + " " + (expression == null ? "null" : expression.getClass().getSimpleName()));
+    }
+
+    public static ObjectExpressionDecorator create(Expression expression) {
+        if (expression == null) {
+            return null;
+        }
+
+        return new ObjectExpressionDecorator(expression);
+    }
+
+    @Override
+    public void addAccessExpressionsToSet(Set<AccessExpression> out) {
+        expression.addAccessExpressionsToSet(out);
+    }
+
+    @Override
+    public Expression replace(Map<AccessExpression, Expression> replacements) {
+        Expression newE = this.expression.replace(replacements);
+
+        if (newE == this.expression) return this;
+        else return create(newE);
+    }
+
+    @Override
+    public Expression update(AccessExpression expression, Expression newExpression) {
+        Expression newE = this.expression.update(expression, newExpression);
+
+        if (newE == this.expression) return this;
+        else return create(newE);
+    }
+
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        expression.accept(visitor);
+    }
+
+    @Override
+    public Predicate getPreconditionForBeingFresh() {
+        return expression.getPreconditionForBeingFresh();
+    }
+
+    @Override
+    public boolean equals(java.lang.Object o) {
+        return expression.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return expression.hashCode();
+    }
 }

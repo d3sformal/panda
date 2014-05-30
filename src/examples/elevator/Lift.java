@@ -3,7 +3,7 @@ package elevator;
 /*
  * Copyright (C) 2000 by ETHZ/INF/CS
  * All rights reserved
- * 
+ *
  * @version $Id$
  * @author Roger Karrer
  */
@@ -24,7 +24,7 @@ class Lift extends Thread {
     private int travelDir; // one of IDLE, UP, or DOWN
     private int currentFloor;
     // holds the number of people who want to get off on each floor
-    private int[] peopleFor; 
+    private int[] peopleFor;
     // Values in pickupOn can be IDLE, UP, DOWN, and UP|DOWN, which indicate
     // which calls the elevator should respond to on each floor.  IDLE means
     // don't pick up on that floor
@@ -57,8 +57,8 @@ class Lift extends Thread {
     // every tenth of a second.  If it is moving, it takes 1 second to
     // move between floors.
     public void run() {
-    	int numIterations = 4;
-    	int i = 0;
+        int numIterations = 4;
+        int i = 0;
         while(i < numIterations) {
             if (travelDir == IDLE) {
                 doIdle();
@@ -76,7 +76,7 @@ class Lift extends Thread {
     private void doIdle() {
         boolean foundFloor = false;
         int targetFloor = -1;
-    
+
         if (controls.claimUp(getName(), currentFloor)) {
             // System.out.println("Lift::doIdle - could claim upcall on current floor"); // CARE
             foundFloor = true;
@@ -110,7 +110,7 @@ class Lift extends Thread {
                 travelDir = (targetFloor > currentFloor) ? UP : DOWN;
             }
         }
-    
+
         if (foundFloor) {
             //System.out.println(getName() + " is now moving " + ((travelDir==UP)?"UP":"DOWN"));
         }
@@ -133,7 +133,7 @@ class Lift extends Thread {
             //System.out.println(getName() + " delivering " + peopleFor[currentFloor] + " passengers on " + currentFloor);
             peopleFor[currentFloor] = 0;
         }
-	
+
         // Pickup people who want to go up if:
         //   1) we previous claimed an up call on this floor, or
         //   2) we are travelling up and there is an unclaimed up call on this
@@ -183,7 +183,7 @@ class Lift extends Thread {
 
         // Print out are new direction
         if (oldDir != travelDir) {
-        	/*
+            /*
             System.out.print(getName());
             if (travelDir == IDLE) System.out.println(" becoming IDLE");
             else if (travelDir == UP) System.out.println(" changing to UP");

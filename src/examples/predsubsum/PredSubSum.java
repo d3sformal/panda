@@ -5,30 +5,30 @@ package predsubsum;
 
 public class PredSubSum
 {
-	public static final int MAX = 10;
+    public static final int MAX = 10;
 
-	public static void doIt() 
-	{
-		int v = 0;
+    public static void doIt()
+    {
+        int v = 0;
 
-		while (true)
-		{
-			// simulate modulo
-			v = v + v + v + 1;
-			while (v >= MAX) v = v - MAX;
+        while (true)
+        {
+            // simulate modulo
+            v = v + v + v + 1;
+            while (v >= MAX) v = v - MAX;
 
-			if (v > 2 && v < MAX - 3)
-			{
-				v++;
-				v++;
-			}
-		}
-	}
+            if (v > 2 && v < MAX - 3)
+            {
+                v++;
+                v++;
+            }
+        }
+    }
 
-	public static void main(String[] args) 
-	{
-		PredSubSum.doIt();
-	}
+    public static void main(String[] args)
+    {
+        PredSubSum.doIt();
+    }
 
 }
 

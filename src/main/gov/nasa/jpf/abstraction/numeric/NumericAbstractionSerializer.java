@@ -30,96 +30,96 @@ import gov.nasa.jpf.util.FinalBitSet;
 import gov.nasa.jpf.util.JPFLogger;
 
 /**
- * a serializer that uses Abstract values stored in attributes 
- * to obtain the values to hash. 
+ * a serializer that uses Abstract values stored in attributes
+ * to obtain the values to hash.
  */
 public class NumericAbstractionSerializer extends FilteringSerializer {
 
-	static JPFLogger logger = JPF.getLogger("gov.nasa.jpf.abstraction.NumericAbstractionSerializer");
+    static JPFLogger logger = JPF.getLogger("gov.nasa.jpf.abstraction.NumericAbstractionSerializer");
 
-	public NumericAbstractionSerializer(Config conf) {
-	}
+    public NumericAbstractionSerializer(Config conf) {
+    }
 
-	protected void processField(Fields fields, int[] slotValues, FieldInfo fi, FinalBitSet filtered) {
-		int off = fi.getStorageOffset();
+    protected void processField(Fields fields, int[] slotValues, FieldInfo fi, FinalBitSet filtered) {
+        int off = fi.getStorageOffset();
 
-		if (!filtered.get(off)) {
-			AbstractValue a = fields.getFieldAttr(fi.getFieldIndex(), AbstractValue.class);
+        if (!filtered.get(off)) {
+            AbstractValue a = fields.getFieldAttr(fi.getFieldIndex(), AbstractValue.class);
 
-			if (a != null) {
-				if (fi.is1SlotField()) {
-					// abstraction cannot exist for references -> we can ignore them here
+            if (a != null) {
+                if (fi.is1SlotField()) {
+                    // abstraction cannot exist for references -> we can ignore them here
 
-					// storing abstract representation of the concrete value (as in DynamicNumericAbstractionSerializer) is not correct
-					// the concrete value is always zero if we use the abstraction for the field 
-	
-					// this should work for one-slot fields (int, float) and also for two-slot fields (long, double)
-					buf.add(a.getKey());
-				}
-			} else { // no abstraction, fall back to concrete values
-				if (fi.is1SlotField()) {
-					if (fi.isReference()) {
-						int ref = slotValues[off];
+                    // storing abstract representation of the concrete value (as in DynamicNumericAbstractionSerializer) is not correct
+                    // the concrete value is always zero if we use the abstraction for the field
 
-						processReference(ref);
-					} else {
-						buf.add(slotValues[off]);
-					}
-				} else { // double or long
-					buf.add(slotValues[off]);
-					buf.add(slotValues[off + 1]);
-				}
-			}
-		}
-	}
+                    // this should work for one-slot fields (int, float) and also for two-slot fields (long, double)
+                    buf.add(a.getKey());
+                }
+            } else { // no abstraction, fall back to concrete values
+                if (fi.is1SlotField()) {
+                    if (fi.isReference()) {
+                        int ref = slotValues[off];
 
-	@Override
-	protected void processNamedFields(ClassInfo ci, Fields fields) {
-		FinalBitSet filtered = getInstanceFilterMask(ci);
-		int nFields = ci.getNumberOfInstanceFields();
-		int[] slotValues = fields.asFieldSlots(); // for non-attributed fields
+                        processReference(ref);
+                    } else {
+                        buf.add(slotValues[off]);
+                    }
+                } else { // double or long
+                    buf.add(slotValues[off]);
+                    buf.add(slotValues[off + 1]);
+                }
+            }
+        }
+    }
 
-		for (int i = 0; i < nFields; i++) {
-			FieldInfo fi = ci.getInstanceField(i);
-			processField(fields, slotValues, fi, filtered);
-		}
-	} 
- 
-	// we must also store the abstract values that are in attributes for locals and method params (stack frame)
-	@Override
-	protected void serializeFrame(StackFrame frame){
-		buf.add(frame.getMethodInfo().getGlobalId());
+    @Override
+    protected void processNamedFields(ClassInfo ci, Fields fields) {
+        FinalBitSet filtered = getInstanceFilterMask(ci);
+        int nFields = ci.getNumberOfInstanceFields();
+        int[] slotValues = fields.asFieldSlots(); // for non-attributed fields
 
-		// there can be (rare) cases where a listener sets a null nextPc in
-		// a frame that is still on the stack
-		Instruction pc = frame.getPC();
-		if (pc != null) {
-			buf.add(pc.getInstructionIndex());
-		} else {
-			buf.add(-1);
-		}
+        for (int i = 0; i < nFields; i++) {
+            FieldInfo fi = ci.getInstanceField(i);
+            processField(fields, slotValues, fi, filtered);
+        }
+    }
 
-		int len = frame.getTopPos()+1;
-		buf.add(len);
+    // we must also store the abstract values that are in attributes for locals and method params (stack frame)
+    @Override
+    protected void serializeFrame(StackFrame frame){
+        buf.add(frame.getMethodInfo().getGlobalId());
 
-		int[] slots = frame.getSlots();
+        // there can be (rare) cases where a listener sets a null nextPc in
+        // a frame that is still on the stack
+        Instruction pc = frame.getPC();
+        if (pc != null) {
+            buf.add(pc.getInstructionIndex());
+        } else {
+            buf.add(-1);
+        }
 
-		for (int i = 0; i < len; i++) {
-			// store either the abstract value (attribute) or the concrete value 
-			// we should not exceed "len"
+        int len = frame.getTopPos()+1;
+        buf.add(len);
 
-			// we must give the offset as method parameter value
-			// we need attribute for the current slot
-			AbstractValue a = frame.getOperandAttr(frame.getTopPos()-i, AbstractValue.class);
+        int[] slots = frame.getSlots();
 
-			if (a != null) {
-				buf.add(a.getKey());
-			} else {
-				buf.add(slots[i]);
-			}
-		}
+        for (int i = 0; i < len; i++) {
+            // store either the abstract value (attribute) or the concrete value
+            // we should not exceed "len"
 
-		frame.visitReferenceSlots(this);
-	}
+            // we must give the offset as method parameter value
+            // we need attribute for the current slot
+            AbstractValue a = frame.getOperandAttr(frame.getTopPos()-i, AbstractValue.class);
+
+            if (a != null) {
+                buf.add(a.getKey());
+            } else {
+                buf.add(slots[i]);
+            }
+        }
+
+        frame.visitReferenceSlots(this);
+    }
 
 }

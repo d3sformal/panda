@@ -26,242 +26,242 @@ import gov.nasa.jpf.jvm.bytecode.ASTORE;
 
 public class LocalVarNameTracker extends ListenerAdapter 
 {
-	@Override
-	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) 
-	{
-		String v1 = null;
-		String v2 = null;
-		String v3 = null;
-		String v4 = null;
+    @Override
+    public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) 
+    {
+        String v1 = null;
+        String v2 = null;
+        String v3 = null;
+        String v4 = null;
 
-		if (execInsn instanceof ALOAD)
-		{
-			ALOAD loadInsn = (ALOAD) execInsn;
+        if (execInsn instanceof ALOAD)
+        {
+            ALOAD loadInsn = (ALOAD) execInsn;
 
-			try { 
-				v1 = loadInsn.
-					getLocalVarInfo().
-					getName(); 
-			} 
-			catch (NullPointerException e) 
-			{
-				System.out.println("v1: NPE"); 
-			}
+            try { 
+                v1 = loadInsn.
+                    getLocalVarInfo().
+                    getName(); 
+            } 
+            catch (NullPointerException e) 
+            {
+                System.out.println("v1: NPE"); 
+            }
 
-			try { 
-				v2 = curTh.
-					getTopFrame().
-					getLocalVarInfo(loadInsn.
-							getLocalVariableIndex()
-						).
-					getName(); 
-			} 
-			catch (NullPointerException e) 
-			{ 
-				System.out.println("v2: NPE"); 
-			}
+            try { 
+                v2 = curTh.
+                    getTopFrame().
+                    getLocalVarInfo(loadInsn.
+                            getLocalVariableIndex()
+                        ).
+                    getName(); 
+            } 
+            catch (NullPointerException e) 
+            { 
+                System.out.println("v2: NPE"); 
+            }
 
-			try
-			{
-				v3 = loadInsn.
-					getMethodInfo().
-					getLocalVars()[loadInsn.
-							getLocalVariableIndex()
-						].
-					getName();
-			}
-			catch (NullPointerException e) 
-			{ 
-				System.out.println("v3: NPE"); 
-			}
-			catch (ArrayIndexOutOfBoundsException e)
-			{
-				System.out.println("v3: AIOOB");
-			}
+            try
+            {
+                v3 = loadInsn.
+                    getMethodInfo().
+                    getLocalVars()[loadInsn.
+                            getLocalVariableIndex()
+                        ].
+                    getName();
+            }
+            catch (NullPointerException e) 
+            { 
+                System.out.println("v3: NPE"); 
+            }
+            catch (ArrayIndexOutOfBoundsException e)
+            {
+                System.out.println("v3: AIOOB");
+            }
 
 
-			try
-			{
-				v4 = loadInsn.getLocalVariableName();
-			}
-			catch (NullPointerException e) 
-			{ 
-				System.out.println("v4: NPE"); 
-			}
+            try
+            {
+                v4 = loadInsn.getLocalVariableName();
+            }
+            catch (NullPointerException e) 
+            { 
+                System.out.println("v4: NPE"); 
+            }
 
-			System.out.println("[POST load] v1 = " + v1 + ", v2 = " + v2 + ", v3 = " + v3 + ", v4 = " + v4); 
-		}
+            System.out.println("[POST load] v1 = " + v1 + ", v2 = " + v2 + ", v3 = " + v3 + ", v4 = " + v4); 
+        }
 
-		if (execInsn instanceof ASTORE)
-		{
-			ASTORE storeInsn = (ASTORE) execInsn;
+        if (execInsn instanceof ASTORE)
+        {
+            ASTORE storeInsn = (ASTORE) execInsn;
 
-			try { 
-				v1 = storeInsn.
-					getLocalVarInfo().
-					getName(); 
-			} 
-			catch (NullPointerException e) 
-			{
-				System.out.println("v1: NPE"); 
-			}
+            try { 
+                v1 = storeInsn.
+                    getLocalVarInfo().
+                    getName(); 
+            } 
+            catch (NullPointerException e) 
+            {
+                System.out.println("v1: NPE"); 
+            }
 
-			try { 
-				v2 = curTh.
-					getTopFrame().
-					getLocalVarInfo(storeInsn.
-							getLocalVariableIndex()
-						).
-					getName(); 
-			} 
-			catch (NullPointerException e) 
-			{ 
-				System.out.println("v2: NPE"); 
-			}
+            try { 
+                v2 = curTh.
+                    getTopFrame().
+                    getLocalVarInfo(storeInsn.
+                            getLocalVariableIndex()
+                        ).
+                    getName(); 
+            } 
+            catch (NullPointerException e) 
+            { 
+                System.out.println("v2: NPE"); 
+            }
 
-			try
-			{
-				v3 = storeInsn.
-					getMethodInfo().
-					getLocalVars()[storeInsn.
-							getLocalVariableIndex()
-						].
-					getName();
-			}
-			catch (NullPointerException e) 
-			{ 
-				System.out.println("v3: NPE"); 
-			}
+            try
+            {
+                v3 = storeInsn.
+                    getMethodInfo().
+                    getLocalVars()[storeInsn.
+                            getLocalVariableIndex()
+                        ].
+                    getName();
+            }
+            catch (NullPointerException e) 
+            { 
+                System.out.println("v3: NPE"); 
+            }
 
-			try
-			{
-				v4 = storeInsn.getLocalVariableName();
-			}
-			catch (NullPointerException e) 
-			{ 
-				System.out.println("v4: NPE"); 
-			}
+            try
+            {
+                v4 = storeInsn.getLocalVariableName();
+            }
+            catch (NullPointerException e) 
+            { 
+                System.out.println("v4: NPE"); 
+            }
 
-			System.out.println("[POST store] v1 = " + v1 + ", v2 = " + v2 + ", v3 = " + v3 + ", v4 = " + v4); 
-		}
-	}
+            System.out.println("[POST store] v1 = " + v1 + ", v2 = " + v2 + ", v3 = " + v3 + ", v4 = " + v4); 
+        }
+    }
 
-	public void executeInstruction(VM vm, ThreadInfo curTh, Instruction insn) 
-	{
-		String v1 = null;
-		String v2 = null;
-		String v3 = null;
-		String v4 = null;
+    public void executeInstruction(VM vm, ThreadInfo curTh, Instruction insn) 
+    {
+        String v1 = null;
+        String v2 = null;
+        String v3 = null;
+        String v4 = null;
 
-		if (insn instanceof ALOAD)
-		{
-			ALOAD loadInsn = (ALOAD) insn;
+        if (insn instanceof ALOAD)
+        {
+            ALOAD loadInsn = (ALOAD) insn;
 
-			try { 
-				v1 = loadInsn.
-					getLocalVarInfo().
-					getName(); 
-			} 
-			catch (NullPointerException e) 
-			{
-				System.out.println("v1: NPE"); 
-			}
+            try { 
+                v1 = loadInsn.
+                    getLocalVarInfo().
+                    getName(); 
+            } 
+            catch (NullPointerException e) 
+            {
+                System.out.println("v1: NPE"); 
+            }
 
-			try { 
-				v2 = curTh.
-					getTopFrame().
-					getLocalVarInfo(loadInsn.
-							getLocalVariableIndex()
-						).
-					getName(); 
-			} 
-			catch (NullPointerException e) 
-			{ 
-				System.out.println("v2: NPE"); 
-			}
+            try { 
+                v2 = curTh.
+                    getTopFrame().
+                    getLocalVarInfo(loadInsn.
+                            getLocalVariableIndex()
+                        ).
+                    getName(); 
+            } 
+            catch (NullPointerException e) 
+            { 
+                System.out.println("v2: NPE"); 
+            }
 
-			try
-			{
-				v3 = loadInsn.
-					getMethodInfo().
-					getLocalVars()[loadInsn.
-							getLocalVariableIndex()
-						].
-					getName();
-			}
-			catch (NullPointerException e) 
-			{ 
-				System.out.println("v3: NPE"); 
-			}
-			catch (ArrayIndexOutOfBoundsException e)
-			{
-				System.out.println("v3: AIOOB");
-			}
+            try
+            {
+                v3 = loadInsn.
+                    getMethodInfo().
+                    getLocalVars()[loadInsn.
+                            getLocalVariableIndex()
+                        ].
+                    getName();
+            }
+            catch (NullPointerException e) 
+            { 
+                System.out.println("v3: NPE"); 
+            }
+            catch (ArrayIndexOutOfBoundsException e)
+            {
+                System.out.println("v3: AIOOB");
+            }
 
-			try
-			{
-				v4 = loadInsn.getLocalVariableName();
-			}
-			catch (NullPointerException e) 
-			{ 
-				System.out.println("v4: NPE"); 
-			}
+            try
+            {
+                v4 = loadInsn.getLocalVariableName();
+            }
+            catch (NullPointerException e) 
+            { 
+                System.out.println("v4: NPE"); 
+            }
 
-			System.out.println("[PRE load] v1 = " + v1 + ", v2 = " + v2 + ", v3 = " + v3 + ", v4 = " + v4); 
-		}
+            System.out.println("[PRE load] v1 = " + v1 + ", v2 = " + v2 + ", v3 = " + v3 + ", v4 = " + v4); 
+        }
 
-		if (insn instanceof ASTORE)
-		{
-			ASTORE storeInsn = (ASTORE) insn;
+        if (insn instanceof ASTORE)
+        {
+            ASTORE storeInsn = (ASTORE) insn;
 
-			try { 
-				v1 = storeInsn.
-					getLocalVarInfo().
-					getName(); 
-			} 
-			catch (NullPointerException e) 
-			{
-				System.out.println("v1: NPE"); 
-			}
+            try { 
+                v1 = storeInsn.
+                    getLocalVarInfo().
+                    getName(); 
+            } 
+            catch (NullPointerException e) 
+            {
+                System.out.println("v1: NPE"); 
+            }
 
-			try { 
-				v2 = curTh.
-					getTopFrame().
-					getLocalVarInfo(storeInsn.
-							getLocalVariableIndex()
-						).
-					getName(); 
-			} 
-			catch (NullPointerException e) 
-			{ 
-				System.out.println("v2: NPE"); 
-			}
+            try { 
+                v2 = curTh.
+                    getTopFrame().
+                    getLocalVarInfo(storeInsn.
+                            getLocalVariableIndex()
+                        ).
+                    getName(); 
+            } 
+            catch (NullPointerException e) 
+            { 
+                System.out.println("v2: NPE"); 
+            }
 
-			try
-			{
-				v3 = storeInsn.
-					getMethodInfo().
-					getLocalVars()[storeInsn.
-							getLocalVariableIndex()
-						].
-					getName();
-			}
-			catch (NullPointerException e) 
-			{ 
-				System.out.println("v3: NPE"); 
-			}
+            try
+            {
+                v3 = storeInsn.
+                    getMethodInfo().
+                    getLocalVars()[storeInsn.
+                            getLocalVariableIndex()
+                        ].
+                    getName();
+            }
+            catch (NullPointerException e) 
+            { 
+                System.out.println("v3: NPE"); 
+            }
 
-			try
-			{
-				v4 = storeInsn.getLocalVariableName();
-			}
-			catch (NullPointerException e) 
-			{ 
-				System.out.println("v4: NPE"); 
-			}
+            try
+            {
+                v4 = storeInsn.getLocalVariableName();
+            }
+            catch (NullPointerException e) 
+            { 
+                System.out.println("v4: NPE"); 
+            }
 
-			System.out.println("[PRE store] v1 = " + v1 + ", v2 = " + v2 + ", v3 = " + v3 + ", v4 = " + v4); 
-		}
-	}
+            System.out.println("[PRE store] v1 = " + v1 + ", v2 = " + v2 + ", v3 = " + v3 + ", v4 = " + v4); 
+        }
+    }
 }
 

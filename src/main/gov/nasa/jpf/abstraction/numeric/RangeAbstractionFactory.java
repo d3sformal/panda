@@ -7,24 +7,24 @@ import gov.nasa.jpf.Config;
 
 public class RangeAbstractionFactory extends AbstractionFactory {
 
-	@Override
-	public Abstraction create(Config config, String[] args) {
-		try {
-			int min = Integer.parseInt(args[1]);
-			int max = Integer.parseInt(args[2]);
+    @Override
+    public Abstraction create(Config config, String[] args) {
+        try {
+            int min = Integer.parseInt(args[1]);
+            int max = Integer.parseInt(args[2]);
 
-			System.out.printf("### jpf-abstraction: RANGE[%d, %d] turned on\n", min, max);
+            System.out.printf("### jpf-abstraction: RANGE[%d, %d] turned on\n", min, max);
 
-			return new RangeAbstraction(min, max);
-		} catch (NumberFormatException nfe) {
-			System.out.println("### jpf-abstraction: please keep format "
-					+ "\"Interval MIN MAX\", where MIN and MAX are int");
-		} catch (ArrayIndexOutOfBoundsException rce) {
-			System.out.println("### jpf-abstraction: please keep format "
-					+ "\"Interval MIN MAX\", where MIN and MAX are int");
-		}
-		
-		return null;
-	}
+            return new RangeAbstraction(min, max);
+        } catch (NumberFormatException nfe) {
+            System.out.println("### jpf-abstraction: please keep format "
+                    + "\"Interval MIN MAX\", where MIN and MAX are int");
+        } catch (ArrayIndexOutOfBoundsException rce) {
+            System.out.println("### jpf-abstraction: please keep format "
+                    + "\"Interval MIN MAX\", where MIN and MAX are int");
+        }
+
+        return null;
+    }
 
 }

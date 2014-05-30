@@ -68,20 +68,20 @@ import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 import gov.nasa.jpf.abstraction.predicate.state.universe.LocalVariable;
 
 /**
- * a serializer that uses Abstract values stored in attributes 
- * to obtain the values to hash. 
+ * a serializer that uses Abstract values stored in attributes
+ * to obtain the values to hash.
  */
 public class PredicateAbstractionSerializer extends FilteringSerializer {
 
-	static JPFLogger logger = JPF.getLogger("gov.nasa.jpf.abstraction.PredicateAbstractionSerializer");
+    static JPFLogger logger = JPF.getLogger("gov.nasa.jpf.abstraction.PredicateAbstractionSerializer");
     protected int depth = 0;
     protected int thread = 0;
     protected PredicateAbstraction pabs;
     protected Universe universe;
     protected Map<StructuredValueIdentifier, Integer> canonical = new HashMap<StructuredValueIdentifier, Integer>();
 
-	public PredicateAbstractionSerializer(Config conf) {
-	}
+    public PredicateAbstractionSerializer(Config conf) {
+    }
 
     protected int canonicalId (StructuredValueIdentifier value) {
         if (canonical.containsKey(value)) {
@@ -103,17 +103,17 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         serializeStructuredValue(value);
     }
 
-    protected void serializeHeap() {    
-    	Set<StructuredValueIdentifier> sorted = sortStructuredValues(universe.getStructuredValues());
-	    int i = 0;
-	
-    	canonical.clear();
-	
+    protected void serializeHeap() {
+        Set<StructuredValueIdentifier> sorted = sortStructuredValues(universe.getStructuredValues());
+        int i = 0;
+
+        canonical.clear();
+
         // define canonical ids for all heap objects
-	    for (StructuredValueIdentifier value : sorted) {
-	        canonical.put(value, i);
-    	    ++i;
-	    }
+        for (StructuredValueIdentifier value : sorted) {
+            canonical.put(value, i);
+            ++i;
+        }
 
         for (StructuredValueIdentifier value : sorted) {
             serializeHeapValue(value);
@@ -151,7 +151,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
             buf.add(o.getFields().size());
 
             for (FieldName field : new TreeSet<FieldName>(o.getFields().keySet())) {
-            	serializeSlot(o.getField(field));
+                serializeSlot(o.getField(field));
             }
         } else if (value instanceof UniverseClass) {
             UniverseClass c = (UniverseClass) value;
@@ -159,7 +159,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
             buf.add(c.getClassName().getClassName().hashCode());
 
             for (FieldName field : new TreeSet<FieldName>(c.getFields().keySet())) {
-            	serializeSlot(c.getField(field));
+                serializeSlot(c.getField(field));
             }
         }
     }
@@ -196,13 +196,13 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     }
 
     @Override
-	protected void serializeStackFrames(ThreadInfo ti){
+    protected void serializeStackFrames(ThreadInfo ti){
         // Set the context of subsequent serializations of individual frames
         depth = 0;
         thread = ti.getId();
 
         super.serializeStackFrames(ti);
-	}
+    }
 
     protected void serializeLocalVariable(Root localVariable, Set<StructuredValueIdentifier> values) {
         buf.add(values.size());
@@ -251,27 +251,27 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     }
 
     @Override
-	protected void serializeFrame(StackFrame frame){
+    protected void serializeFrame(StackFrame frame){
         if (frame.isSynthetic()) return;
 
-		buf.add(frame.getMethodInfo().getGlobalId());
+        buf.add(frame.getMethodInfo().getGlobalId());
 
         // thread is the actual thread being serialized (set in serializeStackFrames)
         // depth is the current depth in the whole stack of the thread being currently processed
         MethodFrameSymbolTable currentSymbolScope = pabs.getSymbolTable().get(thread, depth);
         MethodFramePredicateValuation currentPredicateScope = pabs.getPredicateValuation().get(thread, depth);
 
-		// there can be (rare) cases where a listener sets a null nextPc in
-		// a frame that is still on the stack
-		Instruction pc = frame.getPC();
-		if (pc != null){
-			buf.add(pc.getInstructionIndex());
-		} else {
-			buf.add(-1);
-		}
+        // there can be (rare) cases where a listener sets a null nextPc in
+        // a frame that is still on the stack
+        Instruction pc = frame.getPC();
+        if (pc != null){
+            buf.add(pc.getInstructionIndex());
+        } else {
+            buf.add(-1);
+        }
 
-		int len = frame.getTopPos()+1;
-		buf.add(len);
+        int len = frame.getTopPos()+1;
+        buf.add(len);
 
         // store all local variables of a reference type
         // use canonical ids of referred objects
@@ -281,7 +281,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         serializePredicates(currentPredicateScope);
 
         ++depth;
-	}
+    }
 
     @Override
     protected void serializeThreadState(ThreadInfo ti)
@@ -293,14 +293,14 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         else buf.add(ti.getState().ordinal());
 
         buf.add(ti.getStackDepth());
-    
+
         // see the corresponding method in the superclass for additional comments
-    	
+
         // the object we are waiting for
         ElementInfo eiLock = ti.getLockObject();
         if (eiLock != null) buf.add(getSerializedReferenceValue(eiLock));
-    
-        // the objects we hold locks for 
+
+        // the objects we hold locks for
         serializeLockedObjects(ti.getLockedObjects());
     }
 }

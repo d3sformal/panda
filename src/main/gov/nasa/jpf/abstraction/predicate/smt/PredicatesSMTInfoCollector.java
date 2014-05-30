@@ -57,7 +57,7 @@ import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 
 /**
  * A visitor used to traverse predicates and collect information for the SMT
- * 
+ *
  * - set of all used variables (to be able to define them before they appear in the input)
  * - set of classes whose names need to be valid symbols
  * - set of field names (the same reason as above)
@@ -65,131 +65,131 @@ import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
  * - also a set of additional predicates that need to be added to the query to SMT ... array lengths are always >= 0
  */
 public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
-	private Set<String> classes = new HashSet<String>();
-	private Set<String> vars = new HashSet<String>();
-	private Set<String> fields = new HashSet<String>();
-	private Set<Integer> fresh = new HashSet<Integer>();
+    private Set<String> classes = new HashSet<String>();
+    private Set<String> vars = new HashSet<String>();
+    private Set<String> fields = new HashSet<String>();
+    private Set<Integer> fresh = new HashSet<Integer>();
     private boolean hasFresh = false;
-	
-	private PredicatesComponentVisitable currentCollectable = null;
-	private Map<PredicatesComponentVisitable, Set<Predicate>> additionalPredicates = new HashMap<PredicatesComponentVisitable, Set<Predicate>>();
-	
-	private Set<AccessExpression> objects = new HashSet<AccessExpression>();
 
-	@Override
-	public void visit(Predicates predicates) {
-		for (Context context : predicates.contexts) {
-			context.accept(this);
-		}
-	}
+    private PredicatesComponentVisitable currentCollectable = null;
+    private Map<PredicatesComponentVisitable, Set<Predicate>> additionalPredicates = new HashMap<PredicatesComponentVisitable, Set<Predicate>>();
 
-	@Override
-	public void visit(ObjectContext context) {
-		for (Predicate predicate : context.predicates) {
-			predicate.accept(this);
-		}
-	}
+    private Set<AccessExpression> objects = new HashSet<AccessExpression>();
 
-	@Override
-	public void visit(MethodContext context) {
-		for (Predicate predicate : context.predicates) {
-			predicate.accept(this);
-		}
-	}
+    @Override
+    public void visit(Predicates predicates) {
+        for (Context context : predicates.contexts) {
+            context.accept(this);
+        }
+    }
 
-	@Override
-	public void visit(MethodAssumePreContext context) {
-		for (Predicate predicate : context.predicates) {
-			predicate.accept(this);
-		}
-	}
+    @Override
+    public void visit(ObjectContext context) {
+        for (Predicate predicate : context.predicates) {
+            predicate.accept(this);
+        }
+    }
 
-	@Override
-	public void visit(MethodAssumePostContext context) {
-		for (Predicate predicate : context.predicates) {
-			predicate.accept(this);
-		}
-	}
+    @Override
+    public void visit(MethodContext context) {
+        for (Predicate predicate : context.predicates) {
+            predicate.accept(this);
+        }
+    }
 
-	@Override
-	public void visit(StaticContext context) {
-		for (Predicate predicate : context.predicates) {
-			predicate.accept(this);
-		}
-	}
+    @Override
+    public void visit(MethodAssumePreContext context) {
+        for (Predicate predicate : context.predicates) {
+            predicate.accept(this);
+        }
+    }
 
-	@Override
-	public void visit(Negation predicate) {		
-		predicate.predicate.accept(this);
-	}
+    @Override
+    public void visit(MethodAssumePostContext context) {
+        for (Predicate predicate : context.predicates) {
+            predicate.accept(this);
+        }
+    }
 
-	@Override
-	public void visit(LessThan predicate) {		
-		predicate.a.accept(this);
-		predicate.b.accept(this);
-	}
+    @Override
+    public void visit(StaticContext context) {
+        for (Predicate predicate : context.predicates) {
+            predicate.accept(this);
+        }
+    }
 
-	@Override
-	public void visit(Equals predicate) {		
-		predicate.a.accept(this);
-		predicate.b.accept(this);
-	}
+    @Override
+    public void visit(Negation predicate) {
+        predicate.predicate.accept(this);
+    }
 
-	@Override
-	public void visit(Tautology predicate) {
-	}
+    @Override
+    public void visit(LessThan predicate) {
+        predicate.a.accept(this);
+        predicate.b.accept(this);
+    }
 
-	@Override
-	public void visit(Contradiction predicate) {
-	}
+    @Override
+    public void visit(Equals predicate) {
+        predicate.a.accept(this);
+        predicate.b.accept(this);
+    }
 
-	@Override
-	public void visit(Conjunction predicate) {		
-		predicate.a.accept(this);
-		predicate.b.accept(this);
-	}
+    @Override
+    public void visit(Tautology predicate) {
+    }
 
-	@Override
-	public void visit(Disjunction predicate) {		
-		predicate.a.accept(this);
-		predicate.b.accept(this);
-	}
+    @Override
+    public void visit(Contradiction predicate) {
+    }
 
-	@Override
-	public void visit(Implication predicate) {		
-		predicate.a.accept(this);
-		predicate.b.accept(this);
-	}
+    @Override
+    public void visit(Conjunction predicate) {
+        predicate.a.accept(this);
+        predicate.b.accept(this);
+    }
 
-	@Override
-	public void visit(Add expression) {
-		expression.a.accept(this);
-		expression.b.accept(this);
-	}
+    @Override
+    public void visit(Disjunction predicate) {
+        predicate.a.accept(this);
+        predicate.b.accept(this);
+    }
 
-	@Override
-	public void visit(Subtract expression) {
-		expression.a.accept(this);
-		expression.b.accept(this);
-	}
+    @Override
+    public void visit(Implication predicate) {
+        predicate.a.accept(this);
+        predicate.b.accept(this);
+    }
 
-	@Override
-	public void visit(Multiply expression) {
-		expression.a.accept(this);
-		expression.b.accept(this);
-	}
+    @Override
+    public void visit(Add expression) {
+        expression.a.accept(this);
+        expression.b.accept(this);
+    }
 
-	@Override
-	public void visit(Divide expression) {
-		expression.a.accept(this);
-		expression.b.accept(this);
-	}
+    @Override
+    public void visit(Subtract expression) {
+        expression.a.accept(this);
+        expression.b.accept(this);
+    }
 
-	@Override
-	public void visit(Modulo expression) {
-		expression.a.accept(this);
-		expression.b.accept(this);
-	}
+    @Override
+    public void visit(Multiply expression) {
+        expression.a.accept(this);
+        expression.b.accept(this);
+    }
+
+    @Override
+    public void visit(Divide expression) {
+        expression.a.accept(this);
+        expression.b.accept(this);
+    }
+
+    @Override
+    public void visit(Modulo expression) {
+        expression.a.accept(this);
+        expression.b.accept(this);
+    }
 
     @Override
     public void visit(UninterpretedShiftLeft expression) {
@@ -203,195 +203,195 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
         expression.b.accept(this);
     }
 
-	private void addAdditionalPredicate(Predicate predicate) {		
-		if (!additionalPredicates.containsKey(currentCollectable)) {
-			additionalPredicates.put(currentCollectable, new HashSet<Predicate>());
-		}
-		
-		additionalPredicates.get(currentCollectable).add(predicate);
-	}
+    private void addAdditionalPredicate(Predicate predicate) {
+        if (!additionalPredicates.containsKey(currentCollectable)) {
+            additionalPredicates.put(currentCollectable, new HashSet<Predicate>());
+        }
 
-	private void addObject(AccessExpression expression) {
-		if (!(expression.getRoot() instanceof Fresh)) {
-			objects.add(expression);
-		}
-	}
+        additionalPredicates.get(currentCollectable).add(predicate);
+    }
 
-	@Override
-	public void visit(Constant expression) {
-	}
+    private void addObject(AccessExpression expression) {
+        if (!(expression.getRoot() instanceof Fresh)) {
+            objects.add(expression);
+        }
+    }
 
-	@Override
-	public void visit(AnonymousObject expression) {
-		fresh.add(expression.getReference().getReferenceNumber());
+    @Override
+    public void visit(Constant expression) {
+    }
+
+    @Override
+    public void visit(AnonymousObject expression) {
+        fresh.add(expression.getReference().getReferenceNumber());
         hasFresh = true;
-	}
+    }
 
-	@Override
-	public void visit(AnonymousArray expression) {
-		fresh.add(expression.getReference().getReferenceNumber());
+    @Override
+    public void visit(AnonymousArray expression) {
+        fresh.add(expression.getReference().getReferenceNumber());
         hasFresh = true;
-		
-		expression.getArrayLength().accept(this);
-	}
-	
-	public Set<Predicate> getAdditionalPredicates(PredicatesComponentVisitable collectable) {
-		if (!additionalPredicates.containsKey(collectable)) {
-			return new HashSet<Predicate>();
-		}
-		
-		return additionalPredicates.get(collectable);
-	}
-	
-	public Set<String> getVars() {
-		return vars;
-	}
-	
-	public Set<String> getFields() {
-		return fields;
-	}
-	
-	public Set<String> getClasses() {
-		return classes;
-	}
-	
-	public Set<Integer> getFresh() {
-		return fresh;
-	}
+
+        expression.getArrayLength().accept(this);
+    }
+
+    public Set<Predicate> getAdditionalPredicates(PredicatesComponentVisitable collectable) {
+        if (!additionalPredicates.containsKey(collectable)) {
+            return new HashSet<Predicate>();
+        }
+
+        return additionalPredicates.get(collectable);
+    }
+
+    public Set<String> getVars() {
+        return vars;
+    }
+
+    public Set<String> getFields() {
+        return fields;
+    }
+
+    public Set<String> getClasses() {
+        return classes;
+    }
+
+    public Set<Integer> getFresh() {
+        return fresh;
+    }
 
     public boolean hasFresh() {
         return hasFresh;
     }
-	
-	public Set<AccessExpression> getObjects() {
-		return objects;
-	}
 
-	@Override
-	public void visit(Root expression) {
-		vars.add(expression.getName());
-		
-		addObject(expression);
-	}
+    public Set<AccessExpression> getObjects() {
+        return objects;
+    }
+
+    @Override
+    public void visit(Root expression) {
+        vars.add(expression.getName());
+
+        addObject(expression);
+    }
 
     @Override
     public void visit(SpecialVariable expression) {
     }
 
-	@Override
-	public void visit(Fresh expression) {	
+    @Override
+    public void visit(Fresh expression) {
         hasFresh = true;
-	}
+    }
 
-	@Override
-	public void visit(ObjectFieldRead expression) {
-		expression.getObject().accept(this);
-		expression.getField().accept(this);
-		
-		addObject(expression);
-	}
+    @Override
+    public void visit(ObjectFieldRead expression) {
+        expression.getObject().accept(this);
+        expression.getField().accept(this);
 
-	@Override
-	public void visit(ObjectFieldWrite expression) {
-		expression.getObject().accept(this);
-		expression.getField().accept(this);
-		expression.getNewValue().accept(this);
-	}
+        addObject(expression);
+    }
 
-	@Override
-	public void visit(ArrayElementRead expression) {	
-		expression.getArray().accept(this);
-		expression.getArrays().accept(this);
-		expression.getIndex().accept(this);
+    @Override
+    public void visit(ObjectFieldWrite expression) {
+        expression.getObject().accept(this);
+        expression.getField().accept(this);
+        expression.getNewValue().accept(this);
+    }
+
+    @Override
+    public void visit(ArrayElementRead expression) {
+        expression.getArray().accept(this);
+        expression.getArrays().accept(this);
+        expression.getIndex().accept(this);
 
         addAdditionalPredicate(Equals.create(DefaultArrayElementRead.create(DefaultFresh.create(), expression.getIndex()), NullExpression.create()));
-		
-		addObject(expression);
-	}
 
-	@Override
-	public void visit(ArrayElementWrite expression) {
-		expression.getArray().accept(this);
-		expression.getArrays().accept(this);
-		expression.getIndex().accept(this);
-		expression.getNewValue().accept(this);
-	}
+        addObject(expression);
+    }
 
-	@Override
-	public void visit(ArrayLengthRead expression) {
-		Predicate predicate = Negation.create(LessThan.create(expression, Constant.create(0)));
+    @Override
+    public void visit(ArrayElementWrite expression) {
+        expression.getArray().accept(this);
+        expression.getArrays().accept(this);
+        expression.getIndex().accept(this);
+        expression.getNewValue().accept(this);
+    }
+
+    @Override
+    public void visit(ArrayLengthRead expression) {
+        Predicate predicate = Negation.create(LessThan.create(expression, Constant.create(0)));
 
         // In case of reasoning about fresh arrays
         if (expression.getArray() instanceof AnonymousArray) {
             addAdditionalPredicate(Equals.create(expression, ((AnonymousArray) expression.getArray()).getArrayLength()));
         }
-		
-		addAdditionalPredicate(predicate);
-				
-		expression.getArray().accept(this);
-		expression.getArrayLengths().accept(this);
-		
-		addObject(expression);
-	}
 
-	@Override
-	public void visit(ArrayLengthWrite expression) {
-		expression.getArray().accept(this);
-		expression.getArrayLengths().accept(this);
-		expression.getNewValue().accept(this);
-	}
+        addAdditionalPredicate(predicate);
 
-	@Override
-	public void visit(DefaultArrays meta) {
-	}
+        expression.getArray().accept(this);
+        expression.getArrayLengths().accept(this);
 
-	@Override
-	public void visit(DefaultArrayLengths meta) {
-	}
+        addObject(expression);
+    }
 
-	@Override
-	public void visit(DefaultField meta) {
-		fields.add(meta.getName());
-	}
+    @Override
+    public void visit(ArrayLengthWrite expression) {
+        expression.getArray().accept(this);
+        expression.getArrayLengths().accept(this);
+        expression.getNewValue().accept(this);
+    }
 
-	@Override
-	public void visit(Undefined expression) {
-		throw new SMTException("UNDEFINED IN THE INPUT");
-	}
-	
-	@Override
-	public void visit(NullExpression expression) {
-	}
-	
-	@Override
-	public void visit(EmptyExpression expression) {
-		throw new SMTException("EMPTY EXPRESSION IN THE INPUT");
-	}
+    @Override
+    public void visit(DefaultArrays meta) {
+    }
 
-	@Override
-	public void visit(UpdatedPredicate predicate) {		
-		predicate.apply().accept(this);
-	}
-	
-	public void collect(PredicatesComponentVisitable collectable) {
-		if (collectable instanceof UpdatedPredicate) {
-			UpdatedPredicate updated = (UpdatedPredicate) collectable;
-			
-			currentCollectable = updated.getPredicate();
-		} else {
-			currentCollectable = collectable;
-		}
-		
-		collectable.accept(this);
-	}
+    @Override
+    public void visit(DefaultArrayLengths meta) {
+    }
 
-	@Override
-	public void visit(PackageAndClass expression) {
-		classes.add(expression.getName());
-	}
+    @Override
+    public void visit(DefaultField meta) {
+        fields.add(meta.getName());
+    }
 
-	@Override
-	public void visit(Method expression) {
-	}
+    @Override
+    public void visit(Undefined expression) {
+        throw new SMTException("UNDEFINED IN THE INPUT");
+    }
+
+    @Override
+    public void visit(NullExpression expression) {
+    }
+
+    @Override
+    public void visit(EmptyExpression expression) {
+        throw new SMTException("EMPTY EXPRESSION IN THE INPUT");
+    }
+
+    @Override
+    public void visit(UpdatedPredicate predicate) {
+        predicate.apply().accept(this);
+    }
+
+    public void collect(PredicatesComponentVisitable collectable) {
+        if (collectable instanceof UpdatedPredicate) {
+            UpdatedPredicate updated = (UpdatedPredicate) collectable;
+
+            currentCollectable = updated.getPredicate();
+        } else {
+            currentCollectable = collectable;
+        }
+
+        collectable.accept(this);
+    }
+
+    @Override
+    public void visit(PackageAndClass expression) {
+        classes.add(expression.getName());
+    }
+
+    @Override
+    public void visit(Method expression) {
+    }
 
 }

@@ -46,7 +46,7 @@ public class PredicateConsolePublisher extends ConsolePublisher {
 
             if (showCG) {
                 out.println("choice: " + t.getChoiceGenerator());
-				out.println("");
+                out.println("");
             }
 
             if (showSteps) {

@@ -9,22 +9,22 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 public class StaticClassObjectMonitor extends ListenerAdapter {
-	@Override
-	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {		
-		ClassLoaderList clis = vm.getClassLoaderList();
-		
-		String head = ">>> " + execInsn.getMnemonic() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-		String foot = head.replaceAll(".", "=");
-		
-		System.out.println(head);
-		for (ClassLoaderInfo cli : clis) {			
-			for (ElementInfo ei : cli.getStatics()) {
-				if (ei.getClassInfo().isInitialized()) {
-					StaticClassObjectTracker.dumpElementInfo(curTh, ei);
-				}
-			}
-		}
-		
-		System.out.println(foot);
-	}
+    @Override
+    public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
+        ClassLoaderList clis = vm.getClassLoaderList();
+
+        String head = ">>> " + execInsn.getMnemonic() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+        String foot = head.replaceAll(".", "=");
+
+        System.out.println(head);
+        for (ClassLoaderInfo cli : clis) {
+            for (ElementInfo ei : cli.getStatics()) {
+                if (ei.getClassInfo().isInitialized()) {
+                    StaticClassObjectTracker.dumpElementInfo(curTh, ei);
+                }
+            }
+        }
+
+        System.out.println(foot);
+    }
 }

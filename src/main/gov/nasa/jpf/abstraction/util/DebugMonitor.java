@@ -29,44 +29,44 @@ import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
 
 
-public class DebugMonitor extends ListenerAdapter 
+public class DebugMonitor extends ListenerAdapter
 {
-	public DebugMonitor(Config cfg, JPF jpf)
-	{
-	}
+    public DebugMonitor(Config cfg, JPF jpf)
+    {
+    }
 
 
-	@Override
-	public void stateAdvanced(Search search)
-	{
-		System.out.print("[MONITOR] state : ");
-		if (search.isNewState()) System.out.print("new");
-		else System.out.print("visited");
-		System.out.println(" , id = " + search.getStateId());
-	}
-	
-	@Override
-	public void stateBacktracked(Search search)
-	{
-		System.out.println("[MONITOR] backtrack");
-	}
+    @Override
+    public void stateAdvanced(Search search)
+    {
+        System.out.print("[MONITOR] state : ");
+        if (search.isNewState()) System.out.print("new");
+        else System.out.print("visited");
+        System.out.println(" , id = " + search.getStateId());
+    }
 
-	@Override
-	public void choiceGeneratorRegistered(VM vm, ChoiceGenerator<?> nextCG, ThreadInfo currentThread, Instruction executedInstruction) 
-	{
-		if (nextCG instanceof FocusAbstractChoiceGenerator) 
-		{
-			System.out.println("[MONITOR] new focus cg");
-		}
-	}
+    @Override
+    public void stateBacktracked(Search search)
+    {
+        System.out.println("[MONITOR] backtrack");
+    }
 
-	@Override
-	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> cg) 
-	{	
-		if (cg instanceof FocusAbstractChoiceGenerator) 
-		{
-			System.out.println("[MONITOR] focus cg : more choices = " + cg.hasMoreChoices() + ", current value = " + cg.getNextChoice());
-		}
-	} 
-}	
+    @Override
+    public void choiceGeneratorRegistered(VM vm, ChoiceGenerator<?> nextCG, ThreadInfo currentThread, Instruction executedInstruction)
+    {
+        if (nextCG instanceof FocusAbstractChoiceGenerator)
+        {
+            System.out.println("[MONITOR] new focus cg");
+        }
+    }
+
+    @Override
+    public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> cg)
+    {
+        if (cg instanceof FocusAbstractChoiceGenerator)
+        {
+            System.out.println("[MONITOR] focus cg : more choices = " + cg.hasMoreChoices() + ", current value = " + cg.getNextChoice());
+        }
+    }
+}
 

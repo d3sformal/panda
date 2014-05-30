@@ -33,44 +33,44 @@ import gov.nasa.jpf.vm.Instruction;
  * ..., value1, value2 => ...
  */
 public class IF_ICMPLT extends gov.nasa.jpf.jvm.bytecode.IF_ICMPLT implements AbstractBranching {
-	
+
     /**
      * Share implementation with all the other binary if instructions.
      */
-	BinaryIfInstructionExecutor executor = new BinaryIfInstructionExecutor();
+    BinaryIfInstructionExecutor executor = new BinaryIfInstructionExecutor();
 
-	public IF_ICMPLT(int targetPc) {
-		super(targetPc);
-	}
+    public IF_ICMPLT(int targetPc) {
+        super(targetPc);
+    }
 
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		return executor.execute(this, ti);
-	}
+    @Override
+    public Instruction execute(ThreadInfo ti) {
+        return executor.execute(this, ti);
+    }
 
-	@Override
-	public Instruction executeConcrete(ThreadInfo ti) {
-		return super.execute(ti);
-	}
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
+        return super.execute(ti);
+    }
 
-	@Override
-	public Instruction getSelf() {
-		return this;
-	}
+    @Override
+    public Instruction getSelf() {
+        return this;
+    }
 
-	@Override
-	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
-		return Abstraction._lt(v1, abs_v1, v2, abs_v2);
-	}
+    @Override
+    public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
+        return Abstraction._lt(v1, abs_v1, v2, abs_v2);
+    }
 
     @Override
     public TruthValue getConcreteBranchValue(int v1, int v2) {
         return TruthValue.create(v1 < v2);
     }
 
-	@Override
-	public Predicate createPredicate(Expression expr1, Expression expr2) {
-		return LessThan.create(expr1, expr2);
-	}
+    @Override
+    public Predicate createPredicate(Expression expr1, Expression expr2) {
+        return LessThan.create(expr1, expr2);
+    }
 
 }

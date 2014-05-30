@@ -2,12 +2,12 @@
 // Copyright (C) 2012 United States Government as represented by the
 // Administrator of the National Aeronautics and Space Administration
 // (NASA).  All Rights Reserved.
-// 
+//
 // This software is distributed under the NASA Open Source Agreement
 // (NOSA), version 1.3.  The NOSA has been approved by the Open Source
 // Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
 // directory tree for the complete NOSA document.
-// 
+//
 // THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
 // KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
 // LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
@@ -32,12 +32,12 @@ import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 
 public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
-	
-	@Override
-	public Instruction execute(ThreadInfo ti) {
 
-		Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
-		NativeStackFrame before = (NativeStackFrame) ti.getModifiableTopFrame();
+    @Override
+    public Instruction execute(ThreadInfo ti) {
+
+        Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+        NativeStackFrame before = (NativeStackFrame) ti.getModifiableTopFrame();
         Object retValue = before.getReturnValue();
 
         // Push the value onto the stack
@@ -46,7 +46,7 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
             case Types.T_ARRAY:
             case Types.T_REFERENCE:
                 AnonymousObject returnValue = AnonymousObject.create(new Reference(ti.getElementInfo(((Integer) retValue).intValue())));
-                
+
                 GlobalAbstraction.getInstance().processNewObject(returnValue);
 
                 before.setReturnAttr(new Attribute(null, returnValue));
@@ -62,25 +62,25 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
             case Types.T_DOUBLE:
                 before.setReturnAttr(new Attribute(null, MethodFrameSymbolTable.DUMMY_VARIABLE));
                 break;
-            
+
             case Types.T_VOID:
             default:
         }
-		
-		Instruction actualNextInsn = super.execute(ti);
 
-		StackFrame after = ti.getTopFrame();
-		
-		if (JPFInstructionAdaptor.testReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
-			return actualNextInsn;
-		}
-		
-        if (before.getMethodInfo().getReturnTypeCode() == Types.T_VOID) {
-    		GlobalAbstraction.getInstance().processVoidMethodReturn(ti, before, after);
-        } else {
-    		GlobalAbstraction.getInstance().processMethodReturn(ti, before, after);
+        Instruction actualNextInsn = super.execute(ti);
+
+        StackFrame after = ti.getTopFrame();
+
+        if (JPFInstructionAdaptor.testReturnInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
+            return actualNextInsn;
         }
 
-		return actualNextInsn;
-	}
+        if (before.getMethodInfo().getReturnTypeCode() == Types.T_VOID) {
+            GlobalAbstraction.getInstance().processVoidMethodReturn(ti, before, after);
+        } else {
+            GlobalAbstraction.getInstance().processMethodReturn(ti, before, after);
+        }
+
+        return actualNextInsn;
+    }
 }

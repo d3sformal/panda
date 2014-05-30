@@ -8,20 +8,20 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
 public class PredicateTest {
-	/**
-	 * Test of basic operations
-	 */
+    /**
+     * Test of basic operations
+     */
 
     @Test
-	public void testPredicates() {
-		Notation.policy = Notation.DOT_NOTATION;
+    public void testPredicates() {
+        Notation.policy = Notation.DOT_NOTATION;
 
-		Predicate p = PredicatesFactory.createPredicateFromString("a + b = 2");
+        Predicate p = PredicatesFactory.createPredicateFromString("a + b = 2");
 
-		AccessExpression a = PredicatesFactory.createAccessExpressionFromString("a");
-		Expression aplusb = PredicatesFactory.createExpressionFromString("a + b");
-		AccessExpression b = PredicatesFactory.createAccessExpressionFromString("b");
-		AccessExpression c = PredicatesFactory.createAccessExpressionFromString("c");
+        AccessExpression a = PredicatesFactory.createAccessExpressionFromString("a");
+        Expression aplusb = PredicatesFactory.createExpressionFromString("a + b");
+        AccessExpression b = PredicatesFactory.createAccessExpressionFromString("b");
+        AccessExpression c = PredicatesFactory.createAccessExpressionFromString("c");
 
         p = p.replace(a, aplusb);
         p = p.replace(b, c);
@@ -29,5 +29,5 @@ public class PredicateTest {
         Predicate q = PredicatesFactory.createPredicateFromString("(a + c) + c = 2");
 
         assertEquals(p, q);
-	}
+    }
 }

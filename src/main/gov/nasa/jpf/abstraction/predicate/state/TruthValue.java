@@ -4,21 +4,21 @@ import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
 
 /**
  * Possible valuations of a predicate
- * 
+ *
  * UNDEFINED ... the initial value (not valuated yet, cannot be valuated)
  * UNKNOWN   ... cannot rule out neither true nor false
  * TRUE      ... true
  * FALSE     ... false
  */
 public enum TruthValue implements BranchingConditionInfo {
-	UNDEFINED, // 0 .. 00
-	TRUE,      // 1 .. 01
-	FALSE,     // 2 .. 10
-	UNKNOWN;   // 3 .. 11
+    UNDEFINED, // 0 .. 00
+    TRUE,      // 1 .. 01
+    FALSE,     // 2 .. 10
+    UNKNOWN;   // 3 .. 11
 
     private static TruthValue[] ALL_VALUES = new TruthValue[] {UNDEFINED, TRUE, FALSE, UNKNOWN};
 
-	private static TruthValue create(int i) {
+    private static TruthValue create(int i) {
         if (i == UNDEFINED.ordinal()) return UNDEFINED;
         if (i == TRUE.ordinal()) return TRUE;
         if (i == FALSE.ordinal()) return FALSE;
@@ -27,23 +27,23 @@ public enum TruthValue implements BranchingConditionInfo {
         assert false : "Unknown truth value ordinal";
 
         return UNDEFINED;
-	}
-	
-	public static TruthValue create(boolean isTrue, boolean isFalse) {
-		if (isTrue && isFalse) {
-			return UNKNOWN;
-		}
-		
-		if (isTrue) return TRUE;
-		if (isFalse) return FALSE;
-		
-		return UNDEFINED;
-	}
-	
-	public static TruthValue create(boolean isTrue) {
-		return create(isTrue, !isTrue);
-	}
-    
+    }
+
+    public static TruthValue create(boolean isTrue, boolean isFalse) {
+        if (isTrue && isFalse) {
+            return UNKNOWN;
+        }
+
+        if (isTrue) return TRUE;
+        if (isFalse) return FALSE;
+
+        return UNDEFINED;
+    }
+
+    public static TruthValue create(boolean isTrue) {
+        return create(isTrue, !isTrue);
+    }
+
     public static TruthValue create(String str) {
         for (TruthValue t : ALL_VALUES) {
             if (t.toString().equals(str.trim().toUpperCase())) {
@@ -65,10 +65,10 @@ public enum TruthValue implements BranchingConditionInfo {
      * 10 and 11 ... FALSE     and UNKNOWN  ... FALSE
      * 11 and 11 ... UNKNOWN   and UNKNOWN  ... UNKNOWN
      */
-	public static TruthValue and(TruthValue a, TruthValue b) {
-		return create(a.ordinal() & b.ordinal());
-	}
-	
+    public static TruthValue and(TruthValue a, TruthValue b) {
+        return create(a.ordinal() & b.ordinal());
+    }
+
     /**
      * Returns the least common successor of both the elements of the lattice over {0, 1}
      *
@@ -80,9 +80,9 @@ public enum TruthValue implements BranchingConditionInfo {
      * 10 or 10 ... FALSE     or FALSE     ... FALSE
      * 11 or ?? ... UNKNOWN   or ??        ... UNKNOWN
      */
-	public static TruthValue or(TruthValue a, TruthValue b) {
-		return create(a.ordinal() | b.ordinal());
-	}
+    public static TruthValue or(TruthValue a, TruthValue b) {
+        return create(a.ordinal() | b.ordinal());
+    }
 
     /**
      * Switches TRUE for FALSE

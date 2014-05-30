@@ -22,78 +22,78 @@ package gov.nasa.jpf.abstraction;
  * Used as a return value of comparisons.
  */
 public class AbstractBoolean {
-	public static AbstractBoolean TRUE = new AbstractBoolean();
-	public static AbstractBoolean FALSE = new AbstractBoolean();
-	public static AbstractBoolean TOP = new AbstractBoolean();
+    public static AbstractBoolean TRUE = new AbstractBoolean();
+    public static AbstractBoolean FALSE = new AbstractBoolean();
+    public static AbstractBoolean TOP = new AbstractBoolean();
 
-	public AbstractBoolean () {
-	}	
+    public AbstractBoolean () {
+    }
 
-	AbstractBoolean abstract_map(boolean v) {
-		return (v ? AbstractBoolean.TRUE : AbstractBoolean.FALSE);
-	}
-	
-	/**
-	 * @return Negation of this AbstractBoolean
-	 */
-	public AbstractBoolean not() {
-		return create(this != TRUE, this != FALSE);
-	}
+    AbstractBoolean abstract_map(boolean v) {
+        return (v ? AbstractBoolean.TRUE : AbstractBoolean.FALSE);
+    }
 
-	/**
-	 * @return Conjunction of this AbstractBoolean and the operand.
-	 */	
-	public AbstractBoolean and(AbstractBoolean right) {
-		boolean t = (this != FALSE && right != FALSE);
-		boolean f = (this != TRUE || right != TRUE);
-		return create(t, f);
-	}
-	
-	/**
-	 * @return Disjunction of this AbstractBoolean and the operand.
-	 */		
-	public AbstractBoolean or(AbstractBoolean right) {
-		boolean t = (this != FALSE || right != FALSE);
-		boolean f = (this != TRUE && right != TRUE);
-		return create(t, f);
-	}
-	
-	/**
-	 * @return Exclusive disjunction of this AbstractBoolean and the operand.
-	 */		
-	public AbstractBoolean xor(AbstractBoolean right) {
-		boolean t = (this != FALSE && right != TRUE) || (this != TRUE && right != FALSE);
-		boolean f = (this != FALSE && right != FALSE) || (this != TRUE && right != TRUE);
-		return create(t, f);
-	}	
-	
-	/**
-	 * @param t Indicates whether a new AbstractBoolean can be TRUE
-	 * @param f Indicates whether a new AbstractBoolean can be FALSE
-	 * @return AbstractBoolean.TRUE, if (t && !f); AbstractBoolean.FALSE, if (!t
-	 *         && f); AbstractBoolean.TOP, if (t && f); otherwise throws
-	 *         RuntimeException.
-	 */		
-	public static AbstractBoolean create(boolean t, boolean f) {
-		if (t)
-			if (f)
-				return TOP;
-			else
-				return TRUE;
-		else if (f)
-			return FALSE;
-		throw new RuntimeException("### Error: AbstractBoolean out of range");
-	}
-	
-	@Override
-	public String toString() {
-		if (this == TRUE)
-			return "TRUE";
-		if (this == FALSE)
-			return "FALSE";
-		if (this == TOP)
-			return "TOP";
-		return "OutOfRange";
-	}
-	
+    /**
+     * @return Negation of this AbstractBoolean
+     */
+    public AbstractBoolean not() {
+        return create(this != TRUE, this != FALSE);
+    }
+
+    /**
+     * @return Conjunction of this AbstractBoolean and the operand.
+     */
+    public AbstractBoolean and(AbstractBoolean right) {
+        boolean t = (this != FALSE && right != FALSE);
+        boolean f = (this != TRUE || right != TRUE);
+        return create(t, f);
+    }
+
+    /**
+     * @return Disjunction of this AbstractBoolean and the operand.
+     */
+    public AbstractBoolean or(AbstractBoolean right) {
+        boolean t = (this != FALSE || right != FALSE);
+        boolean f = (this != TRUE && right != TRUE);
+        return create(t, f);
+    }
+
+    /**
+     * @return Exclusive disjunction of this AbstractBoolean and the operand.
+     */
+    public AbstractBoolean xor(AbstractBoolean right) {
+        boolean t = (this != FALSE && right != TRUE) || (this != TRUE && right != FALSE);
+        boolean f = (this != FALSE && right != FALSE) || (this != TRUE && right != TRUE);
+        return create(t, f);
+    }
+
+    /**
+     * @param t Indicates whether a new AbstractBoolean can be TRUE
+     * @param f Indicates whether a new AbstractBoolean can be FALSE
+     * @return AbstractBoolean.TRUE, if (t && !f); AbstractBoolean.FALSE, if (!t
+     *         && f); AbstractBoolean.TOP, if (t && f); otherwise throws
+     *         RuntimeException.
+     */
+    public static AbstractBoolean create(boolean t, boolean f) {
+        if (t)
+            if (f)
+                return TOP;
+            else
+                return TRUE;
+        else if (f)
+            return FALSE;
+        throw new RuntimeException("### Error: AbstractBoolean out of range");
+    }
+
+    @Override
+    public String toString() {
+        if (this == TRUE)
+            return "TRUE";
+        if (this == FALSE)
+            return "FALSE";
+        if (this == TOP)
+            return "TOP";
+        return "OutOfRange";
+    }
+
 }

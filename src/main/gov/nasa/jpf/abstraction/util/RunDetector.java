@@ -14,63 +14,63 @@ import gov.nasa.jpf.vm.VM;
  * Is responsible for determining whether the currently executed code is part of the targeted execution or not
  */
 public class RunDetector {
-	private static Stack<RunningState> runningHistory;
-	private static RunningState running;
-	
-	private static boolean detectRunningMethod(String targetClass, String targetMethod, MethodInfo method) {
-		if (method.getClassName().equals(targetClass)) {
-			if (method.getFullName().equals(targetClass + "." + targetMethod) || method.isClinit()) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	public static void initialiseNotRunning() {
+    private static Stack<RunningState> runningHistory;
+    private static RunningState running;
+
+    private static boolean detectRunningMethod(String targetClass, String targetMethod, MethodInfo method) {
+        if (method.getClassName().equals(targetClass)) {
+            if (method.getFullName().equals(targetClass + "." + targetMethod) || method.isClinit()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static void initialiseNotRunning() {
         runningHistory = new Stack<RunningState>();
         running = new RunningState();
 
-		runningHistory.add(running.clone());
-	}
-	
-	public static void detectRunning(VM vm, Instruction nextInsn, Instruction execInsn) {
-		String targetClass = vm.getJPF().getConfig().getTarget();
+        runningHistory.add(running.clone());
+    }
+
+    public static void detectRunning(VM vm, Instruction nextInsn, Instruction execInsn) {
+        String targetClass = vm.getJPF().getConfig().getTarget();
         String targetMethod = vm.getJPF().getConfig().getTargetEntry();
 
         if (targetMethod == null) {
             targetMethod = "main([Ljava/lang/String;)V";
         }
 
-		if (execInsn instanceof InvokeInstruction) {
-			if (detectRunningMethod(targetClass, targetMethod, nextInsn.getMethodInfo())) {
-				running.enter();
-				return;
-			}
-		}
-		
-		if (execInsn instanceof ReturnInstruction) {
-			if (detectRunningMethod(targetClass, targetMethod, execInsn.getMethodInfo())) {
-				running.leave();
-				return;
-			}
-		}
-		
-		running.touch();
-	}
+        if (execInsn instanceof InvokeInstruction) {
+            if (detectRunningMethod(targetClass, targetMethod, nextInsn.getMethodInfo())) {
+                running.enter();
+                return;
+            }
+        }
 
-	public static void advance() {
-		runningHistory.push(running.clone());
-	}
+        if (execInsn instanceof ReturnInstruction) {
+            if (detectRunningMethod(targetClass, targetMethod, execInsn.getMethodInfo())) {
+                running.leave();
+                return;
+            }
+        }
 
-	public static void backtrack() {
-		runningHistory.pop();
-		running = runningHistory.peek().clone();
-	}
+        running.touch();
+    }
 
-	public static boolean isRunning() {
-		return running.hasBeenRunning();
-	}
+    public static void advance() {
+        runningHistory.push(running.clone());
+    }
+
+    public static void backtrack() {
+        runningHistory.pop();
+        running = runningHistory.peek().clone();
+    }
+
+    public static boolean isRunning() {
+        return running.hasBeenRunning();
+    }
 
     public static boolean isInLibrary(ThreadInfo ti) {
         for (StackFrame sf : ti) {

@@ -8,5 +8,5 @@ import gov.nasa.jpf.Config;
  * Definition is usually obtained from a .jpf file
  */
 public abstract class AbstractionFactory {
-	public abstract Abstraction create(Config config, String[] args);
+    public abstract Abstraction create(Config config, String[] args);
 }

@@ -20,101 +20,101 @@ import gov.nasa.jpf.vm.ThreadInfo;
  * It uses RunDetector to decide what notifications should be passed to the singleton instance
  */
 public class GlobalAbstraction extends Abstraction {
-	private static GlobalAbstraction instance;
-	
-	public static void set(Abstraction abs) {
-		instance = new GlobalAbstraction(abs);
-	}
-	
-	public static GlobalAbstraction getInstance() {
-		return instance;
-	}
-	
-	private Abstraction abs;
-	
-	private GlobalAbstraction(Abstraction abs) {
-		this.abs = abs;
-	}
-	
-	public Abstraction get() {
-		return abs;
-	}
-	
-	@Override
-	public int getDomainSize() {
-		return abs.getDomainSize();
-	}
-	
-	@Override
-	public AbstractValue abstractMap(int value) {
-		return abs.abstractMap(value);
-	}
-	
-	@Override
-	public AbstractValue abstractMap(float value) {
-		return abs.abstractMap(value);
-	}
-	
-	@Override
-	public AbstractValue abstractMap(long value) {
-		return abs.abstractMap(value);
-	}
-	
-	@Override
-	public AbstractValue abstractMap(double value) {
-		return abs.abstractMap(value);
-	}
-	
-	@Override
-	public void start(ThreadInfo threadInfo) {
-		abs.start(threadInfo);
-	}
-	
-	@Override
-	public void forward(MethodInfo method) {
-		abs.forward(method);
-	}
-	
-	@Override
-	public void backtrack(MethodInfo method) {
-		abs.backtrack(method);
-	}
-	
-	@Override
-	public void processPrimitiveStore(Expression from, AccessExpression to) {
-		//if (!RunDetector.isRunning()) return; // Cannot be omitted because we need MethodFrameSymbolTable / Universe to be updated properly (for example AALOAD needs lookupValues)
-		
-		abs.processPrimitiveStore(from, to);
-	}
-	
-	@Override
-	public void processObjectStore(Expression from, AccessExpression to) {
-		//if (!RunDetector.isRunning()) return; // Cannot be omitted because we need MethodFrameSymbolTable / Universe to be updated properly (for example AALOAD needs lookupValues)
-		
-		abs.processObjectStore(from, to);
-	}
-	
-	@Override
-	public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
-		abs.processMethodCall(threadInfo, before, after);
-	}
-	
-	@Override
-	public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {		
-		abs.processMethodReturn(threadInfo, before, after);
-	}
-	
-	@Override
-	public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {		
-		abs.processVoidMethodReturn(threadInfo, before, after);
-	}
-	
-	@Override
-	public BranchingConditionInfo processBranchingCondition(BranchingCondition condition) {
-		if (!RunDetector.isRunning()) return BranchingConditionInfo.NONE;
-		
-		return abs.processBranchingCondition(condition);
-	}
+    private static GlobalAbstraction instance;
+
+    public static void set(Abstraction abs) {
+        instance = new GlobalAbstraction(abs);
+    }
+
+    public static GlobalAbstraction getInstance() {
+        return instance;
+    }
+
+    private Abstraction abs;
+
+    private GlobalAbstraction(Abstraction abs) {
+        this.abs = abs;
+    }
+
+    public Abstraction get() {
+        return abs;
+    }
+
+    @Override
+    public int getDomainSize() {
+        return abs.getDomainSize();
+    }
+
+    @Override
+    public AbstractValue abstractMap(int value) {
+        return abs.abstractMap(value);
+    }
+
+    @Override
+    public AbstractValue abstractMap(float value) {
+        return abs.abstractMap(value);
+    }
+
+    @Override
+    public AbstractValue abstractMap(long value) {
+        return abs.abstractMap(value);
+    }
+
+    @Override
+    public AbstractValue abstractMap(double value) {
+        return abs.abstractMap(value);
+    }
+
+    @Override
+    public void start(ThreadInfo threadInfo) {
+        abs.start(threadInfo);
+    }
+
+    @Override
+    public void forward(MethodInfo method) {
+        abs.forward(method);
+    }
+
+    @Override
+    public void backtrack(MethodInfo method) {
+        abs.backtrack(method);
+    }
+
+    @Override
+    public void processPrimitiveStore(Expression from, AccessExpression to) {
+        //if (!RunDetector.isRunning()) return; // Cannot be omitted because we need MethodFrameSymbolTable / Universe to be updated properly (for example AALOAD needs lookupValues)
+
+        abs.processPrimitiveStore(from, to);
+    }
+
+    @Override
+    public void processObjectStore(Expression from, AccessExpression to) {
+        //if (!RunDetector.isRunning()) return; // Cannot be omitted because we need MethodFrameSymbolTable / Universe to be updated properly (for example AALOAD needs lookupValues)
+
+        abs.processObjectStore(from, to);
+    }
+
+    @Override
+    public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+        abs.processMethodCall(threadInfo, before, after);
+    }
+
+    @Override
+    public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+        abs.processMethodReturn(threadInfo, before, after);
+    }
+
+    @Override
+    public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
+        abs.processVoidMethodReturn(threadInfo, before, after);
+    }
+
+    @Override
+    public BranchingConditionInfo processBranchingCondition(BranchingCondition condition) {
+        if (!RunDetector.isRunning()) return BranchingConditionInfo.NONE;
+
+        return abs.processBranchingCondition(condition);
+    }
 
     @Override
     public void processNewClass(ThreadInfo thread, ClassInfo classInfo) {
@@ -135,13 +135,13 @@ public class GlobalAbstraction extends Abstraction {
     public void informAboutStructuredLocalVariable(Root root) {
         abs.informAboutStructuredLocalVariable(root);
     }
-	
-	@Override
-	public void informAboutBranchingDecision(BranchingDecision decision) {
-		if (!RunDetector.isRunning()) return;
-		
-		abs.informAboutBranchingDecision(decision);
-	}
+
+    @Override
+    public void informAboutBranchingDecision(BranchingDecision decision) {
+        if (!RunDetector.isRunning()) return;
+
+        abs.informAboutBranchingDecision(decision);
+    }
 
     @Override
     public void addThread(ThreadInfo threadInfo) {

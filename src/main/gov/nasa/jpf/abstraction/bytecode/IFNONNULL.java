@@ -49,40 +49,40 @@ import java.util.HashSet;
  * ..., value => ...
  */
 public class IFNONNULL extends gov.nasa.jpf.jvm.bytecode.IFNONNULL implements AbstractBranching {
-	
-	UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor(NullExpression.create());
 
-	public IFNONNULL(int targetPc) {
-		super(targetPc);
-	}
+    UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor(NullExpression.create());
 
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		return executor.execute(this, ti);
-	}
+    public IFNONNULL(int targetPc) {
+        super(targetPc);
+    }
 
-	@Override
-	public Instruction executeConcrete(ThreadInfo ti) {
-		return super.execute(ti);
-	}
+    @Override
+    public Instruction execute(ThreadInfo ti) {
+        return executor.execute(this, ti);
+    }
 
-	@Override
-	public Instruction getSelf() {
-		return this;
-	}
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
+        return super.execute(ti);
+    }
 
-	@Override
-	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
-		return Abstraction._eq(v1, abs_v1, MJIEnv.NULL, null);
-	}
+    @Override
+    public Instruction getSelf() {
+        return this;
+    }
+
+    @Override
+    public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
+        return Abstraction._eq(v1, abs_v1, MJIEnv.NULL, null);
+    }
 
     @Override
     public TruthValue getConcreteBranchValue(int v1, int v2) {
         return TruthValue.create(v1 != MJIEnv.NULL);
     }
 
-	@Override
-	public Predicate createPredicate(Expression expr1, Expression expr2) {
+    @Override
+    public Predicate createPredicate(Expression expr1, Expression expr2) {
         if (expr1 instanceof NullExpression) {
             return Contradiction.create();
         } else if (expr1 instanceof AnonymousExpression) {
@@ -105,7 +105,7 @@ public class IFNONNULL extends gov.nasa.jpf.jvm.bytecode.IFNONNULL implements Ab
             }
         }
 
-		return Negation.create(Equals.create(expr1, expr2));
-	}
+        return Negation.create(Equals.create(expr1, expr2));
+    }
 
 }

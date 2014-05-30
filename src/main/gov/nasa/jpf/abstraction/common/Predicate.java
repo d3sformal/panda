@@ -17,8 +17,8 @@ import java.util.Set;
  * A common ancestor to all predicates used in the abstraction
  */
 public abstract class Predicate implements PredicatesComponentVisitable, BranchingCondition {
-	public abstract void addAccessExpressionsToSet(Set<AccessExpression> out);
-	public abstract Predicate replace(Map<AccessExpression, Expression> replacements);
+    public abstract void addAccessExpressionsToSet(Set<AccessExpression> out);
+    public abstract Predicate replace(Map<AccessExpression, Expression> replacements);
 
     public final Predicate replace(AccessExpression original, Expression replacement) {
         Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
@@ -33,31 +33,31 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
 
 
     public String toString() {
-    	return toString(Notation.policy);
+        return toString(Notation.policy);
     }
     public String toString(Notation policy) {
-    	return Notation.convertToString(this, policy);
-	}
-    
-	/**
-	 * Changes all access expression present in the predicate to a form which reflects an assignment "expression := newExpression"
-	 * 
-	 * Let p = (a = 3):
-	 *   update(p, a, b + 3) returns b + 3 = 3
-	 *   
-	 * Let q = (aread(arr, a, 1) = 0):
-	 *   update(q, a[0], 3) returns aread(awrite(arr, a, 0, 3), 1) = 0
-	 *   
-	 * Let r = (fread(f, o) = 10)
-	 *   update(r, s.f, x) returns fread(fwrite(f, s, x), o) = 10
-	 *   
-	 * Used to determine weakest preconditions.
-	 * 
-	 * @param expression an access expression being written to (e.g. local variable "a")
-	 * @param newExpression any arbitrary expression being written (e.g. "b + 3")
-	 * @return a predicate reflecting the updates
-	 */
-	public abstract Predicate update(AccessExpression expression, Expression newExpression);
+        return Notation.convertToString(this, policy);
+    }
+
+    /**
+     * Changes all access expression present in the predicate to a form which reflects an assignment "expression := newExpression"
+     *
+     * Let p = (a = 3):
+     *   update(p, a, b + 3) returns b + 3 = 3
+     *
+     * Let q = (aread(arr, a, 1) = 0):
+     *   update(q, a[0], 3) returns aread(awrite(arr, a, 0, 3), 1) = 0
+     *
+     * Let r = (fread(f, o) = 10)
+     *   update(r, s.f, x) returns fread(fwrite(f, s, x), o) = 10
+     *
+     * Used to determine weakest preconditions.
+     *
+     * @param expression an access expression being written to (e.g. local variable "a")
+     * @param newExpression any arbitrary expression being written (e.g. "b + 3")
+     * @return a predicate reflecting the updates
+     */
+    public abstract Predicate update(AccessExpression expression, Expression newExpression);
 
     private final String getStringRep() {
         if (stringValue == null) {
@@ -66,28 +66,28 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
 
         return stringValue;
     }
-	
-	@Override
-	public final int hashCode() {
+
+    @Override
+    public final int hashCode() {
         if (hashCodeValue == null) {
-		    hashCodeValue = getStringRep().hashCode();
+            hashCodeValue = getStringRep().hashCode();
         }
-		return hashCodeValue;
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof Predicate) {
-			Predicate p = (Predicate) o;
+        return hashCodeValue;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Predicate) {
+            Predicate p = (Predicate) o;
 
             if (hashCode() != p.hashCode()) {
                 return false;
             }
 
-			return getStringRep().equals(p.getStringRep());
-		}
-		
-		return false;
-	}
+            return getStringRep().equals(p.getStringRep());
+        }
+
+        return false;
+    }
 
 }

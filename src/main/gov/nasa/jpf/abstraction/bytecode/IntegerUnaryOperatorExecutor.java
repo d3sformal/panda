@@ -27,38 +27,38 @@ import gov.nasa.jpf.vm.StackFrame;
  */
 public class IntegerUnaryOperatorExecutor extends UnaryOperatorExecutor<Integer> {
 
-	private static IntegerUnaryOperatorExecutor instance;
+    private static IntegerUnaryOperatorExecutor instance;
 
-	public static IntegerUnaryOperatorExecutor getInstance() {
-		if (instance == null) {
-			instance = new IntegerUnaryOperatorExecutor();
-		}
-		
-		return instance;
-	}
+    public static IntegerUnaryOperatorExecutor getInstance() {
+        if (instance == null) {
+            instance = new IntegerUnaryOperatorExecutor();
+        }
 
-	@Override
-	protected Attribute getAttribute(StackFrame sf) {
-		return getAttribute(sf, 0);
-	}
+        return instance;
+    }
+
+    @Override
+    protected Attribute getAttribute(StackFrame sf) {
+        return getAttribute(sf, 0);
+    }
 
 
-	@Override
-	final protected Integer getOperand(StackFrame sf) {
-		return sf.peek(0);
-	}
-	
-	@Override
-	final protected void storeAttribute(Attribute result, StackFrame sf) {
-		sf.setOperandAttr(result);
-	}
+    @Override
+    final protected Integer getOperand(StackFrame sf) {
+        return sf.peek(0);
+    }
 
-	@Override
-	final protected void storeResult(Attribute result, StackFrame sf) {
-		sf.pop();
-		
-		sf.push(0);
-		storeAttribute(result, sf);
-	}
+    @Override
+    final protected void storeAttribute(Attribute result, StackFrame sf) {
+        sf.setOperandAttr(result);
+    }
+
+    @Override
+    final protected void storeResult(Attribute result, StackFrame sf) {
+        sf.pop();
+
+        sf.push(0);
+        storeAttribute(result, sf);
+    }
 
 }

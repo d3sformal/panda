@@ -27,37 +27,37 @@ import gov.nasa.jpf.vm.StackFrame;
  */
 public class LongUnaryOperatorExecutor extends UnaryOperatorExecutor<Long> {
 
-	private static LongUnaryOperatorExecutor instance;
+    private static LongUnaryOperatorExecutor instance;
 
-	public static LongUnaryOperatorExecutor getInstance() {
-		if (instance == null) {
-			instance = new LongUnaryOperatorExecutor();
-		}
-		
-		return instance;
-	}
-	
-	@Override
-	protected Attribute getAttribute(StackFrame sf) {
-		return getAttribute(sf, 1);
-	}
+    public static LongUnaryOperatorExecutor getInstance() {
+        if (instance == null) {
+            instance = new LongUnaryOperatorExecutor();
+        }
 
-	@Override
-	protected Long getOperand(StackFrame sf) {
-		return sf.peekLong(0);
-	}
-	
-	@Override
-	final protected void storeAttribute(Attribute result, StackFrame sf) {
-		sf.setLongOperandAttr(result);
-	}
+        return instance;
+    }
 
-	@Override
-	protected void storeResult(Attribute result, StackFrame sf) {
-		sf.popLong();
-		
-		sf.pushLong(0);
-		storeAttribute(result, sf);
-	}
+    @Override
+    protected Attribute getAttribute(StackFrame sf) {
+        return getAttribute(sf, 1);
+    }
+
+    @Override
+    protected Long getOperand(StackFrame sf) {
+        return sf.peekLong(0);
+    }
+
+    @Override
+    final protected void storeAttribute(Attribute result, StackFrame sf) {
+        sf.setLongOperandAttr(result);
+    }
+
+    @Override
+    protected void storeResult(Attribute result, StackFrame sf) {
+        sf.popLong();
+
+        sf.pushLong(0);
+        storeAttribute(result, sf);
+    }
 
 }

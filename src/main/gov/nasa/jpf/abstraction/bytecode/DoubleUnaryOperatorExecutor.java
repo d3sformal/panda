@@ -27,38 +27,38 @@ import gov.nasa.jpf.vm.StackFrame;
  */
 public class DoubleUnaryOperatorExecutor extends UnaryOperatorExecutor<Double> {
 
-	private static DoubleUnaryOperatorExecutor instance;
+    private static DoubleUnaryOperatorExecutor instance;
 
-	public static DoubleUnaryOperatorExecutor getInstance() {
-		if (instance == null) {
-			instance = new DoubleUnaryOperatorExecutor();
-		}
-		
-		return instance;
-	}
+    public static DoubleUnaryOperatorExecutor getInstance() {
+        if (instance == null) {
+            instance = new DoubleUnaryOperatorExecutor();
+        }
 
-	@Override
-	protected Attribute getAttribute(StackFrame sf) {
-		return getAttribute(sf, 1);
-	}
+        return instance;
+    }
+
+    @Override
+    protected Attribute getAttribute(StackFrame sf) {
+        return getAttribute(sf, 1);
+    }
 
 
-	@Override
-	final protected Double getOperand(StackFrame sf) {
-		return sf.peekDouble(0);
-	}
-	
-	@Override
-	final protected void storeAttribute(Attribute result, StackFrame sf) {
-		sf.setLongOperandAttr(result);
-	}
+    @Override
+    final protected Double getOperand(StackFrame sf) {
+        return sf.peekDouble(0);
+    }
 
-	@Override
-	final protected void storeResult(Attribute result, StackFrame sf) {
-		sf.popDouble();
-		
-		sf.pushDouble(0);
-		storeAttribute(result, sf);
-	}
+    @Override
+    final protected void storeAttribute(Attribute result, StackFrame sf) {
+        sf.setLongOperandAttr(result);
+    }
+
+    @Override
+    final protected void storeResult(Attribute result, StackFrame sf) {
+        sf.popDouble();
+
+        sf.pushDouble(0);
+        storeAttribute(result, sf);
+    }
 
 }

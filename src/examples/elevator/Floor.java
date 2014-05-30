@@ -3,7 +3,7 @@ package elevator;
 /*
  * Copyright (C) 2000 by ETHZ/INF/CS
  * All rights reserved
- * 
+ *
  * @version $Id$
  * @author Roger Karrer
  */
@@ -28,4 +28,4 @@ class Floor {
         downFlag = false;
     }
 }
- 
+

@@ -25,7 +25,7 @@ import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 
 public class Universe {
     public static int NULL = MJIEnv.NULL;
-    
+
     public static Reference nullReference = UniverseNull.nullReference;
 
     private Map<StructuredValueIdentifier, StructuredValue> currentStructuredRealization = new HashMap<StructuredValueIdentifier, StructuredValue>();
@@ -39,7 +39,7 @@ public class Universe {
         if (id instanceof PrimitiveValueIdentifier) {
             return contains((PrimitiveValueIdentifier) id);
         }
-        
+
         if (id instanceof StructuredValueIdentifier) {
             return contains((StructuredValueIdentifier) id);
         }

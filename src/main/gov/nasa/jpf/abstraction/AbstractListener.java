@@ -115,23 +115,23 @@ public class AbstractListener extends PropertyListenerAdapter {
         testMethods.put(StateMatchingTestClass + ".assertSameAliasingOnEveryVisit([Ljava/lang/String;)V", new AssertSameAliasingOnEveryVisitHandler());
     }
 
-	@Override
-	public void vmInitialized(VM vm) {
-		RunDetector.initialiseNotRunning();
-		GlobalAbstraction.getInstance().start(vm.getCurrentThread());
-	}
+    @Override
+    public void vmInitialized(VM vm) {
+        RunDetector.initialiseNotRunning();
+        GlobalAbstraction.getInstance().start(vm.getCurrentThread());
+    }
 
-	@Override
-	public void stateAdvanced(Search search) {
-		RunDetector.advance();
-		GlobalAbstraction.getInstance().forward(search.getVM().getCurrentThread().getTopFrameMethodInfo());
-	}
+    @Override
+    public void stateAdvanced(Search search) {
+        RunDetector.advance();
+        GlobalAbstraction.getInstance().forward(search.getVM().getCurrentThread().getTopFrameMethodInfo());
+    }
 
-	@Override
-	public void stateBacktracked(Search search) {
-		GlobalAbstraction.getInstance().backtrack(search.getVM().getCurrentThread().getTopFrameMethodInfo());
-		RunDetector.backtrack();
-	}
+    @Override
+    public void stateBacktracked(Search search) {
+        GlobalAbstraction.getInstance().backtrack(search.getVM().getCurrentThread().getTopFrameMethodInfo());
+        RunDetector.backtrack();
+    }
 
     @Override
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
@@ -162,10 +162,10 @@ public class AbstractListener extends PropertyListenerAdapter {
         }
     }
 
-	@Override
-	public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
-		RunDetector.detectRunning(vm, nextInsn, execInsn);
-	}
+    @Override
+    public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
+        RunDetector.detectRunning(vm, nextInsn, execInsn);
+    }
 
     @Override
     public void classLoaded(VM vm, ClassInfo classInfo) {

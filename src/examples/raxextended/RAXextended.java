@@ -1,12 +1,12 @@
 package raxextended;
 
-/* 
-The RAX Error - local deadlock. 
+/*
+The RAX Error - local deadlock.
 */
 
 class Event {
   int count = 0;
-  int wrapCount = 3; 
+  int wrapCount = 3;
 
   public Event(int wc) { wrapCount = wc; }
 
@@ -16,7 +16,7 @@ class Event {
 
   public synchronized void signal_event() {
     count = (count + 1);
-	if (count >= wrapCount) count = 0; // modulo
+    if (count >= wrapCount) count = 0; // modulo
     notifyAll();
   }
 }
@@ -24,7 +24,7 @@ class Event {
 
 class Events {
   static Event plan;
-  static Event exec;  
+  static Event exec;
 
   public static void initialize(int wc) {
     plan = new Event(wc);
@@ -52,7 +52,7 @@ class Plan {
 
   public synchronized boolean done() {
     return currentToken == 5;
-  } 
+  }
 
   public synchronized void executeToken() {
     currentToken++;

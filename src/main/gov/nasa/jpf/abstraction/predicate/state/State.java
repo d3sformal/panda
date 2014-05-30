@@ -9,12 +9,12 @@ import java.util.Map;
  */
 public class State {
     public int currentThread;
-	public Map<Integer, SymbolTableStack> symbolTableStacks;
-	public Map<Integer, PredicateValuationStack> predicateValuationStacks;
-	
-	public State(int currentThread, Map<Integer, SymbolTableStack> symbolTableStacks, Map<Integer, PredicateValuationStack> predicateValuationStacks) {
+    public Map<Integer, SymbolTableStack> symbolTableStacks;
+    public Map<Integer, PredicateValuationStack> predicateValuationStacks;
+
+    public State(int currentThread, Map<Integer, SymbolTableStack> symbolTableStacks, Map<Integer, PredicateValuationStack> predicateValuationStacks) {
         this.currentThread = currentThread;
-		this.symbolTableStacks = symbolTableStacks;
-		this.predicateValuationStacks = predicateValuationStacks;
-	}
+        this.symbolTableStacks = symbolTableStacks;
+        this.predicateValuationStacks = predicateValuationStacks;
+    }
 }

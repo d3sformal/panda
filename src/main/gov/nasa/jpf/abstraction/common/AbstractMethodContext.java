@@ -7,15 +7,15 @@ import java.util.List;
 
 public abstract class AbstractMethodContext extends Context {
 
-	private Method method;
+    private Method method;
 
-	public AbstractMethodContext(Method method, List<Predicate> predicates) {
-		super(predicates);
+    public AbstractMethodContext(Method method, List<Predicate> predicates) {
+        super(predicates);
 
-		this.method = method;
-	}
+        this.method = method;
+    }
 
-	public Method getMethod() {
-		return method;
-	}
+    public Method getMethod() {
+        return method;
+    }
 }

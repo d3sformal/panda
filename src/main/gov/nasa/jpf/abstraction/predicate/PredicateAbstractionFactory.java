@@ -22,41 +22,41 @@ public class PredicateAbstractionFactory extends AbstractionFactory {
 
     private static String systemPredicatesFilename = "systemlibs.pred";
 
-	@Override
-	public Abstraction create(Config config, String[] args) {
-		String filename = args[1];
+    @Override
+    public Abstraction create(Config config, String[] args) {
+        String filename = args[1];
 
-		try {
-			ANTLRInputStream chars = new ANTLRInputStream(new FileInputStream(filename));
-			PredicatesLexer lexer = new PredicatesLexer(chars);
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
-			PredicatesParser parser = new PredicatesParser(tokens);
+        try {
+            ANTLRInputStream chars = new ANTLRInputStream(new FileInputStream(filename));
+            PredicatesLexer lexer = new PredicatesLexer(chars);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            PredicatesParser parser = new PredicatesParser(tokens);
 
-			Predicates predicates = parser.predicates().val;
+            Predicates predicates = parser.predicates().val;
 
-			chars = new ANTLRInputStream(new FileInputStream(systemPredicatesFilename));
-			lexer = new PredicatesLexer(chars);
-			tokens = new CommonTokenStream(lexer);
-			parser = new PredicatesParser(tokens);
+            chars = new ANTLRInputStream(new FileInputStream(systemPredicatesFilename));
+            lexer = new PredicatesLexer(chars);
+            tokens = new CommonTokenStream(lexer);
+            parser = new PredicatesParser(tokens);
 
-			Predicates systemPredicates = parser.predicates().val;
+            Predicates systemPredicates = parser.predicates().val;
 
             predicates.contexts.addAll(systemPredicates.contexts);
 
             if (config.getBoolean("apf.verbose")) {
-    			System.out.println(predicates.toString());
+                System.out.println(predicates.toString());
             }
 
-			return new PredicateAbstraction(predicates);
-		} catch (IOException e) {
-			System.err.println("Could not read input file '" + filename + "'");
+            return new PredicateAbstraction(predicates);
+        } catch (IOException e) {
+            System.err.println("Could not read input file '" + filename + "'");
 
             throw new JPFConfigException("Could not read input file '" + filename + "'");
-		} catch (Exception e) {
-			e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
 
-			throw e;
-		}
-	}
+            throw e;
+        }
+    }
 
 }

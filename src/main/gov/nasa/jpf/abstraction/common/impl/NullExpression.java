@@ -16,40 +16,40 @@ import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
 public class NullExpression extends Constant implements ObjectExpression {
 
     private static NullExpression instance;
-	
-	protected NullExpression() {
-		super(Universe.NULL);
-	}
 
-	@Override
-	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
-	}
+    protected NullExpression() {
+        super(Universe.NULL);
+    }
 
-	@Override
-	public NullExpression replace(Map<AccessExpression, Expression> replacements) {
-		return this;
-	}
+    @Override
+    public void addAccessExpressionsToSet(Set<AccessExpression> out) {
+    }
 
-	@Override
-	public NullExpression update(AccessExpression expression, Expression newExpression) {
-		return this;
-	}
+    @Override
+    public NullExpression replace(Map<AccessExpression, Expression> replacements) {
+        return this;
+    }
 
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		visitor.visit(this);
-	}
-	
-	public static NullExpression create() {
+    @Override
+    public NullExpression update(AccessExpression expression, Expression newExpression) {
+        return this;
+    }
+
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    public static NullExpression create() {
         if (instance == null) {
             instance = new NullExpression();
         }
 
         return instance;
-	}
+    }
 
-	@Override
-	public Predicate getPreconditionForBeingFresh() {
-		return Contradiction.create();
-	}
+    @Override
+    public Predicate getPreconditionForBeingFresh() {
+        return Contradiction.create();
+    }
 }

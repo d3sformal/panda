@@ -7,8 +7,8 @@ import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
  * Interface of all Objects / Arrays obtained by allocation (or duplicates of such)
  */
 public interface AnonymousExpression extends Expression {
-	public Reference getReference();
-    
+    public Reference getReference();
+
     /**
      * An anonymous expression can be either created by NEW or duplicated by DUP
      *

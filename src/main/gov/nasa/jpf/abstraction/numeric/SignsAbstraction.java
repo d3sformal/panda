@@ -24,629 +24,629 @@ import gov.nasa.jpf.abstraction.Abstraction;
 /**
  * The domain of this abstraction consists of three values: NEG, ZERO, and POS.
  * Numeric values are mapped to one of them depending on their signs.
- * 
+ *
  * When the result of an abstract operation cannot be defined unambiguously
  * (e.g. POS + NEG can be NEG, ZERO or POS), special "composite tokens" which
  * represent a set of abstract values (like NON_NEG is {ZERO, POS}) are
  * returned.
- * 
+ *
  * Remember, that this abstraction does not handle such floating-point values as
  * NaN and INF.
  */
 public class SignsAbstraction extends Abstraction {
-	
-	private static SignsAbstraction instance;
-	
-	public static SignsAbstraction getInstance() {
-		if (instance == null)
-		{
-			instance = new SignsAbstraction();
-		}
-		
-		return instance;
-	}
 
-	private SignsAbstraction() {
-	}
-	
-	// basic tokens: NEG, ZERO, POS
-	public static SignsValue NEG = new SignsValue(0);
-	public static SignsValue ZERO = new SignsValue(1);
-	public static SignsValue POS = new SignsValue(2);
-	// composite tokens: NON_NEG, NON_ZERO, NON_POS, TOP
-	public static SignsValue NON_NEG = new SignsValue(3);
-	public static SignsValue NON_ZERO = new SignsValue(4);
-	public static SignsValue NON_POS = new SignsValue(5);
-	public static SignsValue TOP = new SignsValue(6);
+    private static SignsAbstraction instance;
 
-	private static final int DOMAIN_SIZE = 3;
+    public static SignsAbstraction getInstance() {
+        if (instance == null)
+        {
+            instance = new SignsAbstraction();
+        }
 
-	/**
-	 * @param isNeg  indicates whether the new abstraction can be negative
-	 * @param isZero indicates whether the new abstraction can be zero
-	 * @param isPos  indicates whether the new abstraction can be positive 
-	 * @return the new abstraction with specified values
-	 */		
-	public SignsValue create(boolean isNeg, boolean isZero,
-			boolean isPos) {
-		if (isNeg)
-			if (isZero)
-				if (isPos)
-					return TOP;
-				else
-					return NON_POS;
-			else if (isPos)
-				return NON_ZERO;
-			else
-				return NEG;
-		else if (isZero)
-			if (isPos)
-				return NON_NEG;
-			else
-				return ZERO;
-		else if (isPos)
-			return POS;
-		else
-			throw new RuntimeException("Abstraction is out of range");
-	}
+        return instance;
+    }
 
-	@Override
-	public SignsValue abstractMap(int v) {
-		if (v > 0)
-			return POS;
-		if (v == 0)
-			return ZERO;
-		// if (v < 0)
-		return NEG;
-	}
+    private SignsAbstraction() {
+    }
 
-	@Override
-	public SignsValue abstractMap(long v) {
-		if (v > 0)
-			return POS;
-		if (v == 0)
-			return ZERO;
-		// if (v < 0)
-		return NEG;
-	}
+    // basic tokens: NEG, ZERO, POS
+    public static SignsValue NEG = new SignsValue(0);
+    public static SignsValue ZERO = new SignsValue(1);
+    public static SignsValue POS = new SignsValue(2);
+    // composite tokens: NON_NEG, NON_ZERO, NON_POS, TOP
+    public static SignsValue NON_NEG = new SignsValue(3);
+    public static SignsValue NON_ZERO = new SignsValue(4);
+    public static SignsValue NON_POS = new SignsValue(5);
+    public static SignsValue TOP = new SignsValue(6);
 
-	@Override
-	public SignsValue abstractMap(float v) {
-		if (v > 0)
-			return POS;
-		if (v == 0)
-			return ZERO;
-		if (v < 0)
-			return NEG;
-		// NaN or INF
-		return null;
-	}
+    private static final int DOMAIN_SIZE = 3;
 
-	@Override
-	public SignsValue abstractMap(double v) {
-		if (v > 0)
-			return POS;
-		if (v == 0)
-			return ZERO;
-		if (v < 0)
-			return NEG;
-		// NaN or INF
-		return null;
-	}
+    /**
+     * @param isNeg  indicates whether the new abstraction can be negative
+     * @param isZero indicates whether the new abstraction can be zero
+     * @param isPos  indicates whether the new abstraction can be positive
+     * @return the new abstraction with specified values
+     */
+    public SignsValue create(boolean isNeg, boolean isZero,
+            boolean isPos) {
+        if (isNeg)
+            if (isZero)
+                if (isPos)
+                    return TOP;
+                else
+                    return NON_POS;
+            else if (isPos)
+                return NON_ZERO;
+            else
+                return NEG;
+        else if (isZero)
+            if (isPos)
+                return NON_NEG;
+            else
+                return ZERO;
+        else if (isPos)
+            return POS;
+        else
+            throw new RuntimeException("Abstraction is out of range");
+    }
 
-	/**
-	 * 
-	 * @return The number of abstract values in the domain.
-	 */
     @Override
-	public int getDomainSize() {
-		return DOMAIN_SIZE;
-	}
-    
+    public SignsValue abstractMap(int v) {
+        if (v > 0)
+            return POS;
+        if (v == 0)
+            return ZERO;
+        // if (v < 0)
+        return NEG;
+    }
+
     @Override
-	public AbstractValue _plus(AbstractValue left, int right) {
-    	SignsValue left_value = (SignsValue) left;
+    public SignsValue abstractMap(long v) {
+        if (v > 0)
+            return POS;
+        if (v == 0)
+            return ZERO;
+        // if (v < 0)
+        return NEG;
+    }
 
-		if (right == 1) {
-			boolean n = left_value.can_be_NEG();
-			boolean z = left_value.can_be_NEG();
-			boolean p = left_value.can_be_ZERO() || left_value.can_be_POS();
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else if (right == -1) {
-			boolean n = left_value.can_be_NEG() || left_value.can_be_ZERO();
-			boolean z = left_value.can_be_POS();
-			boolean p = left_value.can_be_POS();
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			return _plus(left, left.abs.abstractMap(right));
-	}
+    @Override
+    public SignsValue abstractMap(float v) {
+        if (v > 0)
+            return POS;
+        if (v == 0)
+            return ZERO;
+        if (v < 0)
+            return NEG;
+        // NaN or INF
+        return null;
+    }
 
-	@Override
-	public AbstractValue _plus(AbstractValue left, long right) {
-		SignsValue left_value = (SignsValue) left;
+    @Override
+    public SignsValue abstractMap(double v) {
+        if (v > 0)
+            return POS;
+        if (v == 0)
+            return ZERO;
+        if (v < 0)
+            return NEG;
+        // NaN or INF
+        return null;
+    }
 
-		if (right == 1) {
-			boolean n = left_value.can_be_NEG();
-			boolean z = left_value.can_be_NEG();
-			boolean p = left_value.can_be_ZERO() || left_value.can_be_POS();
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else if (right == -1) {
-			boolean n = left_value.can_be_NEG() || left_value.can_be_ZERO();
-			boolean z = left_value.can_be_POS();
-			boolean p = left_value.can_be_POS();
-			return SignsAbstraction.getInstance().create(n, z, p);
-		} else
-			return _plus(left, left.abs.abstractMap(right));
-	}
+    /**
+     *
+     * @return The number of abstract values in the domain.
+     */
+    @Override
+    public int getDomainSize() {
+        return DOMAIN_SIZE;
+    }
 
-	@Override
-	public AbstractValue _plus(AbstractValue left, AbstractValue right) {		
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean p = false, n = false, z = false;
-		if (left_value.can_be_NEG() && right_value.can_be_NEG())
-			n = true;
-		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-			n = true;
-		if (left_value.can_be_NEG() && right_value.can_be_POS())
-			n = z = p = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-			n = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-			z = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_POS())
-			p = true;
-		if (left_value.can_be_POS() && right_value.can_be_NEG())
-			n = z = p = true;
-		if (left_value.can_be_POS() && right_value.can_be_ZERO())
-			p = true;
-		if (left_value.can_be_POS() && right_value.can_be_POS())
-			p = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+    @Override
+    public AbstractValue _plus(AbstractValue left, int right) {
+        SignsValue left_value = (SignsValue) left;
 
-	@Override
-	public AbstractValue _minus(AbstractValue left, AbstractValue right) {
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean p = false, n = false, z = false;
-		if (left_value.can_be_NEG() && right_value.can_be_NEG())
-			n = z = p = true;
-		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-			n = true;
-		if (left_value.can_be_NEG() && right_value.can_be_POS())
-			n = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-			p = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-			z = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_POS())
-			n = true;
-		if (left_value.can_be_POS() && right_value.can_be_NEG())
-			p = true;
-		if (left_value.can_be_POS() && right_value.can_be_ZERO())
-			p = true;
-		if (left_value.can_be_POS() && right_value.can_be_POS())
-			n = z = p = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+        if (right == 1) {
+            boolean n = left_value.can_be_NEG();
+            boolean z = left_value.can_be_NEG();
+            boolean p = left_value.can_be_ZERO() || left_value.can_be_POS();
+            return SignsAbstraction.getInstance().create(n, z, p);
+        } else if (right == -1) {
+            boolean n = left_value.can_be_NEG() || left_value.can_be_ZERO();
+            boolean z = left_value.can_be_POS();
+            boolean p = left_value.can_be_POS();
+            return SignsAbstraction.getInstance().create(n, z, p);
+        } else
+            return _plus(left, left.abs.abstractMap(right));
+    }
 
-	@Override
-	public AbstractValue _mul(AbstractValue left, AbstractValue right) {
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean p = false, n = false, z = false;
-		if (left_value.can_be_NEG() && right_value.can_be_NEG())
-			p = true;
-		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-			z = true;
-		if (left_value.can_be_NEG() && right_value.can_be_POS())
-			n = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-			z = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-			z = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_POS())
-			z = true;
-		if (left_value.can_be_POS() && right_value.can_be_NEG())
-			n = true;
-		if (left_value.can_be_POS() && right_value.can_be_ZERO())
-			z = true;
-		if (left_value.can_be_POS() && right_value.can_be_POS())
-			p = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+    @Override
+    public AbstractValue _plus(AbstractValue left, long right) {
+        SignsValue left_value = (SignsValue) left;
 
-	@Override
-	public AbstractValue _div(AbstractValue left, AbstractValue right) {
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		if (right_value.can_be_ZERO())
-			throw new ArithmeticException(
-					"Division by zero (in abstract IDIV)");
-		boolean p = false, n = false, z = false;
-		if (left_value.can_be_NEG() && right_value.can_be_NEG())
-			p = true;
-		if (left_value.can_be_NEG() && right_value.can_be_POS())
-			n = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-			z = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_POS())
-			z = true;
-		if (left_value.can_be_POS() && right_value.can_be_NEG())
-			n = true;
-		if (left_value.can_be_POS() && right_value.can_be_POS())
-			p = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+        if (right == 1) {
+            boolean n = left_value.can_be_NEG();
+            boolean z = left_value.can_be_NEG();
+            boolean p = left_value.can_be_ZERO() || left_value.can_be_POS();
+            return SignsAbstraction.getInstance().create(n, z, p);
+        } else if (right == -1) {
+            boolean n = left_value.can_be_NEG() || left_value.can_be_ZERO();
+            boolean z = left_value.can_be_POS();
+            boolean p = left_value.can_be_POS();
+            return SignsAbstraction.getInstance().create(n, z, p);
+        } else
+            return _plus(left, left.abs.abstractMap(right));
+    }
 
-	@Override
-	public AbstractValue _rem(AbstractValue left, AbstractValue right) {
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		if (right_value.can_be_ZERO())
-			throw new ArithmeticException(
-					"Division by zero (in abstract IDIV)");
-		boolean p = false, n = false, z = false;
-		if (left_value.can_be_NEG() && right_value.can_be_NEG())
-			z = p = true;
-		if (left_value.can_be_NEG() && right_value.can_be_POS())
-			z = p = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-			z = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_POS())
-			z = true;
-		if (left_value.can_be_POS() && right_value.can_be_NEG())
-			z = p = true;
-		if (left_value.can_be_POS() && right_value.can_be_POS())
-			z = p = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+    @Override
+    public AbstractValue _plus(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean p = false, n = false, z = false;
+        if (left_value.can_be_NEG() && right_value.can_be_NEG())
+            n = true;
+        if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+            n = true;
+        if (left_value.can_be_NEG() && right_value.can_be_POS())
+            n = z = p = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+            n = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+            z = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_POS())
+            p = true;
+        if (left_value.can_be_POS() && right_value.can_be_NEG())
+            n = z = p = true;
+        if (left_value.can_be_POS() && right_value.can_be_ZERO())
+            p = true;
+        if (left_value.can_be_POS() && right_value.can_be_POS())
+            p = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
 
-	@Override
-	public AbstractValue _bitwise_and(AbstractValue left, AbstractValue right) {
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean p = false, n = false, z = false;
-		if (left_value.can_be_NEG() && right_value.can_be_NEG())
-			n = true;
-		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-			z = true;
-		if (left_value.can_be_NEG() && right_value.can_be_POS())
-			z = p = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-			z = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-			z = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_POS())
-			z = true;
-		if (left_value.can_be_POS() && right_value.can_be_NEG())
-			z = p = true;
-		if (left_value.can_be_POS() && right_value.can_be_ZERO())
-			z = true;
-		if (left_value.can_be_POS() && right_value.can_be_POS())
-			z = p = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+    @Override
+    public AbstractValue _minus(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean p = false, n = false, z = false;
+        if (left_value.can_be_NEG() && right_value.can_be_NEG())
+            n = z = p = true;
+        if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+            n = true;
+        if (left_value.can_be_NEG() && right_value.can_be_POS())
+            n = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+            p = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+            z = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_POS())
+            n = true;
+        if (left_value.can_be_POS() && right_value.can_be_NEG())
+            p = true;
+        if (left_value.can_be_POS() && right_value.can_be_ZERO())
+            p = true;
+        if (left_value.can_be_POS() && right_value.can_be_POS())
+            n = z = p = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
 
-	@Override
-	public AbstractValue _bitwise_or(AbstractValue left, AbstractValue right) {
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean p = false, n = false, z = false;
-		if (left_value.can_be_NEG() && right_value.can_be_NEG())
-			n = true;
-		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-			n = true;
-		if (left_value.can_be_NEG() && right_value.can_be_POS())
-			n = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-			n = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-			z = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_POS())
-			p = true;
-		if (left_value.can_be_POS() && right_value.can_be_NEG())
-			n = true;
-		if (left_value.can_be_POS() && right_value.can_be_ZERO())
-			p = true;
-		if (left_value.can_be_POS() && right_value.can_be_POS())
-			p = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+    @Override
+    public AbstractValue _mul(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean p = false, n = false, z = false;
+        if (left_value.can_be_NEG() && right_value.can_be_NEG())
+            p = true;
+        if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+            z = true;
+        if (left_value.can_be_NEG() && right_value.can_be_POS())
+            n = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+            z = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+            z = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_POS())
+            z = true;
+        if (left_value.can_be_POS() && right_value.can_be_NEG())
+            n = true;
+        if (left_value.can_be_POS() && right_value.can_be_ZERO())
+            z = true;
+        if (left_value.can_be_POS() && right_value.can_be_POS())
+            p = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
 
-	@Override
-	public AbstractValue _bitwise_xor(AbstractValue left, AbstractValue right) {
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean p = false, n = false, z = false;
-		if (left_value.can_be_NEG() && right_value.can_be_NEG())
-			z = p = true;
-		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-			n = true;
-		if (left_value.can_be_NEG() && right_value.can_be_POS())
-			n = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-			n = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-			z = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_POS())
-			p = true;
-		if (left_value.can_be_POS() && right_value.can_be_NEG())
-			n = true;
-		if (left_value.can_be_POS() && right_value.can_be_ZERO())
-			p = true;
-		if (left_value.can_be_POS() && right_value.can_be_POS())
-			z = p = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+    @Override
+    public AbstractValue _div(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        if (right_value.can_be_ZERO())
+            throw new ArithmeticException(
+                    "Division by zero (in abstract IDIV)");
+        boolean p = false, n = false, z = false;
+        if (left_value.can_be_NEG() && right_value.can_be_NEG())
+            p = true;
+        if (left_value.can_be_NEG() && right_value.can_be_POS())
+            n = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+            z = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_POS())
+            z = true;
+        if (left_value.can_be_POS() && right_value.can_be_NEG())
+            n = true;
+        if (left_value.can_be_POS() && right_value.can_be_POS())
+            p = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
 
-	@Override
-	public AbstractValue _shift_left(AbstractValue left, AbstractValue right) {
-		// Note that x << y considers only the least five bits of y
-		// Three disjoint cases:
-		// * x = ZERO, y in { NEG, ZERO, POS} => x << y = ZERO
-		// * x in { NEG, ZERO, POS}, y = ZERO => x << y = x
-		// * x in { NEG, POS }, y in { NEG, POS } => x << y = { POS, ZERO, NEG }		
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean p = false, n = false, z = left_value.can_be_ZERO();
-		if (right_value.can_be_ZERO()) {
-			n |= left_value.can_be_NEG();
-			z |= left_value.can_be_ZERO();
-			p |= left_value.can_be_POS();
-		}
-		if ((left_value.can_be_NEG() || left_value.can_be_POS())
-				&& (right_value.can_be_NEG() || right_value
-						.can_be_POS()))
-			n = z = p = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+    @Override
+    public AbstractValue _rem(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        if (right_value.can_be_ZERO())
+            throw new ArithmeticException(
+                    "Division by zero (in abstract IDIV)");
+        boolean p = false, n = false, z = false;
+        if (left_value.can_be_NEG() && right_value.can_be_NEG())
+            z = p = true;
+        if (left_value.can_be_NEG() && right_value.can_be_POS())
+            z = p = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+            z = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_POS())
+            z = true;
+        if (left_value.can_be_POS() && right_value.can_be_NEG())
+            z = p = true;
+        if (left_value.can_be_POS() && right_value.can_be_POS())
+            z = p = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
 
-	@Override
-	public AbstractValue _shift_right(AbstractValue left, AbstractValue right) {
-		// Note that x >> y considers only the least five bits of y, sign of x is
-		// preserved
-		// Four disjoint cases:
-		// * x = ZERO, y in { NEG, ZERO, POS } => x >> y = ZERO
-		// * x in { NEG, ZERO, POS }, y = ZERO => x >> y = x
-		// * x = POS, y in { NEG, POS } => x >> y = { ZERO, POS }
-		// * x = NEG, y in { NEG, POS } => x >> y = NEG		
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean p = false, n = false, z = left_value.can_be_ZERO();
-		if (right_value.can_be_ZERO()) {
-			n |= left_value.can_be_NEG();
-			z |= left_value.can_be_ZERO();
-			p |= left_value.can_be_POS();
-		}
-		if (right_value.can_be_NEG() || right_value.can_be_POS()) {
-			n |= left_value.can_be_NEG();
-			z |= left_value.can_be_POS();
-			p |= left_value.can_be_POS();
-		}
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+    @Override
+    public AbstractValue _bitwise_and(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean p = false, n = false, z = false;
+        if (left_value.can_be_NEG() && right_value.can_be_NEG())
+            n = true;
+        if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+            z = true;
+        if (left_value.can_be_NEG() && right_value.can_be_POS())
+            z = p = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+            z = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+            z = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_POS())
+            z = true;
+        if (left_value.can_be_POS() && right_value.can_be_NEG())
+            z = p = true;
+        if (left_value.can_be_POS() && right_value.can_be_ZERO())
+            z = true;
+        if (left_value.can_be_POS() && right_value.can_be_POS())
+            z = p = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
 
-	@Override
-	public AbstractValue _unsigned_shift_right(AbstractValue left, AbstractValue right) {
-		// Note that x >>> y considers only the least five bits of y, sign of x is
-		// not preserved
-		// Three disjoint cases:
-		// * x = ZERO, y in { NEG, ZERO, POS } => x >> y = ZERO
-		// * x in { NEG, ZERO, POS }, y = ZERO => x >> y = x
-		// * x in { NEG, POS }, y in { NEG, POS } => x >> y = { ZERO, POS }		
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean p = false, n = false, z = left_value.can_be_ZERO();
-		if (right_value.can_be_ZERO()) {
-			n |= left_value.can_be_NEG();
-			z |= left_value.can_be_ZERO();
-			p |= left_value.can_be_POS();
-		}
-		if ((left_value.can_be_NEG() || left_value.can_be_POS())
-				&& (right_value.can_be_NEG() || right_value
-						.can_be_POS()))
-			z = p = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+    @Override
+    public AbstractValue _bitwise_or(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean p = false, n = false, z = false;
+        if (left_value.can_be_NEG() && right_value.can_be_NEG())
+            n = true;
+        if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+            n = true;
+        if (left_value.can_be_NEG() && right_value.can_be_POS())
+            n = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+            n = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+            z = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_POS())
+            p = true;
+        if (left_value.can_be_POS() && right_value.can_be_NEG())
+            n = true;
+        if (left_value.can_be_POS() && right_value.can_be_ZERO())
+            p = true;
+        if (left_value.can_be_POS() && right_value.can_be_POS())
+            p = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
 
-	@Override
-	public AbstractValue _neg_impl(AbstractValue left) {
-		SignsValue left_value = (SignsValue) left;
+    @Override
+    public AbstractValue _bitwise_xor(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean p = false, n = false, z = false;
+        if (left_value.can_be_NEG() && right_value.can_be_NEG())
+            z = p = true;
+        if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+            n = true;
+        if (left_value.can_be_NEG() && right_value.can_be_POS())
+            n = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+            n = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+            z = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_POS())
+            p = true;
+        if (left_value.can_be_POS() && right_value.can_be_NEG())
+            n = true;
+        if (left_value.can_be_POS() && right_value.can_be_ZERO())
+            p = true;
+        if (left_value.can_be_POS() && right_value.can_be_POS())
+            z = p = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
 
-		return SignsAbstraction.getInstance().create(left_value.can_be_POS(), left_value.can_be_ZERO(), left_value.can_be_NEG());
-	}
+    @Override
+    public AbstractValue _shift_left(AbstractValue left, AbstractValue right) {
+        // Note that x << y considers only the least five bits of y
+        // Three disjoint cases:
+        // * x = ZERO, y in { NEG, ZERO, POS} => x << y = ZERO
+        // * x in { NEG, ZERO, POS}, y = ZERO => x << y = x
+        // * x in { NEG, POS }, y in { NEG, POS } => x << y = { POS, ZERO, NEG }
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean p = false, n = false, z = left_value.can_be_ZERO();
+        if (right_value.can_be_ZERO()) {
+            n |= left_value.can_be_NEG();
+            z |= left_value.can_be_ZERO();
+            p |= left_value.can_be_POS();
+        }
+        if ((left_value.can_be_NEG() || left_value.can_be_POS())
+                && (right_value.can_be_NEG() || right_value
+                        .can_be_POS()))
+            n = z = p = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
 
-	@Override
-	public AbstractBoolean _ge(AbstractValue left, AbstractValue right) {
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean t = false, f = false;
-		if (left_value.can_be_NEG() && right_value.can_be_NEG())
-			t = f = true;
-		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-			f = true;
-		if (left_value.can_be_NEG() && right_value.can_be_POS())
-			f = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-			t = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-			t = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_POS())
-			f = true;
-		if (left_value.can_be_POS() && right_value.can_be_NEG())
-			t = true;
-		if (left_value.can_be_POS() && right_value.can_be_ZERO())
-			t = true;
-		if (left_value.can_be_POS() && right_value.can_be_POS())
-			t = f = true;
-		if (f & t)
-			return AbstractBoolean.TOP;
-		else
-			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-	}
+    @Override
+    public AbstractValue _shift_right(AbstractValue left, AbstractValue right) {
+        // Note that x >> y considers only the least five bits of y, sign of x is
+        // preserved
+        // Four disjoint cases:
+        // * x = ZERO, y in { NEG, ZERO, POS } => x >> y = ZERO
+        // * x in { NEG, ZERO, POS }, y = ZERO => x >> y = x
+        // * x = POS, y in { NEG, POS } => x >> y = { ZERO, POS }
+        // * x = NEG, y in { NEG, POS } => x >> y = NEG
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean p = false, n = false, z = left_value.can_be_ZERO();
+        if (right_value.can_be_ZERO()) {
+            n |= left_value.can_be_NEG();
+            z |= left_value.can_be_ZERO();
+            p |= left_value.can_be_POS();
+        }
+        if (right_value.can_be_NEG() || right_value.can_be_POS()) {
+            n |= left_value.can_be_NEG();
+            z |= left_value.can_be_POS();
+            p |= left_value.can_be_POS();
+        }
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
 
-	@Override
-	public AbstractBoolean _gt(AbstractValue left, AbstractValue right) {
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean t = false, f = false;
-		if (left_value.can_be_NEG() && right_value.can_be_NEG())
-			t = f = true;
-		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-			f = true;
-		if (left_value.can_be_NEG() && right_value.can_be_POS())
-			f = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-			t = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-			f = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_POS())
-			f = true;
-		if (left_value.can_be_POS() && right_value.can_be_NEG())
-			t = true;
-		if (left_value.can_be_POS() && right_value.can_be_ZERO())
-			t = true;
-		if (left_value.can_be_POS() && right_value.can_be_POS())
-			t = f = true;
-		if (f & t)
-			return AbstractBoolean.TOP;
-		else
-			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-	}
+    @Override
+    public AbstractValue _unsigned_shift_right(AbstractValue left, AbstractValue right) {
+        // Note that x >>> y considers only the least five bits of y, sign of x is
+        // not preserved
+        // Three disjoint cases:
+        // * x = ZERO, y in { NEG, ZERO, POS } => x >> y = ZERO
+        // * x in { NEG, ZERO, POS }, y = ZERO => x >> y = x
+        // * x in { NEG, POS }, y in { NEG, POS } => x >> y = { ZERO, POS }
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean p = false, n = false, z = left_value.can_be_ZERO();
+        if (right_value.can_be_ZERO()) {
+            n |= left_value.can_be_NEG();
+            z |= left_value.can_be_ZERO();
+            p |= left_value.can_be_POS();
+        }
+        if ((left_value.can_be_NEG() || left_value.can_be_POS())
+                && (right_value.can_be_NEG() || right_value
+                        .can_be_POS()))
+            z = p = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
 
-	@Override
-	public AbstractBoolean _le(AbstractValue left, AbstractValue right) {
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean t = false, f = false;
-		if (left_value.can_be_NEG() && right_value.can_be_NEG())
-			t = f = true;
-		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-			t = true;
-		if (left_value.can_be_NEG() && right_value.can_be_POS())
-			t = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-			f = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-			t = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_POS())
-			t = true;
-		if (left_value.can_be_POS() && right_value.can_be_NEG())
-			f = true;
-		if (left_value.can_be_POS() && right_value.can_be_ZERO())
-			f = true;
-		if (left_value.can_be_POS() && right_value.can_be_POS())
-			t = f = true;
-		if (f & t)
-			return AbstractBoolean.TOP;
-		else
-			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-	}
+    @Override
+    public AbstractValue _neg_impl(AbstractValue left) {
+        SignsValue left_value = (SignsValue) left;
 
-	@Override
-	public AbstractBoolean _lt(AbstractValue left, AbstractValue right) {
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean t = false, f = false;
-		if (left_value.can_be_NEG() && right_value.can_be_NEG())
-			t = f = true;
-		if (left_value.can_be_NEG() && right_value.can_be_ZERO())
-			t = true;
-		if (left_value.can_be_NEG() && right_value.can_be_POS())
-			t = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_NEG())
-			f = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-			f = true;
-		if (left_value.can_be_ZERO() && right_value.can_be_POS())
-			t = true;
-		if (left_value.can_be_POS() && right_value.can_be_NEG())
-			f = true;
-		if (left_value.can_be_POS() && right_value.can_be_ZERO())
-			f = true;
-		if (left_value.can_be_POS() && right_value.can_be_POS())
-			t = f = true;
-		if (f & t)
-			return AbstractBoolean.TOP;
-		else
-			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-	}
+        return SignsAbstraction.getInstance().create(left_value.can_be_POS(), left_value.can_be_ZERO(), left_value.can_be_NEG());
+    }
 
-	public AbstractBoolean _eq(AbstractValue left, AbstractValue right) {
-		SignsValue left_value = (SignsValue) left;
-		SignsValue right_value = (SignsValue) right;
-		boolean t = (left_value.can_be_NEG() && right_value.can_be_NEG())
-				|| (left_value.can_be_ZERO() && right_value.can_be_ZERO())
-				|| (left_value.can_be_POS() && right_value.can_be_POS());
-		boolean f = (left_value.can_be_NEG() && right_value.can_be_ZERO())
-				|| (left_value.can_be_NEG() && right_value.can_be_POS())
-				|| (left_value.can_be_ZERO() && right_value.can_be_NEG())
-				|| (left_value.can_be_ZERO() && right_value.can_be_POS())
-				|| (left_value.can_be_POS() && right_value.can_be_NEG())
-				|| (left_value.can_be_POS() && right_value.can_be_ZERO());
-		if (f & t)
-			return AbstractBoolean.TOP;
-		else
-			return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
-	}
+    @Override
+    public AbstractBoolean _ge(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean t = false, f = false;
+        if (left_value.can_be_NEG() && right_value.can_be_NEG())
+            t = f = true;
+        if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+            f = true;
+        if (left_value.can_be_NEG() && right_value.can_be_POS())
+            f = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+            t = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+            t = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_POS())
+            f = true;
+        if (left_value.can_be_POS() && right_value.can_be_NEG())
+            t = true;
+        if (left_value.can_be_POS() && right_value.can_be_ZERO())
+            t = true;
+        if (left_value.can_be_POS() && right_value.can_be_POS())
+            t = f = true;
+        if (f & t)
+            return AbstractBoolean.TOP;
+        else
+            return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+    }
 
-	/**
-	 * @return Signs.ZERO if the operand is numerically equal to this
-	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
-	 *         than the operand; and Signs.POS if this Abstraction is
-	 *         numerically greater than the operand.
-	 */
-	@Override
-	public SignsValue _cmp(AbstractValue left, AbstractValue right) {
-		boolean n = false, z = false, p = false;
-		if (_gt(left, right) != AbstractBoolean.FALSE)
-			p = true;
-		if (_lt(left, right) != AbstractBoolean.FALSE)
-			n = true;
-		if (_gt(left, right) != AbstractBoolean.TRUE
-				&& _lt(left, right) != AbstractBoolean.TRUE)
-			z = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+    @Override
+    public AbstractBoolean _gt(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean t = false, f = false;
+        if (left_value.can_be_NEG() && right_value.can_be_NEG())
+            t = f = true;
+        if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+            f = true;
+        if (left_value.can_be_NEG() && right_value.can_be_POS())
+            f = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+            t = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+            f = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_POS())
+            f = true;
+        if (left_value.can_be_POS() && right_value.can_be_NEG())
+            t = true;
+        if (left_value.can_be_POS() && right_value.can_be_ZERO())
+            t = true;
+        if (left_value.can_be_POS() && right_value.can_be_POS())
+            t = f = true;
+        if (f & t)
+            return AbstractBoolean.TOP;
+        else
+            return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+    }
 
-	/**
-	 * @return Signs.ZERO if the operand is numerically equal to this
-	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
-	 *         than the operand; and Signs.POS if this Abstraction is
-	 *         numerically greater than the operand.
-	 */	
-	@Override
-	public SignsValue _cmpg(AbstractValue left, AbstractValue right) {
-		boolean n = false, z = false, p = false;
-		if (_gt(left, right) != AbstractBoolean.FALSE)
-			p = true;
-		if (_lt(left, right) != AbstractBoolean.FALSE)
-			n = true;
-		if (_gt(left, right) != AbstractBoolean.TRUE
-				&& _lt(left, right) != AbstractBoolean.TRUE)
-			z = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+    @Override
+    public AbstractBoolean _le(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean t = false, f = false;
+        if (left_value.can_be_NEG() && right_value.can_be_NEG())
+            t = f = true;
+        if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+            t = true;
+        if (left_value.can_be_NEG() && right_value.can_be_POS())
+            t = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+            f = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+            t = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_POS())
+            t = true;
+        if (left_value.can_be_POS() && right_value.can_be_NEG())
+            f = true;
+        if (left_value.can_be_POS() && right_value.can_be_ZERO())
+            f = true;
+        if (left_value.can_be_POS() && right_value.can_be_POS())
+            t = f = true;
+        if (f & t)
+            return AbstractBoolean.TOP;
+        else
+            return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+    }
 
-	/**
-	 * @return Signs.ZERO if the operand is numerically equal to this
-	 *         Abstraction; Signs.NEG if this Abstraction is numerically less
-	 *         than the operand; and Signs.POS if this Abstraction is
-	 *         numerically greater than the operand.
-	 */	
-	@Override
-	public SignsValue _cmpl(AbstractValue left, AbstractValue right) {
-		boolean n = false, z = false, p = false;
-		if (_gt(left, right) != AbstractBoolean.FALSE)
-			p = true;
-		if (_lt(left, right) != AbstractBoolean.FALSE)
-			n = true;
-		if (_gt(left, right) != AbstractBoolean.TRUE
-				&& this._lt(left, right) != AbstractBoolean.TRUE)
-			z = true;
-		return SignsAbstraction.getInstance().create(n, z, p);
-	}
+    @Override
+    public AbstractBoolean _lt(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean t = false, f = false;
+        if (left_value.can_be_NEG() && right_value.can_be_NEG())
+            t = f = true;
+        if (left_value.can_be_NEG() && right_value.can_be_ZERO())
+            t = true;
+        if (left_value.can_be_NEG() && right_value.can_be_POS())
+            t = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_NEG())
+            f = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+            f = true;
+        if (left_value.can_be_ZERO() && right_value.can_be_POS())
+            t = true;
+        if (left_value.can_be_POS() && right_value.can_be_NEG())
+            f = true;
+        if (left_value.can_be_POS() && right_value.can_be_ZERO())
+            f = true;
+        if (left_value.can_be_POS() && right_value.can_be_POS())
+            t = f = true;
+        if (f & t)
+            return AbstractBoolean.TOP;
+        else
+            return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+    }
+
+    public AbstractBoolean _eq(AbstractValue left, AbstractValue right) {
+        SignsValue left_value = (SignsValue) left;
+        SignsValue right_value = (SignsValue) right;
+        boolean t = (left_value.can_be_NEG() && right_value.can_be_NEG())
+                || (left_value.can_be_ZERO() && right_value.can_be_ZERO())
+                || (left_value.can_be_POS() && right_value.can_be_POS());
+        boolean f = (left_value.can_be_NEG() && right_value.can_be_ZERO())
+                || (left_value.can_be_NEG() && right_value.can_be_POS())
+                || (left_value.can_be_ZERO() && right_value.can_be_NEG())
+                || (left_value.can_be_ZERO() && right_value.can_be_POS())
+                || (left_value.can_be_POS() && right_value.can_be_NEG())
+                || (left_value.can_be_POS() && right_value.can_be_ZERO());
+        if (f & t)
+            return AbstractBoolean.TOP;
+        else
+            return (f) ? AbstractBoolean.FALSE : AbstractBoolean.TRUE;
+    }
+
+    /**
+     * @return Signs.ZERO if the operand is numerically equal to this
+     *         Abstraction; Signs.NEG if this Abstraction is numerically less
+     *         than the operand; and Signs.POS if this Abstraction is
+     *         numerically greater than the operand.
+     */
+    @Override
+    public SignsValue _cmp(AbstractValue left, AbstractValue right) {
+        boolean n = false, z = false, p = false;
+        if (_gt(left, right) != AbstractBoolean.FALSE)
+            p = true;
+        if (_lt(left, right) != AbstractBoolean.FALSE)
+            n = true;
+        if (_gt(left, right) != AbstractBoolean.TRUE
+                && _lt(left, right) != AbstractBoolean.TRUE)
+            z = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
+
+    /**
+     * @return Signs.ZERO if the operand is numerically equal to this
+     *         Abstraction; Signs.NEG if this Abstraction is numerically less
+     *         than the operand; and Signs.POS if this Abstraction is
+     *         numerically greater than the operand.
+     */
+    @Override
+    public SignsValue _cmpg(AbstractValue left, AbstractValue right) {
+        boolean n = false, z = false, p = false;
+        if (_gt(left, right) != AbstractBoolean.FALSE)
+            p = true;
+        if (_lt(left, right) != AbstractBoolean.FALSE)
+            n = true;
+        if (_gt(left, right) != AbstractBoolean.TRUE
+                && _lt(left, right) != AbstractBoolean.TRUE)
+            z = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
+
+    /**
+     * @return Signs.ZERO if the operand is numerically equal to this
+     *         Abstraction; Signs.NEG if this Abstraction is numerically less
+     *         than the operand; and Signs.POS if this Abstraction is
+     *         numerically greater than the operand.
+     */
+    @Override
+    public SignsValue _cmpl(AbstractValue left, AbstractValue right) {
+        boolean n = false, z = false, p = false;
+        if (_gt(left, right) != AbstractBoolean.FALSE)
+            p = true;
+        if (_lt(left, right) != AbstractBoolean.FALSE)
+            n = true;
+        if (_gt(left, right) != AbstractBoolean.TRUE
+                && this._lt(left, right) != AbstractBoolean.TRUE)
+            z = true;
+        return SignsAbstraction.getInstance().create(n, z, p);
+    }
 
 }

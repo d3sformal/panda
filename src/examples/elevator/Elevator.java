@@ -2,7 +2,7 @@ package elevator;
 /*
  * Copyright (C) 2000 by ETHZ/INF/CS
  * All rights reserved
- * 
+ *
  * @version $Id$
  * @author Roger Karrer
  */
@@ -12,7 +12,7 @@ import java.util.*;
 public class Elevator {
 
     // shared control object
-    private Controls controls; 
+    private Controls controls;
     private Vector<ButtonPress> events;
     private Lift[] lifts;
     private int numberOfLifts;
@@ -44,7 +44,7 @@ public class Elevator {
         Thread me = Thread.currentThread();
         // First tick is 1
         int time = 1;
-    
+
         for(int i = 0; i < events.size(); ) {
             ButtonPress bp = events.elementAt(i);
             // if the current tick matches the time of th next event
@@ -60,15 +60,15 @@ public class Elevator {
             time += 1;
         }
     }
-  
+
     private void waitForLiftsToFinishOperation(){
-    	for(int i = 0; i < numberOfLifts; i++){
-    		try{
-    			lifts[i].join();
-    		}
-    		catch(InterruptedException e){
-    			System.err.println("Error while waiting for lift " + i + " to finish");
-    		}
+        for(int i = 0; i < numberOfLifts; i++){
+            try{
+                lifts[i].join();
+            }
+            catch(InterruptedException e){
+                System.err.println("Error while waiting for lift " + i + " to finish");
+            }
         }
     }
 

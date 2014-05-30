@@ -19,8 +19,8 @@ import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
  * A copy of the object reference (created by DUP instruction) may have been stored.
  */
 public class AnonymousObject extends DefaultAccessExpression implements Root, AnonymousExpression {
-	
-	private Reference reference;
+
+    private Reference reference;
     private String name;
 
     /**
@@ -28,117 +28,117 @@ public class AnonymousObject extends DefaultAccessExpression implements Root, An
      */
     private boolean duplicate;
 
-	protected AnonymousObject(Reference reference, boolean duplicate) {
+    protected AnonymousObject(Reference reference, boolean duplicate) {
         super(1);
 
-		this.reference = reference;
+        this.reference = reference;
         this.duplicate = duplicate;
-	}
-	
-	@Override
-	public Reference getReference() {
-		return reference;
-	}
-	
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		visitor.visit(this);
-	}
+    }
+
+    @Override
+    public Reference getReference() {
+        return reference;
+    }
+
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        visitor.visit(this);
+    }
 
     @Override
     public AnonymousObject createShallowCopy() {
         return this;
     }
 
-	public static AnonymousObject create(Reference reference, boolean duplicate) {
-		if (reference == null) {
-			return null;
-		}
-		
-		return new AnonymousObject(reference, duplicate);
-	}
+    public static AnonymousObject create(Reference reference, boolean duplicate) {
+        if (reference == null) {
+            return null;
+        }
 
-	public static AnonymousObject create(Reference reference) {
+        return new AnonymousObject(reference, duplicate);
+    }
+
+    public static AnonymousObject create(Reference reference) {
         return create(reference, false);
-	}
+    }
 
-	@Override
-	public Expression update(AccessExpression expression, Expression newExpression) {
-		return this;
-	}
-	
-	@Override
-	public Predicate getPreconditionForBeingFresh() {
-		return Tautology.create();
-	}
+    @Override
+    public Expression update(AccessExpression expression, Expression newExpression) {
+        return this;
+    }
 
-	@Override
-	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
-	}
+    @Override
+    public Predicate getPreconditionForBeingFresh() {
+        return Tautology.create();
+    }
 
-	@Override
-	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		return this;
-	}
+    @Override
+    public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
+    }
 
-	@Override
-	public Root getRoot() {
-		return this;
-	}
+    @Override
+    public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
+        return this;
+    }
 
-	@Override
-	public AccessExpression get(int depth) {
-		if (depth == 1) {
-			return this;
-		}
-		
-		return null;
-	}
+    @Override
+    public Root getRoot() {
+        return this;
+    }
 
-	@Override
-	public AccessExpression cutTail() {
-		return this;
-	}
+    @Override
+    public AccessExpression get(int depth) {
+        if (depth == 1) {
+            return this;
+        }
 
-	@Override
-	public AccessExpression reRoot(AccessExpression newPrefix) {
-		return newPrefix;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean isSimilarToSlow(AccessExpression expression) {
-		if (expression instanceof AnonymousObject) {
-			AnonymousObject o = (AnonymousObject) expression;
-			
-			return getReference().equals(o.getReference());
-		}
-		
-		return false;
-	}
+    @Override
+    public AccessExpression cutTail() {
+        return this;
+    }
 
-	@Override
-	public String getName() {
+    @Override
+    public AccessExpression reRoot(AccessExpression newPrefix) {
+        return newPrefix;
+    }
+
+    @Override
+    public boolean isSimilarToSlow(AccessExpression expression) {
+        if (expression instanceof AnonymousObject) {
+            AnonymousObject o = (AnonymousObject) expression;
+
+            return getReference().equals(o.getReference());
+        }
+
+        return false;
+    }
+
+    @Override
+    public String getName() {
         if (name == null) {
             name = "ref(" + reference + ")";
         }
 
         return name;
-	}
+    }
 
-	@Override
-	public boolean isEqualToSlow(AccessExpression o) {
-		if (o instanceof AnonymousObject) {
-			AnonymousObject ao = (AnonymousObject) o;
+    @Override
+    public boolean isEqualToSlow(AccessExpression o) {
+        if (o instanceof AnonymousObject) {
+            AnonymousObject ao = (AnonymousObject) o;
 
-			return getReference().equals(ao.getReference());
-		}
-		return false;
-	}
+            return getReference().equals(ao.getReference());
+        }
+        return false;
+    }
 
-	@Override
-	public int hashCode() {
-		return getReference().getReferenceNumber();
-	}
+    @Override
+    public int hashCode() {
+        return getReference().getReferenceNumber();
+    }
 
     @Override
     public boolean isDuplicate() {

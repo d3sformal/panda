@@ -24,17 +24,17 @@ import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
  * Interface for all unary operations.
- * 
+ *
  * @see gov.nasa.jpf.abstraction.bytecode.DNEG
  * @see gov.nasa.jpf.abstraction.bytecode.FNEG
  * @see gov.nasa.jpf.abstraction.bytecode.INEG
  * @see gov.nasa.jpf.abstraction.bytecode.LNEG
  */
 public interface AbstractUnaryOperator<T> {
-	public Instruction executeConcrete(ThreadInfo ti);
-	
-	public Attribute getResult(T v, Attribute attr);
+    public Instruction executeConcrete(ThreadInfo ti);
 
-	public Instruction getSelf();
-	public Instruction getNext(ThreadInfo ti);
+    public Attribute getResult(T v, Attribute attr);
+
+    public Instruction getSelf();
+    public Instruction getNext(ThreadInfo ti);
 }

@@ -10,20 +10,20 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 public class PredicatesFactory {
     private static PredicatesParser createFromString(String definition) {
-		ANTLRInputStream chars = new ANTLRInputStream(definition);
-		PredicatesLexer lexer = new PredicatesLexer(chars);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		PredicatesParser parser = new PredicatesParser(tokens);
+        ANTLRInputStream chars = new ANTLRInputStream(definition);
+        PredicatesLexer lexer = new PredicatesLexer(chars);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        PredicatesParser parser = new PredicatesParser(tokens);
 
         return parser;
     }
 
     public static Predicate createPredicateFromString(String definition) {
-		return createFromString(definition).predicate().val[0];
-	}
+        return createFromString(definition).predicate().val[0];
+    }
 
     public static AccessExpression createAccessExpressionFromString(String definition) {
-		return createFromString(definition).standalonepath().val[0];
+        return createFromString(definition).standalonepath().val[0];
     }
 
     public static Expression createExpressionFromString(String definition) {

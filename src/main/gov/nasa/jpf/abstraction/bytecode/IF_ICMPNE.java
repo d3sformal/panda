@@ -34,41 +34,41 @@ import gov.nasa.jpf.vm.Instruction;
  * ..., value1, value2 => ...
  */
 public class IF_ICMPNE extends gov.nasa.jpf.jvm.bytecode.IF_ICMPNE implements AbstractBranching {
-	
-	BinaryIfInstructionExecutor executor = new BinaryIfInstructionExecutor();
 
-	public IF_ICMPNE(int targetPc) {
-		super(targetPc);
-	}
+    BinaryIfInstructionExecutor executor = new BinaryIfInstructionExecutor();
 
-	@Override
-	public Instruction execute(ThreadInfo ti) {
-		return executor.execute(this, ti);
-	}
+    public IF_ICMPNE(int targetPc) {
+        super(targetPc);
+    }
 
-	@Override
-	public Instruction executeConcrete(ThreadInfo ti) {
-		return super.execute(ti);
-	}
+    @Override
+    public Instruction execute(ThreadInfo ti) {
+        return executor.execute(this, ti);
+    }
 
-	@Override
-	public Instruction getSelf() {
-		return this;
-	}
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
+        return super.execute(ti);
+    }
 
-	@Override
-	public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
-		return Abstraction._ne(v1, abs_v1, v2, abs_v2);
-	}
+    @Override
+    public Instruction getSelf() {
+        return this;
+    }
+
+    @Override
+    public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
+        return Abstraction._ne(v1, abs_v1, v2, abs_v2);
+    }
 
     @Override
     public TruthValue getConcreteBranchValue(int v1, int v2) {
         return TruthValue.create(v1 != v2);
     }
 
-	@Override
-	public Predicate createPredicate(Expression expr1, Expression expr2) {
-		return Negation.create(Equals.create(expr1, expr2));
-	}
+    @Override
+    public Predicate createPredicate(Expression expr1, Expression expr2) {
+        return Negation.create(Equals.create(expr1, expr2));
+    }
 
 }

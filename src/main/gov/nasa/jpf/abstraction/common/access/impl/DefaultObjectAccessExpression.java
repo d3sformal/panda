@@ -9,7 +9,7 @@ import gov.nasa.jpf.abstraction.common.access.Root;
 
 /**
  * Expressions accessing objects (fields, array elements, array length):
- * 
+ *
  * o.f
  * a[i]
  * a.length
@@ -17,57 +17,57 @@ import gov.nasa.jpf.abstraction.common.access.Root;
 public abstract class DefaultObjectAccessExpression extends DefaultAccessExpression implements ObjectAccessExpression {
 
     protected Root root;
-	private AccessExpression expression;
-	
-	protected DefaultObjectAccessExpression(AccessExpression expression) {
+    private AccessExpression expression;
+
+    protected DefaultObjectAccessExpression(AccessExpression expression) {
         super(expression.getLength() + 1);
 
         this.root = expression.getRoot();
-		this.expression = expression;
-	}
+        this.expression = expression;
+    }
 
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		expression.accept(visitor);
-	}
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        expression.accept(visitor);
+    }
 
-	@Override
-	public final AccessExpression cutTail() {
-		return getObject();
-	}
+    @Override
+    public final AccessExpression cutTail() {
+        return getObject();
+    }
 
-	@Override
-	public void setObject(AccessExpression expression) {
-		this.expression = expression;
-	}
-	
-	@Override
-	public AccessExpression getObject() {
-		return expression;
-	}
-	
-	@Override
-	public final AccessExpression get(int depth) {
-		if (depth > getLength()) {
-			return null;
-		}
-		if (depth == getLength()) {
-			return this;
-		}
-		
-		return getObject().get(depth);
-	}
+    @Override
+    public void setObject(AccessExpression expression) {
+        this.expression = expression;
+    }
+
+    @Override
+    public AccessExpression getObject() {
+        return expression;
+    }
+
+    @Override
+    public final AccessExpression get(int depth) {
+        if (depth > getLength()) {
+            return null;
+        }
+        if (depth == getLength()) {
+            return this;
+        }
+
+        return getObject().get(depth);
+    }
 
     @Override
     public abstract DefaultObjectAccessExpression createShallowCopy();
 
-	@Override
-	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
-		getObject().addAccessSubExpressionsToSet(out);
-	}
+    @Override
+    public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
+        getObject().addAccessSubExpressionsToSet(out);
+    }
 
-	@Override
-	public final Root getRoot() {
-		return root;
-	}
+    @Override
+    public final Root getRoot() {
+        return root;
+    }
 }

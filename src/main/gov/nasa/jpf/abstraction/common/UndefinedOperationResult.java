@@ -10,33 +10,33 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 public class UndefinedOperationResult extends Operation implements Undefined {
 
     private static UndefinedOperationResult instance;
-	
-	protected UndefinedOperationResult() {
-		super(null, null);
-	}
 
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		visitor.visit(this);
-	}
-	
-	public static UndefinedOperationResult create() {
-		//return new UndefinedOperationResult();
+    protected UndefinedOperationResult() {
+        super(null, null);
+    }
+
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    public static UndefinedOperationResult create() {
+        //return new UndefinedOperationResult();
         if (instance == null) {
             instance = new UndefinedOperationResult();
         }
 
         return instance;
-	}
+    }
 
-	@Override
-	public Expression replace(Map<AccessExpression, Expression> replacements) {
-		return this;
-	}
-
-	@Override
-	public Expression update(AccessExpression expression, Expression newExpression) {
+    @Override
+    public Expression replace(Map<AccessExpression, Expression> replacements) {
         return this;
-	}
+    }
+
+    @Override
+    public Expression update(AccessExpression expression, Expression newExpression) {
+        return this;
+    }
 
 }

@@ -51,7 +51,7 @@ public class UniverseObject extends HeapValue implements Associative {
     public Map<FieldName, UniverseSlot> getFields() {
         return fields;
     }
-    
+
     @Override
     public void addSlot(UniverseSlotKey slotKey, UniverseSlot slot) {
         fields.put((FieldName) slotKey, slot);

@@ -11,26 +11,26 @@ import java.util.Set;
  * A common ancestor for +, -, *, /, % ... (all binary operations over symbolic expressions)
  */
 public abstract class Operation extends DefaultPrimitiveExpression {
-	public Expression a;
-	public Expression b;
-	
-	protected Operation(Expression a, Expression b) {
-		this.a = a;
-		this.b = b;
-	}
-	
-	@Override
-	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
-		a.addAccessExpressionsToSet(out);
-		b.addAccessExpressionsToSet(out);
-	}
-	
-	protected static boolean argumentsDefined(Expression a, Expression b) {
-		return a != null && b != null;
-	}
-	
-	@Override
-	public Predicate getPreconditionForBeingFresh() {
-		return Disjunction.create(a.getPreconditionForBeingFresh(), b.getPreconditionForBeingFresh());
-	}
+    public Expression a;
+    public Expression b;
+
+    protected Operation(Expression a, Expression b) {
+        this.a = a;
+        this.b = b;
+    }
+
+    @Override
+    public void addAccessExpressionsToSet(Set<AccessExpression> out) {
+        a.addAccessExpressionsToSet(out);
+        b.addAccessExpressionsToSet(out);
+    }
+
+    protected static boolean argumentsDefined(Expression a, Expression b) {
+        return a != null && b != null;
+    }
+
+    @Override
+    public Predicate getPreconditionForBeingFresh() {
+        return Disjunction.create(a.getPreconditionForBeingFresh(), b.getPreconditionForBeingFresh());
+    }
 }

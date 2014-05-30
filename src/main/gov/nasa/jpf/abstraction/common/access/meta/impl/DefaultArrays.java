@@ -12,29 +12,29 @@ import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 public class DefaultArrays implements Arrays {
     private static DefaultArrays instance;
 
-	public static DefaultArrays create() {
+    public static DefaultArrays create() {
         if (instance == null) {
             instance = new DefaultArrays();
         }
 
         return instance;
-	}
+    }
 
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		visitor.visit(this);
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof DefaultArrays) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
-	}
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof DefaultArrays) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
+    }
 }

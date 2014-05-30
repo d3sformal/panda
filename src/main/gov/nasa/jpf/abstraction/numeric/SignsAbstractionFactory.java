@@ -7,11 +7,11 @@ import gov.nasa.jpf.Config;
 
 public class SignsAbstractionFactory extends AbstractionFactory {
 
-	@Override
-	public Abstraction create(Config config, String[] args) {
-		System.out.printf("### jpf-abstraction: SIGNS turned on\n");
+    @Override
+    public Abstraction create(Config config, String[] args) {
+        System.out.printf("### jpf-abstraction: SIGNS turned on\n");
 
-		return SignsAbstraction.getInstance();
-	}
+        return SignsAbstraction.getInstance();
+    }
 
 }

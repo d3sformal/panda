@@ -13,36 +13,36 @@ public class DefaultFresh extends DefaultRoot implements Fresh {
 
     private static DefaultFresh instance;
 
-	protected DefaultFresh() {
-		super("fresh");
-	}
-	
-	public static DefaultFresh create() {
-		//return new DefaultFresh();
+    protected DefaultFresh() {
+        super("fresh");
+    }
+
+    public static DefaultFresh create() {
+        //return new DefaultFresh();
         if (instance == null) {
             instance = new DefaultFresh();
         }
 
         return instance;
-	}
-	
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		visitor.visit(this);
-	}
+    }
+
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        visitor.visit(this);
+    }
 
     @Override
     public DefaultFresh createShallowCopy() {
         return this;
     }
-	
-	@Override
-	public boolean isEqualToSlow(AccessExpression o) {
-		return false;
-	}
-	
-	@Override
-	public Predicate getPreconditionForBeingFresh() {
-		return Tautology.create();
-	}
+
+    @Override
+    public boolean isEqualToSlow(AccessExpression o) {
+        return false;
+    }
+
+    @Override
+    public Predicate getPreconditionForBeingFresh() {
+        return Tautology.create();
+    }
 }

@@ -27,48 +27,48 @@ import gov.nasa.jpf.vm.StackFrame;
  */
 public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Integer> {
 
-	private static IntegerBinaryOperatorExecutor instance;
+    private static IntegerBinaryOperatorExecutor instance;
 
-	public static IntegerBinaryOperatorExecutor getInstance() {
-		if (instance == null) {
-			instance = new IntegerBinaryOperatorExecutor();
-		}
-		
-		return instance;
-	}
-	
-	@Override
-	protected Attribute getLeftAttribute(StackFrame sf) {
-		return getAttribute(sf, 1);
-	}
+    public static IntegerBinaryOperatorExecutor getInstance() {
+        if (instance == null) {
+            instance = new IntegerBinaryOperatorExecutor();
+        }
 
-	@Override
-	protected Attribute getRightAttribute(StackFrame sf) {
-		return getAttribute(sf, 0);
-	}
+        return instance;
+    }
 
-	@Override
-	protected Integer getLeftOperand(StackFrame sf) {
-		return sf.peek(1);
-	}
+    @Override
+    protected Attribute getLeftAttribute(StackFrame sf) {
+        return getAttribute(sf, 1);
+    }
 
-	@Override
-	protected Integer getRightOperand(StackFrame sf) {
-		return sf.peek(0);
-	}
-	
-	@Override
-	final protected void storeAttribute(Attribute result, StackFrame sf) {
-		sf.setOperandAttr(result);
-	}
+    @Override
+    protected Attribute getRightAttribute(StackFrame sf) {
+        return getAttribute(sf, 0);
+    }
 
-	@Override
-	protected void storeResult(Attribute result, StackFrame sf) {
-		sf.pop();
-		sf.pop();
-		
-		sf.push(0);
-		storeAttribute(result, sf);
-	}
+    @Override
+    protected Integer getLeftOperand(StackFrame sf) {
+        return sf.peek(1);
+    }
+
+    @Override
+    protected Integer getRightOperand(StackFrame sf) {
+        return sf.peek(0);
+    }
+
+    @Override
+    final protected void storeAttribute(Attribute result, StackFrame sf) {
+        sf.setOperandAttr(result);
+    }
+
+    @Override
+    protected void storeResult(Attribute result, StackFrame sf) {
+        sf.pop();
+        sf.pop();
+
+        sf.push(0);
+        storeAttribute(result, sf);
+    }
 
 }

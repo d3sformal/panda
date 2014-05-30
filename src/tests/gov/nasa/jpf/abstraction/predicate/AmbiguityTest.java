@@ -40,14 +40,14 @@ public class AmbiguityTest extends BaseTest
         c.z = 3;
 
         b = a.x;
-	
-		assertConjunction("b.y.z = 0: true");
+
+        assertConjunction("b.y.z = 0: true");
 
         a.x.y = c;
 
-		assertConjunction("b.y.z = 3: true");
+        assertConjunction("b.y.z = 3: true");
 
-		assertAliased("c", "b.y");
+        assertAliased("c", "b.y");
 
         // STATIC
 

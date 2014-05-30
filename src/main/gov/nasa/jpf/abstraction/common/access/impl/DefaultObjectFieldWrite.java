@@ -16,110 +16,110 @@ import gov.nasa.jpf.abstraction.common.Predicate;
  */
 public class DefaultObjectFieldWrite extends DefaultObjectFieldExpression implements ObjectFieldWrite {
 
-	private Expression newValue;
+    private Expression newValue;
     private Integer hashCodeValue;
 
-	protected DefaultObjectFieldWrite(AccessExpression object, String name, Expression newValue) {
-		this(object, DefaultField.create(name), newValue);
-	}
-	
-	protected DefaultObjectFieldWrite(AccessExpression object, Field field, Expression newValue) {
-		super(object, field);
-		
-		this.newValue = newValue;
-	}
-	
-	@Override
-	public Expression getNewValue() {
-		return newValue;
-	}
-	
-	public static DefaultObjectFieldWrite create(AccessExpression object, String name, Expression newValue) {
-		if (object == null || name == null || newValue == null) {
-			return null;
-		}
-		
-		return new DefaultObjectFieldWrite(object, name, newValue);
-	}
-	
-	public static DefaultObjectFieldWrite create(AccessExpression object, Field field, Expression newValue) {
-		if (object == null || field == null || newValue == null) {
-			return null;
-		}
-		
-		return new DefaultObjectFieldWrite(object, field, newValue);
-	}
-	
-	@Override
-	public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
-		super.addAccessSubExpressionsToSet(out);
-		
-		newValue.addAccessExpressionsToSet(out);
-	}
-	
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		visitor.visit(this);
-	}
+    protected DefaultObjectFieldWrite(AccessExpression object, String name, Expression newValue) {
+        this(object, DefaultField.create(name), newValue);
+    }
+
+    protected DefaultObjectFieldWrite(AccessExpression object, Field field, Expression newValue) {
+        super(object, field);
+
+        this.newValue = newValue;
+    }
+
+    @Override
+    public Expression getNewValue() {
+        return newValue;
+    }
+
+    public static DefaultObjectFieldWrite create(AccessExpression object, String name, Expression newValue) {
+        if (object == null || name == null || newValue == null) {
+            return null;
+        }
+
+        return new DefaultObjectFieldWrite(object, name, newValue);
+    }
+
+    public static DefaultObjectFieldWrite create(AccessExpression object, Field field, Expression newValue) {
+        if (object == null || field == null || newValue == null) {
+            return null;
+        }
+
+        return new DefaultObjectFieldWrite(object, field, newValue);
+    }
+
+    @Override
+    public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
+        super.addAccessSubExpressionsToSet(out);
+
+        newValue.addAccessExpressionsToSet(out);
+    }
+
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        visitor.visit(this);
+    }
 
     @Override
     public DefaultObjectFieldWrite createShallowCopy() {
         return create(getObject(), getName(), getNewValue());
     }
-	
-	@Override
-	public String getName() {
-		return getField().getName();
-	}
-	
-	@Override
-	public AccessExpression reRoot(AccessExpression newPrefix) {
-		return create(newPrefix, getField(), getNewValue());
-	}
-	
-	@Override
-	public boolean isEqualToSlow(AccessExpression o) {
-		if (o instanceof ObjectFieldWrite) {
-			ObjectFieldWrite w = (ObjectFieldWrite) o;
-			
-			return getObject().isEqualToSlow(w.getObject()) && getField().equals(w.getField()) && getNewValue().equals(w.getNewValue());
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public boolean isSimilarToSlow(AccessExpression expression) {
-		if (expression instanceof ObjectFieldWrite) {
-			ObjectFieldWrite w = (ObjectFieldWrite) expression;
-			
-			return getObject().isSimilarToSlow(w.getObject());
-		}
-		
-		return false;
-	}
-	
-	@Override
-	public int hashCode() {
+
+    @Override
+    public String getName() {
+        return getField().getName();
+    }
+
+    @Override
+    public AccessExpression reRoot(AccessExpression newPrefix) {
+        return create(newPrefix, getField(), getNewValue());
+    }
+
+    @Override
+    public boolean isEqualToSlow(AccessExpression o) {
+        if (o instanceof ObjectFieldWrite) {
+            ObjectFieldWrite w = (ObjectFieldWrite) o;
+
+            return getObject().isEqualToSlow(w.getObject()) && getField().equals(w.getField()) && getNewValue().equals(w.getNewValue());
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean isSimilarToSlow(AccessExpression expression) {
+        if (expression instanceof ObjectFieldWrite) {
+            ObjectFieldWrite w = (ObjectFieldWrite) expression;
+
+            return getObject().isSimilarToSlow(w.getObject());
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
         if (hashCodeValue == null) {
-		    hashCodeValue = ("write_field_" + getObject().hashCode() + "_" + getField().getName().hashCode() + "_" + getNewValue().hashCode()).hashCode();
+            hashCodeValue = ("write_field_" + getObject().hashCode() + "_" + getField().getName().hashCode() + "_" + getNewValue().hashCode()).hashCode();
         }
 
         return hashCodeValue;
-	}
-	
-	@Override
-	public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
-		AccessExpression newO = getObject().replaceSubExpressions(replacements);
-		Expression newNV = getNewValue().replace(replacements);
+    }
 
-		if (newO == getObject() && newNV == getNewValue()) return this;
-		else return create(newO, getField(), newNV);
-	}
+    @Override
+    public AccessExpression replaceSubExpressions(Map<AccessExpression, Expression> replacements) {
+        AccessExpression newO = getObject().replaceSubExpressions(replacements);
+        Expression newNV = getNewValue().replace(replacements);
 
-	@Override
-	public Predicate getPreconditionForBeingFresh() {		
-		return getNewValue().getPreconditionForBeingFresh();
-	}
+        if (newO == getObject() && newNV == getNewValue()) return this;
+        else return create(newO, getField(), newNV);
+    }
+
+    @Override
+    public Predicate getPreconditionForBeingFresh() {
+        return getNewValue().getPreconditionForBeingFresh();
+    }
 
 }

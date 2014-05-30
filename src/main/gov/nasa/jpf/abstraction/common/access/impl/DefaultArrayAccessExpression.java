@@ -7,15 +7,15 @@ import gov.nasa.jpf.abstraction.common.access.ArrayAccessExpression;
  * Access expressions specific to arrays (element/length read: a[0], a.length)
  */
 public abstract class DefaultArrayAccessExpression extends DefaultObjectAccessExpression implements ArrayAccessExpression {
-	
-	protected DefaultArrayAccessExpression(AccessExpression expression) {
-		super(expression);
-	}
 
-	@Override
-	public AccessExpression getArray() {
-		return getObject();
-	}
+    protected DefaultArrayAccessExpression(AccessExpression expression) {
+        super(expression);
+    }
+
+    @Override
+    public AccessExpression getArray() {
+        return getObject();
+    }
 
     @Override
     public abstract DefaultArrayAccessExpression createShallowCopy();

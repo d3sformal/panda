@@ -68,7 +68,7 @@ public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSer
                 out.print("\t\t" + key + ": ");
 
                 boolean first = true;
-                
+
                 for (StructuredValueIdentifier id : ((StructuredValueSlot) slot).getPossibleStructuredValues()) {
                     if (!first) {
                         out.print(" | ");
@@ -139,7 +139,7 @@ public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSer
         }
 
 
-		out.println();
+        out.println();
         out.println("======== Heap ========");
 
         for (Reference ref : references) {
@@ -211,22 +211,22 @@ public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSer
 
     @Override
     protected void serializeFrame(StackFrame frame) {
-		if ( ! frame.isSynthetic() ) {
-	        out.println("\t" + "frame [depth = " + depth + "]");
+        if ( ! frame.isSynthetic() ) {
+            out.println("\t" + "frame [depth = " + depth + "]");
 
-			Instruction pcInsn = frame.getPC();
-			String pcSourceLine = (pcInsn.getSourceLine() != null) ? pcInsn.getSourceLine().trim() : "";
-			out.println("\t\t" + "pc: " + frame.getMethodInfo().getFullName() + "[" + pcInsn.getPosition() + "]");
-			out.println("\t\t\t" + "source line: " + pcSourceLine);
-			out.println("\t\t\t" + "instruction: " + pcInsn.getMnemonic());
-		}
+            Instruction pcInsn = frame.getPC();
+            String pcSourceLine = (pcInsn.getSourceLine() != null) ? pcInsn.getSourceLine().trim() : "";
+            out.println("\t\t" + "pc: " + frame.getMethodInfo().getFullName() + "[" + pcInsn.getPosition() + "]");
+            out.println("\t\t\t" + "source line: " + pcSourceLine);
+            out.println("\t\t\t" + "instruction: " + pcInsn.getMnemonic());
+        }
 
         super.serializeFrame(frame);
     }
 
     @Override
     protected void serializeStackFrames(ThreadInfo threadInfo) {
-		out.println();
+        out.println();
         out.println("======== Thread ========");
         out.println("\t" + "id: " + threadInfo.getId());
         out.println("\t" + "state: " + threadInfo.getState());

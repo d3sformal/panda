@@ -13,36 +13,36 @@ import java.util.Map;
 public class Tautology extends Predicate {
 
     private static Tautology instance;
-	
-	protected Tautology() {
-	}
 
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		visitor.visit(this);
-	}
+    protected Tautology() {
+    }
 
-	@Override
-	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
-	}
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        visitor.visit(this);
+    }
 
-	@Override
-	public Predicate replace(Map<AccessExpression, Expression> replacements) {
-		return this;
-	}
-	
-	public static Predicate create() {
-		//return new Tautology();
+    @Override
+    public void addAccessExpressionsToSet(Set<AccessExpression> out) {
+    }
+
+    @Override
+    public Predicate replace(Map<AccessExpression, Expression> replacements) {
+        return this;
+    }
+
+    public static Predicate create() {
+        //return new Tautology();
         if (instance == null) {
             instance = new Tautology();
         }
 
         return instance;
-	}
-	
-	@Override
-	public Predicate update(AccessExpression expression, Expression newExpression) {
-		return this;
-	}
+    }
+
+    @Override
+    public Predicate update(AccessExpression expression, Expression newExpression) {
+        return this;
+    }
 
 }

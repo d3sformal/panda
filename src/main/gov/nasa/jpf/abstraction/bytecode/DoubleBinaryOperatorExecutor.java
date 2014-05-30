@@ -27,48 +27,48 @@ import gov.nasa.jpf.vm.StackFrame;
  */
 public class DoubleBinaryOperatorExecutor extends BinaryOperatorExecutor<Double> {
 
-	private static DoubleBinaryOperatorExecutor instance;
+    private static DoubleBinaryOperatorExecutor instance;
 
-	public static DoubleBinaryOperatorExecutor getInstance() {
-		if (instance == null) {
-			instance = new DoubleBinaryOperatorExecutor();
-		}
-		
-		return instance;
-	}
+    public static DoubleBinaryOperatorExecutor getInstance() {
+        if (instance == null) {
+            instance = new DoubleBinaryOperatorExecutor();
+        }
 
-	@Override
-	protected Attribute getLeftAttribute(StackFrame sf) {
-		return getAttribute(sf, 3);
-	}
+        return instance;
+    }
 
-	@Override
-	protected Attribute getRightAttribute(StackFrame sf) {
-		return getAttribute(sf, 1);
-	}
+    @Override
+    protected Attribute getLeftAttribute(StackFrame sf) {
+        return getAttribute(sf, 3);
+    }
 
-	@Override
-	final protected Double getLeftOperand(StackFrame sf) {
-		return sf.peekDouble(2);
-	}
+    @Override
+    protected Attribute getRightAttribute(StackFrame sf) {
+        return getAttribute(sf, 1);
+    }
 
-	@Override
-	final protected Double getRightOperand(StackFrame sf) {
-		return sf.peekDouble(0);
-	}
-	
-	@Override
-	final protected void storeAttribute(Attribute result, StackFrame sf) {
-		sf.setLongOperandAttr(result);
-	}
+    @Override
+    final protected Double getLeftOperand(StackFrame sf) {
+        return sf.peekDouble(2);
+    }
 
-	@Override
-	final protected void storeResult(Attribute result, StackFrame sf) {
-		sf.popDouble();
-		sf.popDouble();
-		
-		sf.pushDouble(0);
-		storeAttribute(result, sf);
-	}
+    @Override
+    final protected Double getRightOperand(StackFrame sf) {
+        return sf.peekDouble(0);
+    }
+
+    @Override
+    final protected void storeAttribute(Attribute result, StackFrame sf) {
+        sf.setLongOperandAttr(result);
+    }
+
+    @Override
+    final protected void storeResult(Attribute result, StackFrame sf) {
+        sf.popDouble();
+        sf.popDouble();
+
+        sf.pushDouble(0);
+        storeAttribute(result, sf);
+    }
 
 }

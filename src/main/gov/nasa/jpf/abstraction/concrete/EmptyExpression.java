@@ -17,41 +17,41 @@ import gov.nasa.jpf.abstraction.common.impl.DefaultExpression;
 public class EmptyExpression extends DefaultExpression {
 
     private static EmptyExpression instance;
-	
-	protected EmptyExpression() {
-	}
 
-	@Override
-	public void addAccessExpressionsToSet(Set<AccessExpression> out) {
-	}
+    protected EmptyExpression() {
+    }
 
-	@Override
-	public void accept(PredicatesComponentVisitor visitor) {
-		visitor.visit(this);
-	}
-	
-	public static EmptyExpression create() {
-		//return new EmptyExpression();
+    @Override
+    public void addAccessExpressionsToSet(Set<AccessExpression> out) {
+    }
+
+    @Override
+    public void accept(PredicatesComponentVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    public static EmptyExpression create() {
+        //return new EmptyExpression();
         if (instance == null) {
             instance = new EmptyExpression();
         }
 
         return instance;
-	}
-	
-	@Override
-	public Expression update(AccessExpression expression, Expression newExpression) {
-		return this;
-	}
+    }
 
-	@Override
-	public Predicate getPreconditionForBeingFresh() {
-		return Contradiction.create();
-	}
+    @Override
+    public Expression update(AccessExpression expression, Expression newExpression) {
+        return this;
+    }
 
-	@Override
-	public Expression replace(Map<AccessExpression, Expression> replacements) {
-		return this;
-	}
+    @Override
+    public Predicate getPreconditionForBeingFresh() {
+        return Contradiction.create();
+    }
+
+    @Override
+    public Expression replace(Map<AccessExpression, Expression> replacements) {
+        return this;
+    }
 
 }

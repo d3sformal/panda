@@ -6,8 +6,8 @@ import gov.nasa.jpf.abstraction.common.ArrayExpression;
  * Access expressions specific to arrays (element/length read: a[0], a.length)
  */
 public interface ArrayAccessExpression extends ObjectAccessExpression, ArrayExpression {
-	public AccessExpression getArray();
-	
+    public AccessExpression getArray();
+
     @Override
     public ArrayAccessExpression createShallowCopy();
 }

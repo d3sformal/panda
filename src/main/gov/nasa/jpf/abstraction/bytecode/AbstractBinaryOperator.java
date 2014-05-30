@@ -26,10 +26,10 @@ import gov.nasa.jpf.vm.ThreadInfo;
  * Interface for all binary arithmetic operations, comparisons
  */
 public interface AbstractBinaryOperator<T> {
-	public Instruction executeConcrete(ThreadInfo ti);
-	
-	public Attribute getResult(T v1, Attribute attr1, T v2, Attribute attr2);
+    public Instruction executeConcrete(ThreadInfo ti);
 
-	public Instruction getSelf();
-	public Instruction getNext(ThreadInfo ti);
+    public Attribute getResult(T v1, Attribute attr1, T v2, Attribute attr2);
+
+    public Instruction getSelf();
+    public Instruction getNext(ThreadInfo ti);
 }
