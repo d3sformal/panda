@@ -46,7 +46,7 @@ public class DASTORE extends gov.nasa.jpf.jvm.bytecode.DASTORE {
     @Override
     public Instruction execute(ThreadInfo ti) {
         StackFrame sf = ti.getTopFrame();
-        Expression from = Attribute.getExpression(sf.getOperandAttr(1));
+        Expression from = Attribute.getExpression(sf.getLongOperandAttr());
         Expression index = Attribute.getExpression(sf.getOperandAttr(2));
         AccessExpression to = Attribute.getAccessExpression(sf.getOperandAttr(3));
         AccessExpression element = DefaultArrayElementRead.create(to, index);

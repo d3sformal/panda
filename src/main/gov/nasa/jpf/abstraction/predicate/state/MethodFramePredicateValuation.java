@@ -122,6 +122,10 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return clone;
     }
 
+    /**
+     * @param candidatePaths a space to put paths to. Optimized to avoid new allocations at each invocation
+     * @param prefixes a space to put prefixes to. Optimized to avoid new allocations at each invocation
+     */
     private static boolean shareSymbols(Predicate candidate, Set<AccessExpression> paths, Set<AccessExpression> candidatePaths, Set<AccessExpression> prefixes) {
         candidatePaths.clear();
         candidate.addAccessExpressionsToSet(candidatePaths);
@@ -182,7 +186,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             // Currently discovered elements of the closure
             Set<Predicate> cur;
 
-            // All will eventually contain the entire closure
+            // This set will eventually contain the entire closure
             Set<Predicate> all = new HashSet<Predicate>();
 
             // Elements of the closure that have not yet been processed to obtain other elements
@@ -317,15 +321,16 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         // Change of the set of predicates -> need to recompute determinant sets
         if (!containsKey(predicate)) {
             // Least effort
-            //  - It is sufficient to "invalidate" the cache, let it be recomputed next time an element is requested
+            // It is sufficient to "invalidate" the cache, let it be recomputed next time an element is requested
             //sharedSymbolCache.clear();
 
             // Most effort
-            //  - An alternative approach - extend all cached sets if they should also contain the newly added predicate
+            // An alternative approach: extend all cached sets if they should also contain the newly added predicate
             Set<AccessExpression> paths = new HashSet<AccessExpression>();
             Set<AccessExpression> candidatePaths = new HashSet<AccessExpression>();
             Set<AccessExpression> prefixes = new HashSet<AccessExpression>();
 
+            // Update cache of symbols (access expressions) between predicates
             for (Predicate p : sharedSymbolCache.keySet()) {
                 paths.clear();
                 p.addAccessExpressionsToSet(paths);
@@ -336,8 +341,9 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                     for (Predicate q : sharedSymbolCache.get(p)) {
                         paths.clear();
                         q.addAccessExpressionsToSet(paths);
-                        if (shareSymbols(predicate, paths, candidatePaths, prefixes)) {
+                        if (UhareSymbols(predicate, paths, candidatePaths, prefixes)) {
                             shouldBeAdded = true;
+                            break;
                         }
                     }
                     if (shouldBeAdded) {
@@ -395,7 +401,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return ret.toString();
     }
 
-    private boolean determinesConcreteValueOfAccessExpression(Predicate predicate) {
+    private boolean determinesExactConcreteValueOfAccessExpression(Predicate predicate) {
         TruthValue valuation = TruthValue.TRUE;
 
         while (predicate instanceof Negation) {
@@ -439,7 +445,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         }
     }
 
-    private boolean forbidsConcreteValueOfAccessExpression(Predicate predicate) {
+    private boolean forbidsExactConcreteValueOfAccessExpression(Predicate predicate) {
         TruthValue valuation = TruthValue.FALSE;
 
         while (predicate instanceof Negation) {
@@ -448,6 +454,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             valuation = TruthValue.neg(valuation);
         }
 
+        // There is no GreaterThan relation
         if ((predicate instanceof Equals && valuations.get(predicate) == valuation) || predicate instanceof LessThan) {
             Comparison c = (Comparison) predicate;
 
@@ -468,11 +475,11 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
     private void collectDeterminants(Predicate predicate, Map<Predicate, TruthValue> determinants, Map<AccessExpression, Predicate> equalities, Map<AccessExpression, Set<Predicate>> inequalities) {
         for (Predicate determinant : computeDeterminantClosure(predicate, valuations.keySet())) {
-            if (determinesConcreteValueOfAccessExpression(determinant)) {
+            if (determinesExactConcreteValueOfAccessExpression(determinant)) {
                 AccessExpression expression = getAccessExpression(determinant);
 
                 equalities.put(expression, determinant);
-            } else if (forbidsConcreteValueOfAccessExpression(determinant)) {
+            } else if (forbidsExactConcreteValueOfAccessExpression(determinant)) {
                 AccessExpression expression = getAccessExpression(determinant);
 
                 if (!inequalities.containsKey(expression)) {
@@ -565,7 +572,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                 Map<Predicate, TruthValue> determinantsOrig = new HashMap<Predicate, TruthValue>();
 
                 collectDeterminants(positiveWeakestPrecondition, determinants, equalities, inequalities);
-                // SHOULD NOT BE NECESSARY
+                // This is not necessary
                 //collectDeterminants(negativeWeakestPrecondition, determinants, equalities, inequalities);
 
                 predicates.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
@@ -585,8 +592,8 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         putAll(newValuations);
 
         /**
-         * Aliasing cannot be changed when only primitive data is affected
-         * It is not necessary to update predicates expressing the aliasing
+         * Aliasing cannot be changed when only variables of primitive data types are affected
+         * It is not necessary to update predicates that express aliasing
          */
         MethodFrameSymbolTable sym = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
         if (!sym.isPrimitive(affected)) {
@@ -746,7 +753,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                 Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 
                 collectDeterminants(positiveWeakestPrecondition, determinants, equalities, inequalities);
-                // SHOULD NOT BE NECESSARY
+                // This is not necessary
                 //collectDeterminants(negativeWeakestPrecondition, determinants, equalities, inequalities);
 
                 input.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));

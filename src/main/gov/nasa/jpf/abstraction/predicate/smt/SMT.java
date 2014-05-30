@@ -655,14 +655,6 @@ public class SMT {
     private static String createFormula(Predicate valueConstraint, List<Pair<Predicate, TruthValue>> determinants, Set<Predicate> additionalClauses) {
         Predicate formula = valueConstraint;
 
-        /*
-        java.util.Collections.sort(determinants, new java.util.Comparator<Pair<Predicate, TruthValue>>() {
-            public int compare(Pair<Predicate, TruthValue> p1, Pair<Predicate, TruthValue> p2) {
-                return p1.getFirst().toString().compareTo(p2.getFirst().toString());
-            }
-        });
-        */
-
         for (Pair<Predicate, TruthValue> pair : determinants) {
             Predicate determinant = pair.getFirst();
             TruthValue value = pair.getSecond();
