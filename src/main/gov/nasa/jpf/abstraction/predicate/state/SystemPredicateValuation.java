@@ -201,11 +201,9 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                 for (Predicate predicate : context.predicates) {
                     Set<Predicate> inconsistent = valuation.getPredicatesInconsistentWith(predicate, TruthValue.TRUE);
 
-                    for (Predicate inconsistentPredicate : inconsistent) {
-                        System.out.println("Warning: forced value of `" + predicate + "` is inconsistent with `" + inconsistentPredicate + "`");
-                    }
-
                     if (!inconsistent.isEmpty()) {
+                        System.out.println("Warning: forced value of `" + predicate + "` is inconsistent with " + inconsistent);
+
                         throw new RuntimeException("Trying to make an inconsistent assumption");
                     }
 

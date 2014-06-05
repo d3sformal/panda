@@ -7,16 +7,20 @@ import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.predicate.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
@@ -29,6 +33,7 @@ import gov.nasa.jpf.vm.LocalVarInfo;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Implementation of all binary IF instructions regardless their precise type.
@@ -130,10 +135,26 @@ public class BinaryIfInstructionExecutor {
             if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.pruning")) {
                 ss.setIgnored(true);
             } else if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.adjusting_concrete_values")) {
-                Map<AccessExpression, Integer> consistentValues = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getPredicateValuation().get(0).getConcreteState();
+                Map<AccessExpression, ElementInfo> primitiveExprs = new HashMap<AccessExpression, ElementInfo>();
+                Set<AccessExpression> allExprs = new HashSet<AccessExpression>();
 
-                for (AccessExpression expr : consistentValues.keySet()) {
-                    injectConcreteValueIntoJPFState(expr, consistentValues.get(expr), ti, sf);
+                ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getPredicateValuation().get(0).addAccessExpressionsToSet(allExprs);
+                collectAllStateExpressions(primitiveExprs, allExprs, sf, ti);
+
+                ElementInfo[] targetArray = new ElementInfo[primitiveExprs.keySet().size()];
+                AccessExpression[] exprArray = new AccessExpression[primitiveExprs.keySet().size()];
+
+                int i = 0;
+                for (AccessExpression expr : primitiveExprs.keySet()) {
+                    exprArray[i] = expr;
+                    targetArray[i] = primitiveExprs.get(expr);
+                    ++i;
+                }
+
+                int[] valueArray = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getPredicateValuation().get(0).getConcreteState(exprArray);
+
+                for (int j = 0; j < exprArray.length; ++j) {
+                    injectConcreteValueIntoJPFState(exprArray[j], valueArray[j], targetArray[j], sf, ti);
                 }
             }
         }
@@ -141,67 +162,90 @@ public class BinaryIfInstructionExecutor {
         return (conditionValue ? br.getTarget() : br.getNext(ti));
     }
 
-    private void injectConcreteValueIntoJPFState(AccessExpression expr, int value, ThreadInfo ti, StackFrame sf) {
-        if (expr.getRoot() instanceof AnonymousExpression) {
-            // ...
-        } else if (expr.isStatic()) {
-            Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
+    // Collects all deterministic (no non-constant array index) access expressions that point to primitive data contributing to the current concrete state
+    // The set of access expressions is restricted to the current scope
+    private void collectAllStateExpressions(Map<AccessExpression, ElementInfo> stateExprs, Set<AccessExpression> allExprs, StackFrame sf, ThreadInfo ti) {
+        Set<UniverseIdentifier> cls = new HashSet<UniverseIdentifier>();
 
-            ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0).lookupValues(expr.getRoot(), values);
+        for (AccessExpression expr : allExprs) {
+            Root root = expr.getRoot();
 
-            assert values.size() == 1;
-            // ...
-        } else {
-            if (expr.isLocalVariable()) {
-                LocalVarInfo lvi = sf.getLocalVarInfo(expr.getRoot().getName());
+            if (root.isLocalVariable()) {
+                int idx = sf.getLocalVariableSlotIndex(root.getName());
 
-                // Update only variables that are in scope
-                if (lvi != null) {
-                    sf.setLocalVariable(lvi.getSlotIndex(), value);
+                if (idx >= 0) {
+                    if (sf.isLocalVariableRef(idx)) {
+                        collectStateExpressions(stateExprs, ti, ti.getElementInfo(sf.getLocalVariable(idx)), expr, 2, root);
+                    } else {
+                        stateExprs.put(root, null);
+                    }
                 }
-            } else {
-                Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
+            } else if (root.isStatic()) {
+                cls.clear();
 
-                ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0).lookupValues(expr.getRoot(), values);
+                ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0).lookupValues(root, cls);
 
-                assert values.size() == 1;
+                assert cls.size() == 1;
 
-                Reference r = (Reference) values.iterator().next();
+                ClassName clsName = (ClassName) cls.iterator().next();
 
-                ElementInfo ei = r.getElementInfo();
-
-                injectConcreteValueIntoJPFElement(ei, expr, 2, value, ti);
+                collectStateExpressions(stateExprs, ti, clsName.getStaticElementInfo(), expr, 2, root);
             }
         }
     }
 
-    private void injectConcreteValueIntoJPFElement(ElementInfo ei, AccessExpression expr, int i, int value, ThreadInfo ti) {
-        if (i == expr.getLength()) {
-            if (expr.get(i) instanceof ObjectFieldRead) {
-                ObjectFieldRead r = (ObjectFieldRead) expr.get(i);
+    private void collectStateExpressions(Map<AccessExpression, ElementInfo> stateExprs, ThreadInfo ti, ElementInfo parent, AccessExpression expr, int i, AccessExpression prefix) {
+        if (i < expr.getLength()) {
+            AccessExpression access = expr.get(i);
 
-                ei.setIntField(r.getField().getName(), value);
-            } else {
-                ArrayElementRead r = (ArrayElementRead) expr.get(i);
+            if (access instanceof ObjectFieldRead) {
+                ObjectFieldRead r = (ObjectFieldRead) access;
 
-                //Exact value of the index? (may have changed)
-                //ei.getArrayFields().setIntValue(r.getIndex(), value);
+                if (parent.getClassInfo().getInstanceField(r.getField().getName()).isReference()) {
+                    collectStateExpressions(stateExprs, ti, ti.getElementInfo(parent.getReferenceField(r.getField().getName())), expr, i + 1, r.reRoot(prefix));
+                } else {
+                    stateExprs.put(r.reRoot(prefix), parent);
+                }
+            } else if (access instanceof ArrayElementRead) {
+                ArrayElementRead r = (ArrayElementRead) access;
+                int[] indices;
+
+                if (r.getIndex() instanceof Constant) {
+                    indices = new int[] {((Constant) r.getIndex()).value.intValue()};
+                } else {
+                    indices = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).computeAllExpressionValuesInRange(r.getIndex(), 0, parent.arrayLength());
+                }
+
+                for (int index : indices) {
+                    if (parent.isReferenceArray()) {
+                        collectStateExpressions(stateExprs, ti, ti.getElementInfo(parent.getArrayFields().getReferenceValue(index)), expr, i + 1, DefaultArrayElementRead.create(prefix, Constant.create(index)));
+                    } else {
+                        stateExprs.put(DefaultArrayElementRead.create(prefix, Constant.create(index)), parent);
+                    }
+                }
             }
+        }
+    }
+
+    private void injectConcreteValueIntoJPFState(AccessExpression expr, int value, ElementInfo ei, StackFrame sf, ThreadInfo ti) {
+        if (ei == null) {
+            LocalVarInfo lvi = sf.getLocalVarInfo(expr.getRoot().getName());
+
+            // Update only variables that are in scope
+            if (lvi != null) {
+                sf.setLocalVariable(lvi.getSlotIndex(), value);
+            }
+        } else if (expr instanceof ObjectFieldRead) {
+            ObjectFieldRead r = (ObjectFieldRead) expr;
+
+            ti.getModifiableElementInfo(ei.getObjectRef()).setIntField(r.getField().getName(), value);
+        } else if (expr instanceof ArrayElementRead) {
+            ArrayElementRead r = (ArrayElementRead) expr;
+            Constant c = (Constant) r.getIndex();
+
+            ti.getModifiableElementInfo(ei.getObjectRef()).getArrayFields().setIntValue(c.value.intValue(), value);
         } else {
-            ElementInfo subEI = null;
-
-            if (expr.get(i) instanceof ObjectFieldRead) {
-                ObjectFieldRead r = (ObjectFieldRead) expr.get(i);
-
-                subEI = ti.getElementInfo(ei.getReferenceField(r.getField().getName()));
-            } else {
-                ArrayElementRead r = (ArrayElementRead) expr.get(i);
-
-                //Exact value of the index? (may have changed)
-                //subEI = ti.getElementInfo(ei.getArrayFields().getReferenceValue(r.getIndex()));
-            }
-
-            injectConcreteValueIntoJPFElement(subEI, expr, i + 1, value, ti);
+            throw new RuntimeException("Cannot inject value into anything else than local variable, object field, static field and array element.");
         }
     }
 }

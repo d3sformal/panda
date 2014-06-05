@@ -303,9 +303,9 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
 
             if (universe.contains(reference)) {
                 universe.lookupValues(reference, expression, outValues);
-
-                return;
             }
+
+            return;
         }
 
         if (expression.getRoot().isLocalVariable()) {

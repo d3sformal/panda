@@ -220,11 +220,12 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return sharedSymbolCache.get(predicate);
     }
 
+    // Determine inconsistency with predicates together, pairwise consistency is not enough
     @Override
     public Set<Predicate> getPredicatesInconsistentWith(Predicate assumption, TruthValue value) {
         Set<Predicate> affected = computeAffectedClosure(assumption, valuations.keySet());
+        List<Predicate> formulas = new ArrayList<Predicate>(1);
 
-        Set<Predicate> inconsistent = new HashSet<Predicate>();
         boolean[] satisfiable;
 
         Predicate formula = Tautology.create();
@@ -241,18 +242,13 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             default:
         }
 
-        List<Predicate> predicates = new ArrayList<Predicate>(affected.size());
-        List<Predicate> formulas = new ArrayList<Predicate>(affected.size());
-
         for (Predicate predicate : affected) {
             switch (get(predicate)) {
                 case TRUE:
-                    predicates.add(predicate);
-                    formulas.add(Conjunction.create(formula, predicate));
+                    formula = Conjunction.create(formula, predicate);
                     break;
                 case FALSE:
-                    predicates.add(predicate);
-                    formulas.add(Conjunction.create(formula, Negation.create(predicate)));
+                    formula = Conjunction.create(formula, Negation.create(predicate));
                     break;
 
                 case UNKNOWN:
@@ -260,15 +256,15 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             }
         }
 
+        formulas.add(formula);
+
         satisfiable = smt.isSatisfiable(formulas);
 
-        for (int i = 0; i < predicates.size(); ++i) {
-            if (!satisfiable[i]) {
-                inconsistent.add(predicates.get(i));
-            }
+        if (satisfiable[0]) {
+            return Collections.emptySet();
+        } else {
+            return affected;
         }
-
-        return inconsistent;
     }
 
     /**
@@ -867,9 +863,13 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return ret;
     }
 
-    public Map<AccessExpression, Integer> getConcreteState() {
-        Map<AccessExpression, Integer> ret = new HashMap<AccessExpression, Integer>();
+    public void addAccessExpressionsToSet(Set<AccessExpression> exprs) {
+        for (Predicate p : valuations.keySet()) {
+            p.addAccessExpressionsToSet(exprs);
+        }
+    }
 
+    public int[] getConcreteState(AccessExpression[] exprArray) {
         Predicate state = Tautology.create();
 
         for (Predicate p : valuations.keySet()) {
@@ -883,27 +883,6 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             }
         }
 
-        // COULD BE CACHED
-        // CACHE NEEDS TO BE UPDATED UPON "PUT" AND "DELETE"
-        Set<AccessExpression> allExprs = new HashSet<AccessExpression>();
-        Set<AccessExpression> primitiveExprs = new HashSet<AccessExpression>();
-        state.addAccessExpressionsToSet(allExprs);
-
-        for (AccessExpression expr : allExprs) {
-            // WE CARE ABOUT VALUES OF PRIMITIVE VARIABLES/FIELDS/ELEMENTS ONLY
-            // WE ALSO DO NOT CARE ABOUT ARRAY LENGTH AS THOSE ARE FIXED (CANNOT BE CHANGED, THEY ARE DETERMINED BY SYMBOL TABLE)
-            if (((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0).isPrimitive(expr) && !(expr instanceof ArrayLengthRead)) {
-                primitiveExprs.add(expr);
-            }
-        }
-
-        AccessExpression[] exprArray = primitiveExprs.toArray(new AccessExpression[primitiveExprs.size()]);
-        int[] models = smt.getModels(state, exprArray);
-
-        for (int i = 0; i < exprArray.length; ++i) {
-            ret.put(exprArray[i], models[i]);
-        }
-
-        return ret;
+        return smt.getModels(state, exprArray);
     }
 }

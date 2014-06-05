@@ -12,6 +12,7 @@ import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.impl.DefaultObjectExpression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicatesSMTStringifier;
 
 /**
@@ -156,7 +157,7 @@ public abstract class DefaultAccessExpression extends DefaultObjectExpression im
      */
     @Override
     public final boolean isLocalVariable() {
-        return this instanceof Root && !isStatic() && !isReturnValue();
+        return this instanceof Root && !isStatic() && !isReturnValue() && !(this instanceof AnonymousExpression);
     }
 
     /**
