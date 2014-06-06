@@ -1,12 +1,11 @@
 package gov.nasa.jpf.abstraction.common.access.meta.impl;
 
-import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
-
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.meta.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An unmodified field

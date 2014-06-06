@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.StackFrame;
 
 /**
@@ -38,37 +38,28 @@ public class DoubleBinaryOperatorExecutor extends BinaryOperatorExecutor<Double>
     }
 
     @Override
-    protected Attribute getLeftAttribute(StackFrame sf) {
-        return getAttribute(sf, 3);
+    protected Expression getLHSExpression(StackFrame sf) {
+        return getExpression(sf, 3);
     }
 
     @Override
-    protected Attribute getRightAttribute(StackFrame sf) {
-        return getAttribute(sf, 1);
+    protected Expression getRHSExpression(StackFrame sf) {
+        return getExpression(sf, 1);
     }
 
     @Override
-    final protected Double getLeftOperand(StackFrame sf) {
+    final protected Double getLHSOperand(StackFrame sf) {
         return sf.peekDouble(2);
     }
 
     @Override
-    final protected Double getRightOperand(StackFrame sf) {
+    final protected Double getRHSOperand(StackFrame sf) {
         return sf.peekDouble(0);
     }
 
     @Override
-    final protected void storeAttribute(Attribute result, StackFrame sf) {
+    final protected void storeExpression(Expression result, StackFrame sf) {
         sf.setLongOperandAttr(result);
-    }
-
-    @Override
-    final protected void storeResult(Attribute result, StackFrame sf) {
-        sf.popDouble();
-        sf.popDouble();
-
-        sf.pushDouble(0);
-        storeAttribute(result, sf);
     }
 
 }

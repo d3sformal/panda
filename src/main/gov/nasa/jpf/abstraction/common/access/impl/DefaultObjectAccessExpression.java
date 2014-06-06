@@ -1,11 +1,10 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
-import java.util.Set;
-
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import java.util.Set;
 
 /**
  * Expressions accessing objects (fields, array elements, array length):

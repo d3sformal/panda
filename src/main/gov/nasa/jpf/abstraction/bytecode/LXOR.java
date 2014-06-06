@@ -18,17 +18,14 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.ThreadInfo;
-
-import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Add;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Subtract;
-import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
  * Xor long
@@ -48,13 +45,7 @@ public class LXOR extends gov.nasa.jpf.jvm.bytecode.LXOR implements AbstractBina
     }
 
     @Override
-    public Attribute getResult(Long v1, Attribute attr1, Long v2, Attribute attr2) {
-        AbstractValue abs_v1 = Attribute.getAbstractValue(attr1);
-        AbstractValue abs_v2 = Attribute.getAbstractValue(attr2);
-
-        Expression a = Attribute.getExpression(attr1);
-        Expression b = Attribute.getExpression(attr2);
-
+    public Expression getResult(Expression a, Expression b) {
         LogicalOperandChecker.check(a, b);
 
         /**
@@ -66,7 +57,7 @@ public class LXOR extends gov.nasa.jpf.jvm.bytecode.LXOR implements AbstractBina
         // Therefore:
         // ADD(MUL(a, 1 - b), MUL(1 - a, b)) = XOR(a, b)
         // ADD(a, b) - 2 * MUL(a, b) = XOR(a, b)
-        return new Attribute(Abstraction._xor(v1, abs_v1, v2, abs_v2), Subtract.create(Add.create(a, b), Multiply.create(Constant.create(2), Multiply.create(a, b))));
+        return Subtract.create(Add.create(a, b), Multiply.create(Constant.create(2), Multiply.create(a, b)));
     }
 
     @Override

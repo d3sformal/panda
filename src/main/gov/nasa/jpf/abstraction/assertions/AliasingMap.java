@@ -1,13 +1,12 @@
 package gov.nasa.jpf.abstraction.assertions;
 
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.Comparator;
-import java.util.Iterator;
-
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class AliasingMap extends TreeMap<AccessExpression, Set<UniverseIdentifier>> {
     public static final long serialVersionUID = 1L;

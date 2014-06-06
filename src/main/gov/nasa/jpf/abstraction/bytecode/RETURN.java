@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -39,7 +39,7 @@ public class RETURN extends gov.nasa.jpf.jvm.bytecode.RETURN {
             return actualNextInsn;
         }
 
-        GlobalAbstraction.getInstance().processVoidMethodReturn(ti, before, after);
+        PredicateAbstraction.getInstance().processVoidMethodReturn(ti, before, after);
 
         return actualNextInsn;
     }

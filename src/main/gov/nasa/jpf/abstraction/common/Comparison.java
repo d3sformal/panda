@@ -1,8 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
-
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import java.util.Set;
 
 /**

@@ -1,40 +1,40 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.impl.ObjectExpressionDecorator;
-import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionDecorator;
+import gov.nasa.jpf.abstraction.common.BranchingCondition;
+import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
+import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
+import gov.nasa.jpf.abstraction.common.BranchingDecision;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Predicates;
-import gov.nasa.jpf.abstraction.common.BranchingCondition;
-import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
-import gov.nasa.jpf.abstraction.common.BranchingDecision;
-import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.impl.ObjectExpressionDecorator;
+import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionDecorator;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.predicate.state.PredicateValuationStack;
-import gov.nasa.jpf.abstraction.predicate.state.SystemPredicateValuation;
-import gov.nasa.jpf.abstraction.predicate.state.SystemSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.State;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTableStack;
+import gov.nasa.jpf.abstraction.predicate.state.SystemPredicateValuation;
+import gov.nasa.jpf.abstraction.predicate.state.SystemSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.Trace;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
-import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueIdentifier;
 import gov.nasa.jpf.abstraction.predicate.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueIdentifier;
+import gov.nasa.jpf.abstraction.util.RunDetector;
+import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.VM;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Predicate abstraction class
@@ -53,6 +53,16 @@ public class PredicateAbstraction extends Abstraction {
     private Trace trace;
     private boolean isInitialized = false;
     private Set<ClassInfo> startupClasses = new HashSet<ClassInfo>();
+
+    private static PredicateAbstraction instance = null;
+
+    public static void setInstance(PredicateAbstraction instance) {
+        PredicateAbstraction.instance = instance;
+    }
+
+    public static PredicateAbstraction getInstance() {
+        return instance;
+    }
 
     public PredicateAbstraction(Predicates predicateSet) {
         symbolTable = new SystemSymbolTable(this);
@@ -135,6 +145,8 @@ public class PredicateAbstraction extends Abstraction {
 
     @Override
     public void informAboutBranchingDecision(BranchingDecision decision) {
+        if (!RunDetector.isRunning()) return;
+
         BranchingConditionValuation bcv = (BranchingConditionValuation) decision;
 
         predicateValuation.force(bcv.getCondition(), bcv.getValuation());

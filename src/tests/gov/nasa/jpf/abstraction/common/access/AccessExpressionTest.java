@@ -1,19 +1,17 @@
 package gov.nasa.jpf.abstraction.common.access;
 
-import org.junit.Test;
-import static org.junit.Assert.assertFalse;
-
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
-import gov.nasa.jpf.abstraction.predicate.smt.PredicatesSMTStringifier;
-
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
+import gov.nasa.jpf.abstraction.predicate.smt.PredicatesSMTStringifier;
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
 
 public class AccessExpressionTest {
 

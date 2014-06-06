@@ -19,12 +19,12 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Instruction;
 
 /**
  * Convert int to short

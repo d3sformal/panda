@@ -1,9 +1,9 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -20,11 +20,10 @@ public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
     @Override
     public Instruction execute(ThreadInfo ti) {
         StackFrame sf = ti.getTopFrame();
-        Attribute source = Attribute.getAttribute(sf.getLongOperandAttr());
+        Expression from = ExpressionUtil.getExpression(sf.getLongOperandAttr());
 
         Instruction actualNextInsn = super.execute(ti);
 
-        Expression from = Attribute.getExpression(source);
         DefaultRoot to = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
 
         sf = ti.getModifiableTopFrame();
@@ -32,13 +31,13 @@ public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
         /**
          * Remember what has been stored here
          */
-        sf.setLocalAttr(getLocalVariableIndex(), source);
+        sf.setLocalAttr(getLocalVariableIndex(), from);
 
         /**
          * Inform the abstractions that a primitive value of a local variable may have changed
          */
-        GlobalAbstraction.getInstance().informAboutPrimitiveLocalVariable(to);
-        GlobalAbstraction.getInstance().processPrimitiveStore(from, to);
+        PredicateAbstraction.getInstance().informAboutPrimitiveLocalVariable(to);
+        PredicateAbstraction.getInstance().processPrimitiveStore(from, to);
 
         return actualNextInsn;
     }

@@ -1,15 +1,14 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
-import java.util.Set;
-import java.util.Map;
-
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
-import gov.nasa.jpf.abstraction.common.Predicate;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Write to an array element awrite(arr, a, i, e) ~ a[i] := e

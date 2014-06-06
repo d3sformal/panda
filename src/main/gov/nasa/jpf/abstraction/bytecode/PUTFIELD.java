@@ -18,16 +18,16 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Types;
 
 public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
@@ -39,8 +39,8 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
     @Override
     public Instruction execute(ThreadInfo ti) {
         StackFrame sf = ti.getTopFrame();
-        Attribute source = null;
-        Attribute destination = null;
+        Expression from = null;
+        AccessExpression to = null;
         ElementInfo ei = null;
 
         FieldInfo fi = getFieldInfo();
@@ -54,26 +54,24 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
             case Types.T_SHORT:
             case Types.T_INT:
             case Types.T_FLOAT:
-                source = Attribute.getAttribute(sf.getOperandAttr());
-                destination = Attribute.getAttribute(sf.getOperandAttr(1));
+                from = ExpressionUtil.getExpression(sf.getOperandAttr());
+                to = ExpressionUtil.getAccessExpression(sf.getOperandAttr(1));
                 ei = ti.getModifiableElementInfo(sf.peek(1));
                 break;
 
             case Types.T_LONG:
             case Types.T_DOUBLE:
-                source = Attribute.getAttribute(sf.getLongOperandAttr());
-                destination = Attribute.getAttribute(sf.getOperandAttr(2));
+                from = ExpressionUtil.getExpression(sf.getLongOperandAttr());
+                to = ExpressionUtil.getAccessExpression(sf.getOperandAttr(2));
                 ei = ti.getModifiableElementInfo(sf.peek(2));
                 break;
 
             default:
         }
 
-        Expression from = Attribute.getExpression(source);
-        AccessExpression to = Attribute.getAccessExpression(destination);
         AccessExpression field = DefaultObjectFieldRead.create(to, getFieldName());
 
-        ei.setFieldAttr(fi, source);
+        ei.setFieldAttr(fi, from);
 
         Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
@@ -84,11 +82,11 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
         }
 
         if (ei.getFieldValueObject(getFieldName()) == null) {
-            GlobalAbstraction.getInstance().processObjectStore(from, field);
+            PredicateAbstraction.getInstance().processObjectStore(from, field);
         } else if (ei.getFieldValueObject(getFieldName()) instanceof ElementInfo) {
-            GlobalAbstraction.getInstance().processObjectStore(from, field);
+            PredicateAbstraction.getInstance().processObjectStore(from, field);
         } else {
-            GlobalAbstraction.getInstance().processPrimitiveStore(from, field);
+            PredicateAbstraction.getInstance().processPrimitiveStore(from, field);
         }
 
         AnonymousExpressionTracker.notifyPopped(from);

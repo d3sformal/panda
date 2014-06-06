@@ -18,9 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -42,14 +41,11 @@ public class IUSHR extends gov.nasa.jpf.jvm.bytecode.IUSHR implements AbstractBi
     }
 
     @Override
-    public Attribute getResult(Integer v1, Attribute attr1, Integer v2, Attribute attr2) {
-        AbstractValue abs_v1 = Attribute.getAbstractValue(attr1);
-        AbstractValue abs_v2 = Attribute.getAbstractValue(attr2);
-
+    public Expression getResult(Expression a, Expression b) {
         /**
          * Performs the adequate operation over abstractions
          */
-        return new Attribute(Abstraction._ushr(v1, abs_v1, v2, abs_v2), null);
+        return null;
     }
 
     @Override

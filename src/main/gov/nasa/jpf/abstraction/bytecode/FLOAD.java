@@ -18,9 +18,9 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -36,12 +36,11 @@ public class FLOAD extends gov.nasa.jpf.jvm.bytecode.FLOAD {
         Instruction actualNextInsn = super.execute(ti);
 
         DefaultRoot path = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
-        Attribute attribute = new Attribute(null, path);
 
         StackFrame sf = ti.getModifiableTopFrame();
-        sf.setOperandAttr(attribute);
+        sf.setOperandAttr(path);
 
-        GlobalAbstraction.getInstance().informAboutPrimitiveLocalVariable(path);
+        PredicateAbstraction.getInstance().informAboutPrimitiveLocalVariable(path);
 
         return actualNextInsn;
     }

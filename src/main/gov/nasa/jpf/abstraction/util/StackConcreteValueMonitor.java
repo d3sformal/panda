@@ -1,11 +1,11 @@
 package gov.nasa.jpf.abstraction.util;
 
 import gov.nasa.jpf.ListenerAdapter;
+import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 public class StackConcreteValueMonitor extends ListenerAdapter {
@@ -43,5 +43,3 @@ public class StackConcreteValueMonitor extends ListenerAdapter {
         System.out.println("--------------");
     }
 }
-
-

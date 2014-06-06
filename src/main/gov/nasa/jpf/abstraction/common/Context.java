@@ -1,7 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
-
 import java.util.List;
 
 /**

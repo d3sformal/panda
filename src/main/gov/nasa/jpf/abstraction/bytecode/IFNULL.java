@@ -18,30 +18,25 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractBoolean;
-import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.common.impl.NullExpression;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.Equals;
-import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.MJIEnv;
-
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.common.Tautology;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
-
-import java.util.Set;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MJIEnv;
+import gov.nasa.jpf.vm.ThreadInfo;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Branch if int comparison with NULL value succeeds
@@ -71,11 +66,6 @@ public class IFNULL extends gov.nasa.jpf.jvm.bytecode.IFNULL implements Abstract
     }
 
     @Override
-    public AbstractBoolean getCondition(int v1, AbstractValue abs_v1, int v2, AbstractValue abs_v2) {
-        return Abstraction._eq(v1, abs_v1, MJIEnv.NULL, null);
-    }
-
-    @Override
     public TruthValue getConcreteBranchValue(int v1, int v2) {
         return TruthValue.create(v1 == MJIEnv.NULL);
     }
@@ -89,7 +79,7 @@ public class IFNULL extends gov.nasa.jpf.jvm.bytecode.IFNULL implements Abstract
         } else if (expr1 instanceof AccessExpression) {
             AccessExpression access = (AccessExpression) expr1;
 
-            MethodFrameSymbolTable symbolTable = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
+            MethodFrameSymbolTable symbolTable = PredicateAbstraction.getInstance().getSymbolTable().get(0);
 
             Set<UniverseIdentifier> values = new HashSet<UniverseIdentifier>();
 

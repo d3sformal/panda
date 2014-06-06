@@ -19,8 +19,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
-import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -39,63 +39,36 @@ public abstract class BinaryOperatorExecutor<T> {
         SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getModifiableTopFrame();
 
-        Attribute attr1 = getLeftAttribute(sf);
-        Attribute attr2 = getRightAttribute(sf);
+        Expression expr1 = getLHSExpression(sf);
+        Expression expr2 = getRHSExpression(sf);
 
-        AbstractValue abs_v1 = Attribute.getAbstractValue(attr1);
-        AbstractValue abs_v2 = Attribute.getAbstractValue(attr2);
-
-        T v1 = getLeftOperand(sf);
-        T v2 = getRightOperand(sf);
+        T v1 = getLHSOperand(sf);
+        T v2 = getRHSOperand(sf);
 
         // Create symbolic value (predicate abstraction), abstract value (numeric abstraction)
-        Attribute result;
+        Expression result;
 
         try {
-            result = op.getResult(v1, attr1, v2, attr2);
+            result = op.getResult(expr1, expr2);
         } catch (RuntimeException e) {
             return ti.createAndThrowException(e.getClass().getName(), e.getMessage());
         }
 
         // Concrete execution
-        if (abs_v1 == null && abs_v2 == null) {
-            Instruction ret = op.executeConcrete(ti);
+        Instruction ret = op.executeConcrete(ti);
 
-            storeAttribute(result, sf);
+        storeExpression(result, sf);
 
-            return ret;
-        }
-
-        if (Attribute.getAbstractValue(result).isComposite()) {
-            if (!ti.isFirstStepInsn()) { // first time around
-                int size = Attribute.getAbstractValue(result).getTokensNumber();
-                ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
-                ss.setNextChoiceGenerator(cg);
-
-                return op.getSelf();
-            } else { // this is what really returns results
-                ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-
-                assert (cg instanceof FocusAbstractChoiceGenerator);
-
-                int key = (Integer) cg.getNextChoice();
-                Attribute.setAbstractValue(result, Attribute.getAbstractValue(result).getToken(key));
-            }
-        }
-
-        storeResult(result, sf);
-
-        return op.getNext(ti);
+        return ret;
     }
 
-    protected Attribute getAttribute(StackFrame sf, int index) {
-        return (Attribute)sf.getOperandAttr(index);
+    protected Expression getExpression(StackFrame sf, int index) {
+        return (Expression)sf.getOperandAttr(index);
     }
 
-    abstract protected Attribute getLeftAttribute(StackFrame sf);
-    abstract protected Attribute getRightAttribute(StackFrame sf);
-    abstract protected T getLeftOperand(StackFrame sf);
-    abstract protected T getRightOperand(StackFrame sf);
-    abstract protected void storeAttribute(Attribute result, StackFrame sf);
-    abstract protected void storeResult(Attribute result, StackFrame sf);
+    abstract protected Expression getLHSExpression(StackFrame sf);
+    abstract protected Expression getRHSExpression(StackFrame sf);
+    abstract protected T getLHSOperand(StackFrame sf);
+    abstract protected T getRHSOperand(StackFrame sf);
+    abstract protected void storeExpression(Expression result, StackFrame sf);
 }

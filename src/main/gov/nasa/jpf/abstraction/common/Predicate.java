@@ -1,12 +1,11 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
-import gov.nasa.jpf.abstraction.common.impl.DefaultExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
-
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
+import gov.nasa.jpf.abstraction.common.impl.DefaultExpression;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;

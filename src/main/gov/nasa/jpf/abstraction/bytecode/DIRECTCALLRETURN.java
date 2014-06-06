@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -40,7 +40,7 @@ public class DIRECTCALLRETURN extends gov.nasa.jpf.jvm.bytecode.DIRECTCALLRETURN
         }
 
         // We do not add special scopes for synthetic stack frames yet, therefore we cannot return from them (would remove a different frame, whose return would then remove yet another frame)
-        //GlobalAbstraction.getInstance().processMethodReturn(ti, before, after);
+        //PredicateAbstraction.getInstance().processMethodReturn(ti, before, after);
 
         return actualNextInsn;
     }

@@ -1,9 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
-import java.util.Map;
-
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import java.util.Map;
 
 /**
  * A container holding information used to infer a truth value of a particular predicate

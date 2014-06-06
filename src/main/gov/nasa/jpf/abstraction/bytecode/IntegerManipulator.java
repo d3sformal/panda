@@ -1,12 +1,12 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.abstraction.Attribute;
 
 public class IntegerManipulator implements DataWordManipulator {
     @Override
-    public Attribute getAttribute(StackFrame sf) {
-        return (Attribute) sf.getOperandAttr();
+    public Expression getExpression(StackFrame sf) {
+        return (Expression) sf.getOperandAttr();
     }
 
     @Override
@@ -20,7 +20,7 @@ public class IntegerManipulator implements DataWordManipulator {
     }
 
     @Override
-    public void setAttribute(StackFrame sf, Attribute attribute) {
+    public void setExpression(StackFrame sf, Expression attribute) {
         sf.setOperandAttr(attribute);
     }
 }

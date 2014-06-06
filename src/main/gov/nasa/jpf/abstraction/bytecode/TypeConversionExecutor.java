@@ -1,10 +1,11 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
+import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Instruction;
 
 public class TypeConversionExecutor {
 
@@ -18,18 +19,12 @@ public class TypeConversionExecutor {
 
     public Instruction execute(ThreadInfo ti, TypeConvertor ins) {
         StackFrame sf = ti.getModifiableTopFrame();
-        Attribute attr = Attribute.getAttribute(source.getAttribute(sf));
-        AbstractValue abs_val = Attribute.getAbstractValue(attr);
+        Expression expr = ExpressionUtil.getExpression(source.getExpression(sf));
         Instruction ret;
 
-        if (abs_val == null) {
-            ret = ins.executeConcrete(ti);
-        } else {
-            source.pop(sf);
-            target.push(sf, 0);
-            ret = ins.getNext(ti);
-        }
-        target.setAttribute(sf, attr);
+        ret = ins.executeConcrete(ti);
+
+        target.setExpression(sf, expr);
 
         return ret;
     }

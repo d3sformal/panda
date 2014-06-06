@@ -1,15 +1,14 @@
 package gov.nasa.jpf.abstraction.concrete;
 
-import java.util.Set;
-import java.util.Map;
-
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.Notation;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.impl.DefaultExpression;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A dummy expression (may be used when there would be no expression = null)

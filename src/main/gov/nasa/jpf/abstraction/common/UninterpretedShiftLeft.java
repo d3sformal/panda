@@ -1,7 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-
 import java.util.Map;
 
 public class UninterpretedShiftLeft extends Operation {

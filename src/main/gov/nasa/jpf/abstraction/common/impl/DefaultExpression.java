@@ -1,11 +1,10 @@
 package gov.nasa.jpf.abstraction.common.impl;
 
-import java.util.Map;
-import java.util.HashMap;
-
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of stringification common to all expressions

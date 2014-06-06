@@ -1,53 +1,51 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.common.access.Root;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.ReturnValue;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ReturnValue;
+import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
-import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.predicate.state.SystemSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
-import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
-import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueIdentifier;
-import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
-import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.predicate.state.SystemSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.predicate.state.universe.LocalVariable;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueIdentifier;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.abstraction.util.RunDetector;
+import gov.nasa.jpf.jvm.bytecode.DLOAD;
+import gov.nasa.jpf.jvm.bytecode.DSTORE;
+import gov.nasa.jpf.jvm.bytecode.FLOAD;
+import gov.nasa.jpf.jvm.bytecode.FSTORE;
+import gov.nasa.jpf.jvm.bytecode.ILOAD;
+import gov.nasa.jpf.jvm.bytecode.ISTORE;
+import gov.nasa.jpf.jvm.bytecode.LLOAD;
+import gov.nasa.jpf.jvm.bytecode.LSTORE;
+import gov.nasa.jpf.jvm.bytecode.LocalVariableInstruction;
+import gov.nasa.jpf.vm.ClassLoaderInfo;
 import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.KernelState;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.ThreadList;
 import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.VM;
-import gov.nasa.jpf.vm.KernelState;
-import gov.nasa.jpf.vm.ClassLoaderInfo;
-import gov.nasa.jpf.vm.StaticElementInfo;
-import gov.nasa.jpf.vm.ThreadList;
-import gov.nasa.jpf.vm.Instruction;
-
-import gov.nasa.jpf.jvm.bytecode.DLOAD;
-import gov.nasa.jpf.jvm.bytecode.FLOAD;
-import gov.nasa.jpf.jvm.bytecode.ILOAD;
-import gov.nasa.jpf.jvm.bytecode.LLOAD;
-import gov.nasa.jpf.jvm.bytecode.DSTORE;
-import gov.nasa.jpf.jvm.bytecode.FSTORE;
-import gov.nasa.jpf.jvm.bytecode.ISTORE;
-import gov.nasa.jpf.jvm.bytecode.LSTORE;
-import gov.nasa.jpf.jvm.bytecode.LocalVariableInstruction;
-
-import java.util.Set;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Symbol table aware of method call scope changes
@@ -95,26 +93,25 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
         if (method.getFullName().equals(target + "." + entry)) {
             sf.setFrameAttr(null);
 
+            Expression[] arguments = new Expression[method.getNumberOfStackArguments()];
+
             for (int i = 0; i < method.getNumberOfStackArguments(); ++i) {
                 ElementInfo ei = threadInfo.getElementInfo(sf.getLocalVariable(i));
-
-                AnonymousObject argExpr = null;
 
                 if (ei.isArray()) {
                     int length = ei.arrayLength();
 
-                    argExpr = AnonymousArray.create(new Reference(ei), Constant.create(length));
+                    arguments[i] = AnonymousArray.create(new Reference(ei), Constant.create(length));
                 } else {
-                    argExpr = AnonymousObject.create(new Reference(ei));
+                    arguments[i] = AnonymousObject.create(new Reference(ei));
                 }
 
-                Attribute attr = new Attribute(null, argExpr);
+                sf.setLocalAttr(i, arguments[i]);
 
-                sf.setLocalAttr(i, attr);
-                sf.addFrameAttr(attr);
-
-                ret.addObject(argExpr);
+                ret.addObject((AnonymousObject) arguments[i]);
             }
+
+            sf.setFrameAttr(arguments);
         }
 
         return ret;
@@ -154,7 +151,7 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
 
             for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
                 if (slotInUse[slotIndex]) {
-                    Expression expr = Attribute.getExpression(after.getLocalAttr(slotIndex));
+                    Expression expr = ExpressionUtil.getExpression(after.getLocalAttr(slotIndex));
 
                     LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
                     String name = arg == null ? null : arg.getName();
@@ -176,8 +173,8 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
         ReturnValue calleeReturnValue = DefaultReturnValue.create();
         ReturnValue callerReturnValue = DefaultReturnValue.create(threadInfo.getPC(), before.getMethodInfo().isReferenceReturnType());
 
-        Expression returnExpression = Attribute.getExpression(after.getOperandAttr());
-        //after.setOperandAttr(new Attribute(null, callerReturnValue)); // This is performed by the predicate valuation after it uses the original expression
+        Expression returnExpression = ExpressionUtil.getExpression(after.getOperandAttr());
+        //after.setOperandAttr(callerReturnValue); // This is performed by the predicate valuation after it uses the original expression
 
         /**
          * Register the return value
@@ -397,7 +394,7 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
                 // Anonymous objects on stacks are also live
                 for (StackFrame frame = thread.getTopFrame(); frame != null; frame = frame.getPrevious()) {
                     for (int i = 0; i < frame.getTopPos() - frame.getLocalVariableCount(); ++i) {
-                        Expression expr = Attribute.getExpression(frame.getOperandAttr(i));
+                        Expression expr = ExpressionUtil.getExpression(frame.getOperandAttr(i));
 
                         if (expr instanceof AnonymousExpression) {
                             AnonymousExpression ae = (AnonymousExpression) expr;

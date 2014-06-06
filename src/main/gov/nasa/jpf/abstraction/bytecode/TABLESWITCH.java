@@ -18,12 +18,11 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import java.util.ArrayList;
-
 import gov.nasa.jpf.JPFException;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.jvm.bytecode.InstructionVisitor;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
+import java.util.ArrayList;
 
 /**
  * Access jump table by index and jump

@@ -1,8 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
-import java.util.Set;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class SMTCache {
     private static SMT.QueryResponse emptyResponse = new SMT.QueryResponse(null, null);

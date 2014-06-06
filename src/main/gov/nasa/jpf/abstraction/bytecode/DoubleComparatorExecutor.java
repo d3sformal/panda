@@ -1,7 +1,7 @@
 //
 // Copyright (C) 2012 United States Government as represented by the
 // Administrator of the National Aeronautics and Space Administration
-// (NASA).  All Rights Reserved.
+// (NASA).  All RHSs Reserved.
 //
 // This software is distributed under the NASA Open Source Agreement
 // (NOSA), version 1.3.  The NOSA has been approved by the Open Source
@@ -18,10 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
-import gov.nasa.jpf.abstraction.numeric.SignsValue;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.StackFrame;
 
 /**
@@ -41,46 +39,32 @@ public class DoubleComparatorExecutor extends BinaryComparatorExecutor<Double> {
     }
 
     @Override
-    protected Attribute getLeftAttribute(StackFrame sf) {
-        return getAttribute(sf, 1);
+    protected Expression getLHSExpression(StackFrame sf) {
+        return getExpression(sf, 1);
     }
 
     @Override
-    protected Attribute getRightAttribute(StackFrame sf) {
-        return getAttribute(sf, 3);
+    protected Expression getRHSExpression(StackFrame sf) {
+        return getExpression(sf, 3);
     }
 
     @Override
-    final protected Double getLeftOperand(StackFrame sf) {
+    final protected Double getLHSOperand(StackFrame sf) {
         return sf.peekDouble(0);
     }
 
     @Override
-    final protected Double getRightOperand(StackFrame sf) {
+    final protected Double getRHSOperand(StackFrame sf) {
         return sf.peekDouble(2);
     }
 
     @Override
-    protected void storeAttribute(Attribute result, StackFrame sf) {
-    }
-
-    @Override
-    final protected void storeResult(Attribute result, StackFrame sf) {
+    final protected void storeResult(Expression result, StackFrame sf) {
         sf.popDouble();
         sf.popDouble();
 
-        SignsValue s_result = (SignsValue) Attribute.getAbstractValue(result);
-
-        if (s_result == SignsAbstraction.NEG) {
-            sf.push(-1);
-            sf.setOperandAttr(new Attribute(null, Constant.create(-1)));
-        } else if (s_result == SignsAbstraction.POS) {
-            sf.push(+1);
-            sf.setOperandAttr(new Attribute(null, Constant.create(+1)));
-        } else {
-            sf.push(0);
-            sf.setOperandAttr(new Attribute(null, Constant.create( 0)));
-        }
+        sf.push(((Constant) result).value.intValue());
+        sf.setOperandAttr(result);
     }
 
 }

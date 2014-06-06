@@ -1,10 +1,12 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
-import java.util.Map;
-
 import gov.nasa.jpf.abstraction.common.ArrayExpression;
-import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayAccessExpression;
@@ -13,10 +15,7 @@ import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
-import gov.nasa.jpf.abstraction.common.Conjunction;
-import gov.nasa.jpf.abstraction.common.Contradiction;
-import gov.nasa.jpf.abstraction.common.Equals;
-import gov.nasa.jpf.abstraction.common.Predicate;
+import java.util.Map;
 
 /**
  * Read of an array element aread(arr, a, i) ~ a[i]

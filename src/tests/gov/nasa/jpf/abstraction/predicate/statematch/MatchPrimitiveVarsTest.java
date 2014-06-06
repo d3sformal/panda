@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.statematch;
 
-import gov.nasa.jpf.abstraction.predicate.Test;
 import gov.nasa.jpf.abstraction.predicate.FailingTest;
+import gov.nasa.jpf.abstraction.predicate.Test;
 
 public class MatchPrimitiveVarsTest extends StateMatchingTest {
 

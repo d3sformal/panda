@@ -1,14 +1,13 @@
 package gov.nasa.jpf.abstraction.util;
 
-import java.util.Stack;
-
 import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MethodInfo;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ReturnInstruction;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
+import java.util.Stack;
 
 /**
  * Is responsible for determining whether the currently executed code is part of the targeted execution or not

@@ -19,8 +19,9 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
-import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -33,58 +34,24 @@ import gov.nasa.jpf.vm.ThreadInfo;
 public abstract class UnaryOperatorExecutor<T> {
 
     final public Instruction execute(AbstractUnaryOperator<T> op, ThreadInfo ti) {
-
-        String name = op.getClass().getSimpleName();
-
-        SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getModifiableTopFrame();
 
-        Attribute attr = getAttribute(sf);
+        Expression expr = getExpression(sf);
+        Expression result = op.getResult(expr);
 
-        AbstractValue abs_v = null;
+        Instruction ret = op.executeConcrete(ti);
 
-        abs_v = Attribute.getAbstractValue(attr);
+        storeExpression(result, sf);
 
-        T v = getOperand(sf);
-
-        Attribute result = op.getResult(v, attr);
-
-        if (abs_v == null) {
-            Instruction ret = op.executeConcrete(ti);
-
-            storeAttribute(result, sf);
-
-            return ret;
-        }
-
-        if (Attribute.getAbstractValue(result).isComposite()) {
-            if (!ti.isFirstStepInsn()) { // first time around
-                int size = Attribute.getAbstractValue(result).getTokensNumber();
-                ChoiceGenerator<?> cg = new FocusAbstractChoiceGenerator(size);
-                ss.setNextChoiceGenerator(cg);
-
-                return op.getSelf();
-            } else { // this is what really returns results
-                ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-
-                assert (cg instanceof FocusAbstractChoiceGenerator);
-
-                int key = (Integer) cg.getNextChoice();
-                Attribute.setAbstractValue(result, Attribute.getAbstractValue(result).getToken(key));
-            }
-        }
-
-        storeResult(result, sf);
-
-        return op.getNext(ti);
+        return ret;
     }
 
-    protected Attribute getAttribute(StackFrame sf, int index) {
-        return Attribute.getAttribute(sf.getOperandAttr(index));
+    protected Expression getExpression(StackFrame sf, int index) {
+        return ExpressionUtil.getExpression(sf.getOperandAttr(index));
     }
 
-    abstract protected Attribute getAttribute(StackFrame sf);
+    abstract protected Expression getExpression(StackFrame sf);
     abstract protected T getOperand(StackFrame sf);
-    abstract protected void storeAttribute(Attribute result, StackFrame sf);
-    abstract protected void storeResult(Attribute result, StackFrame sf);
+    abstract protected void storeExpression(Expression result, StackFrame sf);
+    abstract protected void storeResult(Expression result, StackFrame sf);
 }

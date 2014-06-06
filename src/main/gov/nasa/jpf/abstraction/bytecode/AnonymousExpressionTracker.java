@@ -1,6 +1,5 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
@@ -21,7 +20,7 @@ public class AnonymousExpressionTracker {
             AnonymousExpression anonymous = (AnonymousExpression) expr;
 
             if (!anonymous.isDuplicate()) {
-                ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getPredicateValuation().get(depth).dropAllPredicatesSharingSymbolsWith((AccessExpression) expr);
+                PredicateAbstraction.getInstance().getPredicateValuation().get(depth).dropAllPredicatesSharingSymbolsWith((AccessExpression) expr);
             }
         }
     }

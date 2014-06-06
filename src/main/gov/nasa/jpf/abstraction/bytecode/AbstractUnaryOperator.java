@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 
@@ -33,7 +33,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 public interface AbstractUnaryOperator<T> {
     public Instruction executeConcrete(ThreadInfo ti);
 
-    public Attribute getResult(T v, Attribute attr);
+    public Expression getResult(Expression expr);
 
     public Instruction getSelf();
     public Instruction getNext(ThreadInfo ti);

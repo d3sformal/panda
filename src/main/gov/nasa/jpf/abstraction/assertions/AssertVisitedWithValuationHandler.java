@@ -1,18 +1,16 @@
 package gov.nasa.jpf.abstraction.assertions;
 
-import gov.nasa.jpf.vm.VM;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.ElementInfo;
-
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 public abstract class AssertVisitedWithValuationHandler extends AssertHandler {
 
@@ -20,7 +18,7 @@ public abstract class AssertVisitedWithValuationHandler extends AssertHandler {
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
         StackFrame sf = curTh.getModifiableTopFrame();
 
-        AnonymousExpressionTracker.notifyPopped(Attribute.getExpression(sf.getOperandAttr()), 1);
+        AnonymousExpressionTracker.notifyPopped(ExpressionUtil.getExpression(sf.getOperandAttr()), 1);
 
         ElementInfo arrayEI = curTh.getElementInfo(sf.pop());
         int limit = sf.pop();
@@ -42,7 +40,7 @@ public abstract class AssertVisitedWithValuationHandler extends AssertHandler {
 
                 Predicate predicate = PredicatesFactory.createPredicateFromString(strParts[0]);
                 TruthValue trackedValue = TruthValue.create(strParts[1]);
-                TruthValue value = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).processBranchingCondition(predicate);
+                TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(predicate);
 
                 trackedValuation.put(predicate, trackedValue);
                 valuation.put(predicate, value);

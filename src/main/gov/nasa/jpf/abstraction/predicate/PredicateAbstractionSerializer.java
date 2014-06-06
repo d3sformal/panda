@@ -18,54 +18,52 @@
 //
 package gov.nasa.jpf.abstraction.predicate;
 
+import gov.nasa.jpf.Config;
+import gov.nasa.jpf.JPF;
+import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFramePredicateValuation;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.predicate.state.universe.ElementIndex;
+import gov.nasa.jpf.abstraction.predicate.state.universe.FieldName;
+import gov.nasa.jpf.abstraction.predicate.state.universe.LocalVariable;
+import gov.nasa.jpf.abstraction.predicate.state.universe.PrimitiveValue;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValue;
+import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueIdentifier;
+import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueSlot;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseArray;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseClass;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseObject;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseSlot;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseValue;
+import gov.nasa.jpf.util.FinalBitSet;
+import gov.nasa.jpf.util.JPFLogger;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.Fields;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.LocalVarInfo;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.StaticElementInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.ThreadList;
+import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.serialize.FilteringSerializer;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.Collection;
-import java.util.Comparator;
-
-import gov.nasa.jpf.Config;
-import gov.nasa.jpf.JPF;
-import gov.nasa.jpf.vm.VM;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.FieldInfo;
-import gov.nasa.jpf.vm.Fields;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.StaticElementInfo;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.serialize.FilteringSerializer;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.ThreadList;
-import gov.nasa.jpf.vm.LocalVarInfo;
-import gov.nasa.jpf.util.FinalBitSet;
-import gov.nasa.jpf.util.JPFLogger;
-
-import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.access.Root;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
-import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
-import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
-import gov.nasa.jpf.abstraction.predicate.state.MethodFramePredicateValuation;
-import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
-import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseValue;
-import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValue;
-import gov.nasa.jpf.abstraction.predicate.state.universe.PrimitiveValue;
-import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
-import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseSlot;
-import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueSlot;
-import gov.nasa.jpf.abstraction.predicate.state.universe.FieldName;
-import gov.nasa.jpf.abstraction.predicate.state.universe.ElementIndex;
-import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseObject;
-import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseArray;
-import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseClass;
-import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueIdentifier;
-import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
-import gov.nasa.jpf.abstraction.predicate.state.universe.LocalVariable;
 
 /**
  * a serializer that uses Abstract values stored in attributes
@@ -168,7 +166,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     protected int[] computeStoringData() {
         buf.clear();
 
-        pabs = (PredicateAbstraction) GlobalAbstraction.getInstance().get();
+        pabs = PredicateAbstraction.getInstance();
         universe = pabs.getSymbolTable().getUniverse();
 
         serializeHeap();

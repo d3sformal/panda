@@ -1,14 +1,14 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Disjunction;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
-import gov.nasa.jpf.abstraction.common.Equals;
 
 public class LogicalOperandChecker {
     public static void check(Expression a, Expression b) {
@@ -24,7 +24,7 @@ public class LogicalOperandChecker {
                 )
             );
 
-            TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inSupportedDomain);
+            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(inSupportedDomain);
 
             if (value != TruthValue.TRUE) {
                 throw new IllegalArgumentException("logical and bitwise operations over values other than {0, 1} are not supported");

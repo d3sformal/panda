@@ -187,4 +187,3 @@ class RAXextended {
     Environment.create(gc);
   }
 }
-

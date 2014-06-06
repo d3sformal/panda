@@ -1,7 +1,5 @@
 package gov.nasa.jpf.abstraction.util;
 
-import java.util.HashSet;
-
 import gov.nasa.jpf.ListenerAdapter;
 import gov.nasa.jpf.jvm.bytecode.ReturnInstruction;
 import gov.nasa.jpf.vm.ElementInfo;
@@ -10,6 +8,7 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
+import java.util.HashSet;
 
 public class StaticClassObjectTracker extends ListenerAdapter {
 

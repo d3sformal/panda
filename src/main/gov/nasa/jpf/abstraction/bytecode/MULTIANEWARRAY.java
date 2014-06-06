@@ -1,17 +1,16 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 import gov.nasa.jpf.vm.ArrayFields;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MULTIANEWARRAY extends gov.nasa.jpf.jvm.bytecode.MULTIANEWARRAY {
 
@@ -28,19 +27,19 @@ public class MULTIANEWARRAY extends gov.nasa.jpf.jvm.bytecode.MULTIANEWARRAY {
     @Override
     public Instruction execute(ThreadInfo ti) {
         StackFrame sf = ti.getTopFrame();
-        List<Attribute> attrs = new LinkedList<Attribute>();
+        List<Expression> attrs = new LinkedList<Expression>();
 
         for (int i = getDimensions() - 1; i >= 0 ; --i) {
-            Attribute attr = (Attribute) sf.getOperandAttr(i);
+            Expression attr = (Expression) sf.getOperandAttr(i);
 
             if (attr == null) {
-                attr = new EmptyAttribute();
+                attr = new EmptyExpression();
             }
 
             attrs.add(attr);
         }
 
-        Attribute attr = attrs.get(attrs.size() - 1);
+        Expression attr = attrs.get(attrs.size() - 1);
         attrs.remove(attrs.size() - 1);
 
         Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
@@ -54,24 +53,24 @@ public class MULTIANEWARRAY extends gov.nasa.jpf.jvm.bytecode.MULTIANEWARRAY {
         ElementInfo array = ti.getElementInfo(sf.peek());
         AnonymousArray expression = AnonymousArray.create(new Reference(array), attr.getExpression());
 
-        GlobalAbstraction.getInstance().processNewObject(expression);
+        PredicateAbstraction.getInstance().processNewObject(expression);
 
         sf = ti.getModifiableTopFrame();
-        sf.setOperandAttr(new Attribute(null, expression));
+        sf.setOperandAttr(new Expression(null, expression));
 
         // ALL ELEMENTS ARE NULL
-        setArrayAttributes(ti, array, attrs);
+        setArrayExpressions(ti, array, attrs);
 
         return actualNextInsn;
     }
 
-    private void setArrayAttributes(ThreadInfo ti, ElementInfo array, List<Attribute> subList) {
+    private void setArrayExpressions(ThreadInfo ti, ElementInfo array, List<Expression> subList) {
         if (subList.isEmpty()) return;
 
         ArrayFields fields = array.getArrayFields();
         int size = array.arrayLength();
 
-        Attribute attr = subList.get(subList.size() - 1);
+        Expression attr = subList.get(subList.size() - 1);
 
         for (int i = 0; i < size; ++i) {
             fields.addFieldAttr(size, i, attr);
@@ -79,7 +78,7 @@ public class MULTIANEWARRAY extends gov.nasa.jpf.jvm.bytecode.MULTIANEWARRAY {
             if (array.isReferenceArray()) {
                 ElementInfo subArray = ti.getElementInfo(array.getReferenceElement(i));
 
-                setArrayAttributes(ti, subArray, subList.subList(1, subList.size()));
+                setArrayExpressions(ti, subArray, subList.subList(1, subList.size()));
             }
         }
 

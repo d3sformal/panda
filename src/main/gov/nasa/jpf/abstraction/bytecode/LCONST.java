@@ -1,11 +1,10 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-
-import gov.nasa.jpf.abstraction.Attribute;
 
 /**
  * Loads a constant from a const pool onto the stack
@@ -23,10 +22,7 @@ public class LCONST extends gov.nasa.jpf.jvm.bytecode.LCONST {
 
         StackFrame sf = ti.getModifiableTopFrame();
 
-        /**
-         * Symbolic execution
-         */
-        sf.setLongOperandAttr(new Attribute(null, Constant.create(getValue())));
+        sf.setLongOperandAttr(Constant.create(getValue()));
 
         return ret;
     }

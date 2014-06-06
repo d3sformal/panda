@@ -1,21 +1,19 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.predicate.state.Trace;
-import gov.nasa.jpf.abstraction.predicate.state.State;
-import gov.nasa.jpf.abstraction.predicate.state.PredicateValuation;
-
 import gov.nasa.jpf.Config;
-import gov.nasa.jpf.report.Reporter;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.predicate.state.PredicateValuation;
+import gov.nasa.jpf.abstraction.predicate.state.State;
+import gov.nasa.jpf.abstraction.predicate.state.Trace;
 import gov.nasa.jpf.report.ConsolePublisher;
-import gov.nasa.jpf.vm.Transition;
-import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.report.Reporter;
+import gov.nasa.jpf.util.Left;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.Path;
 import gov.nasa.jpf.vm.Step;
-import gov.nasa.jpf.util.Left;
-
+import gov.nasa.jpf.vm.Transition;
 import java.io.PrintWriter;
 
 public class PredicateConsolePublisher extends ConsolePublisher {
@@ -35,7 +33,7 @@ public class PredicateConsolePublisher extends ConsolePublisher {
 
         publishTopicStart("trace " + reporter.getCurrentErrorId());
 
-        Trace trace = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getTrace();
+        Trace trace = PredicateAbstraction.getInstance().getTrace();
         int progressAlongTrace = 1;
 
         for (Transition t : path) {

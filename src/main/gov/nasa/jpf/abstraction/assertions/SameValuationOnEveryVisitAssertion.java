@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.assertions;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 public class SameValuationOnEveryVisitAssertion implements LocationAssertion {
     private Set<PredicateValuationMap> valuations = new HashSet<PredicateValuationMap>();

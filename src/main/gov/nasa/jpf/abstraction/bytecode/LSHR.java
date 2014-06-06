@@ -18,16 +18,13 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Divide;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.UninterpretedShiftRight;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
-
-import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.Divide;
-import gov.nasa.jpf.abstraction.common.UninterpretedShiftRight;
 
 /**
  * Shift right long
@@ -47,13 +44,7 @@ public class LSHR extends gov.nasa.jpf.jvm.bytecode.LSHR implements AbstractBina
     }
 
     @Override
-    public Attribute getResult(Long v1, Attribute attr1, Long v2, Attribute attr2) {
-        AbstractValue abs_v1 = Attribute.getAbstractValue(attr1);
-        AbstractValue abs_v2 = Attribute.getAbstractValue(attr2);
-
-        Expression a = Attribute.getExpression(attr1);
-        Expression b = Attribute.getExpression(attr2);
-
+    public Expression getResult(Expression a, Expression b) {
         Expression e;
 
         if (b instanceof Constant) {
@@ -69,7 +60,7 @@ public class LSHR extends gov.nasa.jpf.jvm.bytecode.LSHR implements AbstractBina
         /**
          * Performs the adequate operation over abstractions
          */
-        return new Attribute(Abstraction._shr(v1, abs_v1, v2, abs_v2), e);
+        return e;
     }
 
     @Override

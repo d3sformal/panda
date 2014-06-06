@@ -1,17 +1,16 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.util.RunDetector;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.LessThan;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -26,13 +25,13 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
     @Override
     public Instruction execute(ThreadInfo ti) {
         StackFrame sf = ti.getTopFrame();
-        Expression lengthExpression = Attribute.getExpression(sf.getOperandAttr());
+        Expression lengthExpression = ExpressionUtil.getExpression(sf.getOperandAttr());
 
         Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
         if (RunDetector.isRunning()) {
             // Determine the unambiguous concrete array length from predicates
-            PredicateAbstraction abs = (PredicateAbstraction) GlobalAbstraction.getInstance().get();
+            PredicateAbstraction abs = PredicateAbstraction.getInstance();
             Integer lengthValue = abs.computePreciseExpressionValue(lengthExpression);
 
             if (lengthValue == null) {
@@ -41,7 +40,7 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
 
             // Check validity of the array length
             Predicate negative = LessThan.create(lengthExpression, Constant.create(0));
-            TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(negative);
+            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(negative);
 
             if (value != TruthValue.FALSE) {
                 return ti.createAndThrowException("java.lang.NegativeArraySizeException");
@@ -61,10 +60,10 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
         ElementInfo array = ti.getElementInfo(sf.peek());
         AnonymousArray expression = AnonymousArray.create(new Reference(array), lengthExpression);
 
-        GlobalAbstraction.getInstance().processNewObject(expression);
+        PredicateAbstraction.getInstance().processNewObject(expression);
 
         sf = ti.getModifiableTopFrame();
-        sf.setOperandAttr(new Attribute(null, expression));
+        sf.setOperandAttr(expression);
 
         return actualNextInsn;
     }

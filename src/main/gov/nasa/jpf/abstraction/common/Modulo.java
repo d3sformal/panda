@@ -1,8 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
-import java.util.Map;
-
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import java.util.Map;
 
 /**
  * Modulo represents remainder operation for two variables (e.g. a % b)

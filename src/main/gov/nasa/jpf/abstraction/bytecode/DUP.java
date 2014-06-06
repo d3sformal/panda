@@ -1,13 +1,12 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
-import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 
 public class DUP extends gov.nasa.jpf.jvm.bytecode.DUP {
     @Override
@@ -15,17 +14,16 @@ public class DUP extends gov.nasa.jpf.jvm.bytecode.DUP {
         Instruction ret = super.execute(ti);
 
         StackFrame sf = ti.getModifiableTopFrame();
-        Attribute source = Attribute.getAttribute(sf.getOperandAttr());
-        Expression value = Attribute.getExpression(source);
+        Expression source = ExpressionUtil.getExpression(sf.getOperandAttr());
 
-        if (value instanceof AnonymousArray) {
-            AnonymousArray array = (AnonymousArray) value;
+        if (source instanceof AnonymousArray) {
+            AnonymousArray array = (AnonymousArray) source;
 
-            sf.setOperandAttr(new Attribute(Attribute.getAbstractValue(source), AnonymousArray.create(array.getReference(), array.getArrayLength(), true)));
-        } else if (value instanceof AnonymousObject) {
-            AnonymousObject object = (AnonymousObject) value;
+            sf.setOperandAttr(AnonymousArray.create(array.getReference(), array.getArrayLength(), true));
+        } else if (source instanceof AnonymousObject) {
+            AnonymousObject object = (AnonymousObject) source;
 
-            sf.setOperandAttr(new Attribute(Attribute.getAbstractValue(source), AnonymousObject.create(object.getReference(), true)));
+            sf.setOperandAttr(AnonymousObject.create(object.getReference(), true));
         }
 
         return ret;

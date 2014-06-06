@@ -1,17 +1,14 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
-
-import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
-import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
-
-import gov.nasa.jpf.abstraction.Attribute;
 
 public class LDC_W extends gov.nasa.jpf.jvm.bytecode.LDC_W {
 
@@ -45,7 +42,7 @@ public class LDC_W extends gov.nasa.jpf.jvm.bytecode.LDC_W {
         case CLASS:
             AnonymousObject object = AnonymousObject.create(new Reference(ti.getElementInfo(sf.peek())));
 
-            GlobalAbstraction.getInstance().processNewObject(object);
+            PredicateAbstraction.getInstance().processNewObject(object);
 
             expression = object;
             break;
@@ -54,7 +51,7 @@ public class LDC_W extends gov.nasa.jpf.jvm.bytecode.LDC_W {
             break;
         }
 
-        sf.setOperandAttr(new Attribute(null, expression));
+        sf.setOperandAttr(expression);
 
         return ret;
     }

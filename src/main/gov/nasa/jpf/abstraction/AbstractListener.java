@@ -18,43 +18,39 @@
 package gov.nasa.jpf.abstraction;
 
 // does not work well for static methods:summary not printed for errors
+
 import gov.nasa.jpf.PropertyListenerAdapter;
-import gov.nasa.jpf.abstraction.util.RunDetector;
-import gov.nasa.jpf.search.Search;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.MethodInfo;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.ClassInfo;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.VM;
-
-import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
-
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-
-import gov.nasa.jpf.abstraction.inspection.AliasingDumper;
-
+import gov.nasa.jpf.abstraction.assertions.AssertAliasedHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertConjunctionHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertDifferentValuationOnEveryVisitHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertDisjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertExclusiveDisjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertKnownValuationHandler;
-import gov.nasa.jpf.abstraction.assertions.AssertAliasedHandler;
-import gov.nasa.jpf.abstraction.assertions.AssertNotAliasedHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertMayBeAliasedHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertNotAliasedHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertNumberOfPossibleValuesHandler;
-import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertRevisitedAtLeastHandler;
-import gov.nasa.jpf.abstraction.assertions.AssertSameValuationOnEveryVisitHandler;
-import gov.nasa.jpf.abstraction.assertions.AssertDifferentValuationOnEveryVisitHandler;
-import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostWithValuationHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertRevisitedAtLeastWithValuationHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertSameAliasingOnEveryVisitHandler;
-
-import java.util.Set;
+import gov.nasa.jpf.abstraction.assertions.AssertSameValuationOnEveryVisitHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostHandler;
+import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostWithValuationHandler;
+import gov.nasa.jpf.abstraction.inspection.AliasingDumper;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.util.RunDetector;
+import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
+import gov.nasa.jpf.search.Search;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.Set;
 
 /**
  * AbstractListener monitors the state space traversal and individual instruction executions
@@ -118,18 +114,18 @@ public class AbstractListener extends PropertyListenerAdapter {
     @Override
     public void vmInitialized(VM vm) {
         RunDetector.initialiseNotRunning();
-        GlobalAbstraction.getInstance().start(vm.getCurrentThread());
+        PredicateAbstraction.getInstance().start(vm.getCurrentThread());
     }
 
     @Override
     public void stateAdvanced(Search search) {
         RunDetector.advance();
-        GlobalAbstraction.getInstance().forward(search.getVM().getCurrentThread().getTopFrameMethodInfo());
+        PredicateAbstraction.getInstance().forward(search.getVM().getCurrentThread().getTopFrameMethodInfo());
     }
 
     @Override
     public void stateBacktracked(Search search) {
-        GlobalAbstraction.getInstance().backtrack(search.getVM().getCurrentThread().getTopFrameMethodInfo());
+        PredicateAbstraction.getInstance().backtrack(search.getVM().getCurrentThread().getTopFrameMethodInfo());
         RunDetector.backtrack();
     }
 
@@ -169,23 +165,23 @@ public class AbstractListener extends PropertyListenerAdapter {
 
     @Override
     public void classLoaded(VM vm, ClassInfo classInfo) {
-        GlobalAbstraction.getInstance().processNewClass(ThreadInfo.getCurrentThread(), classInfo);
+        PredicateAbstraction.getInstance().processNewClass(ThreadInfo.getCurrentThread(), classInfo);
     }
 
     @Override
     public void threadStarted(VM vm, ThreadInfo threadInfo) {
-        GlobalAbstraction.getInstance().addThread(threadInfo);
+        PredicateAbstraction.getInstance().addThread(threadInfo);
     }
 
     @Override
     public void threadScheduled(VM vm, ThreadInfo threadInfo) {
-        GlobalAbstraction.getInstance().scheduleThread(threadInfo);
+        PredicateAbstraction.getInstance().scheduleThread(threadInfo);
     }
 
     @Override
     public void choiceGeneratorRegistered(VM vm, ChoiceGenerator<?> nextCG, ThreadInfo currentThread, Instruction executedInstruction) {
         if (!finished) {
-            ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).collectGarbage(vm, currentThread);
+            PredicateAbstraction.getInstance().collectGarbage(vm, currentThread);
         }
     }
 

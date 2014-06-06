@@ -1,11 +1,10 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
-
-import java.util.Set;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A predicate with a constant truth value ~ true

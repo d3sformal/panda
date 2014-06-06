@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.StackFrame;
 
 /**
@@ -38,37 +38,28 @@ public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long> {
     }
 
     @Override
-    protected Attribute getLeftAttribute(StackFrame sf) {
-        return getAttribute(sf, 3);
+    protected Expression getLHSExpression(StackFrame sf) {
+        return getExpression(sf, 3);
     }
 
     @Override
-    protected Attribute getRightAttribute(StackFrame sf) {
-        return getAttribute(sf, 1);
+    protected Expression getRHSExpression(StackFrame sf) {
+        return getExpression(sf, 1);
     }
 
     @Override
-    protected Long getLeftOperand(StackFrame sf) {
+    protected Long getLHSOperand(StackFrame sf) {
         return sf.peekLong(2);
     }
 
     @Override
-    protected Long getRightOperand(StackFrame sf) {
+    protected Long getRHSOperand(StackFrame sf) {
         return sf.peekLong(0);
     }
 
     @Override
-    final protected void storeAttribute(Attribute result, StackFrame sf) {
+    final protected void storeExpression(Expression result, StackFrame sf) {
         sf.setLongOperandAttr(result);
-    }
-
-    @Override
-    protected void storeResult(Attribute result, StackFrame sf) {
-        sf.popLong();
-        sf.popLong();
-
-        sf.pushLong(0);
-        storeAttribute(result, sf);
     }
 
 }

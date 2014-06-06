@@ -1,10 +1,5 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.common.access.Method;
-import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
-import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
-import gov.nasa.jpf.abstraction.common.impl.NullExpression;
-import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Context;
 import gov.nasa.jpf.abstraction.common.Contradiction;
@@ -19,8 +14,12 @@ import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.common.StaticContext;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
-
+import gov.nasa.jpf.abstraction.common.access.Method;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
+import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 
 /**
  * A special visitor of the hierarchy:

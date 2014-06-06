@@ -18,9 +18,10 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -38,7 +39,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
     @Override
     public Instruction execute(ThreadInfo ti) {
         StackFrame sf = ti.getTopFrame();
-        AccessExpression from = Attribute.getAccessExpression(sf.getOperandAttr());
+        AccessExpression from = ExpressionUtil.getAccessExpression(sf.getOperandAttr());
         AccessExpression path = DefaultObjectFieldRead.create(from, getFieldName());
 
         Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
@@ -53,7 +54,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
         }
 
         sf = ti.getModifiableTopFrame();
-        sf.setOperandAttr(new Attribute(null, path));
+        sf.setOperandAttr(path);
 
         AnonymousExpressionTracker.notifyPopped(from);
 

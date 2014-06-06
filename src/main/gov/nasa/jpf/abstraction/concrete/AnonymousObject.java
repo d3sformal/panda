@@ -1,17 +1,15 @@
 package gov.nasa.jpf.abstraction.concrete;
 
-import java.util.Set;
-import java.util.Map;
-
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
+import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
-import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.Tautology;
-
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents a freshly allocated object (freshly allocated = not loaded from a variable)

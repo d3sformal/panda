@@ -1,9 +1,5 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Map;
-
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
@@ -14,6 +10,9 @@ import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.impl.DefaultObjectExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicatesSMTStringifier;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implements common behaviour of most of the access expression elements

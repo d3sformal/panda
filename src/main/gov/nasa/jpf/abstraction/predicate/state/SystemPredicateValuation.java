@@ -1,43 +1,41 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
-import gov.nasa.jpf.abstraction.common.access.ReturnValue;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
-import gov.nasa.jpf.abstraction.common.access.Root;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
-import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.AbstractMethodContext;
+import gov.nasa.jpf.abstraction.common.AssumeContext;
 import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Context;
-import gov.nasa.jpf.abstraction.common.MethodContext;
-import gov.nasa.jpf.abstraction.common.AssumeContext;
-import gov.nasa.jpf.abstraction.common.AbstractMethodContext;
-import gov.nasa.jpf.abstraction.common.MethodAssumePreContext;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.MethodAssumePostContext;
+import gov.nasa.jpf.abstraction.common.MethodAssumePreContext;
+import gov.nasa.jpf.abstraction.common.MethodContext;
+import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.ObjectContext;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.common.StaticContext;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.ReturnValue;
+import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.abstraction.predicate.smt.SMTException;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.abstraction.util.RunDetector;
-import gov.nasa.jpf.vm.LocalVarInfo;
-import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.jvm.bytecode.IINC;
+import gov.nasa.jpf.jvm.bytecode.LocalVariableInstruction;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.LocalVarInfo;
+import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
-import gov.nasa.jpf.vm.Instruction;
-
-import gov.nasa.jpf.jvm.bytecode.LocalVariableInstruction;
-import gov.nasa.jpf.jvm.bytecode.IINC;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -246,14 +244,14 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
                 if (slotInUse[slotIndex]) {
                     // Actual symbolic parameter
-                    Attribute attr = Attribute.getAttribute(after.getSlotAttr(slotIndex));
+                    Expression expr = ExpressionUtil.getExpression(after.getSlotAttr(slotIndex));
 
                     LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
                     String name = arg == null ? null : arg.getName();
 
                     AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
 
-                    replacements.put(formalArgument, Attribute.getExpression(attr));
+                    replacements.put(formalArgument, expr);
                     argumentSymbols.add(formalArgument);
                 }
             }
@@ -339,7 +337,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
     public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
 
-        Attribute attr = Attribute.getAttribute(after.getResultAttr());
+        Expression expr = ExpressionUtil.getExpression(after.getResultAttr());
 
         if (RunDetector.isRunning()) {
             MethodFramePredicateValuation scope;
@@ -354,7 +352,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
              */
             for (Predicate predicate : getPredicates()) {
                 if (isPredicateOverReturn(predicate)) {
-                    Predicate determinant = predicate.replace(DefaultReturnValue.create(), Attribute.getExpression(attr));
+                    Predicate determinant = predicate.replace(DefaultReturnValue.create(), expr);
 
                     predicates.put(determinant, predicate);
                     determinants.add(determinant);
@@ -376,7 +374,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
         }
 
         ReturnValue returnValueSpecific = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
-        after.setOperandAttr(new Attribute(Attribute.getAbstractValue(attr), returnValueSpecific));
+        after.setOperandAttr(returnValueSpecific);
 
         // The rest is the same as if no return happend
         processVoidMethodReturn(threadInfo, before, after);
@@ -407,14 +405,14 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             getArgumentSlotUsage(method, slotInUse);
             getArgumentSlotType(method, argIsPrimitive);
 
-            Iterator<Object> originalArgumentAttributes = before.frameAttrIterator();
+            Expression[] originalArguments = (Expression[]) before.getFrameAttr();
+            int argIndex;
 
             // Replace formal parameters with actual parameters
+            argIndex = 0;
             for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
                 if (slotInUse[slotIndex]) {
                     // Actual symbolic parameter
-                    Attribute attr = Attribute.getAttribute(before.getSlotAttr(slotIndex));
-
                     LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
                     String name = arg == null ? null : arg.getName();
 
@@ -425,8 +423,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                         referenceArgs.add(l);
                     }
 
-                    Expression originalExpr = Attribute.getExpression(originalArgumentAttributes.next());
-                    Expression actualExpr = Attribute.getExpression(before.getLocalAttr(slotIndex));
+                    Expression originalExpr = originalArguments[argIndex++];
+                    Expression actualExpr = ExpressionUtil.getExpression(before.getLocalAttr(slotIndex));
 
                     boolean different = false;
 
@@ -482,7 +480,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                         LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
                         String name = arg == null ? null : arg.getName();
 
-                        Expression actualExpr = Attribute.getExpression(before.getLocalAttr(slotIndex));
+                        Expression actualExpr = ExpressionUtil.getExpression(before.getLocalAttr(slotIndex));
                         AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
 
                         replacements.put(formalArgument, actualExpr);
@@ -590,11 +588,10 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
                 // Reference arguments
                 for (AccessExpression path : temporaryPathsHolder) {
-                    Iterator<Object> originalActualParameters = before.frameAttrIterator();
-
+                    argIndex = 0;
                     for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments() && !canBeAffected; ++slotIndex) {
                         if (slotInUse[slotIndex]) {
-                            Expression expr = Attribute.getExpression(originalActualParameters.next());
+                            Expression expr = originalArguments[argIndex++];
 
                             if (!argIsPrimitive[slotIndex]) {
                                 // Could be null / access expression

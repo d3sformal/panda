@@ -1,27 +1,22 @@
 package gov.nasa.jpf.abstraction.predicate.state.universe;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-
-import gov.nasa.jpf.vm.MJIEnv;
-
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.FieldInfo;
-import gov.nasa.jpf.vm.StaticElementInfo;
-import gov.nasa.jpf.vm.ThreadInfo;
-
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
-import gov.nasa.jpf.abstraction.common.access.Root;
-import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
-
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.MJIEnv;
+import gov.nasa.jpf.vm.StaticElementInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Universe {
     public static int NULL = MJIEnv.NULL;
@@ -240,7 +235,7 @@ public class Universe {
 
                     if (indices[0] >= array.getLength()) continue;
                 } else {
-                   indices = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).computeAllExpressionValuesInRange(aeRead.getIndex(), 0, array.getLength());
+                   indices = PredicateAbstraction.getInstance().computeAllExpressionValuesInRange(aeRead.getIndex(), 0, array.getLength());
                 }
 
                 for (int i : indices) {

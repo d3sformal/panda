@@ -1,10 +1,9 @@
 package gov.nasa.jpf.abstraction.common.access.meta.impl;
 
-import java.util.Set;
-
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
+import java.util.Set;
 
 /**
  * The unmodified symbol "arr"

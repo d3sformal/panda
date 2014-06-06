@@ -18,25 +18,24 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import java.util.ArrayList;
-
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
+import java.util.ArrayList;
 
 /**
  * common root class for LOOKUPSWITCH and TABLESWITCH insns
@@ -53,10 +52,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 
         SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getModifiableTopFrame();
-        Attribute attr = Attribute.getAttribute(sf.getOperandAttr());
-
-        AbstractValue abs_v = Attribute.getAbstractValue(attr);
-        Expression expr = Attribute.getExpression(attr);
+        Expression expr = ExpressionUtil.getExpression(sf.getOperandAttr());
 
         if (!ti.isFirstStepInsn()) {
 
@@ -69,7 +65,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
                 for (int i = 0; i < matches.length; i++) {
                     int match = matches[i];
 
-                    TruthValue pred = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(Equals.create(expr, Constant.create(match)));
+                    TruthValue pred = PredicateAbstraction.getInstance().processBranchingCondition(Equals.create(expr, Constant.create(match)));
 
                     if (pred == TruthValue.UNDEFINED) {
                         predicateAbstractionFailed = true;
@@ -87,22 +83,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
             }
 
             if (choices == null) {
-                if (abs_v == null) {
-                    return super.execute(ti);
-                }
-
-                choices = new ArrayList<Integer>();
-
-                lastIdx = DEFAULT;
-                int value = sf.peek(0);
-
-                for (int i = 0, l = matches.length; i < l; i++) {
-                    AbstractBoolean result = Abstraction._eq(value, abs_v, matches[i], null);
-
-                    if (result != AbstractBoolean.FALSE) {
-                        choices.add(i);
-                    }
-                }
+                return super.execute(ti);
             }
 
             if (choices.size() > 0) {
@@ -127,7 +108,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 
             lastIdx = idx;
 
-            GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(Equals.create(expr, Constant.create(matches[idx])), TruthValue.TRUE));
+            PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(Equals.create(expr, Constant.create(matches[idx])), TruthValue.TRUE));
 
             return mi.getInstructionAt(targets[idx]);
         }

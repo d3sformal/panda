@@ -1,11 +1,10 @@
 package gov.nasa.jpf.abstraction.util;
 
-import org.apache.tools.ant.taskdefs.optional.junit.JUnitTest;
+import java.util.LinkedList;
+import java.util.List;
 import org.apache.tools.ant.taskdefs.optional.junit.JUnitTask;
 import org.apache.tools.ant.taskdefs.optional.junit.JUnitTaskMirror;
-
-import java.util.List;
-import java.util.LinkedList;
+import org.apache.tools.ant.taskdefs.optional.junit.JUnitTest;
 
 public class AntTestTask extends JUnitTask {
 

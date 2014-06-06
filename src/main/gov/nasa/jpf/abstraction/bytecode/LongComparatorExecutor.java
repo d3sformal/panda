@@ -18,10 +18,8 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Attribute;
 import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
-import gov.nasa.jpf.abstraction.numeric.SignsValue;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.StackFrame;
 
 /**
@@ -41,46 +39,32 @@ public class LongComparatorExecutor extends BinaryComparatorExecutor<Long> {
     }
 
     @Override
-    protected Attribute getLeftAttribute(StackFrame sf) {
-        return getAttribute(sf, 1);
+    protected Expression getLHSExpression(StackFrame sf) {
+        return getExpression(sf, 1);
     }
 
     @Override
-    protected Attribute getRightAttribute(StackFrame sf) {
-        return getAttribute(sf, 3);
+    protected Expression getRHSExpression(StackFrame sf) {
+        return getExpression(sf, 3);
     }
 
     @Override
-    final protected Long getLeftOperand(StackFrame sf) {
+    final protected Long getLHSOperand(StackFrame sf) {
         return sf.peekLong(0);
     }
 
     @Override
-    final protected Long getRightOperand(StackFrame sf) {
+    final protected Long getRHSOperand(StackFrame sf) {
         return sf.peekLong(2);
     }
 
     @Override
-    protected void storeAttribute(Attribute result, StackFrame sf) {
-    }
-
-    @Override
-    final protected void storeResult(Attribute result, StackFrame sf) {
+    final protected void storeResult(Expression result, StackFrame sf) {
         sf.popLong();
         sf.popLong();
 
-        SignsValue s_result = (SignsValue) Attribute.getAbstractValue(result);
-
-        if (s_result == SignsAbstraction.NEG) {
-            sf.push(-1);
-            sf.setOperandAttr(new Attribute(null, Constant.create(-1)));
-        } else if (s_result == SignsAbstraction.POS) {
-            sf.push(+1);
-            sf.setOperandAttr(new Attribute(null, Constant.create(+1)));
-        } else {
-            sf.push(0);
-            sf.setOperandAttr(new Attribute(null, Constant.create( 0)));
-        }
+        sf.push(((Constant) result).value.intValue());
+        sf.setOperandAttr(result);
     }
 
 }

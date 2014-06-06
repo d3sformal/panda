@@ -6,8 +6,6 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
-import gov.nasa.jpf.abstraction.Attribute;
-
 public class LDC2_W extends gov.nasa.jpf.jvm.bytecode.LDC2_W {
 
     public LDC2_W(long l) {
@@ -37,7 +35,7 @@ public class LDC2_W extends gov.nasa.jpf.jvm.bytecode.LDC2_W {
             break;
         }
 
-        sf.setLongOperandAttr(new Attribute(null, expression));
+        sf.setLongOperandAttr(expression);
 
         return ret;
     }

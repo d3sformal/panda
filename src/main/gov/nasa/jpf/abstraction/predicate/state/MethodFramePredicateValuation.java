@@ -1,46 +1,44 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
 import gov.nasa.jpf.Config;
-import gov.nasa.jpf.abstraction.util.Pair;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
-import gov.nasa.jpf.abstraction.common.Tautology;
+import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Conjunction;
-import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.Comparison;
-import gov.nasa.jpf.abstraction.common.Equals;
-import gov.nasa.jpf.abstraction.common.LessThan;
+import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
-import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicateValueDeterminingInfo;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
-import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Comparator;
-import java.util.Collections;
 
 /**
  * A predicate valuation for a single scope
@@ -592,7 +590,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
          * Aliasing cannot be changed when only variables of primitive data types are affected
          * It is not necessary to update predicates that express aliasing
          */
-        MethodFrameSymbolTable sym = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
+        MethodFrameSymbolTable sym = PredicateAbstraction.getInstance().getSymbolTable().get(0);
         if (!sym.isPrimitive(affected)) {
             improvePrecisionOfAliasingPredicates();
         }
@@ -655,7 +653,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
     }
 
     public void improvePrecisionOfAliasingPredicates() {
-        MethodFrameSymbolTable sym = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0);
+        MethodFrameSymbolTable sym = PredicateAbstraction.getInstance().getSymbolTable().get(0);
         Map<Predicate, TruthValue> improved = new HashMap<Predicate, TruthValue>();
 
         for (Predicate p : getPredicates()) {

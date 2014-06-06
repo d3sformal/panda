@@ -3,7 +3,6 @@ package gov.nasa.jpf.abstraction.predicate.state;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-
 import java.util.Map;
 
 /**

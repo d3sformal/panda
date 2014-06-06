@@ -20,13 +20,12 @@ package gov.nasa.jpf.abstraction.util;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.ListenerAdapter;
+import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
+import gov.nasa.jpf.search.Search;
+import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.search.Search;
-
-import gov.nasa.jpf.abstraction.FocusAbstractChoiceGenerator;
 
 
 public class DebugMonitor extends ListenerAdapter
@@ -69,4 +68,3 @@ public class DebugMonitor extends ListenerAdapter
         }
     }
 }
-

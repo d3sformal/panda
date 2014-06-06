@@ -18,7 +18,7 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.StackFrame;
 
 /**
@@ -38,8 +38,8 @@ public class FloatUnaryOperatorExecutor extends UnaryOperatorExecutor<Float> {
     }
 
     @Override
-    protected Attribute getAttribute(StackFrame sf) {
-        return getAttribute(sf, 1);
+    protected Expression getExpression(StackFrame sf) {
+        return getExpression(sf, 1);
     }
 
 
@@ -49,16 +49,16 @@ public class FloatUnaryOperatorExecutor extends UnaryOperatorExecutor<Float> {
     }
 
     @Override
-    final protected void storeAttribute(Attribute result, StackFrame sf) {
+    final protected void storeExpression(Expression result, StackFrame sf) {
         sf.setOperandAttr(result);
     }
 
     @Override
-    final protected void storeResult(Attribute result, StackFrame sf) {
+    final protected void storeResult(Expression result, StackFrame sf) {
         sf.popFloat();
 
         sf.pushFloat(0);
-        storeAttribute(result, sf);
+        storeExpression(result, sf);
     }
 
 }

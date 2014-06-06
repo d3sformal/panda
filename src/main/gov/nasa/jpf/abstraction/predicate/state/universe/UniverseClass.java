@@ -1,12 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate.state.universe;
 
-import java.util.Map;
-import java.util.HashMap;
-
+import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
-
-import gov.nasa.jpf.abstraction.util.Pair;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UniverseClass extends StructuredValue implements Associative {
     private ClassName identifier;
@@ -86,4 +84,3 @@ public class UniverseClass extends StructuredValue implements Associative {
         return false;
     }
 }
-

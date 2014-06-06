@@ -1,10 +1,9 @@
 package gov.nasa.jpf.abstraction.common;
 
-import java.util.Map;
-
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import java.util.Map;
 
 /**
  * Conjunction represents a logical AND of two predicates. (e.g. x > 0 AND x < 10)

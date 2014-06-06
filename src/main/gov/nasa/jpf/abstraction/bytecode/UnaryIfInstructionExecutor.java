@@ -2,16 +2,15 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
-import gov.nasa.jpf.abstraction.AbstractValue;
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
@@ -36,10 +35,7 @@ public class UnaryIfInstructionExecutor {
 
         SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getModifiableTopFrame();
-        Attribute attr = Attribute.getAttribute(sf.getOperandAttr());
-
-        AbstractValue abs_v = Attribute.getAbstractValue(attr);
-        Expression expr = Attribute.getExpression(attr);
+        Expression expr = ExpressionUtil.getExpression(sf.getOperandAttr());
 
         AbstractBoolean abs_condition = null;
 
@@ -60,7 +56,7 @@ public class UnaryIfInstructionExecutor {
              * No other abstraction can do that, the rest of them returns UNDEFINED.
              */
             if (expr != null && RunDetector.isRunning()) {
-                TruthValue pred = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(br.createPredicate(expr, constant));
+                TruthValue pred = PredicateAbstraction.getInstance().processBranchingCondition(br.createPredicate(expr, constant));
 
                 switch (pred) {
                 case TRUE:
@@ -77,15 +73,8 @@ public class UnaryIfInstructionExecutor {
 
             // In case there was no predicate abstraction / no symbolic expression (or the execution did not yet reach the target program or we already left it)
             if (abs_condition == null) {
-                // In case there is no abstract value fallback to a concrete execution
-                if (abs_v == null) { // the condition is concrete
-                    return br.executeConcrete(ti);
-                }
-
-                // the condition is abstract
-
-                // NUMERIC ABSTRACTION
-                abs_condition = br.getCondition(0, abs_v, 0, null);
+                // fallback to a concrete execution
+                return br.executeConcrete(ti);
             }
 
             if (abs_condition == AbstractBoolean.TRUE) {
@@ -109,7 +98,7 @@ public class UnaryIfInstructionExecutor {
 
             if (expr != null) {
                 Predicate predicate = br.createPredicate(expr, constant);
-                GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)));
+                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)));
             }
         }
 

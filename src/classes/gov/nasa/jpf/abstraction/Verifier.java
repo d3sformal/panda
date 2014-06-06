@@ -25,4 +25,3 @@ public class Verifier
         return false;
     }
 }
-

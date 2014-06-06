@@ -18,25 +18,25 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.LessThan;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ArrayFields;
+import gov.nasa.jpf.vm.ArrayIndexOutOfBoundsExecutiveException;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.ArrayIndexOutOfBoundsExecutiveException;
-import gov.nasa.jpf.abstraction.util.RunDetector;
 
 public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
 
@@ -45,16 +45,15 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
     @Override
     public Instruction execute(ThreadInfo ti) {
         StackFrame sf = ti.getTopFrame();
-        Attribute source = Attribute.getAttribute(sf.getOperandAttr(0));
-        Expression from = Attribute.getExpression(source);
-        Expression index = Attribute.getExpression(sf.getOperandAttr(1));
-        AccessExpression to = Attribute.getAccessExpression(sf.getOperandAttr(2));
+        Expression from = ExpressionUtil.getExpression(sf.getOperandAttr(0));
+        Expression index = ExpressionUtil.getExpression(sf.getOperandAttr(1));
+        AccessExpression to = ExpressionUtil.getAccessExpression(sf.getOperandAttr(2));
 
         ElementInfo ei = ti.getElementInfo(sf.peek(2));
         ArrayFields fields = ei.getArrayFields();
 
         for (int i = 0; i < fields.arrayLength(); ++i) {
-            fields.addFieldAttr(fields.arrayLength(), i, source);
+            fields.addFieldAttr(fields.arrayLength(), i, from);
         }
 
         Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
@@ -65,7 +64,7 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
                 LessThan.create(index, DefaultArrayLengthRead.create(to))
             );
 
-            TruthValue value = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(inBounds);
+            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(inBounds);
 
             if (value != TruthValue.TRUE) {
                 throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds));
@@ -83,7 +82,7 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
         AccessExpression element = DefaultArrayElementRead.create(to, index);
 
         // Element indices are derived from predicates in this method call
-        GlobalAbstraction.getInstance().processObjectStore(from, element);
+        PredicateAbstraction.getInstance().processObjectStore(from, element);
 
         AnonymousExpressionTracker.notifyPopped(from);
         AnonymousExpressionTracker.notifyPopped(to);

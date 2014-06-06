@@ -1,32 +1,30 @@
 package gov.nasa.jpf.abstraction.predicate;
 
+import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.Root;
-import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.MethodFramePredicateValuation;
+import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.predicate.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.predicate.state.universe.LocalVariable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
-import gov.nasa.jpf.abstraction.predicate.state.universe.ClassName;
+import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValue;
 import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueIdentifier;
 import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValueSlot;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseSlot;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseSlotKey;
-import gov.nasa.jpf.abstraction.predicate.state.universe.StructuredValue;
-
-import gov.nasa.jpf.Config;
 import gov.nasa.jpf.vm.DebugStateSerializer;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
-
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Comparator;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.ThreadInfo;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSerializer implements DebugStateSerializer {
     PrintWriter out = new PrintWriter(System.out);

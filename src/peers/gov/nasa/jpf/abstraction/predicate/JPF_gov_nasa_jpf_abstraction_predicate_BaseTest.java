@@ -1,8 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-import gov.nasa.jpf.vm.NativePeer;
-import gov.nasa.jpf.vm.MJIEnv;
 import gov.nasa.jpf.annotation.MJI;
+import gov.nasa.jpf.vm.MJIEnv;
+import gov.nasa.jpf.vm.NativePeer;
 
 public class JPF_gov_nasa_jpf_abstraction_predicate_BaseTest extends NativePeer {
 

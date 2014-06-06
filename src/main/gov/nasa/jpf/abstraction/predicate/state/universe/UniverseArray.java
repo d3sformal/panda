@@ -1,12 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate.state.universe;
 
-import java.util.Map;
-import java.util.HashMap;
-
+import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
-
-import gov.nasa.jpf.abstraction.util.Pair;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UniverseArray extends HeapValue implements Indexed {
     private Map<ElementIndex, UniverseSlot> elements = new HashMap<ElementIndex, UniverseSlot>();

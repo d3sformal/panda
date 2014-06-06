@@ -1,6 +1,5 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
-
 import java.util.Stack;
 
 /**

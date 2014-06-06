@@ -3,37 +3,35 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.AbstractValue;
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
-import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
-import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 import gov.nasa.jpf.abstraction.predicate.state.universe.ClassName;
+import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.LocalVarInfo;
-
-import java.util.Set;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Implementation of all binary IF instructions regardless their precise type.
@@ -46,15 +44,8 @@ public class BinaryIfInstructionExecutor {
 
         SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getModifiableTopFrame();
-        Attribute attr1 = Attribute.getAttribute(sf.getOperandAttr(1));
-        Attribute attr2 = Attribute.getAttribute(sf.getOperandAttr(0));
-
-        AbstractValue abs_v1 = Attribute.getAbstractValue(attr1);
-        AbstractValue abs_v2 = Attribute.getAbstractValue(attr2);
-        Expression expr1 = Attribute.getExpression(attr1);
-        Expression expr2 = Attribute.getExpression(attr2);
-
-        AbstractBoolean abs_condition = null;
+        Expression expr1 = ExpressionUtil.getExpression(sf.getOperandAttr(1));
+        Expression expr2 = ExpressionUtil.getExpression(sf.getOperandAttr(0));
 
         boolean conditionValue;
 
@@ -67,6 +58,8 @@ public class BinaryIfInstructionExecutor {
          * Otherwise we inspect all the choices
          */
         if (!ti.isFirstStepInsn()) { // first time around
+            TruthValue truth = TruthValue.UNDEFINED;
+
             /**
              * If there is enough information (symbolic expressions) to decide the condition we ask abstractions to provide the truth value
              * Only predicate abstraction is designed to respond with a valid value (TRUE, FALSE, UNKNOWN).
@@ -74,40 +67,23 @@ public class BinaryIfInstructionExecutor {
              */
             if (expr1 != null && expr2 != null && RunDetector.isRunning()) {
                 Predicate predicate = br.createPredicate(expr1, expr2);
-                TruthValue truth = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(predicate);
+                truth = PredicateAbstraction.getInstance().processBranchingCondition(predicate);
+            }
 
-                switch (truth) {
+            switch (truth) {
+                // IF THE BRANCH COULD NOT BE PICKED BY PREDICATE ABSTRACTION (IT IS NOT ACTIVE)
+                default:
+                case UNDEFINED:
+                    return br.executeConcrete(ti);
                 case TRUE:
-                    abs_condition = AbstractBoolean.TRUE;
+                    ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
+                    conditionValue = true;
                     break;
                 case FALSE:
-                    abs_condition = AbstractBoolean.FALSE;
+                    ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
+                    conditionValue = false;
                     break;
                 case UNKNOWN:
-                    abs_condition = AbstractBoolean.TOP;
-                    break;
-                }
-            }
-
-            // IF THE abs_condition COULD NOT BE DERIVED BY PREDICATE ABSTRACTION (IT IS NOT ACTIVE)
-            if (abs_condition == null) {
-                if (abs_v1 == null && abs_v2 == null) { // the condition is concrete
-                    return br.executeConcrete(ti);
-                }
-
-                // the condition is abstract
-
-                // NUMERIC ABSTRACTION
-                abs_condition = br.getCondition(v1, abs_v1, v2, abs_v2);
-            }
-
-            if (abs_condition == AbstractBoolean.TRUE) {
-                ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
-                conditionValue = true;
-            } else if (abs_condition == AbstractBoolean.FALSE) {
-                ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
-                conditionValue = false;
-            } else { // TOP
                     ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
                     ss.setNextChoiceGenerator(cg);
 
@@ -122,7 +98,7 @@ public class BinaryIfInstructionExecutor {
 
             if (expr1 != null && expr2 != null) {
                 Predicate predicate = br.createPredicate(expr1, expr2);
-                GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)));
+                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)));
             }
         }
 
@@ -138,7 +114,7 @@ public class BinaryIfInstructionExecutor {
                 Map<AccessExpression, ElementInfo> primitiveExprs = new HashMap<AccessExpression, ElementInfo>();
                 Set<AccessExpression> allExprs = new HashSet<AccessExpression>();
 
-                ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getPredicateValuation().get(0).addAccessExpressionsToSet(allExprs);
+                PredicateAbstraction.getInstance().getPredicateValuation().get(0).addAccessExpressionsToSet(allExprs);
                 collectAllStateExpressions(primitiveExprs, allExprs, sf, ti);
 
                 ElementInfo[] targetArray = new ElementInfo[primitiveExprs.keySet().size()];
@@ -151,7 +127,7 @@ public class BinaryIfInstructionExecutor {
                     ++i;
                 }
 
-                int[] valueArray = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getPredicateValuation().get(0).getConcreteState(exprArray);
+                int[] valueArray = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getConcreteState(exprArray);
 
                 for (int j = 0; j < exprArray.length; ++j) {
                     injectConcreteValueIntoJPFState(exprArray[j], valueArray[j], targetArray[j], sf, ti);
@@ -183,7 +159,7 @@ public class BinaryIfInstructionExecutor {
             } else if (root.isStatic()) {
                 cls.clear();
 
-                ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).getSymbolTable().get(0).lookupValues(root, cls);
+                PredicateAbstraction.getInstance().getSymbolTable().get(0).lookupValues(root, cls);
 
                 assert cls.size() == 1;
 
@@ -213,7 +189,7 @@ public class BinaryIfInstructionExecutor {
                 if (r.getIndex() instanceof Constant) {
                     indices = new int[] {((Constant) r.getIndex()).value.intValue()};
                 } else {
-                    indices = ((PredicateAbstraction) GlobalAbstraction.getInstance().get()).computeAllExpressionValuesInRange(r.getIndex(), 0, parent.arrayLength());
+                    indices = PredicateAbstraction.getInstance().computeAllExpressionValuesInRange(r.getIndex(), 0, parent.arrayLength());
                 }
 
                 for (int index : indices) {

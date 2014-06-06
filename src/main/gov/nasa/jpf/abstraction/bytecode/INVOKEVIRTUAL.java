@@ -18,9 +18,10 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.util.StackExpressionMonitor;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -45,8 +46,6 @@ public class INVOKEVIRTUAL extends gov.nasa.jpf.jvm.bytecode.INVOKEVIRTUAL {
             return actualNextInsn;
         }
 
-        after.setFrameAttr(null);
-
         /**
          * Collect current symbolic arguments and store them as attributes of the method
          * this allows predicate abstraction to reason about argument assignment
@@ -54,20 +53,18 @@ public class INVOKEVIRTUAL extends gov.nasa.jpf.jvm.bytecode.INVOKEVIRTUAL {
          * These copies of attributes are preserved during the execution of the method and may be used after return.
          * We cannot rely solely on argument attributes for this reason.
          */
+        Expression[] arguments = new Expression[after.getMethodInfo().getNumberOfStackArguments()];
+
         for (int i = 0; i < after.getMethodInfo().getNumberOfStackArguments(); ++i) {
-            Attribute attr = Attribute.getAttribute(before.getOperandAttr(i));
-
-            if (attr == null) attr = new Attribute(null, null);
-
-            after.addFrameAttr(attr);
+            arguments[after.getMethodInfo().getNumberOfStackArguments() - i - 1] = ExpressionUtil.getExpression(before.getOperandAttr(i));
         }
 
-        GlobalAbstraction.getInstance().processMethodCall(ti, before, after);
+        after.setFrameAttr(arguments);
+
+        PredicateAbstraction.getInstance().processMethodCall(ti, before, after);
 
         for (int i = 0; i < after.getMethodInfo().getNumberOfStackArguments(); ++i) {
-            Attribute attr = Attribute.getAttribute(before.getOperandAttr(i));
-
-            AnonymousExpressionTracker.notifyPopped(Attribute.getExpression(attr), 1);
+            AnonymousExpressionTracker.notifyPopped(arguments[i], 1);
         }
 
         return actualNextInsn;

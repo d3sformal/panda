@@ -1,22 +1,19 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-import org.junit.Test;
-import static org.junit.Assert.assertTrue;
-
-import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.Config;
-
-import java.net.URLClassLoader;
-import java.net.URL;
-import java.net.MalformedURLException;
+import gov.nasa.jpf.JPF;
 import java.io.File;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Iterator;
-
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.annotation.Annotation;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 public class BaseTest {
     native public static void assertConjunction(String... assertions);

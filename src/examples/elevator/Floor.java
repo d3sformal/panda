@@ -28,4 +28,3 @@ class Floor {
         downFlag = false;
     }
 }
-

@@ -1,10 +1,9 @@
 package gov.nasa.jpf.abstraction.assertions;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-
 import gov.nasa.jpf.vm.Instruction;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class AssertStateMatchingContext {
     public static Map<Instruction, LocationAssertion> assertions = new HashMap<Instruction, LocationAssertion>();

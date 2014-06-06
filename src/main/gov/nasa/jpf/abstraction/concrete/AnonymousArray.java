@@ -4,7 +4,6 @@ import gov.nasa.jpf.abstraction.common.ArrayExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
 
 /**

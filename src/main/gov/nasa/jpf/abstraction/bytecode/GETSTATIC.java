@@ -18,14 +18,13 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-
-import gov.nasa.jpf.abstraction.Attribute;
 
 public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
 
@@ -48,7 +47,7 @@ public class GETSTATIC extends gov.nasa.jpf.jvm.bytecode.GETSTATIC {
         path = DefaultObjectFieldRead.create(path, getFieldName());
 
         StackFrame sf = ti.getModifiableTopFrame();
-        sf.setOperandAttr(new Attribute(null, path));
+        sf.setOperandAttr(path);
 
         return actualNextInsn;
     }

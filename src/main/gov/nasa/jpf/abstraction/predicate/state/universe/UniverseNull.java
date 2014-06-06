@@ -1,9 +1,8 @@
 package gov.nasa.jpf.abstraction.predicate.state.universe;
 
-import java.util.Map;
-import java.util.Collections;
-
 import gov.nasa.jpf.abstraction.util.Pair;
+import java.util.Collections;
+import java.util.Map;
 
 public class UniverseNull extends HeapValue implements Associative, Indexed {
 

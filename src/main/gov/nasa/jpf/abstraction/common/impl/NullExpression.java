@@ -1,17 +1,16 @@
 package gov.nasa.jpf.abstraction.common.impl;
 
-import java.util.Set;
-import java.util.Map;
-
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.ObjectExpression;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.Contradiction;
-import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
+import java.util.Map;
+import java.util.Set;
 
 public class NullExpression extends Constant implements ObjectExpression {
 

@@ -18,18 +18,17 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.NativeStackFrame;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Types;
-
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.NativeStackFrame;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Types;
 
 public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
 
@@ -47,9 +46,9 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
             case Types.T_REFERENCE:
                 AnonymousObject returnValue = AnonymousObject.create(new Reference(ti.getElementInfo(((Integer) retValue).intValue())));
 
-                GlobalAbstraction.getInstance().processNewObject(returnValue);
+                PredicateAbstraction.getInstance().processNewObject(returnValue);
 
-                before.setReturnAttr(new Attribute(null, returnValue));
+                before.setReturnAttr(returnValue);
                 break;
 
             case Types.T_BOOLEAN:
@@ -60,7 +59,7 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
             case Types.T_FLOAT:
             case Types.T_LONG:
             case Types.T_DOUBLE:
-                before.setReturnAttr(new Attribute(null, MethodFrameSymbolTable.DUMMY_VARIABLE));
+                before.setReturnAttr(MethodFrameSymbolTable.DUMMY_VARIABLE);
                 break;
 
             case Types.T_VOID:
@@ -76,9 +75,9 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
         }
 
         if (before.getMethodInfo().getReturnTypeCode() == Types.T_VOID) {
-            GlobalAbstraction.getInstance().processVoidMethodReturn(ti, before, after);
+            PredicateAbstraction.getInstance().processVoidMethodReturn(ti, before, after);
         } else {
-            GlobalAbstraction.getInstance().processMethodReturn(ti, before, after);
+            PredicateAbstraction.getInstance().processMethodReturn(ti, before, after);
         }
 
         return actualNextInsn;

@@ -2,14 +2,15 @@ package gov.nasa.jpf.abstraction.predicate.util;
 
 import gov.nasa.jpf.ListenerAdapter;
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.Attribute;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ReturnInstruction;
-import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 /**
@@ -19,23 +20,28 @@ public class StackExpressionMonitor extends ListenerAdapter {
 
     @Override
     public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
-        //if (RunDetector.isRunning()) {
+        if (RunDetector.isRunning()) {
             StackFrame sf = curTh.getTopFrame();
+
             if (sf != null) {
                 inspect(sf);
             }
-        //}
+        }
     }
 
     public static void inspect(StackFrame sf) {
         System.out.println("--EXPRESSIONS --");
-        for (int i = 0; i <= (sf.getTopPos() - sf.getLocalVariableCount()); i++)
-        {
-            Attribute attr = Attribute.getAttribute(sf.getOperandAttr(i));
-            if ((attr != null) && (Attribute.getExpression(attr) != null)) System.out.println("["+i+"]: " + Attribute.getExpression(attr).toString());
-            else System.out.println("["+i+"]: null");
+
+        for (int i = 0; i <= (sf.getTopPos() - sf.getLocalVariableCount()); i++) {
+            Expression expr = ExpressionUtil.getExpression(sf.getOperandAttr(i));
+
+            if (expr != null) {
+                System.out.println("[" + i + "]: " + expr);
+            } else {
+                System.out.println("[" + i + "]: null");
+            }
         }
+
         System.out.println("--------------");
     }
 }
-

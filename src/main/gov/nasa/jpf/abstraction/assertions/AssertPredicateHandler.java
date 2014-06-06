@@ -1,16 +1,15 @@
 package gov.nasa.jpf.abstraction.assertions;
 
 import gov.nasa.jpf.GenericProperty;
-import gov.nasa.jpf.vm.VM;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.ElementInfo;
-
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
 import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
+import gov.nasa.jpf.abstraction.common.Tautology;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 public abstract class AssertPredicateHandler extends AssertHandler {
 
@@ -46,7 +45,7 @@ public abstract class AssertPredicateHandler extends AssertHandler {
 
     protected void checkValuation(Predicate assertedFact, TruthValue assertedValuation) {
         // we model assert in the same way as Java using branches: if (asserted != inferred) throw exception
-        TruthValue inferredValuation = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(assertedFact);
+        TruthValue inferredValuation = PredicateAbstraction.getInstance().processBranchingCondition(assertedFact);
 
         if (assertedValuation != inferredValuation) {
             throw new RuntimeException("Asserted incorrect predicate valuation: `" + assertedFact + "` expected to valuate to `" + assertedValuation + "` but actually valuated to `" + inferredValuation + "`");

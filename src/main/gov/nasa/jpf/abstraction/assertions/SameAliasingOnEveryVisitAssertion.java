@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.assertions;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 public class SameAliasingOnEveryVisitAssertion implements LocationAssertion {
     private Set<AliasingMap> aliasings = new HashSet<AliasingMap>();

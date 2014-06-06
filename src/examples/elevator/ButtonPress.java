@@ -25,4 +25,3 @@ class ButtonPress {
         time = t;
     }
 }
-

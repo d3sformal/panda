@@ -1,15 +1,21 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
 import gov.nasa.jpf.abstraction.common.Add;
+import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Divide;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Implication;
+import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Modulo;
-import gov.nasa.jpf.abstraction.common.UninterpretedShiftLeft;
-import gov.nasa.jpf.abstraction.common.UninterpretedShiftRight;
 import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
 import gov.nasa.jpf.abstraction.common.Subtract;
+import gov.nasa.jpf.abstraction.common.UninterpretedShiftLeft;
+import gov.nasa.jpf.abstraction.common.UninterpretedShiftRight;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
@@ -23,12 +29,6 @@ import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
-import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.Conjunction;
-import gov.nasa.jpf.abstraction.common.Disjunction;
-import gov.nasa.jpf.abstraction.common.Equals;
-import gov.nasa.jpf.abstraction.common.Implication;
-import gov.nasa.jpf.abstraction.common.LessThan;
 
 /**
  * Transforms predicates into syntax that the SMT understands (SMTLIB)

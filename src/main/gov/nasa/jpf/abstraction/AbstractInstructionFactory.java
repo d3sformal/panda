@@ -19,23 +19,18 @@
 
 package gov.nasa.jpf.abstraction;
 
+import gov.nasa.jpf.Config;
+import gov.nasa.jpf.abstraction.bytecode.*;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstractionFactory;
+import gov.nasa.jpf.util.ClassInfoFilter;
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MethodInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import gov.nasa.jpf.Config;
-import gov.nasa.jpf.vm.ClassInfo;
-import gov.nasa.jpf.vm.MethodInfo;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.abstraction.bytecode.*;
-import gov.nasa.jpf.abstraction.numeric.EvennessAbstractionFactory;
-import gov.nasa.jpf.abstraction.numeric.IntervalAbstractionFactory;
-import gov.nasa.jpf.abstraction.numeric.RangeAbstractionFactory;
-import gov.nasa.jpf.abstraction.numeric.SignsAbstractionFactory;
-import gov.nasa.jpf.abstraction.numeric.ContainerAbstraction;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstractionFactory;
-import gov.nasa.jpf.util.ClassInfoFilter;
 
 /**
  * Ensures interpretations of non-standard instructions respecting the selected abstractions.
@@ -54,45 +49,19 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 
         filter = new ClassInfoFilter(null, null, null, null);
 
-        Map<String, AbstractionFactory> abs_factory = new HashMap<String, AbstractionFactory>();
-
-        abs_factory.put("signs", new SignsAbstractionFactory());
-        abs_factory.put("evenness", new EvennessAbstractionFactory());
-        abs_factory.put("interval", new IntervalAbstractionFactory());
-        abs_factory.put("range", new RangeAbstractionFactory());
-        abs_factory.put("predicates", new PredicateAbstractionFactory());
+        PredicateAbstractionFactory factory = new PredicateAbstractionFactory();
 
         List<Abstraction> abs_list = new ArrayList<Abstraction>();
 
         String[] abs_str = conf.getStringArray("apf.abstract_domain");
+        String[][] args = new String[abs_str.length][];
 
-        for (String s : abs_str) {
-            String[] args = s.split(" ");
-            String abs_name = args[0].toLowerCase();
-
-            AbstractionFactory factory = abs_factory.get(abs_name);
-
-            if (factory == null) {
-                System.out.println("### jpf-abstraction: " + s
-                        + " is unknown abstraction");
-            } else {
-                Abstraction abs = factory.create(conf, args);
-
-                if (abs != null) {
-                    abs_list.add(abs);
-                }
-            }
+        for (int i = 0; i < abs_str.length; ++i) {
+            args[i] = abs_str[i].split(" ");
+            args[i][0]= args[i][0].toLowerCase();
         }
 
-        if (abs_list.size() == 0) {
-            GlobalAbstraction.set(null);
-        } else if (abs_list.size() == 1) {
-            GlobalAbstraction.set(abs_list.get(0));
-        } else {
-            GlobalAbstraction.set(new ContainerAbstraction(abs_list));
-            System.out
-                    .println("### jpf-abstraction: CONTAINER abstraction turned on");
-        }
+        PredicateAbstraction.setInstance(factory.create(conf, args));
     }
 
     // bytecodes

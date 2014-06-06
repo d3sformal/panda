@@ -19,18 +19,16 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
-import gov.nasa.jpf.abstraction.Attribute;
-import gov.nasa.jpf.abstraction.GlobalAbstraction;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Notation;
-import gov.nasa.jpf.abstraction.numeric.SignsAbstraction;
-import gov.nasa.jpf.abstraction.numeric.SignsValue;
-import gov.nasa.jpf.abstraction.common.Equals;
-import gov.nasa.jpf.abstraction.common.LessThan;
-import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.LessThan;
+import gov.nasa.jpf.abstraction.common.Notation;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
@@ -39,13 +37,10 @@ import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 
-import gov.nasa.jpf.abstraction.Attribute;
-
 /**
  * An implementation of common behaviour of all the comparison expressions
  */
 public abstract class BinaryComparatorExecutor<T> {
-
     final public Instruction execute(AbstractBinaryOperator<T> cmp, ThreadInfo ti) {
 
         String name = cmp.getClass().getSimpleName();
@@ -53,15 +48,13 @@ public abstract class BinaryComparatorExecutor<T> {
         SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getModifiableTopFrame();
 
-        Attribute attr1 = getLeftAttribute(sf);
-        Attribute attr2 = getRightAttribute(sf);
+        Expression expr1 = getLHSExpression(sf);
+        Expression expr2 = getRHSExpression(sf);
 
-        AbstractValue abs_v1 = Attribute.getAbstractValue(attr1);
-        AbstractValue abs_v2 = Attribute.getAbstractValue(attr2);
-        Expression expr1 = Attribute.getExpression(attr1);
-        Expression expr2 = Attribute.getExpression(attr2);
-
-        Attribute result = null;
+        Integer result = null;
+        boolean less_than = false;
+        boolean equal = false;
+        boolean greater_than = false;
 
         /**
          * First we check whether there is no choice generator present
@@ -75,8 +68,8 @@ public abstract class BinaryComparatorExecutor<T> {
              * No other abstraction can do that, the rest of them returns UNDEFINED.
              */
             if (expr1 != null && expr2 != null && RunDetector.isRunning()) {
-                TruthValue lt = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(LessThan.create(expr1, expr2));
-                TruthValue eq = (TruthValue) GlobalAbstraction.getInstance().processBranchingCondition(Equals.create(expr1, expr2));
+                TruthValue lt = PredicateAbstraction.getInstance().processBranchingCondition(LessThan.create(expr1, expr2));
+                TruthValue eq = PredicateAbstraction.getInstance().processBranchingCondition(Equals.create(expr1, expr2));
                 TruthValue gt = null;
 
                 if (TruthValue.and(lt, eq) == TruthValue.UNDEFINED) {
@@ -91,41 +84,52 @@ public abstract class BinaryComparatorExecutor<T> {
 
                 // UNDEFINED MEANS THERE WAS NO ABSTRACTION TO DECIDE THE VALIDITY OF THE PREDICATE
                 if (gt != TruthValue.UNDEFINED) {
-                    SignsValue absValue = SignsAbstraction.getInstance().create(lt != TruthValue.FALSE, eq != TruthValue.FALSE, gt != TruthValue.FALSE);
+                    less_than = lt != TruthValue.FALSE;
+                    equal = eq != TruthValue.FALSE;
+                    greater_than = gt != TruthValue.FALSE;
 
-                    result = new Attribute(absValue, Constant.create(absValue.getKey() - 1));
+                    if (less_than) result = -1;
+                    if (equal) result = 0;
+                    if (greater_than) result = +1;
                 }
             }
 
             /**
-             * When there was no predicate abstraction we try to follow other abstractions or default to concrete execution when the operands are non abstract values
+             * When there was no predicate abstraction we default to concrete execution
              */
             if (result == null) {
-                T v1 = getLeftOperand(sf);
-                T v2 = getRightOperand(sf);
+                Instruction ret = cmp.executeConcrete(ti);
 
-                if (abs_v1 == null && abs_v2 == null) {
-                    Instruction ret = cmp.executeConcrete(ti);
+                sf.setOperandAttr(Constant.create(sf.peek()));
 
-                    sf.setOperandAttr(new Attribute(null, Constant.create(sf.peek())));
-
-                    return ret;
-                }
-
-                result = cmp.getResult(v1, attr1, v2, attr2);
+                return ret;
             }
 
             /**
              * If the result of the comparison is not deterministic we create a choice generator and let JPF to reexecute this instruction
              */
-            if (Attribute.getAbstractValue(result).isComposite()) {
-                int size = Attribute.getAbstractValue(result).getTokensNumber();
+            if ((less_than && equal) || (less_than && greater_than) || (equal && greater_than)) {
+                int size = 0;
+
+                size += less_than ? 1 : 0;
+                size += equal ? 1 : 0;
+                size += greater_than ? 1 : 0;
+
                 int i = 0;
                 int[] choices = new int[size];
 
-                for (AbstractValue choice : Attribute.getAbstractValue(result).getTokens()) {
-                    choices[i] = choice.getKey();
+                if (less_than) {
+                    choices[i] = -1;
+                    ++i;
+                }
 
+                if (equal) {
+                    choices[i] = 0;
+                    ++i;
+                }
+
+                if (greater_than) {
+                    choices[i] = +1;
                     ++i;
                 }
 
@@ -142,40 +146,34 @@ public abstract class BinaryComparatorExecutor<T> {
 
             assert (cg instanceof IntChoiceFromList);
 
-            int key = (Integer) cg.getNextChoice();
-
-            SignsValue custom = new SignsValue(key);
-            SignsValue absValue = SignsAbstraction.getInstance().create(custom.can_be_NEG(), custom.can_be_ZERO(), custom.can_be_POS());
-
-            result = new Attribute(absValue, Constant.create(absValue.getKey() - 1));
+            result = (Integer) cg.getNextChoice();
 
             if (expr1 != null && expr2 != null) {
                 Predicate predicate = Equals.create(expr1, expr2);
 
-                if (absValue == SignsAbstraction.NEG) {
+                if (result == -1) {
                     predicate = LessThan.create(expr1, expr2);
                 }
-                if (absValue == SignsAbstraction.POS) {
+                if (result == +1) {
                     predicate = LessThan.create(expr2, expr1);
                 }
 
-                GlobalAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.TRUE));
+                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.TRUE));
             }
         }
 
-        storeResult(result, sf);
+        storeResult(Constant.create(result), sf);
 
         return cmp.getNext(ti);
     }
 
-    protected Attribute getAttribute(StackFrame sf, int index) {
-        return (Attribute)sf.getOperandAttr(index);
+    protected Expression getExpression(StackFrame sf, int index) {
+        return ExpressionUtil.getExpression(sf.getOperandAttr(index));
     }
 
-    abstract protected Attribute getLeftAttribute(StackFrame sf);
-    abstract protected Attribute getRightAttribute(StackFrame sf);
-    abstract protected T getLeftOperand(StackFrame sf);
-    abstract protected T getRightOperand(StackFrame sf);
-    abstract protected void storeAttribute(Attribute result, StackFrame sf);
-    abstract protected void storeResult(Attribute result, StackFrame sf);
+    abstract protected Expression getLHSExpression(StackFrame sf);
+    abstract protected Expression getRHSExpression(StackFrame sf);
+    abstract protected T getLHSOperand(StackFrame sf);
+    abstract protected T getRHSOperand(StackFrame sf);
+    abstract protected void storeResult(Expression result, StackFrame sf);
 }
