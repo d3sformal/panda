@@ -18,20 +18,11 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.common.Conjunction;
-import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.LessThan;
-import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.ExpressionUtil;
-import gov.nasa.jpf.abstraction.util.RunDetector;
-import gov.nasa.jpf.vm.ArrayIndexOutOfBoundsExecutiveException;
+import gov.nasa.jpf.jvm.bytecode.ArrayElementInstruction;
+import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -39,47 +30,44 @@ import gov.nasa.jpf.vm.ThreadInfo;
 /**
  * Stores a short value into an array
  */
-public class IASTORE extends gov.nasa.jpf.jvm.bytecode.IASTORE {
+public class IASTORE extends gov.nasa.jpf.jvm.bytecode.IASTORE implements ArrayStoreInstruction {
 
-    private static final String ARRAY_INDEX_OUT_OF_BOUNDS = "java.lang.ArrayIndexOutOfBoundsException";
+    private ArrayStoreExecutor executor = new ArrayStoreExecutor();
 
     @Override
     public Instruction execute(ThreadInfo ti) {
-        StackFrame sf = ti.getTopFrame();
-        Expression from = ExpressionUtil.getExpression(sf.getOperandAttr(0));
-        Expression index = ExpressionUtil.getExpression(sf.getOperandAttr(1));
-        AccessExpression to = ExpressionUtil.getAccessExpression(sf.getOperandAttr(2));
-        AccessExpression element = DefaultArrayElementRead.create(to, index);
-        AccessExpression length = DefaultArrayLengthRead.create(to);
+        return executor.execute(this, ti);
+    }
 
-        Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+    @Override
+    public Instruction executeConcrete(ThreadInfo ti) {
+        return super.execute(ti);
+    }
 
-        if (RunDetector.isRunning() && !RunDetector.isInLibrary(ti)) {
-            Predicate inBounds = Conjunction.create(
-                Negation.create(LessThan.create(index, Constant.create(0))),
-                LessThan.create(index, length)
-            );
+    @Override
+    public AccessExpression getLHSAccessExpression(StackFrame sf) {
+        return ExpressionUtil.getAccessExpression(sf.getOperandAttr(2));
+    }
 
-            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(inBounds);
+    @Override
+    public ElementInfo getLHSArray(StackFrame sf) {
+        ThreadInfo ti = ThreadInfo.getCurrentThread();
 
-            if (value != TruthValue.TRUE) {
-                throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds));
-            }
-        }
+        return ti.getElementInfo(sf.peek(2));
+    }
 
-        // Here we may write into a different index than those corresponding to abstract state
-        // Only if we do not apply pruning of infeasible paths (inconsistent concrete/abstract state)
-        Instruction actualNextInsn = super.execute(ti);
+    @Override
+    public Expression getRHSExpression(StackFrame sf) {
+        return ExpressionUtil.getExpression(sf.getOperandAttr(0));
+    }
 
-        if (JPFInstructionAdaptor.testArrayElementInstructionAbort(this, ti, expectedNextInsn, actualNextInsn)) {
-            return actualNextInsn;
-        }
+    @Override
+    public Expression getIndexExpression(StackFrame sf) {
+        return ExpressionUtil.getExpression(sf.getOperandAttr(1));
+    }
 
-        // Element indices are derived from predicates in this method call
-        PredicateAbstraction.getInstance().processPrimitiveStore(from, element);
-
-        AnonymousExpressionTracker.notifyPopped(to);
-
-        return actualNextInsn;
+    @Override
+    public ArrayElementInstruction getSelf() {
+        return this;
     }
 }
