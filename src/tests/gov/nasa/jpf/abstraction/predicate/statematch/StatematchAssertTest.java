@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.predicate.statematch;
 import gov.nasa.jpf.abstraction.predicate.FailingTest;
 import gov.nasa.jpf.abstraction.predicate.Test;
 
-public class AssertTest extends StateMatchingTest {
+public class StatematchAssertTest extends StateMatchingTest {
     @Test
     public static void test1() {
         Integer o = 42;

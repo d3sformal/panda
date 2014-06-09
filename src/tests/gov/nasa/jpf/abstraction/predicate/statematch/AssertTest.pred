@@ -1,7 +1,0 @@
-[method gov.nasa.jpf.abstraction.predicate.statematch.AssertTest.test2]
-alength(arrlen, a) = 2
-
-[method gov.nasa.jpf.abstraction.predicate.statematch.AssertTest.test3]
-i >= 0
-i < 2
-alength(arrlen, a) = 2
