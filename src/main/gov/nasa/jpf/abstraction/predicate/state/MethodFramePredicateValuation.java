@@ -24,6 +24,7 @@ import gov.nasa.jpf.abstraction.predicate.smt.PredicateValueDeterminingInfo;
 import gov.nasa.jpf.abstraction.predicate.smt.SMT;
 import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.abstraction.util.Pair;
+import gov.nasa.jpf.abstraction.util.PredicateUtil;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
@@ -396,86 +397,14 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return ret.toString();
     }
 
-    private boolean determinesExactConcreteValueOfAccessExpression(Predicate predicate) {
-        TruthValue valuation = TruthValue.TRUE;
-
-        while (predicate instanceof Negation) {
-            predicate = ((Negation) predicate).predicate;
-
-            valuation = TruthValue.neg(valuation);
-        }
-
-        if (predicate instanceof Equals && valuations.get(predicate) == valuation) {
-            Equals e = (Equals) predicate;
-
-            Expression a = e.a;
-            Expression b = e.b;
-
-            if (a instanceof AccessExpression && b instanceof Constant) {
-                return true;
-            }
-            if (a instanceof Constant && b instanceof AccessExpression) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    // Assumes predicate to be comparison (possibly negated) of an access expression and a constant
-    private static AccessExpression getAccessExpression(Predicate predicate) {
-        while (predicate instanceof Negation) {
-            predicate = ((Negation) predicate).predicate;
-        }
-
-        Comparison c = (Comparison) predicate;
-
-        Expression a = c.a;
-        Expression b = c.b;
-
-        if (a instanceof AccessExpression) {
-            return (AccessExpression) a;
-        } else {
-            return (AccessExpression) b;
-        }
-    }
-
-    private boolean forbidsExactConcreteValueOfAccessExpression(Predicate predicate) {
-        TruthValue valuation = TruthValue.FALSE;
-
-        while (predicate instanceof Negation) {
-            predicate = ((Negation) predicate).predicate;
-
-            valuation = TruthValue.neg(valuation);
-        }
-
-        // There is no GreaterThan relation
-        if ((predicate instanceof Equals && valuations.get(predicate) == valuation) || predicate instanceof LessThan) {
-            Comparison c = (Comparison) predicate;
-
-            Expression a = c.a;
-            Expression b = c.b;
-
-            if (a instanceof AccessExpression && b instanceof Constant) {
-                return true;
-            }
-
-            if (a instanceof Constant && b instanceof AccessExpression) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private void collectDeterminants(Predicate predicate, Map<Predicate, TruthValue> determinants, Map<AccessExpression, Predicate> equalities, Map<AccessExpression, Set<Predicate>> inequalities) {
         for (Predicate determinant : computeDeterminantClosure(predicate, valuations.keySet())) {
-            if (determinesExactConcreteValueOfAccessExpression(determinant)) {
-                AccessExpression expression = getAccessExpression(determinant);
+            if (PredicateUtil.determinesExactConcreteValueOfAccessExpression(determinant, valuations)) {
+                AccessExpression expression = PredicateUtil.getAccessExpression(determinant);
 
                 equalities.put(expression, determinant);
-            } else if (forbidsExactConcreteValueOfAccessExpression(determinant)) {
-                AccessExpression expression = getAccessExpression(determinant);
+            } else if (PredicateUtil.forbidsExactConcreteValueOfAccessExpression(determinant, valuations)) {
+                AccessExpression expression = PredicateUtil.getAccessExpression(determinant);
 
                 if (!inequalities.containsKey(expression)) {
                     inequalities.put(expression, new HashSet<Predicate>());
