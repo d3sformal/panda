@@ -4,9 +4,9 @@ import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.Method;
 import java.util.List;
 
-public class MethodAssumePostContext extends AbstractMethodContext implements AssumeContext {
+public class MethodAssumePrePredicateContext extends AbstractMethodPredicateContext implements AssumePredicateContext {
 
-    public MethodAssumePostContext(Method method, List<Predicate> predicates) {
+    public MethodAssumePrePredicateContext(Method method, List<Predicate> predicates) {
         super(method, predicates);
     }
 

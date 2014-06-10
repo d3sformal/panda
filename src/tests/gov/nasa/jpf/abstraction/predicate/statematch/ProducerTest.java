@@ -7,6 +7,9 @@ import static gov.nasa.jpf.abstraction.predicate.BaseTest.*;
 
 class D{public static void main(String[] args) {new ProducerTest().bootstrap();}}
 public class ProducerTest extends StateMatchingTest {
+    public ProducerTest() {
+        config.add("+apf.abstract_domain+=,SIGNS src/tests/" + getClass().getName().replace(".", "/") + ".signs");
+    }
     public static void main(String[] args) {
         Producer p = new Producer();
 

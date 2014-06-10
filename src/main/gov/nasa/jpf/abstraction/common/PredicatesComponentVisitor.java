@@ -31,11 +31,15 @@ import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
  */
 public interface PredicatesComponentVisitor {
     public void visit(Predicates predicates);
-    public void visit(ObjectContext context);
-    public void visit(MethodContext context);
-    public void visit(MethodAssumePreContext context);
-    public void visit(MethodAssumePostContext context);
-    public void visit(StaticContext context);
+    public void visit(Expressions expressions);
+    public void visit(ObjectPredicateContext context);
+    public void visit(MethodPredicateContext context);
+    public void visit(MethodAssumePrePredicateContext context);
+    public void visit(MethodAssumePostPredicateContext context);
+    public void visit(StaticPredicateContext context);
+    public void visit(ObjectExpressionContext context);
+    public void visit(MethodExpressionContext context);
+    public void visit(StaticExpressionContext context);
     public void visit(Negation predicate);
     public void visit(LessThan predicate);
     public void visit(Equals predicate);

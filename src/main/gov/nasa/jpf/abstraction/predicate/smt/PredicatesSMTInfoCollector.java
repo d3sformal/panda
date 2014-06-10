@@ -3,25 +3,29 @@ package gov.nasa.jpf.abstraction.predicate.smt;
 import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Context;
+import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Expressions;
 import gov.nasa.jpf.abstraction.common.Implication;
 import gov.nasa.jpf.abstraction.common.LessThan;
-import gov.nasa.jpf.abstraction.common.MethodAssumePostContext;
-import gov.nasa.jpf.abstraction.common.MethodAssumePreContext;
-import gov.nasa.jpf.abstraction.common.MethodContext;
+import gov.nasa.jpf.abstraction.common.MethodAssumePostPredicateContext;
+import gov.nasa.jpf.abstraction.common.MethodAssumePrePredicateContext;
+import gov.nasa.jpf.abstraction.common.MethodExpressionContext;
+import gov.nasa.jpf.abstraction.common.MethodPredicateContext;
 import gov.nasa.jpf.abstraction.common.Modulo;
 import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.common.ObjectContext;
+import gov.nasa.jpf.abstraction.common.ObjectExpressionContext;
+import gov.nasa.jpf.abstraction.common.ObjectPredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
-import gov.nasa.jpf.abstraction.common.StaticContext;
+import gov.nasa.jpf.abstraction.common.StaticExpressionContext;
+import gov.nasa.jpf.abstraction.common.StaticPredicateContext;
 import gov.nasa.jpf.abstraction.common.Subtract;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.Undefined;
@@ -77,44 +81,60 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 
     @Override
     public void visit(Predicates predicates) {
-        for (Context context : predicates.contexts) {
+        for (PredicateContext context : predicates.contexts) {
             context.accept(this);
         }
     }
 
     @Override
-    public void visit(ObjectContext context) {
+    public void visit(Expressions expressions) {
+    }
+
+    @Override
+    public void visit(ObjectPredicateContext context) {
         for (Predicate predicate : context.predicates) {
             predicate.accept(this);
         }
     }
 
     @Override
-    public void visit(MethodContext context) {
+    public void visit(MethodPredicateContext context) {
         for (Predicate predicate : context.predicates) {
             predicate.accept(this);
         }
     }
 
     @Override
-    public void visit(MethodAssumePreContext context) {
+    public void visit(MethodAssumePrePredicateContext context) {
         for (Predicate predicate : context.predicates) {
             predicate.accept(this);
         }
     }
 
     @Override
-    public void visit(MethodAssumePostContext context) {
+    public void visit(MethodAssumePostPredicateContext context) {
         for (Predicate predicate : context.predicates) {
             predicate.accept(this);
         }
     }
 
     @Override
-    public void visit(StaticContext context) {
+    public void visit(StaticPredicateContext context) {
         for (Predicate predicate : context.predicates) {
             predicate.accept(this);
         }
+    }
+
+    @Override
+    public void visit(ObjectExpressionContext context) {
+    }
+
+    @Override
+    public void visit(MethodExpressionContext context) {
+    }
+
+    @Override
+    public void visit(StaticExpressionContext context) {
     }
 
     @Override

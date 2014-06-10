@@ -1,17 +1,17 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.Conjunction;
-import gov.nasa.jpf.abstraction.common.Context;
+import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Implication;
 import gov.nasa.jpf.abstraction.common.LessThan;
-import gov.nasa.jpf.abstraction.common.MethodContext;
-import gov.nasa.jpf.abstraction.common.ObjectContext;
+import gov.nasa.jpf.abstraction.common.MethodPredicateContext;
+import gov.nasa.jpf.abstraction.common.ObjectPredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Predicates;
-import gov.nasa.jpf.abstraction.common.StaticContext;
+import gov.nasa.jpf.abstraction.common.StaticPredicateContext;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.common.access.Method;
@@ -41,14 +41,22 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 
     @Override
     public void visit(Predicates predicates) {
-        for (Context c : predicates.contexts) {
+        for (PredicateContext c : predicates.contexts) {
             c.accept(this);
             ret.append("\n");
         }
     }
 
     @Override
-    public void visit(ObjectContext context) {
+    public void visit(Expressions expressions) {
+        for (ExpressionContext c : expressions.contexts) {
+            c.accept(this);
+            ret.append("\n");
+        }
+    }
+
+    @Override
+    public void visit(ObjectPredicateContext context) {
         ret.append("[object ");
 
         context.getPackageAndClass().accept(this);
@@ -62,7 +70,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
     }
 
     @Override
-    public void visit(MethodContext context) {
+    public void visit(MethodPredicateContext context) {
         ret.append("[method ");
 
         context.getMethod().accept(this);
@@ -76,7 +84,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
     }
 
     @Override
-    public void visit(MethodAssumePreContext context) {
+    public void visit(MethodAssumePrePredicateContext context) {
         ret.append("[method assume pre ");
 
         context.getMethod().accept(this);
@@ -90,7 +98,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
     }
 
     @Override
-    public void visit(MethodAssumePostContext context) {
+    public void visit(MethodAssumePostPredicateContext context) {
         ret.append("[method assume post ");
 
         context.getMethod().accept(this);
@@ -104,11 +112,49 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
     }
 
     @Override
-    public void visit(StaticContext context) {
+    public void visit(StaticPredicateContext context) {
         ret.append("[static]\n");
 
         for (Predicate p : context.predicates) {
             p.accept(this);
+            ret.append("\n");
+        }
+    }
+
+    @Override
+    public void visit(ObjectExpressionContext context) {
+        ret.append("[object ");
+
+        context.getPackageAndClass().accept(this);
+
+        ret.append("]\n");
+
+        for (Expression e : context.expressions) {
+            e.accept(this);
+            ret.append("\n");
+        }
+    }
+
+    @Override
+    public void visit(MethodExpressionContext context) {
+        ret.append("[method ");
+
+        context.getMethod().accept(this);
+
+        ret.append("]\n");
+
+        for (Expression e : context.expressions) {
+            e.accept(this);
+            ret.append("\n");
+        }
+    }
+
+    @Override
+    public void visit(StaticExpressionContext context) {
+        ret.append("[static]\n");
+
+        for (Expression e : context.expressions) {
+            e.accept(this);
             ret.append("\n");
         }
     }

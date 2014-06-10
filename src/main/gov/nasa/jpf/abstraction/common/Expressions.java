@@ -9,16 +9,16 @@ import java.util.List;
 /**
  * A container of all input predicates (read from a file) divided into individual contexts
  *
- * @see gov.nasa.jpf.abstraction.common.PredicateContext
+ * @see gov.nasa.jpf.abstraction.common.ExpressionContext
  */
-public class Predicates implements PredicatesComponentVisitable {
-    public List<PredicateContext> contexts;
+public class Expressions implements PredicatesComponentVisitable {
+    public List<ExpressionContext> contexts;
 
-    public Predicates() {
-        this(new LinkedList<PredicateContext>());
+    public Expressions() {
+        this(new LinkedList<ExpressionContext>());
     }
 
-    public Predicates(List<PredicateContext> contexts) {
+    public Expressions(List<ExpressionContext> contexts) {
         this.contexts = contexts;
     }
 

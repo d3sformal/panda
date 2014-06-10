@@ -11,8 +11,14 @@ grammar Predicates;
 }
 
 predicates returns [Predicates val]
-    : cs=contextlist {
+    : cs=predicatecontextlist {
         $ctx.val = new Predicates($cs.val);
+    }
+    ;
+
+expressions returns [Expressions val]
+    : cs=expressioncontextlist {
+        $ctx.val = new Expressions($cs.val);
     }
     ;
 
@@ -22,60 +28,93 @@ standalonepath returns [DefaultAccessExpression[] val]
     }
     ;
 
-contextlist returns [List<Context> val]
+predicatecontextlist returns [List<gov.nasa.jpf.abstraction.common.PredicateContext> val]
     : /* EMPTY */ {
-        $ctx.val = new ArrayList<Context>();
+        $ctx.val = new ArrayList<gov.nasa.jpf.abstraction.common.PredicateContext>();
     }
-    | cs=contextlist c=context {
+    | cs=predicatecontextlist c=predicatecontext {
         $ctx.val = $cs.val;
         $ctx.val.add($c.val);
     }
     ;
 
-context returns [Context val] locals [List<String> name = new LinkedList<String>()]
+expressioncontextlist returns [List<gov.nasa.jpf.abstraction.common.ExpressionContext> val]
+    : /* EMPTY */ {
+        $ctx.val = new ArrayList<gov.nasa.jpf.abstraction.common.ExpressionContext>();
+    }
+    | cs=expressioncontextlist c=expressioncontext {
+        $ctx.val = $cs.val;
+        $ctx.val.add($c.val);
+    }
+    ;
+
+expressioncontext returns [gov.nasa.jpf.abstraction.common.ExpressionContext val] locals [List<String> name = new LinkedList<String>()]
+    : '[' STATIC_TOKEN ']' ps=expressionlist {
+        $ctx.val = new StaticExpressionContext($ps.val);
+    }
+    | '[' OBJECT_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} ']' ps=expressionlist {
+        DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
+
+        $ctx.val = new ObjectExpressionContext(packageAndClass, $ps.val);
+    }
+    | '[' METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=ID_TOKEN ']' ps=expressionlist {
+        DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
+        DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
+
+        $ctx.val = new MethodExpressionContext(method, $ps.val);
+    }
+    | '[' METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=INIT_TOKEN ']' ps=expressionlist {
+        DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
+        DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
+
+        $ctx.val = new MethodExpressionContext(method, $ps.val);
+    }
+    ;
+
+predicatecontext returns [gov.nasa.jpf.abstraction.common.PredicateContext val] locals [List<String> name = new LinkedList<String>()]
     : '[' STATIC_TOKEN ']' ps=predicatelist {
-        $ctx.val = new StaticContext($ps.val);
+        $ctx.val = new StaticPredicateContext($ps.val);
     }
     | '[' OBJECT_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} ']' ps=predicatelist {
         DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
 
-        $ctx.val = new ObjectContext(packageAndClass, $ps.val);
+        $ctx.val = new ObjectPredicateContext(packageAndClass, $ps.val);
     }
     | '[' ASSUME_TOKEN PRE_TOKEN METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=ID_TOKEN ']' ps=predicatelist {
         DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
         DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
 
-        $ctx.val = new MethodAssumePreContext(method, $ps.val);
+        $ctx.val = new MethodAssumePrePredicateContext(method, $ps.val);
     }
     | '[' ASSUME_TOKEN PRE_TOKEN METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=INIT_TOKEN ']' ps=predicatelist {
         DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
         DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
 
-        $ctx.val = new MethodAssumePreContext(method, $ps.val);
+        $ctx.val = new MethodAssumePrePredicateContext(method, $ps.val);
     }
     | '[' ASSUME_TOKEN POST_TOKEN METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=ID_TOKEN ']' ps=predicatelist {
         DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
         DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
 
-        $ctx.val = new MethodAssumePostContext(method, $ps.val);
+        $ctx.val = new MethodAssumePostPredicateContext(method, $ps.val);
     }
     | '[' ASSUME_TOKEN POST_TOKEN METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=INIT_TOKEN ']' ps=predicatelist {
         DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
         DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
 
-        $ctx.val = new MethodAssumePostContext(method, $ps.val);
+        $ctx.val = new MethodAssumePostPredicateContext(method, $ps.val);
     }
     | '[' METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=ID_TOKEN ']' ps=predicatelist {
         DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
         DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
 
-        $ctx.val = new MethodContext(method, $ps.val);
+        $ctx.val = new MethodPredicateContext(method, $ps.val);
     }
     | '[' METHOD_TOKEN ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} '.' m=INIT_TOKEN ']' ps=predicatelist {
         DefaultPackageAndClass packageAndClass = DefaultPackageAndClass.create($ctx.name);
         DefaultMethod method = DefaultMethod.create(packageAndClass, $m.text);
 
-        $ctx.val = new MethodContext(method, $ps.val);
+        $ctx.val = new MethodPredicateContext(method, $ps.val);
     }
     ;
 
@@ -87,6 +126,19 @@ predicatelist returns [List<Predicate> val]
         $ctx.val = $ps.val;
 
         for (Predicate p : $p.val) {
+            $ctx.val.add(p);
+        }
+    }
+    ;
+
+expressionlist returns [List<Expression> val]
+    : /* EMPTY */ {
+        $ctx.val = new ArrayList<Expression>();
+    }
+    | ps=expressionlist p=expression {
+        $ctx.val = $ps.val;
+
+        for (Expression p : $p.val) {
             $ctx.val.add(p);
         }
     }
@@ -202,7 +254,7 @@ standaloneexpression returns [Expression[] val]
     }
     ;
 
-expression returns [Expression[] val] locals [List<Expression> expressions = new LinkedList<Expression>()]
+expression returns [Expression[] val]
     : t=term {
         $ctx.val = $t.val;
     }

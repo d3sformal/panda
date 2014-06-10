@@ -1,18 +1,18 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
-import gov.nasa.jpf.abstraction.common.AbstractMethodContext;
-import gov.nasa.jpf.abstraction.common.AssumeContext;
+import gov.nasa.jpf.abstraction.common.AbstractMethodPredicateContext;
+import gov.nasa.jpf.abstraction.common.AssumePredicateContext;
 import gov.nasa.jpf.abstraction.common.Comparison;
-import gov.nasa.jpf.abstraction.common.Context;
+import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.MethodAssumePostContext;
-import gov.nasa.jpf.abstraction.common.MethodAssumePreContext;
-import gov.nasa.jpf.abstraction.common.MethodContext;
+import gov.nasa.jpf.abstraction.common.MethodAssumePostPredicateContext;
+import gov.nasa.jpf.abstraction.common.MethodAssumePrePredicateContext;
+import gov.nasa.jpf.abstraction.common.MethodPredicateContext;
 import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.common.ObjectContext;
+import gov.nasa.jpf.abstraction.common.ObjectPredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Predicates;
-import gov.nasa.jpf.abstraction.common.StaticContext;
+import gov.nasa.jpf.abstraction.common.StaticPredicateContext;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
@@ -65,8 +65,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
         Set<Predicate> predicates = new HashSet<Predicate>();
 
-        for (Context context : predicateSet.contexts) {
-            if (context instanceof AssumeContext) continue;
+        for (PredicateContext context : predicateSet.contexts) {
+            if (context instanceof AssumePredicateContext) continue;
 
             predicates.addAll(context.predicates);
         }
@@ -119,23 +119,23 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
         // Collect relevant contexts and predicates stored in them
         // Match context method with actual method
         // Match context object with actual object
-        for (Context context : predicateSet.contexts) {
-            if (context instanceof AssumeContext) continue;
+        for (PredicateContext context : predicateSet.contexts) {
+            if (context instanceof AssumePredicateContext) continue;
 
-            if (context instanceof MethodContext) {
-                MethodContext methodContext = (MethodContext) context;
+            if (context instanceof MethodPredicateContext) {
+                MethodPredicateContext methodPredicateContext = (MethodPredicateContext) context;
 
-                if (!methodContext.getMethod().toString().equals(method.getBaseName())) {
+                if (!methodPredicateContext.getMethod().toString().equals(method.getBaseName())) {
                     continue;
                 }
-            } else if (context instanceof ObjectContext) {
-                ObjectContext objectContext = (ObjectContext) context;
+            } else if (context instanceof ObjectPredicateContext) {
+                ObjectPredicateContext objectPredicateContext = (ObjectPredicateContext) context;
 
                 if (method.isStatic() || method.isClinit()) {
                     continue;
                 }
 
-                if (!objectContext.getPackageAndClass().toString().equals(method.getClassName())) {
+                if (!objectPredicateContext.getPackageAndClass().toString().equals(method.getClassName())) {
                     continue;
                 }
             }
@@ -179,20 +179,20 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
     }
 
     private void overrideWithAssumedPreValuation(PredicateValuation valuation, MethodInfo method) {
-        overrideWithAssumedValuation(valuation, method, MethodAssumePreContext.class);
+        overrideWithAssumedValuation(valuation, method, MethodAssumePrePredicateContext.class);
     }
 
     private void overrideWithAssumedPostValuation(PredicateValuation valuation, MethodInfo method) {
-        overrideWithAssumedValuation(valuation, method, MethodAssumePostContext.class);
+        overrideWithAssumedValuation(valuation, method, MethodAssumePostPredicateContext.class);
     }
 
-    private void overrideWithAssumedValuation(PredicateValuation valuation, MethodInfo method, Class<? extends AssumeContext> assumedClass) {
+    private void overrideWithAssumedValuation(PredicateValuation valuation, MethodInfo method, Class<? extends AssumePredicateContext> assumedClass) {
         // Override with assumed valuation
-        for (Context context : predicateSet.contexts) {
+        for (PredicateContext context : predicateSet.contexts) {
             if (context.getClass().isAssignableFrom(assumedClass)) {
-                AbstractMethodContext methodContext = (AbstractMethodContext) context;
+                AbstractMethodPredicateContext methodPredicateContext = (AbstractMethodPredicateContext) context;
 
-                if (!methodContext.getMethod().toString().equals(method.getBaseName())) {
+                if (!methodPredicateContext.getMethod().toString().equals(method.getBaseName())) {
                     continue;
                 }
 
