@@ -158,7 +158,7 @@ public class PredicateAbstractionFactory extends AbstractionFactory {
             predicates.contexts.addAll(createPredicates(arguments).contexts);
         }
 
-        if (true || config.getBoolean("apf.verbose")) {
+        if (config.getBoolean("apf.verbose")) {
             System.out.println(predicates.toString());
         }
 

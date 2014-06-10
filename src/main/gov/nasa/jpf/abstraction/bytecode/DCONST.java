@@ -17,7 +17,7 @@ public class DCONST extends gov.nasa.jpf.jvm.bytecode.DCONST {
         Instruction ret = super.execute(ti);
 
         StackFrame sf = ti.getModifiableTopFrame();
-        sf.setOperandAttr(Constant.create(getValue()));
+        sf.setLongOperandAttr(Constant.create(getValue()));
 
         return ret;
     }

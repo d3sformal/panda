@@ -2,7 +2,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
@@ -19,7 +18,7 @@ public class TypeConversionExecutor {
 
     public Instruction execute(ThreadInfo ti, TypeConvertor ins) {
         StackFrame sf = ti.getModifiableTopFrame();
-        Expression expr = ExpressionUtil.getExpression(source.getExpression(sf));
+        Expression expr = source.getExpression(sf);
         Instruction ret;
 
         ret = ins.executeConcrete(ti);

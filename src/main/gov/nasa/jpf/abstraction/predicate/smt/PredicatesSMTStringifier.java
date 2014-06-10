@@ -197,7 +197,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 
     @Override
     public void visit(UninterpretedShiftLeft expression) {
-        ret.append("(shl");
+        ret.append("(shl ");
 
         expression.a.accept(this);
 
@@ -210,7 +210,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 
     @Override
     public void visit(UninterpretedShiftRight expression) {
-        ret.append("(shr");
+        ret.append("(shr ");
 
         expression.a.accept(this);
 
