@@ -20,8 +20,6 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import java.util.ArrayList;
 
-import gov.nasa.jpf.abstraction.AbstractBoolean;
-import gov.nasa.jpf.abstraction.AbstractValue;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Constant;

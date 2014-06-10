@@ -1,6 +1,5 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -37,7 +36,7 @@ public class UnaryIfInstructionExecutor {
         StackFrame sf = ti.getModifiableTopFrame();
         Expression expr = ExpressionUtil.getExpression(sf.getOperandAttr());
 
-        AbstractBoolean abs_condition = null;
+        TruthValue condition = null;
 
         boolean conditionValue;
 
@@ -56,31 +55,19 @@ public class UnaryIfInstructionExecutor {
              * No other abstraction can do that, the rest of them returns UNDEFINED.
              */
             if (expr != null && RunDetector.isRunning()) {
-                TruthValue pred = PredicateAbstraction.getInstance().processBranchingCondition(br.createPredicate(expr, constant));
-
-                switch (pred) {
-                case TRUE:
-                    abs_condition = AbstractBoolean.TRUE;
-                    break;
-                case FALSE:
-                    abs_condition = AbstractBoolean.FALSE;
-                    break;
-                case UNKNOWN:
-                    abs_condition = AbstractBoolean.TOP;
-                    break;
-                }
+                condition = PredicateAbstraction.getInstance().processBranchingCondition(br.createPredicate(expr, constant));
             }
 
             // In case there was no predicate abstraction / no symbolic expression (or the execution did not yet reach the target program or we already left it)
-            if (abs_condition == null) {
+            if (condition == null) {
                 // fallback to a concrete execution
                 return br.executeConcrete(ti);
             }
 
-            if (abs_condition == AbstractBoolean.TRUE) {
+            if (condition == TruthValue.TRUE) {
                 ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
                 conditionValue = true;
-            } else if (abs_condition == AbstractBoolean.FALSE) {
+            } else if (condition == TruthValue.FALSE) {
                 ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
                 conditionValue = false;
             } else { // TOP
