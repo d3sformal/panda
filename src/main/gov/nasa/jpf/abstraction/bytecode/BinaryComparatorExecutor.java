@@ -48,8 +48,8 @@ public abstract class BinaryComparatorExecutor<T> {
         SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getModifiableTopFrame();
 
-        Expression expr1 = getLHSExpression(sf);
-        Expression expr2 = getRHSExpression(sf);
+        Expression expr1 = getLeftHandSideExpression(sf);
+        Expression expr2 = getRightHandSideExpression(sf);
 
         Integer result = null;
         boolean less_than = false;
@@ -171,9 +171,9 @@ public abstract class BinaryComparatorExecutor<T> {
         return ExpressionUtil.getExpression(sf.getOperandAttr(index));
     }
 
-    abstract protected Expression getLHSExpression(StackFrame sf);
-    abstract protected Expression getRHSExpression(StackFrame sf);
-    abstract protected T getLHSOperand(StackFrame sf);
-    abstract protected T getRHSOperand(StackFrame sf);
+    abstract protected Expression getLeftHandSideExpression(StackFrame sf);
+    abstract protected Expression getRightHandSideExpression(StackFrame sf);
+    abstract protected T getLeftHandSideOperand(StackFrame sf);
+    abstract protected T getRightHandSideOperand(StackFrame sf);
     abstract protected void storeResult(Expression result, StackFrame sf);
 }

@@ -38,22 +38,22 @@ public class DoubleBinaryOperatorExecutor extends BinaryOperatorExecutor<Double>
     }
 
     @Override
-    protected Expression getLHSExpression(StackFrame sf) {
+    protected Expression getLeftHandSideExpression(StackFrame sf) {
         return getExpression(sf, 3);
     }
 
     @Override
-    protected Expression getRHSExpression(StackFrame sf) {
+    protected Expression getRightHandSideExpression(StackFrame sf) {
         return getExpression(sf, 1);
     }
 
     @Override
-    final protected Double getLHSOperand(StackFrame sf) {
+    final protected Double getLeftHandSideOperand(StackFrame sf) {
         return sf.peekDouble(2);
     }
 
     @Override
-    final protected Double getRHSOperand(StackFrame sf) {
+    final protected Double getRightHandSideOperand(StackFrame sf) {
         return sf.peekDouble(0);
     }
 

@@ -38,22 +38,22 @@ public class FloatBinaryOperatorExecutor extends BinaryOperatorExecutor<Float> {
     }
 
     @Override
-    protected Expression getLHSExpression(StackFrame sf) {
+    protected Expression getLeftHandSideExpression(StackFrame sf) {
         return getExpression(sf, 1);
     }
 
     @Override
-    protected Expression getRHSExpression(StackFrame sf) {
+    protected Expression getRightHandSideExpression(StackFrame sf) {
         return getExpression(sf, 0);
     }
 
     @Override
-    final protected Float getLHSOperand(StackFrame sf) {
+    final protected Float getLeftHandSideOperand(StackFrame sf) {
         return sf.peekFloat(1);
     }
 
     @Override
-    final protected Float getRHSOperand(StackFrame sf) {
+    final protected Float getRightHandSideOperand(StackFrame sf) {
         return sf.peekFloat(0);
     }
 

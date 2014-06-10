@@ -39,11 +39,11 @@ public abstract class BinaryOperatorExecutor<T> {
         SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getModifiableTopFrame();
 
-        Expression expr1 = getLHSExpression(sf);
-        Expression expr2 = getRHSExpression(sf);
+        Expression expr1 = getLeftHandSideExpression(sf);
+        Expression expr2 = getRightHandSideExpression(sf);
 
-        T v1 = getLHSOperand(sf);
-        T v2 = getRHSOperand(sf);
+        T v1 = getLeftHandSideOperand(sf);
+        T v2 = getRightHandSideOperand(sf);
 
         // Create symbolic value (predicate abstraction), abstract value (numeric abstraction)
         Expression result;
@@ -66,9 +66,9 @@ public abstract class BinaryOperatorExecutor<T> {
         return (Expression)sf.getOperandAttr(index);
     }
 
-    abstract protected Expression getLHSExpression(StackFrame sf);
-    abstract protected Expression getRHSExpression(StackFrame sf);
-    abstract protected T getLHSOperand(StackFrame sf);
-    abstract protected T getRHSOperand(StackFrame sf);
+    abstract protected Expression getLeftHandSideExpression(StackFrame sf);
+    abstract protected Expression getRightHandSideExpression(StackFrame sf);
+    abstract protected T getLeftHandSideOperand(StackFrame sf);
+    abstract protected T getRightHandSideOperand(StackFrame sf);
     abstract protected void storeExpression(Expression result, StackFrame sf);
 }

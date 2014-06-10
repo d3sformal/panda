@@ -1,7 +1,7 @@
 //
 // Copyright (C) 2012 United States Government as represented by the
 // Administrator of the National Aeronautics and Space Administration
-// (NASA).  All RHSs Reserved.
+// (NASA).  All RightHandSides Reserved.
 //
 // This software is distributed under the NASA Open Source Agreement
 // (NOSA), version 1.3.  The NOSA has been approved by the Open Source
@@ -39,22 +39,22 @@ public class FloatComparatorExecutor extends BinaryComparatorExecutor<Float> {
     }
 
     @Override
-    protected Expression getLHSExpression(StackFrame sf) {
+    protected Expression getLeftHandSideExpression(StackFrame sf) {
         return getExpression(sf, 0);
     }
 
     @Override
-    protected Expression getRHSExpression(StackFrame sf) {
+    protected Expression getRightHandSideExpression(StackFrame sf) {
         return getExpression(sf, 1);
     }
 
     @Override
-    final protected Float getLHSOperand(StackFrame sf) {
+    final protected Float getLeftHandSideOperand(StackFrame sf) {
         return sf.peekFloat(0);
     }
 
     @Override
-    final protected Float getRHSOperand(StackFrame sf) {
+    final protected Float getRightHandSideOperand(StackFrame sf) {
         return sf.peekFloat(1);
     }
 

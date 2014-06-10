@@ -25,11 +25,11 @@ public class ArrayStoreExecutor {
 
     public Instruction execute(ArrayStoreInstruction store, ThreadInfo ti) {
         StackFrame sf = ti.getTopFrame();
-        Expression from = store.getRHSExpression(sf);
+        Expression from = store.getSourceExpression(sf);
         Expression index = store.getIndexExpression(sf);
-        AccessExpression to = store.getLHSAccessExpression(sf);
+        AccessExpression to = store.getArrayExpression(sf);
 
-        ElementInfo ei = store.getLHSArray(sf);
+        ElementInfo ei = store.getArray(sf);
         ArrayFields fields = ei.getArrayFields();
 
         for (int i = 0; i < fields.arrayLength(); ++i) {

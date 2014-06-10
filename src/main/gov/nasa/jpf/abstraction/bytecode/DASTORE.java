@@ -45,19 +45,19 @@ public class DASTORE extends gov.nasa.jpf.jvm.bytecode.DASTORE implements ArrayS
     }
 
     @Override
-    public AccessExpression getLHSAccessExpression(StackFrame sf) {
+    public AccessExpression getArrayExpression(StackFrame sf) {
         return ExpressionUtil.getAccessExpression(sf.getOperandAttr(3));
     }
 
     @Override
-    public ElementInfo getLHSArray(StackFrame sf) {
+    public ElementInfo getArray(StackFrame sf) {
         ThreadInfo ti = ThreadInfo.getCurrentThread();
 
         return ti.getElementInfo(sf.peek(3));
     }
 
     @Override
-    public Expression getRHSExpression(StackFrame sf) {
+    public Expression getSourceExpression(StackFrame sf) {
         return ExpressionUtil.getExpression(sf.getLongOperandAttr());
     }
 

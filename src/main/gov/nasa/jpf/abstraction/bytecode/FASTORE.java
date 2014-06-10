@@ -45,19 +45,19 @@ public class FASTORE extends gov.nasa.jpf.jvm.bytecode.FASTORE implements ArrayS
     }
 
     @Override
-    public AccessExpression getLHSAccessExpression(StackFrame sf) {
+    public AccessExpression getArrayExpression(StackFrame sf) {
         return ExpressionUtil.getAccessExpression(sf.getOperandAttr(2));
     }
 
     @Override
-    public ElementInfo getLHSArray(StackFrame sf) {
+    public ElementInfo getArray(StackFrame sf) {
         ThreadInfo ti = ThreadInfo.getCurrentThread();
 
         return ti.getElementInfo(sf.peek(2));
     }
 
     @Override
-    public Expression getRHSExpression(StackFrame sf) {
+    public Expression getSourceExpression(StackFrame sf) {
         return ExpressionUtil.getExpression(sf.getOperandAttr(0));
     }
 

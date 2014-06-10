@@ -11,9 +11,9 @@ import gov.nasa.jpf.vm.ThreadInfo;
 public interface ArrayStoreInstruction {
     public Instruction execute(ThreadInfo ti);
     public Instruction executeConcrete(ThreadInfo ti);
-    public AccessExpression getLHSAccessExpression(StackFrame sf);
-    public ElementInfo getLHSArray(StackFrame sf);
+    public AccessExpression getArrayExpression(StackFrame sf);
+    public ElementInfo getArray(StackFrame sf);
     public Expression getIndexExpression(StackFrame sf);
-    public Expression getRHSExpression(StackFrame sf);
+    public Expression getSourceExpression(StackFrame sf);
     public ArrayElementInstruction getSelf();
 }
