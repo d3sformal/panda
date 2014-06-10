@@ -1,9 +1,10 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthExpression;
 import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
-import java.util.Set;
 
 /**
  * Read/Write to an array length: alength(arrlen, a); alengthupdate(arrlen, a, l);

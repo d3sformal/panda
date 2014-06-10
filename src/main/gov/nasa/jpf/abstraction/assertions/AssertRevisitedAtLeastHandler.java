@@ -1,10 +1,11 @@
 package gov.nasa.jpf.abstraction.assertions;
 
+import java.util.Set;
+
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
-import java.util.Set;
 
 public class AssertRevisitedAtLeastHandler extends AssertHandler {
     @Override

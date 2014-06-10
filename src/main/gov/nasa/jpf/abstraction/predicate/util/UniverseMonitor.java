@@ -1,5 +1,9 @@
 package gov.nasa.jpf.abstraction.predicate.util;
 
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
+
 import gov.nasa.jpf.ListenerAdapter;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
@@ -19,9 +23,6 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Prints the current abstract heap after each instruction in the target program

@@ -1,7 +1,5 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-import gov.nasa.jpf.Config;
-import gov.nasa.jpf.JPF;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -12,7 +10,12 @@ import java.net.URLClassLoader;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import gov.nasa.jpf.Config;
+import gov.nasa.jpf.JPF;
+
 import org.junit.Test;
+
 import static org.junit.Assert.assertTrue;
 
 public class BaseTest {

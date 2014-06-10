@@ -1,11 +1,12 @@
 package gov.nasa.jpf.abstraction.common;
 
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.Undefined;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import java.util.Map;
 
 /**
  * Predicate on equality of two symbolic expressions

@@ -1,9 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate.state.universe;
 
-import gov.nasa.jpf.abstraction.util.Pair;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import gov.nasa.jpf.abstraction.util.Pair;
 
 public abstract class UniverseValue implements Freezable {
     protected boolean frozen = false;

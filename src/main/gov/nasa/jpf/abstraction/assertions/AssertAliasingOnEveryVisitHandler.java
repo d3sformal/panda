@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.assertions;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -11,8 +14,6 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
-import java.util.HashSet;
-import java.util.Set;
 
 public abstract class AssertAliasingOnEveryVisitHandler extends AssertHandler {
 

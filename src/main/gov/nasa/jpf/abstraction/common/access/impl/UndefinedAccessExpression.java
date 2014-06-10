@@ -1,12 +1,13 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
+import java.util.Map;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.Undefined;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * An access expression produces in circumstances where there is no other valid result

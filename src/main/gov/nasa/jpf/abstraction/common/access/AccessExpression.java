@@ -1,8 +1,9 @@
 package gov.nasa.jpf.abstraction.common.access;
 
-import gov.nasa.jpf.abstraction.common.Expression;
 import java.util.Map;
 import java.util.Set;
+
+import gov.nasa.jpf.abstraction.common.Expression;
 
 /**
  * Access expressions:

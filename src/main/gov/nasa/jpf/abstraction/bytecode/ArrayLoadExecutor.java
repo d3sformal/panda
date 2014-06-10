@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Equals;
@@ -29,8 +32,6 @@ import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
-import java.util.HashSet;
-import java.util.Set;
 
 public class ArrayLoadExecutor {
     private AccessExpression array;

@@ -1,5 +1,11 @@
 package gov.nasa.jpf.abstraction.predicate;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
+
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
@@ -20,11 +26,6 @@ import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSerializer implements DebugStateSerializer {
     PrintWriter out = new PrintWriter(System.out);

@@ -1,9 +1,13 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Divide;
@@ -21,6 +25,7 @@ import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.ObjectExpressionContext;
 import gov.nasa.jpf.abstraction.common.ObjectPredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
@@ -53,10 +58,6 @@ import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * A visitor used to traverse predicates and collect information for the SMT

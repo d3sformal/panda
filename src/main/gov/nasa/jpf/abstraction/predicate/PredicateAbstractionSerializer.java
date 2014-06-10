@@ -18,6 +18,15 @@
 //
 package gov.nasa.jpf.abstraction.predicate;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.abstraction.Abstraction;
@@ -56,14 +65,6 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.ThreadList;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.serialize.FilteringSerializer;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * a serializer that uses Abstract values stored in attributes

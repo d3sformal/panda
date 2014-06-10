@@ -1,10 +1,11 @@
 package gov.nasa.jpf.abstraction.common;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A container of all input predicates (read from a file) divided into individual contexts

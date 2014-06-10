@@ -1,9 +1,10 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldExpression;
 import gov.nasa.jpf.abstraction.common.access.meta.Field;
-import java.util.Set;
 
 /**
  * Expressions accessing object fields: fread(f, o); fwrite(f, o, e);

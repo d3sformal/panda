@@ -1,17 +1,18 @@
 package gov.nasa.jpf.abstraction.predicate;
 
-import gov.nasa.jpf.Config;
-import gov.nasa.jpf.JPFConfigException;
-import gov.nasa.jpf.JPFException;
-import gov.nasa.jpf.vm.DebugStateSerializer;
-import gov.nasa.jpf.vm.JenkinsStateSet;
-import gov.nasa.jpf.vm.VM;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import gov.nasa.jpf.Config;
+import gov.nasa.jpf.JPFConfigException;
+import gov.nasa.jpf.JPFException;
+import gov.nasa.jpf.vm.DebugStateSerializer;
+import gov.nasa.jpf.vm.JenkinsStateSet;
+import gov.nasa.jpf.vm.VM;
 
 public class DebugCopyPreservingStateSet extends JenkinsStateSet {
 

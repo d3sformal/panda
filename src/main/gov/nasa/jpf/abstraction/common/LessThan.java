@@ -1,10 +1,11 @@
 package gov.nasa.jpf.abstraction.common;
 
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.Undefined;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import java.util.Map;
 
 /**
  * Predicate on inequality of two symbolic expressions. (e.g. x < y)

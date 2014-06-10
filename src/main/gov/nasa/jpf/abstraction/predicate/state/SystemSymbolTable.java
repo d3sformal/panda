@@ -1,5 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -42,10 +47,6 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.ThreadList;
 import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.VM;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Symbol table aware of method call scope changes

@@ -1,10 +1,11 @@
 package gov.nasa.jpf.abstraction.common;
 
+import java.util.Map;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * A wrapper of a predicate whose truth value may depend on a symbolic expression modified by an instruction

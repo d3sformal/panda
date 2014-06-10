@@ -1,11 +1,12 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
-import java.util.HashMap;
-import java.util.Map;
 
 public class PredicateValuationMap extends HashMap<Predicate, TruthValue> {
     public static final long serialVersionUID = 1L;

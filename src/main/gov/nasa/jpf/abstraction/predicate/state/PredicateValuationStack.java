@@ -1,9 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
-import gov.nasa.jpf.abstraction.util.Pair;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import gov.nasa.jpf.abstraction.util.Pair;
 
 /**
  * Stack keeping Predicate Valuation scopes

@@ -1,12 +1,13 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
-import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 
 /**
  * A grammar element used to specify a target of a [object ...] context

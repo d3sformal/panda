@@ -1,9 +1,15 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.AbstractMethodPredicateContext;
 import gov.nasa.jpf.abstraction.common.AssumePredicateContext;
 import gov.nasa.jpf.abstraction.common.Comparison;
-import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.MethodAssumePostPredicateContext;
 import gov.nasa.jpf.abstraction.common.MethodAssumePrePredicateContext;
@@ -11,6 +17,7 @@ import gov.nasa.jpf.abstraction.common.MethodPredicateContext;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.ObjectPredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.common.StaticPredicateContext;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -36,12 +43,6 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * A predicate valuation aware of method scope changes

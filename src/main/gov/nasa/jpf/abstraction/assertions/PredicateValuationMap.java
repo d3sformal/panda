@@ -1,11 +1,12 @@
 package gov.nasa.jpf.abstraction.assertions;
 
-import gov.nasa.jpf.abstraction.common.Notation;
-import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeMap;
+
+import gov.nasa.jpf.abstraction.common.Notation;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 
 public class PredicateValuationMap extends TreeMap<Predicate, TruthValue> {
     public static final long serialVersionUID = 1L;

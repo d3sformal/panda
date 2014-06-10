@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
+import java.util.Map;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
@@ -7,8 +10,6 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Write to an array length: alengthupdate(arrlen, a, l) ~ a := new int[l]

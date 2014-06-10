@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate.util;
 
+import java.util.Stack;
+
 import gov.nasa.jpf.ListenerAdapter;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
@@ -11,7 +13,6 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ReturnInstruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
-import java.util.Stack;
 
 /**
  * Prints the current predicate valuation after each instruction in the target program

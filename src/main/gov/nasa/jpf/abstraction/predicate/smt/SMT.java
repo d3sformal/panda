@@ -1,20 +1,5 @@
 package gov.nasa.jpf.abstraction.predicate.smt;
 
-import gov.nasa.jpf.abstraction.common.Conjunction;
-import gov.nasa.jpf.abstraction.common.Equals;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.Implication;
-import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.common.Notation;
-import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
-import gov.nasa.jpf.abstraction.common.Tautology;
-import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
-import gov.nasa.jpf.abstraction.util.Pair;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -33,6 +18,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Implication;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.Notation;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
+import gov.nasa.jpf.abstraction.common.Tautology;
+import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
+import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.Pair;
 
 /**
  * Class responsible for invocations of SMT, transformation of predicates into input that the SMT can solve

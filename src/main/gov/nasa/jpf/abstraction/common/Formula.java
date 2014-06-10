@@ -1,7 +1,8 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import java.util.Set;
+
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
 /**
  * A common ancestor to Conjunction and Disjunction (and Implication)

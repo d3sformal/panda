@@ -1,7 +1,8 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import java.util.Map;
+
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
 /**
  * Multiply represents symbolic expression for multiplication of two variables (e.g. a * b)

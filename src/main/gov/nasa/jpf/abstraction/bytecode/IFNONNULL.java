@@ -18,6 +18,9 @@
 //
 package gov.nasa.jpf.abstraction.bytecode;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Equals;
@@ -36,8 +39,6 @@ import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MJIEnv;
 import gov.nasa.jpf.vm.ThreadInfo;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Branch if int comparison with NULL value does not succeed

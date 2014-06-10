@@ -1,8 +1,9 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import java.util.LinkedList;
 import java.util.List;
+
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 
 /**
  * Corresponds to one static section in the input file

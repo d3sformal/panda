@@ -19,6 +19,11 @@ package gov.nasa.jpf.abstraction;
 
 // does not work well for static methods:summary not printed for errors
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.abstraction.assertions.AssertAliasedHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertConjunctionHandler;
@@ -47,10 +52,6 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * AbstractListener monitors the state space traversal and individual instruction executions

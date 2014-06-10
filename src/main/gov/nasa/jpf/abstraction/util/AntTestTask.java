@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.util;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import org.apache.tools.ant.taskdefs.optional.junit.JUnitTask;
 import org.apache.tools.ant.taskdefs.optional.junit.JUnitTaskMirror;
 import org.apache.tools.ant.taskdefs.optional.junit.JUnitTest;

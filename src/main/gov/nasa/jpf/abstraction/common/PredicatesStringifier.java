@@ -1,7 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.Conjunction;
-import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Equals;
@@ -10,6 +9,7 @@ import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.MethodPredicateContext;
 import gov.nasa.jpf.abstraction.common.ObjectPredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.common.StaticPredicateContext;
 import gov.nasa.jpf.abstraction.common.Tautology;

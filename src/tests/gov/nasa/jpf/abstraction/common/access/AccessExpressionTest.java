@@ -10,7 +10,9 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.predicate.smt.PredicatesSMTStringifier;
+
 import org.junit.Test;
+
 import static org.junit.Assert.assertFalse;
 
 public class AccessExpressionTest {

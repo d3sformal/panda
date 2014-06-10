@@ -1,7 +1,8 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
 import java.util.List;
+
+import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
 
 /**
  * Context is a container holding predicates that are targeted at a specific runtime scope (static, object, method)

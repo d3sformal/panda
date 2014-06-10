@@ -1,5 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPFConfigException;
 import gov.nasa.jpf.abstraction.Abstraction;
@@ -9,14 +14,11 @@ import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ExpressionContext;
 import gov.nasa.jpf.abstraction.common.LessThan;
-import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.common.PredicateContext;
+import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 

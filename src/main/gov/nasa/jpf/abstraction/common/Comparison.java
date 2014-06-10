@@ -1,8 +1,9 @@
 package gov.nasa.jpf.abstraction.common;
 
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import java.util.Set;
 
 /**
  * A common ancestor to all non-constant elemental predicates supported in this project

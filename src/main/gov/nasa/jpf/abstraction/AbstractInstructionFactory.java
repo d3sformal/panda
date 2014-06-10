@@ -19,6 +19,11 @@
 
 package gov.nasa.jpf.abstraction;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.bytecode.*;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
@@ -27,10 +32,6 @@ import gov.nasa.jpf.util.ClassInfoFilter;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MethodInfo;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Ensures interpretations of non-standard instructions respecting the selected abstractions.

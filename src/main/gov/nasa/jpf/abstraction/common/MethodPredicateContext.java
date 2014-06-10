@@ -1,8 +1,9 @@
 package gov.nasa.jpf.abstraction.common;
 
+import java.util.List;
+
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.Method;
-import java.util.List;
 
 /**
  * Corresponds to one method section in the input file

@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction.common.impl;
 
+import java.util.Map;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ObjectExpression;
 import gov.nasa.jpf.abstraction.common.Predicate;
@@ -7,8 +10,6 @@ import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Wrapper which marks expressions as Object Expressions @see gov.nasa.jpf.abstraction.common.ObjectExpression

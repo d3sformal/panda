@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.predicate;
 
+import java.io.PrintWriter;
+
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.predicate.state.PredicateValuation;
@@ -14,7 +16,6 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.Path;
 import gov.nasa.jpf.vm.Step;
 import gov.nasa.jpf.vm.Transition;
-import java.io.PrintWriter;
 
 public class PredicateConsolePublisher extends ConsolePublisher {
 

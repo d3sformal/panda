@@ -1,5 +1,9 @@
 package gov.nasa.jpf.abstraction.predicate.util;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
@@ -10,9 +14,6 @@ import gov.nasa.jpf.abstraction.predicate.smt.SMTListener;
 import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.search.Search;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Prints calls to the SMT

@@ -1,9 +1,10 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import java.util.Map;
 import java.util.Set;
+
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
 /**
  * Common interface of all symbolic expressions

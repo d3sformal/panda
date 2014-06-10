@@ -1,10 +1,11 @@
 package gov.nasa.jpf.abstraction.common;
 
+import java.util.Map;
+
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import java.util.Map;
 
 /**
  * Implication between two predicates / formulas over symbolic expressions. (e.g. (x = 0 AND y = x) IMPLIES y = 0)

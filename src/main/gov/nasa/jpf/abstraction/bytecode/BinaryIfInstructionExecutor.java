@@ -1,5 +1,10 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.AbstractBoolean;
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.AbstractValue;
@@ -28,10 +33,6 @@ import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Implementation of all binary IF instructions regardless their precise type.

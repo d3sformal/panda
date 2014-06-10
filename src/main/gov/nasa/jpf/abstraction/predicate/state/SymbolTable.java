@@ -1,9 +1,10 @@
 package gov.nasa.jpf.abstraction.predicate.state;
 
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
-import java.util.Set;
 
 /**
  * Interface for a structure capable of handling assignments of symbolic expressions

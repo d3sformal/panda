@@ -1,11 +1,12 @@
 package gov.nasa.jpf.abstraction.common;
 
+import java.util.Map;
+import java.util.Set;
+
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Negation of a predicate.
