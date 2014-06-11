@@ -1,6 +1,8 @@
 package gov.nasa.jpf.abstraction.util;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -10,6 +12,7 @@ import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 
 public class PredicateUtil {
@@ -83,5 +86,13 @@ public class PredicateUtil {
         }
 
         return false;
+    }
+
+    public static boolean isPredicateOverReturn(Predicate predicate) {
+        Set<AccessExpression> exprs = new HashSet<AccessExpression>();
+
+        predicate.addAccessExpressionsToSet(exprs);
+
+        return exprs.contains(DefaultReturnValue.create());
     }
 }

@@ -32,6 +32,7 @@ import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.smt.SMT;
 import gov.nasa.jpf.abstraction.smt.SMTException;
 import gov.nasa.jpf.abstraction.util.ExpressionUtil;
+import gov.nasa.jpf.abstraction.util.PredicateUtil;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.jvm.bytecode.IINC;
 import gov.nasa.jpf.jvm.bytecode.LocalVariableInstruction;
@@ -225,7 +226,8 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             // Copy of the current caller scope - to avoid modifications - may not be needed now, it is not different from .top() and it is not modified here
             MethodFramePredicateValuation callerScope = scopes.get(currentThreadID).top();
 
-            Map<Predicate, Predicate> replaced = new HashMap<Predicate, Predicate>();
+            Map<Predicate, Set<Predicate>> reverseMap = new HashMap<Predicate, Set<Predicate>>();
+            Set<Predicate> callerScopePredicates = new HashSet<Predicate>();
             Set<Predicate> unknown = new HashSet<Predicate>();
             Set<AccessExpression> temporaryPathHolder = new HashSet<AccessExpression>();
 
@@ -278,17 +280,27 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                 if (usesLocals) {
                     unknown.add(predicate);
                 } else {
-                    replaced.put(predicate.replace(replacements), predicate);
+                    Predicate callerScopePredicate = predicate.replace(replacements);
+
+                    callerScopePredicates.add(callerScopePredicate);
+
+                    if (!reverseMap.containsKey(callerScopePredicate)) {
+                        reverseMap.put(callerScopePredicate, new HashSet<Predicate>());
+                    }
+
+                    reverseMap.get(callerScopePredicate).add(predicate);
                 }
 
                 temporaryPathHolder.clear();
             }
 
             // Valuate predicates in the caller scope, and adopt the valuation for the callee predicates
-            Map<Predicate, TruthValue> valuation = callerScope.evaluatePredicates(replaced.keySet());
+            Map<Predicate, TruthValue> valuation = callerScope.evaluatePredicates(callerScopePredicates);
 
-            for (Predicate predicate : replaced.keySet()) {
-                calleeScope.put(replaced.get(predicate), valuation.get(predicate));
+            for (Predicate callerScopePredicate : callerScopePredicates) {
+                for (Predicate calleeScopePredicate : reverseMap.get(callerScopePredicate)) {
+                    calleeScope.put(calleeScopePredicate, valuation.get(callerScopePredicate));
+                }
             }
 
             for (Predicate predicate : unknown) {
@@ -301,44 +313,17 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
         scopes.get(currentThreadID).push(method.getFullName(), calleeScope);
     }
 
-    private static boolean isPredicateOverReturn(Predicate predicate) {
-        if (predicate instanceof Negation) {
-            Negation n = (Negation) predicate;
-
-            return isPredicateOverReturn(n.predicate);
-        }
-
-        if (predicate instanceof Comparison) {
-            Comparison c = (Comparison) predicate;
-
-            Expression a = c.a;
-            Expression b = c.b;
-
-            if (a instanceof AccessExpression) {
-                AccessExpression ae = (AccessExpression) a;
-
-                if (ae.getRoot() instanceof ReturnValue && ((ReturnValue) ae.getRoot()).isReturnFromCurrentScope()) {
-                    return true;
-                }
-            }
-
-            if (b instanceof AccessExpression) {
-                AccessExpression ae = (AccessExpression) b;
-
-                if (ae.getRoot() instanceof ReturnValue && ((ReturnValue) ae.getRoot()).isReturnFromCurrentScope()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     @Override
     public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
 
-        Expression expr = ExpressionUtil.getExpression(after.getResultAttr());
+        Expression expr;
+
+        if (before.getMethodInfo().getReturnSize() == 2) {
+            expr = ExpressionUtil.getExpression(after.getLongResultAttr());
+        } else {
+            expr = ExpressionUtil.getExpression(after.getResultAttr());
+        }
 
         if (RunDetector.isRunning()) {
             MethodFramePredicateValuation scope;
@@ -352,7 +337,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
              * Determine values of predicates over the return value based on the concrete symbolic expression being returned
              */
             for (Predicate predicate : getPredicates()) {
-                if (isPredicateOverReturn(predicate)) {
+                if (PredicateUtil.isPredicateOverReturn(predicate)) {
                     Predicate determinant = predicate.replace(DefaultReturnValue.create(), expr);
 
                     predicates.put(determinant, predicate);
@@ -375,7 +360,13 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
         }
 
         ReturnValue returnValueSpecific = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
-        after.setOperandAttr(returnValueSpecific);
+
+        if (before.getMethodInfo().getReturnSize() == 2) {
+            after.setLongOperandAttr(returnValueSpecific);
+        } else {
+            after.setOperandAttr(returnValueSpecific);
+        }
+
 
         // The rest is the same as if no return happend
         processVoidMethodReturn(threadInfo, before, after);
@@ -521,7 +512,7 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
                     }
 
                     // Write predicates over return through (this is useful when called from processMethodReturn)
-                    if (isPredicateOverReturn(predicate)) {
+                    if (PredicateUtil.isPredicateOverReturn(predicate)) {
                         calleeReturns.put(predicate.replace(returnValue, returnValueSpecific), value);
                     }
                 }
