@@ -1,385 +1,465 @@
 package gov.nasa.jpf.abstraction;
 
-class D{public static void main(String[] args) {new IntTest().bootstrap();}}
 public class IntTest extends SignsTest {
     @Test
     public static void test1() {
-        test_I2F(1);
+        float x = test_I2F(1);
+
+        assertConjunction("x > 0: true", "x < 0: false");
     }
 
     @Test
     public static void test2() {
-        test_I2D(1);
+        double x = test_I2D(1);
+
+        assertConjunction("x > 0: true", "x < 0: false");
     }
 
     @Test
     public static void test3() {
-        test_I2L(1);
+        long x = test_I2L(1);
+
+        assertConjunction("x > 0: true", "x < 0: false");
     }
 
     @Test
     public static void test4() {
-        test_IADD(3, -2);
+        int x = test_IADD(3, -2);
+
+        assertConjunction("x > 0: true", "x < 0: false");
     }
 
     @Test
     public static void test5() {
-        test_IADD(3, 1);
+        int x = test_IADD(3, 1);
+
+        assertConjunction("x > 0: true", "x < 0: false");
     }
 
-    //@Test
+    @Test
     public static void test6() {
-        test_IADD(-1, 0);
+        int x = test_IADD(-1, 0);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
     //@Test
     public static void test7() {
-        test_IAND(3, -1);
+        int x = test_IAND(0, 0);
+
+        assertConjunction("x > 0: false", "x < 0: false");
     }
 
     //@Test
     public static void test8() {
-        test_IAND(3, 1);
+        int x = test_IAND(0, 1);
+
+        assertConjunction("x > 0: false", "x < 0: false");
     }
 
     //@Test
     public static void test9() {
-        test_IAND(-3, 0);
+        int x = test_IAND(1, 0);
+
+        assertConjunction("x > 0: false", "x < 0: false");
     }
 
     //@Test
     public static void test10() {
-        test_IDIV(3, -1);
+        int x = test_IAND(1, 1);
+
+        assertConjunction("x > 0: true", "x < 0: false");
     }
 
-    //@Test
+    @Test
     public static void test11() {
-        test_IDIV(-3, 1);
+        boolean x = test_IF_ICMPEQ(3, -1);
+
+        assertConjunction("x > 0: false");
     }
 
-    //@Test
+    @Test
     public static void test12() {
-        test_IDIV(-3, -1);
+        boolean x = test_IF_ICMPNE(3, -1);
+
+        assertConjunction("x > 0: true");
     }
 
-    //@Test
+    @Test
     public static void test13() {
-        test_IDIV(0, -1);
+        boolean x = test_IF_ICMPLT(3, -1);
+
+        assertConjunction("x > 0: false");
     }
 
     @Test
     public static void test14() {
-        test_IF_ICMPEQ(3, -1);
+        boolean x = test_IF_ICMPLE(1, 0);
+
+        assertConjunction("x > 0: false");
     }
 
     @Test
     public static void test15() {
-        test_IF_ICMPNE(3, -1);
+        boolean x = test_IF_ICMPGT(1, 0);
+
+        assertConjunction("x > 0: true");
     }
 
     @Test
     public static void test16() {
-        test_IF_ICMPLT(3, -1);
+        boolean x = test_IF_ICMPGE(1, 0);
+
+        assertConjunction("x > 0: true");
     }
 
     @Test
     public static void test17() {
-        test_IF_ICMPLE(1, 0);
+        int x = test_IINC(-2, +1);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
     @Test
     public static void test18() {
-        test_IF_ICMPGT(1, 0);
+        int x = test_IINC(0, +1);
+
+        assertConjunction("x > 0: true", "x < 0: false");
     }
 
     @Test
     public static void test19() {
-        test_IF_ICMPGE(1, 0);
+        int x = test_IINC(0, -1);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
     @Test
     public static void test20() {
-        test_IINC(-2, +1);
+        int x = test_IINC(2, -1);
+
+        assertConjunction("x > 0: true", "x < 0: false");
     }
 
-    @Test
+    //@Test
     public static void test21() {
-        test_IINC(0, +1);
+        int x = test_IMUL(3, -1);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
-    @Test
+    //@Test
     public static void test22() {
-        test_IINC(0, -1);
+        int x = test_IMUL(-3, 1);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
-    @Test
+    //@Test
     public static void test23() {
-        test_IINC(2, -1);
+        int x = test_IMUL(-3, -2);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
-    @Test
+    //@Test
     public static void test24() {
-        test_IMUL(3, -1);
+        int x = test_IMUL(2, -1);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
     @Test
     public static void test25() {
-        test_IMUL(-3, 1);
+        int x = test_INEG(-3);
+
+        assertConjunction("x > 0: true", "x < 0: false");
     }
 
     @Test
     public static void test26() {
-        test_IMUL(-3, -2);
+        int x = test_INEG(0);
+
+        assertConjunction("x > 0: false", "x < 0: false");
     }
 
     @Test
     public static void test27() {
-        test_IMUL(2, -1);
+        int x = test_INEG(3);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
-    @Test
+    //@Test
     public static void test28() {
-        test_INEG(-3);
+        int x = test_IOR(0, 0);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
-    @Test
+    //@Test
     public static void test29() {
-        test_INEG(0);
+        int x = test_IOR(0, 1);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
-    @Test
+    //@Test
     public static void test30() {
-        test_INEG(3);
+        int x = test_IOR(1, 0);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
     //@Test
     public static void test31() {
-        test_IOR(3, -1);
-    }
+        int x = test_IOR(1, 1);
 
-    //@Test
-    public static void test32() {
-        test_IOR(3, 1);
-    }
-
-    //@Test
-    public static void test33() {
-        test_IOR(-1, 0);
-    }
-
-    //@Test
-    public static void test34() {
-        test_IREM(3, -2);
-    }
-
-    //@Test
-    public static void test35() {
-        test_IREM(-3, 2);
-    }
-
-    //@Test
-    public static void test36() {
-        test_IREM(-3, -1);
-    }
-
-    //@Test
-    public static void test37() {
-        test_IREM(0, -1);
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
     @Test
+    public static void test32() {
+        int x = test_ISHL1(1);
+
+        assertConjunction("x > 0: true", "x < 0: false");
+    }
+
+    @Test
+    public static void test33() {
+        int x = test_ISHL10(0);
+
+        assertConjunction("x > 0: false", "x < 0: false");
+    }
+
+    @Test
+    public static void test34() {
+        int x = test_ISHLm3(1);
+
+        assertConjunction("x > 0: true", "x < 0: false");
+    }
+
+    @Test
+    public static void test35() {
+        int x = test_ISHLm3(-1);
+
+        assertConjunction("x > 0: false", "x < 0: true");
+    }
+
+    //1 / ALOT > 0
+    //@Test
+    public static void test36() {
+        int x = test_ISHR1(1);
+
+        assertConjunction("x > 0: false", "x < 0: false");
+    }
+
+    @Test
+    public static void test37() {
+        int x = test_ISHR10(0);
+
+        assertConjunction("x > 0: false", "x < 0: false");
+    }
+
+    //1 / ALOT > 0
+    //@Test
     public static void test38() {
-        test_ISHL(1, 1);
+        int x = test_ISHRm3(1);
+
+        assertConjunction("x > 0: false", "x < 0: false");
     }
 
     @Test
     public static void test39() {
-        test_ISHL(0, 10);
+        int x = test_ISHRm3(-1);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
     @Test
     public static void test40() {
-        test_ISHL(1, -3);
+        int x = test_ISUB(3, -1);
+
+        assertConjunction("x > 0: true", "x < 0: false");
     }
 
     @Test
     public static void test41() {
-        test_ISHL(-1, -3);
+        int x = test_ISUB(3, 1);
+
+        assertConjunction("x > 0: true", "x < 0: false");
     }
 
     @Test
     public static void test42() {
-        test_ISHR(1, 1);
+        int x = test_ISUB(3, 7);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
     @Test
     public static void test43() {
-        test_ISHR(0, 10);
+        int x = test_ISUB(-1, 0);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
-    @Test
+    //@Test
     public static void test44() {
-        test_ISHR(1, -3);
+        int x = test_IUSHR1(-1);
+
+        assertConjunction("x > 0: true", "x < 0: false");
     }
 
-    @Test
+    //@Test
     public static void test45() {
-        test_ISHR(-1, -3);
+        int x = test_IXOR(0, 0);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
-    @Test
+    //@Test
     public static void test46() {
-        test_ISUB(3, -1);
+        int x = test_IXOR(0, 1);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
-    @Test
+    //@Test
     public static void test47() {
-        test_ISUB(3, 1);
+        int x = test_IXOR(0, 1);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
-    @Test
+    //@Test
     public static void test48() {
-        test_ISUB(3, 7);
+        int x = test_IXOR(1, 1);
+
+        assertConjunction("x > 0: false", "x < 0: true");
     }
 
-    @Test
-    public static void test49() {
-        test_ISUB(-1, 0);
+    public static float test_I2F(int x) {
+        return (float)x;
     }
 
-    @Test
-    public static void test50() {
-        test_ISHR(1, 1);
+    public static double test_I2D(int x) {
+        return (double)x;
     }
 
-    @Test
-    public static void test51() {
-        test_ISHR(0, 10);
+    public static long test_I2L(int x) {
+        return (long)x;
     }
 
-    @Test
-    public static void test52() {
-        test_ISHR(1, -3);
+    public static int test_IADD(int x, int y) {
+        return x + y;
     }
 
-    @Test
-    public static void test53() {
-        test_ISHR(-1, -3);
+    public static int test_IAND(int x, int y) {
+        return x & y;
     }
 
-    //@Test
-    public static void test54() {
-        test_IXOR(3, -1);
-    }
-
-    //@Test
-    public static void test55() {
-        test_IXOR(3, 1);
-    }
-
-    //@Test
-    public static void test56() {
-        test_IXOR(-1, 0);
-    }
-
-    public static void test_I2F(int x) {
-        float y = 0.0f;
-        y = x;
-    }
-
-    public static void test_I2D(int x) {
-        double y = 0.0;
-        y = x;
-    }
-
-    public static void test_I2L(int x) {
-        long y = 0;
-        y = x;
-    }
-
-    public static void test_IADD(int x, int y) {
-        y = x + y;
-    }
-
-    public static void test_IAND(int x, int y) {
-        y = x & y;
-    }
-
-    public static void test_IDIV(int x, int y) {
-        y = x / y;
-    }
-
-    public static void test_IF_ICMPEQ(int x, int y) {
+    public static boolean test_IF_ICMPEQ(int x, int y) {
         if (x != y) {
+            return false;
         }
+
+        return true;
     }
 
-    public static void test_IF_ICMPNE(int x, int y) {
+    public static boolean test_IF_ICMPNE(int x, int y) {
         if (x == y) {
+            return false;
         }
+
+        return true;
     }
 
-    public static void test_IF_ICMPLT(int x, int y) {
+    public static boolean test_IF_ICMPLT(int x, int y) {
         if (x >= y) {
+            return false;
         }
+
+        return true;
     }
 
-    public static void test_IF_ICMPLE(int x, int y) {
+    public static boolean test_IF_ICMPLE(int x, int y) {
         if (x > y) {
+            return false;
         }
+
+        return true;
     }
 
-    public static void test_IF_ICMPGT(int x, int y) {
+    public static boolean test_IF_ICMPGT(int x, int y) {
         if (x <= y) {
+            return false;
         }
+
+        return true;
     }
 
-    public static void test_IF_ICMPGE(int x, int y) {
+    public static boolean test_IF_ICMPGE(int x, int y) {
         if (x < y) {
+            return false;
         }
+
+        return true;
     }
 
-    public static void test_IINC(int x, int sign) {
+    public static int test_IINC(int x, int sign) {
         if (sign < 0) {
-            --x;
+            return --x;
         } else {
-            ++x;
+            return ++x;
         }
     }
 
-    public static void test_IMUL(int x, int y) {
-        y = x * y;
+    public static int test_IMUL(int x, int y) {
+        return x * y;
     }
 
-    public static void test_INEG(int x) {
-        x = -x;
+    public static int test_INEG(int x) {
+        return -x;
     }
 
-    public static void test_IOR(int x, int y) {
-        y = x | y;
+    public static int test_IOR(int x, int y) {
+        return x | y;
     }
 
-    public static void test_IREM(int x, int y) {
-        y = x % y;
+    public static int test_ISHL1(int x) {
+        return x << 1;
     }
 
-    public static void test_ISHL(int x, int y) {
-        y = x >> y;
+    public static int test_ISHL10(int x) {
+        return x << 10;
     }
 
-    public static void test_ISHR(int x, int y) {
-        y = x << y;
+    public static int test_ISHLm3(int x) {
+        return x << -3;
     }
 
-    public static void test_ISUB(int x, int y) {
-        y = x - y;
+    public static int test_ISHR1(int x) {
+        return x >> 1;
     }
 
-    public static void test_IUSHR(int x, int y) {
-        y = x >>> y;
+    public static int test_ISHR10(int x) {
+        return x >> 10;
     }
 
-    public static void test_IXOR(int x, int y) {
-        y = x ^ y;
+    public static int test_ISHRm3(int x) {
+        return x >> -3;
+    }
+
+    public static int test_ISUB(int x, int y) {
+        return x - y;
+    }
+
+    public static int test_IUSHR1(int x) {
+        return x >>> 1;
+    }
+
+    public static int test_IXOR(int x, int y) {
+        return x ^ y;
     }
 }
