@@ -12,7 +12,7 @@ import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
+import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 
 public class PredicateUtil {
@@ -93,6 +93,10 @@ public class PredicateUtil {
 
         predicate.addAccessExpressionsToSet(exprs);
 
-        return exprs.contains(DefaultReturnValue.create());
+        for (AccessExpression expr : exprs) {
+            if (expr.getRoot() instanceof ReturnValue && ((ReturnValue) expr.getRoot()).isReturnFromCurrentScope()) return true;
+        }
+
+        return false;
     }
 }
