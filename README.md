@@ -49,7 +49,7 @@ target=target.Target
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/target/Target.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/target/Target.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 ```
@@ -58,7 +58,7 @@ Notable configuration attributes are:
 
 1. **target**  
 The target program (Java class with the ``main`` method).
-2. **abstract.domain**  
+2. **apf.abstract_domain**  
 The abstraction to be used - in our case ``PREDICATES`` - followed by a path to the file with input predicates. Other supported abstractions are described [here](https://bitbucket.org/artkhyzha/jpf-abstraction/wiki/Running_Abstract_Pathfinder).
 3. **listener**  
 The ``gov.nasa.jpf.abstraction.AbstractListener`` listener is mandatory for the predicate abstraction to work properly. 
@@ -169,7 +169,7 @@ target=arraylength.ALength
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-abstract.domain=PREDICATES ${jpf-abstraction}/src/examples/arraylength/ALength.pred
+apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/arraylength/ALength.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 ```
