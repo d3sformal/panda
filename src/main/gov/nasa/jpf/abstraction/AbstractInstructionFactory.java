@@ -1,10 +1,5 @@
 package gov.nasa.jpf.abstraction;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.bytecode.*;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
@@ -22,7 +17,6 @@ import gov.nasa.jpf.vm.MethodInfo;
 public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.InstructionFactory {
 
     ClassInfo ci;
-
     ClassInfoFilter filter;
 
     public AbstractInstructionFactory(Config conf) {
@@ -32,8 +26,6 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
         filter = new ClassInfoFilter(null, null, null, null);
 
         PredicateAbstractionFactory factory = new PredicateAbstractionFactory();
-
-        List<Abstraction> abs_list = new ArrayList<Abstraction>();
 
         String[] abs_str = conf.getStringArray("apf.abstract_domain");
         String[][] args = new String[abs_str.length][];

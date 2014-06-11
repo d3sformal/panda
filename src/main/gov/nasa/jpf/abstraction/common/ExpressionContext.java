@@ -18,7 +18,7 @@ public abstract class ExpressionContext implements PredicatesComponentVisitable 
         this.expressions = expressions;
     }
 
-    public abstract PredicateContext getPredicateContext();
+    public abstract PredicateContext getPredicateContextOfProperType();
 
     @Override
     public String toString() {

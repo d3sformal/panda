@@ -10,7 +10,7 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
- * Stores a short value into an array
+ * Stores a double value into an array
  */
 public class DASTORE extends gov.nasa.jpf.jvm.bytecode.DASTORE implements ArrayStoreInstruction {
 

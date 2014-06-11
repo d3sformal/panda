@@ -35,7 +35,7 @@ public class ObjectExpressionContext extends ExpressionContext {
     }
 
     @Override
-    public ObjectPredicateContext getPredicateContext() {
+    public ObjectPredicateContext getPredicateContextOfProperType() {
         return new ObjectPredicateContext(packageAndClass, new LinkedList<Predicate>());
     }
 

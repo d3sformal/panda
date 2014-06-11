@@ -35,7 +35,7 @@ public class MethodExpressionContext extends ExpressionContext {
     }
 
     @Override
-    public MethodPredicateContext getPredicateContext() {
+    public MethodPredicateContext getPredicateContextOfProperType() {
         return new MethodPredicateContext(method, new LinkedList<Predicate>());
     }
 

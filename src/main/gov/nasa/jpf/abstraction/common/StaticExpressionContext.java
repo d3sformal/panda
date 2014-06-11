@@ -24,7 +24,7 @@ public class StaticExpressionContext extends ExpressionContext {
     }
 
     @Override
-    public StaticPredicateContext getPredicateContext() {
+    public StaticPredicateContext getPredicateContextOfProperType() {
         return new StaticPredicateContext(new LinkedList<Predicate>());
     }
 

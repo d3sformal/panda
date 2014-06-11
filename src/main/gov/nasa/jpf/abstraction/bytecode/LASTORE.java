@@ -10,7 +10,7 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
- * Stores a short value into an array
+ * Stores a long value into an array
  */
 public class LASTORE extends gov.nasa.jpf.jvm.bytecode.LASTORE implements ArrayStoreInstruction {
 

@@ -68,7 +68,7 @@ public class PredicateAbstractionFactory extends AbstractionFactory {
                 Predicates predicates = new Predicates();
 
                 for (ExpressionContext exprContext : parser.expressions().val.contexts) {
-                    PredicateContext predContext = exprContext.getPredicateContext();
+                    PredicateContext predContext = exprContext.getPredicateContextOfProperType();
 
                     for (Expression expr : exprContext.expressions) {
                         predContext.predicates.add(LessThan.create(expr, Constant.create(0)));
@@ -98,7 +98,7 @@ public class PredicateAbstractionFactory extends AbstractionFactory {
                 Predicates predicates = new Predicates();
 
                 for (ExpressionContext exprContext : parser.expressions().val.contexts) {
-                    PredicateContext predContext = exprContext.getPredicateContext();
+                    PredicateContext predContext = exprContext.getPredicateContextOfProperType();
 
                     for (Expression expr : exprContext.expressions) {
                         predContext.predicates.add(LessThan.create(expr, Constant.create(min)));
@@ -128,7 +128,7 @@ public class PredicateAbstractionFactory extends AbstractionFactory {
                 Predicates predicates = new Predicates();
 
                 for (ExpressionContext exprContext : parser.expressions().val.contexts) {
-                    PredicateContext predContext = exprContext.getPredicateContext();
+                    PredicateContext predContext = exprContext.getPredicateContextOfProperType();
 
                     for (Expression expr : exprContext.expressions) {
                         predContext.predicates.add(LessThan.create(expr, Constant.create(min)));

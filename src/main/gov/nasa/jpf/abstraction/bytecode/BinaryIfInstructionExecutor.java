@@ -137,8 +137,9 @@ public class BinaryIfInstructionExecutor {
         return (conditionValue ? br.getTarget() : br.getNext(ti));
     }
 
-    // Collects all deterministic (no non-constant array index) access expressions that point to primitive data contributing to the current concrete state
+    // Collects all deterministic (only constant array indices) access expressions that point to primitive data contributing to the current concrete state
     // The set of access expressions is restricted to the current scope
+    // Effectively it converts all expressions in `allExprs` of the form `a[expr]` into `a[0]` ... `a[n]`
     private void collectAllStateExpressions(Map<AccessExpression, ElementInfo> stateExprs, Set<AccessExpression> allExprs, StackFrame sf, ThreadInfo ti) {
         Set<UniverseIdentifier> cls = new HashSet<UniverseIdentifier>();
 
@@ -169,6 +170,8 @@ public class BinaryIfInstructionExecutor {
         }
     }
 
+    // Recursively expands expressions
+    // Used in collectAllStateExpressions only
     private void collectStateExpressions(Map<AccessExpression, ElementInfo> stateExprs, ThreadInfo ti, ElementInfo parent, AccessExpression expr, int i, AccessExpression prefix) {
         if (i < expr.getLength()) {
             AccessExpression access = expr.get(i);

@@ -220,7 +220,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return sharedSymbolCache.get(predicate);
     }
 
-    // Determine inconsistency with predicates together, pairwise consistency is not enough
+    // Determine inconsistency with all predicates together, pairwise consistency is not enough
     @Override
     public Set<Predicate> getPredicatesInconsistentWith(Predicate assumption, TruthValue value) {
         Set<Predicate> affected = computeAffectedClosure(assumption, valuations.keySet());
@@ -797,6 +797,12 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         }
     }
 
+    /**
+     * Returns a part of an arbitrary concrete state (restricted to given expressions) satisfying the current abstract state
+     * If there are multiple models then it returns an arbitrary concrete state (from the set of possible models)
+     *
+     * @param exprArray is a list of expressions whose concrete value should be derived
+     */
     public int[] getConcreteState(AccessExpression[] exprArray) {
         Predicate state = Tautology.create();
 

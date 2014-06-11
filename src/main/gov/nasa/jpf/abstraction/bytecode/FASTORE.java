@@ -10,7 +10,7 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
- * Stores a short value into an array
+ * Stores a float value into an array
  */
 public class FASTORE extends gov.nasa.jpf.jvm.bytecode.FASTORE implements ArrayStoreInstruction {
 
