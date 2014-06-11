@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction.predicate;
+package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.annotation.MJI;
 import gov.nasa.jpf.vm.MJIEnv;

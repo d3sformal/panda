@@ -1,8 +1,0 @@
-[method gov.nasa.jpf.abstraction.predicate.NullTest.test1]
-alength(arrlen, array) > 1
-
-[method gov.nasa.jpf.abstraction.predicate.NullTest.test2]
-alength(arrlen, array) > 1
-
-[method gov.nasa.jpf.abstraction.predicate.NullTest.test3]
-alength(arrlen, array) > 1

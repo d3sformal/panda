@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.predicate.state.MethodFrameSymbolTable;
-import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
+import gov.nasa.jpf.abstraction.state.MethodFrameSymbolTable;
+import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.vm.VM;
 
 public class AssertNotAliasedHandler extends AssertAliasingHandler {

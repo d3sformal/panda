@@ -1,7 +1,0 @@
-[method gov.nasa.jpf.abstraction.predicate.AmbiguityTest.main]
-a.x.y.z = 0
-a.x.y.z = 3
-c.z = 3
-b.y.z = 0
-b.y.z = 3
-a.x = b

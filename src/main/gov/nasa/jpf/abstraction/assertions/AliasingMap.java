@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.predicate.state.universe.UniverseIdentifier;
+import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 
 public class AliasingMap extends TreeMap<AccessExpression, Set<UniverseIdentifier>> {
     public static final long serialVersionUID = 1L;

@@ -4,7 +4,7 @@ import gov.nasa.jpf.abstraction.common.ArrayExpression;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.state.universe.Reference;
 
 /**
  * A freshly allocated array (or a duplicate) --- not loaded from a variable.

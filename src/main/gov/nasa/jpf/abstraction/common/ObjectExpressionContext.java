@@ -18,7 +18,7 @@ import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
  *
  * <<< SOME OTHER SECTION OR EOF (End of File)
  *
- * @see gov.nasa.jpf.abstraction.predicate.grammar (grammar file Predicates.g4)
+ * @see gov.nasa.jpf.abstraction.grammar (grammar file Predicates.g4)
  */
 public class ObjectExpressionContext extends ExpressionContext {
 

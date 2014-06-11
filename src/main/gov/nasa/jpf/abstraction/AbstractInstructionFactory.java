@@ -7,8 +7,8 @@ import java.util.Map;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.abstraction.bytecode.*;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstractionFactory;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.PredicateAbstractionFactory;
 import gov.nasa.jpf.util.ClassInfoFilter;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;

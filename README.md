@@ -63,12 +63,12 @@ The abstraction to be used - in our case ``PREDICATES`` - followed by a path to 
 3. **listener**  
 The ``gov.nasa.jpf.abstraction.AbstractListener`` listener is mandatory for the predicate abstraction to work properly. 
 It is also possible to specify additional listeners to get more verbose output:
- - ``gov.nasa.jpf.abstraction.predicate.util.PredicateValuationMonitor``  
+ - ``gov.nasa.jpf.abstraction.util.PredicateValuationMonitor``  
     prints the values of all predicates after each instruction.
  - ``gov.nasa.jpf.listener.ExecTracker`` or ``gov.nasa.jpf.abstraction.util.InstructionTracker``  
     to put the output of other listeners into the context of executed bytecode instructions.
 4. **vm.serializer.class**  
-It is necessary to set this option to ``gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer`` to enable abstract state matching.
+It is necessary to set this option to ``gov.nasa.jpf.abstraction.PredicateAbstractionSerializer`` to enable abstract state matching.
 
 Additional configuration options are described on the [JPF-core configuration page](http://babelfish.arc.nasa.gov/trac/jpf/wiki/user/config).
 

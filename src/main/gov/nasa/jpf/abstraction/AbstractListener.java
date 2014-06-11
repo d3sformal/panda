@@ -24,7 +24,7 @@ import gov.nasa.jpf.abstraction.assertions.AssertSameValuationOnEveryVisitHandle
 import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostWithValuationHandler;
 import gov.nasa.jpf.abstraction.inspection.AliasingDumper;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
 import gov.nasa.jpf.search.Search;
@@ -45,9 +45,9 @@ public class AbstractListener extends PropertyListenerAdapter {
     private Map<String, ExecuteInstructionHandler> debugMethods = new HashMap<String, ExecuteInstructionHandler>();
     private Map<String, ExecuteInstructionHandler> testMethods = new HashMap<String, ExecuteInstructionHandler>();
 
-    private static String DebugClass = "gov.nasa.jpf.abstraction.predicate.Debug";
-    private static String BaseTestClass = "gov.nasa.jpf.abstraction.predicate.BaseTest";
-    private static String StateMatchingTestClass = "gov.nasa.jpf.abstraction.predicate.statematch.StateMatchingTest";
+    private static String DebugClass = "gov.nasa.jpf.abstraction.Debug";
+    private static String BaseTestClass = "gov.nasa.jpf.abstraction.BaseTest";
+    private static String StateMatchingTestClass = "gov.nasa.jpf.abstraction.statematch.StateMatchingTest";
 
     public AbstractListener() {
         // Debug

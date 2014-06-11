@@ -7,6 +7,6 @@ sourcepath=${jpf-abstraction}/src/examples
 
 apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/prodcons/predicate/ProdConsEx.pred
 
-listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.predicate.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.predicate.util.StackExpressionMonitor,gov.nasa.jpf.abstraction.predicate.util.UniverseMonitor
+listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.util.StackExpressionMonitor,gov.nasa.jpf.abstraction.util.UniverseMonitor
 
-vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer
+vm.serializer.class=gov.nasa.jpf.abstraction.PredicateAbstractionSerializer

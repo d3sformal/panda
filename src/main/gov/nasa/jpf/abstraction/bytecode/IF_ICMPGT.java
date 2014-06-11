@@ -4,7 +4,7 @@ import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 

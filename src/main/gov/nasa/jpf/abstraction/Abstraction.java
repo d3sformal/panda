@@ -8,7 +8,7 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;

@@ -1,9 +1,0 @@
-[object gov.nasa.jpf.abstraction.predicate.DefaultValue]
-this.b = 0
-this.x = 0
-this.o = null
-
-[method gov.nasa.jpf.abstraction.predicate.DefaultValueTest.main]
-v.b = 0
-v.x = 0
-v.o = null

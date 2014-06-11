@@ -117,10 +117,10 @@
   <target name="-compile-grammar">
     <java jar="lib/antlr-4.0-complete.jar" fork="true">
       <arg value="-package" />
-      <arg value="gov.nasa.jpf.abstraction.predicate.parser" />
+      <arg value="gov.nasa.jpf.abstraction.parser" />
       <arg value="-o" />
-      <arg value="${basedir}/src/main/gov/nasa/jpf/abstraction/predicate/parser" />
-      <arg value="${basedir}/src/main/gov/nasa/jpf/abstraction/predicate/grammar/Predicates.g4" />
+      <arg value="${basedir}/src/main/gov/nasa/jpf/abstraction/parser" />
+      <arg value="${basedir}/src/main/gov/nasa/jpf/abstraction/grammar/Predicates.g4" />
     </java>
   </target>
 

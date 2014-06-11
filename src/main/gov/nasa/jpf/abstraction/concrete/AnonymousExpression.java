@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.concrete;
 
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.state.universe.Reference;
 
 /**
  * Interface of all Objects / Arrays obtained by allocation (or duplicates of such)

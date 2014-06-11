@@ -1,8 +1,8 @@
 package gov.nasa.jpf.abstraction.assertions;
 
 import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.state.TruthValue;
 
 public class AssertKnownValuationHandler extends AssertConjunctionHandler {
 

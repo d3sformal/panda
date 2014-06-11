@@ -1,0 +1,5 @@
+[method gov.nasa.jpf.abstraction.NativeAssertionTest.test1]
+x = 1
+
+[method gov.nasa.jpf.abstraction.NativeAssertionTest.test2]
+x = 1

@@ -9,5 +9,5 @@ apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/svcomp/loops/Inse
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 
-vm.serializer.class=gov.nasa.jpf.abstraction.predicate.PredicateAbstractionSerializer
+vm.serializer.class=gov.nasa.jpf.abstraction.PredicateAbstractionSerializer
 

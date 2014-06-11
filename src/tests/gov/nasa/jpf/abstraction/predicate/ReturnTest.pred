@@ -1,6 +1,0 @@
-[method gov.nasa.jpf.abstraction.predicate.ReturnTest.main]
-r.x = 42
-
-[method gov.nasa.jpf.abstraction.predicate.Return.getValue]
-ret.x = 42
-return.x = 42

@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.ObjectExpression;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.predicate.state.universe.Universe;
+import gov.nasa.jpf.abstraction.state.universe.Universe;
 
 public class NullExpression extends Constant implements ObjectExpression {
 

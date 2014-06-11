@@ -9,7 +9,7 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
-import gov.nasa.jpf.abstraction.predicate.smt.PredicatesSMTStringifier;
+import gov.nasa.jpf.abstraction.smt.PredicatesSMTStringifier;
 
 import org.junit.Test;
 

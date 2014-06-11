@@ -3,7 +3,7 @@
 cd src/tests
 
 common_tests=`find gov/nasa/jpf/abstraction/common -name "*.java" | xargs | tr '/' '.'`
-predabs_tests=`find gov/nasa/jpf/abstraction/predicate -name "*.java" | xargs | tr '/' '.'`
+predabs_tests=`find gov/nasa/jpf/abstraction -name "*.java" | xargs | tr '/' '.'`
 
 cd ../..
 

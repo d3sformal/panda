@@ -6,8 +6,8 @@ import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 
 public class LogicalOperandChecker {

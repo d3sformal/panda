@@ -13,7 +13,7 @@ import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.impl.DefaultObjectExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.predicate.smt.PredicatesSMTStringifier;
+import gov.nasa.jpf.abstraction.smt.PredicatesSMTStringifier;
 
 /**
  * Implements common behaviour of most of the access expression elements

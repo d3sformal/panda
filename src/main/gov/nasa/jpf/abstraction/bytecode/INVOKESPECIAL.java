@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;

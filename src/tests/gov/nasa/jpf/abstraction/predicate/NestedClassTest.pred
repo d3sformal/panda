@@ -1,3 +1,0 @@
-[method gov.nasa.jpf.abstraction.predicate.NestedClassTest.test]
-i.g = 3
-alength(arrlen, i.a) > 10

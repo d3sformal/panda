@@ -1,5 +1,0 @@
-[method gov.nasa.jpf.abstraction.predicate.NativeAssertionTest.test1]
-x = 1
-
-[method gov.nasa.jpf.abstraction.predicate.NativeAssertionTest.test2]
-x = 1

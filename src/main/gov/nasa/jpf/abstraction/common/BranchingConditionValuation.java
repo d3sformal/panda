@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.state.TruthValue;
 
 /**
  * Means of letting predicate abstraction know about valuation of the branching condition under the selected branch.

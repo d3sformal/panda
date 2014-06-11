@@ -1,8 +1,8 @@
 package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.predicate.parser.PredicatesLexer;
-import gov.nasa.jpf.abstraction.predicate.parser.PredicatesParser;
+import gov.nasa.jpf.abstraction.parser.PredicatesLexer;
+import gov.nasa.jpf.abstraction.parser.PredicatesParser;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;

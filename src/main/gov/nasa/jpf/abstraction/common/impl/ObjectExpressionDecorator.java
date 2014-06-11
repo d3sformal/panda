@@ -9,7 +9,7 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
-import gov.nasa.jpf.abstraction.predicate.state.SymbolTable;
+import gov.nasa.jpf.abstraction.state.SymbolTable;
 
 /**
  * Wrapper which marks expressions as Object Expressions @see gov.nasa.jpf.abstraction.common.ObjectExpression

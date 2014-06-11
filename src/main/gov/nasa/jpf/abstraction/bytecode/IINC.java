@@ -6,7 +6,7 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
-import gov.nasa.jpf.abstraction.predicate.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;

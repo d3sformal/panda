@@ -6,7 +6,7 @@ import java.util.TreeMap;
 
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.state.TruthValue;
 
 public class PredicateValuationMap extends TreeMap<Predicate, TruthValue> {
     public static final long serialVersionUID = 1L;

@@ -1,9 +1,0 @@
-[static]
-alength(arrlen,class(gov.nasa.jpf.abstraction.predicate.ArrayTest).static_a) = 2
-class(gov.nasa.jpf.abstraction.predicate.ArrayTest).static_a[0].f = 1..2
-class(gov.nasa.jpf.abstraction.predicate.ArrayTest).static_a[0..1].f = 2
-
-[method gov.nasa.jpf.abstraction.predicate.ArrayTest.main]
-i = -1
-a[0].f = 1..2
-alength(arrlen,a) = 2

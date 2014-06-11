@@ -1,0 +1,6 @@
+[method gov.nasa.jpf.abstraction.ReturnTest.main]
+r.x = 42
+
+[method gov.nasa.jpf.abstraction.Return.getValue]
+ret.x = 42
+return.x = 42

@@ -10,7 +10,7 @@ import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultAccessExpression;
-import gov.nasa.jpf.abstraction.predicate.state.universe.Reference;
+import gov.nasa.jpf.abstraction.state.universe.Reference;
 
 /**
  * Represents a freshly allocated object (freshly allocated = not loaded from a variable)

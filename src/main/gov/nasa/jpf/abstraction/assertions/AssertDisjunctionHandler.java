@@ -4,7 +4,7 @@ import gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.common.Tautology;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.ExpressionUtil;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;

@@ -10,7 +10,7 @@ import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.predicate.state.TruthValue;
+import gov.nasa.jpf.abstraction.state.TruthValue;
 
 public class PredicateUtil {
     public static boolean determinesExactConcreteValueOfAccessExpression(Predicate predicate, Map<Predicate, TruthValue> valuations) {
