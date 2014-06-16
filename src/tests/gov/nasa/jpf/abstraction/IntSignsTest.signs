@@ -1,0 +1,211 @@
+[method gov.nasa.jpf.abstraction.IntSignsTest.test1]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test2]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test3]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test4]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test5]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test6]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test7]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test11]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test12]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test13]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test14]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test15]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test16]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test17]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test18]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test19]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test20]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test25]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test26]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test27]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test32]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test33]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test34]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test35]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test36]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test37]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test38]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test39]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test40]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test41]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test42]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test43]
+x
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_I2F]
+x - 1
+x
+return - 1
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_I2L]
+x - 1
+x
+return - 1
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_I2D]
+x - 1
+x
+return - 1
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_IADD]
+x - 3 // x = 3
+x + 1 // x = -1
+x
+y + 2 // y = -2
+y - 1 // y = 1
+y
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_IAND]
+x - 1
+x
+y - 1
+y
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_IF_ICMPEQ]
+x - 3
+y + 1
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_IF_ICMPNE]
+x - 3
+y + 1
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_IF_ICMPLT]
+x - 3
+y + 1
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_IF_ICMPLE]
+x - 1
+y
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_IF_ICMPGT]
+x - 1
+y
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_IF_ICMPGE]
+x - 1
+y
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_IINC]
+x + 3
+x + 2
+x + 1
+x
+x - 1
+x - 2
+x - 3
+sign
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_INEG]
+x - 3
+x
+x + 3
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_ISHL1]
+x - 1
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_ISHL10]
+x
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_ISHLm3]
+x - 1
+x + 1
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_ISHR1]
+x - 1
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_ISHR10]
+x
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_ISHRm3]
+x - 1
+x + 1
+return
+
+[method gov.nasa.jpf.abstraction.IntSignsTest.test_ISUB]
+x - 3
+x + 1
+y + 1
+y - 1
+y - 7
+y
+return

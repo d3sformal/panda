@@ -1,6 +1,6 @@
 package gov.nasa.jpf.abstraction;
 
-public class IntTest extends SignsTest {
+public class IntSignsTest extends SignsTest {
     @Test
     public static void test1() {
         float x = test_I2F(1);
