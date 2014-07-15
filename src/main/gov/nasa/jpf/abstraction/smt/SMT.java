@@ -41,6 +41,7 @@ import gov.nasa.jpf.abstraction.util.Pair;
 public class SMT {
 
     private static boolean USE_CACHE = true;
+    private static boolean USE_MODELS_CACHE = false;
     private static List<SMTListener> listeners = new LinkedList<SMTListener>();
     private static SMTCache cache = new SMTCache();
 
@@ -491,15 +492,24 @@ public class SMT {
         return input.toString();
     }
 
-    // TODO use cache
-    public int[] getModels(Predicate state, AccessExpression[] expressions) {
+    public int[] getModels(Predicate stateFormula, AccessExpression[] expressions) {
         String separator = InputType.NORMAL.getSeparator();
         StringBuilder input = new StringBuilder();
         int[] ret = new int[expressions.length];
 
+        String state = convertToString(stateFormula);
+        int cachedCount = 0;
+        boolean[] cached = null;
+        String[] queries = null;
+
+        if (USE_MODELS_CACHE) {
+            cached = new boolean[expressions.length];
+            queries = new String[expressions.length];
+        }
+
         PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
 
-        collector.collect(state);
+        collector.collect(stateFormula);
 
         Set<String> classes = collector.getClasses();
         Set<String> variables = collector.getVars();
@@ -510,25 +520,47 @@ public class SMT {
         appendVariableDeclarations(variables, input, separator);
         appendFieldDeclarations(fields, input, separator);
 
-        input.append("(assert "); input.append(convertToString(state)); input.append(")"); input.append(separator);
+        input.append("(assert "); input.append(state); input.append(")"); input.append(separator);
 
-        for (AccessExpression expr : expressions) {
+        for (int i = 0; i < expressions.length; ++i) {
+            AccessExpression expr = expressions[i];
+
             input.append("(push 1)"); input.append(separator);
 
             Predicate valueConstraint = Equals.create(SpecialVariable.create("value"), expr);
 
-            input.append("(assert "); input.append(convertToString(valueConstraint)); input.append(")"); input.append(separator);
+            String query = convertToString(valueConstraint);
 
-            input.append("(check-sat)"); input.append(separator);
-            input.append("(get-value (value))"); input.append(separator);
-            input.append("(pop 1)"); input.append(separator);
+            if (USE_MODELS_CACHE && cache.getQueries().contains(query)) {
+                ret[i] = cache.get(query).getModel();
+                ++cachedCount;
+                cached[i] = true;
+                queries[i] = query;
+            } else {
+                input.append("(assert "); input.append(query); input.append(")"); input.append(separator);
+                input.append("(check-sat)"); input.append(separator);
+                input.append("(get-value (value))"); input.append(separator);
+                input.append("(pop 1)"); input.append(separator);
+            }
         }
 
         input.append("(pop 1)"); input.append(separator);
 
-        QueryResponse[] responses = isSatisfiable(expressions.length, input.toString(), true);
-        for (int i = 0; i < responses.length; ++i) {
-            ret[i] = responses[i].getModel();
+        QueryResponse[] responses = isSatisfiable(expressions.length - cachedCount, input.toString(), true);
+
+        for (int i = 0, j = 0; i < responses.length; ++i, ++j) {
+            if (USE_MODELS_CACHE) {
+                // Cache responses
+                cache.put(state + queries[i], responses[i]);
+
+                // Skip cached values
+                while (cached[j]) {
+                    ++j;
+                }
+            }
+
+            // Insert responses
+            ret[j] = responses[i].getModel();
         }
 
         return ret;
