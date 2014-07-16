@@ -107,9 +107,9 @@ public class BinaryIfInstructionExecutor {
         if (br.getConcreteBranchValue(v1, v2) != TruthValue.create(conditionValue)) {
             System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + br.createPredicate(expr1, expr2));
 
-            if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.pruning")) {
+            if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.prune_infeasible")) {
                 ss.setIgnored(true);
-            } else if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.adjusting_concrete_values")) {
+            } else if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.adjust_concrete_values")) {
                 Map<AccessExpression, ElementInfo> primitiveExprs = new HashMap<AccessExpression, ElementInfo>();
                 Set<AccessExpression> allExprs = new HashSet<AccessExpression>();
 

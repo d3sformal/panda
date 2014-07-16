@@ -91,7 +91,7 @@ public class UnaryIfInstructionExecutor {
 
         sf.pop();
 
-        if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.pruning")) {
+        if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.prune_infeasible")) {
             if (br.getConcreteBranchValue(v1, constant.value.intValue()) != TruthValue.create(conditionValue)) {
                 System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + br.createPredicate(expr, constant));
                 ss.setIgnored(true);

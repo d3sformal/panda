@@ -55,7 +55,7 @@ public class BaseTest {
     }
 
     public void enableBranchPruning() {
-        config.add("+apf.branch.pruning=true");
+        config.add("+apf.branch.prune_infeasible=true");
     }
 
     public void disableStateMatching() {
