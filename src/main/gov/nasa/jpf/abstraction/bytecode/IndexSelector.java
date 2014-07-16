@@ -68,7 +68,7 @@ public class IndexSelector {
 
             Predicate assumption = Equals.create(index, Constant.create(selectedIndex));
 
-            // This is inefficient: many infeasible choices are created and then immediately pruned (when APF starts their exploration)
+            // This is inefficient: many infeasible choices are created and then immediately pruned (when PANDA starts their exploration)
             // We are performing non-deterministic choice over all indices to an array
             // However, only some concrete indices satisfy constraints given in the current abstract state (predicates over index expression)
             // We prune the infeasible choices

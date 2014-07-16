@@ -27,7 +27,7 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 
         PredicateAbstractionFactory factory = new PredicateAbstractionFactory();
 
-        String[] abs_str = conf.getStringArray("apf.abstract_domain");
+        String[] abs_str = conf.getStringArray("panda.abstract_domain");
         String[][] args = new String[abs_str.length][];
 
         for (int i = 0; i < abs_str.length; ++i) {

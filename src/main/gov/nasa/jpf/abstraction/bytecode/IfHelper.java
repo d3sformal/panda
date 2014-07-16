@@ -34,9 +34,9 @@ public class IfHelper {
 
             // Either cut of the inconsistent branch
             // or make the concrete state represent the abstract one (force concrete values)
-            if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.prune_infeasible")) {
+            if (ti.getVM().getJPF().getConfig().getBoolean("panda.branch.prune_infeasible")) {
                 ss.setIgnored(true);
-            } else if (ti.getVM().getJPF().getConfig().getBoolean("apf.branch.adjust_concrete_values")) {
+            } else if (ti.getVM().getJPF().getConfig().getBoolean("panda.branch.adjust_concrete_values")) {
                 Map<AccessExpression, ElementInfo> primitiveExprs = new HashMap<AccessExpression, ElementInfo>();
                 Set<AccessExpression> allExprs = new HashSet<AccessExpression>();
 

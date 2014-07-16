@@ -1,4 +1,4 @@
-**Abstract Pathfinder** (APF) is an extension for **Java Pathfinder** [\[1\]](http://babelfish.arc.nasa.gov/trac/jpf), which introduces support for predicate abstraction and various other abstractions of numeric data domains, such as signs and intervals.
+**Predicate Abstraction in Dynamic Analysis** (<span style='font-variant: small-caps;'>Panda</span>) is an extension for **Java Pathfinder** [\[1\]](http://babelfish.arc.nasa.gov/trac/jpf), which introduces support for predicate abstraction and various other abstractions of numeric data domains, such as signs and intervals.
 
 It started as a Google Summer of Code (GSoC) project in 2012 [\[2\]](https://bitbucket.org/artkhyzha/jpf-abstraction) with the goal to implement basic abstractions of numeric data domains. Support for predicate abstraction was added in the scope of another GSoC project in 2013 [\[3\]](https://bitbucket.org/jd823592/jpf-abstraction).
 Currently, we focus on automated generation of predicates, modeling Java collections, and support for concurrency (multiple threads).
@@ -7,7 +7,7 @@ Currently, we focus on automated generation of predicates, modeling Java collect
 ## Prerequisites ##
 
 1. **Java 7**  
-To be able to run Abstract Pathfinder, it is necessary to have JDK 7 installed on your system.
+To be able to run <span style='font-variant: small-caps;'>Panda</span>, it is necessary to have JDK 7 installed on your system.
 You can download the JDK 7 directly from the [Oracle web site](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html).
 
 2. **MathSAT 5**  
@@ -24,14 +24,14 @@ Create an empty directory (e.g. ``~/workspace``) where you would like to install
 mkdir -p ~/workspace
 ```
 
-Obtain the latest APF
+Obtain the latest <span style='font-variant: small-caps;'>Panda</span>
 ```
-git clone https://github.com/d3sformal/apf.git
+git clone https://github.com/d3sformal/panda.git
 ```
 
 Build it using Ant
 ```
-cd ~/workspace/apf
+cd ~/workspace/panda
 ant clean build
 ```
 
@@ -49,7 +49,7 @@ target=target.Target
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/target/Target.pred
+panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/target/Target.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 ```
@@ -58,7 +58,7 @@ Notable configuration attributes are:
 
 1. **target**  
 The target program (Java class with the ``main`` method).
-2. **apf.abstract_domain**  
+2. **panda.abstract_domain**  
 The abstraction to be used - in our case ``PREDICATES`` - followed by a path to the file with input predicates. Other supported abstractions are described [here](https://bitbucket.org/artkhyzha/jpf-abstraction/wiki/Running_Abstract_Pathfinder).
 3. **listener**  
 The ``gov.nasa.jpf.abstraction.AbstractListener`` listener is mandatory for the predicate abstraction to work properly. 
@@ -127,7 +127,7 @@ In a method context, you may define predicates over the keyword ``return``, whic
 
 ## Running ##
 
-To run Abstract Pathfinder, simply issue the following command within the directory containing APF.
+To run <span style='font-variant: small-caps;'>Panda</span>, simply issue the following command within the directory containing it.
 ```
 bin/run.sh <path-to-a-jpf-file>
 ```
@@ -159,7 +159,7 @@ alength(arrlen, a) = 3
 i = 3
 ```
 
-### Configuration of APF ``src/example/arraylength/ALength.jpf`` ###
+### Configuration of <span style='font-variant: small-caps;'>Panda</span> ``src/example/arraylength/ALength.jpf`` ###
 
 ```
 @using=jpf-abstraction
@@ -169,7 +169,7 @@ target=arraylength.ALength
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/arraylength/ALength.pred
+panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/arraylength/ALength.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener
 ```
@@ -177,7 +177,7 @@ listener=gov.nasa.jpf.abstraction.AbstractListener
 For the purpose of this example, we omitted some of the non-essential listeners, which print only debugging information. 
 ### Running ###
 
-To run the example, simply issue the following command within the directory containing APF.
+To run the example, simply issue the following command within the directory containing <span style='font-variant: small-caps;'>Panda</span>.
 ```
 bin/run.sh src/examples/arraylength/ALength.jpf
 ```
@@ -218,7 +218,7 @@ loaded code:        classes=56, methods=1112
 ====================================================== search finished: 20/09/13 16:39
 ```
 
-Abstract Pathfinder parses the input file and prints all the collected predicates in the default function notation. If some other listeners were added, then a lot of output may follow. In the end, there is the expected statement ``no errors detected`` and statistics provided by JPF-core (number of choices, etc).
+<span style='font-variant: small-caps;'>Panda</span> parses the input file and prints all the collected predicates in the default function notation. If some other listeners were added, then a lot of output may follow. In the end, there is the expected statement ``no errors detected`` and statistics provided by JPF-core (number of choices, etc).
 
 # Links #
 1. http://babelfish.arc.nasa.gov/trac/jpf

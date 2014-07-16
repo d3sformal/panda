@@ -5,6 +5,6 @@ target=symbols.Symbols
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/symbols/Symbols.pred
+panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/symbols/Symbols.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor

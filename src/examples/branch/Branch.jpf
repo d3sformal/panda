@@ -5,7 +5,7 @@ target=branch.Branch
 classpath=${jpf-abstraction}/build/examples
 sourcepath=${jpf-abstraction}/src/examples
 
-apf.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/branch/Branch.pred
+panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/examples/branch/Branch.pred
 
 listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.listener.ExecTracker
 #,gov.nasa.jpf.listener.ExecTracker,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.util.SMTMonitor,gov.nasa.jpf.abstraction.util.SymbolTableMonitor,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor
