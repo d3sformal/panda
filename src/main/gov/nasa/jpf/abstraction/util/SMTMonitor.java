@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import gov.nasa.jpf.search.Search;
+
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
@@ -13,7 +15,6 @@ import gov.nasa.jpf.abstraction.smt.SMTCache;
 import gov.nasa.jpf.abstraction.smt.SMTListener;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.Pair;
-import gov.nasa.jpf.search.Search;
 
 /**
  * Prints calls to the SMT

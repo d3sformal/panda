@@ -5,10 +5,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.LocalVarInfo;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.ThreadInfo;
+
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -17,20 +27,11 @@ import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.state.universe.Reference;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
-import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.abstraction.util.RunDetector;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.LocalVarInfo;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.SystemState;
-import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
  * Implementation of all binary IF instructions regardless their precise type.

@@ -2,9 +2,10 @@ package gov.nasa.jpf.abstraction.assertions;
 
 import gov.nasa.jpf.GenericProperty;
 import gov.nasa.jpf.Property;
-import gov.nasa.jpf.abstraction.ExecuteInstructionHandler;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.VM;
+
+import gov.nasa.jpf.abstraction.ExecuteInstructionHandler;
 
 public abstract class AssertHandler extends ExecuteInstructionHandler {
 

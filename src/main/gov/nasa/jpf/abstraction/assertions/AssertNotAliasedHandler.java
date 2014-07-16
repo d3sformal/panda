@@ -3,10 +3,11 @@ package gov.nasa.jpf.abstraction.assertions;
 import java.util.HashSet;
 import java.util.Set;
 
+import gov.nasa.jpf.vm.VM;
+
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
-import gov.nasa.jpf.vm.VM;
 
 public class AssertNotAliasedHandler extends AssertAliasingHandler {
     @Override

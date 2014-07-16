@@ -1,12 +1,13 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
-import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.ExpressionUtil;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 
 /**
  * Loads a value of a field of an object (identified by objRef) onto the stack

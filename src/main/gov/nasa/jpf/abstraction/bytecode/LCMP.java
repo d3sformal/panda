@@ -1,9 +1,10 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.ThreadInfo;
+
+import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.common.Expression;
 
 /**
  * Compare Long

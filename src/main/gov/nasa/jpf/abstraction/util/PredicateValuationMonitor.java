@@ -3,9 +3,6 @@ package gov.nasa.jpf.abstraction.util;
 import java.util.Stack;
 
 import gov.nasa.jpf.ListenerAdapter;
-import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.Instruction;
@@ -13,6 +10,10 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ReturnInstruction;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
+
+import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 
 /**
  * Prints the current predicate valuation after each instruction in the target program

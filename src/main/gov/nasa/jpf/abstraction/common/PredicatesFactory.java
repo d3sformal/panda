@@ -1,11 +1,11 @@
 package gov.nasa.jpf.abstraction.common;
 
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.parser.PredicatesParser;
-
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
 
 public class PredicatesFactory {
     private static PredicatesParser createFromString(String definition) {

@@ -1,13 +1,14 @@
 package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.Config;
-import gov.nasa.jpf.abstraction.bytecode.*;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.PredicateAbstractionFactory;
 import gov.nasa.jpf.util.ClassInfoFilter;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MethodInfo;
+
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.PredicateAbstractionFactory;
+import gov.nasa.jpf.abstraction.bytecode.*;
 
 /**
  * Ensures interpretations of non-standard instructions respecting the selected abstractions.

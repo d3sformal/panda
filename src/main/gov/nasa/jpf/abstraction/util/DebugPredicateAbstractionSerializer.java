@@ -7,6 +7,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import gov.nasa.jpf.Config;
+import gov.nasa.jpf.vm.DebugStateSerializer;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.ThreadInfo;
+
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.Root;
@@ -21,11 +27,6 @@ import gov.nasa.jpf.abstraction.state.universe.StructuredValueIdentifier;
 import gov.nasa.jpf.abstraction.state.universe.StructuredValueSlot;
 import gov.nasa.jpf.abstraction.state.universe.UniverseSlot;
 import gov.nasa.jpf.abstraction.state.universe.UniverseSlotKey;
-import gov.nasa.jpf.vm.DebugStateSerializer;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.ThreadInfo;
 
 public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSerializer implements DebugStateSerializer {
     PrintWriter out = new PrintWriter(System.out);

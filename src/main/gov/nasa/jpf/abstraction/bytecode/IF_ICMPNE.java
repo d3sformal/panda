@@ -1,13 +1,14 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
+
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.state.TruthValue;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
  * Branch if int comparison succeeds

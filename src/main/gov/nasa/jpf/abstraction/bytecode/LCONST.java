@@ -1,10 +1,11 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
 
 /**
  * Loads a constant from a const pool onto the stack

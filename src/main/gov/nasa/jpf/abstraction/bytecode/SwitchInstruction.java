@@ -2,21 +2,22 @@ package gov.nasa.jpf.abstraction.bytecode;
 
 import java.util.ArrayList;
 
-import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
-import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Equals;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.state.TruthValue;
-import gov.nasa.jpf.abstraction.common.ExpressionUtil;
-import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
+
+import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.ExpressionUtil;
+import gov.nasa.jpf.abstraction.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 
 /**
  * common root class for LOOKUPSWITCH and TABLESWITCH insns

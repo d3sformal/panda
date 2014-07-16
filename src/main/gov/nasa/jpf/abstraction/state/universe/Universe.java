@@ -5,6 +5,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.MJIEnv;
+import gov.nasa.jpf.vm.StaticElementInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
+
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
@@ -12,12 +19,6 @@ import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectAccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.Root;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.FieldInfo;
-import gov.nasa.jpf.vm.MJIEnv;
-import gov.nasa.jpf.vm.StaticElementInfo;
-import gov.nasa.jpf.vm.ThreadInfo;
 
 public class Universe {
     public static int NULL = MJIEnv.NULL;

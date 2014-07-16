@@ -1,12 +1,13 @@
 package gov.nasa.jpf.abstraction.assertions;
 
-import gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker;
-import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
+
+import gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker;
+import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 
 public class AssertConjunctionHandler extends AssertPredicateHandler {
 

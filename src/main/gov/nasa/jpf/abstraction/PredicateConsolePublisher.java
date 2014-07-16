@@ -3,10 +3,6 @@ package gov.nasa.jpf.abstraction;
 import java.io.PrintWriter;
 
 import gov.nasa.jpf.Config;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.state.PredicateValuation;
-import gov.nasa.jpf.abstraction.state.State;
-import gov.nasa.jpf.abstraction.state.Trace;
 import gov.nasa.jpf.report.ConsolePublisher;
 import gov.nasa.jpf.report.Reporter;
 import gov.nasa.jpf.util.Left;
@@ -16,6 +12,11 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.Path;
 import gov.nasa.jpf.vm.Step;
 import gov.nasa.jpf.vm.Transition;
+
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.state.PredicateValuation;
+import gov.nasa.jpf.abstraction.state.State;
+import gov.nasa.jpf.abstraction.state.Trace;
 
 public class PredicateConsolePublisher extends ConsolePublisher {
 

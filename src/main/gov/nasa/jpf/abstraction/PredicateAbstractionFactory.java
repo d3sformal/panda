@@ -7,14 +7,15 @@ import java.util.Map;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPFConfigException;
+
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.AbstractionFactory;
 import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.parser.PredicatesParser;
-
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
 
 /**
  * A factory used to produce predicate abstraction instances from definition in an input file whose name is the first element of the @param args parameter

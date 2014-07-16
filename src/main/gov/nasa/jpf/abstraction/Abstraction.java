@@ -1,5 +1,10 @@
 package gov.nasa.jpf.abstraction;
 
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.ThreadInfo;
+
 import gov.nasa.jpf.abstraction.common.BranchingCondition;
 import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
 import gov.nasa.jpf.abstraction.common.BranchingDecision;
@@ -9,10 +14,6 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.state.TruthValue;
-import gov.nasa.jpf.vm.ClassInfo;
-import gov.nasa.jpf.vm.MethodInfo;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
  * Common root class for numeric abstractions.

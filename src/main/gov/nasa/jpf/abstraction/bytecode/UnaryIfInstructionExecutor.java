@@ -1,21 +1,22 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
-import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
-import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.Notation;
-import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.state.TruthValue;
-import gov.nasa.jpf.abstraction.common.ExpressionUtil;
-import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
+
+import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.ExpressionUtil;
+import gov.nasa.jpf.abstraction.common.Notation;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.state.TruthValue;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 
 /**
  * Implementation of all unary IF instructions regardless their precise type.

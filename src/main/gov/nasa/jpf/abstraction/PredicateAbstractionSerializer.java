@@ -11,10 +11,24 @@ import java.util.TreeSet;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
+import gov.nasa.jpf.util.FinalBitSet;
+import gov.nasa.jpf.util.JPFLogger;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.Fields;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.LocalVarInfo;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.StaticElementInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.ThreadList;
+import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.serialize.FilteringSerializer;
+
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.Root;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.state.MethodFramePredicateValuation;
 import gov.nasa.jpf.abstraction.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.state.SymbolTable;
@@ -34,19 +48,6 @@ import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.abstraction.state.universe.UniverseObject;
 import gov.nasa.jpf.abstraction.state.universe.UniverseSlot;
 import gov.nasa.jpf.abstraction.state.universe.UniverseValue;
-import gov.nasa.jpf.util.FinalBitSet;
-import gov.nasa.jpf.util.JPFLogger;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.FieldInfo;
-import gov.nasa.jpf.vm.Fields;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.LocalVarInfo;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.StaticElementInfo;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.ThreadList;
-import gov.nasa.jpf.vm.VM;
-import gov.nasa.jpf.vm.serialize.FilteringSerializer;
 
 /**
  * a serializer that uses Abstract values stored in attributes

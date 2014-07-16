@@ -8,6 +8,17 @@ import java.util.Map;
 import java.util.Set;
 
 import gov.nasa.jpf.PropertyListenerAdapter;
+import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
+import gov.nasa.jpf.search.Search;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
+
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.assertions.AssertAliasedHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertConjunctionHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertDifferentValuationOnEveryVisitHandler;
@@ -24,17 +35,7 @@ import gov.nasa.jpf.abstraction.assertions.AssertSameValuationOnEveryVisitHandle
 import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostWithValuationHandler;
 import gov.nasa.jpf.abstraction.inspection.AliasingDumper;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.util.RunDetector;
-import gov.nasa.jpf.jvm.bytecode.InvokeInstruction;
-import gov.nasa.jpf.search.Search;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.ClassInfo;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.MethodInfo;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.VM;
 
 /**
  * AbstractListener monitors the state space traversal and individual instruction executions

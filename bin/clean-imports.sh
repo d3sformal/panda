@@ -12,8 +12,11 @@ cleanfile () {
         JAVAIMPORTS=$(echo "${IMPORTS}" | grep '^import java')
         JAVASTATICIMPORTS=$(echo "${IMPORTS}" | grep '^import static java')
 
-        OTHERCATEGORIES="$(echo "${IMPORTS}" | grep -v '^import static ' | sed -n '/^import java/!s/^import \([^.]*\).*$/\1/p' | sort -u)"
-        OTHERSTATICCATEGORIES="$(echo "${IMPORTS}" | grep '^import static ' | sed -n '/^import static java/!s/^import static \([^.]*\).*$/\1/p' | sort -u)"
+        PANDAIMPORTS=$(echo "${IMPORTS}" | grep '^import gov.nasa.jpf.abstraction')
+        PANDASTATICIMPORTS=$(echo "${IMPORTS}" | grep '^import static gov.nasa.jpf.abstraction')
+
+        OTHERCATEGORIES="$(echo "${IMPORTS}" | grep -v '^import static ' | sed -n '/^import \(java\|gov\.nasa\.jpf\.abstraction\)/!s/^import \([^.]*\).*$/\1/p' | sort -u)"
+        OTHERSTATICCATEGORIES="$(echo "${IMPORTS}" | grep '^import static ' | sed -n '/^import static \(java\|gov\.nasa\.jpf\.abstraction\)/!s/^import static \([^.]*\).*$/\1/p' | sort -u)"
 
         echo "${BEFORE}" > ${FILE}
         echo >> ${FILE}
@@ -34,7 +37,7 @@ cleanfile () {
         do
             if [ -n "${CATEGORY}" ]
             then
-                OTHERIMPORTS=$(echo "${IMPORTS}" | grep '^import '"${CATEGORY}")
+                OTHERIMPORTS=$(echo "${IMPORTS}" | grep '^import '"${CATEGORY}" | grep -v '^import gov\.nasa\.jpf\.abstraction')
 
                 echo "${OTHERIMPORTS}" >> ${FILE}
                 echo >> ${FILE}
@@ -45,12 +48,24 @@ cleanfile () {
         do
             if [ -n "${CATEGORY}" ]
             then
-                OTHERSTATICIMPORTS=$(echo "${IMPORTS}" | grep '^import static '"${CATEGORY}")
+                OTHERSTATICIMPORTS=$(echo "${IMPORTS}" | grep '^import static '"${CATEGORY}" | grep -v '^import static gov\.nasa\.jpf\.abstraction')
 
                 echo "${OTHERSTATICIMPORTS}" >> ${FILE}
                 echo >> ${FILE}
             fi
         done
+
+        if [ -n "${PANDAIMPORTS}" ]
+        then
+            echo "${PANDAIMPORTS}" >> ${FILE}
+            echo >> ${FILE}
+        fi
+
+        if [ -n "${PANDASTATICIMPORTS}" ]
+        then
+            echo "${PANDASTATICIMPORTS}" >> ${FILE}
+            echo >> ${FILE}
+        fi
 
         echo "${AFTER}" | tail -n +2 >> ${FILE}
     fi

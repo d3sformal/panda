@@ -1,14 +1,15 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.state.universe.Reference;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.state.universe.Reference;
 
 public class LDC extends gov.nasa.jpf.jvm.bytecode.LDC {
 

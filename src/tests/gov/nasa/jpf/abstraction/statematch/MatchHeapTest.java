@@ -1,7 +1,8 @@
 package gov.nasa.jpf.abstraction.statematch;
 
-import gov.nasa.jpf.abstraction.Test;
 import gov.nasa.jpf.vm.Verify;
+
+import gov.nasa.jpf.abstraction.Test;
 
 public class MatchHeapTest extends StateMatchingTest {
 

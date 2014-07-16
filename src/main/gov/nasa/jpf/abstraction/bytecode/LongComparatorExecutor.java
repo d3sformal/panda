@@ -1,8 +1,9 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
+import gov.nasa.jpf.vm.StackFrame;
+
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.vm.StackFrame;
 
 /**
  * Implements type specific parts of the comparison ( @see gov.nasa.jpf.abstraction.bytecode.BinaryComparatorExecutor )

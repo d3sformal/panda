@@ -5,6 +5,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import gov.nasa.jpf.ListenerAdapter;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
+
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.state.universe.Associative;
@@ -20,9 +24,6 @@ import gov.nasa.jpf.abstraction.state.universe.UniverseClass;
 import gov.nasa.jpf.abstraction.state.universe.UniverseNull;
 import gov.nasa.jpf.abstraction.state.universe.UniverseObject;
 import gov.nasa.jpf.abstraction.util.RunDetector;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.VM;
 
 /**
  * Prints the current abstract heap after each instruction in the target program

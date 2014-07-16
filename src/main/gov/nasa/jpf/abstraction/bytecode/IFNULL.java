@@ -3,7 +3,12 @@ package gov.nasa.jpf.abstraction.bytecode;
 import java.util.HashSet;
 import java.util.Set;
 
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MJIEnv;
+import gov.nasa.jpf.vm.ThreadInfo;
+
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -12,14 +17,10 @@ import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.state.universe.Universe;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.MJIEnv;
-import gov.nasa.jpf.vm.ThreadInfo;
 
 /**
  * Branch if int comparison with NULL value succeeds

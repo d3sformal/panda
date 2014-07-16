@@ -1,8 +1,9 @@
 package gov.nasa.jpf.abstraction.common.access.impl;
 
+import gov.nasa.jpf.vm.Instruction;
+
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
-import gov.nasa.jpf.vm.Instruction;
 
 /**
  * A grammar element representing a keyword 'return' used in predicates over return values of methods

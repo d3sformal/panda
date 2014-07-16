@@ -12,6 +12,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import gov.nasa.jpf.Config;
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
+
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -21,6 +28,7 @@ import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.PredicateUtil;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -30,17 +38,10 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.smt.PredicateValueDeterminingInfo;
 import gov.nasa.jpf.abstraction.smt.SMT;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.abstraction.util.Pair;
-import gov.nasa.jpf.abstraction.common.PredicateUtil;
-import gov.nasa.jpf.vm.ClassInfo;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.FieldInfo;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.VM;
 
 /**
  * A predicate valuation for a single scope

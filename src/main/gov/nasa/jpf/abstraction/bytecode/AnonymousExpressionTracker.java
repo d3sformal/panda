@@ -1,9 +1,9 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
 
 public class AnonymousExpressionTracker {
     public static void notifyPopped(Expression expr) {

@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import gov.nasa.jpf.vm.LocalVarInfo;
+
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
-import gov.nasa.jpf.vm.LocalVarInfo;
 
 /**
  * A common ancestor of all symbolic expressions that can stand alone (variables, package-class expression)

@@ -5,27 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.ReturnValue;
-import gov.nasa.jpf.abstraction.common.access.Root;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
-import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
-import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
-import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.state.MethodFrameSymbolTable;
-import gov.nasa.jpf.abstraction.state.SystemSymbolTable;
-import gov.nasa.jpf.abstraction.state.universe.ClassName;
-import gov.nasa.jpf.abstraction.state.universe.LocalVariable;
-import gov.nasa.jpf.abstraction.state.universe.Reference;
-import gov.nasa.jpf.abstraction.state.universe.StructuredValueIdentifier;
-import gov.nasa.jpf.abstraction.state.universe.Universe;
-import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
-import gov.nasa.jpf.abstraction.common.ExpressionUtil;
-import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.jvm.bytecode.DLOAD;
 import gov.nasa.jpf.jvm.bytecode.DSTORE;
 import gov.nasa.jpf.jvm.bytecode.FLOAD;
@@ -47,6 +26,28 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.ThreadList;
 import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.VM;
+
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.ExpressionUtil;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ReturnValue;
+import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
+import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.state.MethodFrameSymbolTable;
+import gov.nasa.jpf.abstraction.state.SystemSymbolTable;
+import gov.nasa.jpf.abstraction.state.universe.ClassName;
+import gov.nasa.jpf.abstraction.state.universe.LocalVariable;
+import gov.nasa.jpf.abstraction.state.universe.Reference;
+import gov.nasa.jpf.abstraction.state.universe.StructuredValueIdentifier;
+import gov.nasa.jpf.abstraction.state.universe.Universe;
+import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
+import gov.nasa.jpf.abstraction.util.RunDetector;
 
 /**
  * Symbol table aware of method call scope changes

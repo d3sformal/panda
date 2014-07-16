@@ -6,7 +6,6 @@ import gov.nasa.jpf.abstraction.common.ExpressionContext;
 import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicates;
-
 import gov.nasa.jpf.abstraction.parser.PredicatesParser;
 
 public class IntervalAbstractionBuilder extends PredicateAbstractionBuilder {

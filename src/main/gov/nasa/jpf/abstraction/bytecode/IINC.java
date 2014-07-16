@@ -1,18 +1,19 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.common.Add;
-import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
+
+import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.Add;
+import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 
 /**
  * Increment local variable by constant

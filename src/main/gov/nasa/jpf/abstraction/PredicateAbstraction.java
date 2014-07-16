@@ -6,6 +6,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
+
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.common.BranchingCondition;
 import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
@@ -30,12 +37,6 @@ import gov.nasa.jpf.abstraction.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.state.universe.Reference;
 import gov.nasa.jpf.abstraction.state.universe.StructuredValueIdentifier;
 import gov.nasa.jpf.abstraction.util.RunDetector;
-import gov.nasa.jpf.vm.ClassInfo;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.MethodInfo;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.VM;
 
 /**
  * Predicate abstraction class

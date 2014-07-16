@@ -3,15 +3,16 @@ package gov.nasa.jpf.abstraction.bytecode;
 import java.util.LinkedList;
 import java.util.List;
 
-import gov.nasa.jpf.abstraction.common.Expression;
-import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.state.universe.Reference;
 import gov.nasa.jpf.vm.ArrayFields;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
+import gov.nasa.jpf.abstraction.state.universe.Reference;
 
 public class MULTIANEWARRAY extends gov.nasa.jpf.jvm.bytecode.MULTIANEWARRAY {
 

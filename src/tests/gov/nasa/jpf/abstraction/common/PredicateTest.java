@@ -1,12 +1,12 @@
 package gov.nasa.jpf.abstraction.common;
 
-import gov.nasa.jpf.abstraction.common.Notation;
-import gov.nasa.jpf.abstraction.common.Predicate;
-import gov.nasa.jpf.abstraction.common.access.AccessExpression;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+
+import gov.nasa.jpf.abstraction.common.Notation;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 
 public class PredicateTest {
     /**

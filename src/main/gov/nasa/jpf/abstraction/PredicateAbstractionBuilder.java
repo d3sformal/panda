@@ -3,14 +3,14 @@ package gov.nasa.jpf.abstraction;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import gov.nasa.jpf.JPFConfigException;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.parser.PredicatesParser;
-
-import gov.nasa.jpf.JPFConfigException;
 
 public class PredicateAbstractionBuilder {
     public Predicates build(String... args) {
@@ -41,4 +41,3 @@ public class PredicateAbstractionBuilder {
         return parser.predicates().val;
     }
 }
-

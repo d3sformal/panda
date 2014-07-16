@@ -1,7 +1,8 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
-import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.vm.StackFrame;
+
+import gov.nasa.jpf.abstraction.common.Expression;
 
 /**
  * Used to push an pop words of a fixed size and set their attributes

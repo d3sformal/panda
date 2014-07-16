@@ -3,9 +3,10 @@ package gov.nasa.jpf.abstraction.state.universe;
 import java.util.HashMap;
 import java.util.Map;
 
-import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
+
+import gov.nasa.jpf.abstraction.util.Pair;
 
 public class UniverseClass extends StructuredValue implements Associative {
     private ClassName identifier;

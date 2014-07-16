@@ -7,6 +7,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.StaticElementInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
+
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
@@ -26,7 +34,6 @@ import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.state.universe.Associative;
 import gov.nasa.jpf.abstraction.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.state.universe.ElementIndex;
@@ -53,12 +60,6 @@ import gov.nasa.jpf.abstraction.state.universe.UniverseSlot;
 import gov.nasa.jpf.abstraction.state.universe.UniverseSlotKey;
 import gov.nasa.jpf.abstraction.state.universe.UniverseValue;
 import gov.nasa.jpf.abstraction.util.Pair;
-import gov.nasa.jpf.vm.ClassInfo;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.FieldInfo;
-import gov.nasa.jpf.vm.StaticElementInfo;
-import gov.nasa.jpf.vm.ThreadInfo;
-import gov.nasa.jpf.vm.VM;
 
 /**
  * A symbol table for a single scope

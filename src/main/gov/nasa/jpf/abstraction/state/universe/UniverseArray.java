@@ -3,9 +3,10 @@ package gov.nasa.jpf.abstraction.state.universe;
 import java.util.HashMap;
 import java.util.Map;
 
-import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
+
+import gov.nasa.jpf.abstraction.util.Pair;
 
 public class UniverseArray extends HeapValue implements Indexed {
     private Map<ElementIndex, UniverseSlot> elements = new HashMap<ElementIndex, UniverseSlot>();
