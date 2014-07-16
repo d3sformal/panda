@@ -24,7 +24,7 @@ import gov.nasa.jpf.abstraction.state.universe.Reference;
 import gov.nasa.jpf.abstraction.state.universe.StructuredValueIdentifier;
 import gov.nasa.jpf.abstraction.state.universe.Universe;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
-import gov.nasa.jpf.abstraction.util.ExpressionUtil;
+import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 import gov.nasa.jpf.jvm.bytecode.DLOAD;
 import gov.nasa.jpf.jvm.bytecode.DSTORE;

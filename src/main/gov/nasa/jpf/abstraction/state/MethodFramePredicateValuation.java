@@ -35,7 +35,7 @@ import gov.nasa.jpf.abstraction.smt.PredicateValueDeterminingInfo;
 import gov.nasa.jpf.abstraction.smt.SMT;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.abstraction.util.Pair;
-import gov.nasa.jpf.abstraction.util.PredicateUtil;
+import gov.nasa.jpf.abstraction.common.PredicateUtil;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;

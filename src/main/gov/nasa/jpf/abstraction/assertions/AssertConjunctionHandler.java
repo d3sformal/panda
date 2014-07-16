@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.assertions;
 
 import gov.nasa.jpf.abstraction.bytecode.AnonymousExpressionTracker;
-import gov.nasa.jpf.abstraction.util.ExpressionUtil;
+import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
