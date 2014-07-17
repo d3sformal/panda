@@ -22,7 +22,7 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 
     public AbstractInstructionFactory(Config conf) {
 
-        System.out.println("Running Abstract PathFinder ...");
+        System.out.println("Running Panda ...");
 
         filter = new ClassInfoFilter(null, null, null, null);
 
