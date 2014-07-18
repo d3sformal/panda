@@ -33,7 +33,7 @@ public class LSHR extends gov.nasa.jpf.jvm.bytecode.LSHR implements AbstractBina
         if (b instanceof Constant) {
             e = a;
 
-            for (int i = ((Constant) b).value.intValue(); i > 0; --i) {
+            for (int i = ((Constant) b).value.intValue() & 0x1F; i > 0; --i) {
                 e = Divide.create(e, Constant.create(2));
             }
         } else {
