@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.smt;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,6 +43,7 @@ public class SMT {
 
     private static boolean USE_CACHE = true;
     private static boolean USE_MODELS_CACHE = false;
+    private static boolean USE_LOG_FILE = true;
     private static List<SMTListener> listeners = new LinkedList<SMTListener>();
     private static SMTCache cache = new SMTCache();
 
@@ -165,6 +167,8 @@ public class SMT {
     private BufferedWriter in = null;
     private BufferedReader out = null;
 
+    private int indent = 0;
+
     public SMT() throws SMTException {
         try {
             String[] args = new String[] {
@@ -180,7 +184,78 @@ public class SMT {
 
             String separator = InputType.NORMAL.getSeparator();
 
-            in = new BufferedWriter(inwriter);
+            if (USE_LOG_FILE) {
+                final BufferedWriter log = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("smt.log")));
+
+                in = new BufferedWriter(inwriter) {
+                    @Override
+                    public void write(String str) throws IOException {
+                        super.write(str);
+
+                        ArrayList<String> items = new ArrayList<String>();
+
+                        while (true) {
+                            int push = str.indexOf("(push 1)");
+                            int pop = str.indexOf("(pop 1)");
+
+                            if (push > -1 && (pop < 0 || push < pop)) {
+                                items.add(str.substring(0, push));
+                                items.add("(push 1)");
+                                str = str.substring(push + "(push 1)".length());
+                            }
+
+                            if (pop > -1 && (push < 0 || pop < push)) {
+                                items.add(str.substring(0, pop));
+                                items.add("(pop 1)");
+                                str = str.substring(pop + "(pop 1)".length());
+                            }
+
+                            if (push == -1 && pop == -1) {
+                                break;
+                            }
+                        }
+
+                        items.add(str);
+
+                        for (int i = 0; i < items.size(); ++i) {
+                            if (items.get(i).equals("(pop 1)")) {
+                                --indent;
+                            }
+
+                            String[] lines = items.get(i).split("\n");
+
+                            for (String line : lines) {
+                                if (line.length() > 0) {
+                                    for (int k = 0; k < 2 * indent; ++k) {
+                                        log.write(" ");
+                                    }
+                                    log.write(line.trim());
+                                    log.write("\n");
+                                }
+                            }
+
+                            if (items.get(i).equals("(push 1)")) {
+                                ++indent;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void flush() throws IOException {
+                        super.flush();
+                        log.flush();
+                    }
+
+                    @Override
+                    public void close() throws IOException {
+                        super.close();
+                        log.close();
+                    }
+                };
+            } else {
+                in = new BufferedWriter(inwriter);
+            }
+
             in.write(
                 "(set-option :produce-models true)" + separator +
                 "(set-logic QF_AUFLIA)" + separator +
@@ -525,8 +600,6 @@ public class SMT {
         for (int i = 0; i < expressions.length; ++i) {
             AccessExpression expr = expressions[i];
 
-            input.append("(push 1)"); input.append(separator);
-
             Predicate valueConstraint = Equals.create(SpecialVariable.create("value"), expr);
 
             String query = convertToString(valueConstraint);
@@ -537,6 +610,7 @@ public class SMT {
                 cached[i] = true;
                 queries[i] = query;
             } else {
+                input.append("(push 1)"); input.append(separator);
                 input.append("(assert "); input.append(query); input.append(")"); input.append(separator);
                 input.append("(check-sat)"); input.append(separator);
                 input.append("(get-value (value))"); input.append(separator);

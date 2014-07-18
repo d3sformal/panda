@@ -13,3 +13,7 @@ i = 0..4
 pos >= 0
 // pos >= class(gov.nasa.jpf.abstraction.statematch.Producer).SIZE
 pos >= 8
+v < 3
+d.val < 3
+this.buffer[pos] = d
+// this.buffer[pos].val < 3
