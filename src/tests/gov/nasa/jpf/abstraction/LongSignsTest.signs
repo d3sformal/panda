@@ -1,0 +1,188 @@
+[method gov.nasa.jpf.abstraction.LongSignsTest.test1]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test2]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test3]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test4]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test5]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test6]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test7]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test11]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test12]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test13]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test14]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test15]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test16]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test21]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test22]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test23]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test28]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test29]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test30]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test31]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test32]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test33]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test34]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test35]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test36]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test37]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test38]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test39]
+x
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_L2F]
+x - 1
+x
+return - 1
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_L2I]
+x - 1
+x
+return - 1
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_L2D]
+x - 1
+x
+return - 1
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_LADD]
+x - 3 // x = 3
+x + 1 // x = -1
+x
+y + 2 // y = -2
+y - 1 // y = 1
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_LAND]
+x - 1
+x
+y - 1
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_IF_LCMPEQ]
+x - 3
+y + 1
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_IF_LCMPNE]
+x - 3
+y + 1
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_IF_LCMPLT]
+x - 3
+y + 1
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_IF_LCMPLE]
+x - 1
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_IF_LCMPGT]
+x - 1
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_IF_LCMPGE]
+x - 1
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_LNEG]
+x - 3
+x
+x + 3
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_LSHL1]
+x - 1
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_LSHL10]
+x
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_LSHLm3]
+x - 1
+x + 1
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_LSHR1]
+x - 1
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_LSHR10]
+x
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_LSHRm3]
+x - 1
+x + 1
+return
+
+[method gov.nasa.jpf.abstraction.LongSignsTest.test_LSUB]
+x - 3
+x + 1
+y + 1
+y - 1
+y - 7
+y
+return
