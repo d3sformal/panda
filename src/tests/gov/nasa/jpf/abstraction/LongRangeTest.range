@@ -1,0 +1,180 @@
+[method gov.nasa.jpf.abstraction.LongRangeTest.test1]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test2]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test3]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test4]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test5]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test6]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test7]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test11]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test12]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test13]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test14]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test15]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test16]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test17]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test18]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test19]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test20]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test25]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test26]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test27]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test32]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test33]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test34]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test35]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test36]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test37]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test38]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test39]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test40]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test41]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test42]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test43]
+x
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_L2F]
+x
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_L2I]
+x
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_L2D]
+x
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_LADD]
+x
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_LAND]
+x
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_IF_LCMPEQ]
+x
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_IF_LCMPNE]
+x
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_IF_LCMPLT]
+x
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_IF_LCMPLE]
+x
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_IF_LCMPGT]
+x
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_IF_LCMPGE]
+x
+y
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_LNEG]
+x
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_LSHL1]
+x
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_LSHL10]
+x
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_LSHLm3]
+x
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_LSHR1]
+x
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_LSHR10]
+x
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_LSHRm3]
+x
+return
+
+[method gov.nasa.jpf.abstraction.LongRangeTest.test_LSUB]
+x
+y
+return
