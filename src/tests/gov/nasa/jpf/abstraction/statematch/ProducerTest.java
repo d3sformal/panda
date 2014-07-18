@@ -4,6 +4,7 @@ package gov.nasa.jpf.abstraction.statematch;
 // both semantically equivalent and semantically different objects
 
 import static gov.nasa.jpf.abstraction.BaseTest.*;
+import static gov.nasa.jpf.abstraction.statematch.StateMatchingTest.*;
 
 public class ProducerTest extends StateMatchingTest {
     public static void main(String[] args) {
@@ -26,6 +27,9 @@ class Producer {
         int pos = 0;
 
         for (int i = 0; i < 4; ++i) {
+            assertVisitedAtMost(4);
+            assertRevisitedAtLeast(3);
+
             // simulate modulo by 3
             int v = pos + pos + 1;
             while (v >= 3) v = v - 3;
