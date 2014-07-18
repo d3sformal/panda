@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Subtract;
  * Subtract float
  * ..., value1, value2 => ..., result
  */
-public class FSUB extends gov.nasa.jpf.jvm.bytecode.FSUB implements AbstractBinaryOperator<Float> {
+public class FSUB extends gov.nasa.jpf.jvm.bytecode.FSUB implements AbstractBinaryOperator<Float, Float> {
 
     FloatBinaryOperatorExecutor executor = FloatBinaryOperatorExecutor.getInstance();
 

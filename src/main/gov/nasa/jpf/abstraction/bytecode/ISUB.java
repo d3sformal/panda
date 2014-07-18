@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Subtract;
  * Subtract integer
  * ..., value1, value2 => ..., result
  */
-public class ISUB extends gov.nasa.jpf.jvm.bytecode.ISUB implements AbstractBinaryOperator<Integer> {
+public class ISUB extends gov.nasa.jpf.jvm.bytecode.ISUB implements AbstractBinaryOperator<Integer, Integer> {
 
     IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 

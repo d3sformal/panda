@@ -23,7 +23,7 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
  * An implementation of common behaviour of all the comparison expressions
  */
 public abstract class BinaryComparatorExecutor<T> {
-    final public Instruction execute(AbstractBinaryOperator<T> cmp, ThreadInfo ti) {
+    final public Instruction execute(AbstractBinaryOperator<T, T> cmp, ThreadInfo ti) {
 
         String name = cmp.getClass().getSimpleName();
 

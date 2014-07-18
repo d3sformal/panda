@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Multiply;
  * And integer
  * ..., value1, value2 => ..., result
  */
-public class IAND extends gov.nasa.jpf.jvm.bytecode.IAND implements AbstractBinaryOperator<Integer> {
+public class IAND extends gov.nasa.jpf.jvm.bytecode.IAND implements AbstractBinaryOperator<Integer, Integer> {
 
     IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 

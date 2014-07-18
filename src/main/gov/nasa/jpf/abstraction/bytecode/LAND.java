@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Multiply;
  * And long
  * ..., value1, value2 => ..., result
  */
-public class LAND extends gov.nasa.jpf.jvm.bytecode.LAND implements AbstractBinaryOperator<Long> {
+public class LAND extends gov.nasa.jpf.jvm.bytecode.LAND implements AbstractBinaryOperator<Long, Long> {
 
     LongBinaryOperatorExecutor executor = LongBinaryOperatorExecutor.getInstance();
 

@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Divide double
  * ..., value1, value2 => ..., result
  */
-public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV implements AbstractBinaryOperator<Double> {
+public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV implements AbstractBinaryOperator<Double, Double> {
 
     DoubleBinaryOperatorExecutor executor = DoubleBinaryOperatorExecutor.getInstance();
 

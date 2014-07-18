@@ -52,7 +52,7 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
 /**
  * Symbol table aware of method call scope changes
  */
-public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scoped {
+public class SystemSymbolTable implements SymbolTable, Scoped {
     private Universe universe = new Universe();
 
     /**
@@ -145,26 +145,41 @@ public class SystemSymbolTable extends CallAnalyzer implements SymbolTable, Scop
             /**
              * Assign values to the formal parameters according to the actual parameters
              */
-            boolean[] slotInUse = new boolean[method.getNumberOfStackArguments()];
-            boolean[] localVarIsPrimitive = new boolean[method.getNumberOfStackArguments()];
+            byte[] argTypes = new byte[method.getNumberOfStackArguments()];
 
-            getArgumentSlotUsage(method, slotInUse);
-            getArgumentSlotType(method, localVarIsPrimitive);
+            int i = 0;
 
-            for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
-                if (slotInUse[slotIndex]) {
-                    Expression expr = ExpressionUtil.getExpression(after.getLocalAttr(slotIndex));
+            if (!method.isStatic()) {
+                argTypes[i++] = Types.T_REFERENCE;
+            }
 
-                    LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
-                    String name = arg == null ? null : arg.getName();
+            for (byte argType : method.getArgumentTypes()) {
+                argTypes[i++] = argType;
+            }
 
-                    if (localVarIsPrimitive[slotIndex]) {
-                        newScope.addPrimitiveLocalVariable(DefaultRoot.create(name, slotIndex));
-                        newScope.processPrimitiveStore(expr, originalScope, DefaultRoot.create(name, slotIndex));
-                    } else {
-                        newScope.addStructuredLocalVariable(DefaultRoot.create(name, slotIndex));
-                        newScope.processObjectStore(expr, originalScope, DefaultRoot.create(name, slotIndex));
-                    }
+            for (int argIndex = 0, slotIndex = 0; argIndex < method.getNumberOfStackArguments(); ++argIndex) {
+                Expression expr = ExpressionUtil.getExpression(after.getLocalAttr(slotIndex));
+
+                LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
+                String name = arg == null ? null : arg.getName();
+
+                if (argTypes[argIndex] == Types.T_REFERENCE || argTypes[argIndex] == Types.T_ARRAY) {
+                    newScope.addStructuredLocalVariable(DefaultRoot.create(name, slotIndex));
+                    newScope.processObjectStore(expr, originalScope, DefaultRoot.create(name, slotIndex));
+                } else {
+                    newScope.addPrimitiveLocalVariable(DefaultRoot.create(name, slotIndex));
+                    newScope.processPrimitiveStore(expr, originalScope, DefaultRoot.create(name, slotIndex));
+                }
+
+                switch (argTypes[argIndex]) {
+                    case Types.T_LONG:
+                    case Types.T_DOUBLE:
+                        slotIndex += 2;
+                        break;
+
+                    default:
+                        slotIndex += 1;
+                        break;
                 }
             }
         }

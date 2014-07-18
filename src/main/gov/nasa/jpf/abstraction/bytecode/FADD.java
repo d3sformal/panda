@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Add float
  * ..., value1, value2 => ..., result
  */
-public class FADD extends gov.nasa.jpf.jvm.bytecode.FADD implements AbstractBinaryOperator<Float> {
+public class FADD extends gov.nasa.jpf.jvm.bytecode.FADD implements AbstractBinaryOperator<Float, Float> {
 
     FloatBinaryOperatorExecutor executor = FloatBinaryOperatorExecutor.getInstance();
 

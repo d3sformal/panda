@@ -13,7 +13,7 @@ import gov.nasa.jpf.abstraction.common.UninterpretedShiftLeft;
  * Shift left integer
  * ..., value1, value2 => ..., result
  */
-public class ISHL extends gov.nasa.jpf.jvm.bytecode.ISHL implements AbstractBinaryOperator<Integer> {
+public class ISHL extends gov.nasa.jpf.jvm.bytecode.ISHL implements AbstractBinaryOperator<Integer, Integer> {
 
     IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 

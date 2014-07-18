@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Divide float
  * ..., value1, value2 => ..., result
  */
-public class FDIV extends gov.nasa.jpf.jvm.bytecode.FDIV implements AbstractBinaryOperator<Float> {
+public class FDIV extends gov.nasa.jpf.jvm.bytecode.FDIV implements AbstractBinaryOperator<Float, Float> {
 
     FloatBinaryOperatorExecutor executor = FloatBinaryOperatorExecutor.getInstance();
 

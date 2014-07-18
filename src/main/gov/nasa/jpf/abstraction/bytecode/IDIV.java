@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Divide integer
  * ..., value1, value2 => ..., result
  */
-public class IDIV extends gov.nasa.jpf.jvm.bytecode.IDIV implements AbstractBinaryOperator<Integer> {
+public class IDIV extends gov.nasa.jpf.jvm.bytecode.IDIV implements AbstractBinaryOperator<Integer, Integer> {
 
     IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 

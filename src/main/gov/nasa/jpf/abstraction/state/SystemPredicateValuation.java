@@ -16,6 +16,7 @@ import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
@@ -49,7 +50,7 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
 /**
  * A predicate valuation aware of method scope changes
  */
-public class SystemPredicateValuation extends CallAnalyzer implements PredicateValuation, Scoped {
+public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
     /**
      * Stacks of scopes (pushed by invoke, poped by return) separately for all threads
@@ -237,26 +238,43 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
              * Replace formal parameters with the concrete assignment
              * Reason about the value of the predicates using known values of predicates in the caller
              */
-            boolean[] slotInUse = new boolean[method.getNumberOfStackArguments()];
+            byte[] argTypes = new byte[method.getNumberOfStackArguments()];
 
-            getArgumentSlotUsage(method, slotInUse);
+            int i = 0;
+
+            if (!method.isStatic()) {
+                argTypes[i++] = Types.T_REFERENCE;
+            }
+
+            for (byte argType : method.getArgumentTypes()) {
+                argTypes[i++] = argType;
+            }
 
             Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
             Set<AccessExpression> argumentSymbols = new HashSet<AccessExpression>();
 
             // Replace formal parameters with actual parameters
-            for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
-                if (slotInUse[slotIndex]) {
-                    // Actual symbolic parameter
-                    Expression expr = ExpressionUtil.getExpression(after.getSlotAttr(slotIndex));
+            for (int argIndex = 0, slotIndex = 0; argIndex < method.getNumberOfStackArguments(); ++argIndex) {
+                Expression expr = ExpressionUtil.getExpression(after.getSlotAttr(slotIndex));
 
-                    LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
-                    String name = arg == null ? null : arg.getName();
+                // Actual symbolic parameter
+                LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
+                String name = arg == null ? null : arg.getName();
 
-                    AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
+                AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
 
-                    replacements.put(formalArgument, expr);
-                    argumentSymbols.add(formalArgument);
+                replacements.put(formalArgument, expr);
+                argumentSymbols.add(formalArgument);
+
+                switch (argTypes[argIndex]) {
+                    case Types.T_LONG:
+                    case Types.T_DOUBLE:
+                        slotIndex += 2;
+                        break;
+
+                    default:
+                        slotIndex += 1;
+                        break;
                 }
             }
 
@@ -392,43 +410,56 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
              *
              * those parameters and predicates over them cannot be used to argue about the value of predicates over the initial value back in the caller
              */
-            boolean[] slotInUse = new boolean[method.getNumberOfStackArguments()];
-            boolean[] argIsPrimitive = new boolean[method.getNumberOfStackArguments()];
+            byte[] argTypes = new byte[method.getNumberOfStackArguments()];
 
-            getArgumentSlotUsage(method, slotInUse);
-            getArgumentSlotType(method, argIsPrimitive);
+            int i = 0;
+
+            if (!method.isStatic()) {
+                argTypes[i++] = Types.T_REFERENCE;
+            }
+
+            for (byte argType : method.getArgumentTypes()) {
+                argTypes[i++] = argType;
+            }
 
             Expression[] originalArguments = (Expression[]) before.getFrameAttr();
-            int argIndex;
 
             // Replace formal parameters with actual parameters
-            argIndex = 0;
-            for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
-                if (slotInUse[slotIndex]) {
-                    // Actual symbolic parameter
-                    LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
-                    String name = arg == null ? null : arg.getName();
+            for (int argIndex = 0, slotIndex = 0; argIndex < method.getNumberOfStackArguments(); ++argIndex) {
+                // Actual symbolic parameter
+                LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
+                String name = arg == null ? null : arg.getName();
 
-                    Root l = DefaultRoot.create(name, slotIndex);
+                Root l = DefaultRoot.create(name, slotIndex);
 
-                    // Determine type of the arguments
-                    if (!argIsPrimitive[slotIndex]) {
-                        referenceArgs.add(l);
-                    }
+                // Determine type of the arguments
+                if (argTypes[argIndex] == Types.T_REFERENCE || argTypes[argIndex] == Types.T_ARRAY) {
+                    referenceArgs.add(l);
+                }
 
-                    Expression originalExpr = originalArguments[argIndex++];
-                    Expression actualExpr = ExpressionUtil.getExpression(before.getLocalAttr(slotIndex));
+                Expression originalExpr = originalArguments[argIndex];
+                Expression actualExpr = ExpressionUtil.getExpression(before.getLocalAttr(slotIndex));
 
-                    boolean different = false;
+                boolean different = false;
 
-                    different |= originalExpr == null && actualExpr != null;
-                    different |= originalExpr != null && actualExpr == null;
-                    different |= originalExpr != null && actualExpr != null && !originalExpr.equals(actualExpr);
+                different |= originalExpr == null && actualExpr != null;
+                different |= originalExpr != null && actualExpr == null;
+                different |= originalExpr != null && actualExpr != null && !originalExpr.equals(actualExpr);
 
-                    // Someone has changed the argument, we cannot use predicates about it to infer information about the original value supplied by the caller
-                    if (different) {
-                        notWantedLocalVariables.add(l);
-                    }
+                // Someone has changed the argument, we cannot use predicates about it to infer information about the original value supplied by the caller
+                if (different) {
+                    notWantedLocalVariables.add(l);
+                }
+
+                switch (argTypes[argIndex]) {
+                    case Types.T_LONG:
+                    case Types.T_DOUBLE:
+                        slotIndex += 2;
+                        break;
+
+                    default:
+                        slotIndex += 1;
+                        break;
                 }
             }
 
@@ -467,17 +498,26 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
             // Replace formal parameters present in the predicate with actual expressions
             Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
 
-            for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments(); ++slotIndex) {
-                if (slotInUse[slotIndex]) {
-                    if (!argIsPrimitive[slotIndex]) {
-                        LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
-                        String name = arg == null ? null : arg.getName();
+            for (int argIndex = 0, slotIndex = 0; argIndex < method.getNumberOfStackArguments(); ++argIndex) {
+                if (argTypes[argIndex] == Types.T_REFERENCE || argTypes[argIndex] == Types.T_ARRAY) {
+                    LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
+                    String name = arg == null ? null : arg.getName();
 
-                        Expression actualExpr = ExpressionUtil.getExpression(before.getLocalAttr(slotIndex));
-                        AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
+                    Expression actualExpr = ExpressionUtil.getExpression(before.getLocalAttr(slotIndex));
+                    AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
 
-                        replacements.put(formalArgument, actualExpr);
-                    }
+                    replacements.put(formalArgument, actualExpr);
+                }
+
+                switch (argTypes[argIndex]) {
+                    case Types.T_LONG:
+                    case Types.T_DOUBLE:
+                        slotIndex += 2;
+                        break;
+
+                    default:
+                        slotIndex += 1;
+                        break;
                 }
             }
 
@@ -581,55 +621,63 @@ public class SystemPredicateValuation extends CallAnalyzer implements PredicateV
 
                 // Reference arguments
                 for (AccessExpression path : temporaryPathsHolder) {
-                    argIndex = 0;
-                    for (int slotIndex = 0; slotIndex < method.getNumberOfStackArguments() && !canBeAffected; ++slotIndex) {
-                        if (slotInUse[slotIndex]) {
-                            Expression expr = originalArguments[argIndex++];
+                    for (int argIndex = 0, slotIndex = 0; argIndex < method.getNumberOfStackArguments() && !canBeAffected; ++argIndex) {
+                        Expression expr = originalArguments[argIndex];
 
-                            if (!argIsPrimitive[slotIndex]) {
-                                // Could be null / access expression
-                                if (expr instanceof AccessExpression) {
-                                    AccessExpression actualParameter = (AccessExpression) expr;
+                        if (argTypes[argIndex] == Types.T_REFERENCE || argTypes[argIndex] == Types.T_ARRAY) {
+                            // Could be null / access expression
+                            if (expr instanceof AccessExpression) {
+                                AccessExpression actualParameter = (AccessExpression) expr;
 
-                                    // Every predicate referring to an alias of the possibly modified parameter may be affected as well
-                                    abstraction.getSymbolTable().get(0).lookupAliases(path, aliasLength, aliases);
+                                // Every predicate referring to an alias of the possibly modified parameter may be affected as well
+                                abstraction.getSymbolTable().get(0).lookupAliases(path, aliasLength, aliases);
 
-                                    for (AccessExpression alias : aliases) {
-                                        // reference-passed objects may have been affected by the method
-                                        // except array lengths (those cannot change after passing a reference to the array)
-                                        if (actualParameter.isProperPrefixOf(alias) && !(alias instanceof ArrayLengthRead && alias.getLength() == actualParameter.getLength() + 1)) {
-                                            if (alias.getRoot().isThis() && sameObject) {
-                                                // Constructors affect `this` only in scope of the class
-                                                // No further subclass fields may be modified by the constructor
-                                                // Therefore the initial valuation may stay intact after calling super constructor
-                                                if (method.isInit() && alias.getLength() > 1) {
-                                                    ObjectFieldRead fr = (ObjectFieldRead) alias.get(2);
+                                for (AccessExpression alias : aliases) {
+                                    // reference-passed objects may have been affected by the method
+                                    // except array lengths (those cannot change after passing a reference to the array)
+                                    if (actualParameter.isProperPrefixOf(alias) && !(alias instanceof ArrayLengthRead && alias.getLength() == actualParameter.getLength() + 1)) {
+                                        if (alias.getRoot().isThis() && sameObject) {
+                                            // Constructors affect `this` only in scope of the class
+                                            // No further subclass fields may be modified by the constructor
+                                            // Therefore the initial valuation may stay intact after calling super constructor
+                                            if (method.isInit() && alias.getLength() > 1) {
+                                                ObjectFieldRead fr = (ObjectFieldRead) alias.get(2);
 
-                                                    ClassInfo cls = method.getClassInfo();
+                                                ClassInfo cls = method.getClassInfo();
 
-                                                    while (cls != null && !canBeAffected) {
-                                                        for (FieldInfo field : cls.getInstanceFields()) {
-                                                            if (fr.getField().getName().equals(field.getName())) {
-                                                                canBeAffected = true;
+                                                while (cls != null && !canBeAffected) {
+                                                    for (FieldInfo field : cls.getInstanceFields()) {
+                                                        if (fr.getField().getName().equals(field.getName())) {
+                                                            canBeAffected = true;
 
-                                                                break;
-                                                            }
+                                                            break;
                                                         }
-
-                                                        cls = cls.getSuperClass();
                                                     }
-                                                } else {
-                                                    canBeAffected = true; // Not constructor
+
+                                                    cls = cls.getSuperClass();
                                                 }
                                             } else {
-                                                canBeAffected = true; // Any non-this parameter
+                                                canBeAffected = true; // Not constructor
                                             }
+                                        } else {
+                                                canBeAffected = true; // Any non-this parameter
                                         }
                                     }
-
-                                    aliases.clear();
                                 }
+
+                                aliases.clear();
                             }
+                        }
+
+                        switch (argTypes[argIndex]) {
+                            case Types.T_LONG:
+                            case Types.T_DOUBLE:
+                                slotIndex += 2;
+                                break;
+
+                        default:
+                            slotIndex += 1;
+                            break;
                         }
                     }
 

@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Subtract;
  * Subtract double
  * ..., value1, value2 => ..., result
  */
-public class DSUB extends gov.nasa.jpf.jvm.bytecode.DREM implements AbstractBinaryOperator<Double> {
+public class DSUB extends gov.nasa.jpf.jvm.bytecode.DSUB implements AbstractBinaryOperator<Double, Double> {
 
     DoubleBinaryOperatorExecutor executor = DoubleBinaryOperatorExecutor.getInstance();
 

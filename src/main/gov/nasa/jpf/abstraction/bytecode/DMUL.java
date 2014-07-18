@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Multiply;
  * Multiply double
  * ..., value1, value2 => ..., result
  */
-public class DMUL extends gov.nasa.jpf.jvm.bytecode.DMUL implements AbstractBinaryOperator<Double> {
+public class DMUL extends gov.nasa.jpf.jvm.bytecode.DMUL implements AbstractBinaryOperator<Double, Double> {
 
     DoubleBinaryOperatorExecutor executor = DoubleBinaryOperatorExecutor.getInstance();
 

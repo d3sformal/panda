@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Modulo;
  * Remainder double
  * ..., value1, value2 => ..., result
  */
-public class DREM extends gov.nasa.jpf.jvm.bytecode.DREM implements AbstractBinaryOperator<Double> {
+public class DREM extends gov.nasa.jpf.jvm.bytecode.DREM implements AbstractBinaryOperator<Double, Double> {
 
     DoubleBinaryOperatorExecutor executor = DoubleBinaryOperatorExecutor.getInstance();
 

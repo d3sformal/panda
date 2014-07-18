@@ -13,7 +13,7 @@ import gov.nasa.jpf.abstraction.common.Subtract;
  * Or integer
  * ..., value1, value2 => ..., result
  */
-public class IOR extends gov.nasa.jpf.jvm.bytecode.IOR implements AbstractBinaryOperator<Integer> {
+public class IOR extends gov.nasa.jpf.jvm.bytecode.IOR implements AbstractBinaryOperator<Integer, Integer> {
 
     IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 

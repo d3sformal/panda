@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Add integer
  * ..., value1, value2 => ..., result
  */
-public class IADD extends gov.nasa.jpf.jvm.bytecode.IADD implements AbstractBinaryOperator<Integer> {
+public class IADD extends gov.nasa.jpf.jvm.bytecode.IADD implements AbstractBinaryOperator<Integer, Integer> {
 
     IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 

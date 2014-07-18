@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Modulo;
  * Remainder long
  * ..., value1, value2 => ..., result
  */
-public class LREM extends gov.nasa.jpf.jvm.bytecode.LREM implements AbstractBinaryOperator<Long> {
+public class LREM extends gov.nasa.jpf.jvm.bytecode.LREM implements AbstractBinaryOperator<Long, Long> {
 
     LongBinaryOperatorExecutor executor = LongBinaryOperatorExecutor.getInstance();
 

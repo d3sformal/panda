@@ -8,13 +8,13 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Implements type specific parts of the operation ( @see gov.nasa.jpf.abstraction.bytecode.BinaryOperatorExecutor )
  *   - layout of operands (and their attributes) on the stack (type size comes into play)
  */
-public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Integer, Integer> {
+public class LongIntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Long, Integer> {
 
-    private static IntegerBinaryOperatorExecutor instance;
+    private static LongIntegerBinaryOperatorExecutor instance;
 
-    public static IntegerBinaryOperatorExecutor getInstance() {
+    public static LongIntegerBinaryOperatorExecutor getInstance() {
         if (instance == null) {
-            instance = new IntegerBinaryOperatorExecutor();
+            instance = new LongIntegerBinaryOperatorExecutor();
         }
 
         return instance;
@@ -22,7 +22,7 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
 
     @Override
     protected Expression getLeftHandSideExpression(StackFrame sf) {
-        return getExpression(sf, 1);
+        return getExpression(sf, 2);
     }
 
     @Override
@@ -31,8 +31,8 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
     }
 
     @Override
-    protected Integer getLeftHandSideOperand(StackFrame sf) {
-        return sf.peek(1);
+    protected Long getLeftHandSideOperand(StackFrame sf) {
+        return sf.peekLong(1);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
 
     @Override
     final protected void storeExpression(Expression result, StackFrame sf) {
-        sf.setOperandAttr(result);
+        sf.setLongOperandAttr(result);
     }
 
 }

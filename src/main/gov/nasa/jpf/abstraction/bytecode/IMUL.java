@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Multiply;
  * Multiply integer
  * ..., value1, value2 => ..., result
  */
-public class IMUL extends gov.nasa.jpf.jvm.bytecode.IMUL implements AbstractBinaryOperator<Integer> {
+public class IMUL extends gov.nasa.jpf.jvm.bytecode.IMUL implements AbstractBinaryOperator<Integer, Integer> {
 
     IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 

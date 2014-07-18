@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Compare double
  * ..., value1, value2 => ..., result
  */
-public class DCMPL extends gov.nasa.jpf.jvm.bytecode.DCMPL implements AbstractBinaryOperator<Double> {
+public class DCMPL extends gov.nasa.jpf.jvm.bytecode.DCMPL implements AbstractBinaryOperator<Double, Double> {
 
     DoubleComparatorExecutor executor = DoubleComparatorExecutor.getInstance();
 

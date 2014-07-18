@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Multiply;
  * Multiply long
  * ..., value1, value2 => ..., result
  */
-public class LMUL extends gov.nasa.jpf.jvm.bytecode.LMUL implements AbstractBinaryOperator<Long> {
+public class LMUL extends gov.nasa.jpf.jvm.bytecode.LMUL implements AbstractBinaryOperator<Long, Long> {
 
     LongBinaryOperatorExecutor executor = LongBinaryOperatorExecutor.getInstance();
 

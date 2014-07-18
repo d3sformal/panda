@@ -14,7 +14,7 @@ import gov.nasa.jpf.abstraction.common.Subtract;
  * Xor integer
  * ..., value1, value2 => ..., result
  */
-public class IXOR extends gov.nasa.jpf.jvm.bytecode.IXOR implements AbstractBinaryOperator<Integer> {
+public class IXOR extends gov.nasa.jpf.jvm.bytecode.IXOR implements AbstractBinaryOperator<Integer, Integer> {
 
     IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 

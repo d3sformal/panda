@@ -11,9 +11,9 @@ import gov.nasa.jpf.abstraction.common.Expression;
 /**
  * Implementation of binary operations regardless their concrete type.
  */
-public abstract class BinaryOperatorExecutor<T> {
+public abstract class BinaryOperatorExecutor<T, U> {
 
-    final public Instruction execute(AbstractBinaryOperator<T> op, ThreadInfo ti) {
+    final public Instruction execute(AbstractBinaryOperator<T, U> op, ThreadInfo ti) {
 
         String name = op.getClass().getSimpleName();
 
@@ -24,7 +24,7 @@ public abstract class BinaryOperatorExecutor<T> {
         Expression expr2 = getRightHandSideExpression(sf);
 
         T v1 = getLeftHandSideOperand(sf);
-        T v2 = getRightHandSideOperand(sf);
+        U v2 = getRightHandSideOperand(sf);
 
         // Create symbolic value (predicate abstraction), abstract value (numeric abstraction)
         Expression result;
@@ -50,6 +50,6 @@ public abstract class BinaryOperatorExecutor<T> {
     abstract protected Expression getLeftHandSideExpression(StackFrame sf);
     abstract protected Expression getRightHandSideExpression(StackFrame sf);
     abstract protected T getLeftHandSideOperand(StackFrame sf);
-    abstract protected T getRightHandSideOperand(StackFrame sf);
+    abstract protected U getRightHandSideOperand(StackFrame sf);
     abstract protected void storeExpression(Expression result, StackFrame sf);
 }

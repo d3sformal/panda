@@ -10,7 +10,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Unsigned shift right integer
  * ..., value1, value2 => ..., result
  */
-public class IUSHR extends gov.nasa.jpf.jvm.bytecode.IUSHR implements AbstractBinaryOperator<Integer> {
+public class IUSHR extends gov.nasa.jpf.jvm.bytecode.IUSHR implements AbstractBinaryOperator<Integer, Integer> {
 
     IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 

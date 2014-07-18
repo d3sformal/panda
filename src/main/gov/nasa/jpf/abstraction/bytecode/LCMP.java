@@ -10,7 +10,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Compare Long
  * ..., value1, value2 => ..., result
  */
-public class LCMP extends gov.nasa.jpf.jvm.bytecode.LCMP implements AbstractBinaryOperator<Long> {
+public class LCMP extends gov.nasa.jpf.jvm.bytecode.LCMP implements AbstractBinaryOperator<Long, Long> {
 
     /**
      * The handling of choice generation on ambiguous comparison results and other common code for all similar instructions

@@ -10,9 +10,9 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Unsigned shift right long
  * ..., value1, value2 => ..., result
  */
-public class LUSHR extends gov.nasa.jpf.jvm.bytecode.LUSHR implements AbstractBinaryOperator<Long> {
+public class LUSHR extends gov.nasa.jpf.jvm.bytecode.LUSHR implements AbstractBinaryOperator<Long, Integer> {
 
-    LongBinaryOperatorExecutor executor = LongBinaryOperatorExecutor.getInstance();
+    LongIntegerBinaryOperatorExecutor executor = LongIntegerBinaryOperatorExecutor.getInstance();
 
     @Override
     public Instruction execute(ThreadInfo ti) {

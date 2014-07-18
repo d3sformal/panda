@@ -14,7 +14,7 @@ import gov.nasa.jpf.abstraction.common.Subtract;
  * Xor long
  * ..., value1, value2 => ..., result
  */
-public class LXOR extends gov.nasa.jpf.jvm.bytecode.LXOR implements AbstractBinaryOperator<Long> {
+public class LXOR extends gov.nasa.jpf.jvm.bytecode.LXOR implements AbstractBinaryOperator<Long, Long> {
 
     LongBinaryOperatorExecutor executor = LongBinaryOperatorExecutor.getInstance();
 

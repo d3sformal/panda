@@ -8,7 +8,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
 /**
  * Interface for all binary arithmetic operations, comparisons
  */
-public interface AbstractBinaryOperator<T> {
+public interface AbstractBinaryOperator<T, U> {
     public Instruction executeConcrete(ThreadInfo ti);
 
     public Expression getResult(Expression expr1, Expression expr2);

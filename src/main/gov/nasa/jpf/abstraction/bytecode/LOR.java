@@ -13,7 +13,7 @@ import gov.nasa.jpf.abstraction.common.Subtract;
  * Or long
  * ..., value1, value2 => ..., result
  */
-public class LOR extends gov.nasa.jpf.jvm.bytecode.LOR implements AbstractBinaryOperator<Long> {
+public class LOR extends gov.nasa.jpf.jvm.bytecode.LOR implements AbstractBinaryOperator<Long, Long> {
 
     LongBinaryOperatorExecutor executor = LongBinaryOperatorExecutor.getInstance();
 

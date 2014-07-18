@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Compare floats
  * ..., value1, value2 => ..., result
  */
-public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL implements AbstractBinaryOperator<Float> {
+public class FCMPL extends gov.nasa.jpf.jvm.bytecode.FCMPL implements AbstractBinaryOperator<Float, Float> {
 
     FloatComparatorExecutor executor = FloatComparatorExecutor.getInstance();
 

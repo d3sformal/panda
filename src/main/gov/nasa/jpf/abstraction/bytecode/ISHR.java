@@ -13,7 +13,7 @@ import gov.nasa.jpf.abstraction.common.UninterpretedShiftRight;
  * Shift right integer
  * ..., value1, value2 => ..., result
  */
-public class ISHR extends gov.nasa.jpf.jvm.bytecode.ISHR implements AbstractBinaryOperator<Integer> {
+public class ISHR extends gov.nasa.jpf.jvm.bytecode.ISHR implements AbstractBinaryOperator<Integer, Integer> {
 
     IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 

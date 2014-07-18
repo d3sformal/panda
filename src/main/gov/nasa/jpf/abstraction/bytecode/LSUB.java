@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Subtract;
  * Subtract long
  * ..., value1, value2 => ..., result
  */
-public class LSUB extends gov.nasa.jpf.jvm.bytecode.LSUB implements AbstractBinaryOperator<Long> {
+public class LSUB extends gov.nasa.jpf.jvm.bytecode.LSUB implements AbstractBinaryOperator<Long, Long> {
 
     LongBinaryOperatorExecutor executor = LongBinaryOperatorExecutor.getInstance();
 

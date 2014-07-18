@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Compare floats
  * ..., value1, value2 => ..., result
  */
-public class FCMPG extends gov.nasa.jpf.jvm.bytecode.FCMPG implements AbstractBinaryOperator<Float> {
+public class FCMPG extends gov.nasa.jpf.jvm.bytecode.FCMPG implements AbstractBinaryOperator<Float, Float> {
 
     /**
      * Common implementation of choice generation etc.

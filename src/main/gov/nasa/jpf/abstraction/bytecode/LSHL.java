@@ -13,9 +13,9 @@ import gov.nasa.jpf.abstraction.common.UninterpretedShiftLeft;
  * Shift left long
  * ..., value1, value2 => ..., result
  */
-public class LSHL extends gov.nasa.jpf.jvm.bytecode.LSHL implements AbstractBinaryOperator<Long> {
+public class LSHL extends gov.nasa.jpf.jvm.bytecode.LSHL implements AbstractBinaryOperator<Long, Integer> {
 
-    LongBinaryOperatorExecutor executor = LongBinaryOperatorExecutor.getInstance();
+    LongIntegerBinaryOperatorExecutor executor = LongIntegerBinaryOperatorExecutor.getInstance();
 
     @Override
     public Instruction execute(ThreadInfo ti) {

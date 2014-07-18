@@ -8,7 +8,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Implements type specific parts of the operation ( @see gov.nasa.jpf.abstraction.bytecode.BinaryOperatorExecutor )
  *   - layout of operands (and their attributes) on the stack (type size comes into play)
  */
-public class FloatBinaryOperatorExecutor extends BinaryOperatorExecutor<Float> {
+public class FloatBinaryOperatorExecutor extends BinaryOperatorExecutor<Float, Float> {
 
     private static FloatBinaryOperatorExecutor instance;
 

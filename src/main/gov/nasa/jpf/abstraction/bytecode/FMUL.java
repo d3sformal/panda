@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Multiply;
  * Multiply float
  * ..., value1, value2 => ..., result
  */
-public class FMUL extends gov.nasa.jpf.jvm.bytecode.FMUL implements AbstractBinaryOperator<Float> {
+public class FMUL extends gov.nasa.jpf.jvm.bytecode.FMUL implements AbstractBinaryOperator<Float, Float> {
 
     FloatBinaryOperatorExecutor executor = FloatBinaryOperatorExecutor.getInstance();
 

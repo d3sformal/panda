@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Modulo;
  * Remainder integer
  * ..., value1, value2 => ..., result
  */
-public class IREM extends gov.nasa.jpf.jvm.bytecode.IREM implements AbstractBinaryOperator<Integer> {
+public class IREM extends gov.nasa.jpf.jvm.bytecode.IREM implements AbstractBinaryOperator<Integer, Integer> {
 
     IntegerBinaryOperatorExecutor executor = IntegerBinaryOperatorExecutor.getInstance();
 

@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Add double
  * ..., value1, value2 => ..., result
  */
-public class DADD extends gov.nasa.jpf.jvm.bytecode.DADD implements AbstractBinaryOperator<Double> {
+public class DADD extends gov.nasa.jpf.jvm.bytecode.DADD implements AbstractBinaryOperator<Double, Double> {
 
     DoubleBinaryOperatorExecutor executor = DoubleBinaryOperatorExecutor.getInstance();
 

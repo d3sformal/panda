@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Divide long
  * ..., value1, value2 => ..., result
  */
-public class LDIV extends gov.nasa.jpf.jvm.bytecode.LDIV implements AbstractBinaryOperator<Long> {
+public class LDIV extends gov.nasa.jpf.jvm.bytecode.LDIV implements AbstractBinaryOperator<Long, Long> {
 
     LongBinaryOperatorExecutor executor = LongBinaryOperatorExecutor.getInstance();
 

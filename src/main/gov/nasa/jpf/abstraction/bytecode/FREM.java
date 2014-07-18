@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Modulo;
  * Remainder float
  * ..., value1, value2 => ..., result
  */
-public class FREM extends gov.nasa.jpf.jvm.bytecode.FREM implements AbstractBinaryOperator<Float> {
+public class FREM extends gov.nasa.jpf.jvm.bytecode.FREM implements AbstractBinaryOperator<Float, Float> {
 
     FloatBinaryOperatorExecutor executor = FloatBinaryOperatorExecutor.getInstance();
 

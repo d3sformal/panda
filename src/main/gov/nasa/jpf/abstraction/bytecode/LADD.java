@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Expression;
  * Add long
  * ..., value1, value2 => ..., result
  */
-public class LADD extends gov.nasa.jpf.jvm.bytecode.LADD implements AbstractBinaryOperator<Long> {
+public class LADD extends gov.nasa.jpf.jvm.bytecode.LADD implements AbstractBinaryOperator<Long, Long> {
 
     LongBinaryOperatorExecutor executor = LongBinaryOperatorExecutor.getInstance();
 
