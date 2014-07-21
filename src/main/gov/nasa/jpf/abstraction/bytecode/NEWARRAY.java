@@ -41,7 +41,7 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
 
             // Check validity of the array length
             Predicate negative = LessThan.create(lengthExpression, Constant.create(0));
-            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(negative);
+            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(getPosition(), negative);
 
             if (value != TruthValue.FALSE) {
                 return ti.createAndThrowException("java.lang.NegativeArraySizeException");

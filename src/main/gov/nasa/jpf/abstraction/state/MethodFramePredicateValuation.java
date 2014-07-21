@@ -374,8 +374,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return valuations.get(predicate);
     }
 
-    @Override
-    public String toString() {
+    public String toString(int pc) {
         StringBuilder ret = new StringBuilder();
 
         Set<Predicate> sorted = new TreeSet<Predicate>(new Comparator<Predicate>() {
@@ -388,33 +387,37 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         sorted.addAll(valuations.keySet());
 
         for (Predicate p : sorted) {
-            String predicate = p.toString(Notation.DOT_NOTATION);
+            if (p.isInScope(pc)) {
+                String predicate = p.toString(Notation.DOT_NOTATION);
 
-            ret.append(predicate);
-            ret.append(" : ");
-            ret.append(get(p));
-            ret.append("\n");
+                ret.append(predicate);
+                ret.append(" : ");
+                ret.append(get(p));
+                ret.append("\n");
+            }
         }
 
         return ret.toString();
     }
 
-    private void collectDeterminants(Predicate predicate, Map<Predicate, TruthValue> determinants, Map<AccessExpression, Predicate> equalities, Map<AccessExpression, Set<Predicate>> inequalities) {
+    private void collectDeterminants(int lastPC, Predicate predicate, Map<Predicate, TruthValue> determinants, Map<AccessExpression, Predicate> equalities, Map<AccessExpression, Set<Predicate>> inequalities) {
         for (Predicate determinant : computeDeterminantClosure(predicate, valuations.keySet())) {
-            if (PredicateUtil.determinesExactConcreteValueOfAccessExpression(determinant, valuations)) {
-                AccessExpression expression = PredicateUtil.getAccessExpression(determinant);
+            if (determinant.isInScope(lastPC)) {
+                if (PredicateUtil.determinesExactConcreteValueOfAccessExpression(determinant, valuations)) {
+                    AccessExpression expression = PredicateUtil.getAccessExpression(determinant);
 
-                equalities.put(expression, determinant);
-            } else if (PredicateUtil.forbidsExactConcreteValueOfAccessExpression(determinant, valuations)) {
-                AccessExpression expression = PredicateUtil.getAccessExpression(determinant);
+                    equalities.put(expression, determinant);
+                } else if (PredicateUtil.forbidsExactConcreteValueOfAccessExpression(determinant, valuations)) {
+                    AccessExpression expression = PredicateUtil.getAccessExpression(determinant);
 
-                if (!inequalities.containsKey(expression)) {
-                    inequalities.put(expression, new HashSet<Predicate>());
+                    if (!inequalities.containsKey(expression)) {
+                        inequalities.put(expression, new HashSet<Predicate>());
+                    }
+
+                    inequalities.get(expression).add(determinant);
+                } else {
+                    determinants.put(determinant, get(determinant));
                 }
-
-                inequalities.get(expression).add(determinant);
-            } else {
-                determinants.put(determinant, get(determinant));
             }
         }
 
@@ -435,7 +438,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
     }
 
     @Override
-    public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
+    public void reevaluate(int lastPC, int nextPC, AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
         Map<Predicate, PredicateValueDeterminingInfo> predicates = new HashMap<Predicate, PredicateValueDeterminingInfo>();
 
         Map<AccessExpression, Predicate> equalities = new HashMap<AccessExpression, Predicate>();
@@ -486,22 +489,32 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
              * If the predicate may be affected, compute preconditions and determinants and schedule the predicate for reevaluation
              */
             if (affects) {
-                Predicate positiveWeakestPrecondition = predicate;
-                Predicate negativeWeakestPrecondition = Negation.create(predicate);
+                if (predicate.isInScope(nextPC)) {
+                    Predicate positiveWeakestPrecondition = predicate;
+                    Predicate negativeWeakestPrecondition = Negation.create(predicate);
 
-                if (expression != null) {
-                    positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
-                    negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
+                    if (expression != null) {
+                        positiveWeakestPrecondition = UpdatedPredicate.create(positiveWeakestPrecondition, affected, expression);
+                        negativeWeakestPrecondition = UpdatedPredicate.create(negativeWeakestPrecondition, affected, expression);
+                    }
+
+                    Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+                    Map<Predicate, TruthValue> determinantsOrig = new HashMap<Predicate, TruthValue>();
+
+                    collectDeterminants(lastPC, positiveWeakestPrecondition, determinants, equalities, inequalities);
+                    // This is not necessary
+                    //collectDeterminants(lastPC, negativeWeakestPrecondition, determinants, equalities, inequalities);
+
+                    predicates.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
+                } else {
+                    /**
+                     * Havoc values of predicates that are not in scope
+                     *
+                     * This should not be necessary
+                     * It would, however, be hard to detect when old values are used, even though the predicate ran out of scope before getting into the scope again
+                     */
+                    valuations.put(predicate, TruthValue.UNKNOWN);
                 }
-
-                Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
-                Map<Predicate, TruthValue> determinantsOrig = new HashMap<Predicate, TruthValue>();
-
-                collectDeterminants(positiveWeakestPrecondition, determinants, equalities, inequalities);
-                // This is not necessary
-                //collectDeterminants(negativeWeakestPrecondition, determinants, equalities, inequalities);
-
-                predicates.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
             }
         }
 
@@ -645,12 +658,12 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
      * Used to valuate branching conditions - a (possibly) new predicate whose value depends solely on current predicate valuation.
      */
     @Override
-    public TruthValue evaluatePredicate(Predicate predicate) {
+    public TruthValue evaluatePredicate(int lastPC, Predicate predicate) {
         Set<Predicate> predicates = new HashSet<Predicate>();
 
         predicates.add(predicate);
 
-        return evaluatePredicates(predicates).get(predicate);
+        return evaluatePredicates(lastPC, predicates).get(predicate);
     }
 
     /**
@@ -659,7 +672,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
      * Batch variant of evaluatePredicate
      */
     @Override
-    public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
+    public Map<Predicate, TruthValue> evaluatePredicates(int lastPC, Set<Predicate> predicates) {
         if (predicates.isEmpty()) return Collections.emptyMap();
 
         Map<Predicate, PredicateValueDeterminingInfo> input = new HashMap<Predicate, PredicateValueDeterminingInfo>();
@@ -678,9 +691,9 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
                 Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
 
-                collectDeterminants(positiveWeakestPrecondition, determinants, equalities, inequalities);
+                collectDeterminants(lastPC, positiveWeakestPrecondition, determinants, equalities, inequalities);
                 // This is not necessary
-                //collectDeterminants(negativeWeakestPrecondition, determinants, equalities, inequalities);
+                //collectDeterminants(lastPC, negativeWeakestPrecondition, determinants, equalities, inequalities);
 
                 input.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
             }

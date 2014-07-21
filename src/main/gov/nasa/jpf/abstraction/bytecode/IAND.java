@@ -26,7 +26,7 @@ public class IAND extends gov.nasa.jpf.jvm.bytecode.IAND implements AbstractBina
 
     @Override
     public Expression getResult(Expression a, Expression b) {
-        LogicalOperandChecker.check(a, b);
+        LogicalOperandChecker.check(getPosition(), a, b);
 
         /**
          * Performs the adequate operation over abstractions

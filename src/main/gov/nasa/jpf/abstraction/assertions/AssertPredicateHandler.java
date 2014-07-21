@@ -33,7 +33,7 @@ public abstract class AssertPredicateHandler extends AssertHandler {
             throw new RuntimeException("Incorrect format of asserted facts: `" + assertion + "`");
         }
 
-        checkValuation(assertedFact, assertedValuation);
+        checkValuation(curTh, assertedFact, assertedValuation);
     }
 
     protected void checkAssertionSet(ElementInfo arrayEI, ThreadInfo curTh) {
@@ -44,9 +44,9 @@ public abstract class AssertPredicateHandler extends AssertHandler {
         }
     }
 
-    protected void checkValuation(Predicate assertedFact, TruthValue assertedValuation) {
+    protected void checkValuation(ThreadInfo curTh, Predicate assertedFact, TruthValue assertedValuation) {
         // we model assert in the same way as Java using branches: if (asserted != inferred) throw exception
-        TruthValue inferredValuation = PredicateAbstraction.getInstance().processBranchingCondition(assertedFact);
+        TruthValue inferredValuation = PredicateAbstraction.getInstance().processBranchingCondition(curTh.getPC().getPosition(), assertedFact);
 
         if (assertedValuation != inferredValuation) {
             throw new RuntimeException("Asserted incorrect predicate valuation: `" + assertedFact + "` expected to valuate to `" + assertedValuation + "` but actually valuated to `" + inferredValuation + "`");

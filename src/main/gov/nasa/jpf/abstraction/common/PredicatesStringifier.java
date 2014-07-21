@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.common;
 
+import java.util.SortedSet;
+
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Disjunction;
@@ -55,6 +57,42 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
         }
     }
 
+    private void visitPredicate(Predicate p) {
+        SortedSet<Integer> scope = p.getScope();
+
+        if (scope != null) {
+            int last = -1;
+
+            for (int pc : scope) {
+                if (pc > last) {
+                    if (last > -1) {
+                        ret.append(",");
+                    }
+
+                    ret.append(pc);
+
+                    last = pc;
+
+                    while (scope.contains(++pc)) {}
+
+                    --pc;
+
+                    if (pc > last) {
+                        ret.append("..");
+                        ret.append(pc);
+
+                        last = pc;
+                    }
+                }
+            }
+
+            ret.append(": ");
+        }
+
+        p.accept(this);
+        ret.append("\n");
+    }
+
     @Override
     public void visit(ObjectPredicateContext context) {
         ret.append("[object ");
@@ -64,8 +102,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
         ret.append("]\n");
 
         for (Predicate p : context.predicates) {
-            p.accept(this);
-            ret.append("\n");
+            visitPredicate(p);
         }
     }
 
@@ -78,8 +115,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
         ret.append("]\n");
 
         for (Predicate p : context.predicates) {
-            p.accept(this);
-            ret.append("\n");
+            visitPredicate(p);
         }
     }
 
@@ -92,8 +128,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
         ret.append("]\n");
 
         for (Predicate p : context.predicates) {
-            p.accept(this);
-            ret.append("\n");
+            visitPredicate(p);
         }
     }
 
@@ -106,8 +141,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
         ret.append("]\n");
 
         for (Predicate p : context.predicates) {
-            p.accept(this);
-            ret.append("\n");
+            visitPredicate(p);
         }
     }
 
@@ -116,8 +150,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
         ret.append("[static]\n");
 
         for (Predicate p : context.predicates) {
-            p.accept(this);
-            ret.append("\n");
+            visitPredicate(p);
         }
     }
 

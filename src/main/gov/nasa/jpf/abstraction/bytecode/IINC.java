@@ -35,7 +35,7 @@ public class IINC extends gov.nasa.jpf.jvm.bytecode.IINC {
         sf.setLocalAttr(index, expression);
         sf.setLocalVariable(index, sf.getLocalVariable(index) + increment, false);
 
-        PredicateAbstraction.getInstance().processPrimitiveStore(expression, path);
+        PredicateAbstraction.getInstance().processPrimitiveStore(getPosition(), getNext(ti).getPosition(), expression, path);
 
         return getNext(ti);
     }

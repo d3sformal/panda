@@ -38,7 +38,7 @@ public class DSTORE extends gov.nasa.jpf.jvm.bytecode.DSTORE {
          * Inform the abstractions that a primitive value of a local variable may have changed
          */
         PredicateAbstraction.getInstance().informAboutPrimitiveLocalVariable(to);
-        PredicateAbstraction.getInstance().processPrimitiveStore(from, to);
+        PredicateAbstraction.getInstance().processPrimitiveStore(getPosition(), actualNextInsn.getPosition(), from, to);
 
         return actualNextInsn;
     }

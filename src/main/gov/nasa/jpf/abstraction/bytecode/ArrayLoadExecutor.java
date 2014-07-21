@@ -98,7 +98,7 @@ public class ArrayLoadExecutor {
                 LessThan.create(index, getUpperBound(ei, array))
             );
 
-            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(inBounds);
+            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(load.getSelf().getPosition(), inBounds);
 
             if (value != TruthValue.TRUE) {
                 throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds));

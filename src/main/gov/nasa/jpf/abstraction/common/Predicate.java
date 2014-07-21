@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
@@ -30,7 +31,19 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
 
     private Integer hashCodeValue = null;
     private String stringValue = null;
+    private SortedSet<Integer> scope = null;
 
+    public void setScope(SortedSet<Integer> scope) {
+        this.scope = scope;
+    }
+
+    public boolean isInScope(int pc) {
+        return scope == null || scope.contains(pc);
+    }
+
+    public SortedSet<Integer> getScope() {
+        return scope;
+    }
 
     public String toString() {
         return toString(Notation.policy);

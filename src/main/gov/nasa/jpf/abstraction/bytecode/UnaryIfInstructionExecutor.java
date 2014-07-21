@@ -56,7 +56,7 @@ public class UnaryIfInstructionExecutor {
              * No other abstraction can do that, the rest of them returns UNDEFINED.
              */
             if (expr != null && RunDetector.isRunning()) {
-                condition = PredicateAbstraction.getInstance().processBranchingCondition(br.createPredicate(expr, constant));
+                condition = PredicateAbstraction.getInstance().processBranchingCondition(br.getSelf().getPosition(), br.createPredicate(expr, constant));
             }
 
             // In case there was no predicate abstraction / no symbolic expression (or the execution did not yet reach the target program or we already left it)

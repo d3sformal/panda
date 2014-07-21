@@ -64,12 +64,10 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
             return actualNextInsn;
         }
 
-        if (ei.getFieldValueObject(getFieldName()) == null) {
-            PredicateAbstraction.getInstance().processObjectStore(from, field);
-        } else if (ei.getFieldValueObject(getFieldName()) instanceof ElementInfo) {
-            PredicateAbstraction.getInstance().processObjectStore(from, field);
+        if (ei.getFieldValueObject(getFieldName()) == null || ei.getFieldValueObject(getFieldName()) instanceof ElementInfo) {
+            PredicateAbstraction.getInstance().processObjectStore(getPosition(), actualNextInsn.getPosition(), from, field);
         } else {
-            PredicateAbstraction.getInstance().processPrimitiveStore(from, field);
+            PredicateAbstraction.getInstance().processPrimitiveStore(getPosition(), actualNextInsn.getPosition(), from, field);
         }
 
         AnonymousExpressionTracker.notifyPopped(from);

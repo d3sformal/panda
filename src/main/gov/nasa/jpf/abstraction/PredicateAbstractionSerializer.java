@@ -213,7 +213,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         buf.add(value.ordinal());
     }
 
-    protected void serializePredicates(MethodFramePredicateValuation currentScope) {
+    protected void serializePredicates(int pc, MethodFramePredicateValuation currentScope) {
         // sort predicates
         Set<Predicate> order = new TreeSet<Predicate>(new Comparator<Predicate>() {
             public int compare(Predicate p1, Predicate p2) {
@@ -228,7 +228,9 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
 
         // store all predicate valuations in the current scope in a predefined order
         for (Predicate p : order) {
-            serializePredicate(p, currentScope.get(p));
+            if (p.isInScope(pc)) {
+                serializePredicate(p, currentScope.get(p));
+            }
         }
     }
 
@@ -260,7 +262,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         serializeLocalVariables(currentSymbolScope);
 
         // store all predicate valuations
-        serializePredicates(currentPredicateScope);
+        serializePredicates(frame.getPC().getPosition(), currentPredicateScope);
 
         ++depth;
     }

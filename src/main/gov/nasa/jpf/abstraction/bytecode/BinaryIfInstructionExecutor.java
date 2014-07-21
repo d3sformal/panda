@@ -67,7 +67,7 @@ public class BinaryIfInstructionExecutor {
              */
             if (expr1 != null && expr2 != null && RunDetector.isRunning()) {
                 Predicate predicate = br.createPredicate(expr1, expr2);
-                truth = PredicateAbstraction.getInstance().processBranchingCondition(predicate);
+                truth = PredicateAbstraction.getInstance().processBranchingCondition(br.getSelf().getPosition(), predicate);
             }
 
             switch (truth) {

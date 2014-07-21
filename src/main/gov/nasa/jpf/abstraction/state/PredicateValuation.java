@@ -50,19 +50,19 @@ public interface PredicateValuation {
      * @param resolvedAffected set of all aliases of affected
      * @param expression the value being written
      */
-    public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression);
+    public void reevaluate(int lastPC, int nextPC, AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression);
 
     public void dropAllPredicatesSharingSymbolsWith(AccessExpression expression);
 
     /**
      * Evaluate a predicate but do not store its value, just use other predicates to infer the truth value
      */
-    public TruthValue evaluatePredicate(Predicate predicate);
+    public TruthValue evaluatePredicate(int lastPC, Predicate predicate);
 
     /**
      * The same as evaluatePredicate, only for multiple predicates at once (effective due to a single call to the SMT)
      */
-    public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates);
+    public Map<Predicate, TruthValue> evaluatePredicates(int lastPC, Set<Predicate> predicates);
 
     public Integer evaluateExpression(Expression expression);
     public int[] evaluateExpressionInRange(Expression expression, int lowerBound, int upperBound);

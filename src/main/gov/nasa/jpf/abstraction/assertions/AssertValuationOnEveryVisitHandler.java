@@ -31,7 +31,7 @@ public abstract class AssertValuationOnEveryVisitHandler extends AssertHandler {
             String str = new String(ei.getStringChars());
 
             Predicate predicate = PredicatesFactory.createPredicateFromString(str);
-            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(predicate);
+            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(curTh.getPC().getPosition(), predicate);
 
             valuation.put(predicate, value);
         }

@@ -73,17 +73,17 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     @Override
-    public void processPrimitiveStore(Expression from, AccessExpression to) {
+    public void processPrimitiveStore(int lastPC, int nextPC, Expression from, AccessExpression to) {
         Set<AccessExpression> affected = symbolTable.processPrimitiveStore(from, to);
 
-        predicateValuation.reevaluate(to, affected, PrimitiveExpressionDecorator.wrap(from, symbolTable));
+        predicateValuation.reevaluate(lastPC, nextPC, to, affected, PrimitiveExpressionDecorator.wrap(from, symbolTable));
     }
 
     @Override
-    public void processObjectStore(Expression from, AccessExpression to) {
+    public void processObjectStore(int lastPC, int nextPC, Expression from, AccessExpression to) {
         Set<AccessExpression> affected = symbolTable.processObjectStore(from, to);
 
-        predicateValuation.reevaluate(to, affected, ObjectExpressionDecorator.wrap(from, symbolTable));
+        predicateValuation.reevaluate(lastPC, nextPC, to, affected, ObjectExpressionDecorator.wrap(from, symbolTable));
     }
 
     @Override
@@ -114,10 +114,10 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     @Override
-    public TruthValue processBranchingCondition(BranchingCondition condition) {
+    public TruthValue processBranchingCondition(int lastPC, BranchingCondition condition) {
         Predicate predicate = (Predicate) condition;
 
-        return predicateValuation.evaluatePredicate(predicate);
+        return predicateValuation.evaluatePredicate(lastPC, predicate);
     }
 
     @Override

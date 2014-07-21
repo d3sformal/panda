@@ -47,7 +47,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
                 for (int i = 0; i < matches.length; i++) {
                     int match = matches[i];
 
-                    TruthValue pred = PredicateAbstraction.getInstance().processBranchingCondition(Equals.create(expr, Constant.create(match)));
+                    TruthValue pred = PredicateAbstraction.getInstance().processBranchingCondition(getPosition(), Equals.create(expr, Constant.create(match)));
 
                     if (pred == TruthValue.UNDEFINED) {
                         predicateAbstractionFailed = true;

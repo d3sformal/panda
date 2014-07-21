@@ -41,7 +41,7 @@ public abstract class AssertVisitedWithValuationHandler extends AssertHandler {
 
                 Predicate predicate = PredicatesFactory.createPredicateFromString(strParts[0]);
                 TruthValue trackedValue = TruthValue.create(strParts[1]);
-                TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(predicate);
+                TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(curTh.getPC().getPosition(), predicate);
 
                 trackedValuation.put(predicate, trackedValue);
                 valuation.put(predicate, value);

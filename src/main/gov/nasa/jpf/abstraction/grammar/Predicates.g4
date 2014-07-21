@@ -3,6 +3,8 @@ grammar Predicates;
 @header {
     import java.util.List;
     import java.util.LinkedList;
+    import java.util.SortedSet;
+    import java.util.TreeSet;
 
     import gov.nasa.jpf.abstraction.common.*;
     import gov.nasa.jpf.abstraction.common.impl.*;
@@ -118,15 +120,50 @@ predicatecontext returns [gov.nasa.jpf.abstraction.common.PredicateContext val] 
     }
     ;
 
-predicatelist returns [List<Predicate> val]
+predicatelist returns [List<Predicate> val] locals [SortedSet<Integer> scope = null]
     : /* EMPTY */ {
         $ctx.val = new ArrayList<Predicate>();
     }
-    | ps=predicatelist p=predicate {
+    | ps=predicatelist (s=predicatescope ':' {$ctx.scope = new TreeSet<Integer>(); $ctx.scope.addAll($s.val);})? p=predicate {
         $ctx.val = $ps.val;
 
         for (Predicate p : $p.val) {
+            p.setScope($ctx.scope);
             $ctx.val.add(p);
+        }
+    }
+    ;
+
+predicatescope returns [SortedSet<Integer> val]
+    : r=predicaterange {
+        $ctx.val = $r.val;
+    }
+    | ps=predicatescope ',' pr=predicaterange {
+        $ctx.val = new TreeSet<Integer>();
+        $ctx.val.addAll($ps.val);
+        $ctx.val.addAll($pr.val);
+    }
+    ;
+
+predicaterange returns [SortedSet<Integer> val]
+    : c=CONSTANT_TOKEN {
+        $ctx.val = new TreeSet<Integer>();
+        $ctx.val.add(Integer.parseInt($c.text));
+    }
+    | c1=CONSTANT_TOKEN '..' c2=CONSTANT_TOKEN {
+        $ctx.val = new TreeSet<Integer>();
+
+        int lower = Integer.parseInt($c1.text);
+        int upper = Integer.parseInt($c2.text);
+
+        if (lower > upper) {
+            int swap = lower;
+            lower = upper;
+            upper = swap;
+        }
+
+        for (int i = lower; i < upper + 1; ++i) {
+            $ctx.val.add(i);
         }
     }
     ;

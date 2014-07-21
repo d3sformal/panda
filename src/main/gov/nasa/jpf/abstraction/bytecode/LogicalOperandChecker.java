@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 
 public class LogicalOperandChecker {
-    public static void check(Expression a, Expression b) {
+    public static void check(int lastPC, Expression a, Expression b) {
         if (RunDetector.isRunning()) {
             Predicate inSupportedDomain = Conjunction.create(
                 Disjunction.create(
@@ -24,7 +24,7 @@ public class LogicalOperandChecker {
                 )
             );
 
-            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(inSupportedDomain);
+            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(lastPC, inSupportedDomain);
 
             if (value != TruthValue.TRUE) {
                 throw new IllegalArgumentException("logical and bitwise operations over values other than {0, 1} are not supported");

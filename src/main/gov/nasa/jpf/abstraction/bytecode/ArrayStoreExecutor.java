@@ -45,7 +45,7 @@ public class ArrayStoreExecutor {
                 LessThan.create(index, DefaultArrayLengthRead.create(to))
             );
 
-            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(inBounds);
+            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(store.getSelf().getPosition(), inBounds);
 
             if (value != TruthValue.TRUE) {
                 throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds));
@@ -64,10 +64,10 @@ public class ArrayStoreExecutor {
 
         if (store instanceof AASTORE) {
             // Element indices are derived from predicates in this method call
-            PredicateAbstraction.getInstance().processObjectStore(from, element);
+            PredicateAbstraction.getInstance().processObjectStore(store.getSelf().getPosition(), actualNextInsn.getPosition(), from, element);
         } else {
             // Element indices are derived from predicates in this method call
-            PredicateAbstraction.getInstance().processPrimitiveStore(from, element);
+            PredicateAbstraction.getInstance().processPrimitiveStore(store.getSelf().getPosition(), actualNextInsn.getPosition(), from, element);
         }
 
         AnonymousExpressionTracker.notifyPopped(from);

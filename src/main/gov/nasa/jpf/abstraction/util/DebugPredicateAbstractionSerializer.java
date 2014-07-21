@@ -193,20 +193,22 @@ public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSer
     }
 
     @Override
-    protected void serializePredicates(MethodFramePredicateValuation currentScope) {
+    protected void serializePredicates(int pc, MethodFramePredicateValuation currentScope) {
         out.println("\t\t" + "predicates:");
 
         predicateLength = 0;
 
         for (Predicate p : currentScope.getPredicates()) {
-            int length = p.toString(Notation.DOT_NOTATION).length();
+            if (p.isInScope(pc)) {
+                int length = p.toString(Notation.DOT_NOTATION).length();
 
-            if (predicateLength < length) {
-                predicateLength = length;
+                if (predicateLength < length) {
+                    predicateLength = length;
+                }
             }
         }
 
-        super.serializePredicates(currentScope);
+        super.serializePredicates(pc, currentScope);
     }
 
     @Override

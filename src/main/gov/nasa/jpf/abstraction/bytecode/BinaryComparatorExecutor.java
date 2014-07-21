@@ -50,8 +50,8 @@ public abstract class BinaryComparatorExecutor<T> {
              * No other abstraction can do that, the rest of them returns UNDEFINED.
              */
             if (expr1 != null && expr2 != null && RunDetector.isRunning()) {
-                TruthValue lt = PredicateAbstraction.getInstance().processBranchingCondition(LessThan.create(expr1, expr2));
-                TruthValue eq = PredicateAbstraction.getInstance().processBranchingCondition(Equals.create(expr1, expr2));
+                TruthValue lt = PredicateAbstraction.getInstance().processBranchingCondition(cmp.getSelf().getPosition(), LessThan.create(expr1, expr2));
+                TruthValue eq = PredicateAbstraction.getInstance().processBranchingCondition(cmp.getSelf().getPosition(), Equals.create(expr1, expr2));
                 TruthValue gt = null;
 
                 if (TruthValue.and(lt, eq) == TruthValue.UNDEFINED) {

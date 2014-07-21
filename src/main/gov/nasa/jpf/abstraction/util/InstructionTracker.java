@@ -11,7 +11,7 @@ public class InstructionTracker extends ListenerAdapter {
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction execInsn) {
         if (RunDetector.isRunning()) {
             String source = execInsn.getSourceLine() == null ? "" : "'" + execInsn.getSourceLine().trim() + "'";
-            System.out.print("Current instruction [first step = " + curTh.isFirstStepInsn() +  "]: " + execInsn.getClass().getSimpleName());
+            System.out.print("Current instruction [first step = " + curTh.isFirstStepInsn() +  "]: " + execInsn.getPosition() + ": " + execInsn.getClass().getSimpleName());
             if (execInsn instanceof InvokeInstruction) {
                 InvokeInstruction invkInsn = (InvokeInstruction) execInsn;
 

@@ -42,14 +42,14 @@ public abstract class Abstraction {
      * Informs the abstraction about a symbolic assignment
      * @param to An access expression referring to a primitive value
      */
-    public void processPrimitiveStore(Expression from, AccessExpression to) {
+    public void processPrimitiveStore(int lastPC, int nextPC, Expression from, AccessExpression to) {
     }
 
     /**
      * Informs the abstraction about a symbolic assignment
      * @param to An access expression referring to an object on heap
      */
-    public void processObjectStore(Expression from, AccessExpression to) {
+    public void processObjectStore(int lastPC, int nextPC, Expression from, AccessExpression to) {
     }
 
     /**
@@ -80,7 +80,7 @@ public abstract class Abstraction {
     /**
      * Most abstractions do not provide this behaviour, but branching instructions need this method to be present.
      */
-    public BranchingConditionInfo processBranchingCondition(BranchingCondition condition) {
+    public BranchingConditionInfo processBranchingCondition(int lastPC, BranchingCondition condition) {
         return BranchingConditionInfo.NONE;
     }
 

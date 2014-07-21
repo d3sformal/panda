@@ -314,7 +314,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             }
 
             // Valuate predicates in the caller scope, and adopt the valuation for the callee predicates
-            Map<Predicate, TruthValue> valuation = callerScope.evaluatePredicates(callerScopePredicates);
+            Map<Predicate, TruthValue> valuation = callerScope.evaluatePredicates(before.getPC().getPosition(), callerScopePredicates);
 
             for (Predicate callerScopePredicate : callerScopePredicates) {
                 for (Predicate calleeScopePredicate : reverseMap.get(callerScopePredicate)) {
@@ -369,7 +369,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             // Statement: return 2
             //
             // return < 3 is determined by 2 < 3
-            Map<Predicate, TruthValue> valuation = evaluatePredicates(determinants);
+            Map<Predicate, TruthValue> valuation = evaluatePredicates(before.getPC().getPosition(), determinants);
 
             for (Predicate determinant : valuation.keySet()) {
                 put(predicates.get(determinant), valuation.get(determinant));
@@ -544,6 +544,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 // If the predicate uses only allowed symbols (those that do not lose their meaning by changing scope)
                 if (!isUnwanted) {
                     predicate = predicate.replace(replacements);
+                    predicate.setScope(null); // <-- This is done to allow use of the predicate outside its original scope. It should be changed on a copy (TODO)
 
                     relevant.put(predicate, value);
 
@@ -699,7 +700,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             }
 
             // Use the relevant predicates to valuate predicates that need to be updated
-            Map<Predicate, TruthValue> valuation = relevant.evaluatePredicates(toBeUpdated);
+            Map<Predicate, TruthValue> valuation = relevant.evaluatePredicates(after.getPC().getPosition(), toBeUpdated);
 
             for (Predicate predicate : valuation.keySet()) {
                 TruthValue value = valuation.get(predicate);
@@ -746,14 +747,13 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
         return scopesClone;
     }
 
-    @Override
-    public String toString() {
-        return scopes.get(currentThreadID).count() > 0 ? scopes.get(currentThreadID).top().toString() : "";
+    public String toString(int pc) {
+        return scopes.get(currentThreadID).count() > 0 ? scopes.get(currentThreadID).top().toString(pc) : "";
     }
 
     @Override
-    public void reevaluate(AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
-        scopes.get(currentThreadID).top().reevaluate(affected, resolvedAffected, expression);
+    public void reevaluate(int lastPC, int nextPC, AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
+        scopes.get(currentThreadID).top().reevaluate(lastPC, nextPC, affected, resolvedAffected, expression);
     }
 
     @Override
@@ -762,13 +762,13 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
     }
 
     @Override
-    public TruthValue evaluatePredicate(Predicate predicate) {
-        return scopes.get(currentThreadID).top().evaluatePredicate(predicate);
+    public TruthValue evaluatePredicate(int lastPC, Predicate predicate) {
+        return scopes.get(currentThreadID).top().evaluatePredicate(lastPC, predicate);
     }
 
     @Override
-    public Map<Predicate, TruthValue> evaluatePredicates(Set<Predicate> predicates) {
-        return scopes.get(currentThreadID).top().evaluatePredicates(predicates);
+    public Map<Predicate, TruthValue> evaluatePredicates(int lastPC, Set<Predicate> predicates) {
+        return scopes.get(currentThreadID).top().evaluatePredicates(lastPC, predicates);
     }
 
     @Override
@@ -835,7 +835,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
         if (startScope != null) {
             Set<Predicate> predicates = bottomScope.getPredicates();
-            Map<Predicate, TruthValue> values = evaluatePredicates(predicates);
+            Map<Predicate, TruthValue> values = evaluatePredicates(0, predicates);
 
             for (Predicate predicate : predicates) {
                 bottomScope.put(predicate, values.get(predicate));

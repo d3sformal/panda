@@ -22,14 +22,14 @@ public class PredicateValuationMonitor extends ListenerAdapter {
 
     @Override
     public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
-        if (RunDetector.isRunning()) {
-            inspect(PredicateAbstraction.getInstance());
+        if (RunDetector.isRunning() && nextInsn != null) {
+            inspect(PredicateAbstraction.getInstance(), nextInsn.getPosition());
         }
     }
 
-    private void inspect(Abstraction abs) {
+    private void inspect(Abstraction abs, int pc) {
         PredicateAbstraction predicate = (PredicateAbstraction) abs;
-        String table = predicate.getPredicateValuation().toString();
+        String table = predicate.getPredicateValuation().toString(pc);
         System.out.println(
             "--PREDICATES " + predicate.getPredicateValuation().count() + " --\n" +
             table +
