@@ -2,16 +2,17 @@
 class(gov.nasa.jpf.abstraction.SchedulerConfig).SIZE = 5
 
 [method gov.nasa.jpf.abstraction.SchedulerTest.main]
-alength(arrlen, schedule) = 5
-schedule[0..3] = 0..3
+107..342: schedule_size < 3
+107..342: schedule_size = 0..2
+114..342: alength(arrlen, schedule) = 5
+114..342: schedule[0..3] = 0..3
+129..342: k = 0..3
+266..366: i = 0..3
+298..318: j = 0..3
+298..318: j >= i
+
 id2thread[schedule[0]].priority < id2thread[schedule[1]].priority
 id2thread[schedule[1]].priority < id2thread[schedule[2]].priority
-schedule_size < 3
-schedule_size = 0..2
 schTh.priority = 10
-j >= i
-i = 0..3
-j = 0..3
-k = 0..3
 alength(arrlen, id2thread) = 0..3
 actTh = id2thread[0..2]
