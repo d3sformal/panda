@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import gov.nasa.jpf.Config;
@@ -347,6 +348,24 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                     if (shouldBeAdded) {
                         sharedSymbolCache.get(p).add(predicate);
                     }
+                }
+            }
+        }
+
+        if (valuations.containsKey(predicate)) {
+            SortedSet<Integer> scopeNew = predicate.getScope();
+
+            for (Predicate p : valuations.keySet()) {
+                if (p.equals(predicate)) {
+                    SortedSet<Integer> scopeOld = p.getScope();
+
+                    if (scopeOld == null) {
+                        p.setScope(scopeNew);
+                    } else if (scopeNew != null) {
+                        scopeOld.addAll(scopeNew);
+                    }
+
+                    break;
                 }
             }
         }
