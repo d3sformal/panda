@@ -1,0 +1,16 @@
+[method oldclassic.OldClassic.main]
+new_event1
+new_event2
+
+[object oldclassic.Event]
+this.count
+
+[object oldclassic.FirstTask]
+this.count
+this.event1.count
+this.event2.count
+
+[object oldclassic.SecondTask]
+this.count
+this.event1.count
+this.event2.count
