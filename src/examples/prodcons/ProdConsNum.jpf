@@ -1,0 +1,13 @@
+@using=jpf-abstraction
+
+target=prodcons.predicate.ProdConsEx
+
+classpath=${jpf-abstraction}/build/examples
+sourcepath=${jpf-abstraction}/src/examples
+
+panda.abstract_domain=SIGNS ${jpf-abstraction}/src/examples/prodcons/predicate/ProdConsEx.signs
+
+listener = gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.DebugMonitor
+
+vm.serializer.class = gov.nasa.jpf.abstraction.PredicateAbstractionSerializer
+
