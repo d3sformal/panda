@@ -40,9 +40,9 @@ r2.top = 0..6
 r2.bottom = 0..6
 
 [method gov.nasa.jpf.abstraction.Image.render]
-k = 0..2
-i = 0..6
-j = 0..6
+4..116: k = 0..2
+42..110: i = 0..6
+56..104: j = 0..6
 
 rec.left = 0..6
 rec.right = 0..6
