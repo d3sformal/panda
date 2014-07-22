@@ -21,8 +21,8 @@ public class FloatUnaryOperatorExecutor extends UnaryOperatorExecutor<Float> {
     }
 
     @Override
-    protected Expression getExpression(StackFrame sf) {
-        return getExpression(sf, 1);
+    protected Expression getOperandExpression(StackFrame sf) {
+        return getOperandExpression(sf, 1);
     }
 
 

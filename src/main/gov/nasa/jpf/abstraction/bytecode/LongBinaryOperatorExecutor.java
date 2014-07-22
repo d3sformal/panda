@@ -21,22 +21,22 @@ public class LongBinaryOperatorExecutor extends BinaryOperatorExecutor<Long, Lon
     }
 
     @Override
-    protected Expression getLeftHandSideExpression(StackFrame sf) {
-        return getExpression(sf, 3);
+    protected Expression getFirstOperandExpression(StackFrame sf) {
+        return getOperandExpression(sf, 3);
     }
 
     @Override
-    protected Expression getRightHandSideExpression(StackFrame sf) {
-        return getExpression(sf, 1);
+    protected Expression getSecondOperandExpression(StackFrame sf) {
+        return getOperandExpression(sf, 1);
     }
 
     @Override
-    protected Long getLeftHandSideOperand(StackFrame sf) {
+    protected Long getFirstOperand(StackFrame sf) {
         return sf.peekLong(2);
     }
 
     @Override
-    protected Long getRightHandSideOperand(StackFrame sf) {
+    protected Long getSecondOperand(StackFrame sf) {
         return sf.peekLong(0);
     }
 

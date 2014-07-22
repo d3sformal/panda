@@ -559,7 +559,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return false;
     }
 
-    private static AccessExpression getLeftHandSide(Predicate p) {
+    private static AccessExpression getFirstExpression(Predicate p) {
         while (p instanceof Negation) {
             p = ((Negation) p).predicate;
         }
@@ -567,7 +567,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         return (AccessExpression) ((Equals) p).a;
     }
 
-    private static AccessExpression getRightHandSide(Predicate p) {
+    private static AccessExpression getSecondExpression(Predicate p) {
         while (p instanceof Negation) {
             p = ((Negation) p).predicate;
         }
@@ -604,8 +604,8 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             if (isAliasingPredicate(p, sym) && get(p) == TruthValue.UNKNOWN) {
                 TruthValue aliased = p instanceof Equals ? TruthValue.TRUE : TruthValue.FALSE;
 
-                AccessExpression a = getLeftHandSide(p);
-                AccessExpression b = getRightHandSide(p);
+                AccessExpression a = getFirstExpression(p);
+                AccessExpression b = getSecondExpression(p);
 
                 Set<UniverseIdentifier> valuesA = new HashSet<UniverseIdentifier>();
                 Set<UniverseIdentifier> valuesB = new HashSet<UniverseIdentifier>();

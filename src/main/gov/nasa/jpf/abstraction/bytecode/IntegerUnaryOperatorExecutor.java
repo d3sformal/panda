@@ -21,8 +21,8 @@ public class IntegerUnaryOperatorExecutor extends UnaryOperatorExecutor<Integer>
     }
 
     @Override
-    protected Expression getExpression(StackFrame sf) {
-        return getExpression(sf, 0);
+    protected Expression getOperandExpression(StackFrame sf) {
+        return getOperandExpression(sf, 0);
     }
 
 

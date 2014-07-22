@@ -21,22 +21,22 @@ public class IntegerBinaryOperatorExecutor extends BinaryOperatorExecutor<Intege
     }
 
     @Override
-    protected Expression getLeftHandSideExpression(StackFrame sf) {
-        return getExpression(sf, 1);
+    protected Expression getFirstOperandExpression(StackFrame sf) {
+        return getOperandExpression(sf, 1);
     }
 
     @Override
-    protected Expression getRightHandSideExpression(StackFrame sf) {
-        return getExpression(sf, 0);
+    protected Expression getSecondOperandExpression(StackFrame sf) {
+        return getOperandExpression(sf, 0);
     }
 
     @Override
-    protected Integer getLeftHandSideOperand(StackFrame sf) {
+    protected Integer getFirstOperand(StackFrame sf) {
         return sf.peek(1);
     }
 
     @Override
-    protected Integer getRightHandSideOperand(StackFrame sf) {
+    protected Integer getSecondOperand(StackFrame sf) {
         return sf.peek(0);
     }
 

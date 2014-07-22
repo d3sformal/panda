@@ -17,7 +17,7 @@ public abstract class UnaryOperatorExecutor<T> {
     final public Instruction execute(AbstractUnaryOperator<T> op, ThreadInfo ti) {
         StackFrame sf = ti.getModifiableTopFrame();
 
-        Expression expr = getExpression(sf);
+        Expression expr = getOperandExpression(sf);
         Expression result = op.getResult(expr);
 
         Instruction ret = op.executeConcrete(ti);
@@ -27,11 +27,11 @@ public abstract class UnaryOperatorExecutor<T> {
         return ret;
     }
 
-    protected Expression getExpression(StackFrame sf, int index) {
+    protected Expression getOperandExpression(StackFrame sf, int index) {
         return ExpressionUtil.getExpression(sf.getOperandAttr(index));
     }
 
-    abstract protected Expression getExpression(StackFrame sf);
+    abstract protected Expression getOperandExpression(StackFrame sf);
     abstract protected T getOperand(StackFrame sf);
     abstract protected void storeExpression(Expression result, StackFrame sf);
     abstract protected void storeResult(Expression result, StackFrame sf);

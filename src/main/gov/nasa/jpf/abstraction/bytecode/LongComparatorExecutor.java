@@ -22,22 +22,22 @@ public class LongComparatorExecutor extends BinaryComparatorExecutor<Long> {
     }
 
     @Override
-    protected Expression getLeftHandSideExpression(StackFrame sf) {
-        return getExpression(sf, 1);
+    protected Expression getFirstOperandExpression(StackFrame sf) {
+        return getOperandExpression(sf, 1);
     }
 
     @Override
-    protected Expression getRightHandSideExpression(StackFrame sf) {
-        return getExpression(sf, 3);
+    protected Expression getSecondOperandExpression(StackFrame sf) {
+        return getOperandExpression(sf, 3);
     }
 
     @Override
-    final protected Long getLeftHandSideOperand(StackFrame sf) {
+    final protected Long getFirstOperand(StackFrame sf) {
         return sf.peekLong(0);
     }
 
     @Override
-    final protected Long getRightHandSideOperand(StackFrame sf) {
+    final protected Long getSecondOperand(StackFrame sf) {
         return sf.peekLong(2);
     }
 
