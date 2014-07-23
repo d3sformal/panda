@@ -20,7 +20,10 @@ import gov.nasa.jpf.abstraction.common.access.Method;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
+import gov.nasa.jpf.abstraction.common.impl.ArraysAssign;
+import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
+import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 
 /**
@@ -36,6 +39,7 @@ import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 public abstract class PredicatesStringifier implements PredicatesComponentVisitor {
 
     protected StringBuilder ret = new StringBuilder();
+    protected boolean topmost = true;
 
     public String getString() {
         return ret.toString();
@@ -229,35 +233,72 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
         ret.append("false");
     }
 
+    private void inlineConjunction(Predicate predicate) {
+        if (predicate.getClass().equals(Conjunction.class)) {
+            Conjunction c = (Conjunction) predicate;
+
+            inlineConjunction(c.a);
+
+            ret.append(" and ");
+
+            inlineConjunction(c.b);
+        } else {
+            predicate.accept(this);
+        }
+    }
+
     @Override
     public void visit(Conjunction predicate) {
-        ret.append("(");
+        boolean topmost = this.topmost;
+        this.topmost = false;
 
-        predicate.a.accept(this);
+        if (!topmost) ret.append("(");
+
+        inlineConjunction(predicate.a);
 
         ret.append(" and ");
 
-        predicate.b.accept(this);
+        inlineConjunction(predicate.b);
 
-        ret.append(")");
+        if (!topmost) ret.append(")");
+    }
+
+    private void inlineDisjunction(Predicate predicate) {
+        if (predicate.getClass().equals(Disjunction.class)) {
+            Disjunction d = (Disjunction) predicate;
+
+            inlineDisjunction(d.a);
+
+            ret.append(" or ");
+
+            inlineDisjunction(d.b);
+        } else {
+            predicate.accept(this);
+        }
     }
 
     @Override
     public void visit(Disjunction predicate) {
-        ret.append("(");
+        boolean topmost = this.topmost;
+        this.topmost = false;
 
-        predicate.a.accept(this);
+        if (!topmost) ret.append("(");
+
+        inlineDisjunction(predicate.a);
 
         ret.append(" or ");
 
-        predicate.b.accept(this);
+        inlineDisjunction(predicate.b);
 
-        ret.append(")");
+        if (!topmost) ret.append(")");
     }
 
     @Override
     public void visit(Implication predicate) {
-        ret.append("(");
+        boolean topmost = this.topmost;
+        this.topmost = false;
+
+        if (!topmost) ret.append("(");
 
         predicate.a.accept(this);
 
@@ -265,7 +306,34 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 
         predicate.b.accept(this);
 
-        ret.append(")");
+        if (!topmost) ret.append(")");
+    }
+
+    @Override
+    public void visit(VariableAssign predicate) {
+        predicate.variable.accept(this);
+
+        ret.append(" = ");
+
+        predicate.expression.accept(this);
+    }
+
+    @Override
+    public void visit(FieldAssign predicate) {
+        predicate.field.accept(this);
+
+        ret.append(" = ");
+
+        predicate.newField.accept(this);
+    }
+
+    @Override
+    public void visit(ArraysAssign predicate) {
+        predicate.arrays.accept(this);
+
+        ret.append(" = ");
+
+        predicate.newArrays.accept(this);
     }
 
     @Override

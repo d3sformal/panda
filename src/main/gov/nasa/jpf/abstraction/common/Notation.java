@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.common;
 
 import gov.nasa.jpf.abstraction.common.impl.PredicatesDotStringifier;
 import gov.nasa.jpf.abstraction.common.impl.PredicatesFunctionStringifier;
+import gov.nasa.jpf.abstraction.smt.PredicatesSMTStringifier;
 
 /**
  * Notation types for printing predicates.
@@ -18,7 +19,8 @@ import gov.nasa.jpf.abstraction.common.impl.PredicatesFunctionStringifier;
  */
 public enum Notation {
     DOT_NOTATION,
-    FUNCTION_NOTATION;
+    FUNCTION_NOTATION,
+    SMT_NOTATION;
 
     public static Notation policy = Notation.FUNCTION_NOTATION;
 
@@ -28,6 +30,8 @@ public enum Notation {
             return new PredicatesDotStringifier();
         case FUNCTION_NOTATION:
             return new PredicatesFunctionStringifier();
+        case SMT_NOTATION:
+            return new PredicatesSMTStringifier();
         }
 
         return null;

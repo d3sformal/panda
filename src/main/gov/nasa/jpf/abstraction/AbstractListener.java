@@ -184,4 +184,9 @@ public class AbstractListener extends PropertyListenerAdapter {
             h.searchFinished();
         }
     }
+
+    @Override
+    public void propertyViolated(Search search) {
+        PredicateAbstraction.getInstance().error();
+    }
 }

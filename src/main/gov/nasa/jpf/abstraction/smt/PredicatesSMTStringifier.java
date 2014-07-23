@@ -27,6 +27,9 @@ import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
+import gov.nasa.jpf.abstraction.common.impl.ArraysAssign;
+import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
+import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 
@@ -133,6 +136,45 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
         ret.append(" ");
 
         predicate.b.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(VariableAssign predicate) {
+        ret.append("(= ");
+
+        predicate.variable.accept(this);
+
+        ret.append(" ");
+
+        predicate.expression.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(FieldAssign predicate) {
+        ret.append("(= ");
+
+        predicate.field.accept(this);
+
+        ret.append(" ");
+
+        predicate.newField.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(ArraysAssign predicate) {
+        ret.append("(= ");
+
+        predicate.arrays.accept(this);
+
+        ret.append(" ");
+
+        predicate.newArrays.accept(this);
 
         ret.append(")");
     }
@@ -370,7 +412,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 
     @Override
     public void visit(DefaultArrays meta) {
-        ret.append("arr");
+        ret.append(meta.getName());
     }
 
     @Override

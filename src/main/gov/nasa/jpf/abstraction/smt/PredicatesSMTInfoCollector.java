@@ -54,7 +54,10 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
+import gov.nasa.jpf.abstraction.common.impl.ArraysAssign;
+import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
+import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
@@ -72,6 +75,7 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
     private Set<String> classes = new HashSet<String>();
     private Set<String> vars = new HashSet<String>();
     private Set<String> fields = new HashSet<String>();
+    private Set<String> arrays = new HashSet<String>();
     private Set<Integer> fresh = new HashSet<Integer>();
     private boolean hasFresh = false;
 
@@ -182,6 +186,24 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
     }
 
     @Override
+    public void visit(VariableAssign predicate) {
+        predicate.variable.accept(this);
+        predicate.expression.accept(this);
+    }
+
+    @Override
+    public void visit(FieldAssign predicate) {
+        predicate.field.accept(this);
+        predicate.newField.accept(this);
+    }
+
+    @Override
+    public void visit(ArraysAssign predicate) {
+        predicate.arrays.accept(this);
+        predicate.newArrays.accept(this);
+    }
+
+    @Override
     public void visit(Add expression) {
         expression.a.accept(this);
         expression.b.accept(this);
@@ -269,6 +291,10 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 
     public Set<String> getFields() {
         return fields;
+    }
+
+    public Set<String> getArrays() {
+        return arrays;
     }
 
     public Set<String> getClasses() {
@@ -363,6 +389,7 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 
     @Override
     public void visit(DefaultArrays meta) {
+        arrays.add(meta.getName());
     }
 
     @Override

@@ -1,8 +1,10 @@
 package gov.nasa.jpf.abstraction;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,14 +20,33 @@ import gov.nasa.jpf.abstraction.common.BranchingCondition;
 import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.BranchingDecision;
+import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Predicates;
+import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementWrite;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
+import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
+import gov.nasa.jpf.abstraction.common.access.meta.Field;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
+import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
+import gov.nasa.jpf.abstraction.common.impl.ArraysAssign;
+import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
 import gov.nasa.jpf.abstraction.common.impl.ObjectExpressionDecorator;
 import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionDecorator;
+import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
+import gov.nasa.jpf.abstraction.smt.SMT;
 import gov.nasa.jpf.abstraction.state.PredicateValuationStack;
 import gov.nasa.jpf.abstraction.state.State;
 import gov.nasa.jpf.abstraction.state.SymbolTableStack;
@@ -56,6 +77,9 @@ public class PredicateAbstraction extends Abstraction {
     private boolean isInitialized = false;
     private Set<ClassInfo> startupClasses = new HashSet<ClassInfo>();
 
+    public SMT smt = new SMT();
+    private Predicate traceFormula = Tautology.create();
+
     private static PredicateAbstraction instance = null;
 
     public static void setInstance(PredicateAbstraction instance) {
@@ -72,11 +96,86 @@ public class PredicateAbstraction extends Abstraction {
         trace = new Trace();
     }
 
+    private StaticSingleAssignmentFormulaFormatter ssa = new StaticSingleAssignmentFormulaFormatter();
+
+    private void extendTraceFormulaWithAssignment(AccessExpression to, Expression from) {
+        // a := ...
+        // a' = ...
+        //
+        // a.f := ...
+        // f' = fwrite(f, a, ...)
+        //
+        // a[i] := ...
+        // arr' = awrite(arr, a, i, ...)
+        if (RunDetector.isRunning()) {
+            Set<AccessExpression> exprs = new HashSet<AccessExpression>();
+            Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+
+            from.addAccessExpressionsToSet(exprs);
+
+            for (AccessExpression e : exprs) {
+                replacements.put(e, ssa.incarnateSymbol(e));
+            }
+
+            from = from.replace(replacements);
+
+            if (to instanceof Root) {
+                ssa.reincarnateSymbol(to);
+
+                extendTraceFormulaWith(VariableAssign.create((Root) ssa.incarnateSymbol(to), from));
+            } else if (to instanceof ObjectFieldRead) {
+                ObjectFieldRead fr = (ObjectFieldRead) to;
+                Field f = fr.getField();
+
+                Field rightHandSide = DefaultObjectFieldWrite.create(
+                    ssa.incarnateSymbol(fr.getObject()),
+                    ssa.incarnateSymbol(f),
+                    from
+                );
+
+                ssa.reincarnateSymbol(to);
+
+                extendTraceFormulaWith(FieldAssign.create(ssa.incarnateSymbol(f), rightHandSide));
+            } else if (to instanceof ArrayElementRead) {
+                ArrayElementRead ar = (ArrayElementRead) to;
+                Arrays a = ar.getArrays();
+
+                exprs.clear();
+                replacements.clear();
+
+                ar.getIndex().addAccessExpressionsToSet(exprs);
+
+                for (AccessExpression e : exprs) {
+                    replacements.put(e, ssa.incarnateSymbol(e));
+                }
+
+                Expression index = ar.getIndex().replace(replacements);
+
+                Arrays rightHandSide = DefaultArrayElementWrite.create(
+                    ssa.incarnateSymbol(ar.getArray()),
+                    ssa.incarnateSymbol(a),
+                    index,
+                    from
+                );
+
+                ssa.reincarnateSymbol(to);
+
+                extendTraceFormulaWith(ArraysAssign.create(ssa.incarnateSymbol(a), rightHandSide));
+            }
+        }
+    }
+
+    private void extendTraceFormulaWith(Predicate p) {
+        traceFormula = Conjunction.create(traceFormula, p);
+    }
+
     @Override
     public void processPrimitiveStore(int lastPC, int nextPC, Expression from, AccessExpression to) {
         Set<AccessExpression> affected = symbolTable.processPrimitiveStore(from, to);
 
         predicateValuation.reevaluate(lastPC, nextPC, to, affected, PrimitiveExpressionDecorator.wrap(from, symbolTable));
+
+        extendTraceFormulaWithAssignment(to, from);
     }
 
     @Override
@@ -84,6 +183,8 @@ public class PredicateAbstraction extends Abstraction {
         Set<AccessExpression> affected = symbolTable.processObjectStore(from, to);
 
         predicateValuation.reevaluate(lastPC, nextPC, to, affected, ObjectExpressionDecorator.wrap(from, symbolTable));
+
+        extendTraceFormulaWithAssignment(to, from);
     }
 
     @Override
@@ -150,8 +251,27 @@ public class PredicateAbstraction extends Abstraction {
         if (!RunDetector.isRunning()) return;
 
         BranchingConditionValuation bcv = (BranchingConditionValuation) decision;
+        Predicate condition = bcv.getCondition();
+        TruthValue value = bcv.getValuation();
 
-        predicateValuation.force(bcv.getCondition(), bcv.getValuation());
+        predicateValuation.force(condition, value);
+
+        if (value == TruthValue.FALSE) {
+            condition = Negation.create(condition);
+        }
+
+        Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+        Set<AccessExpression> exprs = new HashSet<AccessExpression>();
+
+        condition.addAccessExpressionsToSet(exprs);
+
+        for (AccessExpression e : exprs) {
+            replacements.put(e, ssa.incarnateSymbol(e));
+        }
+
+        condition = condition.replace(replacements);
+
+        extendTraceFormulaWith(condition);
     }
 
     @Override
@@ -180,7 +300,13 @@ public class PredicateAbstraction extends Abstraction {
         Map<Integer, PredicateValuationStack> predicates = new HashMap<Integer, PredicateValuationStack>();
 
         // Initial state for last backtrack
-        State state = new State(mainThread.getId(), symbols, predicates);
+        State state = new State(
+            mainThread.getId(),
+            symbols,
+            predicates,
+            traceFormula,
+            ssa
+        );
 
         trace.push(state);
 
@@ -197,9 +323,19 @@ public class PredicateAbstraction extends Abstraction {
         }
     }
 
+    public Predicate getTraceFormula() {
+        return traceFormula;
+    }
+
     @Override
     public void forward(MethodInfo method) {
-        State state = new State(VM.getVM().getCurrentThread().getId(), symbolTable.memorize(), predicateValuation.memorize());
+        State state = new State(
+            VM.getVM().getCurrentThread().getId(),
+            symbolTable.memorize(),
+            predicateValuation.memorize(),
+            traceFormula,
+            ssa.clone()
+        );
 
         trace.push(state);
     }
@@ -213,8 +349,11 @@ public class PredicateAbstraction extends Abstraction {
         predicateValuation.restore(trace.top().predicateValuationStacks);
         predicateValuation.scheduleThread(trace.top().currentThread);
 
+        traceFormula = trace.top().traceFormula;
+        ssa = trace.top().ssa.clone();
+
         if (trace.isEmpty()) {
-            predicateValuation.close();
+            smt.close();
         }
     }
 
@@ -225,6 +364,71 @@ public class PredicateAbstraction extends Abstraction {
     public void collectGarbage(VM vm, ThreadInfo threadInfo) {
         if (isInitialized) {
             symbolTable.collectGarbage(vm, threadInfo);
+        }
+    }
+
+    private static int traceStep;
+    private static int traceStepCount;
+
+    public void error() {
+        List<Predicate> query = new ArrayList<Predicate>();
+        query.add(traceFormula);
+        boolean sat = smt.isSatisfiable(query)[0];
+
+        System.out.println();
+        System.out.println();
+        System.out.println("Counterexample Trace Formula:");
+        //System.out.println(traceFormula.toString(Notation.SMT_NOTATION));
+        //System.out.println(traceFormula.toString(Notation.FUNCTION_NOTATION));
+
+        traceStep = 0;
+        traceStepCount = countErrorConjuncts(traceFormula);
+        printErrorConjuncts(traceFormula);
+
+        System.out.println();
+        System.out.println("Feasible: " + sat);
+        System.out.println();
+        System.out.println();
+    }
+
+    private static int countErrorConjuncts(Predicate formula) {
+        if (formula instanceof Conjunction) {
+            Conjunction c = (Conjunction) formula;
+
+            return countErrorConjuncts(c.a) + countErrorConjuncts(c.b);
+        } else {
+            return 1;
+        }
+    }
+
+    private static int log(int n) {
+        int i = 0;
+
+        while (n > 0) {
+            n /= 10;
+
+            ++i;
+        }
+
+        return i;
+    }
+
+    private static void printErrorConjuncts(Predicate formula) {
+        if (formula instanceof Conjunction) {
+            Conjunction c = (Conjunction) formula;
+
+            printErrorConjuncts(c.a);
+            printErrorConjuncts(c.b);
+        } else {
+            System.out.print("\t");
+
+            ++traceStep;
+
+            for (int i = 0; i < log(traceStepCount) - log(traceStep); ++i) {
+                System.out.print(" ");
+            }
+
+            System.out.println(traceStep + ": " + formula.toString(Notation.FUNCTION_NOTATION));
         }
     }
 }

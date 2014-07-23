@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction.common.access.meta.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
@@ -10,14 +12,28 @@ import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
  * The unmodified symbol "arr"
  */
 public class DefaultArrays implements Arrays {
-    private static DefaultArrays instance;
+    private static Map<String, DefaultArrays> instances = new HashMap<String, DefaultArrays>();
 
-    public static DefaultArrays create() {
-        if (instance == null) {
-            instance = new DefaultArrays();
+    private String name;
+
+    protected DefaultArrays(String name) {
+        this.name = name;
+    }
+
+    public static DefaultArrays create(String name) {
+        if (!instances.containsKey(name)) {
+            instances.put(name, new DefaultArrays(name));
         }
 
-        return instance;
+        return instances.get(name);
+    }
+
+    public static DefaultArrays create() {
+        return create("arr");
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -28,7 +44,7 @@ public class DefaultArrays implements Arrays {
     @Override
     public boolean equals(Object o) {
         if (o instanceof DefaultArrays) {
-            return true;
+            return name.equals(((DefaultArrays) o).name);
         }
 
         return false;

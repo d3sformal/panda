@@ -60,7 +60,6 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
     private PredicateAbstraction abstraction;
     private Predicates predicateSet;
     private PredicateValuationMap initialValuation = new PredicateValuationMap();
-    private SMT smt = new SMT();
     private Integer currentThreadID;
 
     public SystemPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
@@ -83,7 +82,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
          */
         if (!predicates.isEmpty()) {
             try {
-                initialValuation.putAll(smt.valuatePredicates(predicates));
+                initialValuation.putAll(abstraction.smt.valuatePredicates(predicates));
 
                 for (Predicate predicate : predicates) {
                     // IF NOT A TAUTOLOGY OR CONTRADICTION
@@ -107,16 +106,12 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
         }
     }
 
-    public void close() {
-        smt.close();
-    }
-
     /**
      * Collect predicates targeted at the given method and store them in the upcoming scope
      */
     @Override
     public MethodFramePredicateValuation createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-        MethodFramePredicateValuation valuation = new MethodFramePredicateValuation(smt);
+        MethodFramePredicateValuation valuation = new MethodFramePredicateValuation(abstraction.smt);
 
         if (method == null) return valuation;
 
@@ -486,7 +481,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             notWantedLocalVariables.removeAll(referenceArgs);
 
             // Collection of predicates in callee and caller that have additional value for update of the caller
-            MethodFramePredicateValuation relevant = new MethodFramePredicateValuation(smt);
+            MethodFramePredicateValuation relevant = new MethodFramePredicateValuation(abstraction.smt);
 
             Set<AccessExpression> temporaryPathsHolder = new HashSet<AccessExpression>();
 

@@ -70,7 +70,7 @@ public class PredicatesFunctionStringifier extends PredicatesStringifier {
     public void visit(ArrayElementRead expression) {
         ret.append("aread(");
 
-        ret.append("arr");
+        expression.getArrays().accept(this);
 
         ret.append(", ");
 
@@ -87,7 +87,7 @@ public class PredicatesFunctionStringifier extends PredicatesStringifier {
     public void visit(ArrayElementWrite expression) {
         ret.append("awrite(");
 
-        ret.append("arr");
+        expression.getArrays().accept(this);
 
         ret.append(", ");
 
@@ -146,7 +146,7 @@ public class PredicatesFunctionStringifier extends PredicatesStringifier {
 
     @Override
     public void visit(DefaultArrays meta) {
-        ret.append("arr");
+        ret.append(meta.getName());
     }
 
     @Override

@@ -261,7 +261,6 @@ public class SMT {
                 "(set-logic QF_AUFLIA)" + separator +
 
                 // Memory model symbols
-                "(declare-fun arr () (Array Int (Array Int Int)))" + separator +
                 "(declare-fun arrlen () (Array Int Int))" + separator +
                 "(declare-fun fresh () Int)" + separator + // new object
 
@@ -471,6 +470,13 @@ public class SMT {
         input.append(separator);
     }
 
+    private void appendArraysDeclarations(Set<String> arraysSets, StringBuilder input, String separator) {
+        for (String arrays : arraysSets) {
+            input.append("(declare-fun "); input.append(arrays); input.append(" () (Array Int (Array Int Int)))"); input.append(separator);
+        }
+        input.append(separator);
+    }
+
     private void appendFreshConstraints(Set<AccessExpression> objects, StringBuilder input, String separator) {
         Set<String> freshConstraints = new HashSet<String>();
 
@@ -486,7 +492,7 @@ public class SMT {
         input.append(separator);
     }
 
-    private String prepareGetModelInput(Set<String> classes, Set<String> vars, Set<String> fields, Predicate predicate, String formula, InputType inputType) {
+    private String prepareGetModelInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<String> arrays, Predicate predicate, String formula, InputType inputType) {
         String separator = inputType.getSeparator();
 
         StringBuilder input = new StringBuilder();
@@ -495,6 +501,7 @@ public class SMT {
         appendClassDeclarations(classes, input, separator);
         appendVariableDeclarations(vars, input, separator);
         appendFieldDeclarations(fields, input, separator);
+        appendArraysDeclarations(arrays, input, separator);
 
         Boolean cachedValue = cache.get(formula).getSatisfiability();
         Integer cachedModel = cache.get(formula).getModel();
@@ -506,7 +513,7 @@ public class SMT {
         return input.toString();
     }
 
-    private String prepareValuatePredicatesInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<AccessExpression> objects, boolean hasFresh, Predicate[] predicates, String[] formulas, InputType inputType) {
+    private String prepareValuatePredicatesInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<String> arrays, Set<AccessExpression> objects, boolean hasFresh, Predicate[] predicates, String[] formulas, InputType inputType) {
         String separator = inputType.getSeparator();
 
         StringBuilder input = new StringBuilder();
@@ -515,6 +522,7 @@ public class SMT {
         appendClassDeclarations(classes, input, separator);
         appendVariableDeclarations(vars, input, separator);
         appendFieldDeclarations(fields, input, separator);
+        appendArraysDeclarations(arrays, input, separator);
 
         if (hasFresh) {
             appendFreshConstraints(objects, input, separator);
@@ -538,7 +546,7 @@ public class SMT {
         return input.toString();
     }
 
-    private String prepareIsSatisfiableInput(Set<String> classes, Set<String> vars, Set<String> fields, List<Predicate> predicates, String[] formulas, InputType inputType) {
+    private String prepareIsSatisfiableInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<String> arrays, List<Predicate> predicates, String[] formulas, InputType inputType) {
         String separator = inputType.getSeparator();
 
         StringBuilder input = new StringBuilder();
@@ -547,6 +555,7 @@ public class SMT {
         appendClassDeclarations(classes, input, separator);
         appendVariableDeclarations(vars, input, separator);
         appendFieldDeclarations(fields, input, separator);
+        appendArraysDeclarations(arrays, input, separator);
 
         Iterator<Predicate> predicatesIterator = predicates.iterator();
 
@@ -589,11 +598,13 @@ public class SMT {
         Set<String> classes = collector.getClasses();
         Set<String> variables = collector.getVars();
         Set<String> fields = collector.getFields();
+        Set<String> arrays = collector.getArrays();
 
         input.append("(push 1)"); input.append(separator);
         appendClassDeclarations(classes, input, separator);
         appendVariableDeclarations(variables, input, separator);
         appendFieldDeclarations(fields, input, separator);
+        appendArraysDeclarations(arrays, input, separator);
 
         input.append("(assert "); input.append(state); input.append(")"); input.append(separator);
 
@@ -657,13 +668,14 @@ public class SMT {
         Set<String> classes = collector.getClasses();
         Set<String> variables = collector.getVars();
         Set<String> fields = collector.getFields();
+        Set<String> arrays = collector.getArrays();
 
         String formula = createFormula(valueConstraint, determinants, collector.getAdditionalPredicates(valueConstraint));
 
-        String input = prepareGetModelInput(classes, variables, fields, valueConstraint, formula, InputType.NORMAL);
+        String input = prepareGetModelInput(classes, variables, fields, arrays, valueConstraint, formula, InputType.NORMAL);
 
         if (!listeners.isEmpty()) {
-            String debugInput = prepareGetModelInput(classes, variables, fields, valueConstraint, formula, InputType.DEBUG);
+            String debugInput = prepareGetModelInput(classes, variables, fields, arrays, valueConstraint, formula, InputType.DEBUG);
 
             notifyGetModelInputGenerated(debugInput);
         }
@@ -693,6 +705,7 @@ public class SMT {
         Set<String> classes = collector.getClasses();
         Set<String> variables = collector.getVars();
         Set<String> fields = collector.getFields();
+        Set<String> arrays = collector.getArrays();
 
         String[] formulas = new String[predicates.size()];
 
@@ -702,10 +715,10 @@ public class SMT {
             ++i;
         }
 
-        String input = prepareIsSatisfiableInput(classes, variables, fields, predicates, formulas, InputType.NORMAL);
+        String input = prepareIsSatisfiableInput(classes, variables, fields, arrays, predicates, formulas, InputType.NORMAL);
 
         if (!listeners.isEmpty()) {
-            String debugInput = prepareIsSatisfiableInput(classes, variables, fields, predicates, formulas, InputType.DEBUG);
+            String debugInput = prepareIsSatisfiableInput(classes, variables, fields, arrays, predicates, formulas, InputType.DEBUG);
 
             notifyIsSatisfiableInputGenerated(debugInput);
         }
@@ -770,13 +783,14 @@ public class SMT {
         Set<String> classes = collector.getClasses();
         Set<String> vars = collector.getVars();
         Set<String> fields = collector.getFields();
+        Set<String> arrays = collector.getArrays();
         Set<AccessExpression> objects = collector.getObjects();
         boolean hasFresh = collector.hasFresh();
 
-        String input = prepareValuatePredicatesInput(classes, vars, fields, objects, hasFresh, predicatesArray, formulasArray, InputType.NORMAL);
+        String input = prepareValuatePredicatesInput(classes, vars, fields, arrays, objects, hasFresh, predicatesArray, formulasArray, InputType.NORMAL);
 
         if (!listeners.isEmpty()) {
-            String debugInput = prepareValuatePredicatesInput(classes, vars, fields, objects, hasFresh, predicatesArray, formulasArray, InputType.DEBUG);
+            String debugInput = prepareValuatePredicatesInput(classes, vars, fields, arrays, objects, hasFresh, predicatesArray, formulasArray, InputType.DEBUG);
 
             notifyValuatePredicatesInputGenerated(debugInput);
         }

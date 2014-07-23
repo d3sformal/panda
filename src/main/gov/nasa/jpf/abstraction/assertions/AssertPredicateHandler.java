@@ -7,6 +7,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.common.Tautology;
@@ -49,6 +50,8 @@ public abstract class AssertPredicateHandler extends AssertHandler {
         TruthValue inferredValuation = PredicateAbstraction.getInstance().processBranchingCondition(curTh.getPC().getPosition(), assertedFact);
 
         if (assertedValuation != inferredValuation) {
+            PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(assertedFact, inferredValuation));
+
             throw new RuntimeException("Asserted incorrect predicate valuation: `" + assertedFact + "` expected to valuate to `" + assertedValuation + "` but actually valuated to `" + inferredValuation + "`");
         }
     }
