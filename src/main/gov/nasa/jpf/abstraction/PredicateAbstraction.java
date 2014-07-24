@@ -371,10 +371,6 @@ public class PredicateAbstraction extends Abstraction {
     private static int traceStepCount;
 
     public void error() {
-        List<Predicate> query = new ArrayList<Predicate>();
-        query.add(traceFormula);
-        boolean sat = smt.isSatisfiable(query)[0];
-
         System.out.println();
         System.out.println();
         System.out.println("Counterexample Trace Formula:");
@@ -385,10 +381,19 @@ public class PredicateAbstraction extends Abstraction {
         traceStepCount = countErrorConjuncts(traceFormula);
         printErrorConjuncts(traceFormula);
 
-        System.out.println();
-        System.out.println("Feasible: " + sat);
-        System.out.println();
-        System.out.println();
+        if (gov.nasa.jpf.vm.VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation")) {
+            Predicate[] interpolants = smt.interpolate(traceFormula);
+
+            System.out.println();
+            System.out.println("Feasible: " + (interpolants == null));
+
+            for (Predicate interpolant : interpolants) {
+                System.out.println("\t" + interpolant);
+            }
+
+            System.out.println();
+            System.out.println();
+        }
     }
 
     private static int countErrorConjuncts(Predicate formula) {

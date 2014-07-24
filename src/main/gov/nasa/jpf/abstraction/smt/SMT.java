@@ -28,6 +28,7 @@ import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
+import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -173,7 +174,13 @@ public class SMT {
         try {
             String[] args = new String[] {
                 System.getProperty("user.dir") + "/bin/mathsat",
-                "-theory.arr.enabled=true"
+                "-theory.arr.enabled=true",
+                "-theory.arr.enable_row_lemmas=true",
+                "-theory.arr.enable_wr_lemmas=true",
+                "-theory.arr.auto_wr_lemma=true",
+                "-theory.arr.max_ext_lemmas=0",
+                "-theory.arr.max_row_lemmas=0",
+                "-theory.arr.max_wr_lemmas=0"
             };
             String[] env  = new String[] {};
 
@@ -258,7 +265,11 @@ public class SMT {
 
             in.write(
                 "(set-option :produce-models true)" + separator +
+                (gov.nasa.jpf.vm.VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation") ? "(set-option :produce-interpolants true)" + separator : "") +
+
                 "(set-logic QF_AUFLIA)" + separator +
+
+                (gov.nasa.jpf.vm.VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation") ? "(assert (! true :interpolation-group interpolant-base))" + separator : "") +
 
                 // Memory model symbols
                 "(declare-fun arrlen () (Array Int Int))" + separator +
@@ -308,6 +319,109 @@ public class SMT {
             out.close();
         } catch (IOException e) {
             System.err.println("SMT would not terminate");
+
+            throw new SMTException(e);
+        }
+    }
+
+    private static int interpolationGroup;
+
+    private void appendInterpolationGroups(Predicate conjunction, StringBuilder input, String separator) {
+        if (conjunction instanceof Conjunction) {
+            appendInterpolationGroups(((Conjunction) conjunction).a, input, separator);
+            appendInterpolationGroups(((Conjunction) conjunction).b, input, separator);
+        } else {
+            ++interpolationGroup;
+
+            input.append("(assert (! "); input.append(convertToString(conjunction)); input.append(" :interpolation-group g"); input.append(interpolationGroup); input.append("))"); input.append(separator);
+        }
+    }
+
+    public Predicate[] interpolate(Predicate conjunction) throws SMTException {
+        if (conjunction instanceof Tautology) return new Predicate[] {Tautology.create()};
+
+        PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
+
+        collector.collect(conjunction);
+
+        Set<String> classes = collector.getClasses();
+        Set<String> variables = collector.getVars();
+        Set<String> fields = collector.getFields();
+        Set<String> arrays = collector.getArrays();
+
+        String separator = InputType.DEBUG.getSeparator();
+
+        StringBuilder input = new StringBuilder();
+
+        input.append("(push 1)"); input.append(separator);
+
+        appendClassDeclarations(classes, input, separator);
+        appendVariableDeclarations(variables, input, separator);
+        appendFieldDeclarations(fields, input, separator);
+        appendArraysDeclarations(arrays, input, separator);
+
+        interpolationGroup = 0;
+        appendInterpolationGroups(conjunction, input, separator);
+
+        input.append("(check-sat)"); input.append(separator);
+
+        for (int i = 1; i < interpolationGroup; ++i) {
+            input.append("(get-interpolant (");
+
+            for (int j = 0; j < i; ++j) {
+                if (j != 0) {
+                    input.append(" ");
+                }
+                input.append("g"); input.append(j + 1);
+            }
+
+            input.append("))"); input.append(separator);
+        }
+
+        input.append("(pop 1)"); input.append(separator);
+
+        try {
+            in.write(input.toString());
+            in.flush();
+        } catch (IOException e) {
+            System.err.println("SMT refuses input.");
+
+            throw new SMTException(e);
+        }
+
+        try {
+            String output = out.readLine();
+
+            if (output == null || !output.matches("^(un)?sat$")) {
+                throw new SMTException("SMT replied with '" + output + "'");
+            }
+
+            boolean satisfiable = output.matches("^sat$");
+            Predicate[] interpolants = new Predicate[interpolationGroup - 1];
+
+            for (int i = 1; i < interpolationGroup; ++i) {
+                if (satisfiable) {
+                    output = out.readLine();
+                } else {
+                    output = out.readLine();
+
+                    Pattern pattern = Pattern.compile("^\\(let \\(\\(.def_[0-9]* (?<predicate>.*)\\)\\)$");
+                    Matcher matcher = pattern.matcher(output);
+
+                    if (matcher.matches()) {
+                        interpolants[i - 1] = PredicatesFactory.createInterpolantFromString(matcher.group("predicate"));
+                    } else {
+                        throw new SMTException("Having hard time extracting interpolant");
+                    }
+
+                    output = out.readLine();
+                    output = out.readLine();
+                }
+            }
+
+            return interpolants;
+        } catch (IOException e) {
+            System.err.println("SMT refuses to provide output.");
 
             throw new SMTException(e);
         }

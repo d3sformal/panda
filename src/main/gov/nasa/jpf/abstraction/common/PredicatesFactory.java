@@ -4,6 +4,8 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.parser.InterpolantsLexer;
+import gov.nasa.jpf.abstraction.parser.InterpolantsParser;
 import gov.nasa.jpf.abstraction.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.parser.PredicatesParser;
 
@@ -27,5 +29,14 @@ public class PredicatesFactory {
 
     public static Expression createExpressionFromString(String definition) {
         return createFromString(definition).standaloneexpression().val[0];
+    }
+
+    public static Predicate createInterpolantFromString(String definition) {
+        ANTLRInputStream chars = new ANTLRInputStream(definition);
+        InterpolantsLexer lexer = new InterpolantsLexer(chars);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        InterpolantsParser parser = new InterpolantsParser(tokens);
+
+        return parser.predicate().val;
     }
 }
