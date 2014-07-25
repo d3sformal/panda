@@ -11,7 +11,7 @@ public class InterpolationTest extends BaseTest {
         int x = 0;
         int y = 0;
 
-        assertConjunction("x = y + 1: true");
+        assert x == y;
     }
 
     @FailingTest
@@ -20,7 +20,16 @@ public class InterpolationTest extends BaseTest {
 
         d.val = 10;
 
-        assertConjunction("d.val = 0: true");
+        assert d.val == 10;
+    }
+
+    @FailingTest
+    public static void test3() {
+        int[] a = new int[3];
+
+        a[0]= 10;
+
+        assert a[0] == 10;
     }
 
     static class D {

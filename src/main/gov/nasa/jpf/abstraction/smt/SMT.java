@@ -45,6 +45,7 @@ public class SMT {
     private static boolean USE_CACHE = true;
     private static boolean USE_MODELS_CACHE = false;
     private static boolean USE_LOG_FILE = true;
+    private static int logFileID = 0;
     private static List<SMTListener> listeners = new LinkedList<SMTListener>();
     private static SMTCache cache = new SMTCache();
 
@@ -165,34 +166,115 @@ public class SMT {
         }
     }
 
+    OutputStreamWriter inwriter;
+    InputStreamReader outreader;
+
     private BufferedWriter in = null;
     private BufferedReader out = null;
 
     private int indent = 0;
 
+    public enum SupportedSMT {
+        MathSAT,
+        SMTInterpol
+    }
+
+    private void prepareSMTProcess(SupportedSMT smt) throws IOException {
+        String[] args = null;
+        String[] env = new String[] {};
+
+        switch (smt) {
+            case MathSAT:
+                args = new String[] {
+                    System.getProperty("user.dir") + "/bin/mathsat",
+                    "-theory.arr.enabled=true",
+                    "-theory.arr.enable_row_lemmas=true",
+                    "-theory.arr.enable_wr_lemmas=true",
+                    "-theory.arr.auto_wr_lemma=true",
+                    "-theory.arr.max_ext_lemmas=0",
+                    "-theory.arr.max_row_lemmas=0",
+                    "-theory.arr.max_wr_lemmas=0"
+                };
+
+                break;
+            case SMTInterpol:
+                args = new String[] {
+                    "java",
+                    "-jar",
+                    System.getProperty("user.dir") + "/lib/smtinterpol.jar"
+                };
+
+                break;
+        }
+
+        Process process = Runtime.getRuntime().exec(args, env);
+
+        OutputStream instream = process.getOutputStream();
+        inwriter = new OutputStreamWriter(instream);
+
+        InputStream outstream = process.getInputStream();
+        outreader = new InputStreamReader(outstream);
+    }
+
+    private void configureSMTProcess(SupportedSMT smt) throws IOException {
+        String separator = InputType.NORMAL.getSeparator();
+
+        switch (smt) {
+            case MathSAT:
+                in.write(
+                    "(set-option :produce-models true)" + separator +
+
+                    "(set-logic QF_AUFLIA)" + separator
+                );
+
+                break;
+            case SMTInterpol:
+                in.write(
+                    "(set-option :print-success false)" + separator +
+                    "(set-option :verbosity 3)" + separator +
+                    "(set-option :produce-interpolants true)" + separator +
+
+                    "(set-logic QF_AUFLIA)" + separator
+                );
+
+                break;
+        }
+
+        in.write(
+            // Memory model symbols
+            "(declare-fun arrlen () (Array Int Int))" + separator +
+            "(declare-fun fresh () Int)" + separator + // new object
+
+            // Language symbols
+            "(declare-fun null () Int)" + separator +  // java null
+            "(assert (= null 0))" + separator +
+
+            // Special variables
+            "(declare-fun dummy () Int)" + separator + // for emulating variables in native returns
+
+            // Auxiliary logical variables
+            "(declare-fun value () Int)" + separator + // for extracting models
+
+            // Uninterpreted functions
+            "(declare-fun shl (Int Int) Int)" + separator +
+            "(declare-fun shr (Int Int) Int)" + separator +
+
+            separator
+        );
+
+        in.flush();
+    }
+
     public SMT() throws SMTException {
+        this(SupportedSMT.MathSAT);
+    }
+
+    public SMT(SupportedSMT smt) throws SMTException {
         try {
-            String[] args = new String[] {
-                System.getProperty("user.dir") + "/bin/mathsat",
-                "-theory.arr.enabled=true",
-                "-theory.arr.enable_row_lemmas=true",
-                "-theory.arr.enable_wr_lemmas=true",
-                "-theory.arr.auto_wr_lemma=true",
-                "-theory.arr.max_ext_lemmas=0",
-                "-theory.arr.max_row_lemmas=0",
-                "-theory.arr.max_wr_lemmas=0"
-            };
-            String[] env  = new String[] {};
-
-            Process mathsat = Runtime.getRuntime().exec(args, env);
-
-            OutputStream instream = mathsat.getOutputStream();
-            OutputStreamWriter inwriter = new OutputStreamWriter(instream);
-
-            String separator = InputType.NORMAL.getSeparator();
+            prepareSMTProcess(smt);
 
             if (USE_LOG_FILE) {
-                final BufferedWriter log = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("smt.log")));
+                final BufferedWriter log = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("smt.log." + (++logFileID))));
 
                 in = new BufferedWriter(inwriter) {
                     @Override
@@ -263,39 +345,7 @@ public class SMT {
                 in = new BufferedWriter(inwriter);
             }
 
-            in.write(
-                "(set-option :produce-models true)" + separator +
-                (gov.nasa.jpf.vm.VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation") ? "(set-option :produce-interpolants true)" + separator : "") +
-
-                "(set-logic QF_AUFLIA)" + separator +
-
-                (gov.nasa.jpf.vm.VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation") ? "(assert (! true :interpolation-group interpolant-base))" + separator : "") +
-
-                // Memory model symbols
-                "(declare-fun arrlen () (Array Int Int))" + separator +
-                "(declare-fun fresh () Int)" + separator + // new object
-
-                // Language symbols
-                "(declare-fun null () Int)" + separator +  // java null
-                "(assert (= null 0))" + separator +
-
-                // Special variables
-                "(declare-fun dummy () Int)" + separator + // for emulating variables in native returns
-
-                // Auxiliary logical variables
-                "(declare-fun value () Int)" + separator + // for extracting models
-
-                // Uninterpreted functions
-                "(declare-fun shl (Int Int) Int)" + separator +
-                "(declare-fun shr (Int Int) Int)" + separator +
-
-                separator
-            );
-
-            in.flush();
-
-            InputStream outstream = mathsat.getInputStream();
-            InputStreamReader outreader = new InputStreamReader(outstream);
+            configureSMTProcess(smt);
 
             out = new BufferedReader(outreader);
         } catch (IOException e) {
@@ -333,12 +383,14 @@ public class SMT {
         } else {
             ++interpolationGroup;
 
-            input.append("(assert (! "); input.append(convertToString(conjunction)); input.append(" :interpolation-group g"); input.append(interpolationGroup); input.append("))"); input.append(separator);
+            input.append("(assert (! "); input.append(convertToString(conjunction)); input.append(" :named g"); input.append(interpolationGroup); input.append("))"); input.append(separator);
         }
     }
 
     public Predicate[] interpolate(Predicate conjunction) throws SMTException {
         if (conjunction instanceof Tautology) return new Predicate[] {Tautology.create()};
+
+        SMT interpol = new SMT(SupportedSMT.SMTInterpol);
 
         PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
 
@@ -364,25 +416,17 @@ public class SMT {
         appendInterpolationGroups(conjunction, input, separator);
 
         input.append("(check-sat)"); input.append(separator);
-
-        for (int i = 1; i < interpolationGroup; ++i) {
-            input.append("(get-interpolant (");
-
-            for (int j = 0; j < i; ++j) {
-                if (j != 0) {
-                    input.append(" ");
-                }
-                input.append("g"); input.append(j + 1);
-            }
-
-            input.append("))"); input.append(separator);
+        input.append("(get-interpolants");
+        for (int i = 1; i <= interpolationGroup; ++i) {
+            input.append(" g"); input.append(i);
         }
+        input.append(")");
 
         input.append("(pop 1)"); input.append(separator);
 
         try {
-            in.write(input.toString());
-            in.flush();
+            interpol.in.write(input.toString());
+            interpol.in.flush();
         } catch (IOException e) {
             System.err.println("SMT refuses input.");
 
@@ -390,34 +434,22 @@ public class SMT {
         }
 
         try {
-            String output = out.readLine();
+            String output = interpol.out.readLine();
 
             if (output == null || !output.matches("^(un)?sat$")) {
                 throw new SMTException("SMT replied with '" + output + "'");
             }
 
             boolean satisfiable = output.matches("^sat$");
-            Predicate[] interpolants = new Predicate[interpolationGroup - 1];
+            Predicate[] interpolants = null;
 
-            for (int i = 1; i < interpolationGroup; ++i) {
-                if (satisfiable) {
-                    output = out.readLine();
-                } else {
-                    output = out.readLine();
+            output = interpol.out.readLine();
 
-                    Pattern pattern = Pattern.compile("^\\(let \\(\\(.def_[0-9]* (?<predicate>.*)\\)\\)$");
-                    Matcher matcher = pattern.matcher(output);
-
-                    if (matcher.matches()) {
-                        interpolants[i - 1] = PredicatesFactory.createInterpolantFromString(matcher.group("predicate"));
-                    } else {
-                        throw new SMTException("Having hard time extracting interpolant");
-                    }
-
-                    output = out.readLine();
-                    output = out.readLine();
-                }
+            if (!satisfiable) {
+                interpolants = PredicatesFactory.createInterpolantsFromString(output);
             }
+
+            interpol.close();
 
             return interpolants;
         } catch (IOException e) {

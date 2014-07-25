@@ -12,6 +12,27 @@ grammar Interpolants;
     import gov.nasa.jpf.abstraction.common.access.impl.*;
 }
 
+predicates returns [Predicate[] val]
+    : '(' p=predicatelist ')' {
+        $ctx.val = $p.val;
+    }
+    ;
+
+predicatelist returns [Predicate[] val]
+    : /* EMPTY */ {
+        $ctx.val = new Predicate[0];
+    }
+    | ps=predicatelist p=predicate {
+        $ctx.val = new Predicate[$ps.val.length + 1];
+
+        for (int i = 0; i < $ps.val.length; ++i) {
+            $ctx.val[i] = $ps.val[i];
+        }
+
+        $ctx.val[$ps.val.length] = $p.val;
+    }
+    ;
+
 predicate returns [Predicate val]
     : TRUE_TOKEN {
         $ctx.val = Tautology.create();
@@ -97,31 +118,27 @@ path returns [DefaultAccessExpression val]
     | f=ID_TOKEN {
         $ctx.val = DefaultRoot.create($f.text.replaceAll("var_ssa_[0-9]+_", ""));
     }
-    | '(' SFREAD_TOKEN f=ID_TOKEN ',' c=ID_TOKEN ')' {
-        $ctx.val = DefaultObjectFieldRead.create(DefaultPackageAndClass.create($c.text), $f.text.replaceAll("field_ssa_[0-9]+_", ""));
+    | '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' {
+        $ctx.val = $p.val;
     }
-    | '(' FREAD_TOKEN f=ID_TOKEN ',' p=path ')' {
+    | '(' SELECT_TOKEN f=ID_TOKEN p=path ')' {
         $ctx.val = DefaultObjectFieldRead.create($p.val, $f.text.replaceAll("field_ssa_[0-9]+_", ""));
     }
-    | '(' AREAD_TOKEN ARR_TOKEN ',' p=path ',' e=expression ')' {
+    | '(' SELECT_TOKEN p=path e=expression ')' {
         $ctx.val = DefaultArrayElementRead.create($p.val, $e.val);
     }
     ;
 
 ALENGTH_TOKEN : 'alength';
-AREAD_TOKEN   : 'aread';
 ARR_TOKEN     : 'ssa_'[0-9]+'_arr';
 ARRLEN_TOKEN  : 'arrlen';
 FALSE_TOKEN   : 'false';
-FREAD_TOKEN   : 'fread';
 INIT_TOKEN    : '<init>';
 NOT_TOKEN     : 'not';
 NULL_TOKEN    : 'null';
 RETURN_TOKEN  : 'var_ssa_'[0-9]+'_return_pc[0-9]+';
-SFREAD_TOKEN  : 'sfread';
+SELECT_TOKEN  : 'select';
 TRUE_TOKEN    : 'true';
-
-VAR_SSA_TOKEN : 'var_ssa_'[0-9]+'_';
 
 CONSTANT_TOKEN
     : [-+]?'0'('.'[0-9]+)?

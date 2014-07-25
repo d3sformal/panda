@@ -1,5 +1,8 @@
 // Callsite of ThreadGroup.add
 // Track these to allow precise exception handling
+[assume post method java.lang.Class.desiredAssertionStatus]
+return = 1
+
 [method java.lang.Thread.<init>]
 group = null
 group.destroyed = 0

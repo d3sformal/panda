@@ -31,12 +31,12 @@ public class PredicatesFactory {
         return createFromString(definition).standaloneexpression().val[0];
     }
 
-    public static Predicate createInterpolantFromString(String definition) {
+    public static Predicate[] createInterpolantsFromString(String definition) {
         ANTLRInputStream chars = new ANTLRInputStream(definition);
         InterpolantsLexer lexer = new InterpolantsLexer(chars);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         InterpolantsParser parser = new InterpolantsParser(tokens);
 
-        return parser.predicate().val;
+        return parser.predicates().val;
     }
 }

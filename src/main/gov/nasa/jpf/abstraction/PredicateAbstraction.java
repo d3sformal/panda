@@ -387,8 +387,10 @@ public class PredicateAbstraction extends Abstraction {
             System.out.println();
             System.out.println("Feasible: " + (interpolants == null));
 
-            for (Predicate interpolant : interpolants) {
-                System.out.println("\t" + interpolant);
+            if (interpolants != null) {
+                for (Predicate interpolant : interpolants) {
+                    System.out.println("\t" + interpolant);
+                }
             }
 
             System.out.println();

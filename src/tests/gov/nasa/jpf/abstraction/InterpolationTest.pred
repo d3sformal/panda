@@ -1,0 +1,2 @@
+[method gov.nasa.jpf.abstraction.InterpolationTest.test3]
+alength(arrlen, a) = 3
