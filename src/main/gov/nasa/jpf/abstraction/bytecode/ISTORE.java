@@ -28,7 +28,7 @@ public class ISTORE extends gov.nasa.jpf.jvm.bytecode.ISTORE {
         sf.setLocalAttr(getLocalVariableIndex(), from);
 
         PredicateAbstraction.getInstance().informAboutPrimitiveLocalVariable(to);
-        PredicateAbstraction.getInstance().processPrimitiveStore(getPosition(), actualNextInsn.getPosition(), from, to);
+        PredicateAbstraction.getInstance().processPrimitiveStore(getMethodInfo(), getPosition(), actualNextInsn.getPosition(), from, to);
 
         return actualNextInsn;
     }

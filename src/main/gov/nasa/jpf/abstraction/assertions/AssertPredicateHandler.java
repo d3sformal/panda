@@ -50,7 +50,7 @@ public abstract class AssertPredicateHandler extends AssertHandler {
         TruthValue inferredValuation = PredicateAbstraction.getInstance().processBranchingCondition(curTh.getPC().getPosition(), assertedFact);
 
         if (assertedValuation != inferredValuation) {
-            PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(assertedFact, inferredValuation));
+            PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(assertedFact, inferredValuation), curTh.getPC().getMethodInfo(), curTh.getPC().getPosition());
 
             throw new RuntimeException("Asserted incorrect predicate valuation: `" + assertedFact + "` expected to valuate to `" + assertedValuation + "` but actually valuated to `" + inferredValuation + "`");
         }

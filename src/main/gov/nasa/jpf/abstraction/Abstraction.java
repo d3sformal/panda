@@ -42,14 +42,14 @@ public abstract class Abstraction {
      * Informs the abstraction about a symbolic assignment
      * @param to An access expression referring to a primitive value
      */
-    public void processPrimitiveStore(int lastPC, int nextPC, Expression from, AccessExpression to) {
+    public void processPrimitiveStore(MethodInfo m, int lastPC, int nextPC, Expression from, AccessExpression to) {
     }
 
     /**
      * Informs the abstraction about a symbolic assignment
      * @param to An access expression referring to an object on heap
      */
-    public void processObjectStore(int lastPC, int nextPC, Expression from, AccessExpression to) {
+    public void processObjectStore(MethodInfo m, int lastPC, int nextPC, Expression from, AccessExpression to) {
     }
 
     /**
@@ -101,7 +101,7 @@ public abstract class Abstraction {
     public void informAboutStructuredLocalVariable(Root root) {
     }
 
-    public void informAboutBranchingDecision(BranchingDecision decision) {
+    public void informAboutBranchingDecision(BranchingDecision decision, MethodInfo m, int lastPC) {
     }
 
     public void addThread(ThreadInfo threadInfo) {

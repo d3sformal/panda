@@ -86,7 +86,7 @@ public class UnaryIfInstructionExecutor {
 
             if (expr != null) {
                 Predicate predicate = br.createPredicate(expr, constant);
-                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)));
+                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)), br.getSelf().getMethodInfo(), (conditionValue ? br.getTarget() : br.getNext(ti)).getPosition());
             }
         }
 

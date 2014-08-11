@@ -98,7 +98,7 @@ public class BinaryIfInstructionExecutor {
 
             if (expr1 != null && expr2 != null) {
                 Predicate predicate = br.createPredicate(expr1, expr2);
-                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)));
+                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)), br.getSelf().getMethodInfo(), (conditionValue ? br.getTarget() : br.getNext(ti)).getPosition());
             }
         }
 

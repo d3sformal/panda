@@ -90,7 +90,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 
             lastIdx = idx;
 
-            PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(Equals.create(expr, Constant.create(matches[idx])), TruthValue.TRUE));
+            PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(Equals.create(expr, Constant.create(matches[idx])), TruthValue.TRUE), getMethodInfo(), mi.getInstructionAt(targets[idx]).getPosition());
 
             return mi.getInstructionAt(targets[idx]);
         }

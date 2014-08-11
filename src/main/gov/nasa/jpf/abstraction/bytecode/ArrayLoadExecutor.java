@@ -14,6 +14,7 @@ import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
 
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Equals;
@@ -101,6 +102,7 @@ public class ArrayLoadExecutor {
             TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(load.getSelf().getPosition(), inBounds);
 
             if (value != TruthValue.TRUE) {
+                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(inBounds, TruthValue.FALSE), load.getSelf().getMethodInfo(), load.getSelf().getPosition());
                 throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds));
             }
         }

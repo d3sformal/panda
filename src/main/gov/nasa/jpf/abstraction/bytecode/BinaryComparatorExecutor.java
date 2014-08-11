@@ -140,7 +140,7 @@ public abstract class BinaryComparatorExecutor<T> {
                     predicate = LessThan.create(expr2, expr1);
                 }
 
-                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.TRUE));
+                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.TRUE), cmp.getSelf().getMethodInfo(), cmp.getNext(ti).getPosition());
             }
         }
 

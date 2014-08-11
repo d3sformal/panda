@@ -7,11 +7,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
+import java.util.TreeSet;
 
+import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.StateSet;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
@@ -21,6 +25,7 @@ import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.BranchingDecision;
 import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
@@ -57,6 +62,7 @@ import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.state.universe.Reference;
 import gov.nasa.jpf.abstraction.state.universe.StructuredValueIdentifier;
+import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 
 /**
@@ -78,6 +84,7 @@ public class PredicateAbstraction extends Abstraction {
     private Set<ClassInfo> startupClasses = new HashSet<ClassInfo>();
 
     public SMT smt = new SMT();
+    private Stack<Pair<MethodInfo, Integer>> traceProgramLocations = new Stack<Pair<MethodInfo, Integer>>();
     private Predicate traceFormula = Tautology.create();
 
     private static PredicateAbstraction instance = null;
@@ -98,7 +105,7 @@ public class PredicateAbstraction extends Abstraction {
 
     private StaticSingleAssignmentFormulaFormatter ssa = new StaticSingleAssignmentFormulaFormatter();
 
-    private void extendTraceFormulaWithAssignment(AccessExpression to, Expression from) {
+    private void extendTraceFormulaWithAssignment(AccessExpression to, Expression from, MethodInfo m, int nextPC) {
         // a := ...
         // a' = ...
         //
@@ -122,7 +129,7 @@ public class PredicateAbstraction extends Abstraction {
             if (to instanceof Root) {
                 ssa.reincarnateSymbol(to);
 
-                extendTraceFormulaWith(VariableAssign.create((Root) ssa.incarnateSymbol(to), from));
+                extendTraceFormulaWith(VariableAssign.create((Root) ssa.incarnateSymbol(to), from), m, nextPC);
             } else if (to instanceof ObjectFieldRead) {
                 ObjectFieldRead fr = (ObjectFieldRead) to;
                 Field f = fr.getField();
@@ -135,7 +142,7 @@ public class PredicateAbstraction extends Abstraction {
 
                 ssa.reincarnateSymbol(to);
 
-                extendTraceFormulaWith(FieldAssign.create(ssa.incarnateSymbol(f), rightHandSide));
+                extendTraceFormulaWith(FieldAssign.create(ssa.incarnateSymbol(f), rightHandSide), m, nextPC);
             } else if (to instanceof ArrayElementRead) {
                 ArrayElementRead ar = (ArrayElementRead) to;
                 Arrays a = ar.getArrays();
@@ -160,31 +167,32 @@ public class PredicateAbstraction extends Abstraction {
 
                 ssa.reincarnateSymbol(to);
 
-                extendTraceFormulaWith(ArraysAssign.create(ssa.incarnateSymbol(a), rightHandSide));
+                extendTraceFormulaWith(ArraysAssign.create(ssa.incarnateSymbol(a), rightHandSide), m, nextPC);
             }
         }
     }
 
-    private void extendTraceFormulaWith(Predicate p) {
+    private void extendTraceFormulaWith(Predicate p, MethodInfo m, int nextPC) {
+        traceProgramLocations.push(new Pair<MethodInfo, Integer>(m, nextPC));
         traceFormula = Conjunction.create(traceFormula, p);
     }
 
     @Override
-    public void processPrimitiveStore(int lastPC, int nextPC, Expression from, AccessExpression to) {
+    public void processPrimitiveStore(MethodInfo m, int lastPC, int nextPC, Expression from, AccessExpression to) {
         Set<AccessExpression> affected = symbolTable.processPrimitiveStore(from, to);
 
         predicateValuation.reevaluate(lastPC, nextPC, to, affected, PrimitiveExpressionDecorator.wrap(from, symbolTable));
 
-        extendTraceFormulaWithAssignment(to, from);
+        extendTraceFormulaWithAssignment(to, from, m, nextPC);
     }
 
     @Override
-    public void processObjectStore(int lastPC, int nextPC, Expression from, AccessExpression to) {
+    public void processObjectStore(MethodInfo m, int lastPC, int nextPC, Expression from, AccessExpression to) {
         Set<AccessExpression> affected = symbolTable.processObjectStore(from, to);
 
         predicateValuation.reevaluate(lastPC, nextPC, to, affected, ObjectExpressionDecorator.wrap(from, symbolTable));
 
-        extendTraceFormulaWithAssignment(to, from);
+        extendTraceFormulaWithAssignment(to, from, m, nextPC);
     }
 
     @Override
@@ -247,7 +255,7 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     @Override
-    public void informAboutBranchingDecision(BranchingDecision decision) {
+    public void informAboutBranchingDecision(BranchingDecision decision, MethodInfo m, int nextPC) {
         if (!RunDetector.isRunning()) return;
 
         BranchingConditionValuation bcv = (BranchingConditionValuation) decision;
@@ -271,7 +279,7 @@ public class PredicateAbstraction extends Abstraction {
 
         condition = condition.replace(replacements);
 
-        extendTraceFormulaWith(condition);
+        extendTraceFormulaWith(condition, m, nextPC);
     }
 
     @Override
@@ -304,6 +312,7 @@ public class PredicateAbstraction extends Abstraction {
             mainThread.getId(),
             symbols,
             predicates,
+            traceProgramLocations,
             traceFormula,
             ssa
         );
@@ -327,12 +336,14 @@ public class PredicateAbstraction extends Abstraction {
         return traceFormula;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void forward(MethodInfo method) {
         State state = new State(
             VM.getVM().getCurrentThread().getId(),
             symbolTable.memorize(),
             predicateValuation.memorize(),
+            (Stack<Pair<MethodInfo, Integer>>)traceProgramLocations.clone(),
             traceFormula,
             ssa.clone()
         );
@@ -340,6 +351,7 @@ public class PredicateAbstraction extends Abstraction {
         trace.push(state);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void backtrack(MethodInfo method) {
         trace.pop();
@@ -349,6 +361,7 @@ public class PredicateAbstraction extends Abstraction {
         predicateValuation.restore(trace.top().predicateValuationStacks);
         predicateValuation.scheduleThread(trace.top().currentThread);
 
+        traceProgramLocations = (Stack<Pair<MethodInfo, Integer>>)trace.top().traceProgramLocations.clone();
         traceFormula = trace.top().traceFormula;
         ssa = trace.top().ssa.clone();
 
@@ -370,7 +383,7 @@ public class PredicateAbstraction extends Abstraction {
     private static int traceStep;
     private static int traceStepCount;
 
-    public void error() {
+    public boolean error() {
         System.out.println();
         System.out.println();
         System.out.println("Counterexample Trace Formula:");
@@ -381,21 +394,74 @@ public class PredicateAbstraction extends Abstraction {
         traceStepCount = countErrorConjuncts(traceFormula);
         printErrorConjuncts(traceFormula);
 
-        if (gov.nasa.jpf.vm.VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation")) {
+        if (VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation")) {
             Predicate[] interpolants = smt.interpolate(traceFormula);
 
             System.out.println();
             System.out.println("Feasible: " + (interpolants == null));
 
             if (interpolants != null) {
-                for (Predicate interpolant : interpolants) {
-                    System.out.println("\t" + interpolant);
+                int maxLen = 0;
+
+                for (int i = 0; i < interpolants.length; ++i) {
+                    int pcLen = ("[" + traceProgramLocations.get(i).getFirst().getName() + ":" + traceProgramLocations.get(i).getSecond() + "]").length();
+
+                    if (maxLen < pcLen) {
+                        maxLen = pcLen;
+                    }
                 }
+
+                for (int i = 0; i < interpolants.length; ++i) {
+                    Predicate interpolant = interpolants[i];
+                    int pc = traceProgramLocations.get(i).getSecond();
+                    String pcStr = "[" + traceProgramLocations.get(i).getFirst().getName() + ":" + traceProgramLocations.get(i).getSecond() + "]";
+                    int pcLen = pcStr.length();
+
+                    System.out.print("\t" + pcStr + ": ");
+                    for (int j = 0; j < maxLen - pcLen; ++j) {
+                        System.out.print(" ");
+                    }
+                    System.out.println(interpolant);
+                }
+
+                // TODO properly inject predicates into scopes (method scopes)
+                for (int i = 0; i < interpolants.length; ++i) {
+                    Predicate interpolant = interpolants[i];
+                    TreeSet<Integer> scope = new TreeSet<Integer>();
+
+                    scope.add(traceProgramLocations.get(i).getSecond());
+
+                    interpolant.setScope(scope);
+
+                    if (!(interpolant instanceof Contradiction)) {
+                        predicateValuation.put(interpolant, TruthValue.TRUE);
+                    }
+                }
+
+                // Reset JPF
+                while (VM.getVM().getStateId() > 1) {
+                    // TODO do not go all the way to INIT if not necessary (is it ever possible)
+                    System.out.println("Backtracking ...");
+                    VM.getVM().backtrack();
+                }
+
+                StateSet stateSet = VM.getVM().getStateSet();
+
+                if (stateSet instanceof ResetableStateSet) {
+                    System.out.println("Clearing visited ...");
+                    ((ResetableStateSet)stateSet).clear();
+                } else if (stateSet != null) {
+                    throw new RuntimeException("Cannot restart execution at refinement: invalid state set.");
+                }
+
+                return false;
             }
 
             System.out.println();
             System.out.println();
         }
+
+        return true;
     }
 
     private static int countErrorConjuncts(Predicate formula) {
