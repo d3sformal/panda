@@ -400,6 +400,8 @@ public class SMT {
         Set<String> variables = collector.getVars();
         Set<String> fields = collector.getFields();
         Set<String> arrays = collector.getArrays();
+        Set<AccessExpression> objects = collector.getObjects();
+        Set<Integer> fresh = collector.getFresh();
 
         String separator = InputType.DEBUG.getSeparator();
 
@@ -411,6 +413,10 @@ public class SMT {
         appendVariableDeclarations(variables, input, separator);
         appendFieldDeclarations(fields, input, separator);
         appendArraysDeclarations(arrays, input, separator);
+
+        if (!fresh.isEmpty()) {
+            appendFreshConstraints(fresh, objects, input, separator);
+        }
 
         interpolationGroup = 0;
         appendInterpolationGroups(conjunction, input, separator);
@@ -623,13 +629,26 @@ public class SMT {
         input.append(separator);
     }
 
-    private void appendFreshConstraints(Set<AccessExpression> objects, StringBuilder input, String separator) {
+    private void appendFreshConstraints(Set<Integer> fresh, Set<AccessExpression> objects, StringBuilder input, String separator) {
         Set<String> freshConstraints = new HashSet<String>();
 
+        for (int id : fresh) {
+            input.append("(declare-fun fresh_" + id + " () Int)" + separator);
+        }
+
+        // TODO check these
         for (AccessExpression object : objects) {
             Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.create(DefaultFresh.create(), object)));
 
             freshConstraints.add("(assert " + convertToString(distinction) + ")" + separator);
+        }
+
+        for (int id1 : fresh) {
+            for (int id2 : fresh) {
+                if (id1 > id2) {
+                    freshConstraints.add("(assert (not (= fresh_" + id1 + " fresh_" + id2 + ")))");
+                }
+            }
         }
 
         for (String constraint : freshConstraints) {
@@ -659,7 +678,7 @@ public class SMT {
         return input.toString();
     }
 
-    private String prepareValuatePredicatesInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<String> arrays, Set<AccessExpression> objects, boolean hasFresh, Predicate[] predicates, String[] formulas, InputType inputType) {
+    private String prepareValuatePredicatesInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<String> arrays, Set<AccessExpression> objects, Set<Integer> fresh, Predicate[] predicates, String[] formulas, InputType inputType) {
         String separator = inputType.getSeparator();
 
         StringBuilder input = new StringBuilder();
@@ -670,8 +689,8 @@ public class SMT {
         appendFieldDeclarations(fields, input, separator);
         appendArraysDeclarations(arrays, input, separator);
 
-        if (hasFresh) {
-            appendFreshConstraints(objects, input, separator);
+        if (!fresh.isEmpty()) {
+            appendFreshConstraints(fresh, objects, input, separator);
         }
 
         for (int i = 0; i < predicates.length; ++i) {
@@ -745,12 +764,18 @@ public class SMT {
         Set<String> variables = collector.getVars();
         Set<String> fields = collector.getFields();
         Set<String> arrays = collector.getArrays();
+        Set<AccessExpression> objects = collector.getObjects();
+        Set<Integer> fresh = collector.getFresh();
 
         input.append("(push 1)"); input.append(separator);
         appendClassDeclarations(classes, input, separator);
         appendVariableDeclarations(variables, input, separator);
         appendFieldDeclarations(fields, input, separator);
         appendArraysDeclarations(arrays, input, separator);
+
+        if (!fresh.isEmpty()) {
+            appendFreshConstraints(fresh, objects, input, separator);
+        }
 
         input.append("(assert "); input.append(state); input.append(")"); input.append(separator);
 
@@ -931,12 +956,12 @@ public class SMT {
         Set<String> fields = collector.getFields();
         Set<String> arrays = collector.getArrays();
         Set<AccessExpression> objects = collector.getObjects();
-        boolean hasFresh = collector.hasFresh();
+        Set<Integer> fresh = collector.getFresh();
 
-        String input = prepareValuatePredicatesInput(classes, vars, fields, arrays, objects, hasFresh, predicatesArray, formulasArray, InputType.NORMAL);
+        String input = prepareValuatePredicatesInput(classes, vars, fields, arrays, objects, fresh, predicatesArray, formulasArray, InputType.NORMAL);
 
         if (!listeners.isEmpty()) {
-            String debugInput = prepareValuatePredicatesInput(classes, vars, fields, arrays, objects, hasFresh, predicatesArray, formulasArray, InputType.DEBUG);
+            String debugInput = prepareValuatePredicatesInput(classes, vars, fields, arrays, objects, fresh, predicatesArray, formulasArray, InputType.DEBUG);
 
             notifyValuatePredicatesInputGenerated(debugInput);
         }

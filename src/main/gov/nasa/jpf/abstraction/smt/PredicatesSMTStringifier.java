@@ -266,7 +266,9 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
     @Override
     public void visit(Constant expression) {
         if (expression.value.doubleValue() < 0) {
-            ret.append("(- " + (-expression.value.doubleValue()) + ")");
+            ret.append("(- ");
+            ret.append((-expression.value.doubleValue()));
+            ret.append(")");
         } else {
             ret.append(expression);
         }
@@ -274,17 +276,20 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 
     @Override
     public void visit(AnonymousArray expression) {
-        ret.append("fresh");
+        ret.append("fresh_");
+        ret.append(expression.getReference().getReferenceNumber());
     }
 
     @Override
     public void visit(AnonymousObject expression) {
-        ret.append("fresh");
+        ret.append("fresh_");
+        ret.append(expression.getReference().getReferenceNumber());
     }
 
     @Override
     public void visit(Root expression) {
-        ret.append("var_" + expression.getName());
+        ret.append("var_");
+        ret.append(expression.getName());
     }
 
     @Override

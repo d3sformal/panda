@@ -6,7 +6,7 @@ public class InterpolationTest extends BaseTest {
         config.add("+panda.interpolation=true");
     }
 
-    @FailingTest
+    @Test
     public static void test1() {
         int x = 0;
         int y = 0;
@@ -14,7 +14,7 @@ public class InterpolationTest extends BaseTest {
         assert x == y;
     }
 
-    @FailingTest
+    @Test
     public static void test2() {
         D d = new D();
 
@@ -23,7 +23,7 @@ public class InterpolationTest extends BaseTest {
         assert d.val == 10;
     }
 
-    @FailingTest
+    @Test
     public static void test3() {
         int[] a = new int[3];
 
