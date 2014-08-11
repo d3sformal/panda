@@ -274,7 +274,7 @@ public class SMT {
             prepareSMTProcess(smt);
 
             if (USE_LOG_FILE) {
-                final BufferedWriter log = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("smt.log." + (++logFileID))));
+                final BufferedWriter log = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("smt." + smt + ".log." + (++logFileID))));
 
                 in = new BufferedWriter(inwriter) {
                     @Override
