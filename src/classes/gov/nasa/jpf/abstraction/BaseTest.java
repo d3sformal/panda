@@ -42,7 +42,15 @@ public class BaseTest {
         // why: test driver would not skip calls to native assert methods
         config.add("+classpath=build/tests");
         config.add("+sourcepath=src/tests");
-        config.add("+panda.abstract_domain=PREDICATES src/tests/" + getClass().getName().replace(".", "/") + ".pred");
+
+        String filename = "src/tests/" + getClass().getName().replace(".", "/") + ".pred";
+
+        if (new File(filename).isFile()) {
+            config.add("+panda.abstract_domain=PREDICATES " + filename);
+        } else {
+            config.add("+panda.abstract_domain=PREDICATES");
+        }
+
         config.add("+panda.verbose=false");
         config.add("+listener=gov.nasa.jpf.abstraction.AbstractListener");
         config.add("+vm.serializer.class=gov.nasa.jpf.abstraction.PredicateAbstractionSerializer");

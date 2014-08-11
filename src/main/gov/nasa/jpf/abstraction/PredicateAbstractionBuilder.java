@@ -14,7 +14,11 @@ import gov.nasa.jpf.abstraction.parser.PredicatesParser;
 
 public class PredicateAbstractionBuilder {
     public Predicates build(String... args) {
-        return build(args[1]);
+        if (args.length > 1) {
+            return build(args[1]);
+        } else {
+            return build();
+        }
     }
 
     protected Predicates build(String filename) {
@@ -39,5 +43,9 @@ public class PredicateAbstractionBuilder {
 
     protected Predicates build(PredicatesParser parser) {
         return parser.predicates().val;
+    }
+
+    protected Predicates build() {
+        return new Predicates();
     }
 }
