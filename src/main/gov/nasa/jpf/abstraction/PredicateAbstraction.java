@@ -64,6 +64,7 @@ import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.state.universe.Reference;
 import gov.nasa.jpf.abstraction.state.universe.StructuredValueIdentifier;
+import gov.nasa.jpf.abstraction.util.CounterexampleListener;
 import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 
@@ -91,6 +92,7 @@ public class PredicateAbstraction extends Abstraction {
     private Predicates predicateSet;
 
     private static PredicateAbstraction instance = null;
+    private static List<CounterexampleListener> listeners = new ArrayList<CounterexampleListener>();
 
     public static void setInstance(PredicateAbstraction instance) {
         PredicateAbstraction.instance = instance;
@@ -98,6 +100,10 @@ public class PredicateAbstraction extends Abstraction {
 
     public static PredicateAbstraction getInstance() {
         return instance;
+    }
+
+    public static void registerCounterexampleListener(CounterexampleListener listener) {
+        listeners.add(listener);
     }
 
     public PredicateAbstraction(Predicates predicateSet) {
@@ -410,50 +416,13 @@ public class PredicateAbstraction extends Abstraction {
         }
     }
 
-    private static int traceStep;
-    private static int traceStepCount;
-
     public boolean error() {
-        System.out.println();
-        System.out.println();
-        System.out.println("Counterexample Trace Formula:");
-        //System.out.println(traceFormula.toString(Notation.SMT_NOTATION));
-        //System.out.println(traceFormula.toString(Notation.FUNCTION_NOTATION));
-
-        traceStep = 0;
-        traceStepCount = countErrorConjuncts(traceFormula);
-        printErrorConjuncts(traceFormula);
-
         if (VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation")) {
             Predicate[] interpolants = smt.interpolate(traceFormula);
 
-            System.out.println();
-            System.out.println("Feasible: " + (interpolants == null));
+            notifyAboutCounterexample(traceFormula, traceProgramLocations, interpolants);
 
             if (interpolants != null) {
-                int maxLen = 0;
-
-                for (int i = 0; i < interpolants.length; ++i) {
-                    int pcLen = ("[" + traceProgramLocations.get(i).getFirst().getName() + ":" + traceProgramLocations.get(i).getSecond() + "]").length();
-
-                    if (maxLen < pcLen) {
-                        maxLen = pcLen;
-                    }
-                }
-
-                for (int i = 0; i < interpolants.length; ++i) {
-                    Predicate interpolant = interpolants[i];
-                    int pc = traceProgramLocations.get(i).getSecond();
-                    String pcStr = "[" + traceProgramLocations.get(i).getFirst().getName() + ":" + traceProgramLocations.get(i).getSecond() + "]";
-                    int pcLen = pcStr.length();
-
-                    System.out.print("\t" + pcStr + ": ");
-                    for (int j = 0; j < maxLen - pcLen; ++j) {
-                        System.out.print(" ");
-                    }
-                    System.out.println(interpolant);
-                }
-
                 boolean refined = false;
 
                 for (int i = 0; i < interpolants.length; ++i) {
@@ -481,60 +450,20 @@ public class PredicateAbstraction extends Abstraction {
                 }
 
                 if (!refined) {
-                    System.out.println(predicateSet);
+                    //System.out.println(predicateSet);
                     throw new RuntimeException("Failed to refine abstraction.");
                 }
 
-                System.out.println();
-
                 return false;
             }
-
-            System.out.println();
-            System.out.println();
         }
 
         return true;
     }
 
-    private static int countErrorConjuncts(Predicate formula) {
-        if (formula instanceof Conjunction) {
-            Conjunction c = (Conjunction) formula;
-
-            return countErrorConjuncts(c.a) + countErrorConjuncts(c.b);
-        } else {
-            return 1;
-        }
-    }
-
-    private static int log(int n) {
-        int i = 0;
-
-        while (n > 0) {
-            n /= 10;
-
-            ++i;
-        }
-
-        return i;
-    }
-
-    private static void printErrorConjuncts(Predicate formula) {
-        if (formula instanceof Conjunction) {
-            Conjunction c = (Conjunction) formula;
-
-            printErrorConjuncts(c.a);
-            printErrorConjuncts(c.b);
-        } else {
-            System.out.print("\t");
-
-            ++traceStep;
-
-            for (int i = 0; i < log(traceStepCount) - log(traceStep); ++i) {
-                System.out.print(" ");
-            }
-
-            System.out.println(traceStep + ": " + formula.toString(Notation.FUNCTION_NOTATION));
+    private static void notifyAboutCounterexample(Predicate traceFormula, Stack<Pair<MethodInfo, Integer>> traceProgramLocations, Predicate[] interpolants) {
+        for (CounterexampleListener listener : listeners) {
+            listener.counterexample(traceFormula, traceProgramLocations, interpolants);
         }
     }
 }
