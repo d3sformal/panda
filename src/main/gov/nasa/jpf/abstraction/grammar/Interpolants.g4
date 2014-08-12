@@ -130,7 +130,10 @@ factor returns [Expression val]
     ;
 
 path returns [DefaultAccessExpression val]
-    : f=RETURN_TOKEN {
+    : FRESH_TOKEN {
+        $ctx.val = DefaultFresh.create();
+    }
+    | f=RETURN_TOKEN {
         $ctx.val = DefaultReturnValue.create();
     }
     | f=ID_TOKEN {
@@ -152,6 +155,7 @@ ARR_TOKEN      : 'ssa_'[0-9]+'_arr';
 ARRLEN_TOKEN   : 'arrlen';
 DISTINCT_TOKEN : 'distinct';
 FALSE_TOKEN    : 'false';
+FRESH_TOKEN    : 'fresh_'[0-9]+;
 INIT_TOKEN     : '<init>';
 LET_TOKEN      : 'let';
 NOT_TOKEN      : 'not';

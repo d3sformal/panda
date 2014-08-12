@@ -265,9 +265,9 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 
     @Override
     public void visit(Constant expression) {
-        if (expression.value.doubleValue() < 0) {
+        if (expression.value.intValue() < 0) {
             ret.append("(- ");
-            ret.append((-expression.value.doubleValue()));
+            ret.append((-expression.value.intValue()));
             ret.append(")");
         } else {
             ret.append(expression);
