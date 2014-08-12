@@ -1,8 +1,10 @@
 grammar Interpolants;
 
 @header {
+    import java.util.HashMap;
     import java.util.List;
     import java.util.LinkedList;
+    import java.util.Map;
     import java.util.SortedSet;
     import java.util.TreeSet;
 
@@ -33,15 +35,28 @@ predicatelist returns [Predicate[] val]
     }
     ;
 
-predicate returns [Predicate val]
-    : TRUE_TOKEN {
+predicate returns [Predicate val] locals [Map<AccessExpression, Expression> lets = new HashMap<AccessExpression, Expression>()]
+    : '(' LET_TOKEN '(''(' '.' v=ID_TOKEN e=expression ')'')' p=predicate ')' {
+        $lets.put(DefaultRoot.create("." + $v.text), $e.val);
+        $ctx.val = $p.val.replace($lets);
+    }
+    | TRUE_TOKEN {
         $ctx.val = Tautology.create();
     }
     | FALSE_TOKEN {
         $ctx.val = Contradiction.create();
     }
-    | '(not' p=predicate ')' {
+    | '(' AND_TOKEN p=predicate q=predicate ')' {
+        $ctx.val = Conjunction.create($p.val, $q.val);
+    }
+    | '(' OR_TOKEN p=predicate q=predicate ')' {
+        $ctx.val = Disjunction.create($p.val, $q.val);
+    }
+    | '(' NOT_TOKEN p=predicate ')' {
         $ctx.val = Negation.create($p.val);
+    }
+    | '(' DISTINCT_TOKEN a=expression b=expression ')' {
+        $ctx.val = Negation.create(Equals.create($a.val, $b.val));
     }
     | '(=' a=expression b=expression ')' {
         $ctx.val = Equals.create($a.val, $b.val);
@@ -94,13 +109,16 @@ term returns [Expression val]
     ;
 
 factor returns [Expression val]
-    : CONSTANT_TOKEN {
+    : '.' id=ID_TOKEN {
+        $ctx.val = DefaultRoot.create("." + $id.text);
+    }
+    | CONSTANT_TOKEN {
         $ctx.val = Constant.create(Integer.parseInt($CONSTANT_TOKEN.text));
     }
     | '(-' CONSTANT_TOKEN ')' {
         $ctx.val = Constant.create(-Integer.parseInt($CONSTANT_TOKEN.text));
     }
-    | '(alength' 'arrlen' ',' p=path ')' {
+    | '(' SELECT_TOKEN ARRLEN_TOKEN p=path ')' {
         $ctx.val = DefaultArrayLengthRead.create($p.val);
     }
     | p=path {
@@ -129,16 +147,19 @@ path returns [DefaultAccessExpression val]
     }
     ;
 
-ALENGTH_TOKEN : 'alength';
-ARR_TOKEN     : 'ssa_'[0-9]+'_arr';
-ARRLEN_TOKEN  : 'arrlen';
-FALSE_TOKEN   : 'false';
-INIT_TOKEN    : '<init>';
-NOT_TOKEN     : 'not';
-NULL_TOKEN    : 'null';
-RETURN_TOKEN  : 'var_ssa_'[0-9]+'_return_pc[0-9]+';
-SELECT_TOKEN  : 'select';
-TRUE_TOKEN    : 'true';
+AND_TOKEN      : 'and';
+ARR_TOKEN      : 'ssa_'[0-9]+'_arr';
+ARRLEN_TOKEN   : 'arrlen';
+DISTINCT_TOKEN : 'distinct';
+FALSE_TOKEN    : 'false';
+INIT_TOKEN     : '<init>';
+LET_TOKEN      : 'let';
+NOT_TOKEN      : 'not';
+NULL_TOKEN     : 'null';
+OR_TOKEN       : 'or';
+RETURN_TOKEN   : 'var_ssa_'[0-9]+'_return_pc[0-9]+';
+SELECT_TOKEN   : 'select';
+TRUE_TOKEN     : 'true';
 
 CONSTANT_TOKEN
     : [-+]?'0'('.'[0-9]+)?

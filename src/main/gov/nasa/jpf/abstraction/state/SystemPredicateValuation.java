@@ -1,11 +1,13 @@
 package gov.nasa.jpf.abstraction.state;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import gov.nasa.jpf.jvm.bytecode.IINC;
 import gov.nasa.jpf.jvm.bytecode.LocalVariableInstruction;
@@ -23,6 +25,9 @@ import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.AbstractMethodPredicateContext;
 import gov.nasa.jpf.abstraction.common.AssumePredicateContext;
 import gov.nasa.jpf.abstraction.common.Comparison;
+import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.abstraction.common.MethodAssumePostPredicateContext;
@@ -35,11 +40,14 @@ import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.PredicateUtil;
 import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.common.StaticPredicateContext;
+import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultMethod;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
@@ -155,6 +163,86 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
     @Override
     public void force(Predicate predicate, TruthValue value) {
         scopes.get(currentThreadID).top().force(predicate, value);
+    }
+
+    public boolean refine(Predicate interpolant, MethodInfo m, int fromPC, int toPC) {
+        if (interpolant instanceof Conjunction) {
+            Conjunction c = (Conjunction) interpolant;
+
+            boolean a = refine(c.a, m, fromPC, toPC);
+            boolean b = refine(c.b, m, fromPC, toPC);
+
+            return a || b;
+        } else if (interpolant instanceof Disjunction) {
+            Disjunction d = (Disjunction) interpolant;
+
+            boolean a = refine(d.a, m, fromPC, toPC);
+            boolean b = refine(d.b, m, fromPC, toPC);
+
+            return a || b;
+        } else if (interpolant instanceof Negation) {
+            Negation n = (Negation) interpolant;
+
+            return refine(n.predicate, m, fromPC, toPC);
+        } else if (interpolant instanceof Tautology) {
+            return false;
+        } else if (interpolant instanceof Contradiction) {
+            return false;
+        } else {
+            boolean refined = false;
+            TreeSet<Integer> scope = new TreeSet<Integer>();
+
+            for (int i = fromPC; i <= toPC; ++i) {
+                scope.add(i);
+            }
+
+            interpolant.setScope(scope);
+
+            MethodPredicateContext ctx = null;
+
+            for (PredicateContext candidateCtx : predicateSet.contexts) {
+                if (candidateCtx instanceof MethodPredicateContext) {
+                    MethodPredicateContext methodPredicateContext = (MethodPredicateContext) candidateCtx;
+
+                    if (methodPredicateContext.getMethod().toString().equals(m.getBaseName())) {
+                        ctx = methodPredicateContext;
+
+                        break;
+                    }
+                }
+            }
+
+            if (ctx == null) {
+                refined = true;
+                List<Predicate> predicates = new LinkedList<Predicate>();
+                predicates.add(interpolant);
+                ctx = new MethodPredicateContext(DefaultMethod.create(DefaultPackageAndClass.create(m.getClassInfo().getName()), m.getName()), predicates);
+                predicateSet.contexts.add(ctx);
+            } else {
+                boolean present = false;
+
+                for (Predicate p : ctx.predicates) {
+                    if (p.equals(interpolant)) {
+                        for (int pc : interpolant.getScope()) {
+                            refined = refined || !p.getScope().contains(pc);
+                        }
+                        p.getScope().addAll(interpolant.getScope());
+                        present = true;
+                        break;
+                    }
+                }
+
+                if (!present) {
+                    refined = true;
+                    ctx.predicates.add(interpolant);
+                }
+            }
+
+            initialValuation.put(interpolant, TruthValue.UNKNOWN);
+
+            //System.out.println(gov.nasa.jpf.abstraction.common.Notation.convertToString(ctx));
+            return refined;
+        }
     }
 
     @Override

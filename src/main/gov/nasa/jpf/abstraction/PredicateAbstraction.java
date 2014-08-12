@@ -15,7 +15,6 @@ import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.StateSet;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
@@ -26,6 +25,7 @@ import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.BranchingDecision;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
@@ -38,6 +38,7 @@ import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementWrite;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
@@ -50,6 +51,7 @@ import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
 import gov.nasa.jpf.abstraction.common.impl.ObjectExpressionDecorator;
 import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionDecorator;
 import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
+import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.smt.SMT;
 import gov.nasa.jpf.abstraction.state.PredicateValuationStack;
@@ -86,6 +88,7 @@ public class PredicateAbstraction extends Abstraction {
     public SMT smt = new SMT();
     private Stack<Pair<MethodInfo, Integer>> traceProgramLocations = new Stack<Pair<MethodInfo, Integer>>();
     private Predicate traceFormula = Tautology.create();
+    private Predicates predicateSet;
 
     private static PredicateAbstraction instance = null;
 
@@ -101,6 +104,8 @@ public class PredicateAbstraction extends Abstraction {
         symbolTable = new SystemSymbolTable(this);
         predicateValuation = new SystemPredicateValuation(this, predicateSet);
         trace = new Trace();
+
+        this.predicateSet = predicateSet;
     }
 
     private StaticSingleAssignmentFormulaFormatter ssa = new StaticSingleAssignmentFormulaFormatter();
@@ -169,6 +174,25 @@ public class PredicateAbstraction extends Abstraction {
 
                 extendTraceFormulaWith(ArraysAssign.create(ssa.incarnateSymbol(a), rightHandSide), m, nextPC);
             }
+        }
+    }
+
+    private void extendTraceFormulaWithConstraint(Equals e, MethodInfo m, int nextPC) {
+        if (RunDetector.isRunning()) {
+            Expression e1 = e.a;
+            Expression e2 = e.b;
+
+            Set<AccessExpression> exprs = new HashSet<AccessExpression>();
+            Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+
+            e1.addAccessExpressionsToSet(exprs);
+            e2.addAccessExpressionsToSet(exprs);
+
+            for (AccessExpression expr : exprs) {
+                replacements.put(expr, ssa.incarnateSymbol(expr));
+            }
+
+            extendTraceFormulaWith(e.replace(replacements), m, nextPC);
         }
     }
 
@@ -242,6 +266,12 @@ public class PredicateAbstraction extends Abstraction {
     public void processNewObject(AnonymousObject object) {
         symbolTable.get(0).addObject(object);
         predicateValuation.get(0).addObject(object);
+
+        if (object instanceof AnonymousArray) {
+            AnonymousArray a = (AnonymousArray) object;
+
+            extendTraceFormulaWithConstraint((Equals) Equals.create(DefaultArrayLengthRead.create(a), a.getArrayLength()), ThreadInfo.getCurrentThread().getPC().getMethodInfo(), ThreadInfo.getCurrentThread().getPC().getPosition());
+        }
     }
 
     @Override
@@ -424,35 +454,38 @@ public class PredicateAbstraction extends Abstraction {
                     System.out.println(interpolant);
                 }
 
-                // TODO properly inject predicates into scopes (method scopes)
+                boolean refined = false;
+
                 for (int i = 0; i < interpolants.length; ++i) {
                     Predicate interpolant = interpolants[i];
-                    TreeSet<Integer> scope = new TreeSet<Integer>();
 
-                    scope.add(traceProgramLocations.get(i).getSecond());
+                    // Make the predicate valid at the correct point in the trace (needs to be valid over instructions that follow but do not contribute to the trace formula (stack manipulation))
+                    MethodInfo mStart = traceProgramLocations.get(i).getFirst();
+                    int pcStart = traceProgramLocations.get(i).getSecond();
 
-                    interpolant.setScope(scope);
+                    MethodInfo mEnd = null;
+                    int pcEnd = mStart.getLastInsn().getPosition();
 
-                    if (!(interpolant instanceof Contradiction)) {
-                        predicateValuation.put(interpolant, TruthValue.TRUE);
+                    if (traceProgramLocations.size() > i) {
+                        mEnd = traceProgramLocations.get(i + 1).getFirst();
+
+                        if (mStart == mEnd) {
+                            pcEnd = traceProgramLocations.get(i + 1).getSecond();
+                        }
                     }
+
+                    //System.out.println("Adding predicate `" + interpolant + "` to [" + pcStart + ", " + pcEnd + "]");
+                    boolean refinedOnce = predicateValuation.refine(interpolant, mStart, pcStart, pcEnd);
+
+                    refined = refined || refinedOnce;
                 }
 
-                // Reset JPF
-                while (VM.getVM().getStateId() > 1) {
-                    // TODO do not go all the way to INIT if not necessary (is it ever possible)
-                    System.out.println("Backtracking ...");
-                    VM.getVM().backtrack();
+                if (!refined) {
+                    System.out.println(predicateSet);
+                    throw new RuntimeException("Failed to refine abstraction.");
                 }
 
-                StateSet stateSet = VM.getVM().getStateSet();
-
-                if (stateSet instanceof ResetableStateSet) {
-                    System.out.println("Clearing visited ...");
-                    ((ResetableStateSet)stateSet).clear();
-                } else if (stateSet != null) {
-                    throw new RuntimeException("Cannot restart execution at refinement: invalid state set.");
-                }
+                System.out.println();
 
                 return false;
             }
