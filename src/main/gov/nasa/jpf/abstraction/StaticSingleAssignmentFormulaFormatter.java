@@ -1,7 +1,11 @@
 package gov.nasa.jpf.abstraction;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
+import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -114,7 +118,16 @@ public class StaticSingleAssignmentFormulaFormatter {
             } else if (expr instanceof ArrayElementRead) {
                 ArrayElementRead ar = (ArrayElementRead) expr;
 
-                return DefaultArrayElementRead.create(prefix, incarnateSymbol(ar.getArrays()), ar.getIndex());
+                Set<AccessExpression> exprs = new HashSet<AccessExpression>();
+                Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+
+                ar.getIndex().addAccessExpressionsToSet(exprs);
+
+                for (AccessExpression e : exprs) {
+                    replacements.put(e, incarnateSymbol(e));
+                }
+
+                return DefaultArrayElementRead.create(prefix, incarnateSymbol(ar.getArrays()), ar.getIndex().replace(replacements));
             } else if (expr instanceof ArrayLengthRead) {
                 return DefaultArrayLengthRead.create(prefix);
             }
