@@ -33,25 +33,21 @@ import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 
 public class StaticSingleAssignmentFormulaFormatter {
+    private int frameNumber = 0;
+    private Stack<Integer> frameIncarnations;
     private Stack<HashMap<Root, Integer>> variableIncarnations;
     private HashMap<Field, Integer> fieldIncarnations;
     private int arraysIncarnations;
 
     public StaticSingleAssignmentFormulaFormatter() {
-        this(new HashMap<Root, Integer>(), new HashMap<Field, Integer>(), 0);
+        this(new Stack<Integer>(), new Stack<HashMap<Root, Integer>>(), new HashMap<Field, Integer>(), 0);
+
+        changeDepth(+1);
     }
 
-    public StaticSingleAssignmentFormulaFormatter(Stack<HashMap<Root, Integer>> variableIncarnations, HashMap<Field, Integer> fieldIncarnations, int arraysIncarnations) {
+    public StaticSingleAssignmentFormulaFormatter(Stack<Integer> frameIncarnations, Stack<HashMap<Root, Integer>> variableIncarnations, HashMap<Field, Integer> fieldIncarnations, int arraysIncarnations) {
+        this.frameIncarnations = frameIncarnations;
         this.variableIncarnations = variableIncarnations;
-        this.fieldIncarnations = fieldIncarnations;
-        this.arraysIncarnations = arraysIncarnations;
-    }
-
-    public StaticSingleAssignmentFormulaFormatter(HashMap<Root, Integer> variableIncarnations, HashMap<Field, Integer> fieldIncarnations, int arraysIncarnations) {
-        this.variableIncarnations = new Stack<HashMap<Root, Integer>>();
-
-        this.variableIncarnations.push(variableIncarnations);
-
         this.fieldIncarnations = fieldIncarnations;
         this.arraysIncarnations = arraysIncarnations;
     }
@@ -110,15 +106,17 @@ public class StaticSingleAssignmentFormulaFormatter {
         return DefaultArrays.create("ssa_" + getIncarnationNumber(arrays) + "_arr");
     }
 
-    private int getDepth() {
-        return variableIncarnations.size() - 1;
+    private int getFrame(int depth) {
+        return frameIncarnations.get(frameIncarnations.size() - depth - 1);
     }
 
     public void changeDepth(int delta) {
         if (delta == 0) {
         } else if (delta > 0) {
+            frameIncarnations.push(frameNumber++);
             variableIncarnations.push(new HashMap<Root, Integer>());
         } else if (delta < 0) {
+            frameIncarnations.pop();
             variableIncarnations.pop();
         }
     }
@@ -129,9 +127,9 @@ public class StaticSingleAssignmentFormulaFormatter {
         } else if (expr instanceof AnonymousObject) {
             return expr;
         } else if (expr instanceof ReturnValue) {
-            return DefaultReturnValue.create("ssa_" + getIncarnationNumber((Root) expr, depth) + "_depth_" + (getDepth() - depth) + "_" + expr.getRoot().getName());
+            return DefaultReturnValue.create("ssa_" + getIncarnationNumber((Root) expr, depth) + "_frame_" + getFrame(depth) + "_" + expr.getRoot().getName());
         } else if (expr instanceof Root) {
-            return DefaultRoot.create("ssa_" + getIncarnationNumber((Root) expr, depth) + "_depth_" + (getDepth() - depth) + "_" + expr.getRoot().getName());
+            return DefaultRoot.create("ssa_" + getIncarnationNumber((Root) expr, depth) + "_frame_" + getFrame(depth) + "_" + expr.getRoot().getName());
         } else {
             AccessExpression prefix = incarnateSymbol(expr.cutTail(), depth);
 
@@ -170,6 +168,7 @@ public class StaticSingleAssignmentFormulaFormatter {
         }
 
         return new StaticSingleAssignmentFormulaFormatter(
+            (Stack<Integer>) frameIncarnations.clone(),
             stackClone,
             (HashMap<Field, Integer>) fieldIncarnations.clone(),
             arraysIncarnations

@@ -44,6 +44,7 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.Field;
@@ -290,11 +291,27 @@ public class PredicateAbstraction extends Abstraction {
     @Override
     public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         symbolTable.processMethodReturn(threadInfo, before, after);
-        predicateValuation.processMethodReturn(threadInfo, before, after);
 
         if (RunDetector.isRunning()) {
-            ssa.changeDepth(-1); // TODO: Bind return to actual returned value
+            MethodInfo callee = before.getMethodInfo();
+            MethodInfo caller = before.getMethodInfo();
+            AccessExpression returnSymbolCallee = DefaultReturnValue.create();
+            AccessExpression returnSymbolCaller = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
+            Expression returnValue;
+
+            if (before.getMethodInfo().getReturnSize() == 2) {
+                returnValue = ExpressionUtil.getExpression(after.getLongResultAttr());
+            } else {
+                returnValue = ExpressionUtil.getExpression(after.getResultAttr());
+            }
+
+            extendTraceFormulaWithAssignment(returnSymbolCallee, returnValue, callee, before.getPC().getPosition() + before.getPC().getLength(), 0);
+            extendTraceFormulaWithAssignment(returnSymbolCaller, returnSymbolCallee, caller, after.getPC().getPosition(), -1);
+
+            ssa.changeDepth(-1);
         }
+
+        predicateValuation.processMethodReturn(threadInfo, before, after);
     }
 
     @Override
@@ -303,7 +320,7 @@ public class PredicateAbstraction extends Abstraction {
         predicateValuation.processVoidMethodReturn(threadInfo, before, after);
 
         if (RunDetector.isRunning()) {
-            ssa.changeDepth(-1); // TODO: Bind return to actual returned value
+            ssa.changeDepth(-1);
         }
     }
 

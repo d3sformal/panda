@@ -646,7 +646,7 @@ public class SMT {
         for (int id1 : fresh) {
             for (int id2 : fresh) {
                 if (id1 > id2) {
-                    freshConstraints.add("(assert (not (= fresh_" + id1 + " fresh_" + id2 + ")))");
+                    freshConstraints.add("(assert (not (= fresh_" + id1 + " fresh_" + id2 + ")))" + separator);
                 }
             }
         }

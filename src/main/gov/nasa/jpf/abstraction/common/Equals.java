@@ -33,6 +33,8 @@ public class Equals extends Comparison {
     public static Predicate create(Expression a, Expression b) {
         if (!argumentsDefined(a, b)) return null;
 
+        if (a.equals(b)) return Tautology.create();
+
         if (a instanceof Undefined) return Contradiction.create();
         if (b instanceof Undefined) return Contradiction.create();
 

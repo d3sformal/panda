@@ -145,7 +145,7 @@ path returns [DefaultAccessExpression val]
         $ctx.val = DefaultReturnValue.create();
     }
     | f=ID_TOKEN {
-        $ctx.val = DefaultRoot.create($f.text.replaceAll("var_ssa_[0-9]+_depth_[0-9]+_", ""));
+        $ctx.val = DefaultRoot.create($f.text.replaceAll("var_ssa_[0-9]+_frame_[0-9]+_", ""));
     }
     | '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' {
         $ctx.val = $p.val;
@@ -169,7 +169,7 @@ LET_TOKEN      : 'let';
 NOT_TOKEN      : 'not';
 NULL_TOKEN     : 'null';
 OR_TOKEN       : 'or';
-RETURN_TOKEN   : 'var_ssa_'[0-9]+'_depth_'[0-9]+'_return_pc[0-9]+';
+RETURN_TOKEN   : 'var_ssa_'[0-9]+'_frame_'[0-9]+'_return'('_pc'[0-9]+)?;
 SELECT_TOKEN   : 'select';
 TRUE_TOKEN     : 'true';
 
