@@ -224,9 +224,11 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 for (Predicate p : ctx.predicates) {
                     if (p.equals(interpolant)) {
                         for (int pc : interpolant.getScope()) {
-                            refined = refined || !p.getScope().contains(pc);
+                            refined = refined || !p.isInScope(pc);
                         }
-                        p.getScope().addAll(interpolant.getScope());
+                        if (p.getScope() != null) {
+                            p.getScope().addAll(interpolant.getScope());
+                        }
                         present = true;
                         break;
                     }

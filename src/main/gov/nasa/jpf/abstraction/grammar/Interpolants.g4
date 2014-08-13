@@ -35,10 +35,15 @@ predicatelist returns [Predicate[] val]
     }
     ;
 
-predicate returns [Predicate val] locals [Map<AccessExpression, Expression> lets = new HashMap<AccessExpression, Expression>()]
-    : '(' LET_TOKEN '(''(' '.' v=ID_TOKEN e=expression ')'')' p=predicate ')' {
-        $lets.put(DefaultRoot.create("." + $v.text), $e.val);
-        $ctx.val = $p.val.replace($lets);
+predicate returns [Predicate val] locals [static Map<String, Object> let = new HashMap<String, Object>()]
+    : '.' id=ID_TOKEN {
+        $ctx.val = (Predicate) PredicateContext.let.get($id.text);
+    }
+    | '(' LET_TOKEN '(''(' '.' v=ID_TOKEN e=expression ')' {PredicateContext.let.put($v.text, $e.val);} ')' p=predicate ')' {
+        $ctx.val = $p.val;
+    }
+    | '(' LET_TOKEN '(''(' '.' v=ID_TOKEN q=predicate ')' {PredicateContext.let.put($v.text, $q.val);} ')' p=predicate ')' {
+        $ctx.val = $p.val;
     }
     | TRUE_TOKEN {
         $ctx.val = Tautology.create();
@@ -54,6 +59,9 @@ predicate returns [Predicate val] locals [Map<AccessExpression, Expression> lets
     }
     | '(' NOT_TOKEN p=predicate ')' {
         $ctx.val = Negation.create($p.val);
+    }
+    | '(=>' p=predicate q=predicate ')' {
+        $ctx.val = Disjunction.create(Negation.create($p.val), $q.val);
     }
     | '(' DISTINCT_TOKEN a=expression b=expression ')' {
         $ctx.val = Negation.create(Equals.create($a.val, $b.val));
@@ -110,7 +118,7 @@ term returns [Expression val]
 
 factor returns [Expression val]
     : '.' id=ID_TOKEN {
-        $ctx.val = DefaultRoot.create("." + $id.text);
+        $ctx.val = (Expression) PredicateContext.let.get($id.text);
     }
     | CONSTANT_TOKEN {
         $ctx.val = Constant.create(Integer.parseInt($CONSTANT_TOKEN.text));
@@ -137,7 +145,7 @@ path returns [DefaultAccessExpression val]
         $ctx.val = DefaultReturnValue.create();
     }
     | f=ID_TOKEN {
-        $ctx.val = DefaultRoot.create($f.text.replaceAll("var_ssa_[0-9]+_", ""));
+        $ctx.val = DefaultRoot.create($f.text.replaceAll("var_ssa_[0-9]+_depth_[0-9]+_", ""));
     }
     | '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' {
         $ctx.val = $p.val;
@@ -161,7 +169,7 @@ LET_TOKEN      : 'let';
 NOT_TOKEN      : 'not';
 NULL_TOKEN     : 'null';
 OR_TOKEN       : 'or';
-RETURN_TOKEN   : 'var_ssa_'[0-9]+'_return_pc[0-9]+';
+RETURN_TOKEN   : 'var_ssa_'[0-9]+'_depth_'[0-9]+'_return_pc[0-9]+';
 SELECT_TOKEN   : 'select';
 TRUE_TOKEN     : 'true';
 

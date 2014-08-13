@@ -13,9 +13,11 @@ import java.util.TreeSet;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.Abstraction;
@@ -27,6 +29,7 @@ import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
@@ -116,7 +119,7 @@ public class PredicateAbstraction extends Abstraction {
 
     private StaticSingleAssignmentFormulaFormatter ssa = new StaticSingleAssignmentFormulaFormatter();
 
-    private void extendTraceFormulaWithAssignment(AccessExpression to, Expression from, MethodInfo m, int nextPC) {
+    private void extendTraceFormulaWithAssignment(AccessExpression to, Expression from, MethodInfo m, int nextPC, int depthDelta) {
         // a := ...
         // a' = ...
         //
@@ -126,32 +129,35 @@ public class PredicateAbstraction extends Abstraction {
         // a[i] := ...
         // arr' = awrite(arr, a, i, ...)
         if (RunDetector.isRunning()) {
+            int beforeDepth = depthDelta > 0 ? 1 : 0;
+            int afterDepth = depthDelta < 0 ? 1 : 0;
+
             Set<AccessExpression> exprs = new HashSet<AccessExpression>();
             Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
 
             from.addAccessExpressionsToSet(exprs);
 
             for (AccessExpression e : exprs) {
-                replacements.put(e, ssa.incarnateSymbol(e));
+                replacements.put(e, ssa.incarnateSymbol(e, beforeDepth));
             }
 
             from = from.replace(replacements);
 
             if (to instanceof Root) {
-                ssa.reincarnateSymbol(to);
+                ssa.reincarnateSymbol(to, afterDepth);
 
-                extendTraceFormulaWith(VariableAssign.create((Root) ssa.incarnateSymbol(to), from), m, nextPC);
+                extendTraceFormulaWith(VariableAssign.create((Root) ssa.incarnateSymbol(to, afterDepth), from), m, nextPC);
             } else if (to instanceof ObjectFieldRead) {
                 ObjectFieldRead fr = (ObjectFieldRead) to;
                 Field f = fr.getField();
 
                 Field rightHandSide = DefaultObjectFieldWrite.create(
-                    ssa.incarnateSymbol(fr.getObject()),
+                    ssa.incarnateSymbol(fr.getObject(), beforeDepth),
                     ssa.incarnateSymbol(f),
                     from
                 );
 
-                ssa.reincarnateSymbol(to);
+                ssa.reincarnateSymbol(to, afterDepth);
 
                 extendTraceFormulaWith(FieldAssign.create(ssa.incarnateSymbol(f), rightHandSide), m, nextPC);
             } else if (to instanceof ArrayElementRead) {
@@ -164,19 +170,19 @@ public class PredicateAbstraction extends Abstraction {
                 ar.getIndex().addAccessExpressionsToSet(exprs);
 
                 for (AccessExpression e : exprs) {
-                    replacements.put(e, ssa.incarnateSymbol(e));
+                    replacements.put(e, ssa.incarnateSymbol(e, beforeDepth));
                 }
 
                 Expression index = ar.getIndex().replace(replacements);
 
                 Arrays rightHandSide = DefaultArrayElementWrite.create(
-                    ssa.incarnateSymbol(ar.getArray()),
+                    ssa.incarnateSymbol(ar.getArray(), beforeDepth),
                     ssa.incarnateSymbol(a),
                     index,
                     from
                 );
 
-                ssa.reincarnateSymbol(to);
+                ssa.reincarnateSymbol(to, afterDepth);
 
                 extendTraceFormulaWith(ArraysAssign.create(ssa.incarnateSymbol(a), rightHandSide), m, nextPC);
             }
@@ -195,7 +201,7 @@ public class PredicateAbstraction extends Abstraction {
             e2.addAccessExpressionsToSet(exprs);
 
             for (AccessExpression expr : exprs) {
-                replacements.put(expr, ssa.incarnateSymbol(expr));
+                replacements.put(expr, ssa.incarnateSymbol(expr, 0));
             }
 
             extendTraceFormulaWith(e.replace(replacements), m, nextPC);
@@ -213,7 +219,7 @@ public class PredicateAbstraction extends Abstraction {
 
         predicateValuation.reevaluate(lastPC, nextPC, to, affected, PrimitiveExpressionDecorator.wrap(from, symbolTable));
 
-        extendTraceFormulaWithAssignment(to, from, m, nextPC);
+        extendTraceFormulaWithAssignment(to, from, m, nextPC, 0);
     }
 
     @Override
@@ -222,7 +228,7 @@ public class PredicateAbstraction extends Abstraction {
 
         predicateValuation.reevaluate(lastPC, nextPC, to, affected, ObjectExpressionDecorator.wrap(from, symbolTable));
 
-        extendTraceFormulaWithAssignment(to, from, m, nextPC);
+        extendTraceFormulaWithAssignment(to, from, m, nextPC, 0);
     }
 
     @Override
@@ -230,6 +236,47 @@ public class PredicateAbstraction extends Abstraction {
         symbolTable.processMethodCall(threadInfo, before, after);
 
         predicateValuation.processMethodCall(threadInfo, before, after);
+
+        if (RunDetector.isRunning()) {
+            ssa.changeDepth(+1);
+            MethodInfo method = after.getMethodInfo();
+            byte[] argTypes = new byte[method.getNumberOfStackArguments()];
+
+            int i = 0;
+
+            if (!method.isStatic()) {
+                argTypes[i++] = Types.T_REFERENCE;
+            }
+
+            for (byte argType : method.getArgumentTypes()) {
+                argTypes[i++] = argType;
+            }
+
+            for (int argIndex = 0, slotIndex = 0; argIndex < method.getNumberOfStackArguments(); ++argIndex) {
+                Expression expr = ExpressionUtil.getExpression(after.getSlotAttr(slotIndex));
+
+                // Actual symbolic parameter
+                LocalVarInfo arg = after.getLocalVarInfo(slotIndex);
+                String name = arg == null ? null : arg.getName();
+
+                AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
+
+                if (expr != null) {
+                    extendTraceFormulaWithAssignment(formalArgument, expr, method, 0, +1);
+                }
+
+                switch (argTypes[argIndex]) {
+                    case Types.T_LONG:
+                    case Types.T_DOUBLE:
+                        slotIndex += 2;
+                        break;
+
+                    default:
+                        slotIndex += 1;
+                        break;
+                }
+            }
+        }
     }
 
     public Integer computePreciseExpressionValue(Expression expression) {
@@ -244,12 +291,20 @@ public class PredicateAbstraction extends Abstraction {
     public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         symbolTable.processMethodReturn(threadInfo, before, after);
         predicateValuation.processMethodReturn(threadInfo, before, after);
+
+        if (RunDetector.isRunning()) {
+            ssa.changeDepth(-1); // TODO: Bind return to actual returned value
+        }
     }
 
     @Override
     public void processVoidMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         symbolTable.processVoidMethodReturn(threadInfo, before, after);
         predicateValuation.processVoidMethodReturn(threadInfo, before, after);
+
+        if (RunDetector.isRunning()) {
+            ssa.changeDepth(-1); // TODO: Bind return to actual returned value
+        }
     }
 
     @Override
@@ -310,7 +365,7 @@ public class PredicateAbstraction extends Abstraction {
         condition.addAccessExpressionsToSet(exprs);
 
         for (AccessExpression e : exprs) {
-            replacements.put(e, ssa.incarnateSymbol(e));
+            replacements.put(e, ssa.incarnateSymbol(e, 0));
         }
 
         condition = condition.replace(replacements);
