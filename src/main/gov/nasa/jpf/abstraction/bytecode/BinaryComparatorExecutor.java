@@ -119,6 +119,12 @@ public abstract class BinaryComparatorExecutor<T> {
                 ss.setNextChoiceGenerator(cg);
 
                 return cmp.getSelf();
+            } else if (less_than) {
+                PredicateAbstraction.getInstance().extendTraceFormulaWith(LessThan.create(expr1, expr2), cmp.getSelf().getMethodInfo(), cmp.getSelf().getPosition());
+            } else if (equal) {
+                PredicateAbstraction.getInstance().extendTraceFormulaWith(Equals.create(expr1, expr2), cmp.getSelf().getMethodInfo(), cmp.getSelf().getPosition());
+            } else if (greater_than) {
+                PredicateAbstraction.getInstance().extendTraceFormulaWith(LessThan.create(expr2, expr1), cmp.getSelf().getMethodInfo(), cmp.getSelf().getPosition());
             }
         } else { // this is what really returns results
             /**

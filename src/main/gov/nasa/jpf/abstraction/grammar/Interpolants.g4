@@ -60,6 +60,9 @@ predicate returns [Predicate val] locals [static Map<String, Object> let = new H
     | '(' NOT_TOKEN p=predicate ')' {
         $ctx.val = Negation.create($p.val);
     }
+    | '(' ITE_TOKEN p=predicate q=predicate r=predicate ')' {
+        $ctx.val = Disjunction.create(Conjunction.create($p.val, $q.val), Conjunction.create(Negation.create($p.val), $r.val));
+    }
     | '(=>' p=predicate q=predicate ')' {
         $ctx.val = Disjunction.create(Negation.create($p.val), $q.val);
     }
@@ -101,6 +104,9 @@ expression returns [Expression val]
     }
     | '(-' a=term b=term ')' {
         $ctx.val = Subtract.create($a.val, $b.val);
+    }
+    | '(-' a=term ')' {
+        $ctx.val = Subtract.create(Constant.create(0), $a.val);
     }
     ;
 
@@ -165,6 +171,7 @@ DISTINCT_TOKEN : 'distinct';
 FALSE_TOKEN    : 'false';
 FRESH_TOKEN    : 'fresh_'[0-9]+;
 INIT_TOKEN     : '<init>';
+ITE_TOKEN      : 'ite';
 LET_TOKEN      : 'let';
 NOT_TOKEN      : 'not';
 NULL_TOKEN     : 'null';

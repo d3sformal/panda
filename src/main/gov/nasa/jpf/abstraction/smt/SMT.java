@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import gov.nasa.jpf.abstraction.Step;
+import gov.nasa.jpf.abstraction.TraceFormula;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -374,27 +376,12 @@ public class SMT {
         }
     }
 
-    private static int interpolationGroup;
-
-    private void appendInterpolationGroups(Predicate conjunction, StringBuilder input, String separator) {
-        if (conjunction instanceof Conjunction) {
-            appendInterpolationGroups(((Conjunction) conjunction).a, input, separator);
-            appendInterpolationGroups(((Conjunction) conjunction).b, input, separator);
-        } else {
-            ++interpolationGroup;
-
-            input.append("(assert (! "); input.append(convertToString(conjunction)); input.append(" :named g"); input.append(interpolationGroup); input.append("))"); input.append(separator);
-        }
-    }
-
-    public Predicate[] interpolate(Predicate conjunction) throws SMTException {
-        if (conjunction instanceof Tautology) return new Predicate[] {Tautology.create()};
-
+    public Predicate[] interpolate(TraceFormula traceFormula) throws SMTException {
         SMT interpol = new SMT(SupportedSMT.SMTInterpol);
 
         PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
 
-        collector.collect(conjunction);
+        collector.collect(traceFormula.toConjunction());
 
         Set<String> classes = collector.getClasses();
         Set<String> variables = collector.getVars();
@@ -418,8 +405,11 @@ public class SMT {
             appendFreshConstraints(fresh, objects, input, separator);
         }
 
-        interpolationGroup = 0;
-        appendInterpolationGroups(conjunction, input, separator);
+        int interpolationGroup = 0;
+
+        for (Step s : traceFormula) {
+            input.append("(assert (! "); input.append(convertToString(s.getPredicate())); input.append(" :named g"); input.append(++interpolationGroup); input.append("))"); input.append(separator);
+        }
 
         input.append("(check-sat)"); input.append(separator);
         input.append("(get-interpolants");

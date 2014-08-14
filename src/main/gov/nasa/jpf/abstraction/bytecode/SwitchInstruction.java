@@ -68,15 +68,25 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
                 return super.execute(ti);
             }
 
-            if (choices.size() > 0) {
+            if (choices.size() > 1) {
                 int[] param = new int[choices.size()];
                 for (int i = 0; i < choices.size(); ++i)
                     param[i] = choices.get(i);
                 ChoiceGenerator<?> cg = new IntChoiceFromList("abstractSwitchAll", param);
                 ss.setNextChoiceGenerator(cg);
                 return this;
+            } else if (choices.size() == 1) {
+                sf.pop();
+
+                PredicateAbstraction.getInstance().extendTraceFormulaWith(Equals.create(expr, Constant.create(matches[choices.get(0)])), getMethodInfo(), getPosition());
+
+                return mi.getInstructionAt(targets[choices.get(0)]);
             } else {
                 sf.pop();
+
+                // TODO: how to extend the trace formula?
+                // for all x in matches: expr != x
+
                 return mi.getInstructionAt(target);
             }
         } else {

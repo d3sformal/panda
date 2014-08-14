@@ -82,6 +82,11 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
     }
 
     @Override
+    public Instruction athrow() {
+        return (filter.isPassing(ci) ? new ATHROW() : super.athrow());
+    }
+
+    @Override
     public Instruction baload() {
         return (filter.isPassing(ci) ? new BALOAD() : super.baload());
     }

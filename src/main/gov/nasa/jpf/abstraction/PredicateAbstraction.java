@@ -87,12 +87,12 @@ public class PredicateAbstraction extends Abstraction {
     private SystemSymbolTable symbolTable;
     private SystemPredicateValuation predicateValuation;
     private Trace trace;
+    private TraceFormula traceFormula;
     private boolean isInitialized = false;
     private Set<ClassInfo> startupClasses = new HashSet<ClassInfo>();
 
     public SMT smt = new SMT();
     private Stack<Pair<MethodInfo, Integer>> traceProgramLocations = new Stack<Pair<MethodInfo, Integer>>();
-    private Predicate traceFormula = Tautology.create();
     private Predicates predicateSet;
 
     private static PredicateAbstraction instance = null;
@@ -114,6 +114,7 @@ public class PredicateAbstraction extends Abstraction {
         symbolTable = new SystemSymbolTable(this);
         predicateValuation = new SystemPredicateValuation(this, predicateSet);
         trace = new Trace();
+        traceFormula = new TraceFormula();
 
         this.predicateSet = predicateSet;
     }
@@ -209,9 +210,12 @@ public class PredicateAbstraction extends Abstraction {
         }
     }
 
-    private void extendTraceFormulaWith(Predicate p, MethodInfo m, int nextPC) {
-        traceProgramLocations.push(new Pair<MethodInfo, Integer>(m, nextPC));
-        traceFormula = Conjunction.create(traceFormula, p);
+    public void extendTraceFormulaWith(Predicate p, MethodInfo m, int nextPC) {
+        traceFormula.append(p, m, nextPC);
+    }
+
+    public void cutTraceAfterAssertion(MethodInfo m, int pc) {
+        traceFormula.cutAfterAssertion(m, pc);
     }
 
     @Override
@@ -294,7 +298,7 @@ public class PredicateAbstraction extends Abstraction {
 
         if (RunDetector.isRunning()) {
             MethodInfo callee = before.getMethodInfo();
-            MethodInfo caller = before.getMethodInfo();
+            MethodInfo caller = after.getMethodInfo();
             AccessExpression returnSymbolCallee = DefaultReturnValue.create();
             AccessExpression returnSymbolCaller = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
             Expression returnValue;
@@ -420,7 +424,6 @@ public class PredicateAbstraction extends Abstraction {
             mainThread.getId(),
             symbols,
             predicates,
-            traceProgramLocations,
             traceFormula,
             ssa
         );
@@ -440,7 +443,7 @@ public class PredicateAbstraction extends Abstraction {
         }
     }
 
-    public Predicate getTraceFormula() {
+    public TraceFormula getTraceFormula() {
         return traceFormula;
     }
 
@@ -451,8 +454,7 @@ public class PredicateAbstraction extends Abstraction {
             VM.getVM().getCurrentThread().getId(),
             symbolTable.memorize(),
             predicateValuation.memorize(),
-            (Stack<Pair<MethodInfo, Integer>>)traceProgramLocations.clone(),
-            traceFormula,
+            traceFormula.clone(),
             ssa.clone()
         );
 
@@ -469,8 +471,7 @@ public class PredicateAbstraction extends Abstraction {
         predicateValuation.restore(trace.top().predicateValuationStacks);
         predicateValuation.scheduleThread(trace.top().currentThread);
 
-        traceProgramLocations = (Stack<Pair<MethodInfo, Integer>>)trace.top().traceProgramLocations.clone();
-        traceFormula = trace.top().traceFormula;
+        traceFormula = trace.top().traceFormula.clone();
         ssa = trace.top().ssa.clone();
 
         if (trace.isEmpty()) {
@@ -492,7 +493,7 @@ public class PredicateAbstraction extends Abstraction {
         if (VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation")) {
             Predicate[] interpolants = smt.interpolate(traceFormula);
 
-            notifyAboutCounterexample(traceFormula, traceProgramLocations, interpolants);
+            notifyAboutCounterexample(traceFormula, interpolants);
 
             if (interpolants != null) {
                 boolean refined = false;
@@ -501,17 +502,17 @@ public class PredicateAbstraction extends Abstraction {
                     Predicate interpolant = interpolants[i];
 
                     // Make the predicate valid at the correct point in the trace (needs to be valid over instructions that follow but do not contribute to the trace formula (stack manipulation))
-                    MethodInfo mStart = traceProgramLocations.get(i).getFirst();
-                    int pcStart = traceProgramLocations.get(i).getSecond();
+                    MethodInfo mStart = traceFormula.get(i).getMethod();
+                    int pcStart = traceFormula.get(i).getPC();
 
                     MethodInfo mEnd = null;
                     int pcEnd = mStart.getLastInsn().getPosition();
 
-                    if (traceProgramLocations.size() > i) {
-                        mEnd = traceProgramLocations.get(i + 1).getFirst();
+                    if (traceFormula.size() > i) {
+                        mEnd = traceFormula.get(i + 1).getMethod();
 
                         if (mStart == mEnd) {
-                            pcEnd = traceProgramLocations.get(i + 1).getSecond();
+                            pcEnd = traceFormula.get(i + 1).getPC();
                         }
                     }
 
@@ -533,9 +534,9 @@ public class PredicateAbstraction extends Abstraction {
         return true;
     }
 
-    private static void notifyAboutCounterexample(Predicate traceFormula, Stack<Pair<MethodInfo, Integer>> traceProgramLocations, Predicate[] interpolants) {
+    private static void notifyAboutCounterexample(TraceFormula traceFormula, Predicate[] interpolants) {
         for (CounterexampleListener listener : listeners) {
-            listener.counterexample(traceFormula, traceProgramLocations, interpolants);
+            listener.counterexample(traceFormula, interpolants);
         }
     }
 }

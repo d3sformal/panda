@@ -12,6 +12,7 @@ import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ExpressionUtil;
+import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -37,7 +38,8 @@ public class UnaryIfInstructionExecutor {
         StackFrame sf = ti.getModifiableTopFrame();
         Expression expr = ExpressionUtil.getExpression(sf.getOperandAttr());
 
-        TruthValue condition = null;
+        Predicate predicate = null;
+        TruthValue condition = TruthValue.UNDEFINED;
 
         boolean conditionValue;
 
@@ -56,26 +58,34 @@ public class UnaryIfInstructionExecutor {
              * No other abstraction can do that, the rest of them returns UNDEFINED.
              */
             if (expr != null && RunDetector.isRunning()) {
-                condition = PredicateAbstraction.getInstance().processBranchingCondition(br.getSelf().getPosition(), br.createPredicate(expr, constant));
+                predicate = br.createPredicate(expr, constant);
+                condition = PredicateAbstraction.getInstance().processBranchingCondition(br.getSelf().getPosition(), predicate);
             }
 
-            // In case there was no predicate abstraction / no symbolic expression (or the execution did not yet reach the target program or we already left it)
-            if (condition == null) {
-                // fallback to a concrete execution
-                return br.executeConcrete(ti);
-            }
+            switch (condition) {
+                // IF THE BRANCH COULD NOT BE PICKED BY PREDICATE ABSTRACTION (IT IS NOT ACTIVE)
+                default:
+                case UNDEFINED:
+                    return br.executeConcrete(ti);
+                case TRUE:
+                    ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
+                    conditionValue = true;
 
-            if (condition == TruthValue.TRUE) {
-                ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
-                conditionValue = true;
-            } else if (condition == TruthValue.FALSE) {
-                ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
-                conditionValue = false;
-            } else { // TOP
-                ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
-                ss.setNextChoiceGenerator(cg);
+                    PredicateAbstraction.getInstance().extendTraceFormulaWith(predicate, br.getSelf().getMethodInfo(), br.getSelf().getPosition());
 
-                return br.getSelf();
+                    break;
+                case FALSE:
+                    ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
+                    conditionValue = false;
+
+                    PredicateAbstraction.getInstance().extendTraceFormulaWith(Negation.create(predicate), br.getSelf().getMethodInfo(), br.getSelf().getPosition());
+
+                    break;
+                case UNKNOWN:
+                    ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
+                    ss.setNextChoiceGenerator(cg);
+
+                    return br.getSelf();
             }
         } else { // this is what really returns results
             ChoiceGenerator<?> cg = ss.getChoiceGenerator();
@@ -85,7 +95,7 @@ public class UnaryIfInstructionExecutor {
             conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
 
             if (expr != null) {
-                Predicate predicate = br.createPredicate(expr, constant);
+                predicate = br.createPredicate(expr, constant);
                 PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)), br.getSelf().getMethodInfo(), (conditionValue ? br.getTarget() : br.getNext(ti)).getPosition());
             }
         }

@@ -6,6 +6,8 @@ import gov.nasa.jpf.ListenerAdapter;
 import gov.nasa.jpf.vm.MethodInfo;
 
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.Step;
+import gov.nasa.jpf.abstraction.TraceFormula;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
@@ -13,19 +15,6 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 public class CounterexampleListener extends ListenerAdapter {
     public CounterexampleListener() {
         PredicateAbstraction.registerCounterexampleListener(this);
-    }
-
-    private int traceStep;
-    private int traceStepCount;
-
-    private static int countErrorConjuncts(Predicate formula) {
-        if (formula instanceof Conjunction) {
-            Conjunction c = (Conjunction) formula;
-
-            return countErrorConjuncts(c.a) + countErrorConjuncts(c.b);
-        } else {
-            return 1;
-        }
     }
 
     private static int log(int n) {
@@ -40,13 +29,11 @@ public class CounterexampleListener extends ListenerAdapter {
         return i;
     }
 
-    private void printErrorConjuncts(Predicate formula) {
-        if (formula instanceof Conjunction) {
-            Conjunction c = (Conjunction) formula;
+    private void printErrorConjuncts(TraceFormula traceFormula) {
+        int traceStep = 0;
+        int traceStepCount = traceFormula.size();
 
-            printErrorConjuncts(c.a);
-            printErrorConjuncts(c.b);
-        } else {
+        for (Step s : traceFormula) {
             System.out.print("\t");
 
             ++traceStep;
@@ -55,19 +42,17 @@ public class CounterexampleListener extends ListenerAdapter {
                 System.out.print(" ");
             }
 
-            System.out.println(traceStep + ": " + formula.toString(Notation.FUNCTION_NOTATION));
+            System.out.println(traceStep + ": " + s.getPredicate().toString(Notation.FUNCTION_NOTATION));
         }
     }
 
-    public void counterexample(Predicate traceFormula, Stack<Pair<MethodInfo, Integer>> traceProgramLocations, Predicate[] interpolants) {
+    public void counterexample(TraceFormula traceFormula, Predicate[] interpolants) {
         System.out.println();
         System.out.println();
         System.out.println("Counterexample Trace Formula:");
         //System.out.println(traceFormula.toString(Notation.SMT_NOTATION));
         //System.out.println(traceFormula.toString(Notation.FUNCTION_NOTATION));
 
-        traceStep = 0;
-        traceStepCount = countErrorConjuncts(traceFormula);
         printErrorConjuncts(traceFormula);
 
         System.out.println();
@@ -77,7 +62,7 @@ public class CounterexampleListener extends ListenerAdapter {
             int maxLen = 0;
 
             for (int i = 0; i < interpolants.length; ++i) {
-                int pcLen = ("[" + traceProgramLocations.get(i).getFirst().getName() + ":" + traceProgramLocations.get(i).getSecond() + "]").length();
+                int pcLen = ("[" + traceFormula.get(i).getMethod().getName() + ":" + traceFormula.get(i).getPC() + "]").length();
 
                 if (maxLen < pcLen) {
                     maxLen = pcLen;
@@ -86,8 +71,8 @@ public class CounterexampleListener extends ListenerAdapter {
 
             for (int i = 0; i < interpolants.length; ++i) {
                 Predicate interpolant = interpolants[i];
-                int pc = traceProgramLocations.get(i).getSecond();
-                String pcStr = "[" + traceProgramLocations.get(i).getFirst().getName() + ":" + traceProgramLocations.get(i).getSecond() + "]";
+                int pc = traceFormula.get(i).getPC();
+                String pcStr = "[" + traceFormula.get(i).getMethod().getName() + ":" + traceFormula.get(i).getPC() + "]";
                 int pcLen = pcStr.length();
 
                 System.out.print("\t" + pcStr + ": ");

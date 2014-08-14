@@ -19,6 +19,7 @@ import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ExpressionUtil;
+import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -58,6 +59,7 @@ public class BinaryIfInstructionExecutor {
          * Otherwise we inspect all the choices
          */
         if (!ti.isFirstStepInsn()) { // first time around
+            Predicate predicate = null;
             TruthValue truth = TruthValue.UNDEFINED;
 
             /**
@@ -66,7 +68,7 @@ public class BinaryIfInstructionExecutor {
              * No other abstraction can do that, the rest of them returns UNDEFINED.
              */
             if (expr1 != null && expr2 != null && RunDetector.isRunning()) {
-                Predicate predicate = br.createPredicate(expr1, expr2);
+                predicate = br.createPredicate(expr1, expr2);
                 truth = PredicateAbstraction.getInstance().processBranchingCondition(br.getSelf().getPosition(), predicate);
             }
 
@@ -78,10 +80,16 @@ public class BinaryIfInstructionExecutor {
                 case TRUE:
                     ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
                     conditionValue = true;
+
+                    PredicateAbstraction.getInstance().extendTraceFormulaWith(predicate, br.getSelf().getMethodInfo(), br.getSelf().getPosition());
+
                     break;
                 case FALSE:
                     ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
                     conditionValue = false;
+
+                    PredicateAbstraction.getInstance().extendTraceFormulaWith(Negation.create(predicate), br.getSelf().getMethodInfo(), br.getSelf().getPosition());
+
                     break;
                 case UNKNOWN:
                     ChoiceGenerator<?> cg = new AbstractChoiceGenerator();

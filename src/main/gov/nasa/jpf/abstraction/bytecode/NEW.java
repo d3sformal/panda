@@ -27,7 +27,12 @@ public class NEW extends gov.nasa.jpf.jvm.bytecode.NEW {
         }
 
         StackFrame sf = ti.getModifiableTopFrame();
-        AnonymousObject object = AnonymousObject.create(new Reference(ti.getElementInfo(sf.peek())));
+        ElementInfo ei = ti.getElementInfo(sf.peek());
+        AnonymousObject object = AnonymousObject.create(new Reference(ei));
+
+        if (ei.getClassInfo().getName().equals("java.lang.AssertionError")) {
+            AssertionErrorTracker.setAssertionErrorAllocationSite(ei, sf.getMethodInfo(), getPosition());
+        }
 
         PredicateAbstraction.getInstance().processNewObject(object);
         sf.setOperandAttr(object);

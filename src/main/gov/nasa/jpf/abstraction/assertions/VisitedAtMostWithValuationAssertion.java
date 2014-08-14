@@ -6,6 +6,7 @@ public class VisitedAtMostWithValuationAssertion implements LocationAssertion {
     private int visits = 0;
 
     public VisitedAtMostWithValuationAssertion update(PredicateValuationMap valuationReference, PredicateValuationMap currentValuation, Integer count) {
+        valuation = valuationReference;
         limit = count;
 
         if (valuationReference.equals(currentValuation)) {
