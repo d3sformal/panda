@@ -187,7 +187,7 @@ bin/run.sh src/examples/arraylength/ALength.jpf
 The output of the command should look like this:
 
 ```
-Running Abstract PathFinder ...
+Running Panda ...
 [method arraylength.ALength.main]
 alength(arrlen, a) = -1
 alength(arrlen, a) = i
