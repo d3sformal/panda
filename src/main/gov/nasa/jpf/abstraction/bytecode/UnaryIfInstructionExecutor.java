@@ -102,7 +102,7 @@ public class UnaryIfInstructionExecutor {
 
         sf.pop();
 
-        IfHelper.synchronizeConcreteAndAbstractExecutions(br, ti, v1, constant.value.intValue(), expr, constant, conditionValue);
+        BranchingStateAdjustHelper.synchronizeConcreteAndAbstractExecutions(br, ti, v1, constant.value.intValue(), expr, constant, conditionValue);
 
         return (conditionValue ? br.getTarget() : br.getNext(ti));
     }

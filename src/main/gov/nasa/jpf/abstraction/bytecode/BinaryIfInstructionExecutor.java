@@ -113,7 +113,7 @@ public class BinaryIfInstructionExecutor {
         sf.pop();
         sf.pop();
 
-        IfHelper.synchronizeConcreteAndAbstractExecutions(br, ti, v1, v2, expr1, expr2, conditionValue);
+        BranchingStateAdjustHelper.synchronizeConcreteAndAbstractExecutions(br, ti, v1, v2, expr1, expr2, conditionValue);
 
         return (conditionValue ? br.getTarget() : br.getNext(ti));
     }
