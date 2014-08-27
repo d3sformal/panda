@@ -122,14 +122,21 @@ public class PredicateAbstraction extends Abstraction {
     private StaticSingleAssignmentFormulaFormatter ssa = new StaticSingleAssignmentFormulaFormatter();
 
     private void extendTraceFormulaWithAssignment(AccessExpression to, Expression from, MethodInfo m, int nextPC, int depthDelta) {
-        // a := ...
-        // a' = ...
+        // The trace formula is extended with a constraint relating a POST STATE to a PRE STATE in the following fashion (for variables, field writes, array element writes):
         //
-        // a.f := ...
-        // f' = fwrite(f, a, ...)
+        // Variables:
+        // a := <expr>  (Statement)
+        // a' = ssa(<expr>)  (Constraint)
         //
-        // a[i] := ...
-        // arr' = awrite(arr, a, i, ...)
+        // Field writes:
+        // a.f := <expr>
+        // f' = fwrite(f, a, ssa(<expr>))
+        //
+        // Array element writes:
+        // a[i] := <expr>
+        // arr' = awrite(arr, a, i, ssa(<expr>))
+        //
+        // where `ssa( ... )` denotes expression encoded in SSA form (symbols incarnated ...)
         if (RunDetector.isRunning()) {
             int beforeDepth = depthDelta > 0 ? 1 : 0;
             int afterDepth = depthDelta < 0 ? 1 : 0;

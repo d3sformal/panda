@@ -120,11 +120,11 @@ predicatecontext returns [gov.nasa.jpf.abstraction.common.PredicateContext val] 
     }
     ;
 
-predicatelist returns [List<Predicate> val] locals [SortedSet<Integer> scope = null]
+predicatelist returns [List<Predicate> val] locals [BytecodeRange scope = BytecodeUnlimitedRange.getInstance()]
     : /* EMPTY */ {
         $ctx.val = new ArrayList<Predicate>();
     }
-    | ps=predicatelist (s=predicatescope ':' {$ctx.scope = new TreeSet<Integer>(); $ctx.scope.addAll($s.val);})? p=predicate {
+    | ps=predicatelist (s=predicatescope ':' {$ctx.scope = $s.val;})? p=predicate {
         $ctx.val = $ps.val;
 
         for (Predicate p : $p.val) {
@@ -134,37 +134,25 @@ predicatelist returns [List<Predicate> val] locals [SortedSet<Integer> scope = n
     }
     ;
 
-predicatescope returns [SortedSet<Integer> val]
+predicatescope returns [BytecodeRange val]
     : r=predicaterange {
         $ctx.val = $r.val;
     }
     | ps=predicatescope ',' pr=predicaterange {
-        $ctx.val = new TreeSet<Integer>();
-        $ctx.val.addAll($ps.val);
-        $ctx.val.addAll($pr.val);
+        $ctx.val = $ps.val.merge($pr.val);
     }
     ;
 
-predicaterange returns [SortedSet<Integer> val]
+predicaterange returns [BytecodeRange val]
     : c=CONSTANT_TOKEN {
-        $ctx.val = new TreeSet<Integer>();
-        $ctx.val.add(Integer.parseInt($c.text));
+        int c = Integer.parseInt($c.text);
+        $ctx.val = new BytecodeInterval(c, c);
     }
     | c1=CONSTANT_TOKEN '..' c2=CONSTANT_TOKEN {
-        $ctx.val = new TreeSet<Integer>();
+        int c1 = Integer.parseInt($c1.text);
+        int c2 = Integer.parseInt($c2.text);
 
-        int lower = Integer.parseInt($c1.text);
-        int upper = Integer.parseInt($c2.text);
-
-        if (lower > upper) {
-            int swap = lower;
-            lower = upper;
-            upper = swap;
-        }
-
-        for (int i = lower; i < upper + 1; ++i) {
-            $ctx.val.add(i);
-        }
+        $ctx.val = new BytecodeInterval(c1, c2);
     }
     ;
 

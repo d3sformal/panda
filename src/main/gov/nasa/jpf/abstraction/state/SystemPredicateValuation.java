@@ -24,6 +24,8 @@ import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.AbstractMethodPredicateContext;
 import gov.nasa.jpf.abstraction.common.AssumePredicateContext;
+import gov.nasa.jpf.abstraction.common.BytecodeInterval;
+import gov.nasa.jpf.abstraction.common.BytecodeUnlimitedRange;
 import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Contradiction;
@@ -190,13 +192,8 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             return false;
         } else {
             boolean refined = false;
-            TreeSet<Integer> scope = new TreeSet<Integer>();
 
-            for (int i = fromPC; i <= toPC; ++i) {
-                scope.add(i);
-            }
-
-            interpolant.setScope(scope);
+            interpolant.setScope(new BytecodeInterval(fromPC, toPC));
 
             MethodPredicateContext ctx = null;
 
@@ -226,9 +223,9 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                         for (int pc : interpolant.getScope()) {
                             refined = refined || !p.isInScope(pc);
                         }
-                        if (p.getScope() != null) {
-                            p.getScope().addAll(interpolant.getScope());
-                        }
+
+                        p.setScope(p.getScope().merge(interpolant.getScope()));
+
                         present = true;
                         break;
                     }
@@ -629,7 +626,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 // If the predicate uses only allowed symbols (those that do not lose their meaning by changing scope)
                 if (!isUnwanted) {
                     predicate = predicate.replace(replacements);
-                    predicate.setScope(null); // <-- This is done to allow use of the predicate outside its original scope. It should be changed on a copy (TODO)
+                    predicate.setScope(BytecodeUnlimitedRange.getInstance()); // <-- This is done to allow use of the predicate outside its original scope. It should be changed on a copy (TODO)
 
                     relevant.put(predicate, value);
 

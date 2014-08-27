@@ -31,17 +31,17 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
 
     private Integer hashCodeValue = null;
     private String stringValue = null;
-    private SortedSet<Integer> scope = null;
+    private BytecodeRange scope = BytecodeUnlimitedRange.getInstance();
 
-    public void setScope(SortedSet<Integer> scope) {
+    public void setScope(BytecodeRange scope) {
         this.scope = scope;
     }
 
     public boolean isInScope(int pc) {
-        return scope == null || scope.contains(pc);
+        return scope instanceof BytecodeUnlimitedRange || scope.contains(pc);
     }
 
-    public SortedSet<Integer> getScope() {
+    public BytecodeRange getScope() {
         return scope;
     }
 

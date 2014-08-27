@@ -62,34 +62,10 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
     }
 
     private void visitPredicate(Predicate p) {
-        SortedSet<Integer> scope = p.getScope();
+        BytecodeRange scope = p.getScope();
 
-        if (scope != null) {
-            int last = -1;
-
-            for (int pc : scope) {
-                if (pc > last) {
-                    if (last > -1) {
-                        ret.append(",");
-                    }
-
-                    ret.append(pc);
-
-                    last = pc;
-
-                    while (scope.contains(++pc)) {}
-
-                    --pc;
-
-                    if (pc > last) {
-                        ret.append("..");
-                        ret.append(pc);
-
-                        last = pc;
-                    }
-                }
-            }
-
+        if (!(scope instanceof BytecodeUnlimitedRange)) {
+            ret.append(scope.toString());
             ret.append(": ");
         }
 

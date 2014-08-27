@@ -20,6 +20,8 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.BytecodeRange;
+import gov.nasa.jpf.abstraction.common.BytecodeUnlimitedRange;
 import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -353,16 +355,16 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         }
 
         if (valuations.containsKey(predicate)) {
-            SortedSet<Integer> scopeNew = predicate.getScope();
+            BytecodeRange scopeNew = predicate.getScope();
 
             for (Predicate p : valuations.keySet()) {
                 if (p.equals(predicate)) {
-                    SortedSet<Integer> scopeOld = p.getScope();
+                    BytecodeRange scopeOld = p.getScope();
 
-                    if (scopeOld == null) {
+                    if (scopeOld instanceof BytecodeUnlimitedRange) {
                         p.setScope(scopeNew);
-                    } else if (scopeNew != null) {
-                        scopeOld.addAll(scopeNew);
+                    } else if (!(scopeNew instanceof BytecodeUnlimitedRange)) {
+                        p.setScope(scopeOld.merge(scopeNew));
                     }
 
                     break;
@@ -528,6 +530,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                 } else {
                     /**
                      * Havoc values of predicates that are not in scope
+                     * (We do not want a predicate to keep its old value when it returns to scope after being out of it (and thus it was not maintained properly))
                      *
                      * This should not be necessary
                      * It would, however, be hard to detect when old values are used, even though the predicate ran out of scope before getting into the scope again
