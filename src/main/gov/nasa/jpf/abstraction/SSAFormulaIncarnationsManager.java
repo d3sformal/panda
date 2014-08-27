@@ -32,27 +32,27 @@ import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
 import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 
-public class StaticSingleAssignmentFormulaFormatter {
+public class SSAFormulaIncarnationsManager {
     private int frameNumber = 0;
     private Stack<Integer> frameIncarnations;
     private Stack<HashMap<Root, Integer>> variableIncarnations;
     private HashMap<Field, Integer> fieldIncarnations;
     private int arraysIncarnations;
 
-    public StaticSingleAssignmentFormulaFormatter() {
+    public SSAFormulaIncarnationsManager() {
         this(new Stack<Integer>(), new Stack<HashMap<Root, Integer>>(), new HashMap<Field, Integer>(), 0);
 
         changeDepth(+1);
     }
 
-    public StaticSingleAssignmentFormulaFormatter(Stack<Integer> frameIncarnations, Stack<HashMap<Root, Integer>> variableIncarnations, HashMap<Field, Integer> fieldIncarnations, int arraysIncarnations) {
+    public SSAFormulaIncarnationsManager(Stack<Integer> frameIncarnations, Stack<HashMap<Root, Integer>> variableIncarnations, HashMap<Field, Integer> fieldIncarnations, int arraysIncarnations) {
         this.frameIncarnations = frameIncarnations;
         this.variableIncarnations = variableIncarnations;
         this.fieldIncarnations = fieldIncarnations;
         this.arraysIncarnations = arraysIncarnations;
     }
 
-    private int getIncarnationNumber(Root expr, int depth) {
+    private int getVariableIncarnationNumber(Root expr, int depth) {
         if (!variableIncarnations.get(variableIncarnations.size() - depth - 1).containsKey(expr)) {
             return 0;
         }
@@ -60,11 +60,11 @@ public class StaticSingleAssignmentFormulaFormatter {
         return variableIncarnations.get(variableIncarnations.size() - depth - 1).get(expr);
     }
 
-    private void setIncarnationNumber(Root expr, int depth, int n) {
+    private void setVariableIncarnationNumber(Root expr, int depth, int n) {
         variableIncarnations.get(variableIncarnations.size() - depth - 1).put(expr, n);
     }
 
-    private int getIncarnationNumber(Field expr) {
+    private int getFieldIncarnationNumber(Field expr) {
         if (!fieldIncarnations.containsKey(expr)) {
             return 0;
         }
@@ -72,38 +72,38 @@ public class StaticSingleAssignmentFormulaFormatter {
         return fieldIncarnations.get(expr);
     }
 
-    private void setIncarnationNumber(Field expr, int n) {
+    private void setFieldIncarnationNumber(Field expr, int n) {
         fieldIncarnations.put(expr, n);
     }
 
-    private int getIncarnationNumber(Arrays expr) {
+    private int getArraysIncarnationNumber(Arrays expr) {
         return arraysIncarnations;
     }
 
-    private void setIncarnationNumber(Arrays expr, int n) {
+    private void setArraysIncarnationNumber(Arrays expr, int n) {
         arraysIncarnations = n;
     }
 
-    public void reincarnateSymbol(AccessExpression expr, int depth) {
+    public void createNewSymbolIncarnation(AccessExpression expr, int depth) {
         if (expr instanceof Root) {
-            setIncarnationNumber((Root) expr, depth, getIncarnationNumber((Root) expr, depth) + 1);
+            setVariableIncarnationNumber((Root) expr, depth, getVariableIncarnationNumber((Root) expr, depth) + 1);
         } else if (expr instanceof ObjectFieldRead) {
             ObjectFieldRead fr = (ObjectFieldRead) expr;
 
-            setIncarnationNumber(fr.getField(), getIncarnationNumber(fr.getField()) + 1);
+            setFieldIncarnationNumber(fr.getField(), getFieldIncarnationNumber(fr.getField()) + 1);
         } else if (expr instanceof ArrayElementRead) {
             ArrayElementRead ar = (ArrayElementRead) expr;
 
-            setIncarnationNumber(ar.getArrays(), getIncarnationNumber(ar.getArrays()) + 1);
+            setArraysIncarnationNumber(ar.getArrays(), getArraysIncarnationNumber(ar.getArrays()) + 1);
         }
     }
 
-    public Field incarnateSymbol(Field field) {
-        return DefaultField.create("ssa_" + getIncarnationNumber(field) + "_" + field.getName());
+    public Field incarnateField(Field field) {
+        return DefaultField.create("ssa_" + getFieldIncarnationNumber(field) + "_" + field.getName());
     }
 
-    public Arrays incarnateSymbol(Arrays arrays) {
-        return DefaultArrays.create("ssa_" + getIncarnationNumber(arrays) + "_arr");
+    public Arrays incarnateArrays(Arrays arrays) {
+        return DefaultArrays.create("ssa_" + getArraysIncarnationNumber(arrays) + "_arr");
     }
 
     private int getFrame(int depth) {
@@ -127,16 +127,16 @@ public class StaticSingleAssignmentFormulaFormatter {
         } else if (expr instanceof AnonymousObject) {
             return expr;
         } else if (expr instanceof ReturnValue) {
-            return DefaultReturnValue.create("ssa_" + getIncarnationNumber((Root) expr, depth) + "_frame_" + getFrame(depth) + "_" + expr.getRoot().getName());
+            return DefaultReturnValue.create("ssa_" + getVariableIncarnationNumber((Root) expr, depth) + "_frame_" + getFrame(depth) + "_" + expr.getRoot().getName());
         } else if (expr instanceof Root) {
-            return DefaultRoot.create("ssa_" + getIncarnationNumber((Root) expr, depth) + "_frame_" + getFrame(depth) + "_" + expr.getRoot().getName());
+            return DefaultRoot.create("ssa_" + getVariableIncarnationNumber((Root) expr, depth) + "_frame_" + getFrame(depth) + "_" + expr.getRoot().getName());
         } else {
             AccessExpression prefix = incarnateSymbol(expr.cutTail(), depth);
 
             if (expr instanceof ObjectFieldRead) {
                 ObjectFieldRead fr = (ObjectFieldRead) expr;
 
-                return DefaultObjectFieldRead.create(prefix, incarnateSymbol(fr.getField()));
+                return DefaultObjectFieldRead.create(prefix, incarnateField(fr.getField()));
             } else if (expr instanceof ArrayElementRead) {
                 ArrayElementRead ar = (ArrayElementRead) expr;
 
@@ -149,7 +149,7 @@ public class StaticSingleAssignmentFormulaFormatter {
                     replacements.put(e, incarnateSymbol(e, depth));
                 }
 
-                return DefaultArrayElementRead.create(prefix, incarnateSymbol(ar.getArrays()), ar.getIndex().replace(replacements));
+                return DefaultArrayElementRead.create(prefix, incarnateArrays(ar.getArrays()), ar.getIndex().replace(replacements));
             } else if (expr instanceof ArrayLengthRead) {
                 return DefaultArrayLengthRead.create(prefix);
             }
@@ -160,14 +160,14 @@ public class StaticSingleAssignmentFormulaFormatter {
 
     @Override
     @SuppressWarnings("unchecked")
-    public StaticSingleAssignmentFormulaFormatter clone() {
+    public SSAFormulaIncarnationsManager clone() {
         Stack<HashMap<Root, Integer>> stackClone = new Stack<HashMap<Root, Integer>>();
 
         for (HashMap<Root, Integer> vars : variableIncarnations) {
             stackClone.push((HashMap<Root, Integer>) vars.clone());
         }
 
-        return new StaticSingleAssignmentFormulaFormatter(
+        return new SSAFormulaIncarnationsManager(
             (Stack<Integer>) frameIncarnations.clone(),
             stackClone,
             (HashMap<Field, Integer>) fieldIncarnations.clone(),

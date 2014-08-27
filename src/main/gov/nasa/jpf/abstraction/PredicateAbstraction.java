@@ -119,7 +119,7 @@ public class PredicateAbstraction extends Abstraction {
         this.predicateSet = predicateSet;
     }
 
-    private StaticSingleAssignmentFormulaFormatter ssa = new StaticSingleAssignmentFormulaFormatter();
+    private SSAFormulaIncarnationsManager ssa = new SSAFormulaIncarnationsManager();
 
     private void extendTraceFormulaWithAssignment(AccessExpression to, Expression from, MethodInfo m, int nextPC, int depthDelta) {
         // The trace formula is extended with a constraint relating a POST STATE to a PRE STATE in the following fashion (for variables, field writes, array element writes):
@@ -153,7 +153,7 @@ public class PredicateAbstraction extends Abstraction {
             from = from.replace(replacements);
 
             if (to instanceof Root) {
-                ssa.reincarnateSymbol(to, afterDepth);
+                ssa.createNewSymbolIncarnation(to, afterDepth);
 
                 extendTraceFormulaWith(VariableAssign.create((Root) ssa.incarnateSymbol(to, afterDepth), from), m, nextPC);
             } else if (to instanceof ObjectFieldRead) {
@@ -162,13 +162,13 @@ public class PredicateAbstraction extends Abstraction {
 
                 Field rightHandSide = DefaultObjectFieldWrite.create(
                     ssa.incarnateSymbol(fr.getObject(), beforeDepth),
-                    ssa.incarnateSymbol(f),
+                    ssa.incarnateField(f),
                     from
                 );
 
-                ssa.reincarnateSymbol(to, afterDepth);
+                ssa.createNewSymbolIncarnation(to, afterDepth);
 
-                extendTraceFormulaWith(FieldAssign.create(ssa.incarnateSymbol(f), rightHandSide), m, nextPC);
+                extendTraceFormulaWith(FieldAssign.create(ssa.incarnateField(f), rightHandSide), m, nextPC);
             } else if (to instanceof ArrayElementRead) {
                 ArrayElementRead ar = (ArrayElementRead) to;
                 Arrays a = ar.getArrays();
@@ -186,14 +186,14 @@ public class PredicateAbstraction extends Abstraction {
 
                 Arrays rightHandSide = DefaultArrayElementWrite.create(
                     ssa.incarnateSymbol(ar.getArray(), beforeDepth),
-                    ssa.incarnateSymbol(a),
+                    ssa.incarnateArrays(a),
                     index,
                     from
                 );
 
-                ssa.reincarnateSymbol(to, afterDepth);
+                ssa.createNewSymbolIncarnation(to, afterDepth);
 
-                extendTraceFormulaWith(ArraysAssign.create(ssa.incarnateSymbol(a), rightHandSide), m, nextPC);
+                extendTraceFormulaWith(ArraysAssign.create(ssa.incarnateArrays(a), rightHandSide), m, nextPC);
             }
         }
     }

@@ -7,7 +7,7 @@ import java.util.Stack;
 import gov.nasa.jpf.vm.MethodInfo;
 
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.StaticSingleAssignmentFormulaFormatter;
+import gov.nasa.jpf.abstraction.SSAFormulaIncarnationsManager;
 import gov.nasa.jpf.abstraction.TraceFormula;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.meta.Field;
@@ -23,14 +23,14 @@ public class State {
     public Map<Integer, SymbolTableStack> symbolTableStacks;
     public Map<Integer, PredicateValuationStack> predicateValuationStacks;
     public TraceFormula traceFormula;
-    public StaticSingleAssignmentFormulaFormatter ssa;
+    public SSAFormulaIncarnationsManager ssa;
 
     public State(
         int currentThread,
         Map<Integer, SymbolTableStack> symbolTableStacks,
         Map<Integer, PredicateValuationStack> predicateValuationStacks,
         TraceFormula traceFormula,
-        StaticSingleAssignmentFormulaFormatter ssa
+        SSAFormulaIncarnationsManager ssa
     ) {
         this.currentThread = currentThread;
         this.symbolTableStacks = symbolTableStacks;
