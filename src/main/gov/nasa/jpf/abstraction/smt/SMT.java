@@ -181,6 +181,11 @@ public class SMT {
         SMTInterpol
     }
 
+    /**
+     * Starts a process of a supported SMT solver
+     *
+     * Supported: MathSAT, SMTInterpol
+     */
     private void prepareSMTProcess(SupportedSMT smt) throws IOException {
         String[] args = null;
         String[] env = new String[] {};
@@ -218,6 +223,12 @@ public class SMT {
         outreader = new InputStreamReader(outstream);
     }
 
+    /**
+     * Feed the SMT process with runtime configuration necessary for its correct functionality (e.g., enabling model generation)
+     *
+     * MathSAT configured to be used for satisfiability checks and model generations
+     * SMTInterpol configured to be used for interpolant generation
+     */
     private void configureSMTProcess(SupportedSMT smt) throws IOException {
         String separator = InputType.NORMAL.getSeparator();
 
@@ -267,10 +278,16 @@ public class SMT {
         in.flush();
     }
 
+    /**
+     * The default SMT solver used for the core functionality (maintaining valuations of abstraction predicates during forward state space exploration, maintaining the heap abstraction - models of array index expressions)
+     */
     public SMT() throws SMTException {
         this(SupportedSMT.MathSAT);
     }
 
+    /**
+     * Attach to an SMT solver process
+     */
     public SMT(SupportedSMT smt) throws SMTException {
         try {
             prepareSMTProcess(smt);
@@ -357,6 +374,9 @@ public class SMT {
         }
     }
 
+    /**
+     * Detach and terminate the SMT process (also closes input logs)
+     */
     public void close() {
         try {
             in.write("(exit)");
@@ -376,6 +396,12 @@ public class SMT {
         }
     }
 
+    /**
+     * Given a Trace Formula (basically expressing a conjunction of constraints that model an execution run of the program-to-be-verified)
+     * produces interpolants in all program locations (after each step - assignment, branching, ...)
+     *
+     * @returns null if the Trace Formula is satisfiable. Otherwise an array of !FORMULAS! (non-atomic predicates) is returned (the length of the array corresponds to the length of the Trace Formula)
+     */
     public Predicate[] interpolate(TraceFormula traceFormula) throws SMTException {
         SMT interpol = new SMT(SupportedSMT.SMTInterpol);
 
@@ -455,6 +481,12 @@ public class SMT {
         }
     }
 
+    /**
+     * Checks satisfiability of a bundle of formulas encoded as assertions in the input.
+     * It is expected that the (check-sat) is invoked count-times.
+     *
+     * If extractModels is true it is also expected that (get-value ...) is invoked and that it succeeds when the query is SAT
+     */
     private QueryResponse[] isSatisfiable(int count, String input, boolean extractModels) throws SMTException {
         QueryResponse[] values = new QueryResponse[count];
 
@@ -486,6 +518,7 @@ public class SMT {
                     if (satisfiable) {
                         output = out.readLine();
 
+                        // Account for SMTLIB encoding of negative numbers (unary minus applied to a positive number)
                         Pattern pattern = Pattern.compile("^\\( \\(value ((?<positivevalue>[0-9]*)|\\(- (?<negativevalue>[0-9]*)\\))\\) \\)$");
                         Matcher matcher = pattern.matcher(output);
 
@@ -535,6 +568,9 @@ public class SMT {
         return cacheHitCount;
     }
 
+    /**
+     * Envelopes a given string representation of a formula so that it can be checked for satisfiability in isolation (with potential extraction of model)
+     */
     private String prepareFormulaEvaluation(Predicate predicate, String formula, FormulaType formulaType, InputType inputType, Boolean cachedIsSatisfiable, Integer cachedModel, boolean extractModel) {
         String separator = inputType.getSeparator();
         String linePrefix = cachedIsSatisfiable == null ? "" : "; ";
@@ -591,6 +627,10 @@ public class SMT {
         return ret.toString();
     }
 
+    /**
+     * Methods for generating declarations of symbols used in SMT queries
+     */
+
     private void appendClassDeclarations(Set<String> classes, StringBuilder input, String separator) {
         for (String c : classes) {
             input.append("(declare-fun class_"); input.append(c.replace("_", "__").replace('.', '_')); input.append(" () Int)"); input.append(separator);
@@ -619,6 +659,9 @@ public class SMT {
         input.append(separator);
     }
 
+    /**
+     * It is necessary to explicitely capture uniqueness of fresh symbols
+     */
     private void appendFreshConstraints(Set<Integer> fresh, Set<AccessExpression> objects, StringBuilder input, String separator) {
         Set<String> freshConstraints = new HashSet<String>();
 
@@ -647,6 +690,9 @@ public class SMT {
         input.append(separator);
     }
 
+    /**
+     * Prepare an input for the SMT to query a model of an expression (constrained by other predicates)
+     */
     private String prepareGetModelInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<String> arrays, Predicate predicate, String formula, InputType inputType) {
         String separator = inputType.getSeparator();
 
@@ -668,6 +714,9 @@ public class SMT {
         return input.toString();
     }
 
+    /**
+     * Prepare an input for the SMT to derive valuation of predicate (in POST state) based on the PRE state
+     */
     private String prepareValuatePredicatesInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<String> arrays, Set<AccessExpression> objects, Set<Integer> fresh, Predicate[] predicates, String[] formulas, InputType inputType) {
         String separator = inputType.getSeparator();
 
@@ -701,6 +750,9 @@ public class SMT {
         return input.toString();
     }
 
+    /**
+     * Prepare input for an SMT to check simple satisfiability of formulas
+     */
     private String prepareIsSatisfiableInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<String> arrays, List<Predicate> predicates, String[] formulas, InputType inputType) {
         String separator = inputType.getSeparator();
 
@@ -731,6 +783,9 @@ public class SMT {
         return input.toString();
     }
 
+    /**
+     * Retrieves any arbitrary models of variables/fields/... based on constraints imposed by the state
+     */
     public int[] getModels(Predicate stateFormula, AccessExpression[] expressions) {
         String separator = InputType.NORMAL.getSeparator();
         StringBuilder input = new StringBuilder();
@@ -812,6 +867,9 @@ public class SMT {
         return ret;
     }
 
+    /**
+     * Retrieves a model (if there is any) of an expression (+ - * / ...) based on the state
+     */
     public Integer getModel(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {
         notifyGetModelInvoked(expression, determinants);
 
@@ -852,6 +910,9 @@ public class SMT {
         return response.getModel();
     }
 
+    /**
+     * Checks satisfiability of individual formulas
+     */
     public boolean[] isSatisfiable(List<Predicate> predicates) {
         notifyIsSatisfiableInvoked(predicates);
 
@@ -899,6 +960,9 @@ public class SMT {
         return ret;
     }
 
+    /**
+     * Determines values of predicates in POST state based on PRE state
+     */
     public Map<Predicate, TruthValue> valuatePredicates(Map<Predicate, PredicateValueDeterminingInfo> predicates) throws SMTException {
         notifyValuatePredicatesInvoked(predicates);
 
@@ -959,6 +1023,9 @@ public class SMT {
         return evaluate(input, predicatesArray, formulasArray);
     }
 
+    /**
+     * Evaluates predicates regardless of state (in any state) - useful to detect tautologies/contradictions
+     */
     public Map<Predicate, TruthValue> valuatePredicates(Set<Predicate> predicates) throws SMTException {
         Map<Predicate, PredicateValueDeterminingInfo> predicateDeterminingInfos = new HashMap<Predicate, PredicateValueDeterminingInfo>();
 
@@ -973,6 +1040,9 @@ public class SMT {
         return valuatePredicates(predicateDeterminingInfos);
     }
 
+    /**
+     * Helper for producing SMTLIB compliant string representations of formulas and such
+     */
     private static String convertToString(PredicatesComponentVisitable visitable) {
         PredicatesSMTStringifier stringifier = new PredicatesSMTStringifier();
 
@@ -981,6 +1051,9 @@ public class SMT {
         return stringifier.getString();
     }
 
+    /**
+     * Helper for encoding model queries together with all the determinants (which may be conflicting: x = 0, x != 0, when probing for additional models)
+     */
     private static String createFormula(Predicate valueConstraint, List<Pair<Predicate, TruthValue>> determinants, Set<Predicate> additionalClauses) {
         Predicate formula = valueConstraint;
 
@@ -999,15 +1072,19 @@ public class SMT {
 
                 default:
             }
+        }
 
-            for (Predicate additional : additionalClauses) {
-                formula = Conjunction.create(formula, additional);
-            }
+
+        for (Predicate additional : additionalClauses) {
+            formula = Conjunction.create(formula, additional);
         }
 
         return convertToString(formula);
     }
 
+    /**
+     * Helper for encoding PRE-POST state valuation of predicates (encodes determinants and weakest precondition)
+     */
     private static String createFormula(Predicate weakestPrecondition, Map<Predicate, TruthValue> determinants, Set<Predicate> additionalClauses) {
         Predicate formula = Tautology.create();
 
@@ -1041,6 +1118,16 @@ public class SMT {
         return convertToString(Negation.create(formula));
     }
 
+    /**
+     * Evaluation of multiple predicates in POST state based on PRE state consists of two queries for VALIDITY
+     *
+     * det => WP(statement, pred)
+     * det => WP(statement, not pred)
+     *
+     * These are reduced here to SAT queries and recombined
+     *
+     * Cache of old queries is updated here
+     */
     private Map<Predicate, TruthValue> evaluate(String input, Predicate[] predicates, String[] formulas) throws SMTException {
         Map<Predicate, TruthValue> valuation = new HashMap<Predicate, TruthValue>();
 
