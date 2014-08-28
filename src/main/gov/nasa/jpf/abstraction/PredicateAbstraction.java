@@ -523,14 +523,20 @@ public class PredicateAbstraction extends Abstraction {
                         }
                     }
 
-                    //System.out.println("Adding predicate `" + interpolant + "` to [" + pcStart + ", " + pcEnd + "]");
+                    if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+                        System.out.println("Adding predicate `" + interpolant + "` to [" + pcStart + ", " + pcEnd + "]");
+                    }
+
                     boolean refinedOnce = predicateValuation.refine(interpolant, mStart, pcStart, pcEnd);
 
                     refined = refined || refinedOnce;
                 }
 
                 if (!refined) {
-                    //System.out.println(predicateSet);
+                    if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+                        System.out.println(predicateSet);
+                    }
+
                     throw new RuntimeException("Failed to refine abstraction.");
                 }
 

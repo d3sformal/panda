@@ -239,7 +239,11 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
             initialValuation.put(interpolant, TruthValue.UNKNOWN);
 
-            //System.out.println(gov.nasa.jpf.abstraction.common.Notation.convertToString(ctx));
+            if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+                System.out.println("Refined context:");
+                System.out.println(gov.nasa.jpf.abstraction.common.Notation.convertToString(ctx));
+            }
+
             return refined;
         }
     }
