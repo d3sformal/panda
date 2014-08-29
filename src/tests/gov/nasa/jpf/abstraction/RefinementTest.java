@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction;
 
+import static gov.nasa.jpf.abstraction.statematch.StateMatchingTest.*;
+
 public class RefinementTest extends BaseTest {
     public RefinementTest() {
         config.add("+panda.interpolation=true");
@@ -55,12 +57,38 @@ public class RefinementTest extends BaseTest {
         assert g(x) == 3;
     }
 
+    @Test
+    public static void test7() {
+        assertVisitedAtMost(2); // Ensure second refinement does not backtrack completely
+
+        // Ensure refinement in different methods
+        h();
+    }
+
     private static int f(int x) {
         return x + 1;
     }
 
     private static int g(int x) {
         return 3;
+    }
+
+    private static void h() {
+        int x = 0;
+
+        assert x == 0; // creates new states (1 ok, 1 spurious error)
+
+        // Get here after first refinement
+
+        i();
+    }
+
+    private static void i() {
+        int x = 0;
+
+        assert x == 0; // creates new states (1 ok, 1 spurious error)
+
+        // Get here after second refinement
     }
 
     static class D {

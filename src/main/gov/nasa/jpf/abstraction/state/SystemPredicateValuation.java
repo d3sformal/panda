@@ -122,7 +122,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
      */
     @Override
     public MethodFramePredicateValuation createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-        MethodFramePredicateValuation valuation = new MethodFramePredicateValuation(abstraction.smt);
+        MethodFramePredicateValuation valuation = new MethodFramePredicateValuation(method, abstraction.smt);
 
         if (method == null) return valuation;
 
@@ -573,7 +573,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             notWantedLocalVariables.removeAll(referenceArgs);
 
             // Collection of predicates in callee and caller that have additional value for update of the caller
-            MethodFramePredicateValuation relevant = new MethodFramePredicateValuation(abstraction.smt);
+            MethodFramePredicateValuation relevant = createDefaultScope(null, null);
 
             Set<AccessExpression> temporaryPathsHolder = new HashSet<AccessExpression>();
 

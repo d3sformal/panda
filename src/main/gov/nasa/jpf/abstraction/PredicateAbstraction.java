@@ -58,6 +58,7 @@ import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.smt.SMT;
+import gov.nasa.jpf.abstraction.state.MethodFramePredicateValuation;
 import gov.nasa.jpf.abstraction.state.PredicateValuationStack;
 import gov.nasa.jpf.abstraction.state.State;
 import gov.nasa.jpf.abstraction.state.SymbolTableStack;
@@ -496,7 +497,10 @@ public class PredicateAbstraction extends Abstraction {
         }
     }
 
-    public boolean error() {
+    /**
+     * @returns null if real error, else a backtrack level is returned (the depth in the search to which to return)
+     */
+    public Integer error() {
         if (VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation")) {
             Predicate[] interpolants = smt.interpolate(traceFormula);
 
@@ -504,6 +508,7 @@ public class PredicateAbstraction extends Abstraction {
 
             if (interpolants != null) {
                 boolean refined = false;
+                List<MethodInfo> refinedMethods = new ArrayList<MethodInfo>();
 
                 for (int i = 0; i < interpolants.length; ++i) {
                     Predicate interpolant = interpolants[i];
@@ -529,7 +534,10 @@ public class PredicateAbstraction extends Abstraction {
 
                     boolean refinedOnce = predicateValuation.refine(interpolant, mStart, pcStart, pcEnd);
 
-                    refined = refined || refinedOnce;
+                    if (refinedOnce) {
+                        refined = true;
+                        refinedMethods.add(mStart);
+                    }
                 }
 
                 if (!refined) {
@@ -540,11 +548,34 @@ public class PredicateAbstraction extends Abstraction {
                     throw new RuntimeException("Failed to refine abstraction.");
                 }
 
-                return false;
+                int backtrackLevel = trace.size();
+
+                for (int i = trace.size() - 1; i >= 0; --i) {
+                    Map<Integer, PredicateValuationStack> stacks = trace.get(i).predicateValuationStacks;
+
+                    for (int thread : stacks.keySet()) {
+                        PredicateValuationStack stack = stacks.get(thread);
+
+                        for (MethodFramePredicateValuation pv : stack) {
+                            for (MethodInfo m : refinedMethods) {
+                                if (pv.getMethodInfo().getName().equals(m.getName())) {
+                                    backtrackLevel = i;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+                    System.out.println("Backtrack to level " + (backtrackLevel - 1) + " after refinement");
+                }
+
+                return backtrackLevel - 1; // <-- backtrackLevel needs to account for the dummy level (hence -1)
             }
         }
 
-        return true;
+        return null;
     }
 
     private static void notifyAboutCounterexample(TraceFormula traceFormula, Predicate[] interpolants) {

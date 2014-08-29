@@ -9,7 +9,7 @@ import gov.nasa.jpf.vm.ThreadList;
 import gov.nasa.jpf.vm.VM;
 
 public class PredicateAbstractionRefinementSearch extends DFSearch {
-    private boolean resetExecution = false;
+    private Integer backtrackLevel = null;
 
     public PredicateAbstractionRefinementSearch(Config config, VM vm) {
         super(config, vm);
@@ -17,11 +17,12 @@ public class PredicateAbstractionRefinementSearch extends DFSearch {
 
     @Override
     public void error(Property property, Path path, ThreadList threadList) {
-        if (PredicateAbstraction.getInstance().error()) {
+        backtrackLevel = PredicateAbstraction.getInstance().error();
+
+        if (backtrackLevel == null) {
             super.error(property, path, threadList);
         } else {
             VM.getVM().getSystemState().setIgnored(true);
-            resetExecution = true;
         }
     }
 
@@ -34,7 +35,7 @@ public class PredicateAbstractionRefinementSearch extends DFSearch {
         notifySearchStarted();
 
         while (!done) {
-            boolean b = checkAndResetBacktrackRequest() || !isNewState() || isEndState() || isIgnoredState() || depthLimitReached || (resetExecution && depth > 1);
+            boolean b = checkAndResetBacktrackRequest() || !isNewState() || isEndState() || isIgnoredState() || depthLimitReached || (backtrackLevel != null && backtrackLevel < depth);
             boolean bNotPossible = false;
 
             while (b) {
@@ -47,14 +48,14 @@ public class PredicateAbstractionRefinementSearch extends DFSearch {
                 depth--;
                 notifyStateBacktracked();
 
-                b = resetExecution && depth > 1;
+                b = backtrackLevel != null && backtrackLevel < depth;
             }
 
             if (bNotPossible) {
                 break;
             }
 
-            if (resetExecution) {
+            if (backtrackLevel != null) {
                 StateSet stateSet = VM.getVM().getStateSet();
 
                 if (stateSet instanceof ResetableStateSet) {
@@ -63,7 +64,7 @@ public class PredicateAbstractionRefinementSearch extends DFSearch {
                     throw new RuntimeException("Cannot restart execution at refinement: invalid state set.");
                 }
 
-                resetExecution = false;
+                backtrackLevel = null;
 
                 VM.getVM().getChoiceGenerator().reset();
             }
