@@ -4,6 +4,7 @@ import java.util.Set;
 
 import gov.nasa.jpf.abstraction.common.Assign;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.PredicateNotCloneableException;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
@@ -33,5 +34,10 @@ public class FieldAssign extends Assign {
 
     public static Predicate create(Field field, Field newField) {
         return new FieldAssign(field, newField);
+    }
+
+    @Override
+    public FieldAssign clone() {
+        throw new PredicateNotCloneableException("Should not be copying this");
     }
 }

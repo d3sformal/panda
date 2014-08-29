@@ -73,4 +73,9 @@ public class Equals extends Comparison {
         if (newA == a && newB == b) return this;
         else return create(newA, newB);
     }
+
+    @Override
+    public Equals clone() {
+        return (Equals)create(a, b);
+    }
 }

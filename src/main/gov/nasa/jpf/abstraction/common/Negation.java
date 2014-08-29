@@ -62,4 +62,9 @@ public class Negation extends Predicate {
         if (newP == predicate) return this;
         else return create(newP);
     }
+
+    @Override
+    public Negation clone() {
+        return (Negation)create(predicate);
+    }
 }

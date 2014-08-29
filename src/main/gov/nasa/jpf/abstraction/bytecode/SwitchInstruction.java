@@ -12,10 +12,14 @@ import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
+import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ExpressionUtil;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 
@@ -84,8 +88,14 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
             } else {
                 sf.pop();
 
-                // TODO: how to extend the trace formula?
                 // for all x in matches: expr != x
+                Predicate constraint = Tautology.create();
+
+                for (int idx = 0; idx < matches.length; ++idx) {
+                    constraint = Conjunction.create(constraint, Negation.create(Equals.create(expr, Constant.create(matches[idx]))));
+                }
+
+                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(constraint, TruthValue.TRUE), getMethodInfo(), mi.getInstructionAt(target).getPosition());
 
                 return mi.getInstructionAt(target);
             }

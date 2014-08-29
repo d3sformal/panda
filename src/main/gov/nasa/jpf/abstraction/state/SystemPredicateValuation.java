@@ -39,6 +39,7 @@ import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.ObjectPredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicateContext;
+import gov.nasa.jpf.abstraction.common.PredicateNotCloneableException;
 import gov.nasa.jpf.abstraction.common.PredicateUtil;
 import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.common.StaticPredicateContext;
@@ -629,19 +630,23 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
                 // If the predicate uses only allowed symbols (those that do not lose their meaning by changing scope)
                 if (!isUnwanted) {
-                    predicate = predicate.replace(replacements);
-                    predicate.setScope(BytecodeUnlimitedRange.getInstance()); // <-- This is done to allow use of the predicate outside its original scope. It should be changed on a copy (TODO)
+                    try {
+                        predicate = predicate.replace(replacements).clone();
+                        predicate.setScope(BytecodeUnlimitedRange.getInstance()); // <-- This is done to allow use of the predicate outside its original scope.
 
-                    relevant.put(predicate, value);
+                        relevant.put(predicate, value);
 
-                    // Handling mainly constructor (object still anonymous)
-                    if (isAnonymous) {
-                        callerScope.put(predicate, value);
-                    }
+                        // Handling mainly constructor (object still anonymous)
+                        if (isAnonymous) {
+                            callerScope.put(predicate, value);
+                        }
 
-                    // Write predicates over return through (this is useful when called from processMethodReturn)
-                    if (PredicateUtil.isPredicateOverReturn(predicate)) {
-                        calleeReturns.put(predicate.replace(returnValue, returnValueSpecific), value);
+                        // Write predicates over return through (this is useful when called from processMethodReturn)
+                        if (PredicateUtil.isPredicateOverReturn(predicate)) {
+                            calleeReturns.put(predicate.replace(returnValue, returnValueSpecific), value);
+                        }
+                    } catch (PredicateNotCloneableException e) {
+                        // Silently ignore predicates that should never be cloned (those have either no meaning here: Assign, or little value: Tautology)
                     }
                 }
 

@@ -46,4 +46,9 @@ public class LessThan extends Comparison {
         if (newA == a && newB == b) return this;
         else return create(newA, newB);
     }
+
+    @Override
+    public LessThan clone() {
+        return (LessThan)create(a, b);
+    }
 }

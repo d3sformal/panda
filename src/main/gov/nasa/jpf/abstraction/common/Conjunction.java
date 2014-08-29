@@ -63,4 +63,9 @@ public class Conjunction extends Formula {
         else return create(newA, newB);
     }
 
+    @Override
+    public Conjunction clone() {
+        return (Conjunction)create(a, b);
+    }
+
 }

@@ -17,7 +17,7 @@ import gov.nasa.jpf.abstraction.common.impl.DefaultExpression;
 /**
  * A common ancestor to all predicates used in the abstraction
  */
-public abstract class Predicate implements PredicatesComponentVisitable, BranchingCondition {
+public abstract class Predicate implements PredicatesComponentVisitable, BranchingCondition, Cloneable {
     public abstract void addAccessExpressionsToSet(Set<AccessExpression> out);
     public abstract Predicate replace(Map<AccessExpression, Expression> replacements);
 
@@ -102,5 +102,8 @@ public abstract class Predicate implements PredicatesComponentVisitable, Branchi
 
         return false;
     }
+
+    @Override
+    public abstract Predicate clone();
 
 }

@@ -669,7 +669,6 @@ public class SMT {
             input.append("(declare-fun fresh_" + id + " () Int)" + separator);
         }
 
-        // TODO check these
         for (AccessExpression object : objects) {
             Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.create(DefaultFresh.create(), object)));
 

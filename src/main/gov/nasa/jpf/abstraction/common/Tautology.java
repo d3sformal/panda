@@ -45,4 +45,9 @@ public class Tautology extends Predicate {
         return this;
     }
 
+    @Override
+    public Tautology clone() {
+        throw new PredicateNotCloneableException("Should not be copying this");
+    }
+
 }

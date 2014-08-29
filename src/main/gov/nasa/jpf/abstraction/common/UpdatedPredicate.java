@@ -70,4 +70,9 @@ public class UpdatedPredicate extends Predicate {
         return new UpdatedPredicate(predicate, expression, newExpression);
     }
 
+    @Override
+    public UpdatedPredicate clone() {
+        throw new PredicateNotCloneableException("Should not be copying this");
+    }
+
 }

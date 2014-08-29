@@ -62,4 +62,9 @@ public class Disjunction extends Formula {
         else return create(newA, newB);
     }
 
+    @Override
+    public Disjunction clone() {
+        return (Disjunction)create(a, b);
+    }
+
 }

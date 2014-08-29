@@ -5,6 +5,7 @@ import java.util.Set;
 import gov.nasa.jpf.abstraction.common.Assign;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.PredicateNotCloneableException;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Root;
@@ -32,5 +33,10 @@ public class VariableAssign extends Assign {
 
     public static Predicate create(Root variable, Expression expression) {
         return new VariableAssign(variable, expression);
+    }
+
+    @Override
+    public VariableAssign clone() {
+        throw new PredicateNotCloneableException("Should not be copying this");
     }
 }
