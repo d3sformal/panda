@@ -64,9 +64,9 @@ public class PUTSTATIC extends gov.nasa.jpf.jvm.bytecode.PUTSTATIC {
         to = DefaultObjectFieldRead.create(to, getFieldName());
 
         if (ei.getFieldValueObject(getFieldName()) == null || ei.getFieldValueObject(getFieldName()) instanceof ElementInfo) {
-            PredicateAbstraction.getInstance().processObjectStore(getMethodInfo(), getPosition(), actualNextInsn.getPosition(), from, to);
+            PredicateAbstraction.getInstance().processObjectStore(getMethodInfo(), getPosition(), actualNextInsn.getMethodInfo(), actualNextInsn.getPosition(), from, to);
         } else {
-            PredicateAbstraction.getInstance().processPrimitiveStore(getMethodInfo(), getPosition(), actualNextInsn.getPosition(), from, to);
+            PredicateAbstraction.getInstance().processPrimitiveStore(getMethodInfo(), getPosition(), actualNextInsn.getMethodInfo(), actualNextInsn.getPosition(), from, to);
         }
 
         AnonymousExpressionTracker.notifyPopped(from);

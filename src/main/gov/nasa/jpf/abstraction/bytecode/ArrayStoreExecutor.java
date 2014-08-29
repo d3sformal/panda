@@ -66,10 +66,10 @@ public class ArrayStoreExecutor {
 
         if (store instanceof AASTORE) {
             // Element indices are derived from predicates in this method call
-            PredicateAbstraction.getInstance().processObjectStore(store.getSelf().getMethodInfo(), store.getSelf().getPosition(), actualNextInsn.getPosition(), from, element);
+            PredicateAbstraction.getInstance().processObjectStore(store.getSelf().getMethodInfo(), store.getSelf().getPosition(), actualNextInsn.getMethodInfo(), actualNextInsn.getPosition(), from, element);
         } else {
             // Element indices are derived from predicates in this method call
-            PredicateAbstraction.getInstance().processPrimitiveStore(store.getSelf().getMethodInfo(), store.getSelf().getPosition(), actualNextInsn.getPosition(), from, element);
+            PredicateAbstraction.getInstance().processPrimitiveStore(store.getSelf().getMethodInfo(), store.getSelf().getPosition(), actualNextInsn.getMethodInfo(), actualNextInsn.getPosition(), from, element);
         }
 
         AnonymousExpressionTracker.notifyPopped(from);

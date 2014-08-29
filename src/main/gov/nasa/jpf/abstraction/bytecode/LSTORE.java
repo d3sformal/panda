@@ -28,7 +28,7 @@ public class LSTORE extends gov.nasa.jpf.jvm.bytecode.LSTORE {
         sf.setLocalAttr(getLocalVariableIndex(), from);
 
         PredicateAbstraction.getInstance().informAboutPrimitiveLocalVariable(to);
-        PredicateAbstraction.getInstance().processPrimitiveStore(getMethodInfo(), getPosition(), actualNextInsn.getPosition(), from, to);
+        PredicateAbstraction.getInstance().processPrimitiveStore(getMethodInfo(), getPosition(), actualNextInsn.getMethodInfo(), actualNextInsn.getPosition(), from, to);
 
         return actualNextInsn;
     }

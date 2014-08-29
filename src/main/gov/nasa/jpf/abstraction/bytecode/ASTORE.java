@@ -28,7 +28,7 @@ public class ASTORE extends gov.nasa.jpf.jvm.bytecode.ASTORE {
         sf.setLocalAttr(getLocalVariableIndex(), from);
 
         PredicateAbstraction.getInstance().informAboutStructuredLocalVariable(to);
-        PredicateAbstraction.getInstance().processObjectStore(getMethodInfo(), getPosition(), actualNextInsn.getPosition(), from, to);
+        PredicateAbstraction.getInstance().processObjectStore(getMethodInfo(), getPosition(), actualNextInsn.getMethodInfo(), actualNextInsn.getPosition(), from, to);
 
         AnonymousExpressionTracker.notifyPopped(from);
 

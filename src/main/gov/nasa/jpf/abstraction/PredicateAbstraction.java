@@ -226,21 +226,21 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     @Override
-    public void processPrimitiveStore(MethodInfo m, int lastPC, int nextPC, Expression from, AccessExpression to) {
+    public void processPrimitiveStore(MethodInfo lastM, int lastPC, MethodInfo nextM, int nextPC, Expression from, AccessExpression to) {
         Set<AccessExpression> affected = symbolTable.processPrimitiveStore(from, to);
 
         predicateValuation.reevaluate(lastPC, nextPC, to, affected, PrimitiveExpressionDecorator.wrap(from, symbolTable));
 
-        extendTraceFormulaWithAssignment(to, from, m, nextPC, 0);
+        extendTraceFormulaWithAssignment(to, from, nextM, nextPC, 0);
     }
 
     @Override
-    public void processObjectStore(MethodInfo m, int lastPC, int nextPC, Expression from, AccessExpression to) {
+    public void processObjectStore(MethodInfo lastM, int lastPC, MethodInfo nextM, int nextPC, Expression from, AccessExpression to) {
         Set<AccessExpression> affected = symbolTable.processObjectStore(from, to);
 
         predicateValuation.reevaluate(lastPC, nextPC, to, affected, ObjectExpressionDecorator.wrap(from, symbolTable));
 
-        extendTraceFormulaWithAssignment(to, from, m, nextPC, 0);
+        extendTraceFormulaWithAssignment(to, from, nextM, nextPC, 0);
     }
 
     @Override
