@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.state;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import gov.nasa.jpf.vm.MethodInfo;
@@ -24,18 +25,21 @@ public class State {
     public Map<Integer, PredicateValuationStack> predicateValuationStacks;
     public TraceFormula traceFormula;
     public SSAFormulaIncarnationsManager ssa;
+    public Set<MethodInfo> visitedMethods;
 
     public State(
         int currentThread,
         Map<Integer, SymbolTableStack> symbolTableStacks,
         Map<Integer, PredicateValuationStack> predicateValuationStacks,
         TraceFormula traceFormula,
-        SSAFormulaIncarnationsManager ssa
+        SSAFormulaIncarnationsManager ssa,
+        Set<MethodInfo> visitedMethods
     ) {
         this.currentThread = currentThread;
         this.symbolTableStacks = symbolTableStacks;
         this.predicateValuationStacks = predicateValuationStacks;
         this.traceFormula = traceFormula;
         this.ssa = ssa;
+        this.visitedMethods = visitedMethods;
     }
 }

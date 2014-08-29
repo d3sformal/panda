@@ -122,7 +122,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
      */
     @Override
     public MethodFramePredicateValuation createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-        MethodFramePredicateValuation valuation = new MethodFramePredicateValuation(method, abstraction.smt);
+        MethodFramePredicateValuation valuation = new MethodFramePredicateValuation(abstraction.smt);
 
         if (method == null) return valuation;
 

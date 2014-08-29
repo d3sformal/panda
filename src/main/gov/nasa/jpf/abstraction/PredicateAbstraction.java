@@ -91,6 +91,7 @@ public class PredicateAbstraction extends Abstraction {
     private TraceFormula traceFormula;
     private boolean isInitialized = false;
     private Set<ClassInfo> startupClasses = new HashSet<ClassInfo>();
+    private Set<MethodInfo> visitedMethods = new HashSet<MethodInfo>();
 
     public SMT smt = new SMT();
     private Stack<Pair<MethodInfo, Integer>> traceProgramLocations = new Stack<Pair<MethodInfo, Integer>>();
@@ -249,6 +250,8 @@ public class PredicateAbstraction extends Abstraction {
         symbolTable.processMethodCall(threadInfo, before, after);
 
         predicateValuation.processMethodCall(threadInfo, before, after);
+
+        visitedMethods.add(after.getMethodInfo());
 
         if (RunDetector.isRunning()) {
             ssa.changeDepth(+1);
@@ -433,7 +436,8 @@ public class PredicateAbstraction extends Abstraction {
             symbols,
             predicates,
             traceFormula,
-            ssa
+            ssa,
+            visitedMethods
         );
 
         trace.push(state);
@@ -458,12 +462,17 @@ public class PredicateAbstraction extends Abstraction {
     @SuppressWarnings("unchecked")
     @Override
     public void forward(MethodInfo method) {
+        Set<MethodInfo> visitedMethods = new HashSet<MethodInfo>();
+
+        visitedMethods.addAll(this.visitedMethods);
+
         State state = new State(
             VM.getVM().getCurrentThread().getId(),
             symbolTable.memorize(),
             predicateValuation.memorize(),
             traceFormula.clone(),
-            ssa.clone()
+            ssa.clone(),
+            visitedMethods
         );
 
         trace.push(state);
@@ -481,6 +490,8 @@ public class PredicateAbstraction extends Abstraction {
 
         traceFormula = trace.top().traceFormula.clone();
         ssa = trace.top().ssa.clone();
+        visitedMethods.clear();
+        visitedMethods.addAll(trace.top().visitedMethods);
 
         if (trace.isEmpty()) {
             smt.close();
@@ -551,17 +562,11 @@ public class PredicateAbstraction extends Abstraction {
                 int backtrackLevel = trace.size();
 
                 for (int i = trace.size() - 1; i >= 0; --i) {
-                    Map<Integer, PredicateValuationStack> stacks = trace.get(i).predicateValuationStacks;
-
-                    for (int thread : stacks.keySet()) {
-                        PredicateValuationStack stack = stacks.get(thread);
-
-                        for (MethodFramePredicateValuation pv : stack) {
-                            for (MethodInfo m : refinedMethods) {
-                                if (pv.getMethodInfo().getName().equals(m.getName())) {
-                                    backtrackLevel = i;
-                                    break;
-                                }
+                    for (MethodInfo visitedMethod : trace.get(i).visitedMethods) {
+                        for (MethodInfo refinedMethod : refinedMethods) {
+                            if (visitedMethod.getName().equals(refinedMethod.getName())) {
+                                backtrackLevel = i;
+                                break;
                             }
                         }
                     }

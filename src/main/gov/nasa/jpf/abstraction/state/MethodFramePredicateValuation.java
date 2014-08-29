@@ -53,16 +53,10 @@ import gov.nasa.jpf.abstraction.util.Pair;
 public class MethodFramePredicateValuation implements PredicateValuation, Scope {
     private PredicateValuationMap valuations = new PredicateValuationMap();
     private HashMap<Predicate, Set<Predicate>> sharedSymbolCache = new HashMap<Predicate, Set<Predicate>>();
-    private MethodInfo method;
     private SMT smt;
 
-    public MethodFramePredicateValuation(MethodInfo m, SMT smt) {
-        this.method = m;
+    public MethodFramePredicateValuation(SMT smt) {
         this.smt = smt;
-    }
-
-    public MethodInfo getMethodInfo() {
-        return method;
     }
 
     // not used right now (might be useful for multi-dimensional arrays)
@@ -122,7 +116,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
     @Override
     public MethodFramePredicateValuation clone() {
-        MethodFramePredicateValuation clone = new MethodFramePredicateValuation(method, smt);
+        MethodFramePredicateValuation clone = new MethodFramePredicateValuation(smt);
 
         clone.valuations = valuations.clone();
 
