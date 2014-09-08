@@ -168,13 +168,18 @@ public class AbstractListener extends PropertyListenerAdapter {
         if (!finished) {
             PredicateAbstraction.getInstance().collectGarbage(vm, currentThread);
 
-            // TODO lookup cached generator, filter out processed
+            PredicateAbstraction.getInstance().rememberChoiceGenerator(nextCG);
         }
     }
 
     @Override
     public void choiceGeneratorAdvanced (VM vm, ChoiceGenerator<?> currentCG) {
-        // TODO lookup cached generator, compare with lastExploredChoice (if it is the one over which we backtracked during refinement than it is not yet done, but we may carry cache, if it is completely knew we need to drop the cache here)
+        PredicateAbstraction.getInstance().rememberChoice(currentCG);
+    }
+
+    @Override
+    public void choiceGeneratorProcessed (VM vm, ChoiceGenerator<?> currentCG) {
+        PredicateAbstraction.getInstance().forgetChoiceGenerator();
     }
 
     private boolean finished = false;

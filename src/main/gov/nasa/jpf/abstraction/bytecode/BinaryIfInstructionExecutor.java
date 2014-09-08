@@ -81,14 +81,14 @@ public class BinaryIfInstructionExecutor {
                     ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
                     conditionValue = true;
 
-                    PredicateAbstraction.getInstance().extendTraceFormulaWith(predicate, br.getSelf().getMethodInfo(), br.getSelf().getPosition());
+                    PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(predicate, br.getSelf().getMethodInfo(), br.getSelf().getPosition());
 
                     break;
                 case FALSE:
                     ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
                     conditionValue = false;
 
-                    PredicateAbstraction.getInstance().extendTraceFormulaWith(Negation.create(predicate), br.getSelf().getMethodInfo(), br.getSelf().getPosition());
+                    PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Negation.create(predicate), br.getSelf().getMethodInfo(), br.getSelf().getPosition());
 
                     break;
                 case UNKNOWN:

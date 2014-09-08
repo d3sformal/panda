@@ -59,7 +59,7 @@ public class PredicateAbstractionRefinementSearch extends DFSearch {
                 StateSet stateSet = VM.getVM().getStateSet();
 
                 if (stateSet instanceof ResetableStateSet) {
-                    ((ResetableStateSet)stateSet).clear();
+                    ((ResetableStateSet)stateSet).clear(VM.getVM().getStateId() + 1);
                 } else if (stateSet != null) {
                     throw new RuntimeException("Cannot restart execution at refinement: invalid state set.");
                 }

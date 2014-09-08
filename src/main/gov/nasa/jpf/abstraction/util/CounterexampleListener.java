@@ -86,4 +86,8 @@ public class CounterexampleListener extends ListenerAdapter {
         System.out.println();
         System.out.println();
     }
+
+    public void backtrackLevel(int lvl) {
+        System.out.println("Backtrack to level " + lvl + " after refinement");
+    }
 }

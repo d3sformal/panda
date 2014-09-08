@@ -6,9 +6,10 @@ import gov.nasa.jpf.vm.VM;
 public class ResetableStateSet implements StateSet {
     private StateSet set;
     private VM vm;
+    private int startingStateId;
 
     public ResetableStateSet() {
-        clear();
+        clear(0);
     }
 
     @Override
@@ -19,7 +20,7 @@ public class ResetableStateSet implements StateSet {
 
     @Override
     public int addCurrent() {
-        return set.addCurrent();
+        return set.addCurrent() + startingStateId;
     }
 
     @Override
@@ -27,7 +28,9 @@ public class ResetableStateSet implements StateSet {
         return set.size();
     }
 
-    public void clear() {
+    public void clear(int startingStateId) {
+        this.startingStateId = startingStateId;
+
         set = VM.getVM().getJPF().getConfig().getInstance("panda.storage.class", StateSet.class);
 
         if (vm != null) {

@@ -82,7 +82,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
             } else if (choices.size() == 1) {
                 sf.pop();
 
-                PredicateAbstraction.getInstance().extendTraceFormulaWith(Equals.create(expr, Constant.create(matches[choices.get(0)])), getMethodInfo(), getPosition());
+                PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Equals.create(expr, Constant.create(matches[choices.get(0)])), getMethodInfo(), getPosition());
 
                 return mi.getInstructionAt(targets[choices.get(0)]);
             } else {

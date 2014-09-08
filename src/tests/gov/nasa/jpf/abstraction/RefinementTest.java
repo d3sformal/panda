@@ -65,6 +65,25 @@ public class RefinementTest extends BaseTest {
         h();
     }
 
+    @Test
+    public static void test8() {
+        int[] arr = new int[3];
+
+        arr[0] = 0;
+        arr[1] = 1;
+        arr[2] = 2;
+
+        int i = 0;
+
+        if (i >= 0 && i < arr.length) {
+            // choice over arr[?]
+            int d = arr[i];
+
+            int e = 0;
+            assert e == 0; // unrelated spurious error
+        }
+    }
+
     private static int f(int x) {
         return x + 1;
     }

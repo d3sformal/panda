@@ -11,6 +11,7 @@ import java.util.Stack;
 import java.util.TreeSet;
 
 import gov.nasa.jpf.search.Search;
+import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -121,6 +122,15 @@ public class PredicateAbstraction extends Abstraction {
         this.predicateSet = predicateSet;
     }
 
+    public void rememberChoiceGenerator(ChoiceGenerator<?> cg) {
+    }
+
+    public void rememberChoice(ChoiceGenerator<?> cg) {
+    }
+
+    public void forgetChoiceGenerator() {
+    }
+
     private SSAFormulaIncarnationsManager ssa = new SSAFormulaIncarnationsManager();
 
     private void extendTraceFormulaWithAssignment(AccessExpression to, Expression from, MethodInfo m, int nextPC, int depthDelta) {
@@ -200,26 +210,22 @@ public class PredicateAbstraction extends Abstraction {
         }
     }
 
-    private void extendTraceFormulaWithConstraint(Equals e, MethodInfo m, int nextPC) {
+    public void extendTraceFormulaWithConstraint(Predicate p, MethodInfo m, int nextPC) {
         if (RunDetector.isRunning()) {
-            Expression e1 = e.a;
-            Expression e2 = e.b;
-
             Set<AccessExpression> exprs = new HashSet<AccessExpression>();
             Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
 
-            e1.addAccessExpressionsToSet(exprs);
-            e2.addAccessExpressionsToSet(exprs);
+            p.addAccessExpressionsToSet(exprs);
 
             for (AccessExpression expr : exprs) {
                 replacements.put(expr, ssa.incarnateSymbol(expr, 0));
             }
 
-            extendTraceFormulaWith(e.replace(replacements), m, nextPC);
+            extendTraceFormulaWith(p.replace(replacements), m, nextPC);
         }
     }
 
-    public void extendTraceFormulaWith(Predicate p, MethodInfo m, int nextPC) {
+    private void extendTraceFormulaWith(Predicate p, MethodInfo m, int nextPC) {
         traceFormula.append(p, m, nextPC);
     }
 
@@ -391,18 +397,7 @@ public class PredicateAbstraction extends Abstraction {
             condition = Negation.create(condition);
         }
 
-        Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
-        Set<AccessExpression> exprs = new HashSet<AccessExpression>();
-
-        condition.addAccessExpressionsToSet(exprs);
-
-        for (AccessExpression e : exprs) {
-            replacements.put(e, ssa.incarnateSymbol(e, 0));
-        }
-
-        condition = condition.replace(replacements);
-
-        extendTraceFormulaWith(condition, m, nextPC);
+        extendTraceFormulaWithConstraint(condition, m, nextPC);
     }
 
     @Override
@@ -572,11 +567,14 @@ public class PredicateAbstraction extends Abstraction {
                     }
                 }
 
-                if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
-                    System.out.println("Backtrack to level " + (backtrackLevel - 1) + " after refinement");
-                }
+                // Extract prediction of choices from the recorded choice generator cache
+                // TODO (feed prediction into new CGs to pass them along the refined trace, but disregard them in completely new traces)
 
-                return backtrackLevel - 1; // <-- backtrackLevel needs to account for the dummy level (hence -1)
+                ++backtrackLevel; // There is a special state (-1) which we do not want to backtrack over
+
+                notifyAboutRefinementBacktrackLevel(backtrackLevel);
+
+                return backtrackLevel;
             }
         }
 
@@ -586,6 +584,12 @@ public class PredicateAbstraction extends Abstraction {
     private static void notifyAboutCounterexample(TraceFormula traceFormula, Predicate[] interpolants) {
         for (CounterexampleListener listener : listeners) {
             listener.counterexample(traceFormula, interpolants);
+        }
+    }
+
+    private static void notifyAboutRefinementBacktrackLevel(int lvl) {
+        for (CounterexampleListener listener : listeners) {
+            listener.backtrackLevel(lvl);
         }
     }
 }
