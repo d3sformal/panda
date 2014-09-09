@@ -113,6 +113,10 @@ public class PredicateAbstraction extends Abstraction {
         listeners.add(listener);
     }
 
+    public static void unregisterListeners() {
+        listeners.clear();
+    }
+
     public PredicateAbstraction(Predicates predicateSet) {
         symbolTable = new SystemSymbolTable(this);
         predicateValuation = new SystemPredicateValuation(this, predicateSet);

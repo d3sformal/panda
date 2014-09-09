@@ -56,6 +56,10 @@ public class SMT {
         listener.registerCache(cache);
     }
 
+    public static void unregisterListeners() {
+        listeners.clear();
+    }
+
     // Notify about invocations
     private static void notifyIsSatisfiableInvoked(List<Predicate> formulas) {
         for (SMTListener listener : listeners) {

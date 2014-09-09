@@ -35,6 +35,7 @@ import gov.nasa.jpf.abstraction.assertions.AssertSameValuationOnEveryVisitHandle
 import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostWithValuationHandler;
 import gov.nasa.jpf.abstraction.inspection.AliasingDumper;
+import gov.nasa.jpf.abstraction.smt.SMT;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 
 /**
@@ -195,5 +196,8 @@ public class AbstractListener extends PropertyListenerAdapter {
         for (ExecuteInstructionHandler h : handlers) {
             h.searchFinished();
         }
+
+        SMT.unregisterListeners();
+        PredicateAbstraction.unregisterListeners();
     }
 }
