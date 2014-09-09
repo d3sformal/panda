@@ -1,6 +1,7 @@
 grammar Interpolants;
 
 @header {
+    import java.util.AbstractMap;
     import java.util.HashMap;
     import java.util.List;
     import java.util.LinkedList;
@@ -35,14 +36,20 @@ predicatelist returns [Predicate[] val]
     }
     ;
 
+letpair returns [Map.Entry<String, Object> val]
+    : '(' '.' v=ID_TOKEN e=expression ')' {
+        $ctx.val = new AbstractMap.SimpleEntry<String, Object>($v.text, $e.val);
+    }
+    | '(' '.' v=ID_TOKEN p=predicate ')' {
+        $ctx.val = new AbstractMap.SimpleEntry<String, Object>($v.text, $p.val);
+    }
+    ;
+
 predicate returns [Predicate val] locals [static Map<String, Object> let = new HashMap<String, Object>()]
     : '.' id=ID_TOKEN {
         $ctx.val = (Predicate) PredicateContext.let.get($id.text);
     }
-    | '(' LET_TOKEN '(''(' '.' v=ID_TOKEN e=expression ')' {PredicateContext.let.put($v.text, $e.val);} ')' p=predicate ')' {
-        $ctx.val = $p.val;
-    }
-    | '(' LET_TOKEN '(''(' '.' v=ID_TOKEN q=predicate ')' {PredicateContext.let.put($v.text, $q.val);} ')' p=predicate ')' {
+    | '(' LET_TOKEN '(' (l=letpair {PredicateContext.let.put($l.val.getKey(), $l.val.getValue());})* ')' p=predicate ')' {
         $ctx.val = $p.val;
     }
     | TRUE_TOKEN {
@@ -105,9 +112,6 @@ expression returns [Expression val]
     | '(-' a=term b=term ')' {
         $ctx.val = Subtract.create($a.val, $b.val);
     }
-    | '(-' a=term ')' {
-        $ctx.val = Subtract.create(Constant.create(0), $a.val);
-    }
     ;
 
 term returns [Expression val]
@@ -129,9 +133,6 @@ factor returns [Expression val]
     | CONSTANT_TOKEN {
         $ctx.val = Constant.create(Integer.parseInt($CONSTANT_TOKEN.text));
     }
-    | '(-' CONSTANT_TOKEN ')' {
-        $ctx.val = Constant.create(-Integer.parseInt($CONSTANT_TOKEN.text));
-    }
     | '(' SELECT_TOKEN ARRLEN_TOKEN p=path ')' {
         $ctx.val = DefaultArrayLengthRead.create($p.val);
     }
@@ -140,6 +141,9 @@ factor returns [Expression val]
     }
     | '(' e=expression ')' {
         $ctx.val = $e.val;
+    }
+    | '(-' e=expression ')' {
+        $ctx.val = Subtract.create(Constant.create(0), $e.val);
     }
     ;
 
