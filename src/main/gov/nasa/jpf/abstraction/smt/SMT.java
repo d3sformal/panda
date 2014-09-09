@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import gov.nasa.jpf.vm.VM;
+
 import gov.nasa.jpf.abstraction.Step;
 import gov.nasa.jpf.abstraction.TraceFormula;
 import gov.nasa.jpf.abstraction.common.Conjunction;
@@ -46,7 +48,7 @@ public class SMT {
 
     private static boolean USE_CACHE = true;
     private static boolean USE_MODELS_CACHE = false;
-    private static boolean USE_LOG_FILE = true;
+    private static boolean USE_LOG_FILE = VM.getVM().getJPF().getConfig().getBoolean("panda.log_smt");
     private static int logFileID = 0;
     private static List<SMTListener> listeners = new LinkedList<SMTListener>();
     private static SMTCache cache = new SMTCache();
