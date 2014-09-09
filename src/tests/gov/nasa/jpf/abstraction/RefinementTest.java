@@ -42,8 +42,7 @@ public class RefinementTest extends BaseTest {
         assert -273 == degrees.celsius;
     }
 
-    // Interpolants find return = x + 1, which relies on a local variable and thus will not result in propagation of the predicate past method boundary
-    //@Test
+    @Test
     public static void test5() {
         int x = 2;
 

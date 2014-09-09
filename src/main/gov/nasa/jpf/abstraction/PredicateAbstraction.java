@@ -432,7 +432,7 @@ public class PredicateAbstraction extends Abstraction {
             predicates,
             traceFormula,
             ssa,
-            visitedMethods
+            new HashSet<MethodInfo>()
         );
 
         trace.push(state);
@@ -570,7 +570,20 @@ public class PredicateAbstraction extends Abstraction {
                 // Extract prediction of choices from the recorded choice generator cache
                 // TODO (feed prediction into new CGs to pass them along the refined trace, but disregard them in completely new traces)
 
-                ++backtrackLevel; // There is a special state (-1) which we do not want to backtrack over
+                /**
+                 * At this point backtrackLevel points to the first refined level of the search
+                 *
+                 * We need to backtrack to the last not refined level, however
+                 */
+                --backtrackLevel;
+
+                /**
+                 * The first step of the interpolant should never be contradiction
+                 * Thus the refinement should never happen before the first step (in the auxiliary state -1, which we need to keep to start our refined search from)
+                 */
+                if (backtrackLevel < 1) {
+                    throw new RuntimeException("Refinement backtracks too much and will end the search loop.");
+                }
 
                 notifyAboutRefinementBacktrackLevel(backtrackLevel);
 
