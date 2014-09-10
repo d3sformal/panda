@@ -1,0 +1,16 @@
+[method gov.nasa.jpf.abstraction.FindGreaterTest.test]
+pos >= 0
+pos < alength(arrlen, data)
+pos = alength(arrlen, data)
+data[pos] > 10
+
+[method gov.nasa.jpf.abstraction.FindGreaterTest.findGreater]
+i >= 0
+return >= 0
+i < alength(arrlen, a)
+i = alength(arrlen, a)
+return < alength(arrlen, a)
+return = alength(arrlen, a)
+a[i] > t
+a[return] > 10
+t = 10

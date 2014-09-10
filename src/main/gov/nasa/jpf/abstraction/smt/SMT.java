@@ -49,7 +49,6 @@ public class SMT {
     private static boolean USE_CACHE = true;
     private static boolean USE_MODELS_CACHE = false;
     private static boolean USE_LOG_FILE = VM.getVM().getJPF().getConfig().getBoolean("panda.log_smt");
-    private static int logFileID = 0;
     private static List<SMTListener> listeners = new LinkedList<SMTListener>();
     private static SMTCache cache = new SMTCache();
 
@@ -184,8 +183,13 @@ public class SMT {
 
     public enum SupportedSMT {
         MathSAT,
-        SMTInterpol
+        SMTInterpol,
+        CVC4;
+
+        public int logFileID = 0;
     }
+
+    private static SupportedSMT defaultSMT = SupportedSMT.CVC4;
 
     /**
      * Starts a process of a supported SMT solver
@@ -218,6 +222,15 @@ public class SMT {
                 };
 
                 break;
+            case CVC4:
+                args = new String[] {
+                    System.getProperty("user.dir") + "/bin/cvc4-1.4-x86_64-linux-opt",
+                    "--lang=smt",
+                    "--incremental",
+                    "--continued-execution"
+                };
+
+                break;
         }
 
         Process process = Runtime.getRuntime().exec(args, env);
@@ -227,6 +240,8 @@ public class SMT {
 
         InputStream outstream = process.getInputStream();
         outreader = new InputStreamReader(outstream);
+
+        System.out.println("Started " + smt + " solver.");
     }
 
     /**
@@ -239,6 +254,7 @@ public class SMT {
         String separator = InputType.NORMAL.getSeparator();
 
         switch (smt) {
+            case CVC4:
             case MathSAT:
                 in.write(
                     "(set-option :produce-models true)" + separator +
@@ -282,13 +298,15 @@ public class SMT {
         );
 
         in.flush();
+
+        System.out.println("Configured " + smt + " solver.");
     }
 
     /**
      * The default SMT solver used for the core functionality (maintaining valuations of abstraction predicates during forward state space exploration, maintaining the heap abstraction - models of array index expressions)
      */
     public SMT() throws SMTException {
-        this(SupportedSMT.MathSAT);
+        this(defaultSMT);
     }
 
     /**
@@ -299,7 +317,7 @@ public class SMT {
             prepareSMTProcess(smt);
 
             if (USE_LOG_FILE) {
-                final BufferedWriter log = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("smt." + smt + ".log." + (++logFileID))));
+                final BufferedWriter log = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("smt." + smt + ".log." + (++smt.logFileID))));
 
                 in = new BufferedWriter(inwriter) {
                     @Override
@@ -525,7 +543,7 @@ public class SMT {
                         output = out.readLine();
 
                         // Account for SMTLIB encoding of negative numbers (unary minus applied to a positive number)
-                        Pattern pattern = Pattern.compile("^\\( \\(value ((?<positivevalue>[0-9]*)|\\(- (?<negativevalue>[0-9]*)\\))\\) \\)$");
+                        Pattern pattern = Pattern.compile("^\\( *\\(value ((?<positivevalue>[0-9]*)|\\(- (?<negativevalue>[0-9]*)\\))\\) *\\)$");
                         Matcher matcher = pattern.matcher(output);
 
                         if (matcher.matches()) {
@@ -866,7 +884,13 @@ public class SMT {
             }
 
             // Insert responses
-            ret[j] = responses[i].getModel();
+            Integer model = responses[i].getModel();
+
+            if (model == null) {
+                return null;
+            }
+
+            ret[j] = model;
         }
 
         return ret;
