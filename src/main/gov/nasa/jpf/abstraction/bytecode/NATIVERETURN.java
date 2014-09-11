@@ -29,7 +29,7 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
             case Types.T_REFERENCE:
                 AnonymousObject returnValue = AnonymousObject.create(new Reference(ti.getElementInfo(((Integer) retValue).intValue())));
 
-                PredicateAbstraction.getInstance().processNewObject(returnValue);
+                PredicateAbstraction.getInstance().processObject(returnValue, getMethodInfo(), getPosition());
 
                 before.setReturnAttr(returnValue);
                 break;

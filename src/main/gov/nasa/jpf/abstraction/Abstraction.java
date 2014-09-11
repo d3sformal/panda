@@ -92,7 +92,10 @@ public abstract class Abstraction {
     public void processNewClass(ThreadInfo thread, ClassInfo classInfo) {
     }
 
-    public void processNewObject(AnonymousObject object) {
+    public void processObject(AnonymousObject object, MethodInfo m, int pc) {
+    }
+
+    public void processNewObject(AnonymousObject object, MethodInfo m, int pc) {
     }
 
     public void informAboutPrimitiveLocalVariable(Root root) {

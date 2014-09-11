@@ -32,17 +32,36 @@ public class CounterexampleListener extends ListenerAdapter {
     private void printErrorConjuncts(TraceFormula traceFormula) {
         int traceStep = 0;
         int traceStepCount = traceFormula.size();
+        int maxLen = 0;
+
+        for (Step s : traceFormula) {
+            int pcLen = ("[" + s.getMethod().getName() + ":" + s.getPC() + "]").length();
+
+            if (maxLen < pcLen) {
+                maxLen = pcLen;
+            }
+        }
 
         for (Step s : traceFormula) {
             System.out.print("\t");
 
             ++traceStep;
 
+            int pc = s.getPC();
+            String pcStr = "[" + s.getMethod().getName() + ":" + s.getPC() + "]";
+            int pcLen = pcStr.length();
+
             for (int i = 0; i < log(traceStepCount) - log(traceStep); ++i) {
                 System.out.print(" ");
             }
 
-            System.out.println(traceStep + ": " + s.getPredicate().toString(Notation.FUNCTION_NOTATION));
+            System.out.print(traceStep + ": " + pcStr + ": ");
+
+            for (int i = 0; i < maxLen - pcLen; ++i) {
+                System.out.print(" ");
+            }
+
+            System.out.println(s.getPredicate().toString(Notation.FUNCTION_NOTATION));
         }
     }
 

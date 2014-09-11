@@ -38,7 +38,10 @@ import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
+import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementWrite;
@@ -366,15 +369,36 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     @Override
-    public void processNewObject(AnonymousObject object) {
+    public void processObject(AnonymousObject object, MethodInfo m, int pc) {
         symbolTable.get(0).addObject(object);
         predicateValuation.get(0).addObject(object);
 
         if (object instanceof AnonymousArray) {
             AnonymousArray a = (AnonymousArray) object;
 
-            extendTraceFormulaWithConstraint((Equals) Equals.create(DefaultArrayLengthRead.create(a), a.getArrayLength()), ThreadInfo.getCurrentThread().getPC().getMethodInfo(), ThreadInfo.getCurrentThread().getPC().getPosition());
+            extendTraceFormulaWithConstraint((Equals) Equals.create(DefaultArrayLengthRead.create(a), a.getArrayLength()), m, pc);
         }
+    }
+
+    @Override
+    public void processNewObject(AnonymousObject object, MethodInfo m, int pc) {
+        Set<AccessExpression> exprs = new HashSet<AccessExpression>();
+
+        for (Step s : traceFormula) {
+            s.getPredicate().addAccessExpressionsToSet(exprs);
+        }
+
+        Predicate fresh = Tautology.create();
+
+        for (AccessExpression ae : exprs) {
+            if (!(ae instanceof ObjectFieldWrite) && !(ae instanceof ArrayElementWrite) && !(ae instanceof ArrayLengthWrite)) {
+                fresh = Conjunction.create(fresh, Negation.create(Equals.create(ae, object)));
+            }
+        }
+
+        extendTraceFormulaWith(fresh, m, pc);
+
+        processObject(object, m, pc);
     }
 
     @Override
@@ -581,15 +605,16 @@ public class PredicateAbstraction extends Abstraction {
                  */
                 --backtrackLevel;
 
+                notifyAboutRefinementBacktrackLevel(backtrackLevel);
+
                 /**
                  * The first step of the interpolant should never be contradiction
                  * Thus the refinement should never happen before the first step (in the auxiliary state -1, which we need to keep to start our refined search from)
                  */
                 if (backtrackLevel < 1) {
-                    throw new RuntimeException("Refinement backtracks too much and will end the search loop.");
+                    //throw new RuntimeException("Refinement backtracks too much and will end the search loop.");
+                    return 1;
                 }
-
-                notifyAboutRefinementBacktrackLevel(backtrackLevel);
 
                 return backtrackLevel;
             }

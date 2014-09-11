@@ -35,7 +35,7 @@ public class ANEWARRAY extends gov.nasa.jpf.jvm.bytecode.ANEWARRAY {
 
         PredicateAbstraction.getInstance().processNewClass(ti, array.getClassInfo());
 
-        PredicateAbstraction.getInstance().processNewObject(expression);
+        PredicateAbstraction.getInstance().processNewObject(expression, actualNextInsn.getMethodInfo(), actualNextInsn.getPosition());
 
         sf = ti.getModifiableTopFrame();
         sf.setOperandAttr(expression);

@@ -61,7 +61,7 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
         ElementInfo array = ti.getElementInfo(sf.peek());
         AnonymousArray expression = AnonymousArray.create(new Reference(array), lengthExpression);
 
-        PredicateAbstraction.getInstance().processNewObject(expression);
+        PredicateAbstraction.getInstance().processNewObject(expression, actualNextInsn.getMethodInfo(), actualNextInsn.getPosition());
 
         sf = ti.getModifiableTopFrame();
         sf.setOperandAttr(expression);

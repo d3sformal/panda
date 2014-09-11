@@ -452,7 +452,9 @@ public class SMT {
         appendArraysDeclarations(arrays, input, separator);
 
         if (!fresh.isEmpty()) {
-            appendFreshConstraints(fresh, objects, input, separator);
+            for (int id : fresh) {
+                input.append("(declare-fun fresh_" + id + " () Int)" + separator);
+            }
         }
 
         int interpolationGroup = 0;
@@ -596,8 +598,9 @@ public class SMT {
      * Envelopes a given string representation of a formula so that it can be checked for satisfiability in isolation (with potential extraction of model)
      */
     private String prepareFormulaEvaluation(Predicate predicate, String formula, FormulaType formulaType, InputType inputType, Boolean cachedIsSatisfiable, Integer cachedModel, boolean extractModel) {
+        boolean cacheDisabled = cachedIsSatisfiable == null || (extractModel && cachedModel == null);
         String separator = inputType.getSeparator();
-        String linePrefix = cachedIsSatisfiable == null ? "" : "; ";
+        String linePrefix = cacheDisabled ? "" : "; ";
         StringBuilder ret = new StringBuilder();
 
         if (inputType == InputType.DEBUG) {
@@ -615,7 +618,7 @@ public class SMT {
         }
 
         // The actual call to SMT (formula, model retrieval)
-        if (inputType == InputType.DEBUG || cachedIsSatisfiable == null) {
+        if (inputType == InputType.DEBUG || cacheDisabled) {
             ret.append(linePrefix); ret.append("(push 1)"); ret.append(separator);
             ret.append(linePrefix); ret.append("(assert "); ret.append(formula); ret.append(")"); ret.append(separator);
             ret.append(linePrefix); ret.append("(check-sat)"); ret.append(separator);
@@ -625,13 +628,20 @@ public class SMT {
             }
 
             ret.append(linePrefix); ret.append("(pop 1)"); ret.append(separator);
-        }
-
-        // Reuse of cached values
-        if (inputType == InputType.NORMAL && cachedIsSatisfiable != null) {
+        } else { // Reuse of cached values
             ret.append("(push 1)"); ret.append(separator);
             ret.append("(assert "); ret.append(cachedIsSatisfiable); ret.append(")"); ret.append(separator);
-            ret.append("(assert (= value "); ret.append(cachedModel); ret.append("))"); ret.append(separator);
+
+            if (extractModel) {
+                ret.append("(assert (= value ");
+                if (cachedModel < 0) {
+                    ret.append("(- "); ret.append(-cachedModel); ret.append(")");
+                } else {
+                    ret.append(cachedModel);
+                }
+                ret.append("))"); ret.append(separator);
+            }
+
             ret.append("(check-sat)"); ret.append(separator);
 
             if (extractModel) {

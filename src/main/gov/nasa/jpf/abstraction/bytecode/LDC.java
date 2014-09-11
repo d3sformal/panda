@@ -43,7 +43,7 @@ public class LDC extends gov.nasa.jpf.jvm.bytecode.LDC {
         case CLASS:
             AnonymousObject object = AnonymousObject.create(new Reference(ti.getElementInfo(sf.peek())));
 
-            PredicateAbstraction.getInstance().processNewObject(object);
+            PredicateAbstraction.getInstance().processObject(object, getMethodInfo(), getPosition());
 
             expression = object;
             break;

@@ -3,16 +3,17 @@ package gov.nasa.jpf.abstraction;
 class FGD {public static void main(String[] args) {new FindGreaterTest().bootstrap();}}
 public class FindGreaterTest extends BaseTest {
     public FindGreaterTest() {
-        //config.add("+panda.interpolation=true");
+        config.add("+panda.interpolation=true");
+        config.add("+panda.abstract_domain=PREDICATES");
         config.add("+panda.log_smt=true");
-        //config.add("+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor");
+        config.add("+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener");
+        //config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
+        //config.add("+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor");
     }
 
     @Test
     public static void test() {
-        int[] data = new int[1];
+        int[] data = new int[5];
 
         loadRandomValues(data);
 

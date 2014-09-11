@@ -55,7 +55,7 @@ public class MULTIANEWARRAY extends gov.nasa.jpf.jvm.bytecode.MULTIANEWARRAY {
         ElementInfo array = ti.getElementInfo(sf.peek());
         AnonymousArray expression = AnonymousArray.create(new Reference(array), attr.getExpression());
 
-        PredicateAbstraction.getInstance().processNewObject(expression);
+        PredicateAbstraction.getInstance().processNewObject(expression, actualNextInsn.getMethodInfo(), actualNextInsn.getPosition());
 
         sf = ti.getModifiableTopFrame();
         sf.setOperandAttr(new Expression(null, expression));

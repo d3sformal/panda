@@ -270,7 +270,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
             ret.append((-expression.value.intValue()));
             ret.append(")");
         } else {
-            ret.append(expression);
+            ret.append(expression.value.intValue());
         }
     }
 

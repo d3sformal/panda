@@ -34,7 +34,7 @@ public class NEW extends gov.nasa.jpf.jvm.bytecode.NEW {
             AssertionErrorTracker.setAssertionErrorAllocationSite(ei, sf.getMethodInfo(), getPosition());
         }
 
-        PredicateAbstraction.getInstance().processNewObject(object);
+        PredicateAbstraction.getInstance().processNewObject(object, actualNextInsn.getMethodInfo(), actualNextInsn.getPosition());
         sf.setOperandAttr(object);
 
         return actualNextInsn;
