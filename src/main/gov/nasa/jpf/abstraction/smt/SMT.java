@@ -25,6 +25,7 @@ import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.abstraction.Step;
 import gov.nasa.jpf.abstraction.TraceFormula;
 import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Implication;
@@ -464,11 +465,24 @@ public class SMT {
         }
 
         input.append("(check-sat)"); input.append(separator);
+
+        // Overall interpolants
         input.append("(get-interpolants");
         for (int i = 1; i <= interpolationGroup; ++i) {
             input.append(" g"); input.append(i);
         }
-        input.append(")");
+        input.append(")"); input.append(separator);
+
+        // Method scopes intepolants
+        for (List<Integer> m : traceFormula.getMethods()) {
+            if (m.get(0) > 0) {
+                input.append("(get-interpolants");
+                for (int i : m) {
+                    input.append(" g"); input.append(i + 1);
+                }
+                input.append(")"); input.append(separator);
+            }
+        }
 
         input.append("(pop 1)"); input.append(separator);
 
@@ -495,6 +509,24 @@ public class SMT {
 
             if (!satisfiable) {
                 interpolants = PredicatesFactory.createInterpolantsFromString(output);
+            }
+
+            // Inject method-scoped interpolants
+            for (List<Integer> m : traceFormula.getMethods()) {
+                if (m.get(0) > 0) {
+                    output = interpol.out.readLine();
+
+                    if (!satisfiable) {
+                        Predicate[] methodInterpolants = PredicatesFactory.createInterpolantsFromString(output);
+
+                        for (int i = 0; i < methodInterpolants.length; ++i) {
+                            if (methodInterpolants[i] instanceof Contradiction) {
+                                break;
+                            }
+                            interpolants[m.get(i)] = Conjunction.create(interpolants[m.get(i)], methodInterpolants[i]);
+                        }
+                    }
+                }
             }
 
             interpol.close();

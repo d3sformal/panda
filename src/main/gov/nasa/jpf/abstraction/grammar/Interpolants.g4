@@ -102,12 +102,12 @@ predicate returns [Predicate val] locals [static Map<String, Object> let = new H
     }
     ;
 
-expression returns [Expression val]
+expression returns [Expression val] locals [Expression acc]
     : t=term {
         $ctx.val = $t.val;
     }
-    | '(+' a=term b=term ')' {
-        $ctx.val = Add.create($a.val, $b.val);
+    | '(+' a=term {$ctx.acc = $a.val;} (b=term {$ctx.acc = Add.create($ctx.acc, $b.val);})+ ')' {
+        $ctx.val = $ctx.acc;
     }
     | '(-' a=term b=term ')' {
         $ctx.val = Subtract.create($a.val, $b.val);

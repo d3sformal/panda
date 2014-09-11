@@ -141,6 +141,10 @@ public class PredicateAbstraction extends Abstraction {
     private SSAFormulaIncarnationsManager ssa = new SSAFormulaIncarnationsManager();
 
     private void extendTraceFormulaWithAssignment(AccessExpression to, Expression from, MethodInfo m, int nextPC, int depthDelta) {
+        extendTraceFormulaWith(getTraceFormulaAssignmentConjunct(to, from, depthDelta), m, nextPC);
+    }
+
+    private Predicate getTraceFormulaAssignmentConjunct(AccessExpression to, Expression from, int depthDelta) {
         // The trace formula is extended with a constraint relating a POST STATE to a PRE STATE in the following fashion (for variables, field writes, array element writes):
         //
         // Variables:
@@ -174,7 +178,7 @@ public class PredicateAbstraction extends Abstraction {
             if (to instanceof Root) {
                 ssa.createNewSymbolIncarnation(to, afterDepth);
 
-                extendTraceFormulaWith(VariableAssign.create((Root) ssa.incarnateSymbol(to, afterDepth), from), m, nextPC);
+                return VariableAssign.create((Root) ssa.incarnateSymbol(to, afterDepth), from);
             } else if (to instanceof ObjectFieldRead) {
                 ObjectFieldRead fr = (ObjectFieldRead) to;
                 Field f = fr.getField();
@@ -187,7 +191,7 @@ public class PredicateAbstraction extends Abstraction {
 
                 ssa.createNewSymbolIncarnation(to, afterDepth);
 
-                extendTraceFormulaWith(FieldAssign.create(ssa.incarnateField(f), rightHandSide), m, nextPC);
+                return FieldAssign.create(ssa.incarnateField(f), rightHandSide);
             } else if (to instanceof ArrayElementRead) {
                 ArrayElementRead ar = (ArrayElementRead) to;
                 Arrays a = ar.getArrays();
@@ -212,9 +216,11 @@ public class PredicateAbstraction extends Abstraction {
 
                 ssa.createNewSymbolIncarnation(to, afterDepth);
 
-                extendTraceFormulaWith(ArraysAssign.create(ssa.incarnateArrays(a), rightHandSide), m, nextPC);
+                return ArraysAssign.create(ssa.incarnateArrays(a), rightHandSide);
             }
         }
+
+        return Tautology.create();
     }
 
     public void extendTraceFormulaWithConstraint(Predicate p, MethodInfo m, int nextPC) {
@@ -233,7 +239,9 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     private void extendTraceFormulaWith(Predicate p, MethodInfo m, int nextPC) {
-        traceFormula.append(p, m, nextPC);
+        if (!(p instanceof Tautology)) {
+            traceFormula.append(p, m, nextPC);
+        }
     }
 
     public void cutTraceAfterAssertion(MethodInfo m, int pc) {
@@ -281,6 +289,8 @@ public class PredicateAbstraction extends Abstraction {
                 argTypes[i++] = argType;
             }
 
+            Predicate assignment = Tautology.create();
+
             for (int argIndex = 0, slotIndex = 0; argIndex < method.getNumberOfStackArguments(); ++argIndex) {
                 Expression expr = ExpressionUtil.getExpression(after.getSlotAttr(slotIndex));
 
@@ -291,7 +301,7 @@ public class PredicateAbstraction extends Abstraction {
                 AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
 
                 if (expr != null) {
-                    extendTraceFormulaWithAssignment(formalArgument, expr, method, 0, +1);
+                    assignment = Conjunction.create(assignment, getTraceFormulaAssignmentConjunct(formalArgument, expr, +1));
                 }
 
                 switch (argTypes[argIndex]) {
@@ -305,6 +315,10 @@ public class PredicateAbstraction extends Abstraction {
                         break;
                 }
             }
+
+            extendTraceFormulaWith(assignment, method, 0);
+
+            traceFormula.markCall();
         }
     }
 
@@ -337,6 +351,8 @@ public class PredicateAbstraction extends Abstraction {
             extendTraceFormulaWithAssignment(returnSymbolCaller, returnSymbolCallee, caller, after.getPC().getPosition(), -1);
 
             ssa.changeDepth(-1);
+
+            traceFormula.markReturn();
         }
 
         predicateValuation.processMethodReturn(threadInfo, before, after);
@@ -349,6 +365,8 @@ public class PredicateAbstraction extends Abstraction {
 
         if (RunDetector.isRunning()) {
             ssa.changeDepth(-1);
+
+            traceFormula.markReturn();
         }
     }
 
@@ -396,9 +414,7 @@ public class PredicateAbstraction extends Abstraction {
             }
         }
 
-        if (!(fresh instanceof Tautology)) {
-            extendTraceFormulaWith(fresh, m, pc);
-        }
+        extendTraceFormulaWith(fresh, m, pc);
 
         processObject(object, m, pc);
     }
