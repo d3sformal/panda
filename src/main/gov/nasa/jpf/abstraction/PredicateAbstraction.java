@@ -396,7 +396,9 @@ public class PredicateAbstraction extends Abstraction {
             }
         }
 
-        extendTraceFormulaWith(fresh, m, pc);
+        if (!(fresh instanceof Tautology)) {
+            extendTraceFormulaWith(fresh, m, pc);
+        }
 
         processObject(object, m, pc);
     }
