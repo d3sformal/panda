@@ -45,7 +45,7 @@ letpair returns [Map.Entry<String, Object> val]
     }
     ;
 
-predicate returns [Predicate val] locals [static Map<String, Object> let = new HashMap<String, Object>()]
+predicate returns [Predicate val] locals [static Map<String, Object> let = new HashMap<String, Object>(); Predicate acc;]
     : '.' id=ID_TOKEN {
         $ctx.val = (Predicate) PredicateContext.let.get($id.text);
     }
@@ -58,11 +58,11 @@ predicate returns [Predicate val] locals [static Map<String, Object> let = new H
     | FALSE_TOKEN {
         $ctx.val = Contradiction.create();
     }
-    | '(' AND_TOKEN p=predicate q=predicate ')' {
-        $ctx.val = Conjunction.create($p.val, $q.val);
+    | '(' AND_TOKEN p=predicate {$ctx.acc = $p.val;} (q=predicate {$ctx.acc = Conjunction.create($ctx.acc, $q.val);})+ ')' {
+        $ctx.val = $ctx.acc;
     }
-    | '(' OR_TOKEN p=predicate q=predicate ')' {
-        $ctx.val = Disjunction.create($p.val, $q.val);
+    | '(' OR_TOKEN p=predicate {$ctx.acc = $p.val;} (q=predicate {$ctx.acc = Disjunction.create($ctx.acc, $q.val);})+ ')' {
+        $ctx.val = $ctx.acc;
     }
     | '(' NOT_TOKEN p=predicate ')' {
         $ctx.val = Negation.create($p.val);
@@ -156,6 +156,9 @@ path returns [DefaultAccessExpression val]
     }
     | f=ID_TOKEN {
         $ctx.val = DefaultRoot.create($f.text.replaceAll("var_ssa_[0-9]+_frame_[0-9]+_", ""));
+    }
+    | '(' SELECT_TOKEN '.' id=ID_TOKEN e=expression ')' {
+        $ctx.val = DefaultArrayElementRead.create((AccessExpression) PredicateContext.let.get($id.text), $e.val);
     }
     | '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' {
         $ctx.val = $p.val;
