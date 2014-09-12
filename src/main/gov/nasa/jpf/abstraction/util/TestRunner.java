@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction.util;
 import java.lang.reflect.Method;
 
 public class TestRunner {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Throwable {
         String test = args[0];
 
         Class<?> cls = Class.forName(test);
@@ -11,6 +11,10 @@ public class TestRunner {
 
         Object obj = cls.newInstance();
 
-        bootstrap.invoke(obj);
+        try {
+            bootstrap.invoke(obj);
+        } catch (Throwable e) {
+            throw e.getCause();
+        }
     }
 }
