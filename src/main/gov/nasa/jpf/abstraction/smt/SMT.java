@@ -530,12 +530,9 @@ public class SMT {
 
                         for (int i = 0; i < m.size(); ++i) {
                             if (m.get(i) < interpolants.length) {
-                                System.out.println("[" + traceFormula.get(m.get(i)).getMethod().getName() + ":" + traceFormula.get(m.get(i)).getPC() + "]: " + methodInterpolants[i]);
                                 Predicate p = interpolants[m.get(i)];
                                 p = Conjunction.create(p, methodInterpolants[i]);
                                 interpolants[m.get(i)] = p;
-                            } else {
-                                System.out.println(m.get(i) + " out of bounds " + interpolants.length);
                             }
                         }
                     }

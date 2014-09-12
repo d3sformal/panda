@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import gov.nasa.jpf.ListenerAdapter;
 import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.Step;
@@ -13,6 +14,13 @@ import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 
 public class CounterexampleListener extends ListenerAdapter {
+    public enum Format {
+        SEPARATED,
+        INTERLEAVED
+    }
+
+    private Format format = VM.getVM().getJPF().getConfig().getEnum("panda.counterexample.print_format", Format.class.getEnumConstants(), Format.SEPARATED);
+
     public CounterexampleListener() {
         PredicateAbstraction.registerCounterexampleListener(this);
     }
@@ -65,18 +73,7 @@ public class CounterexampleListener extends ListenerAdapter {
         }
     }
 
-    public void counterexample(TraceFormula traceFormula, Predicate[] interpolants) {
-        System.out.println();
-        System.out.println();
-        System.out.println("Counterexample Trace Formula:");
-        //System.out.println(traceFormula.toString(Notation.SMT_NOTATION));
-        //System.out.println(traceFormula.toString(Notation.FUNCTION_NOTATION));
-
-        printErrorConjuncts(traceFormula);
-
-        System.out.println();
-        System.out.println("Feasible: " + (interpolants == null));
-
+    private void printInterpolants(TraceFormula traceFormula, Predicate[] interpolants) {
         if (interpolants != null) {
             int maxLen = 0;
 
@@ -101,9 +98,92 @@ public class CounterexampleListener extends ListenerAdapter {
                 System.out.println(interpolant);
             }
         }
+    }
 
-        System.out.println();
-        System.out.println();
+    private void printInterpolatedCounterexample(TraceFormula traceFormula, Predicate[] interpolants) {
+        int traceStep = 0;
+        int traceStepCount = traceFormula.size();
+        int maxLen = 0;
+        int maxPLen = 0;
+
+        for (Step s : traceFormula) {
+            int pcLen = ("[" + s.getMethod().getName() + ":" + s.getPC() + "]").length();
+            int pLen = s.getPredicate().toString(Notation.FUNCTION_NOTATION).length();
+
+            if (maxLen < pcLen) {
+                maxLen = pcLen;
+            }
+
+            if (maxPLen < pLen) {
+                maxPLen = pLen;
+            }
+        }
+
+        int interpolant = 0;
+
+        for (Step s : traceFormula) {
+            System.out.print("\t");
+
+            ++traceStep;
+
+            int pc = s.getPC();
+            String pcStr = "[" + s.getMethod().getName() + ":" + s.getPC() + "]";
+            int pcLen = pcStr.length();
+            int pLen = s.getPredicate().toString().length();
+
+            for (int i = 0; i < log(traceStepCount) - log(traceStep); ++i) {
+                System.out.print(" ");
+            }
+
+            System.out.print(traceStep + ": " + pcStr + ": ");
+
+            for (int i = 0; i < maxLen - pcLen; ++i) {
+                System.out.print(" ");
+            }
+
+            System.out.print(s.getPredicate().toString(Notation.FUNCTION_NOTATION));
+
+            if (interpolants != null && interpolant < interpolants.length) {
+                for (int i = 0; i < maxPLen - pLen; ++i) {
+                    System.out.print(" ");
+                }
+
+                System.out.print("\tinterpolant: " + interpolants[interpolant++]);
+            }
+
+            System.out.println();
+        }
+    }
+
+    public void counterexample(TraceFormula traceFormula, Predicate[] interpolants) {
+        switch (format) {
+            default:
+            case SEPARATED:
+                System.out.println();
+                System.out.println();
+                System.out.println("Counterexample Trace Formula:");
+
+                printErrorConjuncts(traceFormula);
+
+                System.out.println();
+                System.out.println("Feasible: " + (interpolants == null));
+
+                printInterpolants(traceFormula, interpolants);
+
+                System.out.println();
+                System.out.println();
+                break;
+            case INTERLEAVED:
+                System.out.println();
+                System.out.println();
+
+                System.out.println("Counterexample:");
+                printInterpolatedCounterexample(traceFormula, interpolants);
+
+                System.out.println();
+                System.out.println();
+                break;
+        }
     }
 
     public void backtrackLevel(int lvl) {

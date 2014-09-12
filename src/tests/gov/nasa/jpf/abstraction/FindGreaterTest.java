@@ -7,8 +7,9 @@ public class FindGreaterTest extends BaseTest {
         config.add("+panda.abstract_domain=PREDICATES");
         config.add("+panda.log_smt=true");
         config.add("+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener");
-        //config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
-        //config.add("+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor");
+        config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
+        config.add("+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor");
+        config.add("+listener+=,gov.nasa.jpf.abstraction.util.Stepper");
     }
 
     @Test
