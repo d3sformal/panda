@@ -1,6 +1,5 @@
 package gov.nasa.jpf.abstraction;
 
-class FGD {public static void main(String[] args) {new FindGreaterTest().bootstrap();}}
 public class FindGreaterTest extends BaseTest {
     public FindGreaterTest() {
         config.add("+panda.interpolation=true");
@@ -9,11 +8,11 @@ public class FindGreaterTest extends BaseTest {
         config.add("+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener");
         config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
         config.add("+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.Stepper");
+        //config.add("+listener+=,gov.nasa.jpf.abstraction.util.Stepper");
     }
 
     @Test
-    public static void test() {
+    public static void test1() {
         int[] data = new int[5];
 
         loadRandomValues(data);
@@ -21,6 +20,23 @@ public class FindGreaterTest extends BaseTest {
         int pos = findGreater(data, 10);
 
         assert pos == data.length || data[pos] > 10;
+    }
+
+    @Test
+    public static void test2() {
+        int[] data = new int[5];
+
+        int pos = data.length;
+
+        for (int i = 0; i < data.length; ++i) {
+            if (data[i] > 10) {
+                pos = i;
+                break;
+            }
+        }
+
+        assert pos == data.length || data[pos] > 10;
+
     }
 
     private static void loadRandomValues(int[] a) {

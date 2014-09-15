@@ -1,4 +1,4 @@
-[method gov.nasa.jpf.abstraction.FindGreaterTest.test]
+[method gov.nasa.jpf.abstraction.FindGreaterTest.test1]
 pos >= 0
 pos < alength(arrlen, data)
 pos = alength(arrlen, data)
