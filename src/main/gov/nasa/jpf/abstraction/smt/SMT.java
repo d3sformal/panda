@@ -37,8 +37,11 @@ import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
+import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.Pair;
 
@@ -886,6 +889,26 @@ public class SMT {
         Set<String> arrays = collector.getArrays();
         Set<AccessExpression> objects = collector.getObjects();
         Set<Integer> fresh = collector.getFresh();
+
+        Set<AccessExpression> exprs = new HashSet<AccessExpression>();
+
+        for (AccessExpression e1 : expressions) {
+            exprs.clear();
+            e1.addAccessExpressionsToSet(exprs);
+
+            for (AccessExpression e2 : exprs) {
+                Root r = e2.getRoot();
+
+                if (r instanceof PackageAndClass) {
+                    classes.add(r.getName());
+                } else if (r instanceof AnonymousObject) {
+                    AnonymousObject o = (AnonymousObject) r;
+                    fresh.add(o.getReference().getReferenceNumber());
+                } else {
+                    variables.add(r.getName());
+                }
+            }
+        }
 
         input.append("(push 1)"); input.append(separator);
         appendClassDeclarations(classes, input, separator);
