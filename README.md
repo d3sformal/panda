@@ -10,9 +10,15 @@ Currently, we focus on automated generation of predicates, modeling Java collect
 To be able to run <span style='font-variant: small-caps;'>Panda</span>, it is necessary to have JDK 7 installed on your system.
 You can download the JDK 7 directly from the [Oracle web site](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html).
 
+<!--
 2. **MathSAT 5**  
 Currently only the Linux x86-64 binaries of MathSAT are included within the project repository.
 For platforms other than Linux x86-64, you also need to obtain the appropriate binary at the [MathSAT web site](http://mathsat.fbk.eu/download.html).
+-->
+
+2. **CVC4**
+Currently only the Linux x86-64 binaries of CVC4 are included within the project repository.
+For platforms other than Linux x86-64, you also need to obtain the appropriate binary at the [CVC4 web site](http://cvc4.cs.nyu.edu).
 
 
 ## Installation ##
