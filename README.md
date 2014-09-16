@@ -16,7 +16,7 @@ Currently only the Linux x86-64 binaries of MathSAT are included within the proj
 For platforms other than Linux x86-64, you also need to obtain the appropriate binary at the [MathSAT web site](http://mathsat.fbk.eu/download.html).
 -->
 
-2. **CVC4**
+2. **CVC4**  
 Currently only the Linux x86-64 binaries of CVC4 are included within the project repository.
 For platforms other than Linux x86-64, you also need to obtain the appropriate binary at the [CVC4 web site](http://cvc4.cs.nyu.edu).
 
