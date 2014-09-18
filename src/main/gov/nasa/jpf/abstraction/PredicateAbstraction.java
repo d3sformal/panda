@@ -554,6 +554,13 @@ public class PredicateAbstraction extends Abstraction {
      */
     public Integer error() {
         if (VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation")) {
+            System.out.println();
+            System.out.println();
+            System.out.println();
+            System.out.println("Error source code line: " + VM.getVM().getCurrentThread().getPC().getSourceLine());
+            System.out.println("Trying to refine abstraction.");
+            System.out.println();
+
             Predicate[] interpolants = smt.interpolate(traceFormula);
 
             notifyAboutCounterexample(traceFormula, interpolants);
