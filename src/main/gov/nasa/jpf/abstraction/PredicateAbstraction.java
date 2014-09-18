@@ -625,6 +625,8 @@ public class PredicateAbstraction extends Abstraction {
 
                 notifyAboutRefinementBacktrackLevel(backtrackLevel);
 
+                notifyAboutCurrentPredicateSet(predicateValuation.getPredicateSet(), refinedMethods);
+
                 /**
                  * The first step of the interpolant should never be contradiction
                  * Thus the refinement should never happen before the first step (in the auxiliary state -1, which we need to keep to start our refined search from)
@@ -652,4 +654,11 @@ public class PredicateAbstraction extends Abstraction {
             listener.backtrackLevel(lvl);
         }
     }
+
+    private static void notifyAboutCurrentPredicateSet(Predicates predicateSet, List<MethodInfo> refinedMethods) {
+        for (CounterexampleListener listener : listeners) {
+            listener.currentPredicateSet(predicateSet, refinedMethods);
+        }
+    }
+
 }

@@ -1,17 +1,24 @@
 package gov.nasa.jpf.abstraction.util;
 
+import java.util.List;
 import java.util.Stack;
 
 import gov.nasa.jpf.ListenerAdapter;
+import gov.nasa.jpf.report.Publisher;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.PredicateConsolePublisher;
 import gov.nasa.jpf.abstraction.Step;
 import gov.nasa.jpf.abstraction.TraceFormula;
+import gov.nasa.jpf.abstraction.common.AssumePredicateContext;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Notation;
+import gov.nasa.jpf.abstraction.common.MethodPredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.PredicateContext;
+import gov.nasa.jpf.abstraction.common.Predicates;
 
 public class CounterexampleListener extends ListenerAdapter {
     public enum Format {
@@ -161,6 +168,17 @@ public class CounterexampleListener extends ListenerAdapter {
             case SEPARATED:
                 System.out.println();
                 System.out.println();
+                System.out.println();
+
+                System.out.println("Counterexample Concrete Trace:");
+
+                if (VM.getVM().getJPF().getConfig().getBoolean("panda.counterexample.print_concrete")) {
+                    for (Publisher p : VM.getVM().getJPF().getReporter().getPublishers()) {;
+                        ((PredicateConsolePublisher) p).printTrace();
+                    }
+                    System.out.println();
+                }
+
                 System.out.println("Counterexample Trace Formula:");
 
                 printErrorConjuncts(traceFormula);
@@ -176,8 +194,19 @@ public class CounterexampleListener extends ListenerAdapter {
             case INTERLEAVED:
                 System.out.println();
                 System.out.println();
+                System.out.println();
+
+                System.out.println("Counterexample Concrete Trace:");
+
+                if (VM.getVM().getJPF().getConfig().getBoolean("panda.counterexample.print_concrete")) {
+                    for (Publisher p : VM.getVM().getJPF().getReporter().getPublishers()) {;
+                        ((PredicateConsolePublisher) p).printTrace();
+                    }
+                    System.out.println();
+                }
 
                 System.out.println("Counterexample:");
+
                 printInterpolatedCounterexample(traceFormula, interpolants);
 
                 System.out.println();
@@ -188,5 +217,34 @@ public class CounterexampleListener extends ListenerAdapter {
 
     public void backtrackLevel(int lvl) {
         System.out.println("Backtrack to level " + lvl + " after refinement");
+        System.out.println();
+    }
+
+    public void currentPredicateSet(Predicates predicateSet, List<MethodInfo> refinedMethods) {
+        if (VM.getVM().getJPF().getConfig().getBoolean("panda.counterexample.print_refined_predicate_contexts")) {
+            System.out.println();
+            System.out.println();
+            System.out.println("Current Predicate Set for the Refined Methods:");
+            System.out.println();
+            for (PredicateContext context : predicateSet.contexts) {
+                if (context instanceof AssumePredicateContext) continue;
+
+                if (context instanceof MethodPredicateContext) {
+                    MethodPredicateContext methodPredicateContext = (MethodPredicateContext) context;
+
+                    boolean isRefined = false;
+
+                    for (MethodInfo m : refinedMethods) {
+                        isRefined |= methodPredicateContext.getMethod().toString().equals(m.getBaseName());
+                    }
+
+                    if (isRefined) {
+                        System.out.println(Notation.convertToString(context));
+                    }
+                }
+            }
+            System.out.println();
+            System.out.println();
+        }
     }
 }

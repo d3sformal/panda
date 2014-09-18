@@ -117,6 +117,10 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
         }
     }
 
+    public Predicates getPredicateSet() {
+        return predicateSet;
+    }
+
     /**
      * Collect predicates targeted at the given method and store them in the upcoming scope
      */

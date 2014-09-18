@@ -13,8 +13,7 @@ import gov.nasa.jpf.vm.Path;
 import gov.nasa.jpf.vm.Step;
 import gov.nasa.jpf.vm.Transition;
 
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.state.PredicateValuation;
+import gov.nasa.jpf.abstraction.state.MethodFramePredicateValuation;
 import gov.nasa.jpf.abstraction.state.State;
 import gov.nasa.jpf.abstraction.state.Trace;
 
@@ -22,6 +21,10 @@ public class PredicateConsolePublisher extends ConsolePublisher {
 
     public PredicateConsolePublisher(Config conf, Reporter reporter) {
         super(conf, reporter);
+    }
+
+    public void printTrace() {
+        publishTrace();
     }
 
     @Override
@@ -42,12 +45,18 @@ public class PredicateConsolePublisher extends ConsolePublisher {
             out.print("------------------------------------------------------ ");
             out.println("transition #" + i++ + " thread: " + t.getThreadIndex());
 
-            State state = trace.get(progressAlongTrace);
+            State state = null;
+
+            if (progressAlongTrace < trace.size()) {
+                state = trace.get(progressAlongTrace);
+            }
 
             if (showCG) {
                 out.println("choice: " + t.getChoiceGenerator());
                 out.println("");
             }
+
+            int pc = -1;
 
             if (showSteps) {
                 out.println("instructions:");
@@ -83,6 +92,8 @@ public class PredicateConsolePublisher extends ConsolePublisher {
                         lastLine = line;
                     }
 
+                    pc = s.getInstruction().getPosition();
+
                     if (showCode) {
                         Instruction insn = s.getInstruction();
 
@@ -117,9 +128,11 @@ public class PredicateConsolePublisher extends ConsolePublisher {
                 out.println("");
             }
 
-            out.println("predicates: ");
-            PredicateValuation valuation = state.predicateValuationStacks.get(state.currentThread).top();
-            out.println("\t" + valuation.toString().replaceAll("\n", "\n\t"));
+            if (state != null) {
+                out.println("predicates: ");
+                MethodFramePredicateValuation valuation = state.predicateValuationStacks.get(state.currentThread).top();
+                out.println("\t" + valuation.toString(pc).replaceAll("\n", "\n\t"));
+            }
 
             ++progressAlongTrace;
         }
