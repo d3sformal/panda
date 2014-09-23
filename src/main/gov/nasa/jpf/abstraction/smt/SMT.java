@@ -469,12 +469,14 @@ public class SMT {
 
         input.append("(check-sat)"); input.append(separator);
 
-        // Overall interpolants
-        input.append("(get-interpolants");
-        for (int i = 1; i <= interpolationGroup; ++i) {
-            input.append(" g"); input.append(i);
+        // Overall (Global) interpolants (No notion of method scopes)
+        if (VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation.global")) {
+            input.append("(get-interpolants");
+            for (int i = 1; i <= interpolationGroup; ++i) {
+                input.append(" g"); input.append(i);
+            }
+            input.append(")"); input.append(separator);
         }
-        input.append(")"); input.append(separator);
 
         // Method scopes intepolants
         for (List<Integer> m : traceFormula.getMethods()) {
@@ -517,10 +519,18 @@ public class SMT {
             boolean satisfiable = output.matches("^sat$");
             Predicate[] interpolants = null;
 
-            output = interpol.out.readLine();
+            if (VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation.global")) {
+                output = interpol.out.readLine();
 
-            if (!satisfiable) {
-                interpolants = PredicatesFactory.createInterpolantsFromString(output);
+                if (!satisfiable) {
+                    interpolants = PredicatesFactory.createInterpolantsFromString(output);
+                }
+            } else {
+                interpolants = new Predicate[traceFormula.size() - 1];
+
+                for (int i = 0; i < interpolants.length; ++i) {
+                    interpolants[i] = Tautology.create();
+                }
             }
 
             // Inject method-scoped interpolants

@@ -605,7 +605,13 @@ public class PredicateAbstraction extends Abstraction {
                         System.out.println(predicateSet);
                     }
 
-                    throw new JPFException("Failed to refine abstraction (cycle).");
+                    if (VM.getVM().getJPF().getConfig().getBoolean("panda.counterexample.print_error_on_refinement_failure")) {
+                        System.out.println("Failed to refine abstraction (cycle).");
+
+                        return null;
+                    } else {
+                        throw new JPFException("Failed to refine abstraction (cycle).");
+                    }
                 }
 
                 int backtrackLevel = trace.size();
