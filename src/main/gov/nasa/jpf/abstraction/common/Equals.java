@@ -47,7 +47,7 @@ public class Equals extends Comparison {
     public static Predicate create(Expression a, Expression b) {
         Predicate min = createMinimised(a, b);
 
-        if (VM.getVM().getJPF().getConfig().getBoolean("panda.language.minimise")) {
+        if (VM.getVM() != null && VM.getVM().getJPF().getConfig().getBoolean("panda.language.minimise")) {
             Predicate raw = createUnminimised(a, b);
 
             if (!SMT.checkEquivalence(min, raw)) {

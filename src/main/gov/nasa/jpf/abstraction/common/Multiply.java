@@ -41,7 +41,7 @@ public class Multiply extends Operation {
     public static Expression create(Expression a, Expression b) {
         Expression min = createMinimised(a, b);
 
-        if (VM.getVM().getJPF().getConfig().getBoolean("panda.language.minimise")) {
+        if (VM.getVM() != null && VM.getVM().getJPF().getConfig().getBoolean("panda.language.minimise")) {
             Expression raw = new Multiply(a, b);
 
             if (!SMT.checkEquivalence(min, raw)) {

@@ -41,7 +41,7 @@ public class Add extends Operation {
     public static Expression create(Expression a, Expression b) {
         Expression min = createMinimised(a, b);
 
-        if (VM.getVM().getJPF().getConfig().getBoolean("panda.language.minimise")) {
+        if (VM.getVM() != null && VM.getVM().getJPF().getConfig().getBoolean("panda.language.minimise")) {
             Expression raw = new Add(a, b);
 
             if (!SMT.checkEquivalence(min, raw)) {
