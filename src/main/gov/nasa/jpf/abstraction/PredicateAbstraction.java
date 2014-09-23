@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
+import gov.nasa.jpf.JPFException;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ClassInfo;
@@ -604,7 +605,7 @@ public class PredicateAbstraction extends Abstraction {
                         System.out.println(predicateSet);
                     }
 
-                    throw new RuntimeException("Failed to refine abstraction.");
+                    throw new JPFException("Failed to refine abstraction (cycle).");
                 }
 
                 int backtrackLevel = trace.size();

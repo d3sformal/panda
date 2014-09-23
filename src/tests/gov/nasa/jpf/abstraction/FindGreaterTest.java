@@ -10,6 +10,7 @@ public class FindGreaterTest extends BaseTest {
         config.add("+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor");
         //config.add("+listener+=,gov.nasa.jpf.abstraction.util.Stepper");
         config.add("+report.console.property_violation=error,trace,snapshot");
+        config.add("+report.console.show_code=true");
     }
 
     @Test
