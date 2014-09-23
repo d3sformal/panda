@@ -840,17 +840,19 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
      *
      * @param exprArray is a list of expressions whose concrete value should be derived
      */
-    public int[] getConcreteState(AccessExpression[] exprArray) {
+    public int[] getConcreteState(AccessExpression[] exprArray, int pc) {
         Predicate state = Tautology.create();
 
         for (Predicate p : valuations.keySet()) {
-            switch (valuations.get(p)) {
-                case TRUE:
-                    state = Conjunction.create(state, p);
-                    break;
-                case FALSE:
-                    state = Conjunction.create(state, Negation.create(p));
-                    break;
+            if (p.isInScope(pc)) {
+                switch (valuations.get(p)) {
+                    case TRUE:
+                        state = Conjunction.create(state, p);
+                        break;
+                    case FALSE:
+                        state = Conjunction.create(state, Negation.create(p));
+                        break;
+                }
             }
         }
 

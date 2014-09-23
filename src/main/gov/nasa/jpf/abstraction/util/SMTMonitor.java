@@ -9,6 +9,7 @@ import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.smt.PredicateValueDeterminingInfo;
 import gov.nasa.jpf.abstraction.smt.SMT;
 import gov.nasa.jpf.abstraction.smt.SMTCache;
@@ -119,7 +120,29 @@ public class SMTMonitor extends SMTListener {
     }
 
     @Override
+    public void getModelsInvoked(Predicate formula, AccessExpression[] exprs) {
+        System.out.println("SMT Get models:");
+
+        System.out.println("\tState: " + formula);
+
+        for (int i = 0; i < exprs.length; ++i) {
+            System.out.println("\t\t" + exprs[i]);
+        }
+
+        System.out.println();
+    }
+
+    @Override
     public void getModelInputGenerated(String input) {
+        System.out.println("SMT Input: ");
+
+        System.out.println(input);
+
+        System.out.println();
+    }
+
+    @Override
+    public void getModelsInputGenerated(String input) {
         System.out.println("SMT Input: ");
 
         System.out.println(input);
@@ -130,6 +153,19 @@ public class SMTMonitor extends SMTListener {
     @Override
     public void getModelExecuted(Boolean satisfiability, Integer model) {
         System.out.println("SMT Returned: " + (satisfiability ? "sat " + model : "unsat"));
+
+        System.out.println();
+    }
+
+    @Override
+    public void getModelsExecuted(AccessExpression[] exprs, int[] models) {
+        System.out.println("SMT Returned:" + (models == null ? " No models" : ""));
+
+        if (models != null) {
+            for (int i = 0; i < exprs.length; ++i) {
+                System.out.println("\t" + exprs[i] + " = " + models[i]);
+            }
+        }
 
         System.out.println();
     }

@@ -26,6 +26,7 @@ import gov.nasa.jpf.abstraction.Step;
 import gov.nasa.jpf.abstraction.TraceFormula;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Implication;
@@ -86,6 +87,11 @@ public class SMT {
             listener.getModelInvoked(expression, determinants);
         }
     }
+    private static void notifyGetModelsInvoked(Predicate formula, AccessExpression[] exprs) {
+        for (SMTListener listener : listeners) {
+            listener.getModelsInvoked(formula, exprs);
+        }
+    }
 
     // Notify about generation of input
     private static void notifyIsSatisfiableInputGenerated(String input) {
@@ -103,6 +109,11 @@ public class SMT {
             listener.getModelInputGenerated(input);
         }
     }
+    private static void notifyGetModelsInputGenerated(String input) {
+        for (SMTListener listener : listeners) {
+            listener.getModelsInputGenerated(input);
+        }
+    }
 
     // Notify about finished execution
     private static void notifyIsSatisfiableExecuted(List<Predicate> formulas, boolean[] satisfiable) {
@@ -118,6 +129,11 @@ public class SMT {
     private static void notifyGetModelExecuted(Boolean satisfiability, Integer model) {
         for (SMTListener listener : listeners) {
             listener.getModelExecuted(satisfiability, model);
+        }
+    }
+    private static void notifyGetModelsExecuted(AccessExpression[] exprs, int[] models) {
+        for (SMTListener listener : listeners) {
+            listener.getModelsExecuted(exprs, models);
         }
     }
 
@@ -759,7 +775,7 @@ public class SMT {
         }
 
         for (AccessExpression object : objects) {
-            Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.create(DefaultFresh.create(), object)));
+            Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.createUnminimised(DefaultFresh.create(), object)));
 
             freshConstraints.add("(assert " + convertToString(distinction) + ")" + separator);
         }
@@ -875,6 +891,8 @@ public class SMT {
      * Retrieves any arbitrary models of variables/fields/... based on constraints imposed by the state
      */
     public int[] getModels(Predicate stateFormula, AccessExpression[] expressions) {
+        notifyGetModelsInvoked(stateFormula, expressions);
+
         String separator = InputType.NORMAL.getSeparator();
         StringBuilder input = new StringBuilder();
         int[] ret = new int[expressions.length];
@@ -935,7 +953,7 @@ public class SMT {
         for (int i = 0; i < expressions.length; ++i) {
             AccessExpression expr = expressions[i];
 
-            Predicate valueConstraint = Equals.create(SpecialVariable.create("value"), expr);
+            Predicate valueConstraint = Equals.createUnminimised(SpecialVariable.create("value"), expr);
 
             String query = convertToString(valueConstraint);
 
@@ -954,6 +972,8 @@ public class SMT {
         }
 
         input.append("(pop 1)"); input.append(separator);
+
+        notifyGetModelsInputGenerated(input.toString());
 
         QueryResponse[] responses = isSatisfiable(expressions.length - cachedCount, input.toString(), true);
 
@@ -978,6 +998,8 @@ public class SMT {
             ret[j] = model;
         }
 
+        notifyGetModelsExecuted(expressions, ret);
+
         return ret;
     }
 
@@ -987,7 +1009,7 @@ public class SMT {
     public Integer getModel(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {
         notifyGetModelInvoked(expression, determinants);
 
-        Predicate valueConstraint = Equals.create(SpecialVariable.create("value"), expression);
+        Predicate valueConstraint = Equals.createUnminimised(SpecialVariable.create("value"), expression);
         PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
 
         collector.collect(valueConstraint);
@@ -1070,6 +1092,51 @@ public class SMT {
         }
 
         notifyIsSatisfiableExecuted(predicates, ret);
+
+        return ret;
+    }
+
+    public static boolean checkEquivalence(Expression e1, Expression e2) {
+        if (e1.equals(e2)) {
+            return true;
+        }
+
+        System.out.println("Check: " + e1 + " ~ " + e2);
+        List<Predicate> ps = new ArrayList<Predicate>();
+
+        ps.add(Negation.create(Equals.createUnminimised(e1, e2)));
+
+        SMT smt = new SMT();
+
+        boolean ret = !smt.isSatisfiable(ps)[0];
+
+        smt.close();
+
+        return ret;
+    }
+
+    public static boolean checkEquivalence(Predicate p1, Predicate p2) {
+        if (p1.equals(p2)) {
+            return true;
+        }
+
+        System.out.println("Check: " + p1 + " ~ " + p2);
+        List<Predicate> ps = new ArrayList<Predicate>();
+
+        ps.add(
+            Negation.create(
+                Disjunction.create(
+                    Conjunction.create(p1, p2),
+                    Conjunction.create(Negation.create(p1), Negation.create(p2))
+                )
+            )
+        );
+
+        SMT smt = new SMT();
+
+        boolean ret = !smt.isSatisfiable(ps)[0];
+
+        smt.close();
 
         return ret;
     }

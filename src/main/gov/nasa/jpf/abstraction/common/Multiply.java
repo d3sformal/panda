@@ -2,7 +2,10 @@ package gov.nasa.jpf.abstraction.common;
 
 import java.util.Map;
 
+import gov.nasa.jpf.vm.VM;
+
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.smt.SMT;
 
 /**
  * Multiply represents symbolic expression for multiplication of two variables (e.g. a * b)
@@ -35,11 +38,32 @@ public class Multiply extends Operation {
      * @param b right hand side operand
      * @return symbolic expression representing the multiplication / undefined expression / null
      */
-    public static Operation create(Expression a, Expression b) {
+    public static Expression create(Expression a, Expression b) {
+        Expression min = createMinimised(a, b);
+
+        if (VM.getVM().getJPF().getConfig().getBoolean("panda.language.minimise")) {
+            Expression raw = new Multiply(a, b);
+
+            if (!SMT.checkEquivalence(min, raw)) {
+                throw new RuntimeException("Wrong convertion from: " + raw + " to: " + min);
+            }
+        }
+
+        return min;
+    }
+
+    public static Expression createMinimised(Expression a, Expression b) {
         if (!argumentsDefined(a, b)) return null;
 
         if (a instanceof Undefined) return UndefinedOperationResult.create();
         if (b instanceof Undefined) return UndefinedOperationResult.create();
+
+        if (a instanceof Constant && b instanceof Constant) {
+            Constant c = (Constant) a;
+            Constant d = (Constant) b;
+
+            return new Constant(c.value.intValue() * d.value.intValue());
+        }
 
         return new Multiply(a, b);
     }

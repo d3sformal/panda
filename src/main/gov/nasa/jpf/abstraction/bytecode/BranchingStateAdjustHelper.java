@@ -58,7 +58,7 @@ public class BranchingStateAdjustHelper {
                 }
 
                 // Compute a concrete (sub)state representing the abstract one
-                int[] valueArray = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getConcreteState(exprArray);
+                int[] valueArray = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getConcreteState(exprArray, br.getSelf().getPosition());
 
                 if (valueArray == null) {
                     throw new RuntimeException("Cannot compute the corresponding concrete state.");
