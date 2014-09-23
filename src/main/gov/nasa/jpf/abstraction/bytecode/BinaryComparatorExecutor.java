@@ -120,11 +120,11 @@ public abstract class BinaryComparatorExecutor<T> {
 
                 return cmp.getSelf();
             } else if (less_than) {
-                PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(LessThan.create(expr1, expr2), cmp.getSelf().getMethodInfo(), cmp.getSelf().getPosition());
+                PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(LessThan.create(expr1, expr2), cmp.getSelf().getMethodInfo(), cmp.getNext(ti).getPosition());
             } else if (equal) {
-                PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Equals.create(expr1, expr2), cmp.getSelf().getMethodInfo(), cmp.getSelf().getPosition());
+                PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Equals.create(expr1, expr2), cmp.getSelf().getMethodInfo(), cmp.getNext(ti).getPosition());
             } else if (greater_than) {
-                PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(LessThan.create(expr2, expr1), cmp.getSelf().getMethodInfo(), cmp.getSelf().getPosition());
+                PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(LessThan.create(expr2, expr1), cmp.getSelf().getMethodInfo(), cmp.getNext(ti).getPosition());
             }
         } else { // this is what really returns results
             /**

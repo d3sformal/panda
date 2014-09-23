@@ -71,14 +71,14 @@ public class UnaryIfInstructionExecutor {
                     ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
                     conditionValue = true;
 
-                    PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(predicate, br.getSelf().getMethodInfo(), br.getSelf().getPosition());
+                    PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(predicate, br.getSelf().getMethodInfo(), br.getTarget().getPosition());
 
                     break;
                 case FALSE:
                     ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
                     conditionValue = false;
 
-                    PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Negation.create(predicate), br.getSelf().getMethodInfo(), br.getSelf().getPosition());
+                    PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Negation.create(predicate), br.getSelf().getMethodInfo(), br.getNext(ti).getPosition());
 
                     break;
                 case UNKNOWN:
