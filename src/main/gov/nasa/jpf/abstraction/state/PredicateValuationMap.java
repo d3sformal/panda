@@ -29,7 +29,11 @@ public class PredicateValuationMap extends HashMap<Predicate, TruthValue> {
 
     private static Predicate getCanonicalPredicateForm(Predicate predicate) {
         if (predicate instanceof Negation) {
-            return ((Negation) predicate).predicate;
+            Negation n = (Negation) predicate;
+
+            n.predicate.setScope(n.getScope());
+
+            return n.predicate;
         }
 
         return predicate;
@@ -50,6 +54,8 @@ public class PredicateValuationMap extends HashMap<Predicate, TruthValue> {
         if (canonical instanceof Equals) {
             Equals e = (Equals) canonical;
             Predicate eSym = Equals.create(e.b, e.a);
+
+            eSym.setScope(e.getScope());
 
             if (super.containsKey(eSym)) {
                 return super.put(eSym, canonicalValue);

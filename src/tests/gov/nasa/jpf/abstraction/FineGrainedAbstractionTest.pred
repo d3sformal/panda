@@ -1,0 +1,4 @@
+[method gov.nasa.jpf.abstraction.FineGrainedAbstractionTest.test]
+2: x = 0
+5..20: x >= 0
+

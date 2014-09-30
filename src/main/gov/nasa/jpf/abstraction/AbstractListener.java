@@ -147,6 +147,10 @@ public class AbstractListener extends PropertyListenerAdapter {
     @Override
     public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
         RunDetector.detectRunning(vm, nextInsn, execInsn);
+
+        if (RunDetector.isRunning() && nextInsn != null) {
+            PredicateAbstraction.getInstance().getPredicateValuation().get(0).evaluateJustInScopePredicates(nextInsn.getPosition());
+        }
     }
 
     @Override

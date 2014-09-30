@@ -54,6 +54,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
     private PredicateValuationMap valuations = new PredicateValuationMap();
     private HashMap<Predicate, Set<Predicate>> sharedSymbolCache = new HashMap<Predicate, Set<Predicate>>();
     private SMT smt;
+    private int lastPC = -1;
 
     public MethodFramePredicateValuation(SMT smt) {
         this.smt = smt;
@@ -119,6 +120,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         MethodFramePredicateValuation clone = new MethodFramePredicateValuation(smt);
 
         clone.valuations = valuations.clone();
+        clone.lastPC = lastPC;
 
         /**
          * No need to memorize
@@ -672,6 +674,32 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         if (!toBeRemoved.isEmpty()) {
             sharedSymbolCache.clear();
         }
+    }
+
+    public void evaluateJustInScopePredicates(int pc) {
+        Set<Predicate> arrivedToScope = new HashSet<Predicate>();
+
+        for (Predicate p : getPredicates()) {
+            if (!p.isInScope(lastPC) && p.isInScope(pc)) { // Just arrived to scope
+                if (get(p) == TruthValue.UNKNOWN) { // TRUE and FALSE mean the predicate has just been valuated
+                    arrivedToScope.add(p);
+                }
+            }
+        }
+
+        // Force not using the old UNKNOWN values
+        for (Predicate p : arrivedToScope) {
+            remove(p);
+        }
+
+        Map<Predicate, TruthValue> valuations = evaluatePredicates(lastPC, arrivedToScope);
+
+        // Add new values
+        for (Predicate p : valuations.keySet()) {
+            put(p, valuations.get(p));
+        }
+
+        lastPC = pc;
     }
 
     /**
