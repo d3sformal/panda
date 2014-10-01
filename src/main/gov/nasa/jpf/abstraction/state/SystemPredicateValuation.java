@@ -440,7 +440,17 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
             scope = scopes.get(currentThreadID).top(1);
 
-            Map<Predicate, Predicate> predicates = new HashMap<Predicate, Predicate>();
+            // Some predicates may have the same determinants, for example:
+            //
+            //   When processing statement "return 3;"
+            //
+            //   3 < return
+            //   return < 3
+            //
+            //   Corresponding determinant for both the predicates is
+            //
+            //   3 < 3
+            Map<Predicate, List<Predicate>> predicates = new HashMap<Predicate, List<Predicate>>();
             Set<Predicate> determinants = new HashSet<Predicate>();
 
             /**
@@ -450,7 +460,11 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 if (PredicateUtil.isPredicateOverReturn(predicate)) {
                     Predicate determinant = predicate.replace(DefaultReturnValue.create(), expr);
 
-                    predicates.put(determinant, predicate);
+                    if (!predicates.containsKey(determinant)) {
+                        predicates.put(determinant, new LinkedList<Predicate>());
+                    }
+
+                    predicates.get(determinant).add(predicate);
                     determinants.add(determinant);
                 }
             }
@@ -463,7 +477,9 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             Map<Predicate, TruthValue> valuation = evaluatePredicates(before.getPC().getPosition(), determinants);
 
             for (Predicate determinant : valuation.keySet()) {
-                put(predicates.get(determinant), valuation.get(determinant));
+                for (Predicate determined : predicates.get(determinant)) {
+                    put(determined, valuation.get(determinant));
+                }
             }
 
             // The actual write through of the return value performed by processVoidMethodReturn
