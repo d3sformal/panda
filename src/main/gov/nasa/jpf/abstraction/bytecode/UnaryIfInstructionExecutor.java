@@ -5,6 +5,7 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
@@ -16,6 +17,9 @@ import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
+import gov.nasa.jpf.abstraction.common.access.meta.Field;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 
@@ -59,7 +63,22 @@ public class UnaryIfInstructionExecutor {
              */
             if (expr != null && RunDetector.isRunning()) {
                 predicate = br.createPredicate(expr, constant);
-                condition = PredicateAbstraction.getInstance().processBranchingCondition(br.getSelf().getPosition(), predicate);
+
+                if (expr instanceof ObjectFieldRead) {
+                    ObjectFieldRead fr = (ObjectFieldRead) expr;
+                    AccessExpression o = fr.getObject();
+                    Field f = fr.getField();
+
+                    if (o instanceof PackageAndClass) {
+                        if (f.getName().equals("$assertionsDisabled")) {
+                            condition = VM.getVM().getJPF().getConfig().getEnum("panda.assertions_disabled", TruthValue.class.getEnumConstants(), TruthValue.UNDEFINED);
+                        }
+                    }
+                }
+
+                if (condition == TruthValue.UNDEFINED) {
+                    condition = PredicateAbstraction.getInstance().processBranchingCondition(br.getSelf().getPosition(), predicate);
+                }
             }
 
             switch (condition) {
