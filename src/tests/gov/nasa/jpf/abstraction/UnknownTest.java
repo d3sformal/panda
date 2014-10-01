@@ -5,7 +5,6 @@ import gov.nasa.jpf.vm.Verify;
 public class UnknownTest extends BaseTest {
     public UnknownTest() {
         config.add("+panda.interpolation=true");
-        config.add("+panda.interpolation=true");
         //config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
         //config.add("+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor");
         //config.add("+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener");
