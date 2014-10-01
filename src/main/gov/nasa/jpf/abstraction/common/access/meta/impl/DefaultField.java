@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.meta.Field;
@@ -55,5 +56,10 @@ public class DefaultField implements Field {
 
     @Override
     public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
+    }
+
+    @Override
+    public String toString() {
+        return Notation.convertToString(this);
     }
 }

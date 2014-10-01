@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.common.access.meta.impl;
 
 import java.util.Set;
 
+import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.meta.ArrayLengths;
@@ -36,5 +37,10 @@ public class DefaultArrayLengths implements ArrayLengths {
 
     @Override
     public void addAccessSubExpressionsToSet(Set<AccessExpression> out) {
+    }
+
+    @Override
+    public String toString() {
+        return Notation.convertToString(this);
     }
 }
