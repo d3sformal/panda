@@ -9,6 +9,7 @@ import gov.nasa.jpf.vm.Types;
 
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.state.universe.Reference;
@@ -21,32 +22,35 @@ public class NATIVERETURN extends gov.nasa.jpf.jvm.bytecode.NATIVERETURN {
         Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
         NativeStackFrame before = (NativeStackFrame) ti.getModifiableTopFrame();
         Object retValue = before.getReturnValue();
+        Expression retExpr = ExpressionUtil.getExpression(before.getReturnAttr());
 
-        // Push the value onto the stack
-        // no matter it is native, we need to have an attribute on the stack to return it in processMethodReturn
-        switch (before.getMethodInfo().getReturnTypeCode()) {
-            case Types.T_ARRAY:
-            case Types.T_REFERENCE:
-                AnonymousObject returnValue = AnonymousObject.create(new Reference(ti.getElementInfo(((Integer) retValue).intValue())));
+        if (retExpr == null) {
+            // Push the value onto the stack
+            // no matter it is native, we need to have an attribute on the stack to return it in processMethodReturn
+            switch (before.getMethodInfo().getReturnTypeCode()) {
+                case Types.T_ARRAY:
+                case Types.T_REFERENCE:
+                    AnonymousObject returnValue = AnonymousObject.create(new Reference(ti.getElementInfo(((Integer) retValue).intValue())));
 
-                PredicateAbstraction.getInstance().processObject(returnValue, getMethodInfo(), getPosition());
+                    PredicateAbstraction.getInstance().processObject(returnValue, getMethodInfo(), getPosition());
 
-                before.setReturnAttr(returnValue);
-                break;
+                    before.setReturnAttr(returnValue);
+                    break;
 
-            case Types.T_BOOLEAN:
-            case Types.T_BYTE:
-            case Types.T_CHAR:
-            case Types.T_SHORT:
-            case Types.T_INT:
-            case Types.T_FLOAT:
-            case Types.T_LONG:
-            case Types.T_DOUBLE:
-                before.setReturnAttr(MethodFrameSymbolTable.DUMMY_VARIABLE);
-                break;
+                case Types.T_BOOLEAN:
+                case Types.T_BYTE:
+                case Types.T_CHAR:
+                case Types.T_SHORT:
+                case Types.T_INT:
+                case Types.T_FLOAT:
+                case Types.T_LONG:
+                case Types.T_DOUBLE:
+                    before.setReturnAttr(MethodFrameSymbolTable.DUMMY_VARIABLE);
+                    break;
 
-            case Types.T_VOID:
-            default:
+                case Types.T_VOID:
+                default:
+            }
         }
 
         Instruction actualNextInsn = super.execute(ti);

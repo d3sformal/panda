@@ -9,7 +9,7 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 public class SpecialVariable extends DefaultRoot {
     private static Map<String, SpecialVariable> instances = new HashMap<String, SpecialVariable>();
 
-    private SpecialVariable(String name) {
+    protected SpecialVariable(String name) {
         super(name);
     }
 

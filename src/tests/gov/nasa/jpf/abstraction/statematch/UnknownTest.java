@@ -1,10 +1,13 @@
-package gov.nasa.jpf.abstraction;
+package gov.nasa.jpf.abstraction.statematch;
 
-import gov.nasa.jpf.vm.Verify;
+import gov.nasa.jpf.abstraction.Test;
+import gov.nasa.jpf.abstraction.Debug;
 
-public class UnknownTest extends BaseTest {
+public class UnknownTest extends StateMatchingTest {
     public UnknownTest() {
         config.add("+panda.interpolation=true");
+        config.add("+panda.branch.prune_infeasible=true");
+        config.add("+listener+=,gov.nasa.jpf.listener.ExecTracker");
         //config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
         //config.add("+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor");
         //config.add("+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener");
@@ -12,8 +15,18 @@ public class UnknownTest extends BaseTest {
     }
 
     @Test
-    public static void test() {
-        int i = Verify.getInt(0, 500); // Should register choice (starting with for example 0) and mark the constant as NONDET
+    public static void test1() {
+        int i = Debug.unknownInt();
+
+        if (i == 1) {
+        }
+
+        assertRevisitedAtLeast(1);
+    }
+
+    //@Test
+    public static void test2() {
+        int i = Debug.unknownInt(); // Should register choice (starting with for example 0) and mark the constant as NONDET
 
         int j = i + 2;
 
@@ -25,6 +38,9 @@ public class UnknownTest extends BaseTest {
         //   lets say its for i: 0
         //
         // There will be exactly one concrete path hitting the body of the IF
-        //   the only value of i possible: 499
+        //   lets say its for i: 499
+
+        assertRevisitedAtLeast(1);
+        assertVisitedAtMost(2);
     }
 };

@@ -134,9 +134,15 @@ public class BaseTest {
 
             JPF jpf = new JPF(config);
 
-            jpf.run();
+            try {
+                jpf.run();
 
-            allPassed = reducePassed(allPassed, expectedPass, checkPassed(jpf));
+                allPassed = reducePassed(allPassed, expectedPass, checkPassed(jpf));
+            } catch (Throwable t) {
+                t.printStackTrace();
+
+                allPassed = reducePassed(allPassed, expectedPass, false);
+            }
         }
 
         assertTrue(allPassed);

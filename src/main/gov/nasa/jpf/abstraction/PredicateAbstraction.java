@@ -44,6 +44,7 @@ import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.Unknown;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
@@ -140,6 +141,15 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     private SSAFormulaIncarnationsManager ssa = new SSAFormulaIncarnationsManager();
+    private Map<String, Unknown> unknowns = new HashMap<String, Unknown>();
+
+    public void registerUnknown(Unknown unknown) {
+        unknowns.put(((Root) ssa.incarnateSymbol(unknown, 0)).getName(), unknown);
+    }
+
+    public Map<String, Unknown> getUnknowns() {
+        return unknowns;
+    }
 
     private void extendTraceFormulaWithAssignment(AccessExpression to, Expression from, MethodInfo m, int nextPC, int depthDelta) {
         extendTraceFormulaWith(getTraceFormulaAssignmentConjunct(to, from, depthDelta), m, nextPC);

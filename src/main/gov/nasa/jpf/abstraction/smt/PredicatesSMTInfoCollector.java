@@ -74,6 +74,7 @@ import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
     private Set<String> classes = new HashSet<String>();
     private Set<String> vars = new HashSet<String>();
+    private Set<String> specials = new HashSet<String>();
     private Set<String> fields = new HashSet<String>();
     private Set<String> arrays = new HashSet<String>();
     private Set<Integer> fresh = new HashSet<Integer>();
@@ -289,6 +290,10 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
         return vars;
     }
 
+    public Set<String> getSpecials() {
+        return specials;
+    }
+
     public Set<String> getFields() {
         return fields;
     }
@@ -322,6 +327,7 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 
     @Override
     public void visit(SpecialVariable expression) {
+        specials.add(expression.getName());
     }
 
     @Override

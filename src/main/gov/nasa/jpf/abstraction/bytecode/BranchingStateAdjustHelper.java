@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,14 +12,24 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.DynamicIntChoiceGenerator;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Disjunction;
+import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.Unknown;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
@@ -30,12 +41,67 @@ public class BranchingStateAdjustHelper {
 
         // In case the concrete execution does not allow the same branch to be taken
         if (br.getConcreteBranchValue(v1, v2) != TruthValue.create(abstractJump)) {
-            System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + br.createPredicate(expr1, expr2));
+            Predicate branchCondition = br.createPredicate(expr1, expr2);
+
+            if (!abstractJump) {
+                branchCondition = Negation.create(branchCondition);
+            }
+
+            System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + branchCondition);
 
             // Either cut of the inconsistent branch
             // or make the concrete state represent the abstract one (force concrete values)
             if (ti.getVM().getJPF().getConfig().getBoolean("panda.branch.prune_infeasible")) {
                 ss.setIgnored(true);
+
+                if (ti.getVM().getJPF().getConfig().getBoolean("panda.branch.force_feasible")) {
+                    System.out.println("[WARNING] Finding feasible trace with matching prefix and " + branchCondition);
+
+                    Predicate traceFormula = PredicateAbstraction.getInstance().getTraceFormula().toConjunction();
+                    Map<String, Unknown> unknowns = PredicateAbstraction.getInstance().getUnknowns();
+
+                    int i = 0;
+                    AccessExpression[] exprArray = new AccessExpression[unknowns.keySet().size()];
+
+                    // Collect unknown expressions
+                    for (String unknown : unknowns.keySet()) {
+                        exprArray[i] = DefaultRoot.create(unknown);
+
+                        ++i;
+                    }
+
+                    // Add blocking clause for unknown models
+                    //   (u1 != v11 & u1 != v12 & ... u1 != v1n) | (u2 != ...) | ... (un != ...)
+                    Predicate blockings = Contradiction.create();
+
+                    for (int j = 0; j < exprArray.length; ++j) {
+                        Predicate blocking = Tautology.create();
+
+                        for (int model : unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator().getChoices()) {
+                            blocking = Conjunction.create(blocking, Negation.create(Equals.create(exprArray[j], Constant.create(model))));
+                        }
+
+                        blockings = Disjunction.create(blockings, blocking);
+                    }
+
+                    traceFormula = Conjunction.create(traceFormula, blockings);
+
+                    int[] models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(traceFormula, exprArray);
+
+                    if (models == null) {
+                        System.out.println("[WARNING] No feasible trace found");
+                    } else {
+                        // TODO: PROBLEM!!! :) The trace found with this choices will force finding models for the original branch (now enabled, then disabled)
+                        System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
+                        for (int j = 0; j < models.length; ++j) {
+                            DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
+
+                            if (cg.hasProcessed(models[j]) || !cg.has(models[j])) {
+                                cg.add(models[j]);
+                            }
+                        }
+                    }
+                }
             } else if (ti.getVM().getJPF().getConfig().getBoolean("panda.branch.adjust_concrete_values")) {
                 Map<AccessExpression, ElementInfo> primitiveExprs = new HashMap<AccessExpression, ElementInfo>();
                 Set<AccessExpression> allExprs = new HashSet<AccessExpression>();

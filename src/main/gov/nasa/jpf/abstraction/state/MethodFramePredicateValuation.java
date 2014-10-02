@@ -884,6 +884,10 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             }
         }
 
+        return getModels(state, exprArray);
+    }
+
+    public int[] getModels(Predicate state, AccessExpression[] exprArray) {
         return smt.getModels(state, exprArray);
     }
 }

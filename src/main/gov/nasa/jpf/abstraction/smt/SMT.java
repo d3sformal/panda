@@ -750,6 +750,13 @@ public class SMT {
         input.append(separator);
     }
 
+    private void appendSpecialDeclarations(Set<String> specials, StringBuilder input, String separator) {
+        for (String special : specials) {
+            input.append("(declare-fun "); input.append(special); input.append(" () Int)"); input.append(separator);
+        }
+        input.append(separator);
+    }
+
     private void appendFieldDeclarations(Set<String> fields, StringBuilder input, String separator) {
         for (String field : fields) {
             input.append("(declare-fun field_"); input.append(field); input.append(" () (Array Int Int))"); input.append(separator);
@@ -913,6 +920,7 @@ public class SMT {
 
         Set<String> classes = collector.getClasses();
         Set<String> variables = collector.getVars();
+        Set<String> specials = collector.getSpecials();
         Set<String> fields = collector.getFields();
         Set<String> arrays = collector.getArrays();
         Set<AccessExpression> objects = collector.getObjects();
@@ -941,6 +949,7 @@ public class SMT {
         input.append("(push 1)"); input.append(separator);
         appendClassDeclarations(classes, input, separator);
         appendVariableDeclarations(variables, input, separator);
+        appendSpecialDeclarations(specials, input, separator);
         appendFieldDeclarations(fields, input, separator);
         appendArraysDeclarations(arrays, input, separator);
 
