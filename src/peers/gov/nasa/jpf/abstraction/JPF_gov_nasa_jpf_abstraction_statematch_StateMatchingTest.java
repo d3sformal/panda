@@ -4,7 +4,7 @@ import gov.nasa.jpf.annotation.MJI;
 import gov.nasa.jpf.vm.MJIEnv;
 import gov.nasa.jpf.vm.NativePeer;
 
-public class JPF_gov_nasa_jpf_abstraction_predicate_statematch_StateMatchingTest extends NativePeer {
+public class JPF_gov_nasa_jpf_abstraction_statematch_StateMatchingTest extends NativePeer {
     @MJI
     public void assertVisitedAtMost__I__V(MJIEnv env, int clsObjRef, int times) {
         /** Should never be reached */
