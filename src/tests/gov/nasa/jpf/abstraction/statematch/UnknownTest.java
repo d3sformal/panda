@@ -14,7 +14,7 @@ public class UnknownTest extends StateMatchingTest {
         config.add("+vm.storage.class="); // Disable state matching, to avoid matching abstract states with different concrete values
     }
 
-    //@Test
+    @Test
     public static void test1() {
         int i = Debug.unknownInt();
 
@@ -31,12 +31,12 @@ public class UnknownTest extends StateMatchingTest {
         assertRevisitedAtLeast(1);
     }
 
-    @Test
+    //@Test
     public static void test2() {
         int i = Debug.unknownInt();
 
         // Test with the special value 0 which is the default
-        if (i != 0) {
+        if (i < 0) {
         }
 
         assertRevisitedAtLeast(1);

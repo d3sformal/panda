@@ -9,11 +9,14 @@ import java.util.Set;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.StateSet;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.DynamicIntChoiceGenerator;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.ResetableStateSet;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Contradiction;
@@ -39,14 +42,18 @@ public class BranchingStateAdjustHelper {
         StackFrame sf = ti.getModifiableTopFrame();
         SystemState ss = ti.getVM().getSystemState();
 
+        Predicate branchCondition = br.createPredicate(expr1, expr2);
+
+        if (!abstractJump) {
+            branchCondition = Negation.create(branchCondition);
+        }
+
         // In case the concrete execution does not allow the same branch to be taken
-        if (br.getConcreteBranchValue(v1, v2) != TruthValue.create(abstractJump)) {
-            Predicate branchCondition = br.createPredicate(expr1, expr2);
+        if (br.getConcreteBranchValue(v1, v2) == TruthValue.create(abstractJump)) {
+            // Add state to allow forward state matching (look if we should generate more choices to get into the branch (it might have been explored before - actually it is explored when this branch is hit))
 
-            if (!abstractJump) {
-                branchCondition = Negation.create(branchCondition);
-            }
-
+            //ti.breakTransition("Creating state after taking an enabled branch");
+        } else {
             System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + branchCondition);
 
             // Either cut of the inconsistent branch
@@ -70,8 +77,24 @@ public class BranchingStateAdjustHelper {
                         ++i;
                     }
 
+                    /**
+                     * Blocking clauses may not be necessary (the trace itself (extended with appropriate branch condition) is enough to demand a new value of unknown)
+                     * On contrary they may cause divergence
+                     * But they are there currently to avoid returning to previously picked choices:
+                     *   i = *
+                     *   if (i = 1) {
+                     *   }
+                     *
+                     *   Starts with 0
+                     *   Generates 1
+                     *   Goes back to 0
+                     *   Goes back to 1
+                     *   Goes back to 0
+                     *   ...
+                     */
                     // Add blocking clause for unknown models
                     //   (u1 != v11 & u1 != v12 & ... u1 != v1n) | (u2 != ...) | ... (un != ...)
+
                     Predicate blockings = Contradiction.create();
 
                     for (int j = 0; j < exprArray.length; ++j) {
@@ -91,15 +114,37 @@ public class BranchingStateAdjustHelper {
                     if (models == null) {
                         System.out.println("[WARNING] No feasible trace found");
                     } else {
-                        // TODO: PROBLEM!!! :) The trace found with this choices will force finding models for the original branch (now enabled, then disabled)
-                        System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
-                        for (int j = 0; j < models.length; ++j) {
-                            DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
+                        // To avoid divergence:
+                        //   one concrete path allows only one branch -> second trace is explored to cover the other branch
+                        //   the second concrete path does not allow the first branch -> third trace is explored to cover the first branch
+                        //   ...
+                        //
+                        // Assume this is the case:
+                        //   We revisit this branch (the other branch has already been visited - it created a state after passing the check)
+                        // Then:
+                        //   Try to create a state (but not store it) if the state matches then dont add the choices
+                        //     - We cannot store it now because:
+                        //       - If this is the first visit -> first enable of a disabled branch -> we WOULD CREATE STATE in the branch -> when we get here with the correct concrete model we would match and not continue exploring
+                        //
 
-                            if (cg.hasProcessed(models[j]) || !cg.has(models[j])) {
-                                cg.add(models[j]);
+                        //StateSet stateSet = VM.getVM().getStateSet();
+                        //ResetableStateSet rStateSet = null;
+                        //
+                        //if (stateSet instanceof ResetableStateSet) {
+                        //    rStateSet = (ResetableStateSet) stateSet;
+                        //}
+
+                        //if (rStateSet == null || rStateSet.isCurrentUnique()) {
+                            System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
+
+                            for (int j = 0; j < models.length; ++j) {
+                                DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
+
+                                if (cg.hasProcessed(models[j]) || !cg.has(models[j])) {
+                                    cg.add(models[j]);
+                                }
                             }
-                        }
+                        //}
                     }
                 }
             } else if (ti.getVM().getJPF().getConfig().getBoolean("panda.branch.adjust_concrete_values")) {
