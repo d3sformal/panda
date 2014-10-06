@@ -48,20 +48,26 @@ public class BranchingStateAdjustHelper {
             branchCondition = Negation.create(branchCondition);
         }
 
+        boolean pruneInfeasible = VM.getVM().getJPF().getConfig().getBoolean("panda.branch.prune_infeasible");
+        boolean forceFeasibleOnce = VM.getVM().getJPF().getConfig().getBoolean("panda.branch.force_feasible_once");
+        boolean forceFeasible = forceFeasibleOnce || VM.getVM().getJPF().getConfig().getBoolean("panda.branch.force_feasible");
+
         // In case the concrete execution does not allow the same branch to be taken
         if (br.getConcreteBranchValue(v1, v2) == TruthValue.create(abstractJump)) {
-            // Add state to allow forward state matching (look if we should generate more choices to get into the branch (it might have been explored before - actually it is explored when this branch is hit))
+            if (forceFeasibleOnce) {
+                // Add state to allow forward state matching (look if we should generate more choices to get into the branch (it might have been explored before - actually it is explored when this branch is hit))
 
-            //ti.breakTransition("Creating state after taking an enabled branch");
+                ti.breakTransition("Creating state after taking an enabled branch");
+            }
         } else {
             System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + branchCondition);
 
             // Either cut of the inconsistent branch
             // or make the concrete state represent the abstract one (force concrete values)
-            if (ti.getVM().getJPF().getConfig().getBoolean("panda.branch.prune_infeasible")) {
+            if (pruneInfeasible) {
                 ss.setIgnored(true);
 
-                if (ti.getVM().getJPF().getConfig().getBoolean("panda.branch.force_feasible")) {
+                if (forceFeasible) {
                     System.out.println("[WARNING] Finding feasible trace with matching prefix and " + branchCondition);
 
                     Predicate traceFormula = PredicateAbstraction.getInstance().getTraceFormula().toConjunction();
@@ -127,14 +133,14 @@ public class BranchingStateAdjustHelper {
                         //       - If this is the first visit -> first enable of a disabled branch -> we WOULD CREATE STATE in the branch -> when we get here with the correct concrete model we would match and not continue exploring
                         //
 
-                        //StateSet stateSet = VM.getVM().getStateSet();
-                        //ResetableStateSet rStateSet = null;
-                        //
-                        //if (stateSet instanceof ResetableStateSet) {
-                        //    rStateSet = (ResetableStateSet) stateSet;
-                        //}
+                        StateSet stateSet = VM.getVM().getStateSet();
+                        ResetableStateSet rStateSet = null;
 
-                        //if (rStateSet == null || rStateSet.isCurrentUnique()) {
+                        if (stateSet instanceof ResetableStateSet) {
+                            rStateSet = (ResetableStateSet) stateSet;
+                        }
+
+                        if (rStateSet == null || rStateSet.isCurrentUnique() || !forceFeasibleOnce) {
                             System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
 
                             for (int j = 0; j < models.length; ++j) {
@@ -144,7 +150,7 @@ public class BranchingStateAdjustHelper {
                                     cg.add(models[j]);
                                 }
                             }
-                        //}
+                        }
                     }
                 }
             } else if (ti.getVM().getJPF().getConfig().getBoolean("panda.branch.adjust_concrete_values")) {
