@@ -79,6 +79,18 @@ public class Add extends Operation {
             }
         }
 
+        if (a instanceof Subtract) {
+            Subtract s = (Subtract) a;
+
+            if (s.a instanceof Constant) {
+                Constant e = (Constant) s.a;
+
+                if (e.value.intValue() == 0) {
+                    return Subtract.create(b, s.b);
+                }
+            }
+        }
+
         if (b instanceof Subtract) {
             Subtract s = (Subtract) b;
 
