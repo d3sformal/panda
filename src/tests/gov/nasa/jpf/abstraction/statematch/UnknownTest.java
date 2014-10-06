@@ -36,6 +36,8 @@ public class UnknownTest extends StateMatchingTest {
         int i = Debug.unknownInt();
 
         // Test with the special value 0 which is the default
+        // Use < to avoid one of the branches having only one model
+        // Both branches having multiple models -> higher chance Panda might diverge
         if (i < 0) {
         }
 
