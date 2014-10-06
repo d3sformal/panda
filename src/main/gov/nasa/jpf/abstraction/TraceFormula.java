@@ -16,7 +16,11 @@ public class TraceFormula implements Iterable<Step> {
     public static final long serialVersionUID = 1L;
 
     private Stack<Step> steps = new Stack<Step>();
+
+    // position of the call on current trace
     private Stack<Integer> unmatchedCalls = new Stack<Integer>();
+
+    // position of calls and returns of methods on current trace
     private Stack<Pair<Integer, Integer>> methodBoundaries = new Stack<Pair<Integer, Integer>>();
 
     public Predicate toConjunction() {

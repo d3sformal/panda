@@ -97,6 +97,12 @@ public class PredicateAbstraction extends Abstraction {
     private TraceFormula traceFormula;
     private boolean isInitialized = false;
     private Set<ClassInfo> startupClasses = new HashSet<ClassInfo>();
+
+    /**
+     * Methods visited along the currently explored trace
+     *
+     * Refinement of these methods forces the procedure to backtrack and recompute the part of the state space
+     */
     private Set<MethodInfo> visitedMethods = new HashSet<MethodInfo>();
 
     public SMT smt = new SMT();
