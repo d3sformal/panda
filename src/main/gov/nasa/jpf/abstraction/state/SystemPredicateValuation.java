@@ -511,6 +511,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
             // Collect original symbolic arguments of the method
             Set<Root> referenceArgs = new HashSet<Root>();
+            Set<Root> primitiveArgs = new HashSet<Root>();
             Set<Root> notWantedLocalVariables = new HashSet<Root>();
 
             /**
@@ -543,6 +544,8 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 // Determine type of the arguments
                 if (argTypes[argIndex] == Types.T_REFERENCE || argTypes[argIndex] == Types.T_ARRAY) {
                     referenceArgs.add(l);
+                } else {
+                    primitiveArgs.add(l);
                 }
 
                 Expression originalExpr = originalArguments[argIndex];
@@ -576,10 +579,15 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
              */
             // Local variables are out of scope
             for (Instruction instruction : method.getInstructions()) {
-                if (instruction instanceof LocalVariableInstruction && instruction instanceof StoreInstruction) {
+                if (instruction instanceof LocalVariableInstruction) {
                     LocalVariableInstruction lvInsn = (LocalVariableInstruction) instruction;
+                    Root var = DefaultRoot.create(lvInsn.getLocalVariableName(), lvInsn.getLocalVariableIndex());
 
-                    notWantedLocalVariables.add(DefaultRoot.create(lvInsn.getLocalVariableName(), lvInsn.getLocalVariableIndex()));
+                    // Arguments are unwanted if they are written to
+                    // Other locals are all unwanted
+                    if ((!primitiveArgs.contains(var) && !referenceArgs.contains(var)) || instruction instanceof StoreInstruction) {
+                        notWantedLocalVariables.add(var);
+                    }
                 } else if (instruction instanceof IINC) {
                     IINC iinc = (IINC) instruction;
 
