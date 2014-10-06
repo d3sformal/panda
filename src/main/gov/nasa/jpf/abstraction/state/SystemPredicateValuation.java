@@ -11,6 +11,7 @@ import java.util.TreeSet;
 
 import gov.nasa.jpf.jvm.bytecode.IINC;
 import gov.nasa.jpf.jvm.bytecode.LocalVariableInstruction;
+import gov.nasa.jpf.jvm.bytecode.StoreInstruction;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -575,7 +576,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
              */
             // Local variables are out of scope
             for (Instruction instruction : method.getInstructions()) {
-                if (instruction instanceof LocalVariableInstruction) {
+                if (instruction instanceof LocalVariableInstruction && instruction instanceof StoreInstruction) {
                     LocalVariableInstruction lvInsn = (LocalVariableInstruction) instruction;
 
                     notWantedLocalVariables.add(DefaultRoot.create(lvInsn.getLocalVariableName(), lvInsn.getLocalVariableIndex()));
