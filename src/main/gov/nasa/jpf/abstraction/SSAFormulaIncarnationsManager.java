@@ -98,11 +98,11 @@ public class SSAFormulaIncarnationsManager {
         }
     }
 
-    public Field incarnateField(Field field) {
+    public Field getFieldIncarnation(Field field) {
         return DefaultField.create("ssa_" + getFieldIncarnationNumber(field) + "_" + field.getName());
     }
 
-    public Arrays incarnateArrays(Arrays arrays) {
+    public Arrays getArraysIncarnation(Arrays arrays) {
         return DefaultArrays.create("ssa_" + getArraysIncarnationNumber(arrays) + "_arr");
     }
 
@@ -121,7 +121,7 @@ public class SSAFormulaIncarnationsManager {
         }
     }
 
-    public AccessExpression incarnateSymbol(AccessExpression expr, int depth) {
+    public AccessExpression getSymbolIncarnation(AccessExpression expr, int depth) {
         if (expr instanceof PackageAndClass) {
             return expr;
         } else if (expr instanceof AnonymousObject) {
@@ -131,12 +131,12 @@ public class SSAFormulaIncarnationsManager {
         } else if (expr instanceof Root) {
             return DefaultRoot.create("ssa_" + getVariableIncarnationNumber((Root) expr, depth) + "_frame_" + getFrame(depth) + "_" + expr.getRoot().getName());
         } else {
-            AccessExpression prefix = incarnateSymbol(expr.cutTail(), depth);
+            AccessExpression prefix = getSymbolIncarnation(expr.cutTail(), depth);
 
             if (expr instanceof ObjectFieldRead) {
                 ObjectFieldRead fr = (ObjectFieldRead) expr;
 
-                return DefaultObjectFieldRead.create(prefix, incarnateField(fr.getField()));
+                return DefaultObjectFieldRead.create(prefix, getFieldIncarnation(fr.getField()));
             } else if (expr instanceof ArrayElementRead) {
                 ArrayElementRead ar = (ArrayElementRead) expr;
 
@@ -146,10 +146,10 @@ public class SSAFormulaIncarnationsManager {
                 ar.getIndex().addAccessExpressionsToSet(exprs);
 
                 for (AccessExpression e : exprs) {
-                    replacements.put(e, incarnateSymbol(e, depth));
+                    replacements.put(e, getSymbolIncarnation(e, depth));
                 }
 
-                return DefaultArrayElementRead.create(prefix, incarnateArrays(ar.getArrays()), ar.getIndex().replace(replacements));
+                return DefaultArrayElementRead.create(prefix, getArraysIncarnation(ar.getArrays()), ar.getIndex().replace(replacements));
             } else if (expr instanceof ArrayLengthRead) {
                 return DefaultArrayLengthRead.create(prefix);
             }

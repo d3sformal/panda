@@ -68,7 +68,7 @@ public class BranchingStateAdjustHelper {
                 ss.setIgnored(true);
 
                 if (forceFeasible) {
-                    if (VM.getVM().getJPF.getConfig().getBoolean("panda.verbose")) {
+                    if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
                         System.out.println("[WARNING] Finding feasible trace with matching prefix and " + branchCondition);
                     }
 
@@ -120,7 +120,7 @@ public class BranchingStateAdjustHelper {
                     int[] models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(traceFormula, exprArray);
 
                     if (models == null) {
-                        if (VM.getVM().getJPF.getConfig().getBoolean("panda.verbose")) {
+                        if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
                             System.out.println("[WARNING] No feasible trace found");
                         }
                     } else {
@@ -145,7 +145,7 @@ public class BranchingStateAdjustHelper {
                         }
 
                         if (rStateSet == null || rStateSet.isCurrentUnique() || !forceFeasibleOnce) {
-                            if (VM.getVM().getJPF.getConfig().getBoolean("panda.verbose")) {
+                            if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
                                 System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
                             }
 

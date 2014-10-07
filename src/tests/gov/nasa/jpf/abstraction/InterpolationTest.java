@@ -1,9 +1,8 @@
 package gov.nasa.jpf.abstraction;
 
-class D{public static void main(String[] args) {new InterpolationTest().bootstrap();}}
 public class InterpolationTest extends BaseTest {
     public InterpolationTest() {
-        config.add("+panda.interpolation=true");
+        config.add("+panda.refinement=true");
     }
 
     @Test

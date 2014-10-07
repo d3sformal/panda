@@ -150,7 +150,7 @@ public class PredicateAbstraction extends Abstraction {
     private Map<String, Unknown> unknowns = new HashMap<String, Unknown>();
 
     public void registerUnknown(Unknown unknown) {
-        unknowns.put(((Root) ssa.incarnateSymbol(unknown, 0)).getName(), unknown);
+        unknowns.put(((Root) ssa.getSymbolIncarnation(unknown, 0)).getName(), unknown);
     }
 
     public Map<String, Unknown> getUnknowns() {
@@ -187,7 +187,7 @@ public class PredicateAbstraction extends Abstraction {
             from.addAccessExpressionsToSet(exprs);
 
             for (AccessExpression e : exprs) {
-                replacements.put(e, ssa.incarnateSymbol(e, beforeDepth));
+                replacements.put(e, ssa.getSymbolIncarnation(e, beforeDepth));
             }
 
             from = from.replace(replacements);
@@ -195,20 +195,20 @@ public class PredicateAbstraction extends Abstraction {
             if (to instanceof Root) {
                 ssa.createNewSymbolIncarnation(to, afterDepth);
 
-                return VariableAssign.create((Root) ssa.incarnateSymbol(to, afterDepth), from);
+                return VariableAssign.create((Root) ssa.getSymbolIncarnation(to, afterDepth), from);
             } else if (to instanceof ObjectFieldRead) {
                 ObjectFieldRead fr = (ObjectFieldRead) to;
                 Field f = fr.getField();
 
                 Field rightHandSide = DefaultObjectFieldWrite.create(
-                    ssa.incarnateSymbol(fr.getObject(), beforeDepth),
-                    ssa.incarnateField(f),
+                    ssa.getSymbolIncarnation(fr.getObject(), beforeDepth),
+                    ssa.getFieldIncarnation(f),
                     from
                 );
 
                 ssa.createNewSymbolIncarnation(to, afterDepth);
 
-                return FieldAssign.create(ssa.incarnateField(f), rightHandSide);
+                return FieldAssign.create(ssa.getFieldIncarnation(f), rightHandSide);
             } else if (to instanceof ArrayElementRead) {
                 ArrayElementRead ar = (ArrayElementRead) to;
                 Arrays a = ar.getArrays();
@@ -219,21 +219,21 @@ public class PredicateAbstraction extends Abstraction {
                 ar.getIndex().addAccessExpressionsToSet(exprs);
 
                 for (AccessExpression e : exprs) {
-                    replacements.put(e, ssa.incarnateSymbol(e, beforeDepth));
+                    replacements.put(e, ssa.getSymbolIncarnation(e, beforeDepth));
                 }
 
                 Expression index = ar.getIndex().replace(replacements);
 
                 Arrays rightHandSide = DefaultArrayElementWrite.create(
-                    ssa.incarnateSymbol(ar.getArray(), beforeDepth),
-                    ssa.incarnateArrays(a),
+                    ssa.getSymbolIncarnation(ar.getArray(), beforeDepth),
+                    ssa.getArraysIncarnation(a),
                     index,
                     from
                 );
 
                 ssa.createNewSymbolIncarnation(to, afterDepth);
 
-                return ArraysAssign.create(ssa.incarnateArrays(a), rightHandSide);
+                return ArraysAssign.create(ssa.getArraysIncarnation(a), rightHandSide);
             }
         }
 
@@ -248,7 +248,7 @@ public class PredicateAbstraction extends Abstraction {
             p.addAccessExpressionsToSet(exprs);
 
             for (AccessExpression expr : exprs) {
-                replacements.put(expr, ssa.incarnateSymbol(expr, 0));
+                replacements.put(expr, ssa.getSymbolIncarnation(expr, 0));
             }
 
             extendTraceFormulaWith(p.replace(replacements), m, nextPC);

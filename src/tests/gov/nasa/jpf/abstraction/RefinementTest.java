@@ -4,7 +4,7 @@ import static gov.nasa.jpf.abstraction.statematch.StateMatchingTest.*;
 
 public class RefinementTest extends BaseTest {
     public RefinementTest() {
-        config.add("+panda.interpolation=true");
+        config.add("+panda.refinement=true");
     }
 
     @Test

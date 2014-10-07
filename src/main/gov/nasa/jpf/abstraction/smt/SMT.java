@@ -1110,7 +1110,7 @@ public class SMT {
             return true;
         }
 
-        if (VM.getVM().getJPF.getConfig().getBoolean("panda.verbose")) {
+        if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
             System.out.println("Check: " + e1 + " ~ " + e2);
         }
 
@@ -1132,7 +1132,7 @@ public class SMT {
             return true;
         }
 
-        if (VM.getVM().getJPF.getConfig().getBoolean("panda.verbose")) {
+        if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
             System.out.println("Check: " + p1 + " ~ " + p2);
         }
 
