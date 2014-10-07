@@ -39,7 +39,7 @@ public class Add extends Operation {
      * @return symbolic expression representing the summation / undefined expression / null
      */
     public static Expression create(Expression a, Expression b) {
-        Expression min = createMinimised(a, b);
+        Expression min = createMinimized(a, b);
 
         if (VM.getVM() != null && VM.getVM().getJPF().getConfig().getBoolean("panda.language.check_minimization")) {
             Expression raw = new Add(a, b);
@@ -52,7 +52,7 @@ public class Add extends Operation {
         return min;
     }
 
-    public static Expression createMinimised(Expression a, Expression b) {
+    public static Expression createMinimized(Expression a, Expression b) {
         if (!argumentsDefined(a, b)) return null;
 
         if (a instanceof Undefined) return UndefinedOperationResult.create();
@@ -64,7 +64,7 @@ public class Add extends Operation {
 
             return new Constant(c.value.intValue() + d.value.intValue());
         } else if (a instanceof Constant) {
-            return createMinimised(b, a);
+            return createMinimized(b, a);
         }
 
         if (b instanceof Constant) {

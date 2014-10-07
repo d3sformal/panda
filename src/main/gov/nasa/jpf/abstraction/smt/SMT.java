@@ -782,7 +782,7 @@ public class SMT {
         }
 
         for (AccessExpression object : objects) {
-            Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.createUnminimised(DefaultFresh.create(), object)));
+            Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.createUnminimized(DefaultFresh.create(), object)));
 
             freshConstraints.add("(assert " + convertToString(distinction) + ")" + separator);
         }
@@ -962,7 +962,7 @@ public class SMT {
         for (int i = 0; i < expressions.length; ++i) {
             AccessExpression expr = expressions[i];
 
-            Predicate valueConstraint = Equals.createUnminimised(SpecialVariable.create("value"), expr);
+            Predicate valueConstraint = Equals.createUnminimized(SpecialVariable.create("value"), expr);
 
             String query = convertToString(valueConstraint);
 
@@ -1018,7 +1018,7 @@ public class SMT {
     public Integer getModel(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {
         notifyGetModelInvoked(expression, determinants);
 
-        Predicate valueConstraint = Equals.createUnminimised(SpecialVariable.create("value"), expression);
+        Predicate valueConstraint = Equals.createUnminimized(SpecialVariable.create("value"), expression);
         PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
 
         collector.collect(valueConstraint);
@@ -1110,10 +1110,13 @@ public class SMT {
             return true;
         }
 
-        System.out.println("Check: " + e1 + " ~ " + e2);
+        if (VM.getVM().getJPF.getConfig().getBoolean("panda.verbose")) {
+            System.out.println("Check: " + e1 + " ~ " + e2);
+        }
+
         List<Predicate> ps = new ArrayList<Predicate>();
 
-        ps.add(Negation.create(Equals.createUnminimised(e1, e2)));
+        ps.add(Negation.create(Equals.createUnminimized(e1, e2)));
 
         SMT smt = new SMT();
 
@@ -1129,7 +1132,10 @@ public class SMT {
             return true;
         }
 
-        System.out.println("Check: " + p1 + " ~ " + p2);
+        if (VM.getVM().getJPF.getConfig().getBoolean("panda.verbose")) {
+            System.out.println("Check: " + p1 + " ~ " + p2);
+        }
+
         List<Predicate> ps = new ArrayList<Predicate>();
 
         ps.add(

@@ -356,7 +356,7 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
         expression.getArrays().accept(this);
         expression.getIndex().accept(this);
 
-        addAdditionalPredicate(Equals.createUnminimised(DefaultArrayElementRead.create(DefaultFresh.create(), expression.getIndex()), NullExpression.create()));
+        addAdditionalPredicate(Equals.createUnminimized(DefaultArrayElementRead.create(DefaultFresh.create(), expression.getIndex()), NullExpression.create()));
 
         addObject(expression);
     }
@@ -371,11 +371,11 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 
     @Override
     public void visit(ArrayLengthRead expression) {
-        Predicate predicate = Negation.create(LessThan.createUnminimised(expression, Constant.create(0)));
+        Predicate predicate = Negation.create(LessThan.createUnminimized(expression, Constant.create(0)));
 
         // In case of reasoning about fresh arrays
         if (expression.getArray() instanceof AnonymousArray) {
-            addAdditionalPredicate(Equals.createUnminimised(expression, ((AnonymousArray) expression.getArray()).getArrayLength()));
+            addAdditionalPredicate(Equals.createUnminimized(expression, ((AnonymousArray) expression.getArray()).getArrayLength()));
         }
 
         addAdditionalPredicate(predicate);

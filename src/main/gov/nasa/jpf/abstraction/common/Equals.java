@@ -33,7 +33,7 @@ public class Equals extends Comparison {
         else return create(newA, newB);
     }
 
-    public static Predicate createUnminimised(Expression a, Expression b) {
+    public static Predicate createUnminimized(Expression a, Expression b) {
         if (!argumentsDefined(a, b)) return null;
 
         if (a.equals(b)) return Tautology.create();
@@ -45,10 +45,10 @@ public class Equals extends Comparison {
     }
 
     public static Predicate create(Expression a, Expression b) {
-        Predicate min = createMinimised(a, b);
+        Predicate min = createMinimized(a, b);
 
         if (VM.getVM() != null && VM.getVM().getJPF().getConfig().getBoolean("panda.language.check_minimization")) {
-            Predicate raw = createUnminimised(a, b);
+            Predicate raw = createUnminimized(a, b);
 
             if (!SMT.checkEquivalence(min, raw)) {
                 throw new RuntimeException("Wrong convertion from: " + raw + " to: " + min);
@@ -58,7 +58,7 @@ public class Equals extends Comparison {
         return min;
     }
 
-    public static Predicate createMinimised(Expression a, Expression b) {
+    public static Predicate createMinimized(Expression a, Expression b) {
         if (!argumentsDefined(a, b)) return null;
 
         if (a.equals(b)) return Tautology.create();

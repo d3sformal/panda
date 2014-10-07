@@ -68,7 +68,9 @@ public class BranchingStateAdjustHelper {
                 ss.setIgnored(true);
 
                 if (forceFeasible) {
-                    System.out.println("[WARNING] Finding feasible trace with matching prefix and " + branchCondition);
+                    if (VM.getVM().getJPF.getConfig().getBoolean("panda.verbose")) {
+                        System.out.println("[WARNING] Finding feasible trace with matching prefix and " + branchCondition);
+                    }
 
                     Predicate traceFormula = PredicateAbstraction.getInstance().getTraceFormula().toConjunction();
                     Map<String, Unknown> unknowns = PredicateAbstraction.getInstance().getUnknowns();
@@ -118,7 +120,9 @@ public class BranchingStateAdjustHelper {
                     int[] models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(traceFormula, exprArray);
 
                     if (models == null) {
-                        System.out.println("[WARNING] No feasible trace found");
+                        if (VM.getVM().getJPF.getConfig().getBoolean("panda.verbose")) {
+                            System.out.println("[WARNING] No feasible trace found");
+                        }
                     } else {
                         // To avoid divergence:
                         //   one concrete path allows only one branch -> second trace is explored to cover the other branch
@@ -141,7 +145,9 @@ public class BranchingStateAdjustHelper {
                         }
 
                         if (rStateSet == null || rStateSet.isCurrentUnique() || !forceFeasibleOnce) {
-                            System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
+                            if (VM.getVM().getJPF.getConfig().getBoolean("panda.verbose")) {
+                                System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
+                            }
 
                             for (int j = 0; j < models.length; ++j) {
                                 DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();

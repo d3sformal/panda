@@ -6,7 +6,6 @@ package gov.nasa.jpf.abstraction.statematch;
 import static gov.nasa.jpf.abstraction.BaseTest.*;
 import static gov.nasa.jpf.abstraction.statematch.StateMatchingTest.*;
 
-class D {public static void main(String[] args) {new ProducerTest().bootstrap();}}
 public class ProducerTest extends StateMatchingTest {
     public ProducerTest() {
         config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
