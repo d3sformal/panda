@@ -1,7 +1,7 @@
 package gov.nasa.jpf.abstraction.statematch;
 
 import gov.nasa.jpf.abstraction.Test;
-import gov.nasa.jpf.abstraction.Debug;
+import gov.nasa.jpf.abstraction.Verifier;
 
 public class UnknownTest extends StateMatchingTest {
     public UnknownTest() {
@@ -16,7 +16,7 @@ public class UnknownTest extends StateMatchingTest {
 
     @Test
     public static void test1() {
-        int i = Debug.unknownInt();
+        int i = Verifier.unknownInt();
 
         // Without matching already explored abstract traces
         // 1. Comes with 0
@@ -33,7 +33,7 @@ public class UnknownTest extends StateMatchingTest {
 
     //@Test
     public static void test2() {
-        int i = Debug.unknownInt();
+        int i = Verifier.unknownInt();
 
         // Test with the special value 0 which is the default
         // Use < to avoid one of the branches having only one model
@@ -46,7 +46,7 @@ public class UnknownTest extends StateMatchingTest {
 
     //@Test
     public static void test3() {
-        int i = Debug.unknownInt(); // Should register choice (starting with for example 0) and mark the constant as NONDET
+        int i = Verifier.unknownInt(); // Should register choice (starting with for example 0) and mark the constant as NONDET
 
         int j = i + 2;
 
