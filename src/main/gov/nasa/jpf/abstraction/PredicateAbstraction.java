@@ -570,7 +570,7 @@ public class PredicateAbstraction extends Abstraction {
      * @returns null if real error, else a backtrack level is returned (the depth in the search to which to return)
      */
     public Integer error() {
-        if (VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation")) {
+        if (VM.getVM().getJPF().getConfig().getBoolean("panda.refinement")) {
             System.out.println();
             System.out.println();
             System.out.println();

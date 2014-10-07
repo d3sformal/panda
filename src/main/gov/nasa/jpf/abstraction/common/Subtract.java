@@ -41,7 +41,7 @@ public class Subtract extends Operation {
     public static Expression create(Expression a, Expression b) {
         Expression min = createMinimised(a, b);
 
-        if (VM.getVM() != null && VM.getVM().getJPF().getConfig().getBoolean("panda.language.minimise")) {
+        if (VM.getVM() != null && VM.getVM().getJPF().getConfig().getBoolean("panda.language.check_minimization")) {
             Expression raw = new Subtract(a, b);
 
             if (!SMT.checkEquivalence(min, raw)) {

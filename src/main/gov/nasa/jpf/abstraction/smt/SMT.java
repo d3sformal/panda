@@ -486,7 +486,7 @@ public class SMT {
         input.append("(check-sat)"); input.append(separator);
 
         // Overall (Global) interpolants (No notion of method scopes)
-        if (VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation.global")) {
+        if (VM.getVM().getJPF().getConfig().getBoolean("panda.refinement.global")) {
             input.append("(get-interpolants");
             for (int i = 1; i <= interpolationGroup; ++i) {
                 input.append(" g"); input.append(i);
@@ -535,7 +535,7 @@ public class SMT {
             boolean satisfiable = output.matches("^sat$");
             Predicate[] interpolants = null;
 
-            if (VM.getVM().getJPF().getConfig().getBoolean("panda.interpolation.global")) {
+            if (VM.getVM().getJPF().getConfig().getBoolean("panda.refinement.global")) {
                 output = interpol.out.readLine();
 
                 if (!satisfiable) {
