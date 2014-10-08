@@ -56,11 +56,14 @@ public class BranchingStateAdjustHelper {
         if (br.getConcreteBranchValue(v1, v2) == TruthValue.create(abstractJump)) {
             if (forceFeasibleOnce) {
                 // Add state to allow forward state matching (look if we should generate more choices to get into the branch (it might have been explored before - actually it is explored when this branch is hit))
+                ti.breakTransition("Creating state after taking an enabled branch: " + branchCondition);
 
-                ti.breakTransition("Creating state after taking an enabled branch");
+                PredicateAbstraction.getInstance().dropForceStatesAlongTrace();
             }
         } else {
-            System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + branchCondition);
+            if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+                System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + branchCondition);
+            }
 
             // Either cut of the inconsistent branch
             // or make the concrete state represent the abstract one (force concrete values)

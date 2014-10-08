@@ -132,6 +132,20 @@ public class TraceFormula implements Iterable<Step> {
         return methods;
     }
 
+    public boolean isPrefixOf(TraceFormula tf) {
+        if (steps.size() > tf.steps.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < steps.size(); ++i) {
+            if (!steps.get(i).equals(tf.steps.get(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public TraceFormula clone() {
         TraceFormula c = new TraceFormula();

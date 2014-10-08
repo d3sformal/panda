@@ -5,13 +5,8 @@ import gov.nasa.jpf.abstraction.Verifier;
 
 public class UnknownTest extends StateMatchingTest {
     public UnknownTest() {
-        config.add("+panda.interpolation=true");
+        config.add("+panda.refinement=true");
         config.add("+panda.branch.prune_infeasible=true");
-        config.add("+listener+=,gov.nasa.jpf.listener.ExecTracker");
-        //config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
-        //config.add("+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor");
-        //config.add("+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener");
-        config.add("+vm.storage.class="); // Disable state matching, to avoid matching abstract states with different concrete values
     }
 
     @Test

@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction;
+package gov.nasa.jpf.abstraction.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,22 +36,15 @@ public class DebugCopyPreservingStateSet extends JenkinsStateSet {
 
   public DebugCopyPreservingStateSet(Config conf){
     String serializerCls = conf.getString("vm.serializer.class");
-    if (serializerCls != null){
-      int idx = serializerCls.lastIndexOf('.') + 1;
-      String cname = serializerCls.substring(idx);
 
-      if (!cname.startsWith("Debug")){
-        if (idx > 0){
-          serializerCls = serializerCls.substring(0,idx) + "Debug" + cname;
-        } else {
-          serializerCls = "Debug" + cname;
-        }
-      }
+    if (serializerCls == null) {
+        serializerCls = "gov.nasa.jpf.abstraction.util.DebugPredicateAbstractionSerializer";
+    }
 
-      serializer = conf.getInstance(null, serializerCls, DebugStateSerializer.class);
-      if (serializer == null){
-        throw new JPFConfigException("Debug StateSet cannot instantiate serializer: " + serializerCls);
-      }
+    try {
+        serializer = conf.getInstance(null, serializerCls, DebugStateSerializer.class);
+    } catch (Throwable t) {
+        throw new JPFConfigException("Debug StateSet cannot instantiate debug serializer: " + serializerCls, t);
     }
 
     String path = conf.getString("vm.serializer.output", "tmp");

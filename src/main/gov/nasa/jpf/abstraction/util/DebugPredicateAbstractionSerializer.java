@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction;
+package gov.nasa.jpf.abstraction.util;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -13,6 +13,7 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.PredicateAbstractionSerializer;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.Root;

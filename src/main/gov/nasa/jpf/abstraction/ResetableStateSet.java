@@ -44,7 +44,7 @@ public class ResetableStateSet implements StateSet {
     public void clear(int startingSize) {
         this.startingSize = startingSize;
 
-        set = new JenkinsStateSet();
+        set = (JenkinsStateSet) VM.getVM().getJPF().getConfig().getInstance("panda.storage.class", StateSet.class);
 
         if (vm != null) {
             set.attach(vm);

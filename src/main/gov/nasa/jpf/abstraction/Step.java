@@ -26,4 +26,15 @@ public class Step {
     public int getPC() {
         return pc;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Step) {
+            Step s = (Step) o;
+
+            return pc == s.pc && m.equals(s.m) && p.equals(s.p);
+        }
+
+        return false;
+    }
 }

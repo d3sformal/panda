@@ -95,6 +95,9 @@ public class PredicateAbstraction extends Abstraction {
     private SystemPredicateValuation predicateValuation;
     private Trace trace;
     private TraceFormula traceFormula;
+    // TODO: This should be a backtracked information
+    private TraceFormula forcedTrace;
+
     private boolean isInitialized = false;
     private Set<ClassInfo> startupClasses = new HashSet<ClassInfo>();
 
@@ -517,6 +520,14 @@ public class PredicateAbstraction extends Abstraction {
         return traceFormula;
     }
 
+    public void forceStatesAlongTrace(TraceFormula tf) {
+        forcedTrace = tf;
+    }
+
+    public void dropForceStatesAlongTrace() {
+        forcedTrace = null;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void forward(MethodInfo method) {
@@ -534,6 +545,14 @@ public class PredicateAbstraction extends Abstraction {
         );
 
         trace.push(state);
+
+        if (forcedTrace != null) {
+            if (traceFormula.isPrefixOf(forcedTrace)) {
+                VM.getVM().forceState();
+            } else {
+                forcedTrace = null;
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
