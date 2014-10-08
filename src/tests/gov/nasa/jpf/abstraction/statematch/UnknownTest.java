@@ -24,9 +24,10 @@ public class UnknownTest extends StateMatchingTest {
         }
 
         assertRevisitedAtLeast(1);
+        assertVisitedAtMost(2);
     }
 
-    //@Test
+    @Test
     public static void test2() {
         int i = Verifier.unknownInt();
 
@@ -37,9 +38,10 @@ public class UnknownTest extends StateMatchingTest {
         }
 
         assertRevisitedAtLeast(1);
+        assertVisitedAtMost(2);
     }
 
-    //@Test
+    @Test
     public static void test3() {
         int i = Verifier.unknownInt(); // Should register choice (starting with for example 0) and mark the constant as NONDET
 

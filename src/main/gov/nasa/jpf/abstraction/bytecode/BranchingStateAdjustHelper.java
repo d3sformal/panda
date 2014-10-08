@@ -147,6 +147,12 @@ public class BranchingStateAdjustHelper {
                             rStateSet = (ResetableStateSet) stateSet;
                         }
 
+                        // Because we want to match current state (its working copy) with state created by the code in enabled branch
+                        // Here we have not yet advanced PC
+                        // Whereas in the enabled branch the state is made after advancing the PC
+                        // We need to advance the PC to get the correct state
+                        ti.setPC(abstractJump ? br.getTarget() : br.getNext(ti));
+
                         if (rStateSet == null || rStateSet.isCurrentUnique() || !forceFeasibleOnce) {
                             if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
                                 System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
