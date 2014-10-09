@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 import gov.nasa.jpf.vm.VM;
 
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.Step;
 import gov.nasa.jpf.abstraction.TraceFormula;
 import gov.nasa.jpf.abstraction.common.Conjunction;
@@ -53,7 +54,7 @@ public class SMT {
 
     private static boolean USE_CACHE = true;
     private static boolean USE_MODELS_CACHE = false;
-    private static boolean USE_LOG_FILE = VM.getVM().getJPF().getConfig().getBoolean("panda.log_smt");
+    private static boolean USE_LOG_FILE = PandaConfig.getInstance().logSMT();
     private static List<SMTListener> listeners = new LinkedList<SMTListener>();
     private static SMTCache cache = new SMTCache();
 
@@ -448,6 +449,7 @@ public class SMT {
      */
     public Predicate[] interpolate(TraceFormula traceFormula) throws SMTException {
         SMT interpol = new SMT(SupportedSMT.SMTInterpol);
+        PandaConfig config = PandaConfig.getInstance();
 
         PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
 
@@ -486,7 +488,7 @@ public class SMT {
         input.append("(check-sat)"); input.append(separator);
 
         // Overall (Global) interpolants (No notion of method scopes)
-        if (VM.getVM().getJPF().getConfig().getBoolean("panda.refinement.global")) {
+        if (config.enabledGlobalRefinement()) {
             input.append("(get-interpolants");
             for (int i = 1; i <= interpolationGroup; ++i) {
                 input.append(" g"); input.append(i);
@@ -535,7 +537,7 @@ public class SMT {
             boolean satisfiable = output.matches("^sat$");
             Predicate[] interpolants = null;
 
-            if (VM.getVM().getJPF().getConfig().getBoolean("panda.refinement.global")) {
+            if (config.enabledGlobalRefinement()) {
                 output = interpol.out.readLine();
 
                 if (!satisfiable) {
@@ -1110,7 +1112,7 @@ public class SMT {
             return true;
         }
 
-        if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+        if (PandaConfig.getInstance().enabledVerbose()) {
             System.out.println("Check: " + e1 + " ~ " + e2);
         }
 
@@ -1132,7 +1134,7 @@ public class SMT {
             return true;
         }
 
-        if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+        if (PandaConfig.getInstance().enabledVerbose()) {
             System.out.println("Check: " + p1 + " ~ " + p2);
         }
 

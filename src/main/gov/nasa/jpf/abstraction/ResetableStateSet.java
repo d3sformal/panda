@@ -49,7 +49,7 @@ public class ResetableStateSet extends SerializingStateSet {
     public void clear(int startingSize) {
         this.startingSize = startingSize;
 
-        set = VM.getVM().getJPF().getConfig().getInstance("panda.storage.class", JenkinsStateSet.class);
+        set = PandaConfig.getInstance().getStorageInstance();
 
         if (vm != null) {
             set.attach(vm);

@@ -8,6 +8,7 @@ import gov.nasa.jpf.report.Publisher;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.VM;
 
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.PredicateConsolePublisher;
 import gov.nasa.jpf.abstraction.Step;
@@ -26,7 +27,7 @@ public class CounterexampleListener extends ListenerAdapter {
         INTERLEAVED
     }
 
-    private Format format = VM.getVM().getJPF().getConfig().getEnum("panda.counterexample.print_format", Format.class.getEnumConstants(), Format.SEPARATED);
+    private Format format = PandaConfig.getInstance().getCounterexamplePrintFormat();
 
     public CounterexampleListener() {
         PredicateAbstraction.registerCounterexampleListener(this);
@@ -163,6 +164,8 @@ public class CounterexampleListener extends ListenerAdapter {
     }
 
     public void counterexample(TraceFormula traceFormula, Predicate[] interpolants) {
+        PandaConfig config = PandaConfig.getInstance();
+
         switch (format) {
             default:
             case SEPARATED:
@@ -172,7 +175,7 @@ public class CounterexampleListener extends ListenerAdapter {
 
                 System.out.println("Counterexample Concrete Trace:");
 
-                if (VM.getVM().getJPF().getConfig().getBoolean("panda.counterexample.print_concrete")) {
+                if (config.printConcreteCounterexample()) {
                     for (Publisher p : VM.getVM().getJPF().getReporter().getPublishers()) {;
                         ((PredicateConsolePublisher) p).printTrace();
                     }
@@ -198,7 +201,7 @@ public class CounterexampleListener extends ListenerAdapter {
 
                 System.out.println("Counterexample Concrete Trace:");
 
-                if (VM.getVM().getJPF().getConfig().getBoolean("panda.counterexample.print_concrete")) {
+                if (config.printConcreteCounterexample()) {
                     for (Publisher p : VM.getVM().getJPF().getReporter().getPublishers()) {;
                         ((PredicateConsolePublisher) p).printTrace();
                     }
@@ -221,7 +224,7 @@ public class CounterexampleListener extends ListenerAdapter {
     }
 
     public void currentPredicateSet(Predicates predicateSet, List<MethodInfo> refinedMethods) {
-        if (VM.getVM().getJPF().getConfig().getBoolean("panda.counterexample.print_refined_predicate_contexts")) {
+        if (PandaConfig.getInstance().printRefinedPredicateContexts()) {
             System.out.println();
             System.out.println();
             System.out.println("Current Predicate Set for the Refined Methods:");

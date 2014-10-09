@@ -591,7 +591,9 @@ public class PredicateAbstraction extends Abstraction {
      * @returns null if real error, else a backtrack level is returned (the depth in the search to which to return)
      */
     public Integer error() {
-        if (VM.getVM().getJPF().getConfig().getBoolean("panda.refinement")) {
+        PandaConfig config = PandaConfig.getInstance();
+
+        if (config.enabledRefinement()) {
             System.out.println();
             System.out.println();
             System.out.println();
@@ -625,7 +627,7 @@ public class PredicateAbstraction extends Abstraction {
                         }
                     }
 
-                    if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+                    if (config.enabledVerbose()) {
                         System.out.println("Adding predicate `" + interpolant + "` to [" + pcStart + ", " + pcEnd + "]");
                     }
 
@@ -638,11 +640,11 @@ public class PredicateAbstraction extends Abstraction {
                 }
 
                 if (!refined) {
-                    if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+                    if (config.enabledVerbose()) {
                         System.out.println(predicateSet);
                     }
 
-                    if (VM.getVM().getJPF().getConfig().getBoolean("panda.counterexample.print_error_on_refinement_failure")) {
+                    if (config.printErrorOnRefinementFailure()) {
                         System.out.println("Failed to refine abstraction (cycle).");
 
                         return null;

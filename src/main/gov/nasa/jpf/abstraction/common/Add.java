@@ -4,6 +4,7 @@ import java.util.Map;
 
 import gov.nasa.jpf.vm.VM;
 
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.smt.SMT;
 
@@ -41,7 +42,7 @@ public class Add extends Operation {
     public static Expression create(Expression a, Expression b) {
         Expression min = createMinimized(a, b);
 
-        if (VM.getVM() != null && VM.getVM().getJPF().getConfig().getBoolean("panda.language.check_minimization")) {
+        if (VM.getVM() != null && PandaConfig.getInstance().checkLanguageMinimization()) {
             Expression raw = new Add(a, b);
 
             if (!SMT.checkEquivalence(min, raw)) {

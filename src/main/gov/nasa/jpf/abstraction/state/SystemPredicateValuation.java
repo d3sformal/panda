@@ -22,6 +22,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.VM;
 
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.AbstractMethodPredicateContext;
 import gov.nasa.jpf.abstraction.common.AssumePredicateContext;
@@ -245,7 +246,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
             initialValuation.put(interpolant, TruthValue.UNKNOWN);
 
-            if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+            if (PandaConfig.getInstance().enabledVerbose()) {
                 System.out.println("Refined context:");
                 System.out.println(gov.nasa.jpf.abstraction.common.Notation.convertToString(ctx));
             }

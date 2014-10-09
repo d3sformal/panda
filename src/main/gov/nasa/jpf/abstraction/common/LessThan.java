@@ -4,6 +4,7 @@ import java.util.Map;
 
 import gov.nasa.jpf.vm.VM;
 
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.Undefined;
@@ -44,7 +45,7 @@ public class LessThan extends Comparison {
     public static Predicate create(Expression a, Expression b) {
         Predicate min = createMinimized(a, b);
 
-        if (VM.getVM() != null && VM.getVM().getJPF().getConfig().getBoolean("panda.language.check_minimization")) {
+        if (VM.getVM() != null && PandaConfig.getInstance().checkLanguageMinimization()) {
             Predicate raw = createUnminimized(a, b);
 
             if (!SMT.checkEquivalence(min, raw)) {

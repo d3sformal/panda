@@ -15,6 +15,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.DynamicIntChoiceGenerator;
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.ResetableStateSet;
 import gov.nasa.jpf.abstraction.common.Conjunction;
@@ -48,9 +49,11 @@ public class BranchingStateAdjustHelper {
             branchCondition = Negation.create(branchCondition);
         }
 
-        boolean pruneInfeasible = VM.getVM().getJPF().getConfig().getBoolean("panda.branch.prune_infeasible");
-        boolean forceFeasibleOnce = VM.getVM().getJPF().getConfig().getBoolean("panda.branch.force_feasible_once");
-        boolean forceFeasible = forceFeasibleOnce || VM.getVM().getJPF().getConfig().getBoolean("panda.branch.force_feasible");
+        PandaConfig config = PandaConfig.getInstance();
+
+        boolean pruneInfeasible = config.pruneInfeasibleBranches();
+        boolean forceFeasibleOnce = config.forceFeasibleBranchesOnce();
+        boolean forceFeasible = forceFeasibleOnce || config.forceFeasibleBranches();
 
         // In case the concrete execution does not allow the same branch to be taken
         if (br.getConcreteBranchValue(v1, v2) == TruthValue.create(abstractJump)) {
@@ -61,7 +64,7 @@ public class BranchingStateAdjustHelper {
                 PredicateAbstraction.getInstance().dropForceStatesAlongTrace();
             }
         } else {
-            if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+            if (config.enabledVerbose()) {
                 System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + branchCondition);
             }
 
@@ -71,7 +74,7 @@ public class BranchingStateAdjustHelper {
                 ss.setIgnored(true);
 
                 if (forceFeasible) {
-                    if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+                    if (config.enabledVerbose()) {
                         System.out.println("[WARNING] Finding feasible trace with matching prefix and " + branchCondition);
                     }
 
@@ -123,7 +126,7 @@ public class BranchingStateAdjustHelper {
                     int[] models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(traceFormula, exprArray);
 
                     if (models == null) {
-                        if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+                        if (config.enabledVerbose()) {
                             System.out.println("[WARNING] No feasible trace found");
                         }
                     } else {
@@ -154,7 +157,7 @@ public class BranchingStateAdjustHelper {
                         ti.setPC(abstractJump ? br.getTarget() : br.getNext(ti));
 
                         if (rStateSet == null || rStateSet.isCurrentUnique() || !forceFeasibleOnce) {
-                            if (VM.getVM().getJPF().getConfig().getBoolean("panda.verbose")) {
+                            if (config.enabledVerbose()) {
                                 System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
                             }
 
@@ -168,7 +171,7 @@ public class BranchingStateAdjustHelper {
                         }
                     }
                 }
-            } else if (ti.getVM().getJPF().getConfig().getBoolean("panda.branch.adjust_concrete_values")) {
+            } else if (config.adjustConcreteValues()) {
                 Map<AccessExpression, ElementInfo> primitiveExprs = new HashMap<AccessExpression, ElementInfo>();
                 Set<AccessExpression> allExprs = new HashSet<AccessExpression>();
 

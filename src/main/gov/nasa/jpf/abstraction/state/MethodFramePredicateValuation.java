@@ -20,6 +20,7 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.BytecodeRange;
 import gov.nasa.jpf.abstraction.common.BytecodeUnlimitedRange;
@@ -281,12 +282,9 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
      */
     @Override
     public void force(Predicate predicate, TruthValue value) {
-        Config config = VM.getVM().getJPF().getConfig();
-        String key = "panda.branch.reevaluate_predicates";
-
         put(predicate, value);
 
-        if (config.containsKey(key) && config.getBoolean(key)) {
+        if (PandaConfig.getInstance().reevaluatePredicatesAfterBranching()) {
             Set<Predicate> affected = computeAffectedClosure(predicate, valuations.keySet());
 
             Map<Predicate, PredicateValueDeterminingInfo> predicateDeterminingInfos = new HashMap<Predicate, PredicateValueDeterminingInfo>();
