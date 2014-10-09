@@ -95,7 +95,6 @@ public class PredicateAbstraction extends Abstraction {
     private SystemPredicateValuation predicateValuation;
     private Trace trace;
     private TraceFormula traceFormula;
-    // TODO: This should be a backtracked information
     private TraceFormula forcedTrace;
 
     private boolean isInitialized = false;
@@ -498,7 +497,8 @@ public class PredicateAbstraction extends Abstraction {
             predicates,
             traceFormula,
             ssa,
-            new HashSet<MethodInfo>()
+            new HashSet<MethodInfo>(),
+            forcedTrace
         );
 
         trace.push(state);
@@ -541,7 +541,8 @@ public class PredicateAbstraction extends Abstraction {
             predicateValuation.memorize(),
             traceFormula.clone(),
             ssa.clone(),
-            visitedMethods
+            visitedMethods,
+            forcedTrace
         );
 
         trace.push(state);
@@ -569,6 +570,7 @@ public class PredicateAbstraction extends Abstraction {
         ssa = trace.top().ssa.clone();
         visitedMethods.clear();
         visitedMethods.addAll(trace.top().visitedMethods);
+        forcedTrace = trace.top().forcedTrace;
 
         if (trace.isEmpty()) {
             smt.close();

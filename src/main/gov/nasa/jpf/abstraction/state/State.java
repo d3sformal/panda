@@ -26,6 +26,7 @@ public class State {
     public TraceFormula traceFormula;
     public SSAFormulaIncarnationsManager ssa;
     public Set<MethodInfo> visitedMethods;
+    public TraceFormula forcedTrace;
 
     public State(
         int currentThread,
@@ -33,7 +34,8 @@ public class State {
         Map<Integer, PredicateValuationStack> predicateValuationStacks,
         TraceFormula traceFormula,
         SSAFormulaIncarnationsManager ssa,
-        Set<MethodInfo> visitedMethods
+        Set<MethodInfo> visitedMethods,
+        TraceFormula forcedTrace
     ) {
         this.currentThread = currentThread;
         this.symbolTableStacks = symbolTableStacks;
@@ -41,5 +43,6 @@ public class State {
         this.traceFormula = traceFormula;
         this.ssa = ssa;
         this.visitedMethods = visitedMethods;
+        this.forcedTrace = forcedTrace;
     }
 }
