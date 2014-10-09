@@ -2,8 +2,8 @@ package gov.nasa.jpf.abstraction;
 
 public class FindGreaterTest extends BaseTest {
     public FindGreaterTest() {
-        config.add("+panda.interpolation=true");
-        config.add("+panda.interpolation.global=false");
+        config.add("+panda.refinement=true");
+        config.add("+panda.refinement.global=false");
         config.add("+panda.abstract_domain=PREDICATES");
         config.add("+panda.log_smt=true");
         config.add("+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener");
