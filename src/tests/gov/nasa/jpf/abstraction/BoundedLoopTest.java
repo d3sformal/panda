@@ -4,7 +4,7 @@ package gov.nasa.jpf.abstraction;
 
 public class BoundedLoopTest extends BaseTest {
     public BoundedLoopTest() {
-        config.add("+panda.interpolation=true");
+        config.add("+panda.refinement=true");
     }
     public static void main(String[] args) {
         int i = 0;
