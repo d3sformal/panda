@@ -81,7 +81,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 
         ret.append("]\n");
 
-        for (Predicate p : context.predicates) {
+        for (Predicate p : context.predicates.keySet()) {
             visitPredicate(p);
         }
     }
@@ -94,7 +94,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 
         ret.append("]\n");
 
-        for (Predicate p : context.predicates) {
+        for (Predicate p : context.predicates.keySet()) {
             visitPredicate(p);
         }
     }
@@ -107,7 +107,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 
         ret.append("]\n");
 
-        for (Predicate p : context.predicates) {
+        for (Predicate p : context.predicates.keySet()) {
             visitPredicate(p);
         }
     }
@@ -120,7 +120,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 
         ret.append("]\n");
 
-        for (Predicate p : context.predicates) {
+        for (Predicate p : context.predicates.keySet()) {
             visitPredicate(p);
         }
     }
@@ -129,7 +129,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
     public void visit(StaticPredicateContext context) {
         ret.append("[static]\n");
 
-        for (Predicate p : context.predicates) {
+        for (Predicate p : context.predicates.keySet()) {
             visitPredicate(p);
         }
     }

@@ -72,7 +72,6 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
     private PredicateAbstraction abstraction;
     private Predicates predicateSet;
-    private PredicateValuationMap initialValuation = new PredicateValuationMap();
     private Integer currentThreadID;
 
     public SystemPredicateValuation(PredicateAbstraction abstraction, Predicates predicateSet) {
@@ -80,11 +79,12 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
         this.predicateSet = predicateSet;
 
         Set<Predicate> predicates = new HashSet<Predicate>();
+        Map<Predicate, TruthValue> initialValuation;
 
         for (PredicateContext context : predicateSet.contexts) {
             if (context instanceof AssumePredicateContext) continue;
 
-            predicates.addAll(context.predicates);
+            predicates.addAll(context.predicates.keySet());
         }
 
         /**
@@ -95,26 +95,19 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
          */
         if (!predicates.isEmpty()) {
             try {
-                initialValuation.putAll(abstraction.smt.valuatePredicates(predicates));
+                initialValuation = abstraction.smt.valuatePredicates(predicates);
 
-                for (Predicate predicate : predicates) {
-                    // IF NOT A TAUTOLOGY OR CONTRADICTION
-                    if (initialValuation.get(predicate) == TruthValue.UNKNOWN) {
-                        initialValuation.put(predicate, TruthValue.UNKNOWN);
-                    } else {
-                        initialValuation.put(predicate, initialValuation.get(predicate));
+                for (PredicateContext context : predicateSet.contexts) {
+                    if (context instanceof AssumePredicateContext) continue;
+
+                    for (Predicate predicate : context.predicates.keySet()) {
+                        context.predicates.put(predicate, initialValuation.get(predicate));
                     }
                 }
             } catch (SMTException e) {
                 e.printStackTrace();
 
                 throw e;
-            }
-        }
-
-        if (initialValuation.isEmpty()) {
-            for (Predicate predicate : predicates) {
-                initialValuation.put(predicate, TruthValue.UNKNOWN);
             }
         }
     }
@@ -156,8 +149,8 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 }
             }
 
-            for (Predicate predicate : context.predicates) {
-                valuation.put(predicate, initialValuation.get(predicate));
+            for (Predicate predicate : context.predicates.keySet()) {
+                valuation.put(predicate, context.predicates.get(predicate));
             }
         }
 
@@ -225,26 +218,12 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             } else {
                 boolean present = false;
 
-                for (Predicate p : ctx.predicates) {
-                    if (p.equals(interpolant)) {
-                        for (int pc : interpolant.getScope()) {
-                            refined = refined || !p.isInScope(pc);
-                        }
-
-                        p.setScope(p.getScope().merge(interpolant.getScope()));
-
-                        present = true;
-                        break;
-                    }
-                }
-
-                if (!present) {
-                    refined = true;
-                    ctx.predicates.add(interpolant);
+                if (ctx.predicates.containsKey(interpolant)) {
+                    refined = ctx.predicates.put(interpolant, ctx.predicates.get(interpolant)) == null;
+                } else {
+                    refined = ctx.predicates.put(interpolant, TruthValue.UNKNOWN) == null;
                 }
             }
-
-            initialValuation.put(interpolant, TruthValue.UNKNOWN);
 
             if (PandaConfig.getInstance().enabledVerbose()) {
                 System.out.println("Refined context:");
@@ -293,7 +272,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                     continue;
                 }
 
-                for (Predicate predicate : context.predicates) {
+                for (Predicate predicate : context.predicates.keySet()) {
                     Set<Predicate> inconsistent = valuation.getPredicatesInconsistentWith(predicate, TruthValue.TRUE);
 
                     if (!inconsistent.isEmpty()) {
@@ -416,7 +395,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             }
 
             for (Predicate predicate : unknown) {
-                calleeScope.put(predicate, initialValuation.get(predicate));
+                calleeScope.put(predicate, TruthValue.UNKNOWN);
             }
 
             overrideWithAssumedPreValuation(calleeScope, method);

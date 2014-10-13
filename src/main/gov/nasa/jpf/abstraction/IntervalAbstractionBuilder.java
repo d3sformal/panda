@@ -7,6 +7,7 @@ import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.parser.PredicatesParser;
+import gov.nasa.jpf.abstraction.state.TruthValue;
 
 public class IntervalAbstractionBuilder extends PredicateAbstractionBuilder {
     private int min;
@@ -28,8 +29,8 @@ public class IntervalAbstractionBuilder extends PredicateAbstractionBuilder {
             PredicateContext predContext = exprContext.getPredicateContextOfProperType();
 
             for (Expression expr : exprContext.expressions) {
-                predContext.predicates.add(LessThan.create(expr, Constant.create(min)));
-                predContext.predicates.add(LessThan.create(Constant.create(max), expr));
+                predContext.predicates.put(LessThan.create(expr, Constant.create(min)), TruthValue.UNKNOWN);
+                predContext.predicates.put(LessThan.create(Constant.create(max), expr), TruthValue.UNKNOWN);
             }
 
             predicates.contexts.add(predContext);

@@ -3,6 +3,7 @@ package gov.nasa.jpf.abstraction.state;
 import java.util.HashMap;
 import java.util.Map;
 
+import gov.nasa.jpf.abstraction.common.BytecodeRange;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
@@ -47,6 +48,21 @@ public class PredicateValuationMap extends HashMap<Predicate, TruthValue> {
         return value;
     }
 
+    private TruthValue overwrite(Predicate o, Predicate n, TruthValue v) {
+        BytecodeRange scope = o.getScope();
+        BytecodeRange newScope = scope.merge(n.getScope());
+
+        o.setScope(newScope);
+
+        TruthValue ret = super.put(n, v);
+
+        if (scope.equals(newScope)) {
+            return ret;
+        } else {
+            return null; // There was no predicate with the same scope, so the previous valuation is 'null'
+        }
+    }
+
     private TruthValue putSymmetrical(Predicate predicate, TruthValue value) {
         Predicate canonical = getCanonicalPredicateForm(predicate);
         TruthValue canonicalValue = getCanonicalPredicateValue(predicate, value);
@@ -57,12 +73,22 @@ public class PredicateValuationMap extends HashMap<Predicate, TruthValue> {
 
             eSym.setScope(e.getScope());
 
-            if (super.containsKey(eSym)) {
-                return super.put(eSym, canonicalValue);
-            } else {
-                return super.put(e, canonicalValue);
+            for (Predicate p : keySet()) {
+                if (p.equals(eSym)) {
+                    return overwrite(p, eSym, canonicalValue);
+                } else if (p.equals(e)) {
+                    return overwrite(p, e, canonicalValue);
+                }
             }
+
+            return super.put(e, canonicalValue);
         } else {
+            for (Predicate p : keySet()) {
+                if (p.equals(canonical)) {
+                    return overwrite(p, canonical, canonicalValue);
+                }
+            }
+
             return super.put(canonical, canonicalValue);
         }
     }
