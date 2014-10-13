@@ -34,7 +34,6 @@ public class PredicateConsolePublisher extends ConsolePublisher {
     @Override
     protected void publishTrace() {
         Path path = reporter.getPath();
-        int i = 0;
 
         if (path.size() == 0) {
             return; // nothing to publish
@@ -51,9 +50,11 @@ public class PredicateConsolePublisher extends ConsolePublisher {
         ThreadInfo tiMain = path.get(0).getThreadInfo();
         MethodInfo miMain = tiMain.getEntryMethod();
 
-        for (Transition t : path) {
+        for (int i = 0; i < path.size(); ++i) {
+            Transition t = path.get(i);
+
             out.print("------------------------------------------------------ ");
-            out.println("transition #" + i++ + " thread: " + t.getThreadIndex());
+            out.println("transition #" + i + " thread: " + t.getThreadIndex());
 
             State state = null;
 
@@ -66,8 +67,6 @@ public class PredicateConsolePublisher extends ConsolePublisher {
                 out.println("");
             }
 
-            int pc = -1;
-
             if (showSteps) {
                 out.println("instructions:");
 
@@ -77,7 +76,6 @@ public class PredicateConsolePublisher extends ConsolePublisher {
 
                 for (Step s : t) {
                     Instruction insn = s.getInstruction();
-                    pc = s.getInstruction().getPosition();
 
                     // start printing code in the main method
                     if (insn.getMethodInfo() == miMain) skip = false;
@@ -129,7 +127,7 @@ public class PredicateConsolePublisher extends ConsolePublisher {
                         lastLine = line;
                     }
 
-                    if (showCode) {                        
+                    if (showCode) {
                         out.print("      ");
                         out.println(insn);
                     }
@@ -143,9 +141,20 @@ public class PredicateConsolePublisher extends ConsolePublisher {
             }
 
             if (state != null) {
-                out.println("predicates: ");
-                MethodFramePredicateValuation valuation = state.predicateValuationStacks.get(state.currentThread).top();
-                out.println("\t" + valuation.toString(pc).replaceAll("\n", "\n\t"));
+                Transition nextT = path.get(i + 1);
+
+                if (nextT != null) {
+                    Step nextS = nextT.getStep(0);
+
+                    if (nextS != null) {
+                        Instruction insn = nextS.getInstruction();
+
+                        MethodFramePredicateValuation valuation = state.predicateValuationStacks.get(state.currentThread).top();
+
+                        out.println("predicates: ");
+                        out.println("\t" + valuation.toString(insn.getPosition()).replaceAll("\n", "\n\t"));
+                    }
+                }
             }
 
             ++progressAlongTrace;
