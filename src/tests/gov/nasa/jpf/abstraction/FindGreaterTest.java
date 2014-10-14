@@ -37,7 +37,28 @@ public class FindGreaterTest extends BaseTest {
         }
 
         assert pos == data.length || data[pos] > 10;
+    }
 
+    @Test
+    public static void test3() {
+        int[] data = new int[5];
+
+        assert data.length > 0;
+
+        int pos = data.length;
+
+        for (int i = 0; i < data.length; ++i) {
+            assert i >= 0 && i < data.length;
+
+            if (data[i] > 10) {
+                pos = i;
+                break;
+            }
+
+            assert data[i] < 11;
+        }
+
+        assert pos == data.length || data[pos] > 10;
     }
 
     private static void loadRandomValues(int[] a) {
