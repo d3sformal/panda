@@ -152,7 +152,13 @@ path returns [DefaultAccessExpression val]
         $ctx.val = DefaultFresh.create();
     }
     | f=RETURN_TOKEN {
-        $ctx.val = DefaultReturnValue.create();
+        String r = $f.text.replaceAll("var_ssa_[0-9]+_frame_[0-9]+_", "");
+
+        if (r.equals("return")) {
+            $ctx.val = DefaultReturnValue.create();
+        } else {
+            $ctx.val = DefaultReturnValue.create(r, false); // TODO: encode isReference and reconstruct correct object
+        }
     }
     | f=ID_TOKEN {
         $ctx.val = DefaultRoot.create($f.text.replaceAll("var_ssa_[0-9]+_frame_[0-9]+_", ""));

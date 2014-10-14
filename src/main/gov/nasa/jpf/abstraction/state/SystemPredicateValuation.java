@@ -722,6 +722,12 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
                 // Reference arguments
                 for (AccessExpression path : temporaryPathsHolder) {
+                    if (path.getRoot().equals(returnValueSpecific)) {
+                        canBeAffected = true;
+
+                        break;
+                    }
+
                     for (int argIndex = 0, slotIndex = 0; argIndex < method.getNumberOfStackArguments() && !canBeAffected; ++argIndex) {
                         Expression expr = originalArguments[argIndex];
 
@@ -799,6 +805,11 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 temporaryPathsHolder.clear();
             }
 
+            // Use predicates over return to evaluate predicates over return_pcXYZ that are already present (interpolation, return from method in loop)
+            for (Predicate predicate : calleeReturns.keySet()) {
+                relevant.put(predicate, calleeReturns.get(predicate));
+            }
+
             // Use the relevant predicates to valuate predicates that need to be updated
             Map<Predicate, TruthValue> valuation = relevant.evaluatePredicates(after.getPC().getPosition(), toBeUpdated);
 
@@ -808,6 +819,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 callerScope.put(predicate, value);
             }
 
+            // Enforce predicates over return in case no such predicate exists (dynamic fwd abstraction computation)
             for (Predicate predicate : calleeReturns.keySet()) {
                 callerScope.put(predicate, calleeReturns.get(predicate));
             }

@@ -10,18 +10,49 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Tautology;
-import gov.nasa.jpf.abstraction.util.Pair;
 
 public class TraceFormula implements Iterable<Step> {
     public static final long serialVersionUID = 1L;
 
     private Stack<Step> steps = new Stack<Step>();
 
+    private class MethodCall {
+        int mCallInvoked;
+        int mCallStarted;
+
+        MethodCall(int mCallInvoked, int mCallStarted) {
+            this.mCallInvoked = mCallInvoked;
+            this.mCallStarted = mCallStarted;
+        }
+
+        MethodCall(MethodBoundaries mBoundaries) {
+            this(mBoundaries.mCallInvoked, mBoundaries.mCallStarted);
+        }
+    }
+
     // position of the call on current trace
-    private Stack<Integer> unmatchedCalls = new Stack<Integer>();
+    private Stack<MethodCall> unmatchedCalls = new Stack<MethodCall>();
+
+    private class MethodBoundaries {
+        int mCallInvoked;
+        int mCallStarted;
+        int mReturn;
+        int mReturned;
+
+        MethodBoundaries(int mCallInvoked, int mCallStarted, int mReturn, int mReturned) {
+            this.mCallInvoked = mCallInvoked;
+            this.mCallStarted = mCallStarted;
+            this.mReturn = mReturn;
+            this.mReturned = mReturned;
+        }
+
+        MethodBoundaries(MethodCall mCall, int mReturn, int mReturned) {
+            this(mCall.mCallInvoked, mCall.mCallStarted, mReturn, mReturned);
+        }
+    }
 
     // position of calls and returns of methods on current trace
-    private Stack<Pair<Integer, Integer>> methodBoundaries = new Stack<Pair<Integer, Integer>>();
+    private Stack<MethodBoundaries> methodBoundaries = new Stack<MethodBoundaries>();
 
     public Predicate toConjunction() {
         Predicate c = Tautology.create();
@@ -52,12 +83,12 @@ public class TraceFormula implements Iterable<Step> {
     private void pop() {
         steps.pop();
 
-        while (!methodBoundaries.isEmpty() && methodBoundaries.peek().getSecond() > size()) {
-            unmatchedCalls.push(methodBoundaries.peek().getFirst());
+        while (!methodBoundaries.isEmpty() && methodBoundaries.peek().mReturned > size()) {
+            unmatchedCalls.push(new MethodCall(methodBoundaries.peek()));
             methodBoundaries.pop();
         }
 
-        while (!unmatchedCalls.isEmpty() && unmatchedCalls.peek() > size()) {
+        while (!unmatchedCalls.isEmpty() && unmatchedCalls.peek().mCallStarted > size()) {
             unmatchedCalls.pop();
         }
     }
@@ -79,13 +110,21 @@ public class TraceFormula implements Iterable<Step> {
         return steps.iterator();
     }
 
-    public void markCall() {
-        unmatchedCalls.push(size());
+    public void markCallInvoked() {
+        unmatchedCalls.push(new MethodCall(size(), size()));
+    }
+
+    public void markCallStarted() {
+        unmatchedCalls.peek().mCallStarted = size();
     }
 
     public void markReturn() {
-        methodBoundaries.push(new Pair<Integer, Integer>(unmatchedCalls.peek(), size()));
+        methodBoundaries.push(new MethodBoundaries(unmatchedCalls.peek(), size(), size()));
         unmatchedCalls.pop();
+    }
+
+    public void markReturned() {
+        methodBoundaries.peek().mReturned = size();
     }
 
     /**
@@ -99,8 +138,8 @@ public class TraceFormula implements Iterable<Step> {
         }
 
         for (int i = methodBoundaries.size() - 1; i >= 0; --i) {
-            int c = methodBoundaries.get(i).getFirst(); // First step of the method
-            int r = methodBoundaries.get(i).getSecond(); // Last step of the method
+            int c = methodBoundaries.get(i).mCallStarted; // First step of the method
+            int r = methodBoundaries.get(i).mReturned; // Last step of the method
 
             int s = c; // Step index
 
@@ -111,8 +150,8 @@ public class TraceFormula implements Iterable<Step> {
                 boolean nested = false;
 
                 for (int j = i - 1; j >= 0; --j) {
-                    int nestedC = methodBoundaries.get(j).getFirst();
-                    int nestedR = methodBoundaries.get(j).getSecond();
+                    int nestedC = methodBoundaries.get(j).mCallStarted;
+                    int nestedR = methodBoundaries.get(j).mReturned;
 
                     nested = nested || (nestedC <= s && s < nestedR);
                 }

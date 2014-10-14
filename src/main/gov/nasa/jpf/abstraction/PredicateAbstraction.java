@@ -335,9 +335,11 @@ public class PredicateAbstraction extends Abstraction {
                 }
             }
 
+            traceFormula.markCallInvoked();
+
             extendTraceFormulaWith(assignment, method, 0);
 
-            traceFormula.markCall();
+            traceFormula.markCallStarted();
         }
     }
 
@@ -367,11 +369,14 @@ public class PredicateAbstraction extends Abstraction {
             }
 
             extendTraceFormulaWithAssignment(returnSymbolCallee, returnValue, callee, before.getPC().getPosition() + before.getPC().getLength(), 0);
+
+            traceFormula.markReturn();
+
             extendTraceFormulaWithAssignment(returnSymbolCaller, returnSymbolCallee, caller, after.getPC().getPosition(), -1);
 
             ssa.changeDepth(-1);
 
-            traceFormula.markReturn();
+            traceFormula.markReturned();
         }
 
         predicateValuation.processMethodReturn(threadInfo, before, after);
@@ -386,6 +391,7 @@ public class PredicateAbstraction extends Abstraction {
             ssa.changeDepth(-1);
 
             traceFormula.markReturn();
+            traceFormula.markReturned();
         }
     }
 
@@ -688,6 +694,7 @@ public class PredicateAbstraction extends Abstraction {
                     //throw new RuntimeException("Refinement backtracks too much and will end the search loop.");
                     return 1;
                 }
+
 
                 return backtrackLevel;
             }
