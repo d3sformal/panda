@@ -659,28 +659,34 @@ public class PredicateAbstraction extends Abstraction {
                     }
                 }
 
-                int backtrackLevel = trace.size();
+                int backtrackLevel;
 
-                for (int i = trace.size() - 1; i >= 0; --i) {
-                    for (MethodInfo visitedMethod : trace.get(i).visitedMethods) {
-                        for (MethodInfo refinedMethod : refinedMethods) {
-                            if (visitedMethod.getName().equals(refinedMethod.getName())) {
-                                backtrackLevel = i;
-                                break;
+                if (config.keepUnrefined()) {
+                    backtrackLevel = trace.size();
+
+                    for (int i = trace.size() - 1; i >= 0; --i) {
+                        for (MethodInfo visitedMethod : trace.get(i).visitedMethods) {
+                            for (MethodInfo refinedMethod : refinedMethods) {
+                                if (visitedMethod.getName().equals(refinedMethod.getName())) {
+                                    backtrackLevel = i;
+                                    break;
+                                }
                             }
                         }
                     }
+
+                    /**
+                     * At this point backtrackLevel points to the first refined level of the search
+                     *
+                     * We need to backtrack to the last not refined level, however
+                     */
+                    --backtrackLevel;
+                } else {
+                    backtrackLevel = 1;
                 }
 
                 // Extract prediction of choices from the recorded choice generator cache
                 // TODO (feed prediction into new CGs to pass them along the refined trace, but disregard them in completely new traces)
-
-                /**
-                 * At this point backtrackLevel points to the first refined level of the search
-                 *
-                 * We need to backtrack to the last not refined level, however
-                 */
-                --backtrackLevel;
 
                 notifyAboutRefinementBacktrackLevel(backtrackLevel);
 

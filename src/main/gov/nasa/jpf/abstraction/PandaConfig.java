@@ -26,6 +26,7 @@ public class PandaConfig {
     private Boolean branchReevaluatePredicates;
     private Boolean refinement;
     private Boolean refinementGlobal;
+    private Boolean refinementKeepUnrefined;
     private Boolean languageCheckMinimization;
 
     protected PandaConfig() {
@@ -169,5 +170,13 @@ public class PandaConfig {
         }
 
         return languageCheckMinimization;
+    }
+
+    public boolean keepUnrefined() {
+        if (refinementKeepUnrefined == null) {
+            refinementKeepUnrefined = getUnderlyingConfig().getBoolean("panda.refinement.keep_unrefined");
+        }
+
+        return refinementKeepUnrefined;
     }
 }
