@@ -139,7 +139,7 @@ public class TraceFormula implements Iterable<Step> {
 
         for (int i = methodBoundaries.size() - 1; i >= 0; --i) {
             int c = methodBoundaries.get(i).mCallStarted; // First step of the method
-            int r = methodBoundaries.get(i).mReturned; // Last step of the method
+            int r = methodBoundaries.get(i).mReturn; // Last step of the method
 
             int s = c; // Step index
 
@@ -150,7 +150,7 @@ public class TraceFormula implements Iterable<Step> {
                 boolean nested = false;
 
                 for (int j = i - 1; j >= 0; --j) {
-                    int nestedC = methodBoundaries.get(j).mCallStarted;
+                    int nestedC = methodBoundaries.get(j).mCallInvoked;
                     int nestedR = methodBoundaries.get(j).mReturned;
 
                     nested = nested || (nestedC <= s && s < nestedR);
