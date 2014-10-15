@@ -37,7 +37,9 @@ public class BytecodeIntervals extends BytecodeRange {
 
             i = (BytecodeInterval) i.merge(overlapping);
 
-            for (BytecodeInterval interval : intervals) {
+            overlapping = null;
+
+            for (BytecodeInterval interval : is) {
                 if (interval.overlaps(i)) {
                     overlapping = interval;
 
