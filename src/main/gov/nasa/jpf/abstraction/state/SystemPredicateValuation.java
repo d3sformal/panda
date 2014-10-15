@@ -513,7 +513,9 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
             Expression[] originalArguments = (Expression[]) before.getFrameAttr();
 
-            // Replace formal parameters with actual parameters
+            // Replace formal parameters present in the predicate with actual expressions
+            Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
+
             for (int argIndex = 0, slotIndex = 0; argIndex < method.getNumberOfStackArguments(); ++argIndex) {
                 // Actual symbolic parameter
                 LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
@@ -530,6 +532,8 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
                 Expression originalExpr = originalArguments[argIndex];
                 Expression actualExpr = ExpressionUtil.getExpression(before.getLocalAttr(slotIndex));
+
+                replacements.put(l, actualExpr);
 
                 boolean different = false;
 
@@ -578,8 +582,34 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 }
             }
 
+            for (AccessExpression arg1 : replacements.keySet()) {
+                Expression expr1 = replacements.get(arg1);
+
+                if (expr1 instanceof AccessExpression) {
+                    AccessExpression actual1 = (AccessExpression) expr1;
+
+                    for (AccessExpression arg2 : replacements.keySet()) {
+                        if (arg1 != arg2) { // It is enough to compare references (we are concerned about identity (the same sets of arguments + there are no two arguments with the same name)
+                            Expression expr2 = replacements.get(arg2);
+
+                            if (expr2 instanceof AccessExpression) {
+                                AccessExpression actual2 = (AccessExpression) expr2;
+
+                                if (actual1.isPrefixOf(actual2)) {
+                                    notWantedLocalVariables.add((Root) arg2); // Argument may not be aliased with the original expression anymore, because the expression might change
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Arguments that are of a reference type are not bound to the callee scope and may be used to determine truth value of a predicate refering to it
             notWantedLocalVariables.removeAll(referenceArgs);
+
+            for (Root l : notWantedLocalVariables) {
+                replacements.remove(l);
+            }
 
             // Collection of predicates in callee and caller that have additional value for update of the caller
             MethodFramePredicateValuation relevant = createDefaultScope(null, null);
@@ -590,32 +620,6 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             ReturnValue returnValueSpecific = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
 
             Map<Predicate, TruthValue> calleeReturns = new HashMap<Predicate, TruthValue>();
-
-            // Replace formal parameters present in the predicate with actual expressions
-            Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
-
-            for (int argIndex = 0, slotIndex = 0; argIndex < method.getNumberOfStackArguments(); ++argIndex) {
-                if (argTypes[argIndex] == Types.T_REFERENCE || argTypes[argIndex] == Types.T_ARRAY) {
-                    LocalVarInfo arg = method.getLocalVar(slotIndex, 0);
-                    String name = arg == null ? null : arg.getName();
-
-                    Expression actualExpr = ExpressionUtil.getExpression(before.getLocalAttr(slotIndex));
-                    AccessExpression formalArgument = DefaultRoot.create(name, slotIndex);
-
-                    replacements.put(formalArgument, actualExpr);
-                }
-
-                switch (argTypes[argIndex]) {
-                    case Types.T_LONG:
-                    case Types.T_DOUBLE:
-                        slotIndex += 2;
-                        break;
-
-                    default:
-                        slotIndex += 1;
-                        break;
-                }
-            }
 
             // Filter out predicates from the callee that cannot be used for propagation to the caller
             for (Predicate predicate : getPredicates()) {

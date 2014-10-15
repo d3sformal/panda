@@ -100,6 +100,9 @@ predicate returns [Predicate val] locals [static Map<String, Object> let = new H
     | '(>=' a=expression b=expression ')' {
         $ctx.val = Negation.create(LessThan.create($a.val, $b.val));
     }
+    | '(=' ARRLEN_TOKEN ARRLEN_TOKEN ')' {
+        $ctx.val = Tautology.create();
+    }
     ;
 
 expression returns [Expression val] locals [Expression acc]
