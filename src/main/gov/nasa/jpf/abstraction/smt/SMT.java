@@ -559,10 +559,26 @@ public class SMT {
                     if (!satisfiable) {
                         Predicate[] methodInterpolants = PredicatesFactory.createInterpolantsFromString(output);
 
+                        if (config.enabledVerbose()) {
+                            System.out.println("Inserting interpolant `" + methodInterpolants[methodInterpolants.length - 1] + "` globally to the whole method " + m);
+                        }
+
                         for (int i = 0; i < m.size(); ++i) {
                             if (m.get(i) < interpolants.length) {
+                                if (config.enabledVerbose()) {
+                                    System.out.println("Inserting interpolant `" + methodInterpolants[i] + "` to " + m.get(i));
+                                }
+
                                 Predicate p = interpolants[m.get(i)];
+
                                 p = Conjunction.create(p, methodInterpolants[i]);
+
+                                if (config.enabledMethodGlobalRefinement()) {
+                                    if (!(methodInterpolants[methodInterpolants.length - 1] instanceof Contradiction)) {
+                                        p = Conjunction.create(p, methodInterpolants[methodInterpolants.length - 1]); // The last interpolant overapproximates the whole method and may be necessary (not globally but what can you do :))
+                                    }
+                                }
+
                                 interpolants[m.get(i)] = p;
                             }
                         }

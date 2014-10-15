@@ -26,6 +26,7 @@ public class PandaConfig {
     private Boolean branchReevaluatePredicates;
     private Boolean refinement;
     private Boolean refinementGlobal;
+    private Boolean refinementMethodGlobal;
     private Boolean refinementKeepUnrefined;
     private Boolean languageCheckMinimization;
 
@@ -158,6 +159,14 @@ public class PandaConfig {
         }
 
         return refinementGlobal;
+    }
+
+    public boolean enabledMethodGlobalRefinement() {
+        if (refinementMethodGlobal == null) {
+            refinementMethodGlobal = getUnderlyingConfig().getBoolean("panda.refinement.method_global");
+        }
+
+        return refinementMethodGlobal;
     }
 
     public JenkinsStateSet getStorageInstance() {
