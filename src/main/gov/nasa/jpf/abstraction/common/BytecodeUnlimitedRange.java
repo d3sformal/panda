@@ -45,4 +45,9 @@ public class BytecodeUnlimitedRange extends BytecodeRange {
             }
         };
     }
+
+    @Override
+    public String toString() {
+        return "*";
+    }
 }
