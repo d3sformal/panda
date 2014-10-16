@@ -647,8 +647,6 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                         predicate = predicate.replace(replacements).clone();
                         predicate.setScope(BytecodeUnlimitedRange.getInstance()); // <-- This is done to allow use of the predicate outside its original scope.
 
-                        relevant.put(predicate, value);
-
                         // Handling mainly constructor (object still anonymous)
                         if (isAnonymous) {
                             callerScope.put(predicate, value);
@@ -657,6 +655,8 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                         // Write predicates over return through (this is useful when called from processMethodReturn)
                         if (PredicateUtil.isPredicateOverReturn(predicate)) {
                             calleeReturns.put(predicate.replace(returnValue, returnValueSpecific), value);
+                        } else {
+                            relevant.put(predicate, value);
                         }
                     } catch (PredicateNotCloneableException e) {
                         // Silently ignore predicates that should never be cloned (those have either no meaning here: Assign, or little value: Tautology)
@@ -730,6 +730,17 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
             // Use the relevant predicates to valuate predicates that need to be updated
             Map<Predicate, TruthValue> valuation = relevant.evaluatePredicates(after.getPC().getPosition(), toBeUpdated);
+
+            if (PandaConfig.getInstance().enabledVerbose()) {
+                System.out.println("Evaluating:");
+                for (Predicate p : toBeUpdated) {
+                    System.out.println("\t" + p);
+                }
+                System.out.println("Using:");
+                for (Predicate p : relevant.getPredicates()) {
+                    System.out.println("\t" + p + " : " + relevant.get(p));
+                }
+            }
 
             for (Predicate predicate : valuation.keySet()) {
                 TruthValue value = valuation.get(predicate);

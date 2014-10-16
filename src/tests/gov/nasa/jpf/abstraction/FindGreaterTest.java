@@ -5,8 +5,6 @@ public class FindGreaterTest extends BaseTest {
         config.add("+panda.refinement=true");
         config.add("+panda.abstract_domain=PREDICATES");
         config.add("+panda.log_smt=true");
-        config.add("+panda.branch.adjust_concrete_values=false");
-        config.add("+panda.branch.prune_infeasible=true");
         config.add("+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener");
         config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
         config.add("+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor");

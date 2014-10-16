@@ -196,12 +196,26 @@ public class BranchingStateAdjustHelper {
                 int[] valueArray = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getConcreteState(exprArray, br.getSelf().getPosition());
 
                 if (valueArray == null) {
-                    throw new RuntimeException("Cannot compute the corresponding concrete state.");
-                }
+                    if (config.enabledVerbose()) {
+                        System.out.println("[WARNING] Cannot compute the corresponding concrete state.");
+                    }
 
-                // Inject the newly computed values into the concrete state
-                for (int j = 0; j < exprArray.length; ++j) {
-                    adjustValueInConcreteState(exprArray[j], valueArray[j], targetArray[j], sf, ti);
+                    // It is possible to reach an inconsistent state
+                    //
+                    // Be in method m1 with some fact1
+                    // Enter method m2 (without carrying fact1 over) and assume fact2 at some non-deterministic branching during its execution
+                    // Return back to m1, use knowledge of fact1 (caller), fact2 (callee) to derive inconsistency and pollute the abstract state with it
+                    // Arrive at another non-det branching where now both branches are equally possible (inconsistent state enables anything)
+                    // Attempt to derive model for an inconsistent state (done by the concrete-value-adjusting procedure)
+                    // Fail (No model for an UNSAT formula)
+                    //
+                    // That is why we abandon the trace
+                    ss.setIgnored(true);
+                } else {
+                    // Inject the newly computed values into the concrete state
+                    for (int j = 0; j < exprArray.length; ++j) {
+                        adjustValueInConcreteState(exprArray[j], valueArray[j], targetArray[j], sf, ti);
+                    }
                 }
             }
         }
