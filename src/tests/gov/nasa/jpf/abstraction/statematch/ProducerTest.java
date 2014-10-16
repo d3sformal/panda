@@ -7,11 +7,6 @@ import static gov.nasa.jpf.abstraction.BaseTest.*;
 import static gov.nasa.jpf.abstraction.statematch.StateMatchingTest.*;
 
 public class ProducerTest extends StateMatchingTest {
-    public ProducerTest() {
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
-        //config.add("+listener+=,gov.nasa.jpf.abstraction.util.SMTMonitor");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor");
-    }
     public static void main(String[] args) {
         Producer p = new Producer();
 

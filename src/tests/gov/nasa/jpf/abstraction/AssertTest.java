@@ -9,10 +9,6 @@ class AssertTestDriver {
 }
 
 public class AssertTest extends BaseTest {
-    public AssertTest() {
-        //config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
-    }
-
     @Test
     public static void test1() {
         int x = 3;

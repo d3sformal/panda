@@ -4,12 +4,6 @@ public class FindGreaterTest extends BaseTest {
     public FindGreaterTest() {
         config.add("+panda.refinement=true");
         config.add("+panda.abstract_domain=PREDICATES");
-        config.add("+panda.log_smt=true");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor");
-        config.add("+report.console.property_violation=error,trace,snapshot");
-        config.add("+report.console.show_code=true");
     }
 
     @Test
