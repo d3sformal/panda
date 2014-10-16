@@ -3,7 +3,7 @@ package gov.nasa.jpf.abstraction;
 public class FindGreaterTest extends BaseTest {
     public FindGreaterTest() {
         config.add("+panda.refinement=true");
-        config.add("+panda.abstract_domain=PREDICATES");
+        config.add("+panda.abstract_domain=PREDICATES"); // Disable loading of predicate file
     }
 
     @Test
