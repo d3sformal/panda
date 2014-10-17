@@ -195,4 +195,26 @@ public class TraceFormula implements Iterable<Step> {
 
         return c;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof TraceFormula) {
+            TraceFormula tf = (TraceFormula) o;
+
+            if (size() == tf.size()) {
+                for (int i = 0; i < size(); ++i) {
+                    Step s1 = get(i);
+                    Step s2 = tf.get(i);
+
+                    if (!s1.equals(s2)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

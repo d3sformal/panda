@@ -3,6 +3,7 @@ package gov.nasa.jpf.abstraction.bytecode;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ import gov.nasa.jpf.abstraction.DynamicIntChoiceGenerator;
 import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.ResetableStateSet;
+import gov.nasa.jpf.abstraction.TraceFormula;
 import gov.nasa.jpf.abstraction.Step;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -119,9 +121,18 @@ public class BranchingStateAdjustHelper {
 
                     for (int j = 0; j < exprArray.length; ++j) {
                         Predicate blocking = Tautology.create();
+                        DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
+                        Integer[] choices = cg.getChoices();
+                        List<TraceFormula> traces = cg.getTraces();
 
-                        for (int model : unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator().getChoices()) {
-                            blocking = Conjunction.create(blocking, Negation.create(Equals.create(exprArray[j], Constant.create(model))));
+                        for (int k = 0; k < choices.length; ++k) {
+                            int model = choices[k];
+
+                            // Block only those models that were created for the same trace (other choices applied in other branches of the state space may easily be reused here)
+                            // Actually it would be wrong to omit models that might easily enable this branch but happen to be used elsewhere first (That would destroy soundness)
+                            if (k == 0 || traces.get(k - 1).equals(PredicateAbstraction.getInstance().getTraceFormula())) {
+                                blocking = Conjunction.create(blocking, Negation.create(Equals.create(exprArray[j], Constant.create(model))));
+                            }
                         }
 
                         blockings = Disjunction.create(blockings, blocking);

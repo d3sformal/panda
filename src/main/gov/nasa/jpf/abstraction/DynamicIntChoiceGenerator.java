@@ -64,4 +64,8 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
     public Integer[] getChoices() {
         return values;
     }
+
+    public List<TraceFormula> getTraces() {
+        return targetBranchings;
+    }
 }
