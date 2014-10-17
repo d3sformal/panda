@@ -18,6 +18,7 @@ import gov.nasa.jpf.abstraction.DynamicIntChoiceGenerator;
 import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.ResetableStateSet;
+import gov.nasa.jpf.abstraction.Step;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Contradiction;
@@ -76,6 +77,11 @@ public class BranchingStateAdjustHelper {
                 if (forceFeasible) {
                     if (config.enabledVerbose()) {
                         System.out.println("[WARNING] Finding feasible trace with matching prefix and " + branchCondition);
+                        System.out.println("\ti.e.:");
+
+                        for (Step s : PredicateAbstraction.getInstance().getTraceFormula()) {
+                            System.out.println("\t\t" + s.getPredicate());
+                        }
                     }
 
                     Predicate traceFormula = PredicateAbstraction.getInstance().getTraceFormula().toConjunction();
