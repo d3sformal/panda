@@ -160,7 +160,7 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     private void extendTraceFormulaWithAssignment(AccessExpression to, Expression from, MethodInfo m, int nextPC, int depthDelta) {
-        extendTraceFormulaWith(getTraceFormulaAssignmentConjunct(to, from, depthDelta), m, nextPC);
+        extendTraceFormulaWith(getTraceFormulaAssignmentConjunct(to, from, depthDelta), m, nextPC, false);
     }
 
     private Predicate getTraceFormulaAssignmentConjunct(AccessExpression to, Expression from, int depthDelta) {
@@ -243,6 +243,10 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     public void extendTraceFormulaWithConstraint(Predicate p, MethodInfo m, int nextPC) {
+        extendTraceFormulaWithConstraint(p, m, nextPC, false);
+    }
+
+    public void extendTraceFormulaWithConstraint(Predicate p, MethodInfo m, int nextPC, boolean forceConstraint) {
         if (RunDetector.isRunning()) {
             Set<AccessExpression> exprs = new HashSet<AccessExpression>();
             Map<AccessExpression, Expression> replacements = new HashMap<AccessExpression, Expression>();
@@ -253,12 +257,12 @@ public class PredicateAbstraction extends Abstraction {
                 replacements.put(expr, ssa.getSymbolIncarnation(expr, 0));
             }
 
-            extendTraceFormulaWith(p.replace(replacements), m, nextPC);
+            extendTraceFormulaWith(p.replace(replacements), m, nextPC, forceConstraint);
         }
     }
 
-    private void extendTraceFormulaWith(Predicate p, MethodInfo m, int nextPC) {
-        if (!(p instanceof Tautology)) {
+    private void extendTraceFormulaWith(Predicate p, MethodInfo m, int nextPC, boolean forceConstraint) {
+        if (forceConstraint || !(p instanceof Tautology)) {
             traceFormula.append(p, m, nextPC);
         }
     }
@@ -337,7 +341,7 @@ public class PredicateAbstraction extends Abstraction {
 
             traceFormula.markCallInvoked();
 
-            extendTraceFormulaWith(assignment, method, 0);
+            extendTraceFormulaWith(assignment, method, 0, false);
 
             traceFormula.markCallStarted();
         }
@@ -439,7 +443,7 @@ public class PredicateAbstraction extends Abstraction {
             }
         }
 
-        extendTraceFormulaWith(fresh, m, pc);
+        extendTraceFormulaWith(fresh, m, pc, false);
 
         processObject(object, m, pc);
     }
@@ -635,6 +639,10 @@ public class PredicateAbstraction extends Abstraction {
 
                     if (config.enabledVerbose()) {
                         System.out.println("Adding predicate `" + interpolant + "` to [" + pcStart + ", " + pcEnd + "]");
+
+                        if (interpolant instanceof Tautology || interpolant instanceof Contradiction) {
+                            System.out.println();
+                        }
                     }
 
                     boolean refinedOnce = predicateValuation.refine(interpolant, mStart, pcStart, pcEnd);

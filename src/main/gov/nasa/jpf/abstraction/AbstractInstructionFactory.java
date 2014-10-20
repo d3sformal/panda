@@ -317,6 +317,16 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
     }
 
     @Override
+    public Instruction goto_(int targetPC) {
+        return (filter.isPassing(ci) ? new GOTO(targetPC) : super.goto_(targetPC));
+    }
+
+    @Override
+    public Instruction goto_w(int targetPC) {
+        return (filter.isPassing(ci) ? new GOTO_W(targetPC) : super.goto_w(targetPC));
+    }
+
+    @Override
     public Instruction i2d() {
         return (filter.isPassing(ci) ? new I2D() : super.i2d());
     }
