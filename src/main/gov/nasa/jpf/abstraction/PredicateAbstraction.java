@@ -669,7 +669,7 @@ public class PredicateAbstraction extends Abstraction {
 
                 int backtrackLevel;
 
-                if (config.keepUnrefined()) {
+                if (config.keepUnrefinedPrefix()) {
                     backtrackLevel = trace.size();
 
                     for (int i = trace.size() - 1; i >= 0; --i) {

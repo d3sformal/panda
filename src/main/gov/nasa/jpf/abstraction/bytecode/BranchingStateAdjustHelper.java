@@ -58,15 +58,14 @@ public class BranchingStateAdjustHelper {
         boolean forceFeasibleOnce = config.forceFeasibleBranchesOnce();
         boolean forceFeasible = forceFeasibleOnce || config.forceFeasibleBranches();
 
-        // In case the concrete execution does not allow the same branch to be taken
-        if (br.getConcreteBranchValue(v1, v2) == TruthValue.create(abstractJump)) {
+        if (br.getConcreteBranchValue(v1, v2) == TruthValue.create(abstractJump)) { // In case concrete and abstract executions agree
             if (forceFeasibleOnce) {
                 // Add state to allow forward state matching (look if we should generate more choices to get into the branch (it might have been explored before - actually it is explored when this branch is hit))
                 ti.breakTransition("Creating state after taking an enabled branch: " + branchCondition);
 
                 PredicateAbstraction.getInstance().dropForceStatesAlongTrace();
             }
-        } else {
+        } else { // In case the concrete execution does not allow the same branch to be taken
             if (config.enabledVerbose()) {
                 System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + branchCondition);
             }

@@ -27,7 +27,7 @@ public class PandaConfig {
     private Boolean refinement;
     private Boolean refinementGlobal;
     private Boolean refinementMethodGlobal;
-    private Boolean refinementKeepUnrefined;
+    private Boolean refinementKeepUnrefinedPrefix;
     private Boolean languageCheckMinimization;
 
     protected PandaConfig() {
@@ -115,7 +115,7 @@ public class PandaConfig {
 
     public boolean forceFeasibleBranches() {
         if (branchForceFeasible == null) {
-            branchForceFeasible = getUnderlyingConfig().getBoolean("panda.branch.force_feasible");
+            branchForceFeasible = getUnderlyingConfig().getBoolean("panda.branch.nondet_force_feasible");
         }
 
         return branchForceFeasible;
@@ -123,7 +123,7 @@ public class PandaConfig {
 
     public boolean forceFeasibleBranchesOnce() {
         if (branchForceFeasibleOnce == null) {
-            branchForceFeasibleOnce = getUnderlyingConfig().getBoolean("panda.branch.force_feasible_once");
+            branchForceFeasibleOnce = getUnderlyingConfig().getBoolean("panda.branch.nondet_force_feasible_once");
         }
 
         return branchForceFeasibleOnce;
@@ -181,11 +181,11 @@ public class PandaConfig {
         return languageCheckMinimization;
     }
 
-    public boolean keepUnrefined() {
-        if (refinementKeepUnrefined == null) {
-            refinementKeepUnrefined = getUnderlyingConfig().getBoolean("panda.refinement.keep_unrefined");
+    public boolean keepUnrefinedPrefix() {
+        if (refinementKeepUnrefinedPrefix == null) {
+            refinementKeepUnrefinedPrefix = getUnderlyingConfig().getBoolean("panda.refinement.keep_unrefined_prefix");
         }
 
-        return refinementKeepUnrefined;
+        return refinementKeepUnrefinedPrefix;
     }
 }

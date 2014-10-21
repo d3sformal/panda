@@ -35,7 +35,7 @@ public class RefinementTest extends BaseTest {
     }
 
     // Interpolants over anonymous objects (this = fresh) not yet supported
-    //@Test
+    @Test
     public static void test4() {
         D degrees = new D();
 
