@@ -9,10 +9,16 @@ grammar Interpolants;
     import java.util.SortedSet;
     import java.util.TreeSet;
 
+    import gov.nasa.jpf.vm.ElementInfo;
+    import gov.nasa.jpf.vm.ThreadInfo;
+
+    import gov.nasa.jpf.abstraction.PredicateAbstraction;
     import gov.nasa.jpf.abstraction.common.*;
     import gov.nasa.jpf.abstraction.common.impl.*;
     import gov.nasa.jpf.abstraction.common.access.*;
     import gov.nasa.jpf.abstraction.common.access.impl.*;
+    import gov.nasa.jpf.abstraction.concrete.*;
+    import gov.nasa.jpf.abstraction.state.universe.*;
 }
 
 predicates returns [Predicate[] val]
@@ -151,8 +157,22 @@ factor returns [Expression val]
     ;
 
 path returns [DefaultAccessExpression val]
-    : FRESH_TOKEN {
-        $ctx.val = DefaultFresh.create();
+    : f=FRESH_TOKEN {
+        int refId = Integer.parseInt($f.text.replaceAll("^fresh_", ""));
+
+        ElementInfo ei = ThreadInfo.getCurrentThread().getElementInfo(refId);
+        Reference ref = new Reference(ei);
+
+        Universe u = PredicateAbstraction.getInstance().getSymbolTable().getUniverse();
+        StructuredValue v = u.get(ref);
+
+        if (v instanceof UniverseArray) {
+            UniverseArray a = (UniverseArray) v;
+
+            $ctx.val = AnonymousArray.create(ref, Constant.create(a.getLength()));
+        } else {
+            $ctx.val = AnonymousObject.create(new Reference(ei));
+        }
     }
     | f=RETURN_TOKEN {
         String r = $f.text.replaceAll("var_ssa_[0-9]+_frame_[0-9]+_", "");

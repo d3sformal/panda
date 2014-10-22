@@ -5,6 +5,7 @@ import static gov.nasa.jpf.abstraction.statematch.StateMatchingTest.*;
 public class RefinementTest extends BaseTest {
     public RefinementTest() {
         config.add("+panda.refinement=true");
+        config.add("+panda.refinement.global=true");
     }
 
     @Test
@@ -34,9 +35,17 @@ public class RefinementTest extends BaseTest {
         assert -273 == degrees.celsius;
     }
 
-    // Interpolants over anonymous objects (this = fresh) not yet supported
+    // Interpolants over anonymous objects (this = fresh) not yet supported properly
     @Test
     public static void test4() {
+        // new
+        // invoke <init>
+        //   - this is another method
+        //   - a parameter binding clauses is added to the trace (this = fresh_xyz)
+        //
+        // when interpolating after astore the method test4 the symbol fresh_xyz is live (because it appears in the previous steps and in <init> param-binging which is added to the end of the interpolation query)
+        // therefore it is possible that the interpolant will look like fresh_xyz.celsius = -273 instead of degrees.celsius = -273
+        // but if we also use `panda.refinement.global` then this does not happen
         D degrees = new D();
 
         assert -273 == degrees.celsius;
