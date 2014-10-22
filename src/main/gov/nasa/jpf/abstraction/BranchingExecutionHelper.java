@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction.bytecode;
+package gov.nasa.jpf.abstraction;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,12 +15,7 @@ import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
-import gov.nasa.jpf.abstraction.DynamicIntChoiceGenerator;
-import gov.nasa.jpf.abstraction.PandaConfig;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
-import gov.nasa.jpf.abstraction.ResetableStateSet;
-import gov.nasa.jpf.abstraction.TraceFormula;
-import gov.nasa.jpf.abstraction.Step;
+import gov.nasa.jpf.abstraction.bytecode.AbstractBranching;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Contradiction;
@@ -41,7 +36,7 @@ import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 
-public class BranchingStateAdjustHelper {
+public class BranchingExecutionHelper {
     public static void synchronizeConcreteAndAbstractExecutions(AbstractBranching br, ThreadInfo ti, int v1, int v2, Expression expr1, Expression expr2, boolean abstractJump) {
         StackFrame sf = ti.getModifiableTopFrame();
         SystemState ss = ti.getVM().getSystemState();

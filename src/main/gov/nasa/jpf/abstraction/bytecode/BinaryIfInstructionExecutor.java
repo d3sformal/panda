@@ -14,6 +14,7 @@ import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -113,7 +114,7 @@ public class BinaryIfInstructionExecutor {
         sf.pop();
         sf.pop();
 
-        BranchingStateAdjustHelper.synchronizeConcreteAndAbstractExecutions(br, ti, v1, v2, expr1, expr2, conditionValue);
+        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(br, ti, v1, v2, expr1, expr2, conditionValue);
 
         return (conditionValue ? br.getTarget() : br.getNext(ti));
     }

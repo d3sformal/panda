@@ -8,6 +8,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -121,7 +122,7 @@ public class UnaryIfInstructionExecutor {
 
         sf.pop();
 
-        BranchingStateAdjustHelper.synchronizeConcreteAndAbstractExecutions(br, ti, v1, constant.value.intValue(), expr, constant, conditionValue);
+        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(br, ti, v1, constant.value.intValue(), expr, constant, conditionValue);
 
         return (conditionValue ? br.getTarget() : br.getNext(ti));
     }
