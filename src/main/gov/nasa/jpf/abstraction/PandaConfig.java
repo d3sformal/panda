@@ -29,6 +29,9 @@ public class PandaConfig {
     private Boolean refinementMethodGlobal;
     private Boolean refinementKeepUnrefinedPrefix;
     private Boolean languageCheckMinimization;
+    private Boolean initializeStaticFields;
+    private Boolean initializeObjectFields;
+    private Boolean initializeArrayElements;
 
     protected PandaConfig() {
     }
@@ -187,5 +190,29 @@ public class PandaConfig {
         }
 
         return refinementKeepUnrefinedPrefix;
+    }
+
+    public boolean initializeStaticFields() {
+        if (initializeStaticFields == null) {
+            initializeStaticFields = getUnderlyingConfig().getBoolean("panda.refinement.initialize_static_fields");
+        }
+
+        return initializeStaticFields;
+    }
+
+    public boolean initializeObjectFields() {
+        if (initializeObjectFields == null) {
+            initializeObjectFields = getUnderlyingConfig().getBoolean("panda.refinement.initialize_object_fields");
+        }
+
+        return initializeObjectFields;
+    }
+
+    public boolean initializeArrayElements() {
+        if (initializeArrayElements == null) {
+            initializeArrayElements = getUnderlyingConfig().getBoolean("panda.refinement.initialize_array_elements");
+        }
+
+        return initializeArrayElements;
     }
 }

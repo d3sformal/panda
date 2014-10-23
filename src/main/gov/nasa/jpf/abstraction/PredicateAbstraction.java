@@ -28,6 +28,7 @@ import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.BranchingDecision;
 import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -43,6 +44,7 @@ import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthWrite;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.Unknown;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
@@ -50,6 +52,7 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
@@ -58,6 +61,7 @@ import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.common.impl.ArraysAssign;
 import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.common.impl.ObjectExpressionDecorator;
 import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionDecorator;
 import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
@@ -73,8 +77,14 @@ import gov.nasa.jpf.abstraction.state.SystemSymbolTable;
 import gov.nasa.jpf.abstraction.state.Trace;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.state.universe.ClassName;
+import gov.nasa.jpf.abstraction.state.universe.FieldName;
 import gov.nasa.jpf.abstraction.state.universe.Reference;
+import gov.nasa.jpf.abstraction.state.universe.StructuredValue;
 import gov.nasa.jpf.abstraction.state.universe.StructuredValueIdentifier;
+import gov.nasa.jpf.abstraction.state.universe.StructuredValueSlot;
+import gov.nasa.jpf.abstraction.state.universe.UniverseArray;
+import gov.nasa.jpf.abstraction.state.universe.UniverseObject;
+import gov.nasa.jpf.abstraction.state.universe.UniverseSlotKey;
 import gov.nasa.jpf.abstraction.util.CounterexampleListener;
 import gov.nasa.jpf.abstraction.util.Pair;
 import gov.nasa.jpf.abstraction.util.RunDetector;
@@ -410,6 +420,28 @@ public class PredicateAbstraction extends Abstraction {
     public void processNewClass(ThreadInfo thread, ClassInfo classInfo) {
         if (isInitialized) {
             symbolTable.get(0).addClass(classInfo.getStaticElementInfo(), thread);
+
+            if (RunDetector.isRunning() && PandaConfig.getInstance().initializeStaticFields()) {
+                ClassName cn = new ClassName(classInfo.getStaticElementInfo());
+                PackageAndClass pkgcn = DefaultPackageAndClass.create(cn.getClassName());
+
+                StructuredValue v = symbolTable.get(0).getUniverse().get(cn);
+                Predicate constraint = Tautology.create();
+
+                for (UniverseSlotKey k : v.getSlots().keySet()) {
+                    FieldName fn = (FieldName) k;
+
+                    ObjectFieldRead fr = DefaultObjectFieldRead.create(pkgcn, fn.getName());
+
+                    if (v.getSlot(k) instanceof StructuredValueSlot) {
+                        constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, NullExpression.create(), 0));
+                    } else {
+                        constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, Constant.create(0), 0));
+                    }
+                }
+
+                extendTraceFormulaWith(constraint, thread.getTopFrameMethodInfo(), thread.getPC().getPosition(), false);
+            }
         } else {
             startupClasses.add(classInfo);
         }
@@ -435,6 +467,8 @@ public class PredicateAbstraction extends Abstraction {
             s.getPredicate().addAccessExpressionsToSet(exprs);
         }
 
+        processObject(object, m, pc);
+
         Predicate fresh = Tautology.create();
 
         for (AccessExpression ae : exprs) {
@@ -443,9 +477,47 @@ public class PredicateAbstraction extends Abstraction {
             }
         }
 
-        extendTraceFormulaWith(fresh, m, pc, false);
+        Predicate constraint = Tautology.create();
 
-        processObject(object, m, pc);
+        boolean initO = PandaConfig.getInstance().initializeObjectFields();
+        boolean initA = PandaConfig.getInstance().initializeArrayElements();
+
+        if (initO || initA) {
+            StructuredValue v = symbolTable.get(0).getUniverse().get(object.getReference());
+
+            initO &= v instanceof UniverseObject;
+            initA &= v instanceof UniverseArray;
+
+            if (initO || initA) {
+                for (UniverseSlotKey k : v.getSlots().keySet()) {
+                    if (object instanceof AnonymousArray) {
+                        UniverseArray a = (UniverseArray) v;
+
+                        for (int i = 0; i < a.getLength(); ++i) {
+                            ArrayElementRead ar = DefaultArrayElementRead.create(object, Constant.create(i));
+
+                            if (v.getSlot(k) instanceof StructuredValueSlot) {
+                                constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(ar, NullExpression.create(), 0));
+                            } else {
+                                constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(ar, Constant.create(0), 0));
+                            }
+                        }
+                    } else {
+                        FieldName fn = (FieldName) k;
+
+                        ObjectFieldRead fr = DefaultObjectFieldRead.create(object, fn.getName());
+
+                        if (v.getSlot(k) instanceof StructuredValueSlot) {
+                            constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, NullExpression.create(), 0));
+                        } else {
+                            constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, Constant.create(0), 0));
+                        }
+                    }
+                }
+            }
+        }
+
+        extendTraceFormulaWith(Conjunction.create(fresh, constraint), m, pc, false);
     }
 
     @Override
