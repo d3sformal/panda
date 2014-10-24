@@ -37,7 +37,7 @@ import gov.nasa.jpf.abstraction.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 
 public class BranchingExecutionHelper {
-    public static void synchronizeConcreteAndAbstractExecutions(AbstractBranching br, ThreadInfo ti, int v1, int v2, Expression expr1, Expression expr2, boolean abstractJump) {
+    public static void synchronizeConcreteAndAbstractExecutions(AbstractBranching br, ThreadInfo ti, int v1, int v2, Expression expr1, Expression expr2, boolean abstractJump, int targetNum) {
         StackFrame sf = ti.getModifiableTopFrame();
         SystemState ss = ti.getVM().getSystemState();
 
@@ -165,7 +165,7 @@ public class BranchingExecutionHelper {
                         // Here we have not yet advanced PC
                         // Whereas in the enabled branch the state is made after advancing the PC
                         // We need to advance the PC to get the correct state
-                        ti.setPC(abstractJump ? br.getTarget() : br.getNext(ti));
+                        ti.setPC(br.getTarget(ti, targetNum));
 
                         if (rStateSet == null || rStateSet.isCurrentUnique() || !forceFeasibleOnce) {
                             if (config.enabledVerbose()) {

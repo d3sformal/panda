@@ -91,7 +91,7 @@ public class UnaryIfInstructionExecutor {
                     ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
                     conditionValue = true;
 
-                    PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(predicate, br.getSelf().getMethodInfo(), br.getTarget().getPosition());
+                    PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(predicate, br.getSelf().getMethodInfo(), br.getDefaultTarget().getPosition());
 
                     break;
                 case FALSE:
@@ -116,14 +116,14 @@ public class UnaryIfInstructionExecutor {
 
             if (expr != null) {
                 predicate = br.createPredicate(expr, constant);
-                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)), br.getSelf().getMethodInfo(), (conditionValue ? br.getTarget() : br.getNext(ti)).getPosition());
+                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)), br.getSelf().getMethodInfo(), br.getTarget(ti, conditionValue ? 1 : 0).getPosition());
             }
         }
 
         sf.pop();
 
-        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(br, ti, v1, constant.value.intValue(), expr, constant, conditionValue);
+        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(br, ti, v1, constant.value.intValue(), expr, constant, conditionValue, conditionValue ? 1 : 0);
 
-        return (conditionValue ? br.getTarget() : br.getNext(ti));
+        return br.getTarget(ti, conditionValue ? 1 : 0);
     }
 }

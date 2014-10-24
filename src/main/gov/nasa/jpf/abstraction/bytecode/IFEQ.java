@@ -47,4 +47,18 @@ public class IFEQ extends gov.nasa.jpf.jvm.bytecode.IFEQ implements AbstractBran
         return Equals.create(expr1, expr2);
     }
 
+    @Override
+    public Instruction getDefaultTarget() {
+        return getTarget();
+    }
+
+    @Override
+    public Instruction getTarget(ThreadInfo ti, int num) {
+        if (num == 0) {
+            return getNext(ti);
+        }
+
+        return getTarget();
+    }
+
 }

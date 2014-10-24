@@ -266,9 +266,13 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
     @Override
     public void visit(Constant expression) {
         if (expression.value.intValue() < 0) {
-            ret.append("(- ");
-            ret.append((-expression.value.intValue()));
-            ret.append(")");
+            if (expression.value.intValue() == Integer.MIN_VALUE) {
+                throw new RuntimeException("Don't know how to represent: " + Integer.MIN_VALUE);
+            } else {
+                ret.append("(- ");
+                ret.append(-expression.value.intValue());
+                ret.append(")");
+            }
         } else {
             ret.append(expression.value.intValue());
         }

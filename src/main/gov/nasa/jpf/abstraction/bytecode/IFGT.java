@@ -47,4 +47,18 @@ public class IFGT extends gov.nasa.jpf.jvm.bytecode.IFGT implements AbstractBran
         return LessThan.create(expr2, expr1);
     }
 
+    @Override
+    public Instruction getDefaultTarget() {
+        return getTarget();
+    }
+
+    @Override
+    public Instruction getTarget(ThreadInfo ti, int num) {
+        if (num == 0) {
+            return getNext(ti);
+        }
+
+        return getTarget();
+    }
+
 }

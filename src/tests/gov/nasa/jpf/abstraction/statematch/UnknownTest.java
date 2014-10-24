@@ -9,7 +9,7 @@ public class UnknownTest extends StateMatchingTest {
         config.add("+panda.branch.prune_infeasible=true");
     }
 
-    @Test
+    //@Test
     public static void test1() {
         int i = Verifier.unknownInt();
 
@@ -27,7 +27,7 @@ public class UnknownTest extends StateMatchingTest {
         assertVisitedAtMost(2);
     }
 
-    @Test
+    //@Test
     public static void test2() {
         int i = Verifier.unknownInt();
 
@@ -41,7 +41,7 @@ public class UnknownTest extends StateMatchingTest {
         assertVisitedAtMost(2);
     }
 
-    @Test
+    //@Test
     public static void test3() {
         int i = Verifier.unknownInt(); // Should register choice (starting with for example 0) and mark the constant as NONDET
 
@@ -59,5 +59,27 @@ public class UnknownTest extends StateMatchingTest {
 
         assertRevisitedAtLeast(1);
         assertVisitedAtMost(2);
+    }
+
+    @Test
+    public static void test4() {
+        int i = Verifier.unknownInt();
+
+        switch (i) {
+            case 0:
+            case 42:
+            case 1024:
+            case -5:
+            case Integer.MAX_VALUE:
+            case -Integer.MAX_VALUE:
+                System.out.println(i);
+                break;
+            default:
+                System.out.println("Default: " + i);
+                break;
+        }
+
+        //assertRevisitedAtLeast(6);
+        assertVisitedAtMost(7);
     }
 };

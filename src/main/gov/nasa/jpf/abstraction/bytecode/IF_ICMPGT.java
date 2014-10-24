@@ -46,5 +46,18 @@ public class IF_ICMPGT extends gov.nasa.jpf.jvm.bytecode.IF_ICMPGT implements Ab
         return LessThan.create(expr2, expr1);
     }
 
+    @Override
+    public Instruction getDefaultTarget() {
+        return getTarget();
+    }
+
+    @Override
+    public Instruction getTarget(ThreadInfo ti, int num) {
+        if (num == 0) {
+            return getNext(ti);
+        }
+
+        return getTarget();
+    }
 
 }
