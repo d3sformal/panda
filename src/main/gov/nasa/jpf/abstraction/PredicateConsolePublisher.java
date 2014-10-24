@@ -160,4 +160,13 @@ public class PredicateConsolePublisher extends ConsolePublisher {
             ++progressAlongTrace;
         }
     }
+
+    @Override
+    public synchronized void printStatistics (PrintWriter out) {
+        super.printStatistics(out);
+
+        if (PandaConfig.getInstance().enabledRefinement()) {
+            out.println("refinements:        " + PredicateAbstraction.getInstance().getNumberOfRefinements());
+        }
+    }
 }

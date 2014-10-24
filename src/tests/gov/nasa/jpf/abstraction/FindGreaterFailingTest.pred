@@ -1,0 +1,24 @@
+[method gov.nasa.jpf.abstraction.FindGreaterFailingTest.test]
+3..43: -5 < (0 - return_pc7)
+3..43: (0 - return_pc7) < 1
+35..35: 10 < aread(arr, data, return_pc7)
+
+// CANNOT PROVIDE ON INPUT
+//3..4: alength(arrlen, array(355)) = 5
+
+4..43: alength(arrlen, data) = 5
+15..35: pos = return_pc7
+
+[method gov.nasa.jpf.abstraction.FindGreaterFailingTest.findGreater]
+15..17: (aread(arr, a, i) - 1) < t
+17..25: (aread(arr, a, return) - 1) < t
+2..20: i < 2
+0 = i
+17..25: return < 2
+2..20: i < 1
+2..20: 2 < i
+17..25: 2 < return
+17..25: 1 < return
+17..25: return < 1
+17..25: 0 = return
+2..20: 1 < i

@@ -120,6 +120,7 @@ public class PredicateAbstraction extends Abstraction {
     public SMT smt = new SMT();
     private Stack<Pair<MethodInfo, Integer>> traceProgramLocations = new Stack<Pair<MethodInfo, Integer>>();
     private Predicates predicateSet;
+    private int refinements = 0;
 
     private static PredicateAbstraction instance = null;
     private static List<CounterexampleListener> listeners = new ArrayList<CounterexampleListener>();
@@ -669,6 +670,10 @@ public class PredicateAbstraction extends Abstraction {
         }
     }
 
+    public int getNumberOfRefinements() {
+        return refinements;
+    }
+
     /**
      * @returns null if real error, else a backtrack level is returned (the depth in the search to which to return)
      */
@@ -688,6 +693,8 @@ public class PredicateAbstraction extends Abstraction {
             notifyAboutCounterexample(traceFormula, interpolants);
 
             if (interpolants != null) {
+                refinements++;
+
                 boolean refined = false;
                 List<MethodInfo> refinedMethods = new ArrayList<MethodInfo>();
 
