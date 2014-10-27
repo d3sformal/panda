@@ -52,22 +52,34 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
             ArrayList<Integer> choices = null;
 
             if (expr != null && RunDetector.isRunning()) {
+                Predicate defaultConstraint = Tautology.create();
                 ArrayList<Integer> choiceCandidates = new ArrayList<Integer>();
                 boolean predicateAbstractionFailed = false;
 
                 for (int i = 0; i < matches.length; i++) {
                     int match = matches[i];
+                    Predicate matchPred = Equals.create(expr, Constant.create(match));
 
-                    TruthValue pred = PredicateAbstraction.getInstance().processBranchingCondition(getPosition(), Equals.create(expr, Constant.create(match)));
+                    TruthValue absVal = PredicateAbstraction.getInstance().processBranchingCondition(getPosition(), matchPred);
 
-                    if (pred == TruthValue.UNDEFINED) {
+                    if (absVal == TruthValue.UNDEFINED) {
                         predicateAbstractionFailed = true;
                         break;
                     }
 
-                    if (pred != TruthValue.FALSE) {
+                    if (absVal != TruthValue.FALSE) {
                         choiceCandidates.add(i);
                     }
+
+                    defaultConstraint = Conjunction.create(defaultConstraint, Negation.create(matchPred));
+                }
+
+                TruthValue absVal = PredicateAbstraction.getInstance().processBranchingCondition(getPosition(), defaultConstraint);
+
+                if (absVal == TruthValue.UNDEFINED) {
+                    predicateAbstractionFailed = true;
+                } else if (absVal != TruthValue.FALSE) {
+                    choiceCandidates.add(DEFAULT);
                 }
 
                 if (!predicateAbstractionFailed) {
@@ -102,28 +114,32 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 
         if (index == DEFAULT) {
             Predicate constraint = Tautology.create();
+            boolean concreteJump = true;
 
             // for all x in matches: expr != x
             for (int idx = 0; idx < matches.length; ++idx) {
                 constraint = Conjunction.create(constraint, Negation.create(Equals.create(expr, Constant.create(matches[idx]))));
+
+                concreteJump &= (v != matches[idx]);
             }
 
             PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(constraint, TruthValue.TRUE), getMethodInfo(), mi.getInstructionAt(target).getPosition());
 
-            // TODO ALLOW MATHING AGAINST THE CONSTRAINT
-            BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(this, ti, v, v, expr, expr, true, index);
+            BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(this, ti, constraint, concreteJump, true, index);
         } else {
-            PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(Equals.create(expr, Constant.create(matches[index])), TruthValue.TRUE), getMethodInfo(), mi.getInstructionAt(targets[index]).getPosition());
+            Predicate constraint = Equals.create(expr, Constant.create(matches[index]));
 
-            BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(this, ti, v, matches[index], expr, Constant.create(matches[index]), true, index);
+            PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(constraint, TruthValue.TRUE), getMethodInfo(), mi.getInstructionAt(targets[index]).getPosition());
+
+            BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(this, ti, constraint, getConcreteBranchValue(v, matches[index]), true, index);
         }
 
         return getTarget(ti, index);
     }
 
     @Override
-    public TruthValue getConcreteBranchValue(int v1, int v2) {
-        return TruthValue.create(v1 == v2);
+    public boolean getConcreteBranchValue(int v1, int v2) {
+        return v1 == v2;
     }
 
     @Override

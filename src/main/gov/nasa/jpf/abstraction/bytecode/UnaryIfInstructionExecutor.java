@@ -122,7 +122,13 @@ public class UnaryIfInstructionExecutor {
 
         sf.pop();
 
-        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(br, ti, v1, constant.value.intValue(), expr, constant, conditionValue, conditionValue ? 1 : 0);
+        Predicate branchCondition = br.createPredicate(expr, constant);
+
+        if (!conditionValue) {
+            branchCondition = Negation.create(branchCondition);
+        }
+
+        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(br, ti, branchCondition, br.getConcreteBranchValue(v1, constant.value.intValue()), conditionValue, conditionValue ? 1 : 0);
 
         return br.getTarget(ti, conditionValue ? 1 : 0);
     }

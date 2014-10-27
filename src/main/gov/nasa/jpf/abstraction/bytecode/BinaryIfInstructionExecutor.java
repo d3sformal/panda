@@ -114,7 +114,13 @@ public class BinaryIfInstructionExecutor {
         sf.pop();
         sf.pop();
 
-        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(br, ti, v1, v2, expr1, expr2, conditionValue, conditionValue ? 1 : 0);
+        Predicate branchCondition = br.createPredicate(expr1, expr2);
+
+        if (!conditionValue) {
+            branchCondition = Negation.create(branchCondition);
+        }
+
+        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(br, ti, branchCondition, br.getConcreteBranchValue(v1, v2), conditionValue, conditionValue ? 1 : 0);
 
         return br.getTarget(ti, conditionValue ? 1 : 0);
     }

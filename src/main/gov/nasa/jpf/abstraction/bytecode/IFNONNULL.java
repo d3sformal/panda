@@ -51,8 +51,8 @@ public class IFNONNULL extends gov.nasa.jpf.jvm.bytecode.IFNONNULL implements Ab
     }
 
     @Override
-    public TruthValue getConcreteBranchValue(int v1, int v2) {
-        return TruthValue.create(v1 != MJIEnv.NULL);
+    public boolean getConcreteBranchValue(int v1, int v2) {
+        return v1 != MJIEnv.NULL;
     }
 
     @Override

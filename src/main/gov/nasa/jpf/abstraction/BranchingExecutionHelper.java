@@ -37,15 +37,9 @@ import gov.nasa.jpf.abstraction.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 
 public class BranchingExecutionHelper {
-    public static void synchronizeConcreteAndAbstractExecutions(AbstractBranching br, ThreadInfo ti, int v1, int v2, Expression expr1, Expression expr2, boolean abstractJump, int targetNum) {
+    public static void synchronizeConcreteAndAbstractExecutions(AbstractBranching br, ThreadInfo ti, Predicate branchCondition, boolean concreteJump, boolean abstractJump, int targetNum) {
         StackFrame sf = ti.getModifiableTopFrame();
         SystemState ss = ti.getVM().getSystemState();
-
-        Predicate branchCondition = br.createPredicate(expr1, expr2);
-
-        if (!abstractJump) {
-            branchCondition = Negation.create(branchCondition);
-        }
 
         PandaConfig config = PandaConfig.getInstance();
 
@@ -53,7 +47,7 @@ public class BranchingExecutionHelper {
         boolean forceFeasibleOnce = config.forceFeasibleBranchesOnce();
         boolean forceFeasible = forceFeasibleOnce || config.forceFeasibleBranches();
 
-        if (br.getConcreteBranchValue(v1, v2) == TruthValue.create(abstractJump)) { // In case concrete and abstract executions agree
+        if (concreteJump == abstractJump) { // In case concrete and abstract executions agree
             if (forceFeasibleOnce) {
                 // Add state to allow forward state matching (look if we should generate more choices to get into the branch (it might have been explored before - actually it is explored when this branch is hit))
                 ti.breakTransition("Creating state after taking an enabled branch: " + branchCondition);

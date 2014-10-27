@@ -50,8 +50,8 @@ public class IFNULL extends gov.nasa.jpf.jvm.bytecode.IFNULL implements Abstract
     }
 
     @Override
-    public TruthValue getConcreteBranchValue(int v1, int v2) {
-        return TruthValue.create(v1 == MJIEnv.NULL);
+    public boolean getConcreteBranchValue(int v1, int v2) {
+        return v1 == MJIEnv.NULL;
     }
 
     @Override
