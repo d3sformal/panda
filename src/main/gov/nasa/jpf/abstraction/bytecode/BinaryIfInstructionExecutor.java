@@ -120,7 +120,7 @@ public class BinaryIfInstructionExecutor {
             branchCondition = Negation.create(branchCondition);
         }
 
-        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(br, ti, branchCondition, br.getConcreteBranchValue(v1, v2), conditionValue, conditionValue ? 1 : 0);
+        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, branchCondition, br.getConcreteBranchValue(v1, v2), conditionValue, br.getTarget(ti, conditionValue ? 1 : 0), br.getSelf());
 
         return br.getTarget(ti, conditionValue ? 1 : 0);
     }

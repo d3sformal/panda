@@ -128,7 +128,7 @@ public class UnaryIfInstructionExecutor {
             branchCondition = Negation.create(branchCondition);
         }
 
-        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(br, ti, branchCondition, br.getConcreteBranchValue(v1, constant.value.intValue()), conditionValue, conditionValue ? 1 : 0);
+        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, branchCondition, br.getConcreteBranchValue(v1, constant.value.intValue()), conditionValue, br.getTarget(ti, conditionValue ? 1 : 0), br.getSelf());
 
         return br.getTarget(ti, conditionValue ? 1 : 0);
     }

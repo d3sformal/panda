@@ -7,6 +7,7 @@ import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 
+import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -22,7 +23,7 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
 /**
  * An implementation of common behaviour of all the comparison expressions
  */
-public abstract class BinaryComparatorExecutor<T> {
+public abstract class BinaryComparatorExecutor<T extends Comparable<T>> {
     final public Instruction execute(AbstractBinaryOperator<T, T> cmp, ThreadInfo ti) {
 
         String name = cmp.getClass().getSimpleName();
@@ -147,6 +148,10 @@ public abstract class BinaryComparatorExecutor<T> {
                 }
 
                 PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.TRUE), cmp.getSelf().getMethodInfo(), cmp.getNext(ti).getPosition());
+
+                int concrete = getFirstOperand(sf).compareTo(getSecondOperand(sf));
+
+                BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, predicate, concrete == result, true, cmp.getNext(ti), cmp.getSelf());
             }
         }
 

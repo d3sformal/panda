@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.StateSet;
@@ -15,7 +16,6 @@ import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 
-import gov.nasa.jpf.abstraction.bytecode.AbstractBranching;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Contradiction;
@@ -37,7 +37,7 @@ import gov.nasa.jpf.abstraction.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 
 public class BranchingExecutionHelper {
-    public static void synchronizeConcreteAndAbstractExecutions(AbstractBranching br, ThreadInfo ti, Predicate branchCondition, boolean concreteJump, boolean abstractJump, int targetNum) {
+    public static void synchronizeConcreteAndAbstractExecutions(ThreadInfo ti, Predicate branchCondition, boolean concreteJump, boolean abstractJump, Instruction target, Instruction self) {
         StackFrame sf = ti.getModifiableTopFrame();
         SystemState ss = ti.getVM().getSystemState();
 
@@ -159,7 +159,7 @@ public class BranchingExecutionHelper {
                         // Here we have not yet advanced PC
                         // Whereas in the enabled branch the state is made after advancing the PC
                         // We need to advance the PC to get the correct state
-                        ti.setPC(br.getTarget(ti, targetNum));
+                        ti.setPC(target);
 
                         if (rStateSet == null || rStateSet.isCurrentUnique() || !forceFeasibleOnce) {
                             if (config.enabledVerbose()) {
@@ -198,7 +198,7 @@ public class BranchingExecutionHelper {
                 }
 
                 // Compute a concrete (sub)state representing the abstract one
-                int[] valueArray = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getConcreteState(exprArray, br.getSelf().getPosition());
+                int[] valueArray = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getConcreteState(exprArray, self.getPosition());
 
                 if (valueArray == null) {
                     if (config.enabledVerbose()) {

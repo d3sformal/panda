@@ -125,13 +125,13 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 
             PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(constraint, TruthValue.TRUE), getMethodInfo(), mi.getInstructionAt(target).getPosition());
 
-            BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(this, ti, constraint, concreteJump, true, index);
+            BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, constraint, concreteJump, true, getDefaultTarget(), this);
         } else {
             Predicate constraint = Equals.create(expr, Constant.create(matches[index]));
 
             PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(constraint, TruthValue.TRUE), getMethodInfo(), mi.getInstructionAt(targets[index]).getPosition());
 
-            BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(this, ti, constraint, getConcreteBranchValue(v, matches[index]), true, index);
+            BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, constraint, getConcreteBranchValue(v, matches[index]), true, getTarget(ti, index), this);
         }
 
         return getTarget(ti, index);
@@ -160,7 +160,7 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
     @Override
     public Instruction getTarget(ThreadInfo ti, int num) {
         if (num == DEFAULT) {
-            return mi.getInstructionAt(target);
+            return getDefaultTarget();
         }
 
         return mi.getInstructionAt(targets[num]);
