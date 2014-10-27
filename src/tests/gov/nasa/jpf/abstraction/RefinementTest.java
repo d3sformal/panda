@@ -43,7 +43,7 @@ public class RefinementTest extends BaseTest {
         //   - this is another method
         //   - a parameter binding clauses is added to the trace (this = fresh_xyz)
         //
-        // when interpolating after astore the method test4 the symbol fresh_xyz is live (because it appears in the previous steps and in <init> param-binging which is added to the end of the interpolation query)
+        // when interpolating after astore in the method test4, the symbol fresh_xyz is live (because it appears in the previous steps and in <init> param-binding which is added to the end of the interpolation query)
         // therefore it is possible that the interpolant will look like fresh_xyz.celsius = -273 instead of degrees.celsius = -273
         // but if we also use `panda.refinement.global` then this does not happen
         D degrees = new D();
