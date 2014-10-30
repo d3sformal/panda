@@ -52,7 +52,15 @@ public class BranchingExecutionHelper {
                 // Add state to allow forward state matching (look if we should generate more choices to get into the branch (it might have been explored before - actually it is explored when this branch is hit))
                 ti.breakTransition("Creating state after taking an enabled branch: " + branchCondition);
 
-                PredicateAbstraction.getInstance().dropForceStatesAlongTrace();
+                PredicateAbstraction pabs = PredicateAbstraction.getInstance();
+                TraceFormula tf = pabs.getTraceFormula();
+                TraceFormula ft = pabs.getForcedTraceFormula();
+
+                if (ft != null) {
+                    if (!tf.isPrefixOf(ft) || tf.size() >= ft.size()) {
+                        pabs.dropForceStatesAlongTrace();
+                    }
+                }
             }
         } else { // In case the concrete execution does not allow the same branch to be taken
             if (config.enabledVerbose()) {
@@ -62,6 +70,8 @@ public class BranchingExecutionHelper {
             // Either cut of the inconsistent branch
             // or make the concrete state represent the abstract one (force concrete values)
             if (pruneInfeasible) {
+                PredicateAbstraction.getInstance().dropForceStatesAlongTrace();
+                ss.setForced(false);
                 ss.setIgnored(true);
 
                 if (forceFeasible) {
@@ -215,6 +225,7 @@ public class BranchingExecutionHelper {
                     // Fail (No model for an UNSAT formula)
                     //
                     // That is why we abandon the trace
+                    ss.setForced(false);
                     ss.setIgnored(true);
                 } else {
                     // Inject the newly computed values into the concrete state

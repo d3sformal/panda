@@ -13,6 +13,8 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
 
+import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Conjunction;
@@ -58,6 +60,9 @@ public class ArrayLoadExecutor {
 
         SystemState ss = ti.getVM().getSystemState();
 
+        int concreteIndex = sf.peek();
+        int abstractIndex = -1;
+
         if (RunDetector.isRunning()) {
             PredicateAbstraction abs = PredicateAbstraction.getInstance();
             MethodFrameSymbolTable sym = abs.getSymbolTable().get(0);
@@ -66,8 +71,10 @@ public class ArrayLoadExecutor {
                 return load.getSelf();
             }
 
+            abstractIndex = indexSelector.getIndex();
+
             sf.pop();
-            sf.push(indexSelector.getIndex());
+            sf.push(abstractIndex);
         }
 
         Instruction actualNextInsn = load.executeConcrete(ti);
@@ -77,6 +84,17 @@ public class ArrayLoadExecutor {
         }
 
         sf.setOperandAttr(path);
+
+        if (RunDetector.isRunning() && PandaConfig.getInstance().pruneInfeasibleBranches()) {
+            Predicate condition = Equals.create(index, Constant.create(abstractIndex));
+
+            if (PandaConfig.getInstance().enabledVerbose()) {
+                System.out.println(path.toString(gov.nasa.jpf.abstraction.common.Notation.DOT_NOTATION) + " (concrete: " + index + " = " + concreteIndex + ", abstract: " + index + " = " + abstractIndex + ") " + (concreteIndex == abstractIndex ? "Pass" : "Cut"));
+            }
+
+            PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(condition, load.getSelf().getMethodInfo(), actualNextInsn.getPosition());
+            BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, condition, concreteIndex == abstractIndex, true, actualNextInsn, load.getSelf());
+        }
 
         return actualNextInsn;
     }

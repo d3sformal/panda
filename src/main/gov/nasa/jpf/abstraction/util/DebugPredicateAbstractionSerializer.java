@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Comparator;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeSet;
 
 import gov.nasa.jpf.Config;
@@ -17,6 +18,7 @@ import gov.nasa.jpf.abstraction.PredicateAbstractionSerializer;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.Unknown;
 import gov.nasa.jpf.abstraction.state.MethodFramePredicateValuation;
 import gov.nasa.jpf.abstraction.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.state.TruthValue;
@@ -39,6 +41,19 @@ public class DebugPredicateAbstractionSerializer extends PredicateAbstractionSer
     @Override
     public void setOutputStream(OutputStream out) {
         this.out = new PrintWriter(out);
+    }
+
+    @Override
+    protected void serializeUnknowns() {
+        super.serializeUnknowns();
+
+        SortedMap<String, Unknown> unknowns = pabs.getUnknowns();
+
+        out.println("======== Unknowns ========");
+
+        for (String u : unknowns.keySet()) {
+            out.print("\t" + u + ": " + unknowns.get(u).getChoiceGenerator().getNextChoice());
+        }
     }
 
     protected void imitateSerializeHeapValue(StructuredValueIdentifier value) {

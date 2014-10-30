@@ -7,7 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import gov.nasa.jpf.JPFException;
@@ -160,13 +162,13 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     private SSAFormulaIncarnationsManager ssa = new SSAFormulaIncarnationsManager();
-    private Map<String, Unknown> unknowns = new HashMap<String, Unknown>();
+    private SortedMap<String, Unknown> unknowns = new TreeMap<String, Unknown>();
 
     public void registerUnknown(Unknown unknown) {
         unknowns.put(((Root) ssa.getSymbolIncarnation(unknown, 0)).getName(), unknown);
     }
 
-    public Map<String, Unknown> getUnknowns() {
+    public SortedMap<String, Unknown> getUnknowns() {
         return unknowns;
     }
 
@@ -609,6 +611,10 @@ public class PredicateAbstraction extends Abstraction {
 
     public void dropForceStatesAlongTrace() {
         forcedTrace = null;
+    }
+
+    public TraceFormula getForcedTraceFormula() {
+        return forcedTrace;
     }
 
     @SuppressWarnings("unchecked")

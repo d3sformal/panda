@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -29,6 +30,7 @@ import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.Unknown;
 import gov.nasa.jpf.abstraction.state.MethodFramePredicateValuation;
 import gov.nasa.jpf.abstraction.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.state.SymbolTable;
@@ -63,6 +65,17 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
     protected Map<StructuredValueIdentifier, Integer> canonical = new HashMap<StructuredValueIdentifier, Integer>();
 
     public PredicateAbstractionSerializer(Config conf) {
+    }
+
+    protected void serializeUnknowns() {
+        SortedMap<String, Unknown> unknowns = pabs.getUnknowns();
+
+        buf.add(unknowns.keySet().size());
+
+        for (String u : unknowns.keySet()) {
+            buf.add(u.hashCode());
+            buf.add(unknowns.get(u).getChoiceGenerator().getNextChoice());
+        }
     }
 
     protected int canonicalId (StructuredValueIdentifier value) {
@@ -153,6 +166,7 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         pabs = PredicateAbstraction.getInstance();
         universe = pabs.getSymbolTable().getUniverse();
 
+        //serializeUnknowns();
         serializeHeap();
         serializeThreadStates();
         serializeStackFrames();

@@ -82,4 +82,22 @@ public class UnknownTest extends StateMatchingTest {
         assertRevisitedAtLeast(6);
         assertVisitedAtMost(7);
     }
+
+    @Test
+    public static void test5() {
+        int i = Verifier.unknownInt();
+        int[] a = new int[5];
+
+        if (0 <= i && i < a.length) { // -1, ..., 5
+            int c = a[i]; // 0, 1, 2, 3, 4
+
+            System.out.println(i);
+        }
+
+        // -1, 0, 1, 2, 3, 4, 5
+
+        assertRevisitedAtLeast(6);
+        assertVisitedAtMost(7);
+    }
+
 };
