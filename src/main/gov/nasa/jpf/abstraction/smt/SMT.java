@@ -544,10 +544,12 @@ public class SMT {
                     interpolants = PredicatesFactory.createInterpolantsFromString(output);
                 }
             } else {
-                interpolants = new Predicate[traceFormula.size() - 1];
+                if (!satisfiable) {
+                    interpolants = new Predicate[traceFormula.size() - 1];
 
-                for (int i = 0; i < interpolants.length; ++i) {
-                    interpolants[i] = Tautology.create();
+                    for (int i = 0; i < interpolants.length; ++i) {
+                        interpolants[i] = Tautology.create();
+                    }
                 }
             }
 

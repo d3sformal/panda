@@ -71,7 +71,13 @@ public class PandaConfig {
         }
 
         if (verboseClasses == null) {
-            verboseClasses = getUnderlyingConfig().getClasses("panda.verbose");
+            Boolean verbose = getUnderlyingConfig().getBoolean("panda.verbose");
+
+            if (verbose == null) {
+                verboseClasses = getUnderlyingConfig().getClasses("panda.verbose");
+            } else {
+                verboseClasses = new Class<?>[0];
+            }
         }
 
         boolean verbose = false;
