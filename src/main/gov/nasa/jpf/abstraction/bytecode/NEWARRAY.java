@@ -5,6 +5,7 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -47,6 +48,14 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
                 return ti.createAndThrowException("java.lang.NegativeArraySizeException");
             } else {
                 // Replace the original concrete value (possibly inconsistent with the abstraction) with the value derived from the abstraction
+                int len = sf.peek();
+
+                if (PandaConfig.getInstance().enabledVerbose()) {
+                    if (len != lengthValue) {
+                        System.out.println("[WARNING] Inconsistent concrete and abstract array length at array allocation.");
+                    }
+                }
+
                 sf.pop();
                 sf.push(lengthValue);
             }
