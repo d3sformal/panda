@@ -88,7 +88,7 @@ public class ArrayLoadExecutor {
         if (RunDetector.isRunning() && PandaConfig.getInstance().pruneInfeasibleBranches()) {
             Predicate condition = Equals.create(index, Constant.create(abstractIndex));
 
-            if (PandaConfig.getInstance().enabledVerbose()) {
+            if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
                 System.out.println(path.toString(gov.nasa.jpf.abstraction.common.Notation.DOT_NOTATION) + " (concrete: " + index + " = " + concreteIndex + ", abstract: " + index + " = " + abstractIndex + ") " + (concreteIndex == abstractIndex ? "Pass" : "Cut"));
             }
 

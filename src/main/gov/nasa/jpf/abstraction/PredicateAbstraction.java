@@ -722,7 +722,7 @@ public class PredicateAbstraction extends Abstraction {
                         }
                     }
 
-                    if (config.enabledVerbose()) {
+                    if (config.enabledVerbose(this.getClass())) {
                         System.out.println("Adding predicate `" + interpolant + "` to [" + pcStart + ", " + pcEnd + "]");
 
                         if (interpolant instanceof Tautology || interpolant instanceof Contradiction) {
@@ -739,7 +739,7 @@ public class PredicateAbstraction extends Abstraction {
                 }
 
                 if (!refined) {
-                    if (config.enabledVerbose()) {
+                    if (config.enabledVerbose(this.getClass())) {
                         System.out.println(predicateSet);
                     }
 

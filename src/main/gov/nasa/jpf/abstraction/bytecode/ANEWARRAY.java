@@ -51,7 +51,7 @@ public class ANEWARRAY extends gov.nasa.jpf.jvm.bytecode.ANEWARRAY {
                 // Replace the original concrete value (possibly inconsistent with the abstraction) with the value derived from the abstraction
                 int len = sf.peek();
 
-                if (PandaConfig.getInstance().enabledVerbose()) {
+                if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
                     if (len != lengthValue) {
                         System.out.println("[WARNING] Inconsistent concrete and abstract array length at array allocation.");
                     }

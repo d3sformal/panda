@@ -225,7 +225,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 }
             }
 
-            if (PandaConfig.getInstance().enabledVerbose()) {
+            if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
                 System.out.println("Refined context:");
                 System.out.println(gov.nasa.jpf.abstraction.common.Notation.convertToString(ctx));
             }
@@ -731,7 +731,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             // Use the relevant predicates to valuate predicates that need to be updated
             Map<Predicate, TruthValue> valuation = relevant.evaluatePredicates(after.getPC().getPosition(), toBeUpdated);
 
-            if (PandaConfig.getInstance().enabledVerbose()) {
+            if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
                 System.out.println("Evaluating:");
                 for (Predicate p : toBeUpdated) {
                     System.out.println("\t" + p);

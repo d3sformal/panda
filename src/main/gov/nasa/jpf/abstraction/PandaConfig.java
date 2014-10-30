@@ -13,6 +13,7 @@ public class PandaConfig {
     private Config config;
 
     private Boolean verbose;
+    private Class<?>[] verboseClasses;
     private Boolean logSMT;
     private TruthValue assertionsDisabled;
     private Boolean printConcreteCounterexample;
@@ -55,6 +56,28 @@ public class PandaConfig {
     public boolean enabledVerbose() {
         if (verbose == null) {
             verbose = getUnderlyingConfig().getBoolean("panda.verbose");
+
+            if (verbose == null) {
+                verbose = false;
+            }
+        }
+
+        return verbose;
+    }
+
+    public boolean enabledVerbose(Class<?> cls) {
+        if (enabledVerbose()) {
+            return true;
+        }
+
+        if (verboseClasses == null) {
+            verboseClasses = getUnderlyingConfig().getClasses("panda.verbose");
+        }
+
+        boolean verbose = false;
+
+        for (Class<?> vCls : verboseClasses) {
+            verbose |= cls.equals(vCls);
         }
 
         return verbose;

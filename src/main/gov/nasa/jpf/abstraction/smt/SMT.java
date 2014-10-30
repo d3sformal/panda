@@ -559,13 +559,13 @@ public class SMT {
                     if (!satisfiable) {
                         Predicate[] methodInterpolants = PredicatesFactory.createInterpolantsFromString(output);
 
-                        if (config.enabledVerbose()) {
+                        if (config.enabledVerbose(this.getClass())) {
                             System.out.println("Inserting interpolant `" + methodInterpolants[methodInterpolants.length - 1] + "` globally to the whole method " + m);
                         }
 
                         for (int i = 0; i < m.size(); ++i) {
                             if (m.get(i) < interpolants.length) {
-                                if (config.enabledVerbose()) {
+                                if (config.enabledVerbose(this.getClass())) {
                                     System.out.println("Inserting interpolant `" + methodInterpolants[i] + "` to " + m.get(i));
                                 }
 
@@ -1128,7 +1128,7 @@ public class SMT {
             return true;
         }
 
-        if (PandaConfig.getInstance().enabledVerbose()) {
+        if (PandaConfig.getInstance().enabledVerbose(SMT.class)) {
             System.out.println("Check: " + e1 + " ~ " + e2);
         }
 
@@ -1150,7 +1150,7 @@ public class SMT {
             return true;
         }
 
-        if (PandaConfig.getInstance().enabledVerbose()) {
+        if (PandaConfig.getInstance().enabledVerbose(SMT.class)) {
             System.out.println("Check: " + p1 + " ~ " + p2);
         }
 

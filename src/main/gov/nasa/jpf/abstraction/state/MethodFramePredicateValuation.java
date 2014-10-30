@@ -882,7 +882,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             }
         }
 
-        if (PandaConfig.getInstance().enabledVerbose()) {
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
             System.out.println("Getting concrete representative state for: " + state);
         }
 

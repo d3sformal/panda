@@ -63,7 +63,7 @@ public class BranchingExecutionHelper {
                 }
             }
         } else { // In case the concrete execution does not allow the same branch to be taken
-            if (config.enabledVerbose()) {
+            if (config.enabledVerbose(BranchingExecutionHelper.class)) {
                 System.err.println("[WARNING] Inconsistent concrete and abstract branching: " + branchCondition);
             }
 
@@ -75,7 +75,7 @@ public class BranchingExecutionHelper {
                 ss.setIgnored(true);
 
                 if (forceFeasible) {
-                    if (config.enabledVerbose()) {
+                    if (config.enabledVerbose(BranchingExecutionHelper.class)) {
                         System.out.println("[WARNING] Finding feasible trace with matching prefix and " + branchCondition);
                         System.out.println("\ti.e.:");
 
@@ -141,7 +141,7 @@ public class BranchingExecutionHelper {
                     int[] models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(traceFormula, exprArray);
 
                     if (models == null) {
-                        if (config.enabledVerbose()) {
+                        if (config.enabledVerbose(BranchingExecutionHelper.class)) {
                             System.out.println("[WARNING] No feasible trace found");
                         }
                     } else {
@@ -172,7 +172,7 @@ public class BranchingExecutionHelper {
                         ti.setPC(target);
 
                         if (rStateSet == null || rStateSet.isCurrentUnique() || !forceFeasibleOnce) {
-                            if (config.enabledVerbose()) {
+                            if (config.enabledVerbose(BranchingExecutionHelper.class)) {
                                 System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
                             }
 
@@ -211,7 +211,7 @@ public class BranchingExecutionHelper {
                 int[] valueArray = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getConcreteState(exprArray, self.getPosition());
 
                 if (valueArray == null) {
-                    if (config.enabledVerbose()) {
+                    if (config.enabledVerbose(BranchingExecutionHelper.class)) {
                         System.out.println("[WARNING] Cannot compute the corresponding concrete state.");
                     }
 
