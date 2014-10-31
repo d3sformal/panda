@@ -15,6 +15,7 @@ public class InitialValueTest extends BaseTest {
         assert InitialValues.i == 0;
         assert InitialValues.l == 0;
         assert InitialValues.s == 0;
+        assert InitialValues.o == null; // Will be decided precisely using heap abstraction (cannot be violated, no refinement)
     }
 }
 
@@ -27,4 +28,5 @@ class InitialValues {
     public static int i;
     public static long l;
     public static short s;
+    public static Object o;
 }
