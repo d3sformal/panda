@@ -183,6 +183,9 @@ path returns [DefaultAccessExpression val]
             $ctx.val = DefaultReturnValue.create(r, false); // TODO: encode isReference and reconstruct correct object
         }
     }
+    | f=CLASS_TOKEN {
+        $ctx.val = DefaultPackageAndClass.create($f.text.substring("class_".length()).replaceAll("_", "."));
+    }
     | f=ID_TOKEN {
         $ctx.val = DefaultRoot.create($f.text.replaceAll("var_ssa_[0-9]+_frame_[0-9]+_", ""));
     }
@@ -203,6 +206,7 @@ path returns [DefaultAccessExpression val]
 AND_TOKEN      : 'and';
 ARR_TOKEN      : 'ssa_'[0-9]+'_arr';
 ARRLEN_TOKEN   : 'arrlen';
+CLASS_TOKEN    : 'class_'[a-zA-Z0-9_$]+;
 DISTINCT_TOKEN : 'distinct';
 FALSE_TOKEN    : 'false';
 FRESH_TOKEN    : 'fresh_'[0-9]+;

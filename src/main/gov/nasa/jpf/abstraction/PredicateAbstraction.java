@@ -425,20 +425,32 @@ public class PredicateAbstraction extends Abstraction {
             symbolTable.get(0).addClass(classInfo.getStaticElementInfo(), thread);
 
             if (RunDetector.isRunning() && PandaConfig.getInstance().initializeStaticFields()) {
+                int lastPC = thread.getPC().getPosition();
+                int nextPC = thread.getPC().getNext().getPosition();
+
                 ClassName cn = new ClassName(classInfo.getStaticElementInfo());
                 PackageAndClass pkgcn = DefaultPackageAndClass.create(cn.getClassName());
 
                 StructuredValue v = symbolTable.get(0).getUniverse().get(cn);
                 Predicate constraint = Tautology.create();
 
+                Set<AccessExpression> affected = new HashSet<AccessExpression>();
+
                 for (UniverseSlotKey k : v.getSlots().keySet()) {
                     FieldName fn = (FieldName) k;
 
                     ObjectFieldRead fr = DefaultObjectFieldRead.create(pkgcn, fn.getName());
 
+                    affected.clear();
+                    affected.add(fr);
+
                     if (v.getSlot(k) instanceof StructuredValueSlot) {
+                        predicateValuation.reevaluate(lastPC, nextPC, fr, affected, ObjectExpressionDecorator.wrap(NullExpression.create(), symbolTable));
+
                         constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, NullExpression.create(), 0));
                     } else {
+                        predicateValuation.reevaluate(lastPC, nextPC, fr, affected, PrimitiveExpressionDecorator.wrap(Constant.create(0), symbolTable));
+
                         constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, Constant.create(0), 0));
                     }
                 }
