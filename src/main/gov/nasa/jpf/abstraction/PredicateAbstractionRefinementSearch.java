@@ -17,7 +17,15 @@ public class PredicateAbstractionRefinementSearch extends DFSearch {
 
     @Override
     public void error(Property property, Path path, ThreadList threadList) {
-        backtrackLevel = PredicateAbstraction.getInstance().error();
+        error(property, path, threadList, false);
+    }
+
+    public void error(Property property, Path path, ThreadList threadList, boolean disableRefinement) {
+        if (disableRefinement) {
+            backtrackLevel = null;
+        } else {
+            backtrackLevel = PredicateAbstraction.getInstance().error();
+        }
 
         if (backtrackLevel == null) {
             super.error(property, path, threadList);

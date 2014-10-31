@@ -6,6 +6,7 @@ import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.ExecuteInstructionHandler;
+import gov.nasa.jpf.abstraction.PredicateAbstractionRefinementSearch;
 
 public abstract class AssertHandler extends ExecuteInstructionHandler {
 
@@ -36,7 +37,10 @@ public abstract class AssertHandler extends ExecuteInstructionHandler {
     protected void reportError(VM vm, int lineNumber, String message) {
         Property property = new AssertProperty("Line " + lineNumber + ": " + message);
 
-        vm.getSearch().error(property, vm.getClonedPath(), vm.getThreadList());
+        PredicateAbstractionRefinementSearch search = (PredicateAbstractionRefinementSearch) vm.getSearch();
+
+        search.error(property, vm.getClonedPath(), vm.getThreadList(), true);
+
         vm.breakTransition(message);
     }
 
