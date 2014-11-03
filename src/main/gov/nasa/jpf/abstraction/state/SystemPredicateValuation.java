@@ -191,70 +191,46 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
     }
 
     public boolean refine(Predicate interpolant, MethodInfo m, int fromPC, int toPC) {
-        if (interpolant instanceof Conjunction) {
-            Conjunction c = (Conjunction) interpolant;
+        boolean refined = false;
 
-            boolean a = refine(c.a, m, fromPC, toPC);
-            boolean b = refine(c.b, m, fromPC, toPC);
+        interpolant.setScope(new BytecodeInterval(fromPC, toPC));
 
-            return a || b;
-        } else if (interpolant instanceof Disjunction) {
-            Disjunction d = (Disjunction) interpolant;
+        MethodPredicateContext ctx = null;
 
-            boolean a = refine(d.a, m, fromPC, toPC);
-            boolean b = refine(d.b, m, fromPC, toPC);
+        for (PredicateContext candidateCtx : predicateSet.contexts) {
+            if (candidateCtx instanceof MethodPredicateContext) {
+                MethodPredicateContext methodPredicateContext = (MethodPredicateContext) candidateCtx;
 
-            return a || b;
-        } else if (interpolant instanceof Negation) {
-            Negation n = (Negation) interpolant;
+                if (methodPredicateContext.getMethod().toString().equals(m.getBaseName())) {
+                    ctx = methodPredicateContext;
 
-            return refine(n.predicate, m, fromPC, toPC);
-        } else if (interpolant instanceof Tautology) {
-            return false;
-        } else if (interpolant instanceof Contradiction) {
-            return false;
-        } else {
-            boolean refined = false;
-
-            interpolant.setScope(new BytecodeInterval(fromPC, toPC));
-
-            MethodPredicateContext ctx = null;
-
-            for (PredicateContext candidateCtx : predicateSet.contexts) {
-                if (candidateCtx instanceof MethodPredicateContext) {
-                    MethodPredicateContext methodPredicateContext = (MethodPredicateContext) candidateCtx;
-
-                    if (methodPredicateContext.getMethod().toString().equals(m.getBaseName())) {
-                        ctx = methodPredicateContext;
-
-                        break;
-                    }
+                    break;
                 }
             }
-
-            if (ctx == null) {
-                refined = true;
-                List<Predicate> predicates = new LinkedList<Predicate>();
-                predicates.add(interpolant);
-                ctx = new MethodPredicateContext(DefaultMethod.create(DefaultPackageAndClass.create(m.getClassInfo().getName()), m.getName()), predicates);
-                predicateSet.contexts.add(ctx);
-            } else {
-                boolean present = false;
-
-                if (ctx.predicates.containsKey(interpolant)) {
-                    refined = ctx.predicates.put(interpolant, ctx.predicates.get(interpolant)) == null;
-                } else {
-                    refined = ctx.predicates.put(interpolant, TruthValue.UNKNOWN) == null;
-                }
-            }
-
-            if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-                System.out.println("Refined context:");
-                System.out.println(gov.nasa.jpf.abstraction.common.Notation.convertToString(ctx));
-            }
-
-            return refined;
         }
+
+        if (ctx == null) {
+            refined = true;
+            List<Predicate> predicates = new LinkedList<Predicate>();
+            predicates.add(interpolant);
+            ctx = new MethodPredicateContext(DefaultMethod.create(DefaultPackageAndClass.create(m.getClassInfo().getName()), m.getName()), predicates);
+            predicateSet.contexts.add(ctx);
+        } else {
+            boolean present = false;
+
+            if (ctx.predicates.containsKey(interpolant)) {
+                refined = ctx.predicates.put(interpolant, ctx.predicates.get(interpolant)) == null;
+            } else {
+                refined = ctx.predicates.put(interpolant, TruthValue.UNKNOWN) == null;
+            }
+        }
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("Refined context:");
+            System.out.println(gov.nasa.jpf.abstraction.common.Notation.convertToString(ctx));
+        }
+
+        return refined;
     }
 
     @Override

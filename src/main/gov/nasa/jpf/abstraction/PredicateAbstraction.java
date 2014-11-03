@@ -123,6 +123,7 @@ public class PredicateAbstraction extends Abstraction {
     private Stack<Pair<MethodInfo, Integer>> traceProgramLocations = new Stack<Pair<MethodInfo, Integer>>();
     private Predicates predicateSet;
     private int refinements = 0;
+    private RefinementHeuristic heuristic;
 
     private static PredicateAbstraction instance = null;
     private static List<CounterexampleListener> listeners = new ArrayList<CounterexampleListener>();
@@ -146,6 +147,7 @@ public class PredicateAbstraction extends Abstraction {
     public PredicateAbstraction(Predicates predicateSet) {
         symbolTable = new SystemSymbolTable(this);
         predicateValuation = new SystemPredicateValuation(this, predicateSet);
+        heuristic = PandaConfig.getInstance().refinementHeuristic(predicateValuation);
         trace = new Trace();
         traceFormula = new TraceFormula();
 
@@ -742,7 +744,7 @@ public class PredicateAbstraction extends Abstraction {
                         }
                     }
 
-                    boolean refinedOnce = predicateValuation.refine(interpolant, mStart, pcStart, pcEnd);
+                    boolean refinedOnce = heuristic.refine(interpolant, mStart, pcStart, pcEnd);
 
                     if (refinedOnce) {
                         refined = true;

@@ -1,9 +1,11 @@
 package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.Config;
+import gov.nasa.jpf.JPFConfigException;
 import gov.nasa.jpf.vm.JenkinsStateSet;
 import gov.nasa.jpf.vm.VM;
 
+import gov.nasa.jpf.abstraction.state.SystemPredicateValuation;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.CounterexampleListener;
 
@@ -33,6 +35,7 @@ public class PandaConfig {
     private Boolean initializeStaticFields;
     private Boolean initializeObjectFields;
     private Boolean initializeArrayElements;
+    private Class<? extends RefinementHeuristic> refinementHeuristic;
 
     protected PandaConfig() {
     }
@@ -243,5 +246,17 @@ public class PandaConfig {
         }
 
         return initializeArrayElements;
+    }
+
+    public RefinementHeuristic refinementHeuristic(SystemPredicateValuation predVal) {
+        if (refinementHeuristic == null) {
+            refinementHeuristic = getUnderlyingConfig().getClass("panda.refinement.heuristic", RefinementHeuristic.class);
+        }
+
+        try {
+            return refinementHeuristic.getConstructor(predVal.getClass()).newInstance(predVal);
+        } catch (Exception e) {
+            throw new JPFConfigException("Could not instantiate refinement heuristic");
+        }
     }
 }
