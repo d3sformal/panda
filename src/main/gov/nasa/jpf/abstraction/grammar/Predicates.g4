@@ -383,6 +383,9 @@ path returns [DefaultAccessExpression[] val] locals [List<String> name = new Lin
     | f=ID_TOKEN {
         $ctx.val = new DefaultAccessExpression[] {DefaultRoot.create($f.text)};
     }
+    | f=SPECIAL_TOKEN {
+        $ctx.val = new DefaultAccessExpression[] {SpecialVariable.create($f.text)};
+    }
     | CLASS_TOKEN '(' ( pkg=ID_TOKEN {$ctx.name.add($pkg.text);} '.' ) * c=ID_TOKEN {$ctx.name.add($c.text);} ')' '.' f=ID_TOKEN {
         $ctx.val = new DefaultAccessExpression[] {DefaultObjectFieldRead.create(DefaultPackageAndClass.create($ctx.name), $f.text)};
     }
@@ -440,6 +443,7 @@ PRE_TOKEN     : 'pre';
 POST_TOKEN    : 'post';
 RETURN_TOKEN  : 'return';
 SFREAD_TOKEN  : 'sfread';
+SPECIAL_TOKEN : '#'[A-Z0-9]+;
 STATIC_TOKEN  : 'static';
 TRUE_TOKEN    : 'true';
 

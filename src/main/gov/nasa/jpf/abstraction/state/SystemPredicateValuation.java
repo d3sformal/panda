@@ -51,6 +51,7 @@ import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultMethod;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultReturnValue;
@@ -79,12 +80,30 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
         this.predicateSet = predicateSet;
 
         Set<Predicate> predicates = new HashSet<Predicate>();
+        Set<AccessExpression> paths = new HashSet<AccessExpression>();
         Map<Predicate, TruthValue> initialValuation;
 
         for (PredicateContext context : predicateSet.contexts) {
             if (context instanceof AssumePredicateContext) continue;
 
-            predicates.addAll(context.predicates.keySet());
+            for (Predicate p : context.predicates.keySet()) {
+                p.addAccessExpressionsToSet(paths);
+
+                boolean special = false;
+
+                for (AccessExpression e : paths) {
+                    if (e instanceof SpecialVariable) {
+                        special = true;
+                        break;
+                    }
+                }
+
+                if (!special) {
+                    predicates.add(p);
+                }
+
+                paths.clear();
+            }
         }
 
         /**
@@ -101,7 +120,11 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                     if (context instanceof AssumePredicateContext) continue;
 
                     for (Predicate predicate : context.predicates.keySet()) {
-                        context.predicates.put(predicate, initialValuation.get(predicate));
+                        if (predicates.contains(predicate)) {
+                            context.predicates.put(predicate, initialValuation.get(predicate));
+                        } else {
+                            context.predicates.put(predicate, TruthValue.UNKNOWN);
+                        }
                     }
                 }
             } catch (SMTException e) {
@@ -276,7 +299,13 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                     Set<Predicate> inconsistent = valuation.getPredicatesInconsistentWith(predicate, TruthValue.TRUE);
 
                     if (!inconsistent.isEmpty()) {
-                        System.out.println("Warning: forced value of `" + predicate + "` is inconsistent with " + inconsistent);
+                        System.out.println("Warning: forced value of `" + predicate + "` is inconsistent with:");
+
+                        for (Predicate i : inconsistent) {
+                            if (valuation.get(i) != TruthValue.UNKNOWN) {
+                                System.out.println("\t" + i + ": " + valuation.get(i));
+                            }
+                        }
 
                         throw new RuntimeException("Trying to make an inconsistent assumption");
                     }

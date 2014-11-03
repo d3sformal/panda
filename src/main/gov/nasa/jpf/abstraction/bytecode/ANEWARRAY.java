@@ -30,8 +30,6 @@ public class ANEWARRAY extends gov.nasa.jpf.jvm.bytecode.ANEWARRAY {
 
         Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
 
-/*
-        // Currently, this would break tests that use library code that allocates arrays of variable length (ThreadGroup in ProdConsTest)
         if (RunDetector.isRunning()) {
             // Determine the unambiguous concrete array length from predicates
             PredicateAbstraction abs = PredicateAbstraction.getInstance();
@@ -61,7 +59,6 @@ public class ANEWARRAY extends gov.nasa.jpf.jvm.bytecode.ANEWARRAY {
                 sf.push(lengthValue);
             }
         }
-*/
 
         Instruction actualNextInsn = super.execute(ti);
 

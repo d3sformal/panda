@@ -38,6 +38,7 @@ import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
+import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
@@ -238,6 +239,8 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
         Predicate formula = Tautology.create();
 
+        assumption = instantiateSpecialVariables(assumption);
+
         switch (value) {
             case TRUE:
                 formula = Conjunction.create(formula, assumption);
@@ -282,6 +285,14 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
      */
     @Override
     public void force(Predicate predicate, TruthValue value) {
+        Predicate predicateOrig = predicate;
+
+        predicate = instantiateSpecialVariables(predicate);
+
+        if (!predicate.equals(predicateOrig)) {
+            put(predicateOrig, TruthValue.UNKNOWN); // Add the predicate to scope with special vars but do not assume any fixed valuation
+        }
+
         put(predicate, value);
 
         if (PandaConfig.getInstance().reevaluatePredicatesAfterBranching()) {
@@ -294,11 +305,13 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             //   1) we can only improve precision, not change from TRUE to FALSE or vice versa
             //   2) a predicate can be valuated to UNKNOWN at first, but if it should be changed to TRUE (without loss of generality) in the second step, then we would not assign it UNKNOWN in the first step in the first place
             for (Predicate affectedPredicate : affected) {
-
                 // Improve precision of only imprecise predicates
                 if (get(affectedPredicate) != TruthValue.UNKNOWN) continue;
 
+                affectedPredicate = instantiateSpecialVariables(affectedPredicate);
+
                 Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+                Map<Predicate, TruthValue> determinantsOrig = new HashMap<Predicate, TruthValue>();
 
                 Predicate positiveWeakestPrecondition = affectedPredicate;
                 Predicate negativeWeakestPrecondition = Negation.create(affectedPredicate);
@@ -307,9 +320,15 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                     // When affectedPredicate = determinantCandidate: we know that
                     // a) the value is either UNKNOWN (the determinant will be left out in the end)
                     // b) the value is consistent with the forced predicate's value, therefore we can use it
-                    determinants.put(determinantCandidate, get(determinantCandidate));
+                    determinantsOrig.put(determinantCandidate, get(determinantCandidate));
                 }
                 // Symmetric for negativeWeakestPrecondition ... no need to do it twice now (the symbols should be the same)
+
+                for (Predicate p : determinantsOrig.keySet()) {
+                    p = instantiateSpecialVariables(p);
+
+                    determinants.put(p, determinantsOrig.get(p));
+                }
 
                 predicateDeterminingInfos.put(affectedPredicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
             }
@@ -459,6 +478,10 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         inequalities.clear();
     }
 
+    private Predicate instantiateSpecialVariables(Predicate p) {
+        return p.replace(SpecialVariable.create("#THREADS"), Constant.create(VM.getVM().getThreadList().length()));
+    }
+
     @Override
     public void reevaluate(int lastPC, int nextPC, AccessExpression affected, Set<AccessExpression> resolvedAffected, Expression expression) {
         Map<Predicate, PredicateValueDeterminingInfo> predicates = new HashMap<Predicate, PredicateValueDeterminingInfo>();
@@ -512,6 +535,8 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
              */
             if (affects) {
                 if (predicate.isInScope(nextPC)) {
+                    predicate = instantiateSpecialVariables(predicate);
+
                     Predicate positiveWeakestPrecondition = predicate;
                     Predicate negativeWeakestPrecondition = Negation.create(predicate);
 
@@ -523,9 +548,15 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
                     Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
                     Map<Predicate, TruthValue> determinantsOrig = new HashMap<Predicate, TruthValue>();
 
-                    collectDeterminants(lastPC, positiveWeakestPrecondition, determinants, equalities, inequalities);
+                    collectDeterminants(lastPC, positiveWeakestPrecondition, determinantsOrig, equalities, inequalities);
                     // This is not necessary
-                    //collectDeterminants(lastPC, negativeWeakestPrecondition, determinants, equalities, inequalities);
+                    //collectDeterminants(lastPC, negativeWeakestPrecondition, determinantsOrig, equalities, inequalities);
+
+                    for (Predicate p : determinantsOrig.keySet()) {
+                        p = instantiateSpecialVariables(p);
+
+                        determinants.put(p, determinantsOrig.get(p));
+                    }
 
                     predicates.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
                 } else {
@@ -735,14 +766,23 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             if (containsKey(predicate)) {
                 known.add(predicate);
             } else {
+                predicate = instantiateSpecialVariables(predicate);
+
                 Predicate positiveWeakestPrecondition = predicate;
                 Predicate negativeWeakestPrecondition = Negation.create(predicate);
 
                 Map<Predicate, TruthValue> determinants = new HashMap<Predicate, TruthValue>();
+                Map<Predicate, TruthValue> determinantsOrig = new HashMap<Predicate, TruthValue>();
 
-                collectDeterminants(lastPC, positiveWeakestPrecondition, determinants, equalities, inequalities);
+                collectDeterminants(lastPC, positiveWeakestPrecondition, determinantsOrig, equalities, inequalities);
                 // This is not necessary
-                //collectDeterminants(lastPC, negativeWeakestPrecondition, determinants, equalities, inequalities);
+                //collectDeterminants(lastPC, negativeWeakestPrecondition, determinantsOrig, equalities, inequalities);
+
+                for (Predicate p : determinantsOrig.keySet()) {
+                    p = instantiateSpecialVariables(p);
+
+                    determinants.put(p, determinantsOrig.get(p));
+                }
 
                 input.put(predicate, new PredicateValueDeterminingInfo(positiveWeakestPrecondition, negativeWeakestPrecondition, determinants));
             }
