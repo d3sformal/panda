@@ -16,6 +16,7 @@ import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
 import gov.nasa.jpf.abstraction.common.Subtract;
 import gov.nasa.jpf.abstraction.common.UninterpretedShiftLeft;
 import gov.nasa.jpf.abstraction.common.UninterpretedShiftRight;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
@@ -25,6 +26,7 @@ import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.common.impl.ArraysAssign;
@@ -352,11 +354,57 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
         ret.append(")");
     }
 
+    private Arrays findArrayElementWriteRootArrays(ArrayElementWrite ew) {
+        if (ew.getArrays() instanceof ArrayElementWrite) {
+            ArrayElementWrite ew2 = (ArrayElementWrite) ew.getArrays();
+
+            if (ew2.getArray().equals(ew.getArray())) {
+                return findArrayElementWriteRootArrays(ew2);
+            }
+        }
+
+        return ew.getArrays();
+    }
+
+    private void visitArrayElementWriteShortcut(Arrays arrays, AccessExpression array) {
+        if (arrays instanceof ArrayElementWrite) {
+            ArrayElementWrite ew = (ArrayElementWrite) arrays;
+
+            if (ew.getArray().equals(array)) {
+                ret.append("(store ");
+
+                visitArrayElementWriteShortcut(ew.getArrays(), array);
+
+                ret.append(" ");
+
+                ew.getIndex().accept(this);
+
+                ret.append(" ");
+
+                ew.getNewValue().accept(this);
+
+                ret.append(")");
+
+                return;
+            }
+        }
+
+        ret.append("(select ");
+
+        arrays.accept(this);
+
+        ret.append(" ");
+
+        array.accept(this);
+
+        ret.append(")");
+    }
+
     @Override
     public void visit(ArrayElementWrite expression) {
         ret.append("(store "); // Store the updated array into arrays
 
-        expression.getArrays().accept(this);
+        findArrayElementWriteRootArrays(expression).accept(this);
 
         ret.append(" ");
 
@@ -364,27 +412,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 
         ret.append(" ");
 
-        ret.append("(store "); // Update the array
-
-        ret.append("(select "); // Select the concrete array
-
-        expression.getArrays().accept(this);
-
-        ret.append(" ");
-
-        expression.getArray().accept(this);
-
-        ret.append(")");
-
-        ret.append(" ");
-
-        expression.getIndex().accept(this);
-
-        ret.append(" ");
-
-        expression.getNewValue().accept(this);
-
-        ret.append(")");
+        visitArrayElementWriteShortcut(expression, expression.getArray());
 
         ret.append(")");
     }

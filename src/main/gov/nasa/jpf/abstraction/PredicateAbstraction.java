@@ -79,6 +79,7 @@ import gov.nasa.jpf.abstraction.state.SystemSymbolTable;
 import gov.nasa.jpf.abstraction.state.Trace;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.state.universe.ClassName;
+import gov.nasa.jpf.abstraction.state.universe.ElementIndex;
 import gov.nasa.jpf.abstraction.state.universe.FieldName;
 import gov.nasa.jpf.abstraction.state.universe.Reference;
 import gov.nasa.jpf.abstraction.state.universe.StructuredValue;
@@ -499,27 +500,42 @@ public class PredicateAbstraction extends Abstraction {
         boolean initO = PandaConfig.getInstance().initializeObjectFields();
         boolean initA = PandaConfig.getInstance().initializeArrayElements();
 
-        if (initO || initA) {
-            StructuredValue v = symbolTable.get(0).getUniverse().get(object.getReference());
-
-            initO &= v instanceof UniverseObject;
-            initA &= v instanceof UniverseArray;
-
+        if (RunDetector.isRunning()) {
             if (initO || initA) {
-                for (UniverseSlotKey k : v.getSlots().keySet()) {
-                    if (object instanceof AnonymousArray) {
-                        UniverseArray a = (UniverseArray) v;
+                StructuredValue v = symbolTable.get(0).getUniverse().get(object.getReference());
 
-                        for (int i = 0; i < a.getLength(); ++i) {
-                            ArrayElementRead ar = DefaultArrayElementRead.create(object, Constant.create(i));
+                initO &= v instanceof UniverseObject;
+                initA &= v instanceof UniverseArray;
 
-                            if (v.getSlot(k) instanceof StructuredValueSlot) {
-                                constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(ar, NullExpression.create(), 0));
-                            } else {
-                                constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(ar, Constant.create(0), 0));
-                            }
+                if (initA) {
+                    UniverseArray a = (UniverseArray) v;
+                    Arrays arr = DefaultArrays.create();
+                    Arrays arrDef = ssa.getArraysIncarnation(DefaultArrays.create());
+
+                    for (UniverseSlotKey k : v.getSlots().keySet()) {
+                        Expression index = Constant.create(((ElementIndex)k).getIndex());
+
+                        Expression val;
+
+                        if (v.getSlot(k) instanceof StructuredValueSlot) {
+                            val = NullExpression.create();
+                        } else {
+                            val = Constant.create(0);
                         }
-                    } else {
+
+                        arrDef = DefaultArrayElementWrite.create(
+                            ssa.getSymbolIncarnation(object, 0),
+                            arrDef,
+                            index,
+                            val
+                        );
+                    }
+
+                    ssa.createNewSymbolIncarnation(DefaultArrayElementRead.create(object, arr, Constant.create(0)), 0);
+
+                    constraint = Conjunction.create(constraint, ArraysAssign.create(ssa.getArraysIncarnation(arr), arrDef));
+                } else if (initO) {
+                    for (UniverseSlotKey k : v.getSlots().keySet()) {
                         FieldName fn = (FieldName) k;
 
                         ObjectFieldRead fr = DefaultObjectFieldRead.create(object, fn.getName());
