@@ -13,7 +13,7 @@ public class Verifier {
     }
 
     public static char unknownChar() {
-        return 0; // TODO: Replace with proper implementation
+        return (char) unknownInt();
     }
 
     public static boolean unknownBool() {
