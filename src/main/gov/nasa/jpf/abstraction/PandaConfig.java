@@ -28,6 +28,7 @@ public class PandaConfig {
     private Boolean branchPruneInfeasible;
     private Boolean branchReevaluatePredicates;
     private Boolean refinement;
+    private PredicateAbstraction.Initialization refinementInitialization;
     private Boolean refinementGlobal;
     private Boolean refinementMethodGlobal;
     private Boolean refinementKeepUnrefinedPrefix;
@@ -258,5 +259,13 @@ public class PandaConfig {
         } catch (Exception e) {
             throw new JPFConfigException("Could not instantiate refinement heuristic");
         }
+    }
+
+    public PredicateAbstraction.Initialization refinementInitializationType() {
+        if (refinementInitialization == null) {
+            refinementInitialization = getUnderlyingConfig().getEnum("panda.refinement.initialization", PredicateAbstraction.Initialization.class.getEnumConstants(), PredicateAbstraction.Initialization.READ);
+        }
+
+        return refinementInitialization;
     }
 }

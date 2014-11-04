@@ -477,6 +477,11 @@ public class PredicateAbstraction extends Abstraction {
         }
     }
 
+    public enum Initialization {
+        READ,
+        WRITE
+    }
+
     @Override
     public void processNewObject(AnonymousObject object, MethodInfo m, int pc) {
         Set<AccessExpression> exprs = new HashSet<AccessExpression>();
@@ -523,27 +528,50 @@ public class PredicateAbstraction extends Abstraction {
                             val = Constant.create(0);
                         }
 
-                        arrDef = DefaultArrayElementWrite.create(
-                            ssa.getSymbolIncarnation(object, 0),
-                            arrDef,
-                            index,
-                            val
-                        );
+                        switch (PandaConfig.getInstance().refinementInitializationType()) {
+                            case READ:
+                                constraint = Conjunction.create(constraint, Equals.create(ssa.getSymbolIncarnation(DefaultArrayElementRead.create(object, index), 0), val));
+                                break;
+                            case WRITE:
+                                arrDef = DefaultArrayElementWrite.create(
+                                    ssa.getSymbolIncarnation(object, 0),
+                                    arrDef,
+                                    index,
+                                    val
+                                );
+                                ssa.createNewSymbolIncarnation(DefaultArrayElementRead.create(object, arr, Constant.create(0)), 0);
+                                break;
+                        }
                     }
 
-                    ssa.createNewSymbolIncarnation(DefaultArrayElementRead.create(object, arr, Constant.create(0)), 0);
-
-                    constraint = Conjunction.create(constraint, ArraysAssign.create(ssa.getArraysIncarnation(arr), arrDef));
+                    switch (PandaConfig.getInstance().refinementInitializationType()) {
+                        case READ:
+                            break;
+                        case WRITE:
+                            constraint = Conjunction.create(constraint, ArraysAssign.create(ssa.getArraysIncarnation(arr), arrDef));
+                            break;
+                    }
                 } else if (initO) {
                     for (UniverseSlotKey k : v.getSlots().keySet()) {
                         FieldName fn = (FieldName) k;
 
                         ObjectFieldRead fr = DefaultObjectFieldRead.create(object, fn.getName());
 
+                        Expression val;
+
                         if (v.getSlot(k) instanceof StructuredValueSlot) {
-                            constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, NullExpression.create(), 0));
+                            val = NullExpression.create();
                         } else {
-                            constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, Constant.create(0), 0));
+                            val = Constant.create(0);
+                        }
+
+                        switch (PandaConfig.getInstance().refinementInitializationType()) {
+                            case READ:
+                                constraint = Conjunction.create(constraint, Equals.create(ssa.getSymbolIncarnation(fr, 0), val));
+                                break;
+                            case WRITE:
+                                constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, val, 0));
+                                break;
                         }
                     }
                 }

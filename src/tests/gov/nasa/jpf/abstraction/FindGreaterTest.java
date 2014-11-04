@@ -4,6 +4,7 @@ public class FindGreaterTest extends BaseTest {
     public FindGreaterTest() {
         config.add("+panda.refinement=true");
         config.add("+panda.abstract_domain=PREDICATES"); // Disable loading of predicate file
+        config.add("+panda.refinement.initialize_array_elements=false");
     }
 
     @Test
