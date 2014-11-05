@@ -64,8 +64,6 @@ import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.common.impl.ArraysAssign;
 import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
-import gov.nasa.jpf.abstraction.common.impl.ObjectExpressionDecorator;
-import gov.nasa.jpf.abstraction.common.impl.PrimitiveExpressionDecorator;
 import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
@@ -291,7 +289,7 @@ public class PredicateAbstraction extends Abstraction {
     public void processPrimitiveStore(MethodInfo lastM, int lastPC, MethodInfo nextM, int nextPC, Expression from, AccessExpression to) {
         Set<AccessExpression> affected = symbolTable.processPrimitiveStore(from, to);
 
-        predicateValuation.reevaluate(lastPC, nextPC, to, affected, PrimitiveExpressionDecorator.wrap(from, symbolTable));
+        predicateValuation.reevaluate(lastPC, nextPC, to, affected, from);
 
         extendTraceFormulaWithAssignment(to, from, nextM, nextPC, 0);
     }
@@ -300,7 +298,7 @@ public class PredicateAbstraction extends Abstraction {
     public void processObjectStore(MethodInfo lastM, int lastPC, MethodInfo nextM, int nextPC, Expression from, AccessExpression to) {
         Set<AccessExpression> affected = symbolTable.processObjectStore(from, to);
 
-        predicateValuation.reevaluate(lastPC, nextPC, to, affected, ObjectExpressionDecorator.wrap(from, symbolTable));
+        predicateValuation.reevaluate(lastPC, nextPC, to, affected, from);
 
         extendTraceFormulaWithAssignment(to, from, nextM, nextPC, 0);
     }
@@ -379,7 +377,7 @@ public class PredicateAbstraction extends Abstraction {
             MethodInfo callee = before.getMethodInfo();
             MethodInfo caller = after.getMethodInfo();
             AccessExpression returnSymbolCallee = DefaultReturnValue.create();
-            AccessExpression returnSymbolCaller = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
+            AccessExpression returnSymbolCaller = DefaultReturnValue.create(after.getPC());
             Expression returnValue;
 
             if (before.getMethodInfo().getReturnSize() == 2) {
@@ -448,11 +446,11 @@ public class PredicateAbstraction extends Abstraction {
                     affected.add(fr);
 
                     if (v.getSlot(k) instanceof StructuredValueSlot) {
-                        predicateValuation.reevaluate(lastPC, nextPC, fr, affected, ObjectExpressionDecorator.wrap(NullExpression.create(), symbolTable));
+                        predicateValuation.reevaluate(lastPC, nextPC, fr, affected, NullExpression.create());
 
                         constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, NullExpression.create(), 0));
                     } else {
-                        predicateValuation.reevaluate(lastPC, nextPC, fr, affected, PrimitiveExpressionDecorator.wrap(Constant.create(0), symbolTable));
+                        predicateValuation.reevaluate(lastPC, nextPC, fr, affected, Constant.create(0));
 
                         constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, Constant.create(0), 0));
                     }

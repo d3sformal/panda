@@ -471,7 +471,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             // The actual write through of the return value performed by processVoidMethodReturn
         }
 
-        ReturnValue returnValueSpecific = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
+        ReturnValue returnValueSpecific = DefaultReturnValue.create(after.getPC());
 
         if (before.getMethodInfo().getReturnSize() == 2) {
             after.setLongOperandAttr(returnValueSpecific);
@@ -622,7 +622,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             Set<AccessExpression> temporaryPathsHolder = new HashSet<AccessExpression>();
 
             ReturnValue returnValue = DefaultReturnValue.create();
-            ReturnValue returnValueSpecific = DefaultReturnValue.create(after.getPC(), threadInfo.getTopFrameMethodInfo().isReferenceReturnType());
+            ReturnValue returnValueSpecific = DefaultReturnValue.create(after.getPC());
 
             Map<Predicate, TruthValue> calleeReturns = new HashMap<Predicate, TruthValue>();
 

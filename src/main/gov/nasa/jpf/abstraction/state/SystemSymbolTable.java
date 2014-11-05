@@ -188,7 +188,7 @@ public class SystemSymbolTable implements SymbolTable, Scoped {
     @Override
     public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         ReturnValue calleeReturnValue = DefaultReturnValue.create();
-        ReturnValue callerReturnValue = DefaultReturnValue.create(threadInfo.getPC(), before.getMethodInfo().isReferenceReturnType());
+        ReturnValue callerReturnValue = DefaultReturnValue.create(threadInfo.getPC());
 
         Expression returnExpression = ExpressionUtil.getExpression(after.getOperandAttr());
         //after.setOperandAttr(callerReturnValue); // This is performed by the predicate valuation after it uses the original expression

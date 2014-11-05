@@ -180,7 +180,7 @@ path returns [DefaultAccessExpression val]
         if (r.equals("return")) {
             $ctx.val = DefaultReturnValue.create();
         } else {
-            $ctx.val = DefaultReturnValue.create(r, false); // TODO: encode isReference and reconstruct correct object
+            $ctx.val = DefaultReturnValue.create(r);
         }
     }
     | f=CLASS_TOKEN {

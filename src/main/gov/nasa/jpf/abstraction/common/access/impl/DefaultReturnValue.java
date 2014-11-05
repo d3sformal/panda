@@ -10,17 +10,15 @@ import gov.nasa.jpf.abstraction.common.access.ReturnValue;
  */
 public class DefaultReturnValue extends DefaultRoot implements ReturnValue {
 
-    private boolean isReference = false;
     private boolean isReturnFromCurrentScope = true;
 
     protected DefaultReturnValue() {
         super("return");
     }
 
-    protected DefaultReturnValue(String name, boolean isReference) {
+    protected DefaultReturnValue(String name) {
         super(name);
 
-        this.isReference = isReference;
         this.isReturnFromCurrentScope = false;
     }
 
@@ -28,17 +26,12 @@ public class DefaultReturnValue extends DefaultRoot implements ReturnValue {
         return new DefaultReturnValue();
     }
 
-    public static DefaultReturnValue create(String name, boolean isReference) {
-        return new DefaultReturnValue(name, isReference);
+    public static DefaultReturnValue create(String name) {
+        return new DefaultReturnValue(name);
     }
 
-    public static DefaultReturnValue create(Instruction pc, boolean isReference) {
-        return create("return_pc" + pc.getInstructionIndex(), isReference);
-    }
-
-    @Override
-    public boolean isReference() {
-        return isReference;
+    public static DefaultReturnValue create(Instruction pc) {
+        return create("return_pc" + pc.getInstructionIndex());
     }
 
     @Override
