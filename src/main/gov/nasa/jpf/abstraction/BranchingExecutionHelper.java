@@ -48,7 +48,7 @@ public class BranchingExecutionHelper {
         boolean forceFeasible = forceFeasibleOnce || config.forceFeasibleBranches();
 
         if (concreteJump == abstractJump) { // In case concrete and abstract executions agree
-            if (forceFeasibleOnce) {
+            if (pruneInfeasible && forceFeasibleOnce) {
                 // Add state to allow forward state matching (look if we should generate more choices to get into the branch (it might have been explored before - actually it is explored when this branch is hit))
                 ti.breakTransition("Creating state after taking an enabled branch: " + branchCondition);
 
@@ -309,22 +309,36 @@ public class BranchingExecutionHelper {
     }
 
     private static void adjustValueInConcreteState(AccessExpression expr, int value, ElementInfo ei, StackFrame sf, ThreadInfo ti) {
+        PandaConfig config = PandaConfig.getInstance();
+
         if (ei == null) {
             LocalVarInfo lvi = sf.getLocalVarInfo(expr.getRoot().getName());
 
             // Update only variables that are in scope
             if (lvi != null) {
                 sf.setLocalVariable(lvi.getSlotIndex(), value);
+
+                if (config.enabledVerbose(BranchingExecutionHelper.class)) {
+                    System.out.println("Setting local variable slot #" + lvi.getSlotIndex() + " (" + expr + ") to " + value);
+                }
             }
         } else if (expr instanceof ObjectFieldRead) {
             ObjectFieldRead r = (ObjectFieldRead) expr;
 
             ti.getModifiableElementInfo(ei.getObjectRef()).setIntField(r.getField().getName(), value);
+
+            if (config.enabledVerbose(BranchingExecutionHelper.class)) {
+                System.out.println("Setting object field `" + r.getField().getName() + "` of " + ei.getObjectRef() + " (" + expr + ") to " + value);
+            }
         } else if (expr instanceof ArrayElementRead) {
             ArrayElementRead r = (ArrayElementRead) expr;
             Constant c = (Constant) r.getIndex();
 
             ti.getModifiableElementInfo(ei.getObjectRef()).getArrayFields().setIntValue(c.value.intValue(), value);
+
+            if (config.enabledVerbose(BranchingExecutionHelper.class)) {
+                System.out.println("Setting array element number " + c.value.intValue() + " of " + ei.getObjectRef() + " (" + expr + ") to " + value);
+            }
         } else {
             throw new RuntimeException("Cannot inject value into anything else than local variable, object field, static field and array element.");
         }

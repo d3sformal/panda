@@ -85,7 +85,7 @@ public class ArrayLoadExecutor {
 
         sf.setOperandAttr(path);
 
-        if (RunDetector.isRunning() && PandaConfig.getInstance().pruneInfeasibleBranches()) {
+        if (RunDetector.isRunning()) {
             Predicate condition = Equals.create(index, Constant.create(abstractIndex));
 
             if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
