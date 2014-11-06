@@ -262,7 +262,9 @@ public class BranchingExecutionHelper {
 
                 PredicateAbstraction.getInstance().getSymbolTable().get(0).lookupValues(root, cls);
 
-                assert cls.size() == 1;
+                if (cls.size() != 1) {
+                    throw new RuntimeException("Ambiguity when searching for class `" + root + "`");
+                }
 
                 ClassName clsName = (ClassName) cls.iterator().next();
 

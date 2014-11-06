@@ -24,9 +24,7 @@ public enum TruthValue implements BranchingConditionInfo {
         if (i == FALSE.ordinal()) return FALSE;
         if (i == UNKNOWN.ordinal()) return UNKNOWN;
 
-        assert false : "Unknown truth value ordinal";
-
-        return UNDEFINED;
+        throw new RuntimeException("Unknown truth value ordinal");
     }
 
     public static TruthValue create(boolean isTrue, boolean isFalse) {

@@ -110,7 +110,9 @@ public class UnaryIfInstructionExecutor {
         } else { // this is what really returns results
             ChoiceGenerator<?> cg = ss.getChoiceGenerator();
 
-            assert (cg instanceof AbstractChoiceGenerator) : "expected AbstractChoiceGenerator, got: " + cg;
+            if (!(cg instanceof AbstractChoiceGenerator)) {
+                throw new RuntimeException("expected AbstractChoiceGenerator, got: " + cg);
+            }
 
             conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
 

@@ -133,7 +133,9 @@ public abstract class BinaryComparatorExecutor<T extends Comparable<T>> {
              */
             ChoiceGenerator<?> cg = ss.getChoiceGenerator();
 
-            assert (cg instanceof IntChoiceFromList);
+            if (!(cg instanceof IntChoiceFromList)) {
+                throw new RuntimeException("Unexpected choice generator type");
+            }
 
             result = (Integer) cg.getNextChoice();
 
