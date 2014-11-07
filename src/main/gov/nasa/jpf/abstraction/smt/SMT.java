@@ -938,6 +938,10 @@ public class SMT {
 
         collector.collect(stateFormula);
 
+        for (AccessExpression e : expressions) {
+            collector.collect(e);
+        }
+
         Set<String> classes = collector.getClasses();
         Set<String> variables = collector.getVars();
         Set<String> specials = collector.getSpecials();

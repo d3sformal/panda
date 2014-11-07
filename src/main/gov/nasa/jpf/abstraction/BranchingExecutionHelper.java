@@ -8,10 +8,12 @@ import java.util.Map;
 import java.util.Set;
 
 import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.StateSet;
+import gov.nasa.jpf.vm.StaticElementInfo;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
@@ -28,6 +30,7 @@ import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.Unknown;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
@@ -268,7 +271,7 @@ public class BranchingExecutionHelper {
 
                 ClassName clsName = (ClassName) cls.iterator().next();
 
-                collectStateExpressions(stateExprs, ti, clsName.getStaticElementInfo(), expr, 2, root);
+                collectStateExpressions(stateExprs, ti, clsName.getStaticElementInfo().getClassInfo().getStaticElementInfo(), expr, 2, root);
             }
         }
     }
@@ -276,13 +279,29 @@ public class BranchingExecutionHelper {
     // Recursively expands expressions
     // Used in collectAllStateExpressions only
     private static void collectStateExpressions(Map<AccessExpression, ElementInfo> stateExprs, ThreadInfo ti, ElementInfo parent, AccessExpression expr, int i, AccessExpression prefix) {
-        if (i < expr.getLength()) {
+        if (parent == null) {
+            if (PandaConfig.getInstance().enabledVerbose(BranchingExecutionHelper.class)) {
+                System.out.println("Attempting to collect subexpressions of null (" + expr + ")");
+            }
+
+            return;
+        }
+
+        if (i <= expr.getLength()) {
             AccessExpression access = expr.get(i);
 
             if (access instanceof ObjectFieldRead) {
                 ObjectFieldRead r = (ObjectFieldRead) access;
 
-                if (parent.getClassInfo().getInstanceField(r.getField().getName()).isReference()) {
+                FieldInfo fi;
+
+                if (parent instanceof StaticElementInfo) {
+                    fi = parent.getClassInfo().getStaticField(r.getField().getName());
+                } else {
+                    fi = parent.getClassInfo().getInstanceField(r.getField().getName());
+                }
+
+                if (fi.isReference()) {
                     collectStateExpressions(stateExprs, ti, ti.getElementInfo(parent.getReferenceField(r.getField().getName())), expr, i + 1, r.reRoot(prefix));
                 } else {
                     stateExprs.put(r.reRoot(prefix), parent);
@@ -298,10 +317,12 @@ public class BranchingExecutionHelper {
                 }
 
                 for (int index : indices) {
-                    if (parent.isReferenceArray()) {
-                        collectStateExpressions(stateExprs, ti, ti.getElementInfo(parent.getArrayFields().getReferenceValue(index)), expr, i + 1, DefaultArrayElementRead.create(prefix, Constant.create(index)));
-                    } else {
-                        stateExprs.put(DefaultArrayElementRead.create(prefix, Constant.create(index)), parent);
+                    if (index < parent.arrayLength()) {
+                        if (parent.isReferenceArray()) {
+                            collectStateExpressions(stateExprs, ti, ti.getElementInfo(parent.getArrayFields().getReferenceValue(index)), expr, i + 1, DefaultArrayElementRead.create(prefix, Constant.create(index)));
+                        } else {
+                            stateExprs.put(DefaultArrayElementRead.create(prefix, Constant.create(index)), parent);
+                        }
                     }
                 }
             }
@@ -324,8 +345,21 @@ public class BranchingExecutionHelper {
             }
         } else if (expr instanceof ObjectFieldRead) {
             ObjectFieldRead r = (ObjectFieldRead) expr;
+            FieldInfo fi;
 
-            ti.getModifiableElementInfo(ei.getObjectRef()).setIntField(r.getField().getName(), value);
+            if (ei instanceof StaticElementInfo) {
+                fi = ei.getClassInfo().getStaticField(r.getField().getName());
+            } else {
+                fi = ei.getClassInfo().getInstanceField(r.getField().getName());
+            }
+
+            ei = ei.getModifiableInstance();
+
+            if (fi.is1SlotField()) {
+                ei.set1SlotField(fi, value);
+            } else {
+                ei.set2SlotField(fi, (long)value);
+            }
 
             if (config.enabledVerbose(BranchingExecutionHelper.class)) {
                 System.out.println("Setting object field `" + r.getField().getName() + "` of " + ei.getObjectRef() + " (" + expr + ") to " + value);
@@ -334,7 +368,10 @@ public class BranchingExecutionHelper {
             ArrayElementRead r = (ArrayElementRead) expr;
             Constant c = (Constant) r.getIndex();
 
-            ti.getModifiableElementInfo(ei.getObjectRef()).getArrayFields().setIntValue(c.value.intValue(), value);
+            ei = ei.getModifiableInstance();
+
+            // TODO other types
+            ei.getArrayFields().setIntValue(c.value.intValue(), value);
 
             if (config.enabledVerbose(BranchingExecutionHelper.class)) {
                 System.out.println("Setting array element number " + c.value.intValue() + " of " + ei.getObjectRef() + " (" + expr + ") to " + value);

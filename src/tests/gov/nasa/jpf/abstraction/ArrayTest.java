@@ -15,6 +15,7 @@ public class ArrayTest extends BaseTest {
         static_a[0] = static_a[1];
     }
 
+    @Test
     public static void main(String[] args) {
         ArrA a[] = static_a;
         assertConjunction("a[0].f = 2: true");
@@ -22,5 +23,20 @@ public class ArrayTest extends BaseTest {
         int i = a[0].f;
         i = -1;
         a[0].f = i + 2;
+    }
+
+    @Test
+    public static void test() {
+        int x;
+        int i = 0;
+        int[] a = new int[2];
+
+        // Load -> non-det choice of values of `i`
+        // Adjusting -> set `i` to 1 in the abstract "branch" i = 1
+        if (i >= 0 && i < a.length) {
+            if (a[i] > 0) {
+                x = a[i];
+            }
+        }
     }
 }

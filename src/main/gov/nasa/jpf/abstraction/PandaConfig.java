@@ -75,11 +75,14 @@ public class PandaConfig {
         }
 
         if (verboseClasses == null) {
-            Boolean verbose = getUnderlyingConfig().getBoolean("panda.verbose");
-
-            if (verbose == null) {
+            try {
                 verboseClasses = getUnderlyingConfig().getClasses("panda.verbose");
-            } else {
+
+                System.out.println("[VERBOSE] Turning on verbose for classes:");
+                for (Class<?> c : verboseClasses) {
+                    System.out.println("\t" + c);
+                }
+            } catch (Throwable t) {
                 verboseClasses = new Class<?>[0];
             }
         }
