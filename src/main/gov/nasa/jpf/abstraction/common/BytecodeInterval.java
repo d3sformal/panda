@@ -19,6 +19,14 @@ public class BytecodeInterval extends BytecodeRange {
         this.max = b;
     }
 
+    public int getMin() {
+        return min;
+    }
+
+    public int getMax() {
+        return max;
+    }
+
     @Override
     public BytecodeRange merge(BytecodeInterval i) {
         if (overlaps(i)) {

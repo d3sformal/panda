@@ -8,7 +8,7 @@ import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 
-public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
+public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD implements VariableLoadInstruction {
 
     public ILOAD(int index) {
         super(index);
@@ -18,7 +18,7 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
     public Instruction execute(ThreadInfo ti) {
         Instruction actualNextInsn = super.execute(ti);
 
-        DefaultRoot path = DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
+        DefaultRoot path = getVariable();
 
         StackFrame sf = ti.getModifiableTopFrame();
         sf.setOperandAttr(path);
@@ -26,5 +26,10 @@ public class ILOAD extends gov.nasa.jpf.jvm.bytecode.ILOAD {
         PredicateAbstraction.getInstance().informAboutPrimitiveLocalVariable(path);
 
         return actualNextInsn;
+    }
+
+    @Override
+    public DefaultRoot getVariable() {
+        return DefaultRoot.create(getLocalVariableName(), getLocalVariableIndex());
     }
 }

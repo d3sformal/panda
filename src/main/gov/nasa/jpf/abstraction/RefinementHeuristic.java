@@ -11,7 +11,7 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.state.SystemPredicateValuation;
 
 public class RefinementHeuristic {
-    private SystemPredicateValuation predVal;
+    protected SystemPredicateValuation predVal;
 
     public RefinementHeuristic(SystemPredicateValuation predVal) {
         this.predVal = predVal;

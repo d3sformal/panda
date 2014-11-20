@@ -11,6 +11,30 @@ public class BytecodeIntervals extends BytecodeRange {
         this.intervals = intervals;
     }
 
+    public int getMin() {
+        int min = intervals.iterator().next().getMin();
+
+        for (BytecodeInterval i : intervals) {
+            if (min > i.getMin()) {
+                min = i.getMin();
+            }
+        }
+
+        return min;
+    }
+
+    public int getMax() {
+        int max = intervals.iterator().next().getMax();
+
+        for (BytecodeInterval i : intervals) {
+            if (max < i.getMax()) {
+                max = i.getMax();
+            }
+        }
+
+        return max;
+    }
+
     @Override
     public BytecodeRange merge(BytecodeInterval i) {
         BytecodeInterval overlapping = null;
