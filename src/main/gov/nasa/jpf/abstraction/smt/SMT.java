@@ -262,7 +262,9 @@ public class SMT {
         InputStream outstream = process.getInputStream();
         outreader = new InputStreamReader(outstream);
 
-        System.out.println("Started " + smt + " solver.");
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("Started " + smt + " solver.");
+        }
     }
 
     /**
@@ -320,7 +322,9 @@ public class SMT {
 
         in.flush();
 
-        System.out.println("Configured " + smt + " solver.");
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("Configured " + smt + " solver.");
+        }
     }
 
     /**
@@ -453,7 +457,12 @@ public class SMT {
 
         PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
 
-        collector.collect(traceFormula.toConjunction());
+        // Treat all steps separately
+        // False-conjunct may turn the conjunction into False
+        // Not having any symbols
+        for (Step s : traceFormula) {
+            collector.collect(s.getPredicate());
+        }
 
         Set<String> classes = collector.getClasses();
         Set<String> variables = collector.getVars();

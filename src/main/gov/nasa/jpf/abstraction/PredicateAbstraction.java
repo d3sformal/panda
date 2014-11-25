@@ -13,7 +13,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import gov.nasa.jpf.JPFException;
-import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ElementInfo;
@@ -153,13 +152,18 @@ public class PredicateAbstraction extends Abstraction {
         this.predicateSet = predicateSet;
     }
 
+    private ChoiceHistory history = new ChoiceHistory();
+
     public void rememberChoiceGenerator(ChoiceGenerator<?> cg) {
+        history.rememberChoiceGenerator(cg);
     }
 
     public void rememberChoice(ChoiceGenerator<?> cg) {
+        history.rememberChoice();
     }
 
     public void forgetChoiceGenerator() {
+        history.forgetChoiceGenerator();
     }
 
     private SSAFormulaIncarnationsManager ssa = new SSAFormulaIncarnationsManager();
@@ -717,6 +721,8 @@ public class PredicateAbstraction extends Abstraction {
         visitedMethods.addAll(trace.top().visitedMethods);
         forcedTrace = trace.top().forcedTrace;
 
+        history.backtrack();
+
         if (trace.isEmpty()) {
             smt.close();
         }
@@ -743,12 +749,14 @@ public class PredicateAbstraction extends Abstraction {
         PandaConfig config = PandaConfig.getInstance();
 
         if (config.enabledRefinement()) {
-            System.out.println();
-            System.out.println();
-            System.out.println();
-            System.out.println("Error source code line: " + VM.getVM().getCurrentThread().getPC().getSourceLine());
-            System.out.println("Trying to refine abstraction.");
-            System.out.println();
+            if (config.enabledVerbose(this.getClass())) {
+                System.out.println();
+                System.out.println();
+                System.out.println();
+                System.out.println("Error source code line: " + VM.getVM().getCurrentThread().getPC().getSourceLine());
+                System.out.println("Trying to refine abstraction.");
+                System.out.println();
+            }
 
             Predicate[] interpolants = smt.interpolate(traceFormula);
 
@@ -834,22 +842,18 @@ public class PredicateAbstraction extends Abstraction {
                     backtrackLevel = 1;
                 }
 
-                // Extract prediction of choices from the recorded choice generator cache
-                // TODO (feed prediction into new CGs to pass them along the refined trace, but disregard them in completely new traces)
-
-                notifyAboutRefinementBacktrackLevel(backtrackLevel);
-
-                notifyAboutCurrentPredicateSet(predicateValuation.getPredicateSet(), refinedMethods);
-
                 /**
                  * The first step of the interpolant should never be contradiction
                  * Thus the refinement should never happen before the first step (in the auxiliary state -1, which we need to keep to start our refined search from)
                  */
                 if (backtrackLevel < 1) {
                     //throw new RuntimeException("Refinement backtracks too much and will end the search loop.");
-                    return 1;
+                    backtrackLevel = 1;
                 }
 
+                notifyAboutRefinementBacktrackLevel(backtrackLevel);
+
+                notifyAboutCurrentPredicateSet(predicateValuation.getPredicateSet(), refinedMethods);
 
                 return backtrackLevel;
             }
