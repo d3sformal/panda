@@ -32,6 +32,7 @@ public class PandaConfig {
     private Boolean refinementGlobal;
     private Boolean refinementMethodGlobal;
     private Boolean refinementKeepUnrefinedPrefix;
+    private Boolean refinementKeepExploredBranches;
     private Boolean languageCheckMinimization;
     private Boolean initializeStaticFields;
     private Boolean initializeObjectFields;
@@ -226,6 +227,14 @@ public class PandaConfig {
         }
 
         return refinementKeepUnrefinedPrefix;
+    }
+
+    public boolean keepExploredBranches() {
+        if (refinementKeepExploredBranches == null) {
+            refinementKeepExploredBranches = getUnderlyingConfig().getBoolean("panda.refinement.keep_explored_branches");
+        }
+
+        return refinementKeepExploredBranches;
     }
 
     public boolean initializeStaticFields() {

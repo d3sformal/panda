@@ -122,6 +122,7 @@ public class PredicateAbstraction extends Abstraction {
     private Predicates predicateSet;
     private int refinements = 0;
     private RefinementHeuristic heuristic;
+    private ChoiceHistory history;
 
     private static PredicateAbstraction instance = null;
     private static List<CounterexampleListener> listeners = new ArrayList<CounterexampleListener>();
@@ -149,21 +150,29 @@ public class PredicateAbstraction extends Abstraction {
         trace = new Trace();
         traceFormula = new TraceFormula();
 
+        if (PandaConfig.getInstance().keepExploredBranches()) {
+            history = new ChoiceHistory();
+        }
+
         this.predicateSet = predicateSet;
     }
 
-    private ChoiceHistory history = new ChoiceHistory();
-
     public void rememberChoiceGenerator(ChoiceGenerator<?> cg) {
-        history.rememberChoiceGenerator(cg);
+        if (PandaConfig.getInstance().keepExploredBranches()) {
+            history.rememberChoiceGenerator(cg);
+        }
     }
 
     public void rememberChoice(ChoiceGenerator<?> cg) {
-        history.rememberChoice();
+        if (PandaConfig.getInstance().keepExploredBranches()) {
+            history.rememberChoice();
+        }
     }
 
     public void forgetChoiceGenerator() {
-        history.forgetChoiceGenerator();
+        if (PandaConfig.getInstance().keepExploredBranches()) {
+            history.forgetChoiceGenerator();
+        }
     }
 
     private SSAFormulaIncarnationsManager ssa = new SSAFormulaIncarnationsManager();
@@ -721,7 +730,9 @@ public class PredicateAbstraction extends Abstraction {
         visitedMethods.addAll(trace.top().visitedMethods);
         forcedTrace = trace.top().forcedTrace;
 
-        history.backtrack();
+        if (PandaConfig.getInstance().keepExploredBranches()) {
+            history.backtrack();
+        }
 
         if (trace.isEmpty()) {
             smt.close();

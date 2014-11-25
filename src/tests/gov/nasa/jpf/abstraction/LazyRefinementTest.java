@@ -2,21 +2,31 @@ package gov.nasa.jpf.abstraction;
 
 import gov.nasa.jpf.vm.Verify;
 
+import static gov.nasa.jpf.abstraction.statematch.StateMatchingTest.assertRevisitedAtLeast;
+import static gov.nasa.jpf.abstraction.statematch.StateMatchingTest.assertVisitedAtMost;
+
 public class LazyRefinementTest extends BaseTest {
     public LazyRefinementTest() {
         config.add("+panda.refinement=true");
+        //config.add("+panda.refinement.keep_explored_branches=false");
         config.add("+panda.branch.prune_infeasible=true");
         config.add("+panda.branch.nondet_force_feasible=true");
+        config.add("+search.multiple_errors=true");
         config.add("+classpath+=;lib/jpf-core/build/jpf.jar");
     }
 
+    private final static int choices = 1000;
+
     @Test
     public static void test() {
-        createChoices();
+        createChoices(choices);
 
-        error();
+        error(choices - 1);
+
+        assertRevisitedAtLeast(choices);
+        assertVisitedAtMost(choices + 1);
     }
 
-    native private static void createChoices();
-    native private static void error();
+    native private static void createChoices(int choices);
+    native private static void error(int choice);
 }
