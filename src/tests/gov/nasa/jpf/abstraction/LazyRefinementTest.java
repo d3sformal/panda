@@ -11,7 +11,6 @@ public class LazyRefinementTest extends BaseTest {
         config.add("+panda.branch.prune_infeasible=true");
         config.add("+panda.branch.nondet_force_feasible=true");
         config.add("+search.multiple_errors=true");
-        config.add("+classpath+=;lib/jpf-core/build/jpf.jar");
     }
 
     private final static int choices = 1000;

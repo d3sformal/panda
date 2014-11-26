@@ -159,10 +159,6 @@ public class BaseTest {
         Iterator<Boolean> passIter = targetShouldPass.iterator();
         Iterator<String[]> configIter = targetConfig.iterator();
 
-        System.out.println(targetEntries);
-        System.out.println(targetShouldPass);
-        System.out.println(targetConfig);
-
         while (entryIter.hasNext()) {
             String entry = entryIter.next();
             Boolean expectedPass = passIter.next();
