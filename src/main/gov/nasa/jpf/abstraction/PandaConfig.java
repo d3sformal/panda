@@ -50,6 +50,10 @@ public class PandaConfig {
         return instance;
     }
 
+    public static void reset() {
+        instance = null;
+    }
+
     private Config getUnderlyingConfig() {
         if (config == null) {
             config = VM.getVM().getJPF().getConfig();

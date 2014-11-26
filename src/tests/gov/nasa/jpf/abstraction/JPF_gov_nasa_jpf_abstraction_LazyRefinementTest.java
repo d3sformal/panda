@@ -16,7 +16,6 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 
 public class JPF_gov_nasa_jpf_abstraction_LazyRefinementTest extends NativePeer {
     private static int curChoice;
-    private static boolean refinement = false;
 
     @MJI
     public void createChoices__I__V(MJIEnv env, int clsObjRef, int choices) {
@@ -37,7 +36,7 @@ public class JPF_gov_nasa_jpf_abstraction_LazyRefinementTest extends NativePeer 
 
     @MJI
     public void error__I__V(MJIEnv env, int clsObjRef, int choice) {
-        if (curChoice == choice && !refinement) {
+        if (curChoice == choice && PredicateAbstraction.getInstance().getNumberOfRefinements() == 0) {
             Predicate p1 = Equals.create(DefaultRoot.create("x"), Constant.create(0));
             Predicate p2 = LessThan.create(DefaultRoot.create("x"), Constant.create(0));
 
@@ -49,8 +48,6 @@ public class JPF_gov_nasa_jpf_abstraction_LazyRefinementTest extends NativePeer 
             PredicateAbstraction.getInstance().getTraceFormula().markReturned();
 
             env.throwException("java.lang.RuntimeException");
-
-            refinement = true;
         }
     }
 }

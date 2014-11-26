@@ -58,8 +58,14 @@ public class BaseTest {
         config.add("+target=" + getClass().getName());
     }
 
-    private String[] getConfig() {
-        return config.toArray(new String[config.size()]);
+    private String[] getConfig(String... targetConfig) {
+        String[] config = this.config.toArray(new String[this.config.size() + targetConfig.length]);
+
+        for (int i = 0; i < targetConfig.length; ++i) {
+            config[this.config.size() + i] = targetConfig[i];
+        }
+
+        return config;
     }
 
     public void enableBranchPruning() {
@@ -72,11 +78,10 @@ public class BaseTest {
 
     @Test
     public void bootstrap() {
-        Config config = JPF.createConfig(getConfig());
-
         Class<? extends BaseTest> cls = this.getClass();
 
         List<String> targetEntries = new LinkedList<String>();
+        List<String[]> targetConfig = new LinkedList<String[]>();
         List<Boolean> targetShouldPass = new LinkedList<Boolean>();
 
         for (Method m : cls.getDeclaredMethods()) {
@@ -87,6 +92,8 @@ public class BaseTest {
                 t = m.getAnnotation(gov.nasa.jpf.abstraction.FailingTest.class);
                 pass = false;
             }
+
+            Annotation c = m.getAnnotation(gov.nasa.jpf.abstraction.Config.class);
 
             if (t != null) {
                 if (!Modifier.isStatic(m.getModifiers())) {
@@ -113,22 +120,55 @@ public class BaseTest {
                 }
 
                 targetShouldPass.add(pass);
+
+                if (c == null) {
+                    targetConfig.add(new String[0]);
+                } else {
+                    targetConfig.add(((gov.nasa.jpf.abstraction.Config) c).items());
+                }
             }
         }
 
         if (targetEntries.isEmpty()) {
             targetEntries.add("main([Ljava/lang/String;)V");
             targetShouldPass.add(true);
+
+            Method main = null;
+
+            try {
+                main = cls.getMethod("main", String[].class);
+            } catch (NoSuchMethodException e) {
+            }
+
+            Annotation c = null;
+
+            if (main != null) {
+                c = main.getAnnotation(gov.nasa.jpf.abstraction.Config.class);
+            }
+
+            if (c == null) {
+                targetConfig.add(new String[0]);
+            } else {
+                targetConfig.add(((gov.nasa.jpf.abstraction.Config) c).items());
+            }
         }
 
         boolean allPassed = true;
 
         Iterator<String> entryIter = targetEntries.iterator();
         Iterator<Boolean> passIter = targetShouldPass.iterator();
+        Iterator<String[]> configIter = targetConfig.iterator();
+
+        System.out.println(targetEntries);
+        System.out.println(targetShouldPass);
+        System.out.println(targetConfig);
 
         while (entryIter.hasNext()) {
             String entry = entryIter.next();
             Boolean expectedPass = passIter.next();
+            String[] specificConfig = configIter.next();
+
+            Config config = JPF.createConfig(getConfig(specificConfig));
 
             config.setTargetEntry(entry);
 
