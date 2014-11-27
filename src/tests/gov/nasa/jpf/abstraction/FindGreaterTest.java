@@ -8,7 +8,7 @@ public class FindGreaterTest extends BaseTest {
     }
 
     @Test
-    public static void test1() {
+    public static void findGreater() {
         int[] data = new int[5];
 
         loadRandomValues(data);
@@ -16,6 +16,11 @@ public class FindGreaterTest extends BaseTest {
         int pos = findGreater(data, 10);
 
         assert pos == data.length || data[pos] > 10;
+    }
+
+    @Test
+    public static void test1() {
+        findGreater();
     }
 
     @Test
@@ -54,6 +59,15 @@ public class FindGreaterTest extends BaseTest {
         }
 
         assert pos == data.length || data[pos] > 10;
+    }
+
+    @Test
+    @Config(items = {
+        "+panda.branch.adjust_concrete_values=false",
+        "+panda.branch.prune_infeasible=true"
+    })
+    public static void test4() {
+        findGreater();
     }
 
     private static void loadRandomValues(int[] a) {
