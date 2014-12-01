@@ -2,8 +2,8 @@
 
 cd src/tests
 
-common_tests=`find gov/nasa/jpf/abstraction/common -name "*.java" | xargs | tr '/' '.'`
-predabs_tests=`find gov/nasa/jpf/abstraction -mindepth 1 -maxdepth 1 -name "*.java" | xargs | tr '/' '.'`
+common_tests=`find gov/nasa/jpf/abstraction/common -name "*.java" | sort | xargs | tr '/' '.'`
+predabs_tests=`find gov/nasa/jpf/abstraction -mindepth 1 -maxdepth 1 -name "*.java" | sort | xargs | tr '/' '.'`
 
 cd ../..
 
