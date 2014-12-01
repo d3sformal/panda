@@ -1,5 +1,7 @@
 package gov.nasa.jpf.abstraction;
 
+import static gov.nasa.jpf.abstraction.Verifier.unknownInt;
+
 public class FindGreaterTest extends BaseTest {
     public FindGreaterTest() {
         config.add("+panda.refinement=true");
@@ -7,20 +9,19 @@ public class FindGreaterTest extends BaseTest {
         config.add("+panda.refinement.initialize_array_elements=false");
     }
 
-    @Test
-    public static void findGreater() {
+    public static void findGreater(int n) {
         int[] data = new int[5];
 
         loadRandomValues(data);
 
-        int pos = findGreater(data, 10);
+        int pos = findGreater(data, n);
 
-        assert pos == data.length || data[pos] > 10;
+        assert pos == data.length || data[pos] > n;
     }
 
     @Test
     public static void test1() {
-        findGreater();
+        findGreater(10);
     }
 
     @Test
@@ -67,7 +68,7 @@ public class FindGreaterTest extends BaseTest {
         "+panda.branch.prune_infeasible=true"
     })
     public static void test4() {
-        findGreater();
+        findGreater(unknownInt());
     }
 
     private static void loadRandomValues(int[] a) {
