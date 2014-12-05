@@ -210,7 +210,7 @@ public class SMT {
         public int logFileID = 0;
     }
 
-    private static SupportedSMT defaultSMT = SupportedSMT.CVC4;
+    private static SupportedSMT defaultSMT = PandaConfig.getInstance().getSMT();
 
     /**
      * Starts a process of a supported SMT solver

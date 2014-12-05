@@ -5,6 +5,7 @@ import gov.nasa.jpf.JPFConfigException;
 import gov.nasa.jpf.vm.JenkinsStateSet;
 import gov.nasa.jpf.vm.VM;
 
+import gov.nasa.jpf.abstraction.smt.SMT;
 import gov.nasa.jpf.abstraction.state.SystemPredicateValuation;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.CounterexampleListener;
@@ -17,6 +18,7 @@ public class PandaConfig {
     private Boolean verbose;
     private Class<?>[] verboseClasses;
     private Boolean logSMT;
+    private SMT.SupportedSMT smt;
     private TruthValue assertionsDisabled;
     private Boolean printConcreteCounterexample;
     private CounterexampleListener.Format counterexamplePrintFormat;
@@ -107,6 +109,14 @@ public class PandaConfig {
         }
 
         return logSMT;
+    }
+
+    public SMT.SupportedSMT getSMT() {
+        if (smt == null) {
+            smt = getUnderlyingConfig().getEnum("panda.smt", SMT.SupportedSMT.class.getEnumConstants(), SMT.SupportedSMT.CVC4);
+        }
+
+        return smt;
     }
 
     public TruthValue getAssertionsDisabled() {
