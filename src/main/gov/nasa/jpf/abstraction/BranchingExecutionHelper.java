@@ -370,7 +370,6 @@ public class BranchingExecutionHelper {
 
             ei = ei.getModifiableInstance();
 
-            // TODO other types
             ei.getArrayFields().setIntValue(c.value.intValue(), value);
 
             if (config.enabledVerbose(BranchingExecutionHelper.class)) {

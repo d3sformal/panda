@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 
 import org.junit.Test;
@@ -164,7 +163,7 @@ public class BaseTest {
             Boolean expectedPass = passIter.next();
             String[] specificConfig = configIter.next();
 
-            Config config = JPF.createConfig(getConfig(specificConfig));
+            gov.nasa.jpf.Config config = JPF.createConfig(getConfig(specificConfig));
 
             config.setTargetEntry(entry);
 
