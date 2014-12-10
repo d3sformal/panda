@@ -9,7 +9,7 @@ public class FindGreaterTest extends BaseTest {
         config.add("+panda.refinement.initialize_array_elements=false");
     }
 
-    public static void findGreater(int n) {
+    public static void test(int n) {
         int[] data = new int[5];
 
         loadRandomValues(data);
@@ -21,7 +21,7 @@ public class FindGreaterTest extends BaseTest {
 
     @Test
     public static void test1() {
-        findGreater(10);
+        test(10);
     }
 
     @Test
@@ -68,7 +68,30 @@ public class FindGreaterTest extends BaseTest {
         "+panda.branch.prune_infeasible=true"
     })
     public static void test4() {
-        findGreater(unknownInt());
+        test(unknownInt());
+    }
+
+    @Test
+    @Config(items = {
+        "+panda.refinement.initialize_array_elements=true"
+    })
+    public static void test5() {
+        int[] data = new int[5];
+
+        for (int i = 0; i < data.length; ++i) {
+            data[i] = unknownInt();
+        }
+
+        int pos = data.length;
+
+        for (int i = 0; i < data.length; ++i) {
+            if (data[i] > 10) {
+                pos = i;
+                break;
+            }
+        }
+
+        assert pos == data.length || data[pos] > 10;
     }
 
     private static void loadRandomValues(int[] a) {
