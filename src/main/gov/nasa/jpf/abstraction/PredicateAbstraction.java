@@ -126,6 +126,11 @@ public class PredicateAbstraction extends Abstraction {
 
     private static PredicateAbstraction instance = null;
     private static List<CounterexampleListener> listeners = new ArrayList<CounterexampleListener>();
+    private static Set<String> ignoredStaticFields = new HashSet<String>();
+
+    static {
+        ignoredStaticFields.add("serialVersionUID");
+    }
 
     public static void setInstance(PredicateAbstraction instance) {
         PredicateAbstraction.instance = instance;
@@ -453,19 +458,21 @@ public class PredicateAbstraction extends Abstraction {
                 for (UniverseSlotKey k : v.getSlots().keySet()) {
                     FieldName fn = (FieldName) k;
 
-                    ObjectFieldRead fr = DefaultObjectFieldRead.create(pkgcn, fn.getName());
+                    if (!ignoredStaticFields.contains(fn.getName())) {
+                        ObjectFieldRead fr = DefaultObjectFieldRead.create(pkgcn, fn.getName());
 
-                    affected.clear();
-                    affected.add(fr);
+                        affected.clear();
+                        affected.add(fr);
 
-                    if (v.getSlot(k) instanceof StructuredValueSlot) {
-                        predicateValuation.reevaluate(lastPC, nextPC, fr, affected, NullExpression.create());
+                        if (v.getSlot(k) instanceof StructuredValueSlot) {
+                            predicateValuation.reevaluate(lastPC, nextPC, fr, affected, NullExpression.create());
 
-                        constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, NullExpression.create(), 0));
-                    } else {
-                        predicateValuation.reevaluate(lastPC, nextPC, fr, affected, Constant.create(0));
+                            constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, NullExpression.create(), 0));
+                        } else {
+                            predicateValuation.reevaluate(lastPC, nextPC, fr, affected, Constant.create(0));
 
-                        constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, Constant.create(0), 0));
+                            constraint = Conjunction.create(constraint, getTraceFormulaAssignmentConjunct(fr, Constant.create(0), 0));
+                        }
                     }
                 }
 
