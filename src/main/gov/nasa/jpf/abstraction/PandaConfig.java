@@ -5,6 +5,8 @@ import gov.nasa.jpf.JPFConfigException;
 import gov.nasa.jpf.vm.JenkinsStateSet;
 import gov.nasa.jpf.vm.VM;
 
+import gov.nasa.jpf.abstraction.heuristic.CompoundRefinementHeuristic;
+import gov.nasa.jpf.abstraction.heuristic.RefinementHeuristic;
 import gov.nasa.jpf.abstraction.smt.SMT;
 import gov.nasa.jpf.abstraction.state.SystemPredicateValuation;
 import gov.nasa.jpf.abstraction.state.TruthValue;
@@ -39,7 +41,7 @@ public class PandaConfig {
     private Boolean initializeStaticFields;
     private Boolean initializeObjectFields;
     private Boolean initializeArrayElements;
-    private Class<? extends RefinementHeuristic> refinementHeuristic;
+    private RefinementHeuristic refinementHeuristic;
 
     protected PandaConfig() {
     }
@@ -276,12 +278,32 @@ public class PandaConfig {
     }
 
     public RefinementHeuristic refinementHeuristic(SystemPredicateValuation predVal) {
-        if (refinementHeuristic == null) {
-            refinementHeuristic = getUnderlyingConfig().getClass("panda.refinement.heuristic", RefinementHeuristic.class);
-        }
-
         try {
-            return refinementHeuristic.getConstructor(predVal.getClass()).newInstance(predVal);
+            if (refinementHeuristic == null) {
+                Class<?>[] classes = getUnderlyingConfig().getClasses("panda.refinement.heuristic");
+                RefinementHeuristic[] refinementHeuristics = new RefinementHeuristic[classes.length];
+
+                for (int i = 0; i < classes.length; ++i) {
+                    refinementHeuristics[i] = (RefinementHeuristic) classes[i].getConstructor(predVal.getClass()).newInstance(predVal);
+                }
+
+                // Default trivial heuristic (does nothing)
+                if (refinementHeuristics.length < 1) {
+                    refinementHeuristic = new RefinementHeuristic(predVal);
+                }
+
+                // Just one heuristic
+                if (refinementHeuristics.length < 2) {
+                    refinementHeuristic = refinementHeuristics[0];
+                }
+
+                // Multiple heuristics
+                if (refinementHeuristics.length > 1) {
+		    refinementHeuristic = new CompoundRefinementHeuristic(refinementHeuristics);
+                }
+            }
+
+            return refinementHeuristic;
         } catch (Exception e) {
             throw new JPFConfigException("Could not instantiate refinement heuristic");
         }

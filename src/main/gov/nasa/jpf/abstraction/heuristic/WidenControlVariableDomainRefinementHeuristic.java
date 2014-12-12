@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction;
+package gov.nasa.jpf.abstraction.heuristic;
 
 import gov.nasa.jpf.jvm.bytecode.BIPUSH;
 import gov.nasa.jpf.jvm.bytecode.IfInstruction;
