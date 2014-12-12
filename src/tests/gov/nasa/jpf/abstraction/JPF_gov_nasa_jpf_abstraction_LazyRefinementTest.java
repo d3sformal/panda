@@ -44,6 +44,7 @@ public class JPF_gov_nasa_jpf_abstraction_LazyRefinementTest extends NativePeer 
             PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(p1, env.getMethodInfo(), 0);
             PredicateAbstraction.getInstance().getTraceFormula().markCallStarted();
             PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(p2, env.getMethodInfo(), 1);
+            PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Contradiction.create(), env.getMethodInfo(), 2);
             PredicateAbstraction.getInstance().getTraceFormula().markReturn();
             PredicateAbstraction.getInstance().getTraceFormula().markReturned();
 
