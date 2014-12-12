@@ -490,6 +490,7 @@ public class SMT {
 
         int interpolationGroup = 0;
 
+        input.append("(assert (! true :named g0))"); input.append(separator);
         for (Step s : traceFormula) {
             input.append("(assert (! "); input.append(convertToString(s.getPredicate())); input.append(" :named g"); input.append(++interpolationGroup); input.append("))"); input.append(separator);
         }
@@ -513,7 +514,7 @@ public class SMT {
                     input.append(" g"); input.append(i + 1);
                 }
 
-                input.append(" (and");
+                input.append(" (and g0 g0"); // Make sure the operation is at least binary
                 for (int i = 0; i < traceFormula.size(); ++i) {
                     if (!m.contains(i)) {
                         input.append(" g"); input.append(i + 1);
