@@ -10,6 +10,7 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
 
@@ -39,6 +40,7 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
 
 public class ArrayLoadExecutor {
     private AccessExpression array;
+    private int originalIndex;
     private Expression index;
     private AccessExpression path;
 
@@ -72,8 +74,8 @@ public class ArrayLoadExecutor {
             }
 
             abstractIndex = indexSelector.getIndex();
+            originalIndex = sf.pop();
 
-            sf.pop();
             sf.push(abstractIndex);
         }
 
@@ -119,9 +121,18 @@ public class ArrayLoadExecutor {
 
             TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(load.getSelf().getPosition(), inBounds);
 
-            if (value != TruthValue.TRUE) {
+            boolean concretePass = (originalIndex >= 0 && originalIndex < ei.arrayLength());
+            boolean abstractPass = (value == TruthValue.TRUE);
+
+            ThreadInfo ti = VM.getVM().getCurrentThread();
+
+            if (!abstractPass) {
                 PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(inBounds, TruthValue.FALSE), load.getSelf().getMethodInfo(), load.getSelf().getPosition());
-                throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds));
+                BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, inBounds, concretePass, abstractPass, ti.getPC().getNext(), load.getSelf());
+
+                if (!PandaConfig.getInstance().pruneInfeasibleBranches() && (concretePass != abstractPass)) {
+                    throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds));
+                }
             }
         }
 
