@@ -150,6 +150,8 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     public PredicateAbstraction(Predicates predicateSet) {
+        PandaConfig.reset();
+
         symbolTable = new SystemSymbolTable(this);
         predicateValuation = new SystemPredicateValuation(this, predicateSet);
         heuristic = PandaConfig.getInstance().refinementHeuristic(predicateValuation);

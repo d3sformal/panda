@@ -52,8 +52,6 @@ public class AbstractListener extends PropertyListenerAdapter {
     private static String StateMatchingTestClass = "gov.nasa.jpf.abstraction.statematch.StateMatchingTest";
 
     public AbstractListener() {
-        PandaConfig.reset();
-
         // Debug
         debugMethods.put(DebugClass + ".dumpAliasing(Ljava/lang/String;)V", new AliasingDumper());
 
