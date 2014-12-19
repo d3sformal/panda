@@ -3,11 +3,9 @@ package gov.nasa.jpf.abstraction;
 public class CopyTest extends BaseTest {
     public CopyTest() {
         config.add("+panda.refinement=true");
-        config.add("+panda.log_smt=true");
-        config.add("+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener");
     }
 
-    private static final int N = 1;
+    private static final int N = 5;
 
     private static void copy2() {
         int[] a1 = new int[N];

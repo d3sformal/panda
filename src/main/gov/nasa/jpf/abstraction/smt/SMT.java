@@ -984,16 +984,19 @@ public class SMT {
     /**
      * Prepare an input for the SMT to query a model of an expression (constrained by other predicates)
      */
-    private String prepareGetModelInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<String> arrays, Predicate predicate, String formula, InputType inputType) {
+    private String prepareGetModelInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<String> arrays, Set<Integer> fresh, Predicate predicate, String formula, InputType inputType) {
         String separator = inputType.getSeparator();
 
         StringBuilder input = new StringBuilder();
+
+        Set<AccessExpression> objects = Collections.emptySet();
 
         input.append("(push 1)"); input.append(separator);
         appendClassDeclarations(classes, input, separator);
         appendVariableDeclarations(vars, input, separator);
         appendFieldDeclarations(fields, input, separator);
         appendArraysDeclarations(arrays, input, separator);
+        appendFreshConstraints(fresh, objects, input, separator);
 
         Boolean cachedValue = cache.get(formula).getSatisfiability();
         Integer cachedModel = cache.get(formula).getModel();
@@ -1217,13 +1220,14 @@ public class SMT {
         Set<String> variables = collector.getVars();
         Set<String> fields = collector.getFields();
         Set<String> arrays = collector.getArrays();
+        Set<Integer> fresh = collector.getFresh();
 
         String formula = createFormula(valueConstraint, determinants, collector.getAdditionalPredicates(valueConstraint));
 
-        String input = prepareGetModelInput(classes, variables, fields, arrays, valueConstraint, formula, InputType.NORMAL);
+        String input = prepareGetModelInput(classes, variables, fields, arrays, fresh, valueConstraint, formula, InputType.NORMAL);
 
         if (!listeners.isEmpty()) {
-            String debugInput = prepareGetModelInput(classes, variables, fields, arrays, valueConstraint, formula, InputType.DEBUG);
+            String debugInput = prepareGetModelInput(classes, variables, fields, arrays, fresh, valueConstraint, formula, InputType.DEBUG);
 
             notifyGetModelInputGenerated(debugInput);
         }
