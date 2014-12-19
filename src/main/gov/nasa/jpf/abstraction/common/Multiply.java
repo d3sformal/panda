@@ -66,6 +66,19 @@ public class Multiply extends Operation {
             return new Constant(c.value.intValue() * d.value.intValue());
         }
 
+        if (a instanceof Constant) {
+            Constant c = (Constant) a;
+
+            switch (c.value.intValue()) {
+                case -1:
+                    return Subtract.create(Constant.create(0), b);
+                case 0:
+                    return a;
+                case 1:
+                    return b;
+            }
+        }
+
         return new Multiply(a, b);
     }
 

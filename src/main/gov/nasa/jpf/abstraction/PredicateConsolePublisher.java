@@ -74,13 +74,23 @@ public class PredicateConsolePublisher extends ConsolePublisher {
                 MethodInfo lastMi = null;
                 int nNoSrc = 0;
 
+                boolean skipped = false;
+
                 for (Step s : t) {
                     Instruction insn = s.getInstruction();
 
                     // start printing code in the main method
                     if (insn.getMethodInfo() == miMain) skip = false;
 
-                    if (skip) continue;
+                    if (skip) {
+                        if (!skipped) {
+                            System.out.println("... skipping ...");
+                        }
+                        skipped = true;
+                        continue;
+                    } else {
+                        skipped = false;
+                    }
 
                     if (showMethod) {
                         MethodInfo mi = insn.getMethodInfo();

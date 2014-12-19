@@ -10,7 +10,7 @@ import gov.nasa.jpf.abstraction.parser.PredicatesLexer;
 import gov.nasa.jpf.abstraction.parser.PredicatesParser;
 
 public class PredicatesFactory {
-    private static PredicatesParser createFromString(String definition) {
+    private static PredicatesParser parse(String definition) {
         ANTLRInputStream chars = new ANTLRInputStream(definition);
         PredicatesLexer lexer = new PredicatesLexer(chars);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -20,23 +20,31 @@ public class PredicatesFactory {
     }
 
     public static Predicate createPredicateFromString(String definition) {
-        return createFromString(definition).predicate().val[0];
+        return parse(definition).predicate().val[0];
     }
 
     public static AccessExpression createAccessExpressionFromString(String definition) {
-        return createFromString(definition).standalonepath().val[0];
+        return parse(definition).standalonepath().val[0];
     }
 
     public static Expression createExpressionFromString(String definition) {
-        return createFromString(definition).standaloneexpression().val[0];
+        return parse(definition).standaloneexpression().val[0];
     }
 
-    public static Predicate[] createInterpolantsFromString(String definition) {
+    private static InterpolantsParser parseInterpolants(String definition) {
         ANTLRInputStream chars = new ANTLRInputStream(definition);
         InterpolantsLexer lexer = new InterpolantsLexer(chars);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         InterpolantsParser parser = new InterpolantsParser(tokens);
 
-        return parser.predicates().val;
+        return parser;
+    }
+
+    public static Predicate createInterpolantFromString(String definition) {
+        return parseInterpolants(definition).standalonepredicate().val;
+    }
+
+    public static Predicate[] createInterpolantsFromString(String definition) {
+        return parseInterpolants(definition).predicates().val;
     }
 }

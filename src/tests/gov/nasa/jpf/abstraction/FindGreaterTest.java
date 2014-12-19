@@ -7,6 +7,7 @@ public class FindGreaterTest extends BaseTest {
         config.add("+panda.refinement=true");
         config.add("+panda.abstract_domain=PREDICATES"); // Disable loading of predicate file
         config.add("+panda.refinement.initialize_array_elements=false");
+        config.add("+report.console.property_violation=error,snapshot,trace");
     }
 
     public static void test(int n) {
@@ -41,6 +42,9 @@ public class FindGreaterTest extends BaseTest {
     }
 
     @Test
+    @Config(items = {
+        "+panda.smt.interpolation=SMTInterpol"
+    })
     public static void test3() {
         int[] data = new int[5];
 

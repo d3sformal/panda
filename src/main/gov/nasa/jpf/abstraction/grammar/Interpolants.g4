@@ -46,14 +46,29 @@ letpair returns [Map.Entry<String, Object> val]
     : '(' '.' v=ID_TOKEN e=expression ')' {
         $ctx.val = new AbstractMap.SimpleEntry<String, Object>($v.text, $e.val);
     }
+    | '(' v=ID_TOKEN '!' n=CONSTANT_TOKEN e=expression ')' {
+        $ctx.val = new AbstractMap.SimpleEntry<String, Object>($v.text + '!' + Integer.parseInt($n.text), $e.val);
+    }
     | '(' '.' v=ID_TOKEN p=predicate ')' {
         $ctx.val = new AbstractMap.SimpleEntry<String, Object>($v.text, $p.val);
+    }
+    | '(' v=ID_TOKEN '!' n=CONSTANT_TOKEN p=predicate ')' {
+        $ctx.val = new AbstractMap.SimpleEntry<String, Object>($v.text + '!' + Integer.parseInt($n.text), $p.val);
+    }
+    ;
+
+standalonepredicate returns [Predicate val]
+    : p=predicate {
+        $ctx.val = $p.val;
     }
     ;
 
 predicate returns [Predicate val] locals [static Map<String, Object> let = new HashMap<String, Object>(); Predicate acc;]
     : '.' id=ID_TOKEN {
         $ctx.val = (Predicate) PredicateContext.let.get($id.text);
+    }
+    | id=ID_TOKEN '!' n=CONSTANT_TOKEN {
+        $ctx.val = (Predicate) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
     }
     | '(' LET_TOKEN '(' (l=letpair {PredicateContext.let.put($l.val.getKey(), $l.val.getValue());})* ')' p=predicate ')' {
         $ctx.val = $p.val;
@@ -78,6 +93,9 @@ predicate returns [Predicate val] locals [static Map<String, Object> let = new H
     }
     | '(=>' p=predicate q=predicate ')' {
         $ctx.val = Disjunction.create(Negation.create($p.val), $q.val);
+    }
+    | '(=' p=predicate q=predicate ')' {
+        $ctx.val = Disjunction.create(Conjunction.create($p.val, $q.val), Conjunction.create(Negation.create($p.val), Negation.create($q.val)));
     }
     | '(' DISTINCT_TOKEN a=expression b=expression ')' {
         $ctx.val = Negation.create(Equals.create($a.val, $b.val));
@@ -139,6 +157,9 @@ factor returns [Expression val]
     : '.' id=ID_TOKEN {
         $ctx.val = (Expression) PredicateContext.let.get($id.text);
     }
+    | id=ID_TOKEN '!' n=CONSTANT_TOKEN {
+        $ctx.val = (Expression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
+    }
     | CONSTANT_TOKEN {
         $ctx.val = Constant.create(Integer.parseInt($CONSTANT_TOKEN.text));
     }
@@ -192,6 +213,9 @@ path returns [DefaultAccessExpression val]
     | '(' SELECT_TOKEN '.' id=ID_TOKEN e=expression ')' {
         $ctx.val = DefaultArrayElementRead.create((AccessExpression) PredicateContext.let.get($id.text), $e.val);
     }
+    | '(' SELECT_TOKEN id=ID_TOKEN '!' n=CONSTANT_TOKEN e=expression ')' {
+        $ctx.val = DefaultArrayElementRead.create((AccessExpression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text)), $e.val);
+    }
     | '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' {
         $ctx.val = $p.val;
     }
@@ -199,7 +223,20 @@ path returns [DefaultAccessExpression val]
         $ctx.val = DefaultObjectFieldRead.create($p.val, $f.text.replaceAll("field_ssa_[0-9]+_", ""));
     }
     | '(' SELECT_TOKEN p=path e=expression ')' {
-        $ctx.val = DefaultArrayElementRead.create($p.val, $e.val);
+        if ($p.val instanceof DefaultArrayElementWrite) {
+            $ctx.val = (DefaultAccessExpression) $e.val;
+        } else {
+            $ctx.val = DefaultArrayElementRead.create($p.val, $e.val);
+        }
+    }
+    | '(' STORE_TOKEN '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' e1=expression e2=expression ')' {
+        $ctx.val = DefaultArrayElementWrite.create($p.val, $e1.val, $e2.val);
+    }
+    | '(' STORE_TOKEN a=ARR_TOKEN p1=path p2=path ')' {
+        $ctx.val = $p2.val;
+    }
+    | '(' STORE_TOKEN f=ID_TOKEN p=path e=expression ')' {
+        $ctx.val = DefaultObjectFieldWrite.create($p.val, $f.text.replaceAll("field_ssa_[0-9]+_", ""), $e.val);
     }
     ;
 
@@ -218,6 +255,7 @@ NULL_TOKEN     : 'null';
 OR_TOKEN       : 'or';
 RETURN_TOKEN   : 'var_ssa_'[0-9]+'_frame_'[0-9]+'_return'('_pc'[0-9]+)?;
 SELECT_TOKEN   : 'select';
+STORE_TOKEN    : 'store';
 TRUE_TOKEN     : 'true';
 
 CONSTANT_TOKEN

@@ -5,6 +5,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.ThreadInfo;
+
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -61,6 +65,7 @@ import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
+import gov.nasa.jpf.abstraction.state.universe.Reference;
 
 /**
  * A visitor used to traverse predicates and collect information for the SMT
@@ -283,7 +288,19 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
             return new HashSet<Predicate>();
         }
 
-        return additionalPredicates.get(collectable);
+        Set<Predicate> instances = new HashSet<Predicate>();
+
+        for (Predicate p : additionalPredicates.get(collectable)) {
+            for (int f : fresh) {
+                ElementInfo ei = ThreadInfo.getCurrentThread().getElementInfo(f);
+
+                if (ei != null) {
+                    instances.add(p.replace(SpecialVariable.create("fresh"), AnonymousObject.create(new Reference(ei))));
+                }
+            }
+        }
+
+        return instances;
     }
 
     public Set<String> getVars() {
@@ -356,7 +373,10 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
         expression.getArrays().accept(this);
         expression.getIndex().accept(this);
 
-        addAdditionalPredicate(Equals.createUnminimized(DefaultArrayElementRead.create(DefaultFresh.create(), expression.getIndex()), NullExpression.create()));
+        AccessExpression ae = DefaultArrayElementRead.create(SpecialVariable.create("fresh"), expression.getIndex());
+
+        addAdditionalPredicate(Equals.createUnminimized(ae, NullExpression.create()));
+        addAdditionalPredicate(Equals.createUnminimized(ae, Constant.create(0)));
 
         addObject(expression);
     }

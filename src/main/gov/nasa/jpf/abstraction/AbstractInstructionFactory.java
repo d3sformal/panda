@@ -21,22 +21,27 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
     ClassInfoFilter filter;
 
     public AbstractInstructionFactory(Config conf) {
+        try {
+            System.out.println("Running Panda ...");
 
-        System.out.println("Running Panda ...");
+            filter = new ClassInfoFilter(null, null, null, null);
 
-        filter = new ClassInfoFilter(null, null, null, null);
+            PredicateAbstractionFactory factory = new PredicateAbstractionFactory();
 
-        PredicateAbstractionFactory factory = new PredicateAbstractionFactory();
+            String[] abs_str = conf.getStringArray("panda.abstract_domain");
+            String[][] args = new String[abs_str.length][];
 
-        String[] abs_str = conf.getStringArray("panda.abstract_domain");
-        String[][] args = new String[abs_str.length][];
+            for (int i = 0; i < abs_str.length; ++i) {
+                args[i] = abs_str[i].split(" ");
+                args[i][0]= args[i][0].toLowerCase();
+            }
 
-        for (int i = 0; i < abs_str.length; ++i) {
-            args[i] = abs_str[i].split(" ");
-            args[i][0]= args[i][0].toLowerCase();
+            PredicateAbstraction.setInstance(factory.create(conf, args));
+        } catch (Throwable t) {
+            t.printStackTrace();
+
+            throw t;
         }
-
-        PredicateAbstraction.setInstance(factory.create(conf, args));
     }
 
     // bytecodes

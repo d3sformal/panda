@@ -21,6 +21,7 @@ public class PandaConfig {
     private Class<?>[] verboseClasses;
     private Boolean logSMT;
     private SMT.SupportedSMT smt;
+    private SMT.SupportedSMT interpolationSMT;
     private TruthValue assertionsDisabled;
     private Boolean printConcreteCounterexample;
     private CounterexampleListener.Format counterexamplePrintFormat;
@@ -119,6 +120,14 @@ public class PandaConfig {
         }
 
         return smt;
+    }
+
+    public SMT.SupportedSMT getInterpolationSMT() {
+        if (interpolationSMT == null) {
+            interpolationSMT = getUnderlyingConfig().getEnum("panda.smt.interpolation", SMT.SupportedSMT.class.getEnumConstants(), SMT.SupportedSMT.SMTInterpol);
+        }
+
+        return interpolationSMT;
     }
 
     public TruthValue getAssertionsDisabled() {

@@ -8,10 +8,10 @@ import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
 
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.Constant;
-import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultRoot;
 
 public class JPF_gov_nasa_jpf_abstraction_LazyRefinementTest extends NativePeer {
@@ -44,7 +44,7 @@ public class JPF_gov_nasa_jpf_abstraction_LazyRefinementTest extends NativePeer 
             PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(p1, env.getMethodInfo(), 0);
             PredicateAbstraction.getInstance().getTraceFormula().markCallStarted();
             PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(p2, env.getMethodInfo(), 1);
-            PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Contradiction.create(), env.getMethodInfo(), 2);
+            PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Tautology.create(), env.getMethodInfo(), 2, true);
             PredicateAbstraction.getInstance().getTraceFormula().markReturn();
             PredicateAbstraction.getInstance().getTraceFormula().markReturned();
 

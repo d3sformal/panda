@@ -763,9 +763,17 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
         // This takes long
         for (Predicate predicate : predicates) {
             // Skip predicates whose value is directly known
-            if (containsKey(predicate)) {
-                known.add(predicate);
-            } else {
+            boolean contains = false;
+
+            for (Predicate p : getPredicates()) {
+                if (p.equals(predicate) && p.isInScope(lastPC)) {
+                    known.add(predicate);
+                    contains = true;
+                    break;
+                }
+            }
+
+            if (!contains) {
                 predicate = instantiateSpecialVariables(predicate);
 
                 Predicate positiveWeakestPrecondition = predicate;

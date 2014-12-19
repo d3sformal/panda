@@ -193,6 +193,10 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
     public boolean refine(Predicate interpolant, MethodInfo m, int fromPC, int toPC) {
         boolean refined = false;
 
+        // We need to clone here, because SMT might have reused the same object as an interpolant at different places of the trace
+        // we will be processing them one-by-one here
+        // by setting the scope we will override the previous choice (that will be destroyed here, and will not get to merging in PredicateValuationMap)
+        interpolant = interpolant.clone();
         interpolant.setScope(new BytecodeInterval(fromPC, toPC));
 
         MethodPredicateContext ctx = null;
@@ -616,10 +620,30 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 replacements.remove(l);
             }
 
+            Set<AccessExpression> temporaryPathsHolder = new HashSet<AccessExpression>();
+
+            int uniqueID = 0;
+
+            for (Predicate p : callerScope.getPredicates()) {
+                p.addAccessExpressionsToSet(temporaryPathsHolder);
+
+                for (AccessExpression ae : temporaryPathsHolder) {
+                    Root l = ae.getRoot();
+
+                    if (l.getName().matches("l[0-9]+")) {
+                        uniqueID = Math.max(uniqueID, Integer.parseInt(l.getName().substring(1)));
+                    }
+                }
+
+                temporaryPathsHolder.clear();
+            }
+
+            for (Root l : notWantedLocalVariables) {
+                replacements.put(l, DefaultRoot.create("l" + (++uniqueID)));
+            }
+
             // Collection of predicates in callee and caller that have additional value for update of the caller
             MethodFramePredicateValuation relevant = createDefaultScope(null, null);
-
-            Set<AccessExpression> temporaryPathsHolder = new HashSet<AccessExpression>();
 
             ReturnValue returnValue = DefaultReturnValue.create();
             ReturnValue returnValueSpecific = DefaultReturnValue.create(after.getPC());
@@ -636,18 +660,18 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 predicate.addAccessExpressionsToSet(temporaryPathsHolder);
 
                 // If any of the symbols used in the predicate has changed
-                for (Root l : notWantedLocalVariables) {
-                    for (AccessExpression path : temporaryPathsHolder) {
-                        isUnwanted |= path.isLocalVariable() && path.getRoot().getName().equals(l.getName());
-                    }
-                }
+                //for (Root l : notWantedLocalVariables) {
+                //    for (AccessExpression path : temporaryPathsHolder) {
+                //        isUnwanted |= path.isLocalVariable() && path.getRoot().getName().equals(l.getName());
+                //    }
+                //}
 
                 for (AccessExpression path : temporaryPathsHolder) {
                     isAnonymous |= method.isInit() && path.getRoot().isThis(); // new C() ... C.<init> which calls B.<init> and A.<init> on "this" which is in fact anonymous
                 }
 
                 // If the predicate uses only allowed symbols (those that do not lose their meaning by changing scope)
-                if (!isUnwanted) {
+                //if (!isUnwanted) {
                     try {
                         predicate = predicate.replace(replacements).clone();
                         predicate.setScope(BytecodeUnlimitedRange.getInstance()); // <-- This is done to allow use of the predicate outside its original scope.
@@ -666,7 +690,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                     } catch (PredicateNotCloneableException e) {
                         // Silently ignore predicates that should never be cloned (those have either no meaning here: Assign, or little value: Tautology)
                     }
-                }
+                //}
 
                 temporaryPathsHolder.clear();
             }

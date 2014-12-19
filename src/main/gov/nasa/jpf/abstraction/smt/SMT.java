@@ -2,6 +2,7 @@ package gov.nasa.jpf.abstraction.smt;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Closeable;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -197,15 +198,23 @@ public class SMT {
     OutputStreamWriter inwriter;
     InputStreamReader outreader;
 
+    interface SMTOutputReader extends Closeable {
+        public String readLine() throws IOException;
+
+        @Override
+        public void close() throws IOException;
+    }
+
     private BufferedWriter in = null;
-    private BufferedReader out = null;
+    private SMTOutputReader out = null;
 
     private int indent = 0;
 
     public enum SupportedSMT {
         MathSAT,
         SMTInterpol,
-        CVC4;
+        CVC4,
+        Z3;
 
         public int logFileID = 0;
     }
@@ -252,6 +261,14 @@ public class SMT {
                 };
 
                 break;
+           case Z3:
+                args = new String[] {
+                    System.getProperty("user.dir") + "/bin/z3",
+                    "-smt2",
+                    "-in"
+                };
+
+                break;
         }
 
         Process process = Runtime.getRuntime().exec(args, env);
@@ -293,6 +310,12 @@ public class SMT {
                     "(set-option :produce-interpolants true)" + separator +
 
                     "(set-logic QF_AUFLIA)" + separator
+                );
+
+                break;
+            case Z3:
+                in.write(
+                    "(set-option :produce-interpolants true)" + separator
                 );
 
                 break;
@@ -415,7 +438,38 @@ public class SMT {
 
             configureSMTProcess(smt);
 
-            out = new BufferedReader(outreader);
+            switch (smt) {
+                case Z3:
+                    out = new SMTOutputReader() {
+                        private Z3LineReader lr = new Z3LineReader(outreader);
+
+                        @Override
+                        public String readLine() throws IOException {
+                            return lr.readLine();
+                        }
+
+                        @Override
+                        public void close() throws IOException {
+                            lr.close();
+                        }
+                    };
+                    break;
+
+                default:
+                    out = new SMTOutputReader() {
+                        private BufferedReader br = new BufferedReader(outreader);
+
+                        @Override
+                        public String readLine() throws IOException {
+                            return br.readLine();
+                        }
+
+                        @Override
+                        public void close() throws IOException {
+                            br.close();
+                        }
+                    };
+            }
         } catch (IOException e) {
             System.err.println("SMT will not start.");
 
@@ -452,7 +506,9 @@ public class SMT {
      * @returns null if the Trace Formula is satisfiable. Otherwise an array of !FORMULAS! (non-atomic predicates) is returned (the length of the array corresponds to the length of the Trace Formula)
      */
     public Predicate[] interpolate(TraceFormula traceFormula) throws SMTException {
-        SMT interpol = new SMT(SupportedSMT.SMTInterpol);
+        SupportedSMT type = PandaConfig.getInstance().getInterpolationSMT();
+
+        SMT interpol = new SMT(type);
         PandaConfig config = PandaConfig.getInstance();
 
         PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
@@ -499,7 +555,14 @@ public class SMT {
 
         // Overall (Global) interpolants (No notion of method scopes)
         if (config.enabledGlobalRefinement()) {
-            input.append("(get-interpolants");
+            switch (type) {
+                case SMTInterpol:
+                    input.append("(get-interpolants");
+                    break;
+                case Z3:
+                    input.append("(get-interpolant");
+                    break;
+            }
             for (int i = 1; i <= interpolationGroup; ++i) {
                 input.append(" g"); input.append(i);
             }
@@ -509,7 +572,14 @@ public class SMT {
         // Method scopes intepolants
         for (List<Integer> m : traceFormula.getMethods()) {
             if (m.get(0) > 0) {
-                input.append("(get-interpolants");
+                switch (type) {
+                    case SMTInterpol:
+                        input.append("(get-interpolants");
+                        break;
+                    case Z3:
+                        input.append("(get-interpolant");
+                        break;
+                }
                 for (int i : m) {
                     input.append(" g"); input.append(i + 1);
                 }
@@ -548,10 +618,27 @@ public class SMT {
             Predicate[] interpolants = null;
 
             if (config.enabledGlobalRefinement()) {
-                output = interpol.out.readLine();
+                switch (type) {
+                    case SMTInterpol:
+                        output = interpol.out.readLine();
 
-                if (!satisfiable) {
-                    interpolants = PredicatesFactory.createInterpolantsFromString(output);
+                        if (!satisfiable) {
+                            interpolants = PredicatesFactory.createInterpolantsFromString(output);
+                        }
+                        break;
+                    case Z3:
+                        if (satisfiable) {
+                            output = interpol.out.readLine();
+                        } else {
+                            interpolants = new Predicate[traceFormula.size() - 1];
+
+                            for (int i = 0; i < interpolants.length; ++i) {
+                                output = interpol.out.readLine();
+
+                                interpolants[i] = PredicatesFactory.createInterpolantFromString(output);
+                            }
+                        }
+                        break;
                 }
             } else {
                 if (!satisfiable) {
@@ -565,20 +652,66 @@ public class SMT {
 
             // Inject method-scoped interpolants
             for (List<Integer> m : traceFormula.getMethods()) {
-                if (m.get(0) > 0) {
-                    output = interpol.out.readLine();
+                if (config.enabledVerbose(this.getClass())) {
+                    Step start = traceFormula.get(m.get(0));
+                    Step end = traceFormula.get(m.get(m.size() - 1));
+                    System.out.println("Method [" + start.getMethod().getName() + ":" + start.getPC() + ".." + end.getMethod().getName() + ":" + end.getPC() + "]");
 
-                    if (!satisfiable) {
-                        Predicate[] methodInterpolants = PredicatesFactory.createInterpolantsFromString(output);
+                    for (int i : m) {
+                        {
+                            int j = i - 1;
 
-                        if (config.enabledVerbose(this.getClass())) {
-                            System.out.println("Inserting interpolant `" + methodInterpolants[methodInterpolants.length - 1] + "` globally to the whole method " + m);
+                            if (j > m.get(0) && !m.contains(j)) {
+                                Step ps = traceFormula.get(j);
+                                System.out.println("\t" + (j + 1) + ": " +  ps.getMethod().getName() + ":" + ps.getPC() + " return");
+                            }
                         }
 
+                        Step s = traceFormula.get(i);
+                        System.out.println("\t" + (i + 1) + ": " +  s.getMethod().getName() + ":" + s.getPC());
+
+                        {
+                            int j = i + 1;
+
+                            if (j < m.get(m.size() - 1) && !m.contains(j)) {
+                                Step ns = traceFormula.get(j);
+                                System.out.println("\t" + (j + 1) + ": " +  ns.getMethod().getName() + ":" + ns.getPC() + " call");
+                            }
+                        }
+                    }
+                }
+
+                if (m.get(0) > 0) {
+                    Predicate[] methodInterpolants = null;
+
+                    switch (type) {
+                        case SMTInterpol:
+                            output = interpol.out.readLine();
+
+                            if (!satisfiable) {
+                                methodInterpolants = PredicatesFactory.createInterpolantsFromString(output);
+                            }
+                            break;
+                        case Z3:
+                            if (satisfiable) {
+                                output = interpol.out.readLine();
+                            } else {
+                                methodInterpolants = new Predicate[m.size()];
+
+                                for (int i = 0; i < methodInterpolants.length; ++i) {
+                                    output = interpol.out.readLine();
+
+                                    methodInterpolants[i] = PredicatesFactory.createInterpolantFromString(output);
+                                }
+                            }
+                            break;
+                    }
+
+                    if (!satisfiable) {
                         for (int i = 0; i < m.size(); ++i) {
                             if (m.get(i) < interpolants.length) {
-                                if (config.enabledVerbose(this.getClass())) {
-                                    System.out.println("Inserting interpolant `" + methodInterpolants[i] + "` to " + m.get(i));
+                                if (!(methodInterpolants[i] instanceof Tautology) && config.enabledVerbose(this.getClass())) {
+                                    System.out.println("\t... inserting interpolant `" + methodInterpolants[i] + "` to " + (m.get(i) + 1));
                                 }
 
                                 Predicate p = interpolants[m.get(i)];
@@ -588,10 +721,27 @@ public class SMT {
                                 if (config.enabledMethodGlobalRefinement()) {
                                     if (!(methodInterpolants[methodInterpolants.length - 1] instanceof Contradiction)) {
                                         p = Conjunction.create(p, methodInterpolants[methodInterpolants.length - 1]); // The last interpolant overapproximates the whole method and may be necessary (not globally but what can you do :))
+                                        // Also check if there was not a return location where we might also want to track the predicate
+                                        int j = m.get(i) - 1;
+
+                                        if (j > m.get(0) && !m.contains(j)) {
+                                            Predicate q = interpolants[m.get(i) - 1];
+
+                                            q = Conjunction.create(q, methodInterpolants[methodInterpolants.length - 1]);
+
+                                            interpolants[m.get(i) - 1] = q;
+                                        }
                                     }
+
                                 }
 
                                 interpolants[m.get(i)] = p;
+                            }
+                        }
+
+                        if (config.enabledMethodGlobalRefinement()) {
+                            if (!(methodInterpolants[methodInterpolants.length - 1] instanceof Tautology) && config.enabledVerbose(this.getClass())) {
+                                System.out.println("\t... inserting interpolant `" + methodInterpolants[methodInterpolants.length - 1] + "` globally to the whole method");
                             }
                         }
                     }
