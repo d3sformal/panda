@@ -24,7 +24,7 @@ public class ResetableStateSet extends SerializingStateSet {
 
     @Override
     public int addCurrent() {
-        return add(serializer.getStoringData());
+        return set.addCurrent() + startingSize;
     }
 
     @Override
