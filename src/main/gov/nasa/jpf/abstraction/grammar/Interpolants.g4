@@ -287,6 +287,12 @@ path returns [DefaultAccessExpression val]
     | '(' STORE_TOKEN a=ARR_TOKEN p1=path p2=path ')' {
         $ctx.val = $p2.val;
     }
+    | '(' STORE_TOKEN a=ARR_TOKEN p1=path '.' id=ID_TOKEN ')' {
+        $ctx.val = (DefaultAccessExpression) PredicateContext.let.get($id.text);
+    }
+    | '(' STORE_TOKEN a=ARR_TOKEN p1=path id=ID_TOKEN '!' n=CONSTANT_TOKEN ')' {
+        $ctx.val = (DefaultAccessExpression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
+    }
     | '(' STORE_TOKEN f=ID_TOKEN p=path e=expression ')' {
         $ctx.val = DefaultObjectFieldWrite.create($p.val, $f.text.replaceAll("field_ssa_[0-9]+_", ""), $e.val);
     }
