@@ -94,6 +94,42 @@ predicate returns [Predicate val] locals [static Map<String, Object> let = new H
     | '(=>' p=predicate q=predicate ')' {
         $ctx.val = Disjunction.create(Negation.create($p.val), $q.val);
     }
+    | '(=' '.' id1=ID_TOKEN '.' id2=ID_TOKEN ')' {
+        Object o1 = PredicateContext.let.get($id1.text);
+        Object o2 = PredicateContext.let.get($id2.text);
+
+        if (o1 instanceof Predicate && o2 instanceof Predicate) {
+            Predicate p = (Predicate) o1;
+            Predicate q = (Predicate) o2;
+
+            $ctx.val = Disjunction.create(Conjunction.create(p, q), Conjunction.create(Negation.create(p), Negation.create(q)));
+        }
+
+        if (o1 instanceof Expression && o2 instanceof Expression) {
+            Expression a = (Expression) o1;
+            Expression b = (Expression) o2;
+
+            $ctx.val = Equals.create(a, b);
+        }
+    }
+    | '(=' id1=ID_TOKEN '!' n1=CONSTANT_TOKEN id2=ID_TOKEN '!' n2=CONSTANT_TOKEN ')' {
+        Object o1 = PredicateContext.let.get($id1.text + '!' + Integer.parseInt($n1.text));
+        Object o2 = PredicateContext.let.get($id2.text + '!' + Integer.parseInt($n2.text));
+
+        if (o1 instanceof Predicate && o2 instanceof Predicate) {
+            Predicate p = (Predicate) o1;
+            Predicate q = (Predicate) o2;
+
+            $ctx.val = Disjunction.create(Conjunction.create(p, q), Conjunction.create(Negation.create(p), Negation.create(q)));
+        }
+
+        if (o1 instanceof Expression && o2 instanceof Expression) {
+            Expression a = (Expression) o1;
+            Expression b = (Expression) o2;
+
+            $ctx.val = Equals.create(a, b);
+        }
+    }
     | '(=' p=predicate q=predicate ')' {
         $ctx.val = Disjunction.create(Conjunction.create($p.val, $q.val), Conjunction.create(Negation.create($p.val), Negation.create($q.val)));
     }
@@ -211,10 +247,26 @@ path returns [DefaultAccessExpression val]
         $ctx.val = DefaultRoot.create($f.text.replaceAll("var_ssa_[0-9]+_frame_[0-9]+_", ""));
     }
     | '(' SELECT_TOKEN '.' id=ID_TOKEN e=expression ')' {
-        $ctx.val = DefaultArrayElementRead.create((AccessExpression) PredicateContext.let.get($id.text), $e.val);
+        AccessExpression ae = (AccessExpression) PredicateContext.let.get($id.text);
+
+        if (ae instanceof ArrayElementWrite) {
+            // Losing precision (there is no way to express (select (store arr b (...)) b) - query for a possibly modified array)
+            // .. we can only query elements with aread: (select (select (store arr b (...)) b) index)
+            $ctx.val = (DefaultAccessExpression) $e.val;
+        } else {
+            $ctx.val = DefaultArrayElementRead.create(ae, $e.val);
+        }
     }
     | '(' SELECT_TOKEN id=ID_TOKEN '!' n=CONSTANT_TOKEN e=expression ')' {
-        $ctx.val = DefaultArrayElementRead.create((AccessExpression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text)), $e.val);
+        AccessExpression ae = (AccessExpression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
+
+        if (ae instanceof ArrayElementWrite) {
+            // Losing precision (there is no way to express (select (store arr b (...)) b) - query for a possibly modified array)
+            // .. we can only query elements with aread: (select (select (store arr b (...)) b) index)
+            $ctx.val = (DefaultAccessExpression) $e.val;
+        } else {
+            $ctx.val = DefaultArrayElementRead.create(ae, $e.val);
+        }
     }
     | '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' {
         $ctx.val = $p.val;
