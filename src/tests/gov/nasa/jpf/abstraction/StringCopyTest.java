@@ -14,7 +14,9 @@ public class StringCopyTest extends BaseTest {
         "+vm.serializer.class=gov.nasa.jpf.abstraction.util.DebugPredicateAbstractionSerializer",
         "+listener+=,gov.nasa.jpf.listener.ExecTracker",
         "+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker",
-        "+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener"
+        "+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor",
+        "+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener",
+        "+listener+=,gov.nasa.jpf.abstraction.util.Stepper"
     })
     public static void test() {
         int[] src = new int[N];

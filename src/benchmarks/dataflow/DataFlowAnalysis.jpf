@@ -1,0 +1,12 @@
+@using=jpf-abstraction
+
+target=dataflow.DataFlowAnalysis
+
+classpath=${jpf-abstraction}/build/benchmarks
+sourcepath=${jpf-abstraction}/src/benchmarks
+
+panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/dataflow/DataFlowAnalysis.pred
+
+listener=gov.nasa.jpf.abstraction.AbstractListener
+
+vm.serializer.class=gov.nasa.jpf.abstraction.PredicateAbstractionSerializer

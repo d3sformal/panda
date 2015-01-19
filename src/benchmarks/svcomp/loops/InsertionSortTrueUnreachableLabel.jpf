@@ -1,0 +1,14 @@
+@using=jpf-abstraction
+
+target=svcomp.loops.InsertionSortTrueUnreachableLabel
+
+classpath=${jpf-abstraction}/build/benchmarks/
+sourcepath=${jpf-abstraction}/src/benchmarks/
+
+panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/svcomp/loops/InsertionSortTrueUnreachableLabel.pred
+
+listener=gov.nasa.jpf.abstraction.AbstractListener
+
+vm.serializer.class=gov.nasa.jpf.abstraction.PredicateAbstractionSerializer
+
+report.console.property_violation=error,snapshot

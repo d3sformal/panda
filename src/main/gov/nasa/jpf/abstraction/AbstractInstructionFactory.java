@@ -332,6 +332,11 @@ public class AbstractInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
     }
 
     @Override
+    public Instruction i2c() {
+        return (filter.isPassing(ci) ? new I2C() : super.i2c());
+    }
+
+    @Override
     public Instruction i2d() {
         return (filter.isPassing(ci) ? new I2D() : super.i2d());
     }

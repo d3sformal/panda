@@ -8,10 +8,10 @@ import gov.nasa.jpf.abstraction.common.Expression;
 
 public class TypeConversionExecutor {
 
-    private DataWordManipulator source;
-    private DataWordManipulator target;
+    private DataWordManipulator<?> source;
+    private DataWordManipulator<?> target;
 
-    public TypeConversionExecutor(DataWordManipulator source, DataWordManipulator target) {
+    public TypeConversionExecutor(DataWordManipulator<?> source, DataWordManipulator<?> target) {
         this.source = source;
         this.target = target;
     }

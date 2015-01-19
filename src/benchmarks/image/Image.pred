@@ -1,0 +1,103 @@
+[static]
+class(image.Image).SIZE >= 0
+class(image.Image).SIZE = 6
+
+[object image.Image]
+alength(arrlen, this.pixels) = class(image.Image).SIZE
+alength(arrlen, this.pixels[0]) = class(image.Image).SIZE
+alength(arrlen, this.pixels[1]) = class(image.Image).SIZE
+
+alength(arrlen, this.pixels) = 6
+alength(arrlen, this.pixels[0]) = 6
+alength(arrlen, this.pixels[1]) = 6
+
+alength(arrlen, this.rectangles) = 2
+
+this.rectangles[0] = this.rectangles[1]
+
+this.rectangles[0..1].left >= 0
+this.rectangles[0..1].right >= 0
+this.rectangles[0..1].top >= 0
+this.rectangles[0..1].bottom >= 0
+
+this.rectangles[0..1].left < 6
+this.rectangles[0..1].right < 6
+this.rectangles[0..1].top < 6
+this.rectangles[0..1].bottom < 6
+
+[method image.Image.<init>]
+i = 0..6
+
+[method image.Image.load]
+r1.left >= 0
+r1.top >= 0
+r1.right >= 0
+r1.bottom >= 0
+
+r1.left < 6
+r1.top < 6
+r1.right < 6
+r1.bottom < 6
+
+r2.left >= 0
+r2.top >= 0
+r2.right >= 0
+r2.bottom >= 0
+
+r2.left < 6
+r2.top < 6
+r2.right < 6
+r2.bottom < 6
+
+[method image.Image.crop]
+r.left >= 0
+r.top >= 0
+r.right >= 0
+r.bottom >= 0
+
+r.left < class(image.Image).SIZE
+r.top < class(image.Image).SIZE
+r.right < class(image.Image).SIZE
+r.bottom < class(image.Image).SIZE
+
+[method image.Image.render]
+k = 0..2
+
+i >= 0
+i < 6
+
+j >= 0
+j < 6
+
+rec.left >= 0
+rec.top >= 0
+rec.right >= 0
+rec.bottom >= 0
+
+rec.left < class(image.Image).SIZE
+rec.top < class(image.Image).SIZE
+rec.right < class(image.Image).SIZE
+rec.bottom < class(image.Image).SIZE
+
+rec = this.rectangles[0]
+rec = this.rectangles[1]
+
+[method image.Image.main]
+img.rectangles[0..1].left >= 0
+img.rectangles[0..1].right >= 0
+img.rectangles[0..1].top >= 0
+img.rectangles[0..1].bottom >= 0
+
+img.rectangles[0..1].left < class(image.Image).SIZE
+img.rectangles[0..1].right < class(image.Image).SIZE
+img.rectangles[0..1].top < class(image.Image).SIZE
+img.rectangles[0..1].bottom < class(image.Image).SIZE
+
+alength(arrlen, img.rectangles) = 2
+alength(arrlen, img.pixels) = class(image.Image).SIZE
+alength(arrlen, img.pixels[0]) = class(image.Image).SIZE
+alength(arrlen, img.pixels[1]) = class(image.Image).SIZE
+
+alength(arrlen, img.pixels) = 6
+alength(arrlen, img.pixels[0]) = 6
+alength(arrlen, img.pixels[1]) = 6

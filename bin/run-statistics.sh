@@ -27,7 +27,7 @@ do
         printf " "
     done
 
-    bin/run.sh src/examples/${prefix}.jpf 2>&1 | awk '
+    bin/run.sh ${DIR}/${prefix}.jpf 2>&1 | awk '
         BEGIN {
             STATES=0;
             TIME=0;
@@ -54,12 +54,8 @@ do
         }
 
         END {
-            if (!ERROR) {
-                printf "	states: %s	memory: %s	time: ", STATES, MEMORY;
+            printf "	error: %s   states: %s	memory: %s	time: ", ERROR, STATES, MEMORY;
 
-                system("expr $(date -d " TIME " +%s) - $(date -d 00:00:00 +%s) | sed '\''s/$/ s/'\''");
-            } else {
-                print "	error";
-            }
+            system("expr $(date -d " TIME " +%s) - $(date -d 00:00:00 +%s) | sed '\''s/$/ s/'\''");
         }'
 done

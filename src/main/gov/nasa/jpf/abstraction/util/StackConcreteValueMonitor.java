@@ -26,7 +26,7 @@ public class StackConcreteValueMonitor extends ListenerAdapter {
         for (int i = 0; i <= (sf.getTopPos() - sf.getLocalVariableCount()); ++i) {
             System.out.print(i + ": " + sf.peek(i));
             if (sf.isReferenceSlot(i)) {
-                ElementInfo ei = ti.getElementInfo(i);
+                ElementInfo ei = ti.getElementInfo(sf.peek(i));
 
                 if (ei != null && ei.isStringObject()) {
                     System.out.print(" -> \"" + ei.asString() + "\"");
@@ -38,7 +38,17 @@ public class StackConcreteValueMonitor extends ListenerAdapter {
         for (int i = 0; i < sf.getLocalVariableCount(); ++i) {
             LocalVarInfo var = sf.getLocalVarInfo(i);
 
-            System.out.println((var == null ? null : var.getName()) + ": " + sf.getLocalVariable(i));
+            System.out.print((var == null ? null : var.getName()) + ": " + sf.getLocalVariable(i) + " " + (var == null ? "null" : sf.isLocalVariableRef(var.getSlotIndex())));
+            if (var != null) {
+                if (sf.isLocalVariableRef(var.getSlotIndex())) {
+                    ElementInfo ei = ti.getElementInfo(sf.getLocalVariable(var.getSlotIndex()));
+
+                    if (ei != null && ei.isStringObject()) {
+                        System.out.print(" -> \"" + ei.asString() + "\"");
+                    }
+                }
+            }
+            System.out.println();
         }
         System.out.println("--------------");
     }

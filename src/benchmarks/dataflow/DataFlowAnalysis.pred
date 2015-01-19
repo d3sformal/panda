@@ -1,0 +1,39 @@
+[method dataflow.DataFlowAnalysis.main]
+alength(arrlen, newFacts) >= alength(arrlen, oldFacts)
+i = 0
+i >= 0
+j >= 0
+i < alength(arrlen, queue)
+j < alength(arrlen, queue)
+i = j
+alength(arrlen, oldFacts) = 0
+alength(arrlen, oldFacts) = 1
+alength(arrlen, newFacts) = 0
+alength(arrlen, newFacts) = 1
+alength(arrlen, queue) = 26
+queue[0..5] = 0..4
+i = 1..5
+j = i + 1
+j = i + 2
+j = i + 3
+alength(arrlen, cfg) = 5
+cfnodeID = 0..4
+alength(arrlen, cfg[0..4].facts) = 0
+alength(arrlen, cfg[0..4].facts) = 1
+k = 0..4
+equal = 0
+equal = 1
+alength(arrlen, succ) = 0..2
+succ[0..1] = 1..4
+alength(arrlen, cfg[0..4].successors) = 0..2
+cfg[0..4].successors[0..1] = 1..4
+
+[object dataflow.DataFlowAnalysis$NodeInfo]
+alength(arrlen, this.facts) = 0
+alength(arrlen, this.facts) = 1
+alength(arrlen, this.successors) = 0..2
+alength(arrlen, successors) = 0..2
+this.successors[0] = 1..4
+this.successors[1] = 1..4
+successors[0] = 1..4
+successors[1] = 1..4

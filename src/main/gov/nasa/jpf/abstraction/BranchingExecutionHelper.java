@@ -336,11 +336,11 @@ public class BranchingExecutionHelper {
             LocalVarInfo lvi = sf.getLocalVarInfo(expr.getRoot().getName());
 
             // Update only variables that are in scope
-            if (lvi != null) {
+            if (lvi != null && !sf.isLocalVariableRef(lvi.getSlotIndex())) {
                 sf.setLocalVariable(lvi.getSlotIndex(), value);
 
                 if (config.enabledVerbose(BranchingExecutionHelper.class)) {
-                    System.out.println("Setting local variable slot #" + lvi.getSlotIndex() + " (" + expr + ") to " + value);
+                    System.out.println("Setting local variable slot #" + lvi.getSlotIndex() + " (" + expr + ") to " + value + " " + lvi);
                 }
             }
         } else if (expr instanceof ObjectFieldRead) {

@@ -1,0 +1,13 @@
+@using=jpf-abstraction
+
+target=svcomp.loops.Eureka01FalseUnreachableLabel
+
+classpath=${jpf-abstraction}/build/benchmarks/
+sourcepath=${jpf-abstraction}/src/benchmarks/
+
+panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/svcomp/loops/Eureka01FalseUnreachableLabel.pred
+
+listener=gov.nasa.jpf.abstraction.AbstractListener,gov.nasa.jpf.abstraction.util.InstructionTracker
+
+vm.serializer.class=gov.nasa.jpf.abstraction.PredicateAbstractionSerializer
+

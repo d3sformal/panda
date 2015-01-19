@@ -1,0 +1,22 @@
+[static]
+class(scheduler.SchedulerConfig).SIZE = 5
+
+[method scheduler.Scheduler.main]
+alength(arrlen, schedule) = 5
+schedule[0..3] = 0..3
+id2thread[schedule[0]].priority < id2thread[schedule[1]].priority
+id2thread[schedule[0]].priority < id2thread[schedule[2]].priority
+id2thread[schedule[1]].priority < id2thread[schedule[0]].priority
+id2thread[schedule[1]].priority < id2thread[schedule[2]].priority
+id2thread[schedule[2]].priority < id2thread[schedule[0]].priority
+id2thread[schedule[2]].priority < id2thread[schedule[1]].priority
+schedule_size = 0
+schedule_size < 3
+schedule_size = 0..2
+schTh.priority = 10
+j >= i
+i = 0..3
+j = 0..3
+k = 0..3
+alength(arrlen, id2thread) = 0..3
+actTh = id2thread[0..2]

@@ -4,20 +4,20 @@ import gov.nasa.jpf.vm.StackFrame;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 
-public class FloatManipulator implements DataWordManipulator {
+public class FloatManipulator implements DataWordManipulator<Float> {
     @Override
     public Expression getExpression(StackFrame sf) {
         return (Expression) sf.getOperandAttr();
     }
 
     @Override
-    public Number pop(StackFrame sf) {
+    public Float pop(StackFrame sf) {
         return sf.popFloat();
     }
 
     @Override
-    public void push(StackFrame sf, Number n) {
-        sf.pushFloat(n.floatValue());
+    public void push(StackFrame sf, Float f) {
+        sf.pushFloat(f);
     }
 
     @Override

@@ -4,20 +4,20 @@ import gov.nasa.jpf.vm.StackFrame;
 
 import gov.nasa.jpf.abstraction.common.Expression;
 
-public class DoubleManipulator implements DataWordManipulator {
+public class DoubleManipulator implements DataWordManipulator<Double> {
     @Override
     public Expression getExpression(StackFrame sf) {
         return (Expression) sf.getLongOperandAttr();
     }
 
     @Override
-    public Number pop(StackFrame sf) {
-        return sf.popLong();
+    public Double pop(StackFrame sf) {
+        return sf.popDouble();
     }
 
     @Override
-    public void push(StackFrame sf, Number n) {
-        sf.pushLong(n.longValue());
+    public void push(StackFrame sf, Double d) {
+        sf.pushDouble(d);
     }
 
     @Override

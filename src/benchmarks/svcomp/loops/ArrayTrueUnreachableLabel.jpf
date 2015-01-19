@@ -1,0 +1,13 @@
+@using=jpf-abstraction
+
+target=svcomp.loops.ArrayTrueUnreachableLabel
+
+classpath=${jpf-abstraction}/build/benchmarks/
+sourcepath=${jpf-abstraction}/src/benchmarks/
+
+panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/svcomp/loops/ArrayTrueUnreachableLabel.pred
+
+listener=gov.nasa.jpf.abstraction.AbstractListener
+
+vm.serializer.class=gov.nasa.jpf.abstraction.PredicateAbstractionSerializer
+

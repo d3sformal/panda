@@ -407,11 +407,15 @@ public class PredicateAbstraction extends Abstraction {
                 returnValue = ExpressionUtil.getExpression(after.getResultAttr());
             }
 
-            extendTraceFormulaWithAssignment(returnSymbolCallee, returnValue, callee, before.getPC().getPosition() + before.getPC().getLength(), 0);
+            if (before.getMethodInfo().getReturnSize() > 0) {
+                extendTraceFormulaWithAssignment(returnSymbolCallee, returnValue, callee, before.getPC().getPosition() + before.getPC().getLength(), 0);
+            }
 
             traceFormula.markReturn();
 
-            extendTraceFormulaWithAssignment(returnSymbolCaller, returnSymbolCallee, caller, after.getPC().getPosition(), -1);
+            if (before.getMethodInfo().getReturnSize() > 0) {
+                extendTraceFormulaWithAssignment(returnSymbolCaller, returnSymbolCallee, caller, after.getPC().getPosition(), -1);
+            }
 
             ssa.changeDepth(-1);
 

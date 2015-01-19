@@ -56,7 +56,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD implements ArrayLoa
     @Override
     public void pushConcrete(StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsExecutiveException {
         if (RunDetector.isRunning()) {
-            sf.push(elementSelector.getElementRef().intValue());
+            sf.pushRef(elementSelector.getElementRef().intValue());
         } else {
             super.push(sf, ei, someIndex);
         }
