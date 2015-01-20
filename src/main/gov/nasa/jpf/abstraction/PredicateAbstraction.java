@@ -151,6 +151,7 @@ public class PredicateAbstraction extends Abstraction {
 
     public PredicateAbstraction(Predicates predicateSet) {
         PandaConfig.reset();
+        SMT.reset();
 
         symbolTable = new SystemSymbolTable(this);
         predicateValuation = new SystemPredicateValuation(this, predicateSet);

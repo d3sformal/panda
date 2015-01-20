@@ -59,11 +59,23 @@ public class SMT {
     private static boolean USE_LOG_FILE = PandaConfig.getInstance().logSMT();
     private static List<SMTListener> listeners = new LinkedList<SMTListener>();
     private static SMTCache cache = new SMTCache();
-    private static int calls = 0;
-    private static long elapsed = 0;
+    private static int isSat;
+    private static int itp;
+    private static long elapsed;
 
-    public static int getCalls() {
-        return calls;
+    public static void reset() {
+        listeners.clear();
+        isSat = 0;
+        itp = 0;
+        elapsed = 0;
+    }
+
+    public static int getIsSat() {
+        return isSat;
+    }
+
+    public static int getItp() {
+        return itp;
     }
 
     public static long getElapsed() {
@@ -517,7 +529,7 @@ public class SMT {
      * @returns null if the Trace Formula is satisfiable. Otherwise an array of !FORMULAS! (non-atomic predicates) is returned (the length of the array corresponds to the length of the Trace Formula)
      */
     public Predicate[] interpolate(TraceFormula traceFormula) throws SMTException {
-        ++calls;
+        ++itp;
         Date startTime = new Date();
         SupportedSMT type = PandaConfig.getInstance().getInterpolationSMT();
 
@@ -782,7 +794,7 @@ public class SMT {
      * If extractModels is true it is also expected that (get-value ...) is invoked and that it succeeds when the query is SAT
      */
     private QueryResponse[] isSatisfiable(int count, String input, boolean extractModels) throws SMTException {
-        ++calls;
+        isSat += count;
         Date startTime = new Date();
         QueryResponse[] values = new QueryResponse[count];
 

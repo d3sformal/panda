@@ -281,6 +281,9 @@ public class PredicateConsolePublisher extends ConsolePublisher {
             }
         }
 
+        Method locationM = null;
+        int locationPC = 0;
+
         for (Method m : method2pred.keySet()) {
             int min = -1;
             int max = -1;
@@ -324,13 +327,18 @@ public class PredicateConsolePublisher extends ConsolePublisher {
 
                 if (location < inScope) {
                     location = inScope;
+                    locationM = m;
+                    locationPC = i;
                 }
             }
         }
 
+        Method methodM = null;
+
         for (Method m : method2pred.keySet()) {
             if (method < method2pred.get(m).size()) {
                 method = method2pred.get(m).size();
+                methodM = m;
             }
         }
 
@@ -340,8 +348,8 @@ public class PredicateConsolePublisher extends ConsolePublisher {
             }
         }
 
-        out.println("predicates:         location=" + location + ",method=" + method + ",total=" + total);
-        out.println("smt:                calls=" + SMT.getCalls() + ",elapsed=" + formatHMS(SMT.getElapsed()));
+        out.println("predicates:         location=" + location + (locationM != null ? " (" + locationM + ":" + (locationPC >= 0 ? locationPC : "*") + ")" : "") + ",method=" + method + (methodM != null ? " (" + methodM + ")" : "") + ",total=" + total);
+        out.println("smt:                sat=" + SMT.getIsSat() + ",itp=" + SMT.getItp() + ",elapsed=" + formatHMS(SMT.getElapsed()));
 
         if (PandaConfig.getInstance().enabledRefinement()) {
             out.println("refinements:        " + abs.getNumberOfRefinements());
