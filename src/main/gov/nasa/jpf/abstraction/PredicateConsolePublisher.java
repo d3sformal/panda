@@ -1,6 +1,10 @@
 package gov.nasa.jpf.abstraction;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.report.ConsolePublisher;
@@ -14,6 +18,19 @@ import gov.nasa.jpf.vm.Path;
 import gov.nasa.jpf.vm.Step;
 import gov.nasa.jpf.vm.Transition;
 
+import gov.nasa.jpf.abstraction.common.MethodPredicateContext;
+import gov.nasa.jpf.abstraction.common.ObjectPredicateContext;
+import gov.nasa.jpf.abstraction.common.StaticPredicateContext;
+import gov.nasa.jpf.abstraction.common.BytecodeInterval;
+import gov.nasa.jpf.abstraction.common.BytecodeIntervals;
+import gov.nasa.jpf.abstraction.common.BytecodeRange;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.PredicateContext;
+import gov.nasa.jpf.abstraction.common.Predicates;
+import gov.nasa.jpf.abstraction.common.access.Method;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultMethod;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
 import gov.nasa.jpf.abstraction.state.MethodFramePredicateValuation;
 import gov.nasa.jpf.abstraction.state.State;
 import gov.nasa.jpf.abstraction.state.Trace;
@@ -175,8 +192,157 @@ public class PredicateConsolePublisher extends ConsolePublisher {
     public synchronized void printStatistics (PrintWriter out) {
         super.printStatistics(out);
 
+        PredicateAbstraction abs = PredicateAbstraction.getInstance();
+
+        Predicates preds = abs.getPredicateValuation().getPredicateSet();
+        Map<Method, Set<Predicate>> method2pred = new HashMap<Method, Set<Predicate>>();
+        int method = 0;
+        int location = 0;
+        int total = 0;
+
+        for (PredicateContext ctx : preds.contexts) {
+            if (ctx instanceof MethodPredicateContext) {
+                MethodPredicateContext mctx = (MethodPredicateContext) ctx;
+                Method m = mctx.getMethod();
+
+                for (Predicate p : ctx.predicates.keySet()) {
+                    if (!method2pred.containsKey(m)) {
+                        method2pred.put(m, new HashSet<Predicate>());
+                    }
+                    if (method2pred.get(m).contains(p)) {
+                        for (Predicate q : method2pred.get(m)) {
+                            if (p.equals(q)) {
+                                q.setScope(q.getScope().merge(p.getScope()));
+                                break;
+                            }
+                        }
+                    } else {
+                        method2pred.get(m).add(p);
+                    }
+                }
+            }
+        }
+        for (PredicateContext ctx : preds.contexts) {
+            if (ctx instanceof ObjectPredicateContext) {
+                ObjectPredicateContext octx = (ObjectPredicateContext) ctx;
+                PackageAndClass pc = octx.getPackageAndClass();
+                boolean added = false;
+
+                for (Method m : method2pred.keySet()) {
+                    if (m.getPackageAndClass().equals(pc)) {
+                        added = true;
+
+                        for (Predicate p : octx.predicates.keySet()) {
+                            if (method2pred.get(m).contains(p)) {
+                                for (Predicate q : method2pred.get(m)) {
+                                    if (p.equals(q)) {
+                                        q.setScope(q.getScope().merge(p.getScope()));
+                                        break;
+                                    }
+                                }
+                            } else {
+                                method2pred.get(m).add(p);
+                            }
+                        }
+                    }
+                }
+
+                if (!added) {
+                    Method m = DefaultMethod.create(pc, "<init>");
+
+                    method2pred.put(m, new HashSet<Predicate>());
+                    method2pred.get(m).addAll(octx.predicates.keySet());
+                }
+            }
+        }
+        for (PredicateContext ctx : preds.contexts) {
+            if (ctx instanceof StaticPredicateContext) {
+                StaticPredicateContext sctx = (StaticPredicateContext) ctx;
+
+                if (method2pred.isEmpty()) {
+                    method2pred.put(DefaultMethod.create(DefaultPackageAndClass.create(""), ""), new HashSet<Predicate>());
+                }
+
+                for (Method m : method2pred.keySet()) {
+                    for (Predicate p : sctx.predicates.keySet()) {
+                        if (method2pred.get(m).contains(p)) {
+                            for (Predicate q : method2pred.get(m)) {
+                                if (p.equals(q)) {
+                                    q.setScope(q.getScope().merge(p.getScope()));
+                                    break;
+                                }
+                            }
+                        } else {
+                            method2pred.get(m).add(p);
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Method m : method2pred.keySet()) {
+            int min = -1;
+            int max = -1;
+
+            for (Predicate p : method2pred.get(m)) {
+                BytecodeRange br = p.getScope();
+
+                if (br instanceof BytecodeInterval) {
+                    BytecodeInterval bi = (BytecodeInterval) br;
+
+                    if (min > bi.getMin()) {
+                        min = bi.getMin();
+                    }
+
+                    if (max < bi.getMax()) {
+                        max = bi.getMax();
+                    }
+                }
+
+                if (br instanceof BytecodeIntervals) {
+                    BytecodeIntervals bis = (BytecodeIntervals) br;
+
+                    if (min > bis.getMin()) {
+                        min = bis.getMin();
+                    }
+
+                    if (max < bis.getMax()) {
+                        max = bis.getMax();
+                    }
+                }
+            }
+
+            for (int i = min; i <= max; ++i) {
+                int inScope = 0;
+
+                for (Predicate p : method2pred.get(m)) {
+                    if (p.isInScope(i)) {
+                        ++inScope;
+                    }
+                }
+
+                if (location < inScope) {
+                    location = inScope;
+                }
+            }
+        }
+
+        for (Method m : method2pred.keySet()) {
+            if (method < method2pred.get(m).size()) {
+                method = method2pred.get(m).size();
+            }
+        }
+
+        for (PredicateContext ctx : preds.contexts) {
+            for (Predicate p : ctx.predicates.keySet()) {
+                ++total;
+            }
+        }
+
+        out.println("predicates:         location=" + location + ",method=" + method + ",total=" + total);
+
         if (PandaConfig.getInstance().enabledRefinement()) {
-            out.println("refinements:        " + PredicateAbstraction.getInstance().getNumberOfRefinements());
+            out.println("refinements:        " + abs.getNumberOfRefinements());
         }
     }
 }
