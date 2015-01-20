@@ -31,6 +31,7 @@ import gov.nasa.jpf.abstraction.common.access.Method;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultMethod;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultPackageAndClass;
+import gov.nasa.jpf.abstraction.smt.SMT;
 import gov.nasa.jpf.abstraction.state.MethodFramePredicateValuation;
 import gov.nasa.jpf.abstraction.state.State;
 import gov.nasa.jpf.abstraction.state.Trace;
@@ -340,6 +341,7 @@ public class PredicateConsolePublisher extends ConsolePublisher {
         }
 
         out.println("predicates:         location=" + location + ",method=" + method + ",total=" + total);
+        out.println("smt:                calls=" + SMT.getCalls() + ",elapsed=" + formatHMS(SMT.getElapsed()));
 
         if (PandaConfig.getInstance().enabledRefinement()) {
             out.println("refinements:        " + abs.getNumberOfRefinements());

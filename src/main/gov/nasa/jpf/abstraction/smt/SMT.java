@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -58,6 +59,16 @@ public class SMT {
     private static boolean USE_LOG_FILE = PandaConfig.getInstance().logSMT();
     private static List<SMTListener> listeners = new LinkedList<SMTListener>();
     private static SMTCache cache = new SMTCache();
+    private static int calls = 0;
+    private static long elapsed = 0;
+
+    public static int getCalls() {
+        return calls;
+    }
+
+    public static long getElapsed() {
+        return elapsed;
+    }
 
     public static void registerListener(SMTListener listener) {
         listeners.add(listener);
@@ -506,6 +517,8 @@ public class SMT {
      * @returns null if the Trace Formula is satisfiable. Otherwise an array of !FORMULAS! (non-atomic predicates) is returned (the length of the array corresponds to the length of the Trace Formula)
      */
     public Predicate[] interpolate(TraceFormula traceFormula) throws SMTException {
+        ++calls;
+        Date startTime = new Date();
         SupportedSMT type = PandaConfig.getInstance().getInterpolationSMT();
 
         SMT interpol = new SMT(type);
@@ -755,6 +768,10 @@ public class SMT {
             System.err.println("SMT refuses to provide output.");
 
             throw new SMTException(e);
+        } finally {
+            Date endTime = new Date();
+
+            elapsed += endTime.getTime() - startTime.getTime();
         }
     }
 
@@ -765,6 +782,8 @@ public class SMT {
      * If extractModels is true it is also expected that (get-value ...) is invoked and that it succeeds when the query is SAT
      */
     private QueryResponse[] isSatisfiable(int count, String input, boolean extractModels) throws SMTException {
+        ++calls;
+        Date startTime = new Date();
         QueryResponse[] values = new QueryResponse[count];
 
         String output = "";
@@ -824,6 +843,10 @@ public class SMT {
             System.err.println("SMT refuses to provide output.");
 
             throw new SMTException(e);
+        } finally {
+            Date endTime = new Date();
+
+            elapsed += endTime.getTime() - startTime.getTime();
         }
 
         return values;
