@@ -6,7 +6,3 @@ classpath=${jpf-abstraction}/build/benchmarks
 sourcepath=${jpf-abstraction}/src/benchmarks
 
 panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/cycling/CyclingRace.pred
-
-listener=gov.nasa.jpf.abstraction.AbstractListener
-
-vm.serializer.class=gov.nasa.jpf.abstraction.PredicateAbstractionSerializer

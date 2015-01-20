@@ -1,0 +1,8 @@
+@using=jpf-abstraction
+
+target=svcomp.loops.TREX03TrueUnreachableLabel
+
+classpath=${jpf-abstraction}/build/benchmarks/
+sourcepath=${jpf-abstraction}/src/benchmarks/
+
+panda.refinement=true
