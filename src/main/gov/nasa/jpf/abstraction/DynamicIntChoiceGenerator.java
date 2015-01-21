@@ -24,6 +24,12 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
     }
 
     public boolean hasProcessed(int value) {
+        for (int i = count; i < values.length; ++i) {
+            if (values[i] == value) {
+                return false;
+            }
+        }
+
         for (int i = 0; i < count; ++i) {
             if (values[i] == value) {
                 return true;
@@ -43,7 +49,7 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
         return false;
     }
 
-    public void add(int value) {
+    public void add(int value, TraceFormula trace) {
         Integer[] newValues = new Integer[values.length + 1];
 
         for (int i = 0; i < values.length; ++i) {
@@ -56,9 +62,13 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
         // Keep track of the branching that forced this choice to be added
         // This allows us to force-disable state matching and actually reach the branching
         // Not necessary to clone (because there is backtrack right after adding this choice)
-        targetBranchings.add(PredicateAbstraction.getInstance().getTraceFormula());
+        targetBranchings.add(trace);
 
         isDone = false;
+    }
+
+    public void add(int value) {
+        add(value, PredicateAbstraction.getInstance().getTraceFormula());
     }
 
     public Integer[] getChoices() {

@@ -187,6 +187,10 @@ public class PredicateAbstraction extends Abstraction {
     private SSAFormulaIncarnationsManager ssa = new SSAFormulaIncarnationsManager();
     private SortedMap<String, Unknown> unknowns = new TreeMap<String, Unknown>();
 
+    public SSAFormulaIncarnationsManager getSSAManager() {
+        return ssa;
+    }
+
     public void registerUnknown(Unknown unknown) {
         unknowns.put(((Root) ssa.getSymbolIncarnation(unknown, 0)).getName(), unknown);
     }

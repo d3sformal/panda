@@ -79,26 +79,38 @@ public class BranchingExecutionHelper {
 
                 if (forceFeasible) {
                     if (config.enabledVerbose(BranchingExecutionHelper.class)) {
-                        System.out.println("[WARNING] Finding feasible trace with matching prefix and " + branchCondition);
-                        System.out.println("\ti.e.:");
+                        System.out.println("[WARNING] Deciding feasibility of the following trace (prefix matching current trace + " + branchCondition + ")");
 
                         for (Step s : PredicateAbstraction.getInstance().getTraceFormula()) {
-                            System.out.println("\t\t" + s.getPredicate());
+                            System.out.println("\t" + s.getPredicate());
                         }
                     }
 
                     Predicate traceFormula = PredicateAbstraction.getInstance().getTraceFormula().toConjunction();
-                    Map<String, Unknown> unknowns = PredicateAbstraction.getInstance().getUnknowns();
+                    Map<String, Unknown> allUnknowns = PredicateAbstraction.getInstance().getUnknowns();
+                    Map<String, Unknown> unknowns = new HashMap<String, Unknown>();
 
                     int i = 0;
-                    AccessExpression[] exprArray = new AccessExpression[unknowns.keySet().size()];
+
+                    Set<AccessExpression> exprs = new HashSet<AccessExpression>();
+                    Set<AccessExpression> unknownExprs = new HashSet<AccessExpression>();
+
+                    traceFormula.addAccessExpressionsToSet(exprs);
 
                     // Collect unknown expressions
-                    for (String unknown : unknowns.keySet()) {
-                        exprArray[i] = DefaultRoot.create(unknown);
+                    // Filter out only those that appear along the trace
+                    for (String unknown : allUnknowns.keySet()) {
+                        AccessExpression ae = DefaultRoot.create(unknown);
+
+                        if (exprs.contains(ae)) {
+                            unknowns.put(unknown, allUnknowns.get(unknown));
+                            unknownExprs.add(ae);
+                        }
 
                         ++i;
                     }
+
+                    AccessExpression[] exprArray = unknownExprs.toArray(new AccessExpression[unknownExprs.size()]);
 
                     /**
                      * Blocking clauses may not be necessary (the trace itself (extended with appropriate branch condition) is enough to demand a new value of unknown)
@@ -184,6 +196,10 @@ public class BranchingExecutionHelper {
 
                                 if (cg.hasProcessed(models[j]) || !cg.has(models[j])) {
                                     cg.add(models[j]);
+
+                                    if (config.enabledVerbose(BranchingExecutionHelper.class)) {
+                                        System.out.println("\t" + exprArray[j] + ": " + models[j]);
+                                    }
                                 }
                             }
                         }
