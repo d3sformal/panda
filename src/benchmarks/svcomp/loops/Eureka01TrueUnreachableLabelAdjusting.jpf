@@ -1,0 +1,10 @@
+@using=jpf-abstraction
+
+target=svcomp.loops.Eureka01TrueUnreachableLabel
+
+classpath=${jpf-abstraction}/build/benchmarks/
+sourcepath=${jpf-abstraction}/src/benchmarks/
+
+panda.refinement=true
+
+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener
