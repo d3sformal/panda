@@ -15,6 +15,7 @@ public class TraceFormula implements Iterable<Step> {
     public static final long serialVersionUID = 1L;
 
     private Stack<Step> steps = new Stack<Step>();
+    private int depth = 0;
 
     private class MethodCall {
         int mCallInvoked;
@@ -102,12 +103,20 @@ public class TraceFormula implements Iterable<Step> {
     }
 
     public void append(Predicate p, MethodInfo m, int pc) {
-        push(new Step(p, m, pc));
+        push(new Step(p, m, pc, depth));
     }
 
     @Override
     public Iterator<Step> iterator() {
         return steps.iterator();
+    }
+
+    public void markState() {
+        ++depth;
+    }
+
+    public int getDepth() {
+        return depth;
     }
 
     public void markCallInvoked() {
@@ -190,6 +199,7 @@ public class TraceFormula implements Iterable<Step> {
         TraceFormula c = new TraceFormula();
 
         c.steps.addAll(steps);
+        c.depth = depth;
         c.unmatchedCalls.addAll(unmatchedCalls);
         c.methodBoundaries.addAll(methodBoundaries);
 

@@ -18,7 +18,7 @@ public class DebugCopyPreservingStateSet extends JenkinsStateSet {
 
   static final String LOGFILE = "state";
 
-  private Map<Integer, Integer> visits = new HashMap<Integer, Integer>();
+  private static Map<Integer, Integer> visits = new HashMap<Integer, Integer>();
   protected File outputDir;
   protected File outputFile;
 

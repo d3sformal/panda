@@ -37,7 +37,9 @@ public class PandaConfig {
     private Boolean refinementGlobal;
     private Boolean refinementMethodGlobal;
     private Boolean refinementKeepUnrefinedPrefix;
+    private Boolean refinementKeepUnrefinedMethodPrefix;
     private Boolean refinementKeepExploredBranches;
+    private Boolean refinementDropUnrefinedPrefixOnFailure;
     private Boolean languageCheckMinimization;
     private Boolean initializeStaticFields;
     private Boolean initializeObjectFields;
@@ -254,12 +256,28 @@ public class PandaConfig {
         return refinementKeepUnrefinedPrefix;
     }
 
+    public boolean keepUnrefinedMethodPrefix() {
+        if (refinementKeepUnrefinedMethodPrefix == null) {
+            refinementKeepUnrefinedMethodPrefix = getUnderlyingConfig().getBoolean("panda.refinement.keep_unrefined_method_prefix");
+        }
+
+        return refinementKeepUnrefinedMethodPrefix;
+    }
+
     public boolean keepExploredBranches() {
         if (refinementKeepExploredBranches == null) {
             refinementKeepExploredBranches = getUnderlyingConfig().getBoolean("panda.refinement.keep_explored_branches");
         }
 
         return refinementKeepExploredBranches;
+    }
+
+    public boolean dropUnrefinedPrefixOnFailure() {
+        if (refinementDropUnrefinedPrefixOnFailure == null) {
+            refinementDropUnrefinedPrefixOnFailure = getUnderlyingConfig().getBoolean("panda.refinement.drop_unrefined_prefix_on_failure");
+        }
+
+        return refinementDropUnrefinedPrefixOnFailure;
     }
 
     public boolean initializeStaticFields() {

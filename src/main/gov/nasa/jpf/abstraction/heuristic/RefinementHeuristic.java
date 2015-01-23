@@ -2,6 +2,8 @@ package gov.nasa.jpf.abstraction.heuristic;
 
 import gov.nasa.jpf.vm.MethodInfo;
 
+import gov.nasa.jpf.abstraction.common.BytecodeInterval;
+import gov.nasa.jpf.abstraction.common.BytecodeRange;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Disjunction;
@@ -46,6 +48,8 @@ public class RefinementHeuristic {
     }
 
     protected boolean refineAtomic(Predicate interpolant, MethodInfo m, int fromPC, int toPC) {
-        return predVal.refine(interpolant, m, fromPC, toPC);
+        BytecodeRange scope = new BytecodeInterval(fromPC, toPC);
+
+        return predVal.refine(interpolant, m, scope);
     }
 }

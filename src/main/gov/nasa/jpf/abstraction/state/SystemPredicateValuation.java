@@ -26,7 +26,7 @@ import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.AbstractMethodPredicateContext;
 import gov.nasa.jpf.abstraction.common.AssumePredicateContext;
-import gov.nasa.jpf.abstraction.common.BytecodeInterval;
+import gov.nasa.jpf.abstraction.common.BytecodeRange;
 import gov.nasa.jpf.abstraction.common.BytecodeUnlimitedRange;
 import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Conjunction;
@@ -190,14 +190,14 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
         scopes.get(currentThreadID).top().force(predicate, value);
     }
 
-    public boolean refine(Predicate interpolant, MethodInfo m, int fromPC, int toPC) {
+    public boolean refine(Predicate interpolant, MethodInfo m, BytecodeRange scope) {
         boolean refined = false;
 
         // We need to clone here, because SMT might have reused the same object as an interpolant at different places of the trace
         // we will be processing them one-by-one here
         // by setting the scope we will override the previous choice (that will be destroyed here, and will not get to merging in PredicateValuationMap)
         interpolant = interpolant.clone();
-        interpolant.setScope(new BytecodeInterval(fromPC, toPC));
+        interpolant.setScope(scope);
 
         MethodPredicateContext ctx = null;
 

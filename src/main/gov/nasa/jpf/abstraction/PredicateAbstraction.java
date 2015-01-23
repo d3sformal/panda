@@ -675,6 +675,7 @@ public class PredicateAbstraction extends Abstraction {
         );
 
         trace.push(state);
+        traceFormula.markState();
 
         /**
          * Register the main thread as it is not explicitely created elsewhere
@@ -723,6 +724,7 @@ public class PredicateAbstraction extends Abstraction {
         );
 
         trace.push(state);
+        traceFormula.markState();
 
         if (forcedTrace != null) {
             if (traceFormula.isPrefixOf(forcedTrace)) {
@@ -772,6 +774,8 @@ public class PredicateAbstraction extends Abstraction {
         return refinements;
     }
 
+    boolean dropped = false;
+
     /**
      * @returns null if real error, else a backtrack level is returned (the depth in the search to which to return)
      */
@@ -796,6 +800,9 @@ public class PredicateAbstraction extends Abstraction {
                 refinements++;
 
                 boolean refined = false;
+                int refinedAt = traceFormula.get(traceFormula.size() - 1).getDepth();
+                int refinedMethodAt = trace.size();
+
                 List<MethodInfo> refinedMethods = new ArrayList<MethodInfo>();
 
                 for (int i = 0; i < interpolants.length; ++i) {
@@ -828,48 +835,110 @@ public class PredicateAbstraction extends Abstraction {
 
                     if (refinedOnce) {
                         refined = true;
-                        refinedMethods.add(mStart);
+                        refinedAt = Math.min(refinedAt, traceFormula.get(i).getDepth());
+
+                        boolean contained = false;
+
+                        for (MethodInfo m : refinedMethods) {
+                            if (m.getFullName().equals(mStart.getFullName())) {
+                                contained = true;
+                                break;
+                            }
+                        }
+
+                        if (!contained) {
+                            refinedMethods.add(mStart);
+                        }
                     }
                 }
+
+                boolean drop = false;
 
                 if (!refined) {
                     if (config.enabledVerbose(this.getClass())) {
                         System.out.println(predicateSet);
                     }
 
-                    if (config.printErrorOnRefinementFailure()) {
-                        System.out.println("Failed to refine abstraction (cycle).");
+                    if ((config.keepUnrefinedPrefix() || config.keepUnrefinedMethodPrefix()) && config.dropUnrefinedPrefixOnFailure() && !dropped) {
+                        drop = true;
+                        System.out.println("Failed to refine abstraction (possible cycle). Trying to recompute entire state space with the latest abstraction.");
+                    } else if (config.printErrorOnRefinementFailure()) {
+                        System.out.println("Failed to refine abstraction (possible cycle).");
 
                         return null;
                     } else {
-                        throw new JPFException("Failed to refine abstraction (cycle).");
+                        throw new JPFException("Failed to refine abstraction (possible cycle).");
                     }
                 }
 
-                int backtrackLevel;
-
-                if (config.keepUnrefinedPrefix()) {
-                    backtrackLevel = trace.size();
-
-                    for (int i = trace.size() - 1; i >= 0; --i) {
-                        for (MethodInfo visitedMethod : trace.get(i).visitedMethods) {
-                            for (MethodInfo refinedMethod : refinedMethods) {
-                                if (visitedMethod.getName().equals(refinedMethod.getName())) {
-                                    backtrackLevel = i;
-                                    break;
-                                }
+                for (int i = trace.size() - 1; i >= 0; --i) {
+                    for (MethodInfo visitedMethod : trace.get(i).visitedMethods) {
+                        for (MethodInfo refinedMethod : refinedMethods) {
+                            if (visitedMethod.getFullName().equals(refinedMethod.getFullName())) {
+                                refinedMethodAt = i;
                             }
                         }
                     }
+                }
 
-                    /**
-                     * At this point backtrackLevel points to the first refined level of the search
-                     *
-                     * We need to backtrack to the last not refined level, however
-                     */
-                    --backtrackLevel;
+                /*
+                System.out.println("RefinedAt = " + refinedAt + "/" + traceFormula.getDepth() + ", RefinedMethodAt = " + refinedMethodAt + "/" + trace.size());
+                if (refinedAt < refinedMethodAt) {
+                    // Something unexpected happens
+                    System.out.println("Refined:");
+                    for (MethodInfo m : refinedMethods) {
+                        System.out.println("\t" + m.getName());
+                    }
+                    System.out.println("Visited:");
+                    for (int i = 0; i < trace.size(); ++i) {
+                        System.out.print(i + ":");
+                        for (MethodInfo m : trace.get(i).visitedMethods) {
+                            System.out.print(" " + m.getName());
+                        }
+                        System.out.println();
+                    }
+
+                    boolean printAt = false;
+                    boolean printMethodAt = false;
+                    for (int i = 0; i < traceFormula.size(); ++i) {
+                        System.out.print(traceFormula.get(i).getDepth() + ": " + traceFormula.get(i).getMethod().getName() + ": " + traceFormula.get(i).getPredicate());
+                        if (traceFormula.get(i).getDepth() == refinedAt && !printAt) {
+                            System.out.print("\t <<<<<< STATE REF");
+                            printAt = true;
+                        }
+                        if (traceFormula.get(i).getDepth() == refinedMethodAt && !printMethodAt) {
+                            System.out.print("\t <<<<<< METHOD REF");
+                            printMethodAt = true;
+                        }
+                        System.out.println();
+                    }
+                    try {
+                        System.out.println("[ENTER]");
+                        System.in.read();
+                    } catch (Exception e) {
+                    }
+                }
+                */
+
+                /**
+                 * At this point backtrackLevel points to the first refined level of the search
+                 *
+                 * We need to backtrack to the last not refined level, however
+                 */
+                int backtrackLevel;
+
+                if (config.keepUnrefinedPrefix() && config.keepUnrefinedMethodPrefix() && !drop) {
+                    backtrackLevel = Math.max(refinedAt, refinedMethodAt) - 1;
+                    dropped = false;
+                } else if (config.keepUnrefinedMethodPrefix() && !drop) {
+                    backtrackLevel = refinedMethodAt - 1;
+                    dropped = false;
+                } else if (config.keepUnrefinedPrefix() && !drop) {
+                    backtrackLevel = refinedAt - 1;
+                    dropped = false;
                 } else {
                     backtrackLevel = 1;
+                    dropped = true;
                 }
 
                 /**
