@@ -102,10 +102,10 @@ public class BranchingExecutionHelper {
                     for (String unknown : allUnknowns.keySet()) {
                         AccessExpression ae = DefaultRoot.create(unknown);
 
-                        if (exprs.contains(ae)) {
+                        //if (exprs.contains(ae)) {
                             unknowns.put(unknown, allUnknowns.get(unknown));
                             unknownExprs.add(ae);
-                        }
+                        //}
 
                         ++i;
                     }

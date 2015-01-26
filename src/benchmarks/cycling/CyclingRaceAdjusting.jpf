@@ -1,0 +1,8 @@
+@using=jpf-abstraction
+
+target=cycling.CyclingRace
+
+classpath=${jpf-abstraction}/build/benchmarks
+sourcepath=${jpf-abstraction}/src/benchmarks
+
+panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/cycling/CyclingRace.pred

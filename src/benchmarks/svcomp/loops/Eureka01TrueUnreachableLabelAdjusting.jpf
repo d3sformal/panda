@@ -11,4 +11,4 @@ panda.log_smt=true
 panda.storage.class=gov.nasa.jpf.abstraction.util.DebugCopyPreservingStateSet
 vm.serializer.class=gov.nasa.jpf.abstraction.util.DebugPredicateAbstractionSerializer
 
-listener+=,gov.nasa.jpf.listener.ExecTracker,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.util.CounterexampleListener
+#listener+=,gov.nasa.jpf.listener.ExecTracker,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.util.CounterexampleListener

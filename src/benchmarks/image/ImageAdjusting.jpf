@@ -1,0 +1,10 @@
+@using=jpf-abstraction
+
+target=image.Image
+
+classpath=${jpf-abstraction}/build/benchmarks
+sourcepath=${jpf-abstraction}/src/benchmarks
+
+panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/image/Image.pred
+
+report.console.property_violation=error,snapshot

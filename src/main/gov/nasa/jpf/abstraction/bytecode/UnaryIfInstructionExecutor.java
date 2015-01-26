@@ -6,6 +6,7 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.choice.BreakGenerator;
 
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
@@ -30,6 +31,8 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
 public class UnaryIfInstructionExecutor {
 
     private Constant constant;
+    private boolean conditionValue;
+
 
     public UnaryIfInstructionExecutor(Constant constant) {
         this.constant = constant;
@@ -45,8 +48,6 @@ public class UnaryIfInstructionExecutor {
 
         Predicate predicate = null;
         TruthValue condition = TruthValue.UNDEFINED;
-
-        boolean conditionValue;
 
         int v1 = sf.peek(0);
         int v2 = constant.value.intValue();
@@ -93,14 +94,14 @@ public class UnaryIfInstructionExecutor {
 
                     PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(predicate, br.getSelf().getMethodInfo(), br.getDefaultTarget().getPosition());
 
-                    break;
+                    return br.getSelf();
                 case FALSE:
                     ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
                     conditionValue = false;
 
                     PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Negation.create(predicate), br.getSelf().getMethodInfo(), br.getNext(ti).getPosition());
 
-                    break;
+                    return br.getSelf();
                 case UNKNOWN:
                     ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
                     ss.setNextChoiceGenerator(cg);
@@ -110,15 +111,15 @@ public class UnaryIfInstructionExecutor {
         } else { // this is what really returns results
             ChoiceGenerator<?> cg = ss.getChoiceGenerator();
 
-            if (!(cg instanceof AbstractChoiceGenerator)) {
+            if (cg instanceof AbstractChoiceGenerator) {
+                conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
+
+                if (expr != null) {
+                    predicate = br.createPredicate(expr, constant);
+                    PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)), br.getSelf().getMethodInfo(), br.getTarget(ti, conditionValue ? 1 : 0).getPosition());
+                }
+            } else if (!(cg instanceof BreakGenerator)) {
                 throw new RuntimeException("expected AbstractChoiceGenerator, got: " + cg);
-            }
-
-            conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
-
-            if (expr != null) {
-                predicate = br.createPredicate(expr, constant);
-                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)), br.getSelf().getMethodInfo(), br.getTarget(ti, conditionValue ? 1 : 0).getPosition());
             }
         }
 
