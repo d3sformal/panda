@@ -7,6 +7,7 @@ import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.choice.BreakGenerator;
+import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
@@ -31,8 +32,6 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
 public class UnaryIfInstructionExecutor {
 
     private Constant constant;
-    private boolean conditionValue;
-
 
     public UnaryIfInstructionExecutor(Constant constant) {
         this.constant = constant;
@@ -51,6 +50,8 @@ public class UnaryIfInstructionExecutor {
 
         int v1 = sf.peek(0);
         int v2 = constant.value.intValue();
+
+        boolean conditionValue;
 
         /**
          * First we check whether there is no choice generator present
@@ -83,27 +84,29 @@ public class UnaryIfInstructionExecutor {
                 }
             }
 
+            ChoiceGenerator<?> cg;
+
             switch (condition) {
                 // IF THE BRANCH COULD NOT BE PICKED BY PREDICATE ABSTRACTION (IT IS NOT ACTIVE)
                 default:
                 case UNDEFINED:
                     return br.executeConcrete(ti);
                 case TRUE:
-                    ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
-                    conditionValue = true;
+                    cg = new IntChoiceFromList("Ensure that state matching is used in case there was an infinite loop", 1);
+                    ss.setNextChoiceGenerator(cg);
 
                     PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(predicate, br.getSelf().getMethodInfo(), br.getDefaultTarget().getPosition());
 
                     return br.getSelf();
                 case FALSE:
-                    ti.breakTransition("Ensure that state matching is used in case there was an infinite loop");
-                    conditionValue = false;
+                    cg = new IntChoiceFromList("Ensure that state matching is used in case there was an infinite loop", 0);
+                    ss.setNextChoiceGenerator(cg);
 
                     PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Negation.create(predicate), br.getSelf().getMethodInfo(), br.getNext(ti).getPosition());
 
                     return br.getSelf();
                 case UNKNOWN:
-                    ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
+                    cg = new AbstractChoiceGenerator();
                     ss.setNextChoiceGenerator(cg);
 
                     return br.getSelf();
@@ -118,7 +121,9 @@ public class UnaryIfInstructionExecutor {
                     predicate = br.createPredicate(expr, constant);
                     PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)), br.getSelf().getMethodInfo(), br.getTarget(ti, conditionValue ? 1 : 0).getPosition());
                 }
-            } else if (!(cg instanceof BreakGenerator)) {
+            } else if (cg instanceof IntChoiceFromList) {
+                conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
+            } else {
                 throw new RuntimeException("expected AbstractChoiceGenerator, got: " + cg);
             }
         }

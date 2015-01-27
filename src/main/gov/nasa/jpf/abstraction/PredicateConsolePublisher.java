@@ -168,7 +168,7 @@ public class PredicateConsolePublisher extends ConsolePublisher {
                 out.println("");
             }
 
-            if (state != null) {
+            if (state != null && i + 1 < path.size()) {
                 Transition nextT = path.get(i + 1);
 
                 if (nextT != null) {

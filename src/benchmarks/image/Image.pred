@@ -4,12 +4,10 @@ class(image.Image).SIZE = 6
 
 [object image.Image]
 alength(arrlen, this.pixels) = class(image.Image).SIZE
-alength(arrlen, this.pixels[0]) = class(image.Image).SIZE
-alength(arrlen, this.pixels[1]) = class(image.Image).SIZE
+alength(arrlen, this.pixels[0..5]) = class(image.Image).SIZE
 
 alength(arrlen, this.pixels) = 6
-alength(arrlen, this.pixels[0]) = 6
-alength(arrlen, this.pixels[1]) = 6
+alength(arrlen, this.pixels[0..5]) = 6
 
 alength(arrlen, this.rectangles) = 2
 
@@ -95,9 +93,7 @@ img.rectangles[0..1].bottom < class(image.Image).SIZE
 
 alength(arrlen, img.rectangles) = 2
 alength(arrlen, img.pixels) = class(image.Image).SIZE
-alength(arrlen, img.pixels[0]) = class(image.Image).SIZE
-alength(arrlen, img.pixels[1]) = class(image.Image).SIZE
+alength(arrlen, img.pixels[0..5]) = class(image.Image).SIZE
 
 alength(arrlen, img.pixels) = 6
-alength(arrlen, img.pixels[0]) = 6
-alength(arrlen, img.pixels[1]) = 6
+alength(arrlen, img.pixels[0..5]) = 6
