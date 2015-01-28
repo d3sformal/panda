@@ -11,6 +11,7 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.choice.BreakGenerator;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
 
@@ -43,6 +44,7 @@ public class ArrayLoadExecutor {
     private int originalIndex;
     private Expression index;
     private AccessExpression path;
+    private Instruction next;
 
     private IndexSelector indexSelector;
     private static final String ARRAY_INDEX_OUT_OF_BOUNDS = "java.lang.ArrayIndexOutOfBoundsException";
@@ -52,15 +54,23 @@ public class ArrayLoadExecutor {
     }
 
     public Instruction execute(ArrayLoadInstruction load, ThreadInfo ti) {
+        SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getModifiableTopFrame();
+        ChoiceGenerator<?> cg = null;
+
+        if (ti.isFirstStepInsn()) {
+            cg = ss.getChoiceGenerator();
+
+            if (cg instanceof BreakGenerator) {
+                return next;
+            }
+        }
 
         array = ExpressionUtil.getAccessExpression(sf.getOperandAttr(1));
         index = ExpressionUtil.getExpression(sf.getOperandAttr(0));
         path = DefaultArrayElementRead.create(array, index);
 
         Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(load.getSelf(), ti);
-
-        SystemState ss = ti.getVM().getSystemState();
 
         int concreteIndex = sf.peek();
         int abstractIndex = -1;
@@ -95,7 +105,10 @@ public class ArrayLoadExecutor {
             }
 
             PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(condition, load.getSelf().getMethodInfo(), actualNextInsn.getPosition());
-            BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, condition, concreteIndex == abstractIndex, true, actualNextInsn, load.getSelf());
+
+            next = actualNextInsn;
+
+            return BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, condition, concreteIndex == abstractIndex, true, actualNextInsn, load.getSelf());
         }
 
         return actualNextInsn;

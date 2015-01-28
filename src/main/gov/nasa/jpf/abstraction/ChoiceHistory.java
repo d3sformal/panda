@@ -173,7 +173,7 @@ public class ChoiceHistory implements Cloneable {
             if (level == this.level) {
                 ret.append("v----------------vVv----------------v\n");
             }
-            ret.append(choices.toString());
+            ret.append(choices.toString() + " " + choices.generator.getClass().getSimpleName() + " " + System.identityHashCode(choices.generator));
             ret.append('\n');
             ++level;
         }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Instruction;
@@ -40,7 +41,7 @@ import gov.nasa.jpf.abstraction.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 
 public class BranchingExecutionHelper {
-    public static void synchronizeConcreteAndAbstractExecutions(ThreadInfo ti, Predicate branchCondition, boolean concreteJump, boolean abstractJump, Instruction target, Instruction self) {
+    public static Instruction synchronizeConcreteAndAbstractExecutions(ThreadInfo ti, Predicate branchCondition, boolean concreteJump, boolean abstractJump, Instruction target, Instruction self) {
         StackFrame sf = ti.getModifiableTopFrame();
         SystemState ss = ti.getVM().getSystemState();
 
@@ -64,6 +65,8 @@ public class BranchingExecutionHelper {
                         pabs.dropForceStatesAlongTrace();
                     }
                 }
+
+                return self;
             }
         } else { // In case the concrete execution does not allow the same branch to be taken
             if (config.enabledVerbose(BranchingExecutionHelper.class)) {
@@ -180,11 +183,12 @@ public class BranchingExecutionHelper {
                             rStateSet = (ResetableStateSet) stateSet;
                         }
 
-                        // Because we want to match current state (its working copy) with state created by the code in enabled branch
-                        // Here we have not yet advanced PC
-                        // Whereas in the enabled branch the state is made after advancing the PC
-                        // We need to advance the PC to get the correct state
-                        ti.setPC(target);
+                        // Currently not true:
+                        //   Because we want to match current state (its working copy) with state created by the code in enabled branch
+                        //   Here we have not yet advanced PC
+                        //   Whereas in the enabled branch the state is made after advancing the PC
+                        //   We need to advance the PC to get the correct state
+                        //   ti.setPC(target);
 
                         if (rStateSet == null || rStateSet.isCurrentUnique() || !forceFeasibleOnce) {
                             if (config.enabledVerbose(BranchingExecutionHelper.class)) {
@@ -254,6 +258,8 @@ public class BranchingExecutionHelper {
                 }
             }
         }
+
+        return target;
     }
 
     // Collects all deterministic (only constant array indices) access expressions that point to primitive data contributing to the current concrete state

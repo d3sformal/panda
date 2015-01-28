@@ -32,6 +32,7 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
 public class UnaryIfInstructionExecutor {
 
     private Constant constant;
+    private Instruction next;
 
     public UnaryIfInstructionExecutor(Constant constant) {
         this.constant = constant;
@@ -43,6 +44,16 @@ public class UnaryIfInstructionExecutor {
 
         SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getModifiableTopFrame();
+        ChoiceGenerator<?> cg = null;
+
+        if (ti.isFirstStepInsn()) {
+            cg = ss.getChoiceGenerator();
+
+            if (cg instanceof BreakGenerator) {
+                return next;
+            }
+        }
+
         Expression expr = ExpressionUtil.getExpression(sf.getOperandAttr());
 
         Predicate predicate = null;
@@ -84,8 +95,6 @@ public class UnaryIfInstructionExecutor {
                 }
             }
 
-            ChoiceGenerator<?> cg;
-
             switch (condition) {
                 // IF THE BRANCH COULD NOT BE PICKED BY PREDICATE ABSTRACTION (IT IS NOT ACTIVE)
                 default:
@@ -112,8 +121,6 @@ public class UnaryIfInstructionExecutor {
                     return br.getSelf();
             }
         } else { // this is what really returns results
-            ChoiceGenerator<?> cg = ss.getChoiceGenerator();
-
             if (cg instanceof AbstractChoiceGenerator) {
                 conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
 
@@ -136,8 +143,8 @@ public class UnaryIfInstructionExecutor {
             branchCondition = Negation.create(branchCondition);
         }
 
-        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, branchCondition, br.getConcreteBranchValue(v1, constant.value.intValue()), conditionValue, br.getTarget(ti, conditionValue ? 1 : 0), br.getSelf());
+        next = br.getTarget(ti, conditionValue ? 1 : 0);
 
-        return br.getTarget(ti, conditionValue ? 1 : 0);
+        return BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, branchCondition, br.getConcreteBranchValue(v1, constant.value.intValue()), conditionValue, next, br.getSelf());
     }
 }

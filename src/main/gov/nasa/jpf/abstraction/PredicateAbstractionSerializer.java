@@ -276,7 +276,9 @@ public class PredicateAbstractionSerializer extends FilteringSerializer {
         serializeLocalVariables(currentSymbolScope);
 
         // store all predicate valuations
-        serializePredicates(frame.getPC().getPosition(), currentPredicateScope);
+        if (pc != null) {
+            serializePredicates(pc.getPosition(), currentPredicateScope);
+        }
 
         ++depth;
     }

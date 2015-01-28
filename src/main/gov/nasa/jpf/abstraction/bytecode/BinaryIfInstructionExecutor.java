@@ -42,12 +42,24 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
  */
 public class BinaryIfInstructionExecutor {
 
+    private Instruction next;
+
     final public Instruction execute(AbstractBranching br, ThreadInfo ti) {
 
         String name = br.getClass().getSimpleName();
 
         SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getModifiableTopFrame();
+        ChoiceGenerator<?> cg = null;
+
+        if (ti.isFirstStepInsn()) {
+            cg = ss.getChoiceGenerator();
+
+            if (cg instanceof BreakGenerator) {
+                return next;
+            }
+        }
+
         Expression expr1 = ExpressionUtil.getExpression(sf.getOperandAttr(1));
         Expression expr2 = ExpressionUtil.getExpression(sf.getOperandAttr(0));
 
@@ -75,8 +87,6 @@ public class BinaryIfInstructionExecutor {
                 truth = PredicateAbstraction.getInstance().processBranchingCondition(br.getSelf().getPosition(), predicate);
             }
 
-            ChoiceGenerator<?> cg;
-
             switch (truth) {
                 // IF THE BRANCH COULD NOT BE PICKED BY PREDICATE ABSTRACTION (IT IS NOT ACTIVE)
                 default:
@@ -103,7 +113,7 @@ public class BinaryIfInstructionExecutor {
                     return br.getSelf();
             }
         } else { // this is what really returns results
-            ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+            cg = ss.getChoiceGenerator();
 
             if (cg instanceof AbstractChoiceGenerator) {
                 conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
@@ -114,6 +124,8 @@ public class BinaryIfInstructionExecutor {
                 }
             } else if (cg instanceof IntChoiceFromList) {
                 conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
+            } else if (cg instanceof BreakGenerator) {
+                return next;
             } else {
                 throw new RuntimeException("expected AbstractChoiceGenerator, got: " + cg);
             }
@@ -128,8 +140,8 @@ public class BinaryIfInstructionExecutor {
             branchCondition = Negation.create(branchCondition);
         }
 
-        BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, branchCondition, br.getConcreteBranchValue(v1, v2), conditionValue, br.getTarget(ti, conditionValue ? 1 : 0), br.getSelf());
+        next = br.getTarget(ti, conditionValue ? 1 : 0);
 
-        return br.getTarget(ti, conditionValue ? 1 : 0);
+        return BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, branchCondition, br.getConcreteBranchValue(v1, v2), conditionValue, next, br.getSelf());
     }
 }
