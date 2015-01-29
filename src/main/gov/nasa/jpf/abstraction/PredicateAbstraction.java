@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -857,6 +860,14 @@ public class PredicateAbstraction extends Abstraction {
                 if (!refined) {
                     if (config.enabledVerbose(this.getClass())) {
                         System.out.println(predicateSet);
+                    }
+
+                    String filename = config.refinementDumpAbstractionPredicatesTo();
+
+                    try (PrintWriter w = new PrintWriter(new FileOutputStream(filename))) {
+                       w.println(predicateSet.toString());
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
 
                     if ((config.keepUnrefinedPrefix() || config.keepUnrefinedMethodPrefix()) && config.dropUnrefinedPrefixOnFailure() && !dropped) {

@@ -6,9 +6,11 @@ classpath=${jpf-abstraction}/build/benchmarks/
 sourcepath=${jpf-abstraction}/src/benchmarks/
 
 panda.refinement=true
-panda.refinement.heuristic=gov.nasa.jpf.abstraction.heuristic.VariableLifespanRefinementHeuristic
+#panda.refinement.heuristic=gov.nasa.jpf.abstraction.heuristic.VariableLifespanRefinementHeuristic
+panda.refinement.heuristic=gov.nasa.jpf.abstraction.heuristic.MethodGlobalRefinementHeuristic
 panda.log_smt=true
 panda.storage.class=gov.nasa.jpf.abstraction.util.DebugCopyPreservingStateSet
 vm.serializer.class=gov.nasa.jpf.abstraction.util.DebugPredicateAbstractionSerializer
 
-#listener+=,gov.nasa.jpf.listener.ExecTracker,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.util.CounterexampleListener
+listener+=,gov.nasa.jpf.listener.ExecTracker,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.util.CounterexampleListener
+report.console.property_violation=error,snapshot

@@ -34,6 +34,9 @@ import gov.nasa.jpf.abstraction.assertions.AssertSameAliasingOnEveryVisitHandler
 import gov.nasa.jpf.abstraction.assertions.AssertSameValuationOnEveryVisitHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostHandler;
 import gov.nasa.jpf.abstraction.assertions.AssertVisitedAtMostWithValuationHandler;
+import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.inspection.AliasingDumper;
 import gov.nasa.jpf.abstraction.smt.SMT;
 import gov.nasa.jpf.abstraction.util.RunDetector;
@@ -150,6 +153,17 @@ public class AbstractListener extends PropertyListenerAdapter {
 
         if (RunDetector.isRunning() && nextInsn != null) {
             PredicateAbstraction.getInstance().getPredicateValuation().get(0).evaluateJustInScopePredicates(nextInsn.getPosition());
+        }
+
+        if (PandaConfig.getInstance().checkTraceFeasibilityAtEveryStep()) {
+            PredicateAbstraction abs = PredicateAbstraction.getInstance();
+            SpecialVariable v = SpecialVariable.create("FeasibilityCheck");
+
+            if (abs.smt.getModels(abs.getTraceFormula().toConjunction(), new AccessExpression[] {v}) == null) {
+                System.out.println("Infeasible trace:");
+                System.out.println(abs.getTraceFormula().toConjunction());
+                System.exit(0);
+            }
         }
     }
 

@@ -45,6 +45,8 @@ public class PandaConfig {
     private Boolean initializeObjectFields;
     private Boolean initializeArrayElements;
     private RefinementHeuristic refinementHeuristic;
+    private Boolean checkTraceFeasibilityAtEveryStep;
+    private String refinementDumpAbstractionPredicatesTo;
 
     protected PandaConfig() {
     }
@@ -342,5 +344,21 @@ public class PandaConfig {
         }
 
         return refinementInitialization;
+    }
+
+    public boolean checkTraceFeasibilityAtEveryStep() {
+        if (checkTraceFeasibilityAtEveryStep == null) {
+            checkTraceFeasibilityAtEveryStep = getUnderlyingConfig().getBoolean("panda.check_trace_feasibility_at_every_step");
+        }
+
+        return checkTraceFeasibilityAtEveryStep;
+    }
+
+    public String refinementDumpAbstractionPredicatesTo() {
+        if (refinementDumpAbstractionPredicatesTo == null) {
+            refinementDumpAbstractionPredicatesTo = getUnderlyingConfig().getString("panda.refinement.dump_abstraction_predicates_to");
+        }
+
+        return refinementDumpAbstractionPredicatesTo;
     }
 }
