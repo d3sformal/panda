@@ -622,6 +622,8 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
             Set<AccessExpression> temporaryPathsHolder = new HashSet<AccessExpression>();
 
+
+            // We can use all the predicates in case we rename all out-of-scope local variables to avoid clashes (this allows us to use predicates about them to be more precise)
             int uniqueID = 0;
 
             for (Predicate p : callerScope.getPredicates()) {
@@ -659,6 +661,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
                 predicate.addAccessExpressionsToSet(temporaryPathsHolder);
 
+                // This is not used now, because we rename every out-of-scope local variable and use the latest predicates about it
                 // If any of the symbols used in the predicate has changed
                 //for (Root l : notWantedLocalVariables) {
                 //    for (AccessExpression path : temporaryPathsHolder) {
