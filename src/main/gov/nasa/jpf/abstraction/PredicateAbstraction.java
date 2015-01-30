@@ -912,6 +912,7 @@ public class PredicateAbstraction extends Abstraction {
 
                         if (path.size() != size) {
                             System.out.println("[WARNING] The above proper prefix of the error trace is already inconsistent, the execution possibly failed to rule out this trace based on predicates that should have already block it.");
+                            System.out.println();
                         }
 
                         throw new JPFException("Failed to refine abstraction (possible cycle).");
