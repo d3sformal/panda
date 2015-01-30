@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction;
 
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +40,7 @@ import gov.nasa.jpf.abstraction.state.Trace;
 public class PredicateConsolePublisher extends ConsolePublisher {
 
     // whether to skip static init instructions when printing code
-    private boolean skip;
+    private static boolean skip;
 
     public PredicateConsolePublisher(Config conf, Reporter reporter) {
         super(conf, reporter);
@@ -51,15 +52,25 @@ public class PredicateConsolePublisher extends ConsolePublisher {
 
     @Override
     protected void publishTrace() {
-        Path path = reporter.getPath();
+        publishTopicStart("trace " + reporter.getCurrentErrorId());
 
+        publishTrace(out, reporter.getPath());
+    }
+
+    public static void publishTrace(PrintStream out, Path path) {
+        publishTrace(new PrintWriter(out, true), path);
+    }
+
+    public static void publishTrace(PrintWriter out, Path path) {
+        publishTrace(out, path, true, true, true, true, true, true);
+    }
+
+    private static void publishTrace(PrintWriter out, Path path, boolean showCG, boolean showSteps, boolean showMethod, boolean showSource, boolean showLocation, boolean showCode) {
         if (path.size() == 0) {
             return; // nothing to publish
         }
 
         skip = true;
-
-        publishTopicStart("trace " + reporter.getCurrentErrorId());
 
         Trace trace = PredicateAbstraction.getInstance().getTrace();
         int progressAlongTrace = 1;

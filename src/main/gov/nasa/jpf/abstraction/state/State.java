@@ -45,4 +45,9 @@ public class State {
         this.visitedMethods = visitedMethods;
         this.forcedTrace = forcedTrace;
     }
+
+    @Override
+    public State clone() {
+      return new State(currentThread, symbolTableStacks, predicateValuationStacks, traceFormula, ssa, visitedMethods, forcedTrace);
+    }
 }

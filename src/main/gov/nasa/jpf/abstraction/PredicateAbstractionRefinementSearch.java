@@ -34,6 +34,16 @@ public class PredicateAbstractionRefinementSearch extends DFSearch {
         }
     }
 
+    public boolean performBacktrack() {
+        if (backtrack()) {
+            notifyStateBacktracked();
+
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     public void search() {
         boolean depthLimitReached = false;
@@ -47,14 +57,13 @@ public class PredicateAbstractionRefinementSearch extends DFSearch {
             boolean bNotPossible = false;
 
             while (b) {
-                if (!backtrack()) { // backtrack not possible, done
+                if (!performBacktrack()) { // backtrack not possible, done
                     bNotPossible = true;
                     break;
                 }
 
                 depthLimitReached = false;
                 depth--;
-                notifyStateBacktracked();
 
                 b = backtrackLevel != null && backtrackLevel < depth;
             }

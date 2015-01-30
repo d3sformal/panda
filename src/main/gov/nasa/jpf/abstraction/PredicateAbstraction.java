@@ -16,11 +16,13 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import gov.nasa.jpf.JPFException;
+import gov.nasa.jpf.report.Publisher;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.Path;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Types;
@@ -50,6 +52,7 @@ import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.common.access.Unknown;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementWrite;
@@ -878,6 +881,39 @@ public class PredicateAbstraction extends Abstraction {
 
                         return null;
                     } else {
+                        PredicateAbstractionRefinementSearch search = (PredicateAbstractionRefinementSearch) VM.getVM().getSearch();
+                        Path path = VM.getVM().getPath().clone();
+                        Trace trace = this.trace.clone();
+                        int i = path.size() - 1;
+
+                        // Find the first state, where the trace becomes infeasible
+                        while (this.trace.size() > 1) {
+                            SpecialVariable v = SpecialVariable.create("FeasibilityCheck");
+
+                            if (smt.getModels(traceFormula.toConjunction(), new AccessExpression[] {v}) == null) {
+                                i = VM.getVM().getPath().size() - 1;
+                                trace = this.trace.clone();
+                            }
+
+                            search.performBacktrack();
+                        }
+
+                        // Recover the state of Panda's trace (beware: not the whole state of Panda) to be able to print specific info from PredicateValuation etc
+                        this.trace = trace;
+
+                        int size = path.size();
+
+                        while (path.size() - 1 > i) {
+                            path.removeLast();
+                        }
+
+                        // Dump the prefix of the error trace
+                        PredicateConsolePublisher.publishTrace(System.out, path);
+
+                        if (path.size() != size) {
+                            System.out.println("[WARNING] The above proper prefix of the error trace is already inconsistent, the execution possibly failed to rule out this trace based on predicates that should have already block it.");
+                        }
+
                         throw new JPFException("Failed to refine abstraction (possible cycle).");
                     }
                 }

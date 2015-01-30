@@ -35,4 +35,15 @@ public class Trace {
     public boolean isEmpty() {
         return states.isEmpty();
     }
+
+    @Override
+    public Trace clone() {
+        Trace clone = new Trace();
+
+        for (State s : states) {
+            clone.push(s.clone());
+        }
+
+        return clone;
+    }
 }
