@@ -14,6 +14,10 @@ You can download the JDK 7 directly from the [Oracle web site](http://www.oracle
 Currently only the Linux x86-64 binaries of CVC4 are included within the project repository.
 For platforms other than Linux x86-64, you also need to obtain the appropriate binary at the [CVC4 web site](http://cvc4.cs.nyu.edu).
 
+3. **Z3**  
+Currently only the Linux x86-64 binaries of Z3 are included within the project repository.
+For platforms other than Linux x86-64 or in case of trouble with dynamically linked libraries, you also need to obtain the appropriate binary or to compile the solver from source. Both precompiled binaries and source code can be found at the [Z3 web site](http://z3.codeplex.com/).
+
 <!--
 2. **MathSAT 5**  
 Currently only the Linux x86-64 binaries of MathSAT are included within the project repository.
