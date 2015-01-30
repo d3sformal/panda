@@ -46,8 +46,8 @@ public class Contradiction extends Predicate {
     }
 
     @Override
-    public Tautology clone() {
-        throw new PredicateNotCloneableException("Should not be copying this");
+    public Contradiction clone() {
+        return this;
     }
 
 }
