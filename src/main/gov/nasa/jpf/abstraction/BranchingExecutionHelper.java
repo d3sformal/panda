@@ -54,6 +54,7 @@ public class BranchingExecutionHelper {
         if (concreteJump == abstractJump) { // In case concrete and abstract executions agree
             if (pruneInfeasible && forceFeasibleOnce) {
                 // Add state to allow forward state matching (look if we should generate more choices to get into the branch (it might have been explored before - actually it is explored when this branch is hit))
+                ss.setForced(true);
                 ti.breakTransition("Creating state after taking an enabled branch: " + branchCondition);
 
                 PredicateAbstraction pabs = PredicateAbstraction.getInstance();
