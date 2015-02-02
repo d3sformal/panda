@@ -1,0 +1,10 @@
+@using=jpf-abstraction
+
+target=svcomp.loops.Eureka01FalseUnreachableLabel
+
+classpath=${jpf-abstraction}/build/benchmarks/
+sourcepath=${jpf-abstraction}/src/benchmarks/
+
+panda.refinement=true
+panda.branch.adjust_concrete_values=false
+panda.branch.prune_infeasible=true
