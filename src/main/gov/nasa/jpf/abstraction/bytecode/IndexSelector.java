@@ -76,7 +76,10 @@ public class IndexSelector {
             if (abs.getPredicateValuation().getPredicatesInconsistentWith(assumption, TruthValue.TRUE).isEmpty()) {
                 abs.getPredicateValuation().force(assumption, TruthValue.TRUE);
             } else {
+                ti.breakTransition("Ignore inconsistent state");
                 ss.setIgnored(true);
+
+                return true;
             }
         }
 

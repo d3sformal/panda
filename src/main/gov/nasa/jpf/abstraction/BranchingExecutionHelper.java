@@ -54,7 +54,9 @@ public class BranchingExecutionHelper {
         if (concreteJump == abstractJump) { // In case concrete and abstract executions agree
             if (pruneInfeasible && forceFeasibleOnce) {
                 // Add state to allow forward state matching (look if we should generate more choices to get into the branch (it might have been explored before - actually it is explored when this branch is hit))
-                ss.setForced(true);
+                if (ti.isFirstStepInsn()) {
+                    ss.setForced(true);
+                }
                 ti.breakTransition("Creating state after taking an enabled branch: " + branchCondition);
 
                 PredicateAbstraction pabs = PredicateAbstraction.getInstance();
@@ -78,6 +80,7 @@ public class BranchingExecutionHelper {
             // or make the concrete state represent the abstract one (force concrete values)
             if (pruneInfeasible) {
                 PredicateAbstraction.getInstance().dropForceStatesAlongTrace();
+                ti.breakTransition("Ignore inconsistent state");
                 ss.setForced(false);
                 ss.setIgnored(true);
 
@@ -139,7 +142,7 @@ public class BranchingExecutionHelper {
                     for (int j = 0; j < exprArray.length; ++j) {
                         Predicate blocking = Tautology.create();
                         DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
-                        Integer[] choices = cg.getChoices();
+                        Integer[] choices = cg.getProcessedChoices();
                         List<TraceFormula> traces = cg.getTraces();
 
                         for (int k = 0; k < choices.length; ++k) {
@@ -159,7 +162,7 @@ public class BranchingExecutionHelper {
 
                     int[] models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(traceFormula, exprArray);
 
-                    if (models == null) {
+                    if (models == null || models.length == 0) {
                         if (config.enabledVerbose(BranchingExecutionHelper.class)) {
                             System.out.println("[WARNING] No feasible trace found");
                         }
@@ -210,6 +213,8 @@ public class BranchingExecutionHelper {
                         }
                     }
                 }
+
+                return self;
             } else if (config.adjustConcreteValues()) {
                 Map<AccessExpression, ElementInfo> primitiveExprs = new HashMap<AccessExpression, ElementInfo>();
                 Set<AccessExpression> allExprs = new HashSet<AccessExpression>();
@@ -249,8 +254,11 @@ public class BranchingExecutionHelper {
                     // Fail (No model for an UNSAT formula)
                     //
                     // That is why we abandon the trace
+                    ti.breakTransition("Ignore inconsistent state");
                     ss.setForced(false);
                     ss.setIgnored(true);
+
+                    return self;
                 } else {
                     // Inject the newly computed values into the concrete state
                     for (int j = 0; j < exprArray.length; ++j) {

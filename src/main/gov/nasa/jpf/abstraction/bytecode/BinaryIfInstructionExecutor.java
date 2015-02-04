@@ -45,7 +45,6 @@ public class BinaryIfInstructionExecutor {
     private Instruction next;
 
     final public Instruction execute(AbstractBranching br, ThreadInfo ti) {
-
         String name = br.getClass().getSimpleName();
 
         SystemState ss = ti.getVM().getSystemState();
@@ -124,8 +123,6 @@ public class BinaryIfInstructionExecutor {
                 }
             } else if (cg instanceof IntChoiceFromList) {
                 conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
-            } else if (cg instanceof BreakGenerator) {
-                return next;
             } else {
                 throw new RuntimeException("expected AbstractChoiceGenerator, got: " + cg);
             }

@@ -5,8 +5,7 @@ public class DivergenceTest extends BaseTest {
     @Config(items = {
         "+panda.refinement=true",
         "+panda.branch.adjust_concrete_values=false",
-        "+panda.branch.prune_infeasible=true",
-        "+listener+=,gov.nasa.jpf.listener.ExecTracker"
+        "+panda.branch.prune_infeasible=true"
     })
     public static void test() {
         int x1 = Verifier.unknownInt();

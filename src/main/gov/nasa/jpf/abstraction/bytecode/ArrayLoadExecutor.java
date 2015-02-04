@@ -15,6 +15,7 @@ import gov.nasa.jpf.vm.choice.BreakGenerator;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 import gov.nasa.jpf.vm.choice.IntIntervalGenerator;
 
+import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
 import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
@@ -40,46 +41,115 @@ import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 
 public class ArrayLoadExecutor {
+    private ElementInfo ei;
     private AccessExpression array;
     private int originalIndex;
+    private int concreteIndex;
+    private int abstractIndex;
     private Expression index;
     private AccessExpression path;
-    private Instruction next;
+    private Predicate inBounds;
+    private TruthValue indexInBounds;
+
+    enum Phase {
+        PHASE1,
+        PHASE2,
+        PHASE3,
+        PHASE4,
+        PHASE5
+    }
+
+    class State {
+        Phase phase;
+        ElementInfo ei;
+        AccessExpression array;
+        int originalIndex;
+        int concreteIndex;
+        int abstractIndex;
+        Expression index;
+        AccessExpression path;
+        Predicate inBounds;
+        TruthValue indexInBounds;
+    }
 
     private IndexSelector indexSelector;
     private static final String ARRAY_INDEX_OUT_OF_BOUNDS = "java.lang.ArrayIndexOutOfBoundsException";
+    private static final String BOUNDS_CHECK = "Checking array bounds";
 
     public ArrayLoadExecutor(IndexSelector indexSelector) {
         this.indexSelector = indexSelector;
     }
 
+    protected void storeState(SystemState ss, Phase phase) {
+        State s = new State();
+
+        s.phase = phase;
+        s.ei = ei;
+        s.array = array;
+        s.originalIndex = originalIndex;
+        s.concreteIndex = concreteIndex;
+        s.abstractIndex = abstractIndex;
+        s.index = index;
+        s.path = path;
+        s.inBounds = inBounds;
+        s.indexInBounds = indexInBounds;
+
+        ss.getNextChoiceGenerator().setAttr(s);
+    }
+
+    protected Phase restoreState(SystemState ss) {
+        State s = (State) ss.getChoiceGenerator().getAttr();
+
+        ei = s.ei;
+        array = s.array;
+        originalIndex = s.originalIndex;
+        concreteIndex = s.concreteIndex;
+        abstractIndex = s.abstractIndex;
+        index = s.index;
+        path = s.path;
+        inBounds = s.inBounds;
+        indexInBounds = s.indexInBounds;
+
+        return s.phase;
+    }
+
     public Instruction execute(ArrayLoadInstruction load, ThreadInfo ti) {
         SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getModifiableTopFrame();
-        ChoiceGenerator<?> cg = null;
 
         if (ti.isFirstStepInsn()) {
-            cg = ss.getChoiceGenerator();
-
-            if (cg instanceof BreakGenerator) {
-                return next;
+            switch (restoreState(ss)) {
+                case PHASE1: return phase1(load, ti);
+                case PHASE2: return phase2(load, ti);
+                case PHASE3: return phase3(load, ti);
+                case PHASE4: return phase4(load, ti);
+                case PHASE5: return phase5(load, ti);
             }
         }
+
+        ei = ti.getElementInfo(sf.peek(1));
 
         array = ExpressionUtil.getAccessExpression(sf.getOperandAttr(1));
         index = ExpressionUtil.getExpression(sf.getOperandAttr(0));
         path = DefaultArrayElementRead.create(array, index);
 
-        Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(load.getSelf(), ti);
+        return phase1(load, ti);
+    }
 
-        int concreteIndex = sf.peek();
-        int abstractIndex = -1;
+    protected Instruction phase1(ArrayLoadInstruction load, ThreadInfo ti) {
+        SystemState ss = ti.getVM().getSystemState();
+        StackFrame sf = ti.getModifiableTopFrame();
+
+        concreteIndex = sf.peek();
+        abstractIndex = -1;
 
         if (RunDetector.isRunning()) {
             PredicateAbstraction abs = PredicateAbstraction.getInstance();
             MethodFrameSymbolTable sym = abs.getSymbolTable().get(0);
 
             if (indexSelector.makeChoices(ti, ss, abs, sym, array, index)) {
+                storeState(ss, Phase.PHASE1);
+
                 return load.getSelf();
             }
 
@@ -89,13 +159,66 @@ public class ArrayLoadExecutor {
             sf.push(abstractIndex);
         }
 
-        Instruction actualNextInsn = load.executeConcrete(ti);
+        return phase2(load, ti);
+    }
 
-        if (JPFInstructionAdaptor.testArrayElementInstructionAbort(load.getSelf(), ti, expectedNextInsn, actualNextInsn)) {
-            return actualNextInsn;
+
+    protected Instruction phase2(ArrayLoadInstruction load, ThreadInfo ti) {
+        SystemState ss = ti.getVM().getSystemState();
+
+        if (RunDetector.isRunning() && !RunDetector.isInLibrary(ThreadInfo.getCurrentThread())) {
+            // i >= 0 && i < a.length
+            inBounds = Conjunction.create(
+                Negation.create(LessThan.create(index, Constant.create(0))),
+                LessThan.create(index, getUpperBound(ei, array))
+            );
+
+            if (ti.isFirstStepInsn() && ss.getChoiceGenerator().getId().equals(BOUNDS_CHECK)) {
+                indexInBounds = (Integer) ss.getChoiceGenerator().getNextChoice() == 0 ? TruthValue.FALSE : TruthValue.TRUE;
+            } else {
+                indexInBounds = PredicateAbstraction.getInstance().processBranchingCondition(load.getSelf().getPosition(), inBounds);
+
+                if (indexInBounds == TruthValue.UNKNOWN) {
+                    ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
+                    cg.setId(BOUNDS_CHECK);
+                    ss.setNextChoiceGenerator(cg);
+
+                    storeState(ss, Phase.PHASE2);
+
+                    return load.getSelf();
+                }
+            }
         }
 
-        sf.setOperandAttr(path);
+        return phase3(load, ti);
+    }
+
+    protected Instruction phase3(ArrayLoadInstruction load, ThreadInfo ti) {
+        SystemState ss = ti.getVM().getSystemState();
+
+        if (RunDetector.isRunning() && !RunDetector.isInLibrary(ThreadInfo.getCurrentThread())) {
+            boolean concretePass = (originalIndex >= 0 && originalIndex < ei.arrayLength());
+            boolean abstractPass = (indexInBounds == TruthValue.TRUE);
+
+            if (!abstractPass) {
+                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(inBounds, TruthValue.FALSE), load.getSelf().getMethodInfo(), load.getSelf().getPosition());
+                Instruction insn = BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, inBounds, concretePass, abstractPass, ti.getPC().getNext(), load.getSelf());
+
+                if (insn == load.getSelf()) {
+                    storeState(ss, Phase.PHASE3);
+
+                    return insn;
+                }
+
+                return ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds);
+            }
+        }
+
+        return phase4(load, ti);
+    }
+
+    protected Instruction phase4(ArrayLoadInstruction load, ThreadInfo ti) {
+        SystemState ss = ti.getVM().getSystemState();
 
         if (RunDetector.isRunning()) {
             Predicate condition = Equals.create(index, Constant.create(abstractIndex));
@@ -104,14 +227,36 @@ public class ArrayLoadExecutor {
                 System.out.println(path.toString(gov.nasa.jpf.abstraction.common.Notation.DOT_NOTATION) + " (concrete: " + index + " = " + concreteIndex + ", abstract: " + index + " = " + abstractIndex + ") " + (concreteIndex == abstractIndex ? "Pass" : "Cut"));
             }
 
-            PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(condition, load.getSelf().getMethodInfo(), actualNextInsn.getPosition());
+            PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(condition, load.getSelf().getMethodInfo(), load.getSelf().getNext().getPosition());
 
-            next = actualNextInsn;
+            Instruction insn = BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, condition, concreteIndex == abstractIndex, true, load.getSelf().getNext(), load.getSelf());
 
-            return BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, condition, concreteIndex == abstractIndex, true, actualNextInsn, load.getSelf());
+            if (insn == load.getSelf()) {
+                storeState(ss, Phase.PHASE5); // Skip to the next phase (this is just break)
+
+                return insn;
+            }
         }
 
-        return actualNextInsn;
+        return phase5(load, ti);
+    }
+
+    protected Instruction phase5(ArrayLoadInstruction load, ThreadInfo ti) {
+        SystemState ss = ti.getVM().getSystemState();
+        StackFrame sf = ti.getModifiableTopFrame();
+
+        Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(load.getSelf(), ti);
+        Instruction actualNextInsn = load.executeConcrete(ti);
+
+        if (JPFInstructionAdaptor.testArrayElementInstructionAbort(load.getSelf(), ti, expectedNextInsn, actualNextInsn)) {
+            storeState(ss, Phase.PHASE5);
+
+            return actualNextInsn;
+        }
+
+        sf.setOperandAttr(path);
+
+        return load.getSelf().getNext();
     }
 
     protected Expression getUpperBound(ElementInfo ei, AccessExpression array) {
@@ -125,30 +270,6 @@ public class ArrayLoadExecutor {
     }
 
     public void push(ArrayLoadInstruction load, StackFrame sf, ElementInfo ei, int someIndex) throws ArrayIndexOutOfBoundsExecutiveException {
-        if (RunDetector.isRunning() && !RunDetector.isInLibrary(ThreadInfo.getCurrentThread())) {
-            // i >= 0 && i < a.length
-            Predicate inBounds = Conjunction.create(
-                Negation.create(LessThan.create(index, Constant.create(0))),
-                LessThan.create(index, getUpperBound(ei, array))
-            );
-
-            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(load.getSelf().getPosition(), inBounds);
-
-            boolean concretePass = (originalIndex >= 0 && originalIndex < ei.arrayLength());
-            boolean abstractPass = (value == TruthValue.TRUE);
-
-            ThreadInfo ti = VM.getVM().getCurrentThread();
-
-            if (!abstractPass) {
-                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(inBounds, TruthValue.FALSE), load.getSelf().getMethodInfo(), load.getSelf().getPosition());
-                BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, inBounds, concretePass, abstractPass, ti.getPC().getNext(), load.getSelf());
-
-                if (!PandaConfig.getInstance().pruneInfeasibleBranches() && (concretePass != abstractPass)) {
-                    throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds));
-                }
-            }
-        }
-
         load.pushConcrete(sf, ei, someIndex);
     }
 }

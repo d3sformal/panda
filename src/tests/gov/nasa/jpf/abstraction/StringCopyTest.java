@@ -11,12 +11,7 @@ public class StringCopyTest extends BaseTest {
     @Config(items = {
         "+panda.refinement=true",
         "+panda.storage.class=gov.nasa.jpf.abstraction.util.DebugCopyPreservingStateSet",
-        "+vm.serializer.class=gov.nasa.jpf.abstraction.util.DebugPredicateAbstractionSerializer",
-        "+listener+=,gov.nasa.jpf.listener.ExecTracker",
-        "+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker",
-        "+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor",
-        "+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener",
-        "+listener+=,gov.nasa.jpf.abstraction.util.Stepper"
+        "+vm.serializer.class=gov.nasa.jpf.abstraction.util.DebugPredicateAbstractionSerializer"
     })
     public static void test() {
         int[] src = new int[N];

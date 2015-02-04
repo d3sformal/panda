@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
@@ -73,6 +74,10 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
 
     public Integer[] getChoices() {
         return values;
+    }
+
+    public Integer[] getProcessedChoices() {
+        return Arrays.copyOf(values, count);
     }
 
     public List<TraceFormula> getTraces() {
