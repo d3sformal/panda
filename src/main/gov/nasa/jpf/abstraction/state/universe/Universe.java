@@ -215,6 +215,10 @@ public class Universe {
         lookupValues(root, read.getObject(), parents);
 
         for (UniverseIdentifier parent : parents) {
+            if (!(parent instanceof StructuredValueIdentifier)) {
+                continue;
+            }
+
             StructuredValue parentObject = get((StructuredValueIdentifier) parent);
 
             if (read instanceof ObjectFieldRead) {

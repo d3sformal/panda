@@ -252,7 +252,9 @@ path returns [DefaultAccessExpression val]
         if (ae instanceof ArrayElementWrite) {
             // Losing precision (there is no way to express (select (store arr b (...)) b) - query for a possibly modified array)
             // .. we can only query elements with aread: (select (select (store arr b (...)) b) index)
-            $ctx.val = (DefaultAccessExpression) $e.val;
+            ArrayElementWrite aew = (ArrayElementWrite) ae;
+
+            $ctx.val = DefaultArrayElementRead.create(aew.getArray(), $e.val);
         } else {
             $ctx.val = DefaultArrayElementRead.create(ae, $e.val);
         }
@@ -263,7 +265,9 @@ path returns [DefaultAccessExpression val]
         if (ae instanceof ArrayElementWrite) {
             // Losing precision (there is no way to express (select (store arr b (...)) b) - query for a possibly modified array)
             // .. we can only query elements with aread: (select (select (store arr b (...)) b) index)
-            $ctx.val = (DefaultAccessExpression) $e.val;
+            ArrayElementWrite aew = (ArrayElementWrite) ae;
+
+            $ctx.val = DefaultArrayElementRead.create(aew.getArray(), $e.val);
         } else {
             $ctx.val = DefaultArrayElementRead.create(ae, $e.val);
         }
@@ -276,7 +280,11 @@ path returns [DefaultAccessExpression val]
     }
     | '(' SELECT_TOKEN p=path e=expression ')' {
         if ($p.val instanceof DefaultArrayElementWrite) {
-            $ctx.val = (DefaultAccessExpression) $e.val;
+            // Losing precision (there is no way to express (select (store arr b (...)) b) - query for a possibly modified array)
+            // .. we can only query elements with aread: (select (select (store arr b (...)) b) index)
+            ArrayElementWrite aew = (ArrayElementWrite) $p.val;
+
+            $ctx.val = DefaultArrayElementRead.create(aew.getArray(), $e.val);
         } else {
             $ctx.val = DefaultArrayElementRead.create($p.val, $e.val);
         }

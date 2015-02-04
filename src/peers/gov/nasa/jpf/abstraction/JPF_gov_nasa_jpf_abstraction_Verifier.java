@@ -51,6 +51,7 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
             }
 
             if (env.setNextChoiceGenerator(cg)) {
+                env.getSystemState().setForced(true);
                 env.repeatInvocation();
             }
 

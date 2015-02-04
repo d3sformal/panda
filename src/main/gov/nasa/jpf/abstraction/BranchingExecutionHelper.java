@@ -7,11 +7,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import gov.nasa.jpf.vm.ArrayFields;
+import gov.nasa.jpf.vm.ByteArrayFields;
+import gov.nasa.jpf.vm.CharArrayFields;
 import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.DoubleArrayFields;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.FloatArrayFields;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.IntArrayFields;
 import gov.nasa.jpf.vm.LocalVarInfo;
+import gov.nasa.jpf.vm.LongArrayFields;
+import gov.nasa.jpf.vm.ShortArrayFields;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.StateSet;
 import gov.nasa.jpf.vm.StaticElementInfo;
@@ -401,7 +409,23 @@ public class BranchingExecutionHelper {
 
             ei = ei.getModifiableInstance();
 
-            ei.getArrayFields().setIntValue(c.value.intValue(), value);
+            ArrayFields af = ei.getArrayFields();
+
+            if (af instanceof IntArrayFields) {
+                af.setIntValue(c.value.intValue(), value);
+            } else if (af instanceof FloatArrayFields) {
+                af.setFloatValue(c.value.intValue(), (float) value);
+            } else if (af instanceof LongArrayFields) {
+                af.setLongValue(c.value.intValue(), (long) value);
+            } else if (af instanceof DoubleArrayFields) {
+                af.setDoubleValue(c.value.intValue(), (double) value);
+            } else if (af instanceof ByteArrayFields) {
+                af.setByteValue(c.value.intValue(), (byte) value);
+            } else if (af instanceof CharArrayFields) {
+                af.setCharValue(c.value.intValue(), (char) value);
+            } else if (af instanceof ShortArrayFields) {
+                af.setShortValue(c.value.intValue(), (short) value);
+            }
 
             if (config.enabledVerbose(BranchingExecutionHelper.class)) {
                 System.out.println("Setting array element number " + c.value.intValue() + " of " + ei.getObjectRef() + " (" + expr + ") to " + value);
