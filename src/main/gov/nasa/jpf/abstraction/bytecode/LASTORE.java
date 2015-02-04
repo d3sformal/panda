@@ -50,6 +50,11 @@ public class LASTORE extends gov.nasa.jpf.jvm.bytecode.LASTORE implements ArrayS
     }
 
     @Override
+    public int getIndex(StackFrame sf) {
+        return sf.peek(2);
+    }
+
+    @Override
     public ArrayElementInstruction getSelf() {
         return this;
     }

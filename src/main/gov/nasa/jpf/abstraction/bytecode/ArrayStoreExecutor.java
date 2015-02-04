@@ -3,11 +3,15 @@ package gov.nasa.jpf.abstraction.bytecode;
 import gov.nasa.jpf.jvm.bytecode.ArrayElementInstruction;
 import gov.nasa.jpf.vm.ArrayFields;
 import gov.nasa.jpf.vm.ArrayIndexOutOfBoundsExecutiveException;
+import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Conjunction;
@@ -26,6 +30,7 @@ public class ArrayStoreExecutor {
     private static final String ARRAY_INDEX_OUT_OF_BOUNDS = "java.lang.ArrayIndexOutOfBoundsException";
 
     public Instruction execute(ArrayStoreInstruction store, ThreadInfo ti) {
+        SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getTopFrame();
         Expression from = store.getSourceExpression(sf);
         Expression index = store.getIndexExpression(sf);
@@ -33,6 +38,8 @@ public class ArrayStoreExecutor {
 
         ElementInfo ei = store.getArray(sf);
         ArrayFields fields = ei.getArrayFields();
+
+        int originalIndex = store.getIndex(sf);
 
         for (int i = 0; i < fields.arrayLength(); ++i) {
             fields.addFieldAttr(fields.arrayLength(), i, from);
@@ -46,11 +53,36 @@ public class ArrayStoreExecutor {
                 LessThan.create(index, DefaultArrayLengthRead.create(to))
             );
 
-            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(store.getSelf().getPosition(), inBounds);
+            TruthValue indexInBounds;
 
-            if (value != TruthValue.TRUE) {
+            if (!ti.isFirstStepInsn()) {
+                indexInBounds = PredicateAbstraction.getInstance().processBranchingCondition(store.getSelf().getPosition(), inBounds);
+
+                if (indexInBounds == TruthValue.UNKNOWN) {
+                    ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
+
+                    ss.setNextChoiceGenerator(cg);
+
+                    return store.getSelf();
+                }
+            } else {
+                ChoiceGenerator<?> cg = ss.getChoiceGenerator();
+
+                indexInBounds = (Integer) cg.getNextChoice() == 0 ? TruthValue.FALSE : TruthValue.TRUE;
+            }
+
+            boolean concretePass = (originalIndex >= 0 && originalIndex < ei.arrayLength());
+            boolean abstractPass = (indexInBounds == TruthValue.TRUE);
+
+            if (!abstractPass) {
                 PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(inBounds, TruthValue.FALSE), store.getSelf().getMethodInfo(), store.getSelf().getPosition());
-                throw new ArrayIndexOutOfBoundsExecutiveException(ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds));
+                Instruction insn = BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, inBounds, concretePass, abstractPass, ti.getPC().getNext(), store.getSelf());
+
+                if (insn == store.getSelf()) {
+                    return insn;
+                }
+
+                return ThreadInfo.getCurrentThread().createAndThrowException(ARRAY_INDEX_OUT_OF_BOUNDS, "Cannot ensure: " + inBounds);
             }
         }
 

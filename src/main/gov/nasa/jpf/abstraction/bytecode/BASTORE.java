@@ -50,6 +50,11 @@ public class BASTORE extends gov.nasa.jpf.jvm.bytecode.BASTORE implements ArrayS
     }
 
     @Override
+    public int getIndex(StackFrame sf) {
+        return sf.peek(1);
+    }
+
+    @Override
     public ArrayElementInstruction getSelf() {
         return this;
     }

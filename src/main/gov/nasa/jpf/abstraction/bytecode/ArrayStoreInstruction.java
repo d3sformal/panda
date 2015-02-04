@@ -15,6 +15,7 @@ public interface ArrayStoreInstruction {
     public AccessExpression getArrayExpression(StackFrame sf);
     public ElementInfo getArray(StackFrame sf);
     public Expression getIndexExpression(StackFrame sf);
+    public int getIndex(StackFrame sf);
     public Expression getSourceExpression(StackFrame sf);
     public ArrayElementInstruction getSelf();
 }
