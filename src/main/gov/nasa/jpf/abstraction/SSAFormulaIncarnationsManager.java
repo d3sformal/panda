@@ -33,19 +33,20 @@ import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 
 public class SSAFormulaIncarnationsManager {
-    private int frameNumber = 0;
+    private int frameNumber;
     private Stack<Integer> frameIncarnations;
     private Stack<HashMap<Root, Integer>> variableIncarnations;
     private HashMap<Field, Integer> fieldIncarnations;
     private int arraysIncarnations;
 
     public SSAFormulaIncarnationsManager() {
-        this(new Stack<Integer>(), new Stack<HashMap<Root, Integer>>(), new HashMap<Field, Integer>(), 0);
+        this(0, new Stack<Integer>(), new Stack<HashMap<Root, Integer>>(), new HashMap<Field, Integer>(), 0);
 
         changeDepth(+1);
     }
 
-    public SSAFormulaIncarnationsManager(Stack<Integer> frameIncarnations, Stack<HashMap<Root, Integer>> variableIncarnations, HashMap<Field, Integer> fieldIncarnations, int arraysIncarnations) {
+    public SSAFormulaIncarnationsManager(int frameNumber, Stack<Integer> frameIncarnations, Stack<HashMap<Root, Integer>> variableIncarnations, HashMap<Field, Integer> fieldIncarnations, int arraysIncarnations) {
+        this.frameNumber = frameNumber;
         this.frameIncarnations = frameIncarnations;
         this.variableIncarnations = variableIncarnations;
         this.fieldIncarnations = fieldIncarnations;
@@ -168,6 +169,7 @@ public class SSAFormulaIncarnationsManager {
         }
 
         return new SSAFormulaIncarnationsManager(
+            frameNumber,
             (Stack<Integer>) frameIncarnations.clone(),
             stackClone,
             (HashMap<Field, Integer>) fieldIncarnations.clone(),
