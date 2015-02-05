@@ -1,6 +1,6 @@
 @using=jpf-abstraction
 
-target=svcomp.arrays.ReverseArrayTest
+target=svcomp.arrays.ReverseArray
 target.entry=test()V
 
 classpath=${jpf-abstraction}/build/benchmarks
@@ -8,6 +8,6 @@ sourcepath=${jpf-abstraction}/src/benchmarks
 
 panda.abstract_domain=PREDICATES
 panda.refinement=true
-panda.refinement.keep_unrefined_prefix=false
-panda.refinement.keep_unrefined_method_prefix=false
-panda.refinement.keep_explored_branches=false
+panda.verbose=false
+panda.branch.adjust_concrete_values=false
+panda.branch.prune_infeasible=true

@@ -16,21 +16,21 @@ bin/run.sh src/benchmarks/svcomp/loops/TREX03TrueUnreachableLabelAdjusting.jpf 2
 echo
 bin/run.sh src/benchmarks/svcomp/loops/TREX03TrueUnreachableLabelPruning.jpf 2>&1 | tee output/trex-pruning
 echo
-bin/run.sh src/benchmarks/svcomp/loops/InvertStringTrueUnreachableLabelAdjusting.jpf 2>&1 | tee output/invert-adjusting
+bin/run.sh src/benchmarks/svcomp/loops/InvertStringTrueUnreachableLabelAdjusting.jpf 2>&1 | tee output/invert-string-adjusting
 echo
-bin/run.sh src/benchmarks/svcomp/loops/InvertStringTrueUnreachableLabelPruning.jpf 2>&1 | tee output/invert-pruning
+bin/run.sh src/benchmarks/svcomp/loops/InvertStringTrueUnreachableLabelPruning.jpf 2>&1 | tee output/invert-string-pruning
 echo
-bin/run.sh src/benchmarks/svcomp/arrays/PasswordTestAdjusting.jpf 2>&1 | tee output/password-adjusting
+bin/run.sh src/benchmarks/svcomp/arrays/PasswordAdjusting.jpf 2>&1 | tee output/password-adjusting
 echo
-bin/run.sh src/benchmarks/svcomp/arrays/PasswordTestPruning.jpf 2>&1 | tee output/password-pruning
+bin/run.sh src/benchmarks/svcomp/arrays/PasswordPruning.jpf 2>&1 | tee output/password-pruning
 echo
-bin/run.sh src/benchmarks/svcomp/arrays/ReverseArrayTestAdjusting.jpf 2>&1 | tee output/reverse-array-adjusting
+bin/run.sh src/benchmarks/svcomp/arrays/ReverseArrayAdjusting.jpf 2>&1 | tee output/reverse-array-adjusting
 echo
-bin/run.sh src/benchmarks/svcomp/arrays/ReverseArrayTestPruning.jpf 2>&1 | tee output/reverse-array-pruning
+bin/run.sh src/benchmarks/svcomp/arrays/ReverseArrayPruning.jpf 2>&1 | tee output/reverse-array-pruning
 echo
-bin/run.sh src/benchmarks/svcomp/arrays/TwoIndicesTestAdjusting.jpf 2>&1 | tee output/two-indices-adjusting
+bin/run.sh src/benchmarks/svcomp/arrays/TwoIndicesAdjusting.jpf 2>&1 | tee output/two-indices-adjusting
 echo
-bin/run.sh src/benchmarks/svcomp/arrays/TwoIndicesTestPruning.jpf 2>&1 | tee output/two-indices-pruning
+bin/run.sh src/benchmarks/svcomp/arrays/TwoIndicesPruning.jpf 2>&1 | tee output/two-indices-pruning
 echo
 bin/run.sh src/benchmarks/dataflow/DataFlowAnalysisAdjusting.jpf 2>&1 | tee output/dataflow-adjusting
 echo

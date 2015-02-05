@@ -2,7 +2,7 @@ package svcomp.arrays;
 
 // Taken from SVCOMP (ETAPS 2014)
 
-public class PasswordTest {
+public class Password {
     private static final int SIZE = 5;
 
     public static void test() {

@@ -1,6 +1,6 @@
 @using=jpf-abstraction
 
-target=svcomp.arrays.TwoIndicesTest
+target=svcomp.arrays.TwoIndices
 target.entry=test()V
 
 classpath=${jpf-abstraction}/build/benchmarks

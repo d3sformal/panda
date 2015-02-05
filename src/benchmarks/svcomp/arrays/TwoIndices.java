@@ -2,7 +2,7 @@ package svcomp.arrays;
 
 // Taken from SVCOMP
 
-public class TwoIndicesTest {
+public class TwoIndices {
     private static final int SIZE = 5;
 
     public static void test() {

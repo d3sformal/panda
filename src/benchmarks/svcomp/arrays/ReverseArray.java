@@ -2,7 +2,7 @@ package svcomp.arrays;
 
 // Taken from SVCOMP
 
-public class ReverseArrayTest {
+public class ReverseArray {
     private static final int N = 5;
 
     public static void test() {
