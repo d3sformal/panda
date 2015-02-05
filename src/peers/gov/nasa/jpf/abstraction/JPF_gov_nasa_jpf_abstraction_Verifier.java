@@ -17,6 +17,27 @@ import gov.nasa.jpf.abstraction.common.access.Unknown;
 public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
     @MJI
     public static int unknownInt____I(MJIEnv env, int clsObjRef) {
+        return unknown(env, clsObjRef);
+    }
+
+    @MJI
+    public static int unknownPositiveInt____I(MJIEnv env, int clsObjRef) {
+        int ret = unknown(env, clsObjRef);
+
+        return ret < 0 ? -ret : ret;
+    }
+
+    @MJI
+    public static char unknownChar____C(MJIEnv env, int clsObjRef) {
+        return (char) unknown(env, clsObjRef);
+    }
+
+    @MJI
+    public static boolean unknownBool____Z(MJIEnv env, int clsObjRef) {
+        return unknown(env, clsObjRef) < 0;
+    }
+
+    public static int unknown(MJIEnv env, int clsObjRef) {
         ThreadInfo ti = env.getThreadInfo();
 
         if (!ti.isFirstStepInsn()) { // first time around
