@@ -207,10 +207,20 @@ public class BranchingExecutionHelper {
                                 System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
                             }
 
+                            boolean isNewCombination = false;
+
                             for (int j = 0; j < models.length; ++j) {
                                 DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
 
-                                if (cg.hasProcessed(models[j]) || !cg.has(models[j])) {
+                                if (!cg.has(models[j])) {
+                                    isNewCombination = true;
+                                }
+                            }
+
+                            for (int j = 0; j < models.length; ++j) {
+                                DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
+
+                                if ((cg.hasProcessed(models[j]) && isNewCombination) || !cg.has(models[j])) {
                                     cg.add(models[j]);
 
                                     if (config.enabledVerbose(BranchingExecutionHelper.class)) {
