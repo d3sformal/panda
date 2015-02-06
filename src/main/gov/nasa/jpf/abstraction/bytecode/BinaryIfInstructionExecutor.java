@@ -17,17 +17,22 @@ import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
+import gov.nasa.jpf.abstraction.common.BytecodeInterval;
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
+import gov.nasa.jpf.abstraction.common.Operation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
@@ -120,6 +125,40 @@ public class BinaryIfInstructionExecutor {
                 if (expr1 != null && expr2 != null) {
                     Predicate predicate = br.createPredicate(expr1, expr2);
                     PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)), br.getSelf().getMethodInfo(), br.getTarget(ti, conditionValue ? 1 : 0).getPosition());
+
+                    if (PandaConfig.getInstance().trackExactValueForLoopControlVariable() && !conditionValue) {
+                        Instruction bJump = br.getSelf();
+                        Instruction cmpStart = br.getSelf();
+
+                        /*
+                        // find the first instruction of the comparison operands load (based on the structured of the compared expressions)
+                        cmpStart = unwind(cmpStart, expr1);
+                        cmpStart = unwind(cmpStart, expr2);
+                        */
+
+                        int start = cmpStart.getPosition();
+                        int end = start;
+
+                        while (bJump != null) {
+                            if (bJump instanceof gov.nasa.jpf.jvm.bytecode.GOTO) {
+                                gov.nasa.jpf.jvm.bytecode.GOTO gt = (gov.nasa.jpf.jvm.bytecode.GOTO) bJump;
+
+                                //if (gt.getTarget() == cmpStart) { // find a matching backjump
+                                if (gt.getTarget().getPosition() < cmpStart.getPosition()) { // find the first jump to a location before comparison
+                                    end = gt.getPosition();
+                                    break;
+                                }
+                            }
+
+                            bJump = bJump.getNext();
+                        }
+
+                        Predicate eq = Equals.create(expr1, Constant.create(v1));
+
+                        eq.setScope(new BytecodeInterval(start, end));
+
+                        PredicateAbstraction.getInstance().getPredicateValuation().force(eq, TruthValue.UNKNOWN);
+                    }
                 }
             } else if (cg instanceof IntChoiceFromList) {
                 conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
@@ -140,5 +179,34 @@ public class BinaryIfInstructionExecutor {
         next = br.getTarget(ti, conditionValue ? 1 : 0);
 
         return BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, branchCondition, br.getConcreteBranchValue(v1, v2), conditionValue, next, br.getSelf());
+    }
+
+    private static Instruction unwind(Instruction base, Expression expr) {
+        if (expr instanceof Constant) {
+            return base.getPrev();
+        }
+        if (expr instanceof PackageAndClass) {
+            return base;
+        }
+        if (expr instanceof Root) {
+            return base.getPrev();
+        }
+        if (expr instanceof ArrayElementRead) {
+            ArrayElementRead ar = (ArrayElementRead) expr;
+
+            return unwind(unwind(base.getPrev(), ar.getIndex()), ar.getArray());
+        }
+        if (expr instanceof ObjectFieldRead) {
+            ObjectFieldRead fr = (ObjectFieldRead) expr;
+
+            return unwind(base.getPrev(), fr.getObject());
+        }
+        if (expr instanceof Operation) {
+            Operation op = (Operation) expr;
+
+            return unwind(unwind(base.getPrev(), op.a), op.b);
+        }
+
+        return base;
     }
 }

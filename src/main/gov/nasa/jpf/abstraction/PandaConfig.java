@@ -47,6 +47,7 @@ public class PandaConfig {
     private RefinementHeuristic refinementHeuristic;
     private Boolean checkTraceFeasibilityAtEveryStep;
     private String refinementDumpAbstractionPredicatesTo;
+    private Boolean trackExactValueForLoopControlVariable;
 
     protected PandaConfig() {
     }
@@ -360,5 +361,13 @@ public class PandaConfig {
         }
 
         return refinementDumpAbstractionPredicatesTo;
+    }
+
+    public boolean trackExactValueForLoopControlVariable() {
+        if (trackExactValueForLoopControlVariable == null) {
+            trackExactValueForLoopControlVariable = getUnderlyingConfig().getBoolean("panda.branch.track_exact_value_for_loop_control_variable");
+        }
+
+        return trackExactValueForLoopControlVariable;
     }
 }
