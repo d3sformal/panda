@@ -117,10 +117,10 @@ public class BranchingExecutionHelper {
                     for (String unknown : allUnknowns.keySet()) {
                         AccessExpression ae = DefaultRoot.create(unknown);
 
-                        //if (exprs.contains(ae)) {
+                        if (exprs.contains(ae)) {
                             unknowns.put(unknown, allUnknowns.get(unknown));
                             unknownExprs.add(ae);
-                        //}
+                        }
 
                         ++i;
                     }
@@ -145,9 +145,11 @@ public class BranchingExecutionHelper {
                     // Add blocking clause for unknown models
                     //   (u1 != v11 & u1 != v12 & ... u1 != v1n) | (u2 != ...) | ... (un != ...)
 
+                    Predicate reuses = Tautology.create();
                     Predicate blockings = Contradiction.create();
 
                     for (int j = 0; j < exprArray.length; ++j) {
+                        Predicate reuse = Contradiction.create();
                         Predicate blocking = Tautology.create();
                         DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
                         Integer[] choices = cg.getProcessedChoices();
@@ -155,20 +157,29 @@ public class BranchingExecutionHelper {
 
                         for (int k = 0; k < choices.length; ++k) {
                             int model = choices[k];
+                            Predicate binding = Equals.create(exprArray[j], Constant.create(model));
 
                             // Block only those models that were created for the same trace (other choices applied in other branches of the state space may easily be reused here)
                             // Actually it would be wrong to omit models that might easily enable this branch but happen to be used elsewhere first (That would destroy soundness)
                             if (k == 0 || traces.get(k - 1).equals(PredicateAbstraction.getInstance().getTraceFormula())) {
-                                blocking = Conjunction.create(blocking, Negation.create(Equals.create(exprArray[j], Constant.create(model))));
+                                blocking = Conjunction.create(blocking, Negation.create(binding));
                             }
+
+                            reuse = Disjunction.create(reuse, binding);
                         }
 
+                        reuses = Conjunction.create(reuses, reuse);
                         blockings = Disjunction.create(blockings, blocking);
                     }
 
-                    traceFormula = Conjunction.create(traceFormula, blockings);
+                    Predicate oldModelFormula = Conjunction.create(traceFormula, reuses);
+                    Predicate newModelFormula = Conjunction.create(traceFormula, blockings);
 
-                    int[] models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(traceFormula, exprArray);
+                    int[] models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(oldModelFormula, exprArray);
+
+                    if (models == null) {
+                        models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(newModelFormula, exprArray);
+                    }
 
                     if (models == null || models.length == 0) {
                         if (config.enabledVerbose(BranchingExecutionHelper.class)) {
