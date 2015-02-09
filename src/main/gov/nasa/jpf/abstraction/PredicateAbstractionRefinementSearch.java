@@ -36,6 +36,8 @@ public class PredicateAbstractionRefinementSearch extends DFSearch {
 
     public boolean performBacktrack() {
         if (backtrack()) {
+            depth--;
+
             notifyStateBacktracked();
 
             return true;
@@ -63,7 +65,6 @@ public class PredicateAbstractionRefinementSearch extends DFSearch {
                 }
 
                 depthLimitReached = false;
-                depth--;
 
                 b = backtrackLevel != null && backtrackLevel < depth;
             }

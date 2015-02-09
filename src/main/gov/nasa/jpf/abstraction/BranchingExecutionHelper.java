@@ -165,6 +165,8 @@ public class BranchingExecutionHelper {
                                 blocking = Conjunction.create(blocking, Negation.create(binding));
                             }
 
+                            // In contrast to blocking:
+                            // Force using one of the old models of the given unknown
                             reuse = Disjunction.create(reuse, binding);
                         }
 
@@ -175,8 +177,10 @@ public class BranchingExecutionHelper {
                     Predicate oldModelFormula = Conjunction.create(traceFormula, reuses);
                     Predicate newModelFormula = Conjunction.create(traceFormula, blockings);
 
+                    // First, try using a combination of old (already generated) models for the unknowns
                     int[] models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(oldModelFormula, exprArray);
 
+                    // Only if none exists, generate a possibly completely different model (may change all the values to something new, if used unwisely may cause divergence - too many different model combinations)
                     if (models == null) {
                         models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(newModelFormula, exprArray);
                     }

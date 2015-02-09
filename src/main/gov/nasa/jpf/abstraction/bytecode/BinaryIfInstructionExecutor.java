@@ -127,21 +127,21 @@ public class BinaryIfInstructionExecutor {
                     PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)), br.getSelf().getMethodInfo(), br.getTarget(ti, conditionValue ? 1 : 0).getPosition());
 
                     if (PandaConfig.getInstance().trackExactValueForLoopControlVariable() && !conditionValue) {
-                        Instruction bJump = br.getSelf();
+                        Instruction bJumpCandidate = br.getSelf();
                         Instruction cmpStart = br.getSelf();
 
                         /*
                         // find the first instruction of the comparison operands load (based on the structured of the compared expressions)
-                        cmpStart = unwind(cmpStart, expr1);
-                        cmpStart = unwind(cmpStart, expr2);
+                        cmpStart = unwindExprLoad(cmpStart, expr1);
+                        cmpStart = unwindExprLoad(cmpStart, expr2);
                         */
 
                         int start = cmpStart.getPosition();
                         int end = start;
 
-                        while (bJump != null) {
-                            if (bJump instanceof gov.nasa.jpf.jvm.bytecode.GOTO) {
-                                gov.nasa.jpf.jvm.bytecode.GOTO gt = (gov.nasa.jpf.jvm.bytecode.GOTO) bJump;
+                        while (bJumpCandidate != null) {
+                            if (bJumpCandidate instanceof gov.nasa.jpf.jvm.bytecode.GOTO) {
+                                gov.nasa.jpf.jvm.bytecode.GOTO gt = (gov.nasa.jpf.jvm.bytecode.GOTO) bJumpCandidate;
 
                                 //if (gt.getTarget() == cmpStart) { // find a matching backjump
                                 if (gt.getTarget().getPosition() < cmpStart.getPosition()) { // find the first jump to a location before comparison
@@ -150,7 +150,7 @@ public class BinaryIfInstructionExecutor {
                                 }
                             }
 
-                            bJump = bJump.getNext();
+                            bJumpCandidate = bJumpCandidate.getNext();
                         }
 
                         Predicate eq = Equals.create(expr1, Constant.create(v1));
@@ -181,7 +181,8 @@ public class BinaryIfInstructionExecutor {
         return BranchingExecutionHelper.synchronizeConcreteAndAbstractExecutions(ti, branchCondition, br.getConcreteBranchValue(v1, v2), conditionValue, next, br.getSelf());
     }
 
-    private static Instruction unwind(Instruction base, Expression expr) {
+    /*
+    private static Instruction unwindExprLoad(Instruction base, Expression expr) {
         if (expr instanceof Constant) {
             return base.getPrev();
         }
@@ -209,4 +210,5 @@ public class BinaryIfInstructionExecutor {
 
         return base;
     }
+    */
 }

@@ -929,44 +929,44 @@ public class PredicateAbstraction extends Abstraction {
                     }
                 }
 
-                /*
-                System.out.println("RefinedAt = " + refinedAt + "/" + traceFormula.getDepth() + ", RefinedMethodAt = " + refinedMethodAt + "/" + trace.size());
-                if (refinedAt < refinedMethodAt) {
-                    // Something unexpected happens
-                    System.out.println("Refined:");
-                    for (MethodInfo m : refinedMethods) {
-                        System.out.println("\t" + m.getName());
-                    }
-                    System.out.println("Visited:");
-                    for (int i = 0; i < trace.size(); ++i) {
-                        System.out.print(i + ":");
-                        for (MethodInfo m : trace.get(i).visitedMethods) {
-                            System.out.print(" " + m.getName());
+                if (config.enabledDebug(this.getClass())) {
+                    System.out.println("RefinedAt = " + refinedAt + "/" + traceFormula.getDepth() + ", RefinedMethodAt = " + refinedMethodAt + "/" + trace.size());
+                    if (refinedAt < refinedMethodAt) {
+                        // Something unexpected happens
+                        System.out.println("Refined:");
+                        for (MethodInfo m : refinedMethods) {
+                            System.out.println("\t" + m.getName());
                         }
-                        System.out.println();
-                    }
+                        System.out.println("Visited:");
+                        for (int i = 0; i < trace.size(); ++i) {
+                            System.out.print(i + ":");
+                            for (MethodInfo m : trace.get(i).visitedMethods) {
+                                System.out.print(" " + m.getName());
+                            }
+                            System.out.println();
+                        }
 
-                    boolean printAt = false;
-                    boolean printMethodAt = false;
-                    for (int i = 0; i < traceFormula.size(); ++i) {
-                        System.out.print(traceFormula.get(i).getDepth() + ": " + traceFormula.get(i).getMethod().getName() + ": " + traceFormula.get(i).getPredicate());
-                        if (traceFormula.get(i).getDepth() == refinedAt && !printAt) {
-                            System.out.print("\t <<<<<< STATE REF");
-                            printAt = true;
+                        boolean printAt = false;
+                        boolean printMethodAt = false;
+                        for (int i = 0; i < traceFormula.size(); ++i) {
+                            System.out.print(traceFormula.get(i).getDepth() + ": " + traceFormula.get(i).getMethod().getName() + ": " + traceFormula.get(i).getPredicate());
+                            if (traceFormula.get(i).getDepth() == refinedAt && !printAt) {
+                                System.out.print("\t <<<<<< STATE REF");
+                                printAt = true;
+                            }
+                            if (traceFormula.get(i).getDepth() == refinedMethodAt && !printMethodAt) {
+                                System.out.print("\t <<<<<< METHOD REF");
+                                printMethodAt = true;
+                            }
+                            System.out.println();
                         }
-                        if (traceFormula.get(i).getDepth() == refinedMethodAt && !printMethodAt) {
-                            System.out.print("\t <<<<<< METHOD REF");
-                            printMethodAt = true;
+                        try {
+                            System.out.println("[ENTER]");
+                            System.in.read();
+                        } catch (Exception e) {
                         }
-                        System.out.println();
-                    }
-                    try {
-                        System.out.println("[ENTER]");
-                        System.in.read();
-                    } catch (Exception e) {
                     }
                 }
-                */
 
                 /**
                  * At this point backtrackLevel points to the first refined level of the search

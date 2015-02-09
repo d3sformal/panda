@@ -6,7 +6,7 @@ public class FindGreaterTest extends BaseTest {
     public FindGreaterTest() {
         config.add("+panda.refinement=true");
         config.add("+panda.abstract_domain=PREDICATES"); // Disable loading of predicate file
-        config.add("+panda.refinement.initialize_array_elements=false");
+        config.add("+panda.refinement.trace.initialize_array_elements=false");
         config.add("+report.console.property_violation=error,snapshot,trace");
     }
 
@@ -77,7 +77,7 @@ public class FindGreaterTest extends BaseTest {
 
     @Test
     @Config(items = {
-        "+panda.refinement.initialize_array_elements=true"
+        "+panda.refinement.trace.initialize_array_elements=true"
     })
     public static void test5() {
         int[] data = new int[5];

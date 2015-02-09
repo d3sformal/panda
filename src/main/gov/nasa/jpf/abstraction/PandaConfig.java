@@ -18,7 +18,9 @@ public class PandaConfig {
     private Config config;
 
     private Boolean verbose;
+    private Boolean debug;
     private Class<?>[] verboseClasses;
+    private Class<?>[] debugClasses;
     private Boolean logSMT;
     private SMT.SupportedSMT smt;
     private SMT.SupportedSMT interpolationSMT;
@@ -110,6 +112,46 @@ public class PandaConfig {
 
         return verbose;
     }
+
+    public boolean enabledDebug() {
+        if (debug == null) {
+            debug = getUnderlyingConfig().getBoolean("panda.debug");
+
+            if (debug == null) {
+                debug = false;
+            }
+        }
+
+        return debug;
+    }
+
+    public boolean enabledDebug(Class<?> cls) {
+        if (enabledDebug()) {
+            return true;
+        }
+
+        if (debugClasses == null) {
+            try {
+                debugClasses = getUnderlyingConfig().getClasses("panda.debug");
+
+                System.out.println("[DEBUG] Turning on debug for classes:");
+                for (Class<?> c : debugClasses) {
+                    System.out.println("\t" + c);
+                }
+            } catch (Throwable t) {
+                debugClasses = new Class<?>[0];
+            }
+        }
+
+        boolean debug = false;
+
+        for (Class<?> vCls : debugClasses) {
+            debug |= cls.equals(vCls);
+        }
+
+        return debug;
+    }
+
 
     public boolean logSMT() {
         if (logSMT == null) {
@@ -285,7 +327,7 @@ public class PandaConfig {
 
     public boolean initializeStaticFields() {
         if (initializeStaticFields == null) {
-            initializeStaticFields = getUnderlyingConfig().getBoolean("panda.refinement.initialize_static_fields");
+            initializeStaticFields = getUnderlyingConfig().getBoolean("panda.refinement.trace.initialize_static_fields");
         }
 
         return initializeStaticFields;
@@ -293,7 +335,7 @@ public class PandaConfig {
 
     public boolean initializeObjectFields() {
         if (initializeObjectFields == null) {
-            initializeObjectFields = getUnderlyingConfig().getBoolean("panda.refinement.initialize_object_fields");
+            initializeObjectFields = getUnderlyingConfig().getBoolean("panda.refinement.trace.initialize_object_fields");
         }
 
         return initializeObjectFields;
@@ -301,7 +343,7 @@ public class PandaConfig {
 
     public boolean initializeArrayElements() {
         if (initializeArrayElements == null) {
-            initializeArrayElements = getUnderlyingConfig().getBoolean("panda.refinement.initialize_array_elements");
+            initializeArrayElements = getUnderlyingConfig().getBoolean("panda.refinement.trace.initialize_array_elements");
         }
 
         return initializeArrayElements;
@@ -341,7 +383,7 @@ public class PandaConfig {
 
     public PredicateAbstraction.Initialization refinementInitializationType() {
         if (refinementInitialization == null) {
-            refinementInitialization = getUnderlyingConfig().getEnum("panda.refinement.initialization", PredicateAbstraction.Initialization.class.getEnumConstants(), PredicateAbstraction.Initialization.READ);
+            refinementInitialization = getUnderlyingConfig().getEnum("panda.refinement.trace.initialization_encoding", PredicateAbstraction.Initialization.class.getEnumConstants(), PredicateAbstraction.Initialization.READ);
         }
 
         return refinementInitialization;
