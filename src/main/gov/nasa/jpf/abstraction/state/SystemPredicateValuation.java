@@ -656,44 +656,32 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             for (Predicate predicate : getPredicates()) {
                 TruthValue value = get(predicate);
 
-                boolean isUnwanted = false;
                 boolean isAnonymous = false;
 
                 predicate.addAccessExpressionsToSet(temporaryPathsHolder);
-
-                // This is not used now, because we rename every out-of-scope local variable and use the latest predicates about it
-                // If any of the symbols used in the predicate has changed
-                //for (Root l : notWantedLocalVariables) {
-                //    for (AccessExpression path : temporaryPathsHolder) {
-                //        isUnwanted |= path.isLocalVariable() && path.getRoot().getName().equals(l.getName());
-                //    }
-                //}
 
                 for (AccessExpression path : temporaryPathsHolder) {
                     isAnonymous |= method.isInit() && path.getRoot().isThis(); // new C() ... C.<init> which calls B.<init> and A.<init> on "this" which is in fact anonymous
                 }
 
-                // If the predicate uses only allowed symbols (those that do not lose their meaning by changing scope)
-                //if (!isUnwanted) {
-                    try {
-                        predicate = predicate.replace(replacements).clone();
-                        predicate.setScope(BytecodeUnlimitedRange.getInstance()); // <-- This is done to allow use of the predicate outside its original scope.
+                try {
+                    predicate = predicate.replace(replacements).clone();
+                    predicate.setScope(BytecodeUnlimitedRange.getInstance()); // <-- This is done to allow use of the predicate outside its original scope.
 
-                        // Handling mainly constructor (object still anonymous)
-                        if (isAnonymous) {
-                            callerScope.put(predicate, value);
-                        }
-
-                        // Write predicates over return through (this is useful when called from processMethodReturn)
-                        if (PredicateUtil.isPredicateOverReturn(predicate)) {
-                            calleeReturns.put(predicate.replace(returnValue, returnValueSpecific), value);
-                        } else {
-                            relevant.put(predicate, value);
-                        }
-                    } catch (PredicateNotCloneableException e) {
-                        // Silently ignore predicates that should never be cloned (those have either no meaning here: Assign, or little value: Tautology)
+                    // Handling mainly constructor (object still anonymous)
+                    if (isAnonymous) {
+                        callerScope.put(predicate, value);
                     }
-                //}
+
+                    // Write predicates over return through (this is useful when called from processMethodReturn)
+                    if (PredicateUtil.isPredicateOverReturn(predicate)) {
+                        calleeReturns.put(predicate.replace(returnValue, returnValueSpecific), value);
+                    } else {
+                        relevant.put(predicate, value);
+                    }
+                } catch (PredicateNotCloneableException e) {
+                    // Silently ignore predicates that should never be cloned (those have either no meaning here: Assign, or little value: Tautology)
+                }
 
                 temporaryPathsHolder.clear();
             }

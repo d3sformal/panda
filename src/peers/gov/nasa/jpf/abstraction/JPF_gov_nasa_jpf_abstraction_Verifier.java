@@ -8,6 +8,7 @@ import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.MJIEnv;
 import gov.nasa.jpf.vm.NativePeer;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.choice.BreakGenerator;
 
 import gov.nasa.jpf.abstraction.DynamicIntChoiceGenerator;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
@@ -61,14 +62,16 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
             Map<String, Unknown> unknowns = PredicateAbstraction.getInstance().getUnknowns();
             Integer[] prevValues = new Integer[0];
             List<TraceFormula> prevTraces = null;
+            List<Map<String, Integer>> prevConditions = null;
 
             if (unknowns.containsKey(name)) {
                 prevValues = unknowns.get(name).getChoiceGenerator().getChoices();
                 prevTraces = unknowns.get(name).getChoiceGenerator().getTraces();
+                prevConditions = unknowns.get(name).getChoiceGenerator().getConditions();
             }
 
             for (int i = 1; i < prevValues.length; ++i) {
-                cg.add(prevValues[i], prevTraces.get(i - 1));
+                cg.add(prevValues[i], prevTraces.get(i - 1), prevConditions.get(i - 1));
             }
 
             if (env.setNextChoiceGenerator(cg)) {
@@ -83,6 +86,15 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
             assert (cg instanceof DynamicIntChoiceGenerator) : "expected DynamicIntChoiceGenerator, got: " + cg;
 
             DynamicIntChoiceGenerator icg = (DynamicIntChoiceGenerator) cg;
+
+            // Check condition and break the transition if it does not hold
+            if (!icg.isNextChoiceEnabled()) {
+                cg = new BreakGenerator("The model of this unknown has not been explicitely enabled under the current combination of all the preceding unknowns", ThreadInfo.getCurrentThread(), false);
+
+                env.getSystemState().setIgnored(true);
+
+                return 0;
+            }
 
             Unknown unknown = Unknown.create(ti.getPC(), icg);
 

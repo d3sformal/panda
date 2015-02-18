@@ -2,12 +2,18 @@ package gov.nasa.jpf.abstraction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 
+import gov.nasa.jpf.abstraction.common.access.Unknown;
+
 public class DynamicIntChoiceGenerator extends IntChoiceFromList {
     private List<TraceFormula> targetBranchings = new ArrayList<TraceFormula>();
+    private List<Map<String, Integer>> otherUnknownsConditions = new ArrayList<Map<String, Integer>>();
 
     public DynamicIntChoiceGenerator(String name, int... values) {
         super(name, values);
@@ -19,6 +25,28 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
 
         if (count > 0) {
             PredicateAbstraction.getInstance().forceStatesAlongTrace(targetBranchings.get(count - 1));
+        }
+
+        return ret;
+    }
+
+    public boolean isNextChoiceEnabled() {
+        boolean ret = true;
+
+        if (count > 0) {
+            Map<String, Integer> condition = otherUnknownsConditions.get(count - 1);
+
+            for (String name : condition.keySet()) {
+                Unknown unknown = PredicateAbstraction.getInstance().getUnknowns().get(name);
+
+                int currentChoice = unknown.getChoiceGenerator().getNextChoice();
+                int enabledChoice = condition.get(name);
+
+                if (currentChoice != enabledChoice) {
+                    ret = false;
+                    break;
+                }
+            }
         }
 
         return ret;
@@ -50,7 +78,7 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
         return false;
     }
 
-    public void add(int value, TraceFormula trace) {
+    public void add(int value, TraceFormula trace, Map<String, Integer> otherUnknownsCondition) {
         Integer[] newValues = new Integer[values.length + 1];
 
         for (int i = 0; i < values.length; ++i) {
@@ -64,12 +92,17 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
         // This allows us to force-disable state matching and actually reach the branching
         // Not necessary to clone (because there is backtrack right after adding this choice)
         targetBranchings.add(trace);
+        otherUnknownsConditions.add(otherUnknownsCondition);
 
         isDone = false;
     }
 
+    public void add(int value, Map<String, Integer> condition) {
+        add(value, PredicateAbstraction.getInstance().getTraceFormula(), condition);
+    }
+
     public void add(int value) {
-        add(value, PredicateAbstraction.getInstance().getTraceFormula());
+        add(value, new HashMap<String, Integer>());
     }
 
     public Integer[] getChoices() {
@@ -82,5 +115,9 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
 
     public List<TraceFormula> getTraces() {
         return targetBranchings;
+    }
+
+    public List<Map<String, Integer>> getConditions() {
+        return otherUnknownsConditions;
     }
 }

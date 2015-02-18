@@ -210,13 +210,6 @@ public class BranchingExecutionHelper {
                             rStateSet = (ResetableStateSet) stateSet;
                         }
 
-                        // Currently not true:
-                        //   Because we want to match current state (its working copy) with state created by the code in enabled branch
-                        //   Here we have not yet advanced PC
-                        //   Whereas in the enabled branch the state is made after advancing the PC
-                        //   We need to advance the PC to get the correct state
-                        //   ti.setPC(target);
-
                         if (rStateSet == null || rStateSet.isCurrentUnique() || !forceFeasibleOnce) {
                             if (config.enabledVerbose(BranchingExecutionHelper.class)) {
                                 System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
@@ -232,16 +225,49 @@ public class BranchingExecutionHelper {
                                 }
                             }
 
-                            for (int j = 0; j < models.length; ++j) {
-                                DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
+                            Set<AccessExpression> stepExprs = new HashSet<AccessExpression>();
+                            int ord = 0;
+                            Integer[] order = new Integer[exprArray.length];
 
-                                if ((cg.hasProcessed(models[j]) && isNewCombination) || !cg.has(models[j])) {
-                                    cg.add(models[j]);
+                            for (Step s : PredicateAbstraction.getInstance().getTraceFormula()) {
+                                stepExprs.clear();
+                                s.getPredicate().addAccessExpressionsToSet(stepExprs);
 
-                                    if (config.enabledVerbose(BranchingExecutionHelper.class)) {
-                                        System.out.println("\t" + exprArray[j] + ": " + models[j]);
+                                for (int j = 0; j < exprArray.length; ++j) {
+                                    if (order[j] == null && stepExprs.contains(exprArray[j])) {
+                                        order[j] = ord++;
                                     }
                                 }
+                            }
+
+                            AccessExpression[] ordExprArray = new AccessExpression[exprArray.length];
+                            int[] ordModels = new int[models.length];
+
+                            for (int j = 0; j < ord; ++j) {
+                                ordExprArray[order[j]] = exprArray[j];
+                                ordModels[order[j]] = models[j];
+                            }
+
+                            Map<String, Integer> prevUnknowns = new HashMap<String, Integer>();
+
+                            for (int j = 0; j < ordModels.length; ++j) {
+                                Map<String, Integer> prevUnknownsCopy = new HashMap<String, Integer>();
+                                AccessExpression cur = ordExprArray[j];
+                                String name = ((DefaultRoot) cur).getName();
+
+                                prevUnknownsCopy.putAll(prevUnknowns);
+
+                                DynamicIntChoiceGenerator cg = unknowns.get(name).getChoiceGenerator();
+
+                                if ((cg.hasProcessed(ordModels[j]) && isNewCombination) || !cg.has(ordModels[j])) {
+                                    cg.add(ordModels[j], prevUnknownsCopy);
+
+                                    if (config.enabledVerbose(BranchingExecutionHelper.class)) {
+                                        System.out.println("\t" + ordExprArray[j] + ": " + ordModels[j]);
+                                    }
+                                }
+
+                                prevUnknowns.put(name, ordModels[j]);
                             }
                         }
                     }
