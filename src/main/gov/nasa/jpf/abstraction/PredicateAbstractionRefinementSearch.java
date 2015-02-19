@@ -3,6 +3,7 @@ package gov.nasa.jpf.abstraction;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.Property;
 import gov.nasa.jpf.search.DFSearch;
+import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.Path;
 import gov.nasa.jpf.vm.StateSet;
 import gov.nasa.jpf.vm.ThreadList;
@@ -84,7 +85,14 @@ public class PredicateAbstractionRefinementSearch extends DFSearch {
 
                 backtrackLevel = null;
 
-                VM.getVM().getChoiceGenerator().reset();
+                ChoiceGenerator<?> cg = VM.getVM().getChoiceGenerator();
+                int processed = cg.getProcessedNumberOfChoices();
+
+                cg.reset();
+
+                if (PandaConfig.getInstance().keepExploredBranches()) {
+                    cg.advance(processed - 1);
+                }
             }
 
             if (forward()) {
