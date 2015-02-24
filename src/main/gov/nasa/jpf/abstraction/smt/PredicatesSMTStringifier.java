@@ -133,11 +133,55 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
     public void visit(Equals predicate) {
         ret.append("(= ");
 
-        predicate.a.accept(this);
+        if (!(predicate.a instanceof ArrayElementWrite) && predicate.b instanceof ArrayElementWrite) {
+            ret.append("(select arr ");
+
+            predicate.a.accept(this);
+
+            ret.append(")");
+        } else {
+            if (predicate.a instanceof ArrayElementWrite && !(predicate.b instanceof ArrayElementWrite)) {
+                ret.append("(select ");
+
+                predicate.a.accept(this);
+
+                ArrayElementWrite aw = (ArrayElementWrite) predicate.a;
+
+                ret.append(" ");
+
+                aw.getArray().accept(this);
+
+                ret.append(")");
+            } else {
+                predicate.a.accept(this);
+            }
+        }
 
         ret.append(" ");
 
-        predicate.b.accept(this);
+        if (predicate.a instanceof ArrayElementWrite && !(predicate.b instanceof ArrayElementWrite)) {
+            ret.append("(select arr ");
+
+            predicate.b.accept(this);
+
+            ret.append(")");
+        } else {
+            if (!(predicate.a instanceof ArrayElementWrite) && predicate.b instanceof ArrayElementWrite) {
+                ret.append("(select ");
+
+                predicate.b.accept(this);
+
+                ArrayElementWrite aw = (ArrayElementWrite) predicate.b;
+
+                ret.append(" ");
+
+                aw.getArray().accept(this);
+
+                ret.append(")");
+            } else {
+                predicate.b.accept(this);
+            }
+        }
 
         ret.append(")");
     }

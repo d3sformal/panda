@@ -137,7 +137,30 @@ predicate returns [Predicate val] locals [static Map<String, Object> let = new H
         $ctx.val = Negation.create(Equals.create($a.val, $b.val));
     }
     | '(=' a=expression b=expression ')' {
-        $ctx.val = Equals.create($a.val, $b.val);
+        boolean fail = false;
+
+        if ($a.val instanceof Root) {
+            Root r = (Root) $a.val;
+
+            if (r.getName().matches("field_ssa_[0-9]+_[a-zA-Z_$][a-zA-Z0-9_$]*")) {
+                System.out.println("[WARNING] Omitting interpolant equality of the field: " + r);
+                fail = true;
+            }
+        }
+        if ($b.val instanceof Root) {
+            Root r = (Root) $b.val;
+
+            if (r.getName().matches("field_ssa_[0-9]+_[a-zA-Z_$][a-zA-Z0-9_$]*")) {
+                System.out.println("[WARNING] Omitting interpolant equality of the field: " + r);
+                fail = true;
+            }
+        }
+
+        if (fail) {
+            $ctx.val = Tautology.create();
+        } else {
+            $ctx.val = Equals.create($a.val, $b.val);
+        }
     }
     | '(=' a=expression NULL_TOKEN ')' {
         $ctx.val = Equals.create($a.val, NullExpression.create());

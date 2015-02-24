@@ -1082,16 +1082,19 @@ public class SMT {
     /**
      * Prepare input for an SMT to check simple satisfiability of formulas
      */
-    private String prepareIsSatisfiableInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<String> arrays, List<Predicate> predicates, String[] formulas, InputType inputType) {
+    private String prepareIsSatisfiableInput(Set<String> classes, Set<String> vars, Set<String> fields, Set<String> arrays, Set<Integer> fresh, List<Predicate> predicates, String[] formulas, InputType inputType) {
         String separator = inputType.getSeparator();
 
         StringBuilder input = new StringBuilder();
+
+        Set<AccessExpression> objects = new HashSet<AccessExpression>();
 
         input.append("(push 1)"); input.append(separator);
         appendClassDeclarations(classes, input, separator);
         appendVariableDeclarations(vars, input, separator);
         appendFieldDeclarations(fields, input, separator);
         appendArraysDeclarations(arrays, input, separator);
+        appendFreshConstraints(fresh, objects, input, separator);
 
         Iterator<Predicate> predicatesIterator = predicates.iterator();
 
@@ -1296,6 +1299,7 @@ public class SMT {
         Set<String> variables = collector.getVars();
         Set<String> fields = collector.getFields();
         Set<String> arrays = collector.getArrays();
+        Set<Integer> fresh = collector.getFresh();
 
         String[] formulas = new String[predicates.size()];
 
@@ -1305,10 +1309,10 @@ public class SMT {
             ++i;
         }
 
-        String input = prepareIsSatisfiableInput(classes, variables, fields, arrays, predicates, formulas, InputType.NORMAL);
+        String input = prepareIsSatisfiableInput(classes, variables, fields, arrays, fresh, predicates, formulas, InputType.NORMAL);
 
         if (!listeners.isEmpty()) {
-            String debugInput = prepareIsSatisfiableInput(classes, variables, fields, arrays, predicates, formulas, InputType.DEBUG);
+            String debugInput = prepareIsSatisfiableInput(classes, variables, fields, arrays, fresh, predicates, formulas, InputType.DEBUG);
 
             notifyIsSatisfiableInputGenerated(debugInput);
         }

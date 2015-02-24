@@ -1,3 +1,3 @@
 #!/bin/sh
 
-java -Xmx8g -jar ./lib/jpf-core/build/RunJPF.jar +site=site.properties $@
+java -Xmx2g -jar ./lib/jpf-core/build/RunJPF.jar +site=site.properties $@

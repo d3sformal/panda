@@ -37,6 +37,9 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
             Integer lengthValue = abs.computePreciseExpressionValue(lengthExpression);
 
             if (lengthValue == null) {
+                // Assert a contradictory claim about the array length, so that we can derive an abstraction predicate capturing the exact value
+                PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(LessThan.create(lengthExpression, Constant.create(0)), sf.getMethodInfo(), getPosition());
+
                 return ti.createAndThrowException("java.lang.IllegalArgumentException", "predicates do not specify exact array length");
             }
 
