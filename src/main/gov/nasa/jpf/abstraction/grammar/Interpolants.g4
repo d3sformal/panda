@@ -137,27 +137,48 @@ predicate returns [Predicate val] locals [static Map<String, Object> let = new H
         $ctx.val = Negation.create(Equals.create($a.val, $b.val));
     }
     | '(=' a=expression b=expression ')' {
+        Predicate fallback = Tautology.create();
+        String pattern1 = "field_ssa_[0-9]+_[a-zA-Z_$][a-zA-Z0-9_$]*";
+        String pattern2 = "field_ssa_[0-9]+_";
         boolean fail = false;
 
         if ($a.val instanceof Root) {
             Root r = (Root) $a.val;
 
-            if (r.getName().matches("field_ssa_[0-9]+_[a-zA-Z_$][a-zA-Z0-9_$]*")) {
-                System.out.println("[WARNING] Omitting interpolant equality of the field: " + r);
+            if (r.getName().matches(pattern1)) {
+                if ($b.val instanceof ObjectFieldWrite) {
+                    ObjectFieldWrite fw = (ObjectFieldWrite) $b.val;
+
+                    if (r.getName().replaceAll(pattern2, "").equals(fw.getField().getName())) {
+                        fallback = Equals.create(DefaultObjectFieldRead.create(fw.getObject(), fw.getField()), fw.getNewValue());
+                    } else {
+                        System.out.println("[WARNING] Omitting equality interpolant " + Equals.create($a.val, $b.val) + " (refers to " + r + ")");
+                    }
+                }
+
                 fail = true;
             }
         }
         if ($b.val instanceof Root) {
             Root r = (Root) $b.val;
 
-            if (r.getName().matches("field_ssa_[0-9]+_[a-zA-Z_$][a-zA-Z0-9_$]*")) {
-                System.out.println("[WARNING] Omitting interpolant equality of the field: " + r);
+            if (r.getName().matches(pattern1)) {
+                if ($a.val instanceof ObjectFieldWrite) {
+                    ObjectFieldWrite fw = (ObjectFieldWrite) $a.val;
+
+                    if (r.getName().replaceAll(pattern2, "").equals(fw.getField().getName())) {
+                        fallback = Equals.create(DefaultObjectFieldRead.create(fw.getObject(), fw.getField()), fw.getNewValue());
+                    } else {
+                        System.out.println("[WARNING] Omitting equality interpolant " + Equals.create($a.val, $b.val) + " (refers to " + r + ")");
+                    }
+                }
+
                 fail = true;
             }
         }
 
         if (fail) {
-            $ctx.val = Tautology.create();
+            $ctx.val = fallback;
         } else {
             $ctx.val = Equals.create($a.val, $b.val);
         }
