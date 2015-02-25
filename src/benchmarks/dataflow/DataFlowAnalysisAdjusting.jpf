@@ -8,7 +8,11 @@ sourcepath=${jpf-abstraction}/src/benchmarks
 #panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/dataflow/DataFlowAnalysis.pred
 panda.abstract_domain=PREDICATES
 panda.refinement=true
+panda.refinement.heuristic=gov.nasa.jpf.abstraction.heuristic.MethodGlobalRefinementHeuristic
 panda.log_smt=true
 
-#listener+=,gov.nasa.jpf.listener.ExecTracker
-listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor,gov.nasa.jpf.abstraction.util.CounterexampleListener
+listener+=,gov.nasa.jpf.abstraction.util.BacktrackedLogger
+listener+=,gov.nasa.jpf.listener.ExecTracker
+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor
+listener+=,gov.nasa.jpf.abstraction.util.StackExpressionMonitor
+#listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener
