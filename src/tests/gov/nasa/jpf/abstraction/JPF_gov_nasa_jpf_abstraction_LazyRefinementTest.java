@@ -40,7 +40,7 @@ public class JPF_gov_nasa_jpf_abstraction_LazyRefinementTest extends NativePeer 
             Predicate p1 = Equals.create(DefaultRoot.create("x"), Constant.create(0));
             Predicate p2 = LessThan.create(DefaultRoot.create("x"), Constant.create(0));
 
-            PredicateAbstraction.getInstance().getTraceFormula().markCallInvoked();
+            PredicateAbstraction.getInstance().getTraceFormula().markCallInvoked(env.getMethodInfo());
             PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(p1, env.getMethodInfo(), 0);
             PredicateAbstraction.getInstance().getTraceFormula().markCallStarted();
             PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(p2, env.getMethodInfo(), 1);

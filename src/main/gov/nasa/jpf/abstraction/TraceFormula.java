@@ -10,6 +10,7 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Tautology;
+import gov.nasa.jpf.abstraction.util.Pair;
 
 public class TraceFormula implements Iterable<Step> {
     public static final long serialVersionUID = 1L;
@@ -18,16 +19,18 @@ public class TraceFormula implements Iterable<Step> {
     private int depth = 0;
 
     private class MethodCall {
+        MethodInfo m;
         int mCallInvoked;
         int mCallStarted;
 
-        MethodCall(int mCallInvoked, int mCallStarted) {
+        MethodCall(MethodInfo m, int mCallInvoked, int mCallStarted) {
+            this.m = m;
             this.mCallInvoked = mCallInvoked;
             this.mCallStarted = mCallStarted;
         }
 
         MethodCall(MethodBoundaries mBoundaries) {
-            this(mBoundaries.mCallInvoked, mBoundaries.mCallStarted);
+            this(mBoundaries.m, mBoundaries.mCallInvoked, mBoundaries.mCallStarted);
         }
     }
 
@@ -35,12 +38,14 @@ public class TraceFormula implements Iterable<Step> {
     private Stack<MethodCall> unmatchedCalls = new Stack<MethodCall>();
 
     private class MethodBoundaries {
+        MethodInfo m;
         int mCallInvoked;
         int mCallStarted;
         int mReturn;
         int mReturned;
 
-        MethodBoundaries(int mCallInvoked, int mCallStarted, int mReturn, int mReturned) {
+        MethodBoundaries(MethodInfo m, int mCallInvoked, int mCallStarted, int mReturn, int mReturned) {
+            this.m = m;
             this.mCallInvoked = mCallInvoked;
             this.mCallStarted = mCallStarted;
             this.mReturn = mReturn;
@@ -48,7 +53,7 @@ public class TraceFormula implements Iterable<Step> {
         }
 
         MethodBoundaries(MethodCall mCall, int mReturn, int mReturned) {
-            this(mCall.mCallInvoked, mCall.mCallStarted, mReturn, mReturned);
+            this(mCall.m, mCall.mCallInvoked, mCall.mCallStarted, mReturn, mReturned);
         }
     }
 
@@ -119,8 +124,8 @@ public class TraceFormula implements Iterable<Step> {
         return depth;
     }
 
-    public void markCallInvoked() {
-        unmatchedCalls.push(new MethodCall(size(), size()));
+    public void markCallInvoked(MethodInfo m) {
+        unmatchedCalls.push(new MethodCall(m, size(), size()));
     }
 
     public void markCallStarted() {
@@ -139,8 +144,8 @@ public class TraceFormula implements Iterable<Step> {
     /**
      * @returns list of step indices constituting individual methods (excluding nested calls)
      */
-    public List<List<Integer>> getMethods() {
-        List<List<Integer>> methods = new ArrayList<List<Integer>>();
+    public List<Pair<MethodInfo, List<Integer>>> getMethods() {
+        List<Pair<MethodInfo, List<Integer>>> methods = new ArrayList<Pair<MethodInfo, List<Integer>>>();
 
         while (!unmatchedCalls.isEmpty()) {
             markReturn();
@@ -173,7 +178,7 @@ public class TraceFormula implements Iterable<Step> {
             }
 
             if (!method.isEmpty()) {
-                methods.add(method);
+                methods.add(new Pair<MethodInfo, List<Integer>>(methodBoundaries.get(i).m, method));
             }
         }
 

@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.PandaConfig;
@@ -595,8 +596,11 @@ public class SMT {
         }
 
         // Method scopes intepolants
-        for (List<Integer> m : traceFormula.getMethods()) {
+        for (Pair<MethodInfo, List<Integer>> mp : traceFormula.getMethods()) {
+            List<Integer> m = mp.getSecond();
+
             if (m.get(0) > 0) {
+                input.append("; Method "); input.append(mp.getFirst().getFullName()); input.append(separator);
                 switch (type) {
                     case SMTInterpol:
                         input.append("(get-interpolants");
@@ -676,7 +680,9 @@ public class SMT {
             }
 
             // Inject method-scoped interpolants
-            for (List<Integer> m : traceFormula.getMethods()) {
+            for (Pair<MethodInfo, List<Integer>> mp : traceFormula.getMethods()) {
+                List<Integer> m = mp.getSecond();
+
                 if (config.enabledVerbose(this.getClass())) {
                     Step start = traceFormula.get(m.get(0));
                     Step end = traceFormula.get(m.get(m.size() - 1));

@@ -385,7 +385,7 @@ public class PredicateAbstraction extends Abstraction {
                 }
             }
 
-            traceFormula.markCallInvoked();
+            traceFormula.markCallInvoked(method);
 
             extendTraceFormulaWith(assignment, method, 0, false);
 
