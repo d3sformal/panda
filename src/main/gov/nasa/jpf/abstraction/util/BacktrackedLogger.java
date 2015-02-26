@@ -12,6 +12,8 @@ import gov.nasa.jpf.Config;
 import gov.nasa.jpf.ListenerAdapter;
 import gov.nasa.jpf.search.Search;
 
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+
 import static java.nio.file.StandardCopyOption.*;
 
 public class BacktrackedLogger extends ListenerAdapter {
@@ -101,7 +103,7 @@ public class BacktrackedLogger extends ListenerAdapter {
     private void freeze() throws IOException {
         if (!frozen) {
             fos.flush();
-            Files.copy(Paths.get(WORKING), Paths.get(FINAL + (++i)), REPLACE_EXISTING);
+            Files.copy(Paths.get(WORKING), Paths.get(FINAL + PredicateAbstraction.getInstance().getNumberOfRefinements() + "." + (++i)), REPLACE_EXISTING);
 
             frozen = true;
         }
