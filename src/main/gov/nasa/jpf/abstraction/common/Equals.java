@@ -10,6 +10,7 @@ import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
 import gov.nasa.jpf.abstraction.common.Undefined;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.concrete.AnonymousExpression;
+import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.smt.SMT;
 
 /**
@@ -82,6 +83,17 @@ public class Equals extends Comparison {
 
             if (d.value.intValue() == 0) {
                 return new Equals(s.a, s.b);
+            }
+        }
+
+        if (a instanceof AnonymousObject && b instanceof AnonymousObject) {
+            AnonymousObject aa = (AnonymousObject) a;
+            AnonymousObject ab = (AnonymousObject) b;
+
+            if (aa.getReference().equals(ab.getReference())) {
+                return Tautology.create();
+            } else {
+                return Contradiction.create();
             }
         }
 

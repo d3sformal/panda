@@ -157,6 +157,13 @@ predicate returns [Predicate val] locals [static Map<String, Object> let = new H
                 }
 
                 fail = true;
+            } else if ($b.val instanceof ArrayElementWrite) {
+                ArrayElementWrite aw = (ArrayElementWrite) $b.val;
+
+                if (aw.getArray().equals($a.val)) {
+                    fallback = Equals.create(DefaultArrayElementRead.create(aw.getArray(), aw.getIndex()), aw.getNewValue());
+                    fail = true;
+                }
             }
         }
         if ($b.val instanceof Root) {
@@ -174,6 +181,13 @@ predicate returns [Predicate val] locals [static Map<String, Object> let = new H
                 }
 
                 fail = true;
+            } else if ($a.val instanceof ArrayElementWrite) {
+                ArrayElementWrite aw = (ArrayElementWrite) $a.val;
+
+                if (aw.getArray().equals($b.val)) {
+                    fallback = Equals.create(DefaultArrayElementRead.create(aw.getArray(), aw.getIndex()), aw.getNewValue());
+                    fail = true;
+                }
             }
         }
 

@@ -34,6 +34,7 @@ import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.PredicateUtil;
+import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -418,14 +419,20 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
     public String toString(int pc) {
         StringBuilder ret = new StringBuilder();
 
+        /*
         Set<Predicate> sorted = new TreeSet<Predicate>(new Comparator<Predicate>() {
             @Override
             public int compare(Predicate p1, Predicate p2) {
                 return p1.toString(Notation.DOT_NOTATION).compareTo(p2.toString(Notation.DOT_NOTATION));
             }
         });
+        */
+        Set<Predicate> sorted = new TreeSet<Predicate>(PredicatesStringifier.predCmp);
 
+        Notation backup = Notation.policy;
+        Notation.policy = Notation.DOT_NOTATION;
         sorted.addAll(valuations.keySet());
+        Notation.policy = backup;
 
         for (Predicate p : sorted) {
             if (p.isInScope(pc)) {

@@ -1,6 +1,8 @@
 package gov.nasa.jpf.abstraction.common;
 
-import java.util.SortedSet;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Contradiction;
@@ -16,6 +18,7 @@ import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.common.StaticPredicateContext;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.Method;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
@@ -37,6 +40,88 @@ import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
  * to be used to produce a string representation of the captured hierarchy.
  */
 public abstract class PredicatesStringifier implements PredicatesComponentVisitor {
+
+    public final Comparator<Expression> exprCmp = new Comparator<Expression>() {
+        @Override
+        public int compare(Expression e1, Expression e2) {
+            return cmpExpr(e1, e2);
+        }
+    };
+
+    public final static Comparator<Predicate> predCmp = new Comparator<Predicate>() {
+        @Override
+        public int compare(Predicate p1, Predicate p2) {
+            return cmpPred(p1, p2);
+        }
+    };
+
+    private static int cmpExpr(Expression e1, Expression e2) {
+        if (e1 instanceof Constant) {
+            Constant c1 = (Constant) e1;
+
+            if (e2 instanceof Constant) {
+                Constant c2 = (Constant) e2;
+
+                return c1.value.intValue() - c2.value.intValue();
+            }
+
+            return -1;
+        }
+
+        if (e2 instanceof Constant) {
+            return +1;
+        }
+
+        if (e1 instanceof AccessExpression) {
+            if (e2 instanceof AccessExpression) {
+                return e1.toString().compareTo(e2.toString());
+            }
+
+            return -1;
+        }
+
+        if (e2 instanceof AccessExpression) {
+            return +1;
+        }
+
+        return e1.toString().compareTo(e2.toString());
+    }
+
+    private static int cmpPred(Predicate p1, Predicate p2) {
+        if (p1 instanceof Equals) {
+            Equals e1 = (Equals) p1;
+
+            if (p2 instanceof Equals) {
+                Equals e2 = (Equals) p2;
+
+                int cmpA = cmpExpr(e1.a, e2.a);
+
+                if (cmpA < 0) return -1;
+                if (cmpA > 0) return +1;
+
+                int cmpB = cmpExpr(e1.b, e2.b);
+
+                return cmpB;
+            }
+        }
+        if (p1 instanceof LessThan) {
+            LessThan l1 = (LessThan) p1;
+
+            if (p2 instanceof LessThan) {
+                LessThan l2 = (LessThan) p2;
+
+                int cmpA = cmpExpr(l1.a, l2.a);
+
+                if (cmpA < 0) return -1;
+                if (cmpA > 0) return +1;
+
+                int cmpB = cmpExpr(l1.b, l2.b);
+
+                return cmpB;
+            }
+        }
+        return p1.toString().compareTo(p2.toString());
+    }
 
     protected StringBuilder ret = new StringBuilder();
     protected boolean topmost = true;
@@ -81,9 +166,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 
         ret.append("]\n");
 
-        for (Predicate p : context.predicates.keySet()) {
-            visitPredicate(p);
-        }
+        visitRawPredicateContext(context);
     }
 
     @Override
@@ -94,9 +177,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 
         ret.append("]\n");
 
-        for (Predicate p : context.predicates.keySet()) {
-            visitPredicate(p);
-        }
+        visitRawPredicateContext(context);
     }
 
     @Override
@@ -107,9 +188,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 
         ret.append("]\n");
 
-        for (Predicate p : context.predicates.keySet()) {
-            visitPredicate(p);
-        }
+        visitRawPredicateContext(context);
     }
 
     @Override
@@ -120,16 +199,22 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 
         ret.append("]\n");
 
-        for (Predicate p : context.predicates.keySet()) {
-            visitPredicate(p);
-        }
+        visitRawPredicateContext(context);
     }
 
     @Override
     public void visit(StaticPredicateContext context) {
         ret.append("[static]\n");
 
-        for (Predicate p : context.predicates.keySet()) {
+        visitRawPredicateContext(context);
+    }
+
+    private void visitRawPredicateContext(PredicateContext context) {
+        Set<Predicate> order = new TreeSet<Predicate>(predCmp);
+
+        order.addAll(context.predicates.keySet());
+
+        for (Predicate p : order) {
             visitPredicate(p);
         }
     }
@@ -142,10 +227,7 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 
         ret.append("]\n");
 
-        for (Expression e : context.expressions) {
-            e.accept(this);
-            ret.append("\n");
-        }
+        visitRawExpressionContext(context);
     }
 
     @Override
@@ -156,17 +238,22 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
 
         ret.append("]\n");
 
-        for (Expression e : context.expressions) {
-            e.accept(this);
-            ret.append("\n");
-        }
+        visitRawExpressionContext(context);
     }
 
     @Override
     public void visit(StaticExpressionContext context) {
         ret.append("[static]\n");
 
-        for (Expression e : context.expressions) {
+        visitRawExpressionContext(context);
+    }
+
+    private void visitRawExpressionContext(ExpressionContext context) {
+        Set<Expression> order = new TreeSet<Expression>(exprCmp);
+
+        order.addAll(context.expressions);
+
+        for (Expression e : order) {
             e.accept(this);
             ret.append("\n");
         }
