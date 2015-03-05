@@ -98,6 +98,11 @@ public class SMT {
             listener.isSatisfiableInvoked(formulas);
         }
     }
+    private static void notifyInterpolateInvoked(TraceFormula traceFormula) {
+        for (SMTListener listener : listeners) {
+            listener.interpolateInvoked(traceFormula);
+        }
+    }
     private static void notifyValuatePredicatesInvoked(Map<Predicate, PredicateValueDeterminingInfo> predicates) {
         for (SMTListener listener : listeners) {
             listener.valuatePredicatesInvoked(predicates);
@@ -125,6 +130,11 @@ public class SMT {
             listener.isSatisfiableInputGenerated(input);
         }
     }
+    private static void notifyInterpolateInputGenerated(String input) {
+        for (SMTListener listener : listeners) {
+            listener.interpolateInputGenerated(input);
+        }
+    }
     private static void notifyValuatePredicatesInputGenerated(String input) {
         for (SMTListener listener : listeners) {
             listener.valuatePredicatesInputGenerated(input);
@@ -145,6 +155,11 @@ public class SMT {
     private static void notifyIsSatisfiableExecuted(List<Predicate> formulas, boolean[] satisfiable) {
         for (SMTListener listener : listeners) {
             listener.isSatisfiableExecuted(formulas, satisfiable);
+        }
+    }
+    private static void notifyInterpolateExecuted(Predicate[] interpolants) {
+        for (SMTListener listener : listeners) {
+            listener.interpolateExecuted(interpolants);
         }
     }
     private static void notifyValuatePredicatesExecuted(Map<Predicate, TruthValue> valuation) {
@@ -530,6 +545,8 @@ public class SMT {
      * @returns null if the Trace Formula is satisfiable. Otherwise an array of !FORMULAS! (non-atomic predicates) is returned (the length of the array corresponds to the length of the Trace Formula)
      */
     public Predicate[] interpolate(TraceFormula traceFormula) throws SMTException {
+        notifyInterpolateInvoked(traceFormula);
+
         ++itp;
         Date startTime = new Date();
         SupportedSMT type = PandaConfig.getInstance().getInterpolationSMT();
@@ -626,6 +643,8 @@ public class SMT {
         }
 
         input.append("(pop 1)"); input.append(separator);
+
+        notifyInterpolateInputGenerated(input.toString());
 
         try {
             interpol.in.write(input.toString());
@@ -780,6 +799,8 @@ public class SMT {
             }
 
             interpol.close();
+
+            notifyInterpolateExecuted(interpolants);
 
             return interpolants;
         } catch (IOException e) {

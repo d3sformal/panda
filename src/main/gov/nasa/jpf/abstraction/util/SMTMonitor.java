@@ -6,6 +6,7 @@ import java.util.Set;
 
 import gov.nasa.jpf.search.Search;
 
+import gov.nasa.jpf.abstraction.TraceFormula;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
@@ -32,6 +33,13 @@ public class SMTMonitor extends SMTListener {
 
         System.out.println();
 
+    }
+
+    @Override
+    public void interpolateInvoked(TraceFormula traceFormula) {
+        System.out.println("SMT Interpolate:");
+
+        CounterexampleListener.printErrorConjuncts(traceFormula);
     }
 
     @Override
@@ -87,6 +95,15 @@ public class SMTMonitor extends SMTListener {
 
     @Override
     public void valuatePredicatesInputGenerated(String input) {
+        System.out.println("SMT Input: ");
+
+        System.out.println(input);
+
+        System.out.println();
+    }
+
+    @Override
+    public void interpolateInputGenerated(String input) {
         System.out.println("SMT Input: ");
 
         System.out.println(input);
@@ -153,6 +170,17 @@ public class SMTMonitor extends SMTListener {
     @Override
     public void getModelExecuted(Boolean satisfiability, Integer model) {
         System.out.println("SMT Returned: " + (satisfiability ? "sat " + model : "unsat"));
+
+        System.out.println();
+    }
+
+    @Override
+    public void interpolateExecuted(Predicate[] interpolants) {
+        System.out.println("SMT Returned: ");
+
+        for (Predicate interpolant : interpolants) {
+            System.out.println("\t" + interpolant);
+        }
 
         System.out.println();
     }

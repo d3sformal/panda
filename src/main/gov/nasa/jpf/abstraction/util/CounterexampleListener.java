@@ -45,7 +45,7 @@ public class CounterexampleListener extends ListenerAdapter {
         return i;
     }
 
-    private void printErrorConjuncts(TraceFormula traceFormula) {
+    public static void printErrorConjuncts(TraceFormula traceFormula) {
         int traceStep = 0;
         int traceStepCount = traceFormula.size();
         int maxLen = 0;

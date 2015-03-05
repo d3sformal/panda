@@ -33,31 +33,38 @@ public class ANEWARRAY extends gov.nasa.jpf.jvm.bytecode.ANEWARRAY {
         if (RunDetector.isRunning()) {
             // Determine the unambiguous concrete array length from predicates
             PredicateAbstraction abs = PredicateAbstraction.getInstance();
-            Integer lengthValue = abs.computePreciseExpressionValue(lengthExpression);
+            Integer lengthValue = sf.peek();
 
-            if (lengthValue == null) {
-                return ti.createAndThrowException("java.lang.IllegalArgumentException", "predicates do not specify exact array length");
-            }
+            if (!PandaConfig.getInstance().pruneInfeasibleBranches()) {
+                lengthValue = abs.computePreciseExpressionValue(lengthExpression);
 
-            // Check validity of the array length
-            Predicate negative = LessThan.create(lengthExpression, Constant.create(0));
-            TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(getPosition(), negative);
+                if (lengthValue == null) {
+                    // Assert a contradictory claim about the array length, so that we can derive an abstraction predicate capturing the exact value
+                    PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(LessThan.create(lengthExpression, Constant.create(0)), sf.getMethodInfo(), getPosition());
 
-            if (value != TruthValue.FALSE) {
-                return ti.createAndThrowException("java.lang.NegativeArraySizeException");
-            } else {
-                // Replace the original concrete value (possibly inconsistent with the abstraction) with the value derived from the abstraction
-                int len = sf.peek();
-
-                if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-                    if (len != lengthValue) {
-                        System.out.println("[WARNING] Inconsistent concrete and abstract array length at array allocation.");
-                    }
+                    return ti.createAndThrowException("java.lang.IllegalArgumentException", "predicates do not specify exact array length");
                 }
 
-                sf.pop();
-                sf.push(lengthValue);
+                // Check validity of the array length
+                Predicate negative = LessThan.create(lengthExpression, Constant.create(0));
+                TruthValue value = PredicateAbstraction.getInstance().processBranchingCondition(getPosition(), negative);
+
+                if (value != TruthValue.FALSE) {
+                    return ti.createAndThrowException("java.lang.NegativeArraySizeException");
+                }
             }
+
+            // Replace the original concrete value (possibly inconsistent with the abstraction) with the value derived from the abstraction
+            int len = sf.peek();
+
+            if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+                if (len != lengthValue) {
+                    System.out.println("[WARNING] Inconsistent concrete and abstract array length at array allocation.");
+                }
+            }
+
+            sf.pop();
+            sf.push(lengthValue);
         }
 
         Instruction actualNextInsn = super.execute(ti);

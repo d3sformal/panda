@@ -7,6 +7,7 @@ import java.util.Set;
 
 import gov.nasa.jpf.ListenerAdapter;
 
+import gov.nasa.jpf.abstraction.TraceFormula;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
@@ -29,17 +30,20 @@ public abstract class SMTListener extends ListenerAdapter {
     }
 
     public void isSatisfiableInvoked(List<Predicate> formulas) {}
+    public void interpolateInvoked(TraceFormula traceFormula) {}
     public void valuatePredicatesInvoked(Map<Predicate, PredicateValueDeterminingInfo> predicates) {}
     public void valuatePredicatesInvoked(Set<Predicate> predicates) {}
     public void getModelInvoked(Expression expression, List<Pair<Predicate, TruthValue>> determinants) {}
     public void getModelsInvoked(Predicate formula, AccessExpression[] expression) {}
 
     public void isSatisfiableInputGenerated(String input) {}
+    public void interpolateInputGenerated(String input) {}
     public void valuatePredicatesInputGenerated(String input) {}
     public void getModelInputGenerated(String input) {}
     public void getModelsInputGenerated(String input) {}
 
     public void isSatisfiableExecuted(List<Predicate> formulas, boolean[] satisfiable) {}
+    public void interpolateExecuted(Predicate[] interpolants) {}
     public void valuatePredicatesExecuted(Map<Predicate, TruthValue> valuation) {}
     public void getModelExecuted(Boolean satisfiability, Integer model) {}
     public void getModelsExecuted(AccessExpression[] exps, int[] models) {}
