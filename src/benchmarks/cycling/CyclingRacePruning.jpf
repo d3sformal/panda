@@ -5,6 +5,8 @@ target=cycling.CyclingRace
 classpath=${jpf-abstraction}/build/benchmarks
 sourcepath=${jpf-abstraction}/src/benchmarks
 
-panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/cycling/CyclingRace.pred
+#panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/cycling/CyclingRace.pred
+panda.abstract_domain=PREDICATES
+panda.refinement=true
 panda.branch.adjust_concrete_values=false
 panda.branch.prune_infeasible=true

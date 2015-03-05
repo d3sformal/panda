@@ -278,7 +278,7 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
         lookupValues(expression, values);
 
         for (UniverseIdentifier id : values) {
-            if (id != Universe.nullReference) {
+            if (!id.equals(Universe.nullReference)) {
                 valueToAccessExpressions(id, length, outAliases);
             }
         }
@@ -369,6 +369,10 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
          */
         for (Pair<Identifier, UniverseSlotKey> pair: value.getParentSlots()) {
             Identifier parent = pair.getFirst();
+
+            if (parent.equals(Universe.nullReference)) {
+                continue;
+            }
 
             if (parent instanceof StructuredValueIdentifier) {
                 Set<AccessExpression> resolution = new HashSet<AccessExpression>();

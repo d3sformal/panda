@@ -5,4 +5,6 @@ target=scheduler.Scheduler
 classpath=${jpf-abstraction}/build/benchmarks
 sourcepath=${jpf-abstraction}/src/benchmarks
 
-panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/scheduler/Scheduler.pred
+#panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/scheduler/Scheduler.pred
+panda.abstract_domain=PREDICATES
+panda.refinement=true

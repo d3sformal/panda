@@ -19,6 +19,7 @@ grammar Interpolants;
     import gov.nasa.jpf.abstraction.common.access.impl.*;
     import gov.nasa.jpf.abstraction.concrete.*;
     import gov.nasa.jpf.abstraction.state.universe.*;
+    import gov.nasa.jpf.abstraction.util.*;
 }
 
 predicates returns [Predicate[] val]
@@ -63,14 +64,16 @@ standalonepredicate returns [Predicate val]
     }
     ;
 
-predicate returns [Predicate val] locals [static Map<String, Object> let = new HashMap<String, Object>(); Predicate acc;]
+predicate returns [Predicate val] locals [static ScopedDefineMap let = new ScopedDefineMap(); Predicate acc;]
     : '.' id=ID_TOKEN {
         $ctx.val = (Predicate) PredicateContext.let.get($id.text);
     }
     | id=ID_TOKEN '!' n=CONSTANT_TOKEN {
         $ctx.val = (Predicate) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
     }
-    | '(' LET_TOKEN '(' (l=letpair {PredicateContext.let.put($l.val.getKey(), $l.val.getValue());})* ')' p=predicate ')' {
+    | '(' LET_TOKEN {PredicateContext.let.nest();} '(' (l=letpair {PredicateContext.let.put($l.val.getKey(), $l.val.getValue());})* ')' p=predicate ')' {
+        PredicateContext.let.unnest();
+
         $ctx.val = $p.val;
     }
     | TRUE_TOKEN {
@@ -90,6 +93,11 @@ predicate returns [Predicate val] locals [static Map<String, Object> let = new H
     }
     | '(' ITE_TOKEN p=predicate q=predicate r=predicate ')' {
         $ctx.val = Disjunction.create(Conjunction.create($p.val, $q.val), Conjunction.create(Negation.create($p.val), $r.val));
+    }
+    | '(' FORALL_TOKEN {PredicateContext.let.nest();} '(' ('(' '%' n=CONSTANT_TOKEN TYPE_TOKEN ')' {PredicateContext.let.put("%" + Integer.parseInt($n.text), DefaultRoot.create("%" + Integer.parseInt($n.text)));} )+ ')' '(' '!' p=predicate ':qid' 'itp' ')' ')' {
+        PredicateContext.let.unnest();
+
+        $ctx.val = $p.val;
     }
     | '(=>' p=predicate q=predicate ')' {
         $ctx.val = Disjunction.create(Negation.create($p.val), $q.val);
@@ -254,6 +262,9 @@ factor returns [Expression val]
     | id=ID_TOKEN '!' n=CONSTANT_TOKEN {
         $ctx.val = (Expression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
     }
+    | '%' n=CONSTANT_TOKEN {
+        $ctx.val = (Expression) PredicateContext.let.get("%" + Integer.parseInt($n.text));
+    }
     | CONSTANT_TOKEN {
         $ctx.val = Constant.create(Integer.parseInt($CONSTANT_TOKEN.text));
     }
@@ -370,6 +381,7 @@ ARRLEN_TOKEN   : 'arrlen';
 CLASS_TOKEN    : 'class_'[a-zA-Z0-9_$]+;
 DISTINCT_TOKEN : 'distinct';
 FALSE_TOKEN    : 'false';
+FORALL_TOKEN   : 'forall';
 FRESH_TOKEN    : 'fresh_'[0-9]+;
 INIT_TOKEN     : '<init>';
 ITE_TOKEN      : 'ite';
@@ -381,6 +393,7 @@ RETURN_TOKEN   : 'var_ssa_'[0-9]+'_frame_'[0-9]+'_return'('_pc'[0-9]+)?;
 SELECT_TOKEN   : 'select';
 STORE_TOKEN    : 'store';
 TRUE_TOKEN     : 'true';
+TYPE_TOKEN     : 'Int';
 
 CONSTANT_TOKEN
     : [-+]?'0'('.'[0-9]+)?
