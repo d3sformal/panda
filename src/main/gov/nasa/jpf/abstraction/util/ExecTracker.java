@@ -103,6 +103,8 @@ public class ExecTracker extends ListenerAdapter {
                      search.getDepth() + "] forward: " + id);
     if (search.isNewState()) {
       out.print(" new");
+    } else if (search.isIgnoredState()) {
+      out.print(" ignored");
     } else {
       out.print(" visited");
     }

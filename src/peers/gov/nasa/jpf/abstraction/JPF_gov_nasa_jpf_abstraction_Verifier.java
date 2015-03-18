@@ -11,6 +11,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.choice.BreakGenerator;
 
 import gov.nasa.jpf.abstraction.DynamicIntChoiceGenerator;
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.Unknown;
@@ -89,7 +90,16 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
 
             // Check condition and break the transition if it does not hold
             if (!icg.isNextChoiceEnabled()) {
-                cg = new BreakGenerator("The model of this unknown has not been explicitely enabled under the current combination of all the preceding unknowns", ThreadInfo.getCurrentThread(), false);
+                String message = "The model of this unknown has not been explicitely enabled under the current combination of all the preceding unknowns";
+                cg = new BreakGenerator(message, ThreadInfo.getCurrentThread(), false);
+
+                if (PandaConfig.getInstance().enabledVerbose(JPF_gov_nasa_jpf_abstraction_Verifier.class)) {
+                    System.out.println();
+                    System.out.println();
+                    System.out.println("[DEBUG] " + message);
+                    System.out.println();
+                    System.out.println();
+                }
 
                 env.getSystemState().setIgnored(true);
 
