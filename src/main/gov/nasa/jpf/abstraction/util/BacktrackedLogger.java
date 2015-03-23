@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.util;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -21,6 +22,7 @@ public class BacktrackedLogger extends ListenerAdapter {
     private FileOutputStream fos;
     private FileChannel fc;
 
+    private String PREFIX = "output/";
     private String WORKING = ".pathlog";
     private String FINAL;
     private int i = 0;
@@ -33,7 +35,13 @@ public class BacktrackedLogger extends ListenerAdapter {
         FINAL = WORKING + ".";
 
         try {
-            fos = new FileOutputStream(WORKING);
+            File dir = new File(PREFIX);
+
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+
+            fos = new FileOutputStream(PREFIX + WORKING);
             fc = fos.getChannel();
 
             PrintStream ps = new PrintStream(fos, true);
@@ -103,7 +111,7 @@ public class BacktrackedLogger extends ListenerAdapter {
     private void freeze() throws IOException {
         if (!frozen) {
             fos.flush();
-            Files.copy(Paths.get(WORKING), Paths.get(FINAL + PredicateAbstraction.getInstance().getNumberOfRefinements() + "." + (++i)), REPLACE_EXISTING);
+            Files.copy(Paths.get(PREFIX, WORKING), Paths.get(PREFIX, FINAL + PredicateAbstraction.getInstance().getNumberOfRefinements() + "." + (++i)), REPLACE_EXISTING);
 
             frozen = true;
         }

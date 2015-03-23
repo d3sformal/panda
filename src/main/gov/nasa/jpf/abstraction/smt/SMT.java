@@ -3,6 +3,7 @@ package gov.nasa.jpf.abstraction.smt;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -404,7 +405,13 @@ public class SMT {
             prepareSMTProcess(smt);
 
             if (USE_LOG_FILE) {
-                final BufferedWriter log = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("smt." + smt + ".log." + (++smt.logFileID))));
+                File dir = new File("output");
+
+                if (dir.exists()) {
+                    dir.mkdir();
+                }
+
+                final BufferedWriter log = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("output/smt." + smt + ".log." + (++smt.logFileID))));
 
                 in = new BufferedWriter(inwriter) {
                     @Override
