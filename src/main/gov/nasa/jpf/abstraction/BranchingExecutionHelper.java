@@ -215,6 +215,8 @@ public class BranchingExecutionHelper {
                                 System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
                             }
 
+                            // Make sure we do not enable one tuple of values multiple times (that could cause divergence)
+                            // At least one value for one of the unknowns needs to be new
                             boolean isNewCombination = false;
 
                             for (int j = 0; j < models.length; ++j) {
@@ -229,6 +231,10 @@ public class BranchingExecutionHelper {
                             int ord = 0;
                             Integer[] order = new Integer[exprArray.length];
 
+                            // Order the unknown expressions as they appear in the trace
+                            //   walk through the trace from the beginning
+                            //   assign a number to an expression found on the trace
+                            //   increase the counter
                             for (Step s : PredicateAbstraction.getInstance().getTraceFormula()) {
                                 stepExprs.clear();
                                 s.getPredicate().addAccessExpressionsToSet(stepExprs);
@@ -240,6 +246,7 @@ public class BranchingExecutionHelper {
                                 }
                             }
 
+                            // Reorder the unknown expressions according to the order imposed above
                             AccessExpression[] ordExprArray = new AccessExpression[exprArray.length];
                             int[] ordModels = new int[models.length];
 
@@ -250,6 +257,16 @@ public class BranchingExecutionHelper {
 
                             Map<String, Integer> prevUnknowns = new HashMap<String, Integer>();
 
+                            // Enable the newly generated value for each of the unknowns
+                            //   always require that all the previous unknowns have the values dictated by the newly discovered tuple
+                            //
+                            //   the domain of the first unknown is extended unconditionally
+                            //     values(u1) += {v1}
+                            //
+                            //     values(u2) += {v2 as long as value(u1) = v1}
+                            //     values(u3) += {v3 as long as value(u1) = v1, value(u2) = u2}
+                            //     values(u4) += {v4 as long as value(u1) = v1, value(u2) = u2, value(u3) = v3}
+                            //     ...
                             for (int j = 0; j < ordModels.length; ++j) {
                                 Map<String, Integer> prevUnknownsCopy = new HashMap<String, Integer>();
                                 AccessExpression cur = ordExprArray[j];
