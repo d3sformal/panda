@@ -21,11 +21,11 @@ public class ScopedDefineMap {
         return null;
     }
 
-    public void nest() {
+    public void enterNested() {
         scopes.push(new HashMap<String, Object>());
     }
 
-    public void unnest() {
+    public void exitNested() {
         scopes.pop();
     }
 }

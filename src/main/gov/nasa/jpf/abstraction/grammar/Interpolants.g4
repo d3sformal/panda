@@ -71,8 +71,8 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
     | id=ID_TOKEN '!' n=CONSTANT_TOKEN {
         $ctx.val = (Predicate) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
     }
-    | '(' LET_TOKEN {PredicateContext.let.nest();} '(' (l=letpair {PredicateContext.let.put($l.val.getKey(), $l.val.getValue());})* ')' p=predicate ')' {
-        PredicateContext.let.unnest();
+    | '(' LET_TOKEN {PredicateContext.let.enterNested();} '(' (l=letpair {PredicateContext.let.put($l.val.getKey(), $l.val.getValue());})* ')' p=predicate ')' {
+        PredicateContext.let.exitNested();
 
         $ctx.val = $p.val;
     }
@@ -94,8 +94,8 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
     | '(' ITE_TOKEN p=predicate q=predicate r=predicate ')' {
         $ctx.val = Disjunction.create(Conjunction.create($p.val, $q.val), Conjunction.create(Negation.create($p.val), $r.val));
     }
-    | '(' FORALL_TOKEN {PredicateContext.let.nest();} '(' ('(' '%' n=CONSTANT_TOKEN TYPE_TOKEN ')' {PredicateContext.let.put("%" + Integer.parseInt($n.text), DefaultRoot.create("%" + Integer.parseInt($n.text)));} )+ ')' '(' '!' p=predicate ':qid' 'itp' ')' ')' {
-        PredicateContext.let.unnest();
+    | '(' FORALL_TOKEN {PredicateContext.let.enterNested();} '(' ('(' '%' n=CONSTANT_TOKEN TYPE_TOKEN ')' {PredicateContext.let.put("%" + Integer.parseInt($n.text), DefaultRoot.create("%" + Integer.parseInt($n.text)));} )+ ')' '(' '!' p=predicate ':qid' 'itp' ')' ')' {
+        PredicateContext.let.exitNested();
 
         $ctx.val = $p.val;
     }
