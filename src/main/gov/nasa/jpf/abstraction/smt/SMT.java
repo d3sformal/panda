@@ -407,7 +407,7 @@ public class SMT {
             if (USE_LOG_FILE) {
                 File dir = new File("output");
 
-                if (dir.exists()) {
+                if (!dir.exists()) {
                     dir.mkdir();
                 }
 
