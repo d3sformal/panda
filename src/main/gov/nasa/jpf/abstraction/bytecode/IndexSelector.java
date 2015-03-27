@@ -57,6 +57,10 @@ public class IndexSelector {
 
                     ChoiceGenerator<?> indexChoice = new IntIntervalGenerator(INDEX_CHOICE_ID, 0, arrayObject.getLength() - 1);
 
+                    if (ti.isFirstStepInsn()) {
+                        ss.setForced(true);
+                    }
+
                     ss.setNextChoiceGenerator(indexChoice);
 
                     return true;

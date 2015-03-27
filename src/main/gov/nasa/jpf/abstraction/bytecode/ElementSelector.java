@@ -64,6 +64,10 @@ public class ElementSelector extends IndexSelector {
 
                 ChoiceGenerator<?> elementValueChoice = new IntChoiceFromList(ELEMENT_VALUE_CHOICE_ID, references);
 
+                if (ti.isFirstStepInsn()) {
+                    ss.setForced(true);
+                }
+
                 ss.setNextChoiceGenerator(elementValueChoice);
 
                 return true;

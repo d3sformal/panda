@@ -10,3 +10,13 @@ panda.abstract_domain=PREDICATES
 panda.refinement=true
 panda.branch.adjust_concrete_values=false
 panda.branch.prune_infeasible=true
+#panda.verbose=gov.nasa.jpf.abstraction.JPF_gov_nasa_jpf_abstraction_Verifier
+
+#listener+=,gov.nasa.jpf.abstraction.util.BacktrackedLogger
+#listener+=,gov.nasa.jpf.abstraction.util.ExecTracker
+#listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker
+#listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor
+#listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener
+#listener+=,gov.nasa.jpf.abstraction.util.UniverseMonitor
+
+#panda.monitor_entire_universe=false

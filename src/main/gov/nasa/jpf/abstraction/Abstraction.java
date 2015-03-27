@@ -53,6 +53,13 @@ public abstract class Abstraction {
     }
 
     /**
+     * Informs the abstraction about a symbolic assignment
+     * @param to An access expression referring to an object on heap
+     */
+    public void processObjectStore(MethodInfo lastM, int lastPC, MethodInfo nextM, int nextPC, Expression from, AccessExpression to, AccessExpression exactTo) {
+    }
+
+    /**
      * Called by all InvokeInstructions to inform about a successful method invocations
      * @param before Caller stack
      * @param after  Callee stack

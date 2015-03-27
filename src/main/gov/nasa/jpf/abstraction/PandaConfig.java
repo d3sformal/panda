@@ -50,6 +50,7 @@ public class PandaConfig {
     private Boolean checkTraceFeasibilityAtEveryStep;
     private String refinementDumpAbstractionPredicatesTo;
     private Boolean trackExactValueForLoopControlVariable;
+    private Boolean monitorEntireUniverse;
 
     protected PandaConfig() {
     }
@@ -411,5 +412,13 @@ public class PandaConfig {
         }
 
         return trackExactValueForLoopControlVariable;
+    }
+
+    public boolean monitorEntireUniverse() {
+        if (monitorEntireUniverse == null) {
+            monitorEntireUniverse = getUnderlyingConfig().getBoolean("panda.universe.monitor_whole");
+        }
+
+        return monitorEntireUniverse;
     }
 }

@@ -287,10 +287,12 @@ public class Universe {
         return currentStructuredRealization.keySet();
     }
 
-    public void retainLiveValuesOnly(Set<UniverseIdentifier> liveRoots) {
+    public Set<UniverseIdentifier> computeReachable(Set<? extends UniverseIdentifier> roots) {
         // Compute reachability closure
-        Set<UniverseIdentifier> open = liveRoots;
+        Set<UniverseIdentifier> open = new HashSet<UniverseIdentifier>();
         Set<UniverseIdentifier> closed = new HashSet<UniverseIdentifier>();
+
+        open.addAll(roots);
 
         while (!open.isEmpty()) {
             Set<UniverseIdentifier> nextOpen = new HashSet<UniverseIdentifier>();
@@ -316,7 +318,11 @@ public class Universe {
             open = nextOpen;
         }
 
-        Set<UniverseIdentifier> liveValues = closed;
+        return closed;
+    }
+
+    public void retainLiveValuesOnly(Set<UniverseIdentifier> liveRoots) {
+        Set<UniverseIdentifier> liveValues = computeReachable(liveRoots);
 
         // Always keep the representation of null, no matter what
         liveValues.add(nullReference);

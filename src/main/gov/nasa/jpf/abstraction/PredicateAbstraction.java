@@ -336,6 +336,21 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     @Override
+    public void processObjectStore(MethodInfo lastM, int lastPC, MethodInfo nextM, int nextPC, Expression from, AccessExpression to, AccessExpression exactTo) {
+        Set<AccessExpression> affected = null;
+
+        if (PandaConfig.getInstance().pruneInfeasibleBranches()) {
+            affected = symbolTable.processObjectStore(from, exactTo);
+        } else {
+            affected = symbolTable.processObjectStore(from, to);
+        }
+
+        predicateValuation.reevaluate(lastPC, nextPC, to, affected, from);
+
+        extendTraceFormulaWithAssignment(to, from, nextM, nextPC, 0);
+    }
+
+    @Override
     public void processMethodCall(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         symbolTable.processMethodCall(threadInfo, before, after);
 

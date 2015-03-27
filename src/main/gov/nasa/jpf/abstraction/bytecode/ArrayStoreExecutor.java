@@ -12,10 +12,12 @@ import gov.nasa.jpf.vm.ThreadInfo;
 
 import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
 import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Negation;
@@ -23,20 +25,30 @@ import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 
 public class ArrayStoreExecutor {
     private static final String ARRAY_INDEX_OUT_OF_BOUNDS = "java.lang.ArrayIndexOutOfBoundsException";
+    private static final String NULL_POINTER_EXCEPTION = "java.lang.NullPointerException";
 
     public Instruction execute(ArrayStoreInstruction store, ThreadInfo ti) {
         SystemState ss = ti.getVM().getSystemState();
         StackFrame sf = ti.getTopFrame();
         Expression from = store.getSourceExpression(sf);
         Expression index = store.getIndexExpression(sf);
+        int concreteIndex = store.getIndex(sf);
         AccessExpression to = store.getArrayExpression(sf);
 
         ElementInfo ei = store.getArray(sf);
+
+        if (ei == null) {
+            PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Equals.create(from, NullExpression.create()), store.getSelf().getMethodInfo(), store.getSelf().getNext().getPosition());
+
+            return ti.createAndThrowException(NULL_POINTER_EXCEPTION, "Null dereference");
+        }
+
         ArrayFields fields = ei.getArrayFields();
 
         int originalIndex = store.getIndex(sf);
@@ -95,10 +107,11 @@ public class ArrayStoreExecutor {
         }
 
         AccessExpression element = DefaultArrayElementRead.create(to, index);
+        AccessExpression exactElement = DefaultArrayElementRead.create(to, Constant.create(concreteIndex));
 
         if (store instanceof AASTORE) {
             // Element indices are derived from predicates in this method call
-            PredicateAbstraction.getInstance().processObjectStore(store.getSelf().getMethodInfo(), store.getSelf().getPosition(), actualNextInsn.getMethodInfo(), actualNextInsn.getPosition(), from, element);
+            PredicateAbstraction.getInstance().processObjectStore(store.getSelf().getMethodInfo(), store.getSelf().getPosition(), actualNextInsn.getMethodInfo(), actualNextInsn.getPosition(), from, element, exactElement);
         } else {
             // Element indices are derived from predicates in this method call
             PredicateAbstraction.getInstance().processPrimitiveStore(store.getSelf().getMethodInfo(), store.getSelf().getPosition(), actualNextInsn.getMethodInfo(), actualNextInsn.getPosition(), from, element);

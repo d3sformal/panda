@@ -32,6 +32,7 @@ import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayLengthRead;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.state.MethodFrameSymbolTable;
 import gov.nasa.jpf.abstraction.state.TruthValue;
 import gov.nasa.jpf.abstraction.state.universe.Indexed;
@@ -75,6 +76,7 @@ public class ArrayLoadExecutor {
     private IndexSelector indexSelector;
     private static final String ARRAY_INDEX_OUT_OF_BOUNDS = "java.lang.ArrayIndexOutOfBoundsException";
     private static final String BOUNDS_CHECK = "Checking array bounds";
+    private static final String NULL_POINTER_EXCEPTION = "java.lang.NullPointerException";
 
     public ArrayLoadExecutor(IndexSelector indexSelector) {
         this.indexSelector = indexSelector;
@@ -129,6 +131,12 @@ public class ArrayLoadExecutor {
 
         ei = ti.getElementInfo(sf.peek(1));
 
+        if (ei == null) {
+            PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Equals.create(array, NullExpression.create()), load.getSelf().getMethodInfo(), load.getSelf().getNext().getPosition());
+
+            return ti.createAndThrowException(NULL_POINTER_EXCEPTION, "Null dereference");
+        }
+
         array = ExpressionUtil.getAccessExpression(sf.getOperandAttr(1));
         index = ExpressionUtil.getExpression(sf.getOperandAttr(0));
         path = DefaultArrayElementRead.create(array, index);
@@ -181,6 +189,11 @@ public class ArrayLoadExecutor {
                 if (indexInBounds == TruthValue.UNKNOWN) {
                     ChoiceGenerator<?> cg = new AbstractChoiceGenerator();
                     cg.setId(BOUNDS_CHECK);
+
+                    if (ti.isFirstStepInsn()) {
+                        ss.setForced(true);
+                    }
+
                     ss.setNextChoiceGenerator(cg);
 
                     storeState(ss, Phase.PHASE2);
