@@ -22,6 +22,7 @@ import gov.nasa.jpf.abstraction.state.universe.FieldName;
 import gov.nasa.jpf.abstraction.state.universe.Indexed;
 import gov.nasa.jpf.abstraction.state.universe.Reference;
 import gov.nasa.jpf.abstraction.state.universe.StructuredValueIdentifier;
+import gov.nasa.jpf.abstraction.state.universe.StructuredValueSlot;
 import gov.nasa.jpf.abstraction.state.universe.Universe;
 import gov.nasa.jpf.abstraction.state.universe.UniverseArray;
 import gov.nasa.jpf.abstraction.state.universe.UniverseClass;
@@ -36,6 +37,15 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
 public class UniverseMonitor extends ListenerAdapter {
 
     @Override
+    public void vmInitialized(VM vm) {
+        if (PandaConfig.getInstance().monitorEntireUniverse()) {
+            inspectAll(PredicateAbstraction.getInstance());
+        } else {
+            inspectLocal(PredicateAbstraction.getInstance());
+        }
+    }
+
+    @Override
     public void instructionExecuted(VM vm, ThreadInfo curTh, Instruction nextInsn, Instruction execInsn) {
         if (RunDetector.isRunning()) {
             if (PandaConfig.getInstance().monitorEntireUniverse()) {
@@ -47,11 +57,11 @@ public class UniverseMonitor extends ListenerAdapter {
     }
 
     private void inspectAll(Abstraction abs) {
-        System.out.println("--UNIVERSE--");
-
         PredicateAbstraction predicate = (PredicateAbstraction) abs;
         Universe universe = predicate.getSymbolTable().getUniverse();
         Set<StructuredValueIdentifier> values = universe.getStructuredValues();
+
+        System.out.println("--UNIVERSE " + universe.hashCode() +  "--");
 
         inspect(abs, universe, values);
 
@@ -60,11 +70,12 @@ public class UniverseMonitor extends ListenerAdapter {
     }
 
     private void inspectLocal(Abstraction abs) {
-        System.out.println("--UNIVERSE--");
-
         PredicateAbstraction predicate = (PredicateAbstraction) abs;
         Universe universe = predicate.getSymbolTable().getUniverse();
-        Set<StructuredValueIdentifier> values = new HashSet<StructuredValueIdentifier>();
+        Set<StructuredValueIdentifier> values = universe.getStructuredValues();
+
+        System.out.println("--UNIVERSE " + universe.hashCode() +  "--");
+
         Set<UniverseIdentifier> reachable = new HashSet<UniverseIdentifier>();
 
         ThreadInfo ti = ThreadInfo.getCurrentThread();
@@ -97,6 +108,8 @@ public class UniverseMonitor extends ListenerAdapter {
     }
 
     private void inspect(Abstraction abs, Universe universe, Set<StructuredValueIdentifier> values) {
+        boolean printPrimitive = false;
+
         Set<StructuredValueIdentifier> ordered = new TreeSet<StructuredValueIdentifier>(new Comparator<StructuredValueIdentifier>() {
             @Override
             public int compare(StructuredValueIdentifier o1, StructuredValueIdentifier o2) {
@@ -133,7 +146,9 @@ public class UniverseMonitor extends ListenerAdapter {
                 }
 
                 for (FieldName f : a.getFields().keySet()) {
-                    System.out.println("\t" + f.getName() + ": " + a.getField(f).getPossibleValues());
+                    if (printPrimitive || a.getField(f) instanceof StructuredValueSlot) {
+                        System.out.println("\t" + f.getName() + ": " + a.getField(f).getPossibleValues());
+                    }
                 }
             } else if (universe.get(v) instanceof Indexed) {
                 Indexed i = (Indexed) universe.get(v);
@@ -141,7 +156,9 @@ public class UniverseMonitor extends ListenerAdapter {
                 System.out.println(v + " @ " + ((Reference) v).getElementInfo().getClassInfo().getName());
 
                 for (ElementIndex j : i.getElements().keySet()) {
-                    System.out.println("\t" + j.getIndex() + ": " + i.getElement(j).getPossibleValues());
+                    if (printPrimitive || i.getElement(j) instanceof StructuredValueSlot) {
+                        System.out.println("\t" + j.getIndex() + ": " + i.getElement(j).getPossibleValues());
+                    }
                 }
             }
         }
