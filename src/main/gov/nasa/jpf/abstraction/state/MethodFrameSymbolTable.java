@@ -175,6 +175,12 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
         PrimitiveValue value = universe.get(universe.add());
 
         v.addPossiblePrimitiveValue(value.getIdentifier());
+
+        if (value.isFrozen()) {
+            value = value.createShallowCopy();
+
+            universe.put(value.getIdentifier(), value);
+        }
         value.addParentSlot(v, PrimitiveLocalVariable.slotKey);
     }
 
@@ -182,6 +188,12 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
         StructuredValue value = universe.get(Universe.nullReference);
 
         v.addPossibleStructuredValue(value.getIdentifier());
+
+        if (value.isFrozen()) {
+            value = value.createShallowCopy();
+
+            universe.put(value.getIdentifier(), value);
+        }
         value.addParentSlot(v, StructuredLocalVariable.slotKey);
     }
 
@@ -236,6 +248,10 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
             StructuredValueIdentifier value = universe.add(elementInfo, threadInfo);
 
             lc.addPossibleStructuredValue(value);
+
+            if (universe.get(value).isFrozen()) {
+                universe.put(value, universe.get(value).createShallowCopy());
+            }
 
             universe.get(value).addParentSlot(lc, LoadedClass.slotKey);
 

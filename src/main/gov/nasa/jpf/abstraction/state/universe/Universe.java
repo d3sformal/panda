@@ -120,6 +120,10 @@ public class Universe {
         }
 
         get(parent).addSlot(slotKey, slot);
+
+        if (get(value).isFrozen()) {
+            put(value, get(value).createShallowCopy());
+        }
         get(value).addParentSlot(parent, slotKey);
     }
 

@@ -29,10 +29,18 @@ public abstract class UniverseValue implements Freezable {
     }
 
     public void addParentSlot(Identifier parent, UniverseSlotKey slotKey) {
+        if (frozen) {
+            throw new RuntimeException("Adding a parent slot to a frozen object");
+        }
+
         parentSlots.add(new Pair<Identifier, UniverseSlotKey>(parent, slotKey));
     }
 
     public void removeParentSlot(Identifier parent, UniverseSlotKey slotKey) {
+        if (frozen) {
+            throw new RuntimeException("Removing a parent slot from a frozen object");
+        }
+
         parentSlots.remove(new Pair<Identifier, UniverseSlotKey>(parent, slotKey));
     }
 
