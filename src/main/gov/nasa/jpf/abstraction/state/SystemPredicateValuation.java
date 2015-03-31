@@ -190,6 +190,41 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
         scopes.get(currentThreadID).top().force(predicate, value);
     }
 
+    public boolean refineStatic(Predicate interpolant) {
+        boolean refined = false;
+
+        StaticPredicateContext ctx = null;
+
+        for (PredicateContext candidateCtx : predicateSet.contexts) {
+            if (candidateCtx instanceof StaticPredicateContext) {
+                ctx = (StaticPredicateContext) candidateCtx;
+            }
+        }
+
+        if (ctx == null) {
+            refined = true;
+            List<Predicate> predicates = new LinkedList<Predicate>();
+            predicates.add(interpolant);
+            ctx = new StaticPredicateContext(predicates);
+            predicateSet.contexts.add(ctx);
+        } else {
+            boolean present = false;
+
+            if (ctx.predicates.containsKey(interpolant)) {
+                refined = ctx.predicates.put(interpolant, ctx.predicates.get(interpolant)) == null;
+            } else {
+                refined = ctx.predicates.put(interpolant, TruthValue.UNKNOWN) == null;
+            }
+        }
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("Refined context:");
+            System.out.println(gov.nasa.jpf.abstraction.common.Notation.convertToString(ctx));
+        }
+
+        return refined;
+    }
+
     public boolean refine(Predicate interpolant, MethodInfo m, BytecodeRange scope) {
         boolean refined = false;
 
@@ -232,6 +267,10 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
         if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
             System.out.println("Refined context:");
             System.out.println(gov.nasa.jpf.abstraction.common.Notation.convertToString(ctx));
+        }
+
+        if (m.getName().equals("<clinit>")) {
+            refined |= refineStatic(interpolant);
         }
 
         return refined;
