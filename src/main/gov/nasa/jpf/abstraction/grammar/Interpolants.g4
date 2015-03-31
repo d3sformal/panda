@@ -12,6 +12,7 @@ grammar Interpolants;
     import gov.nasa.jpf.vm.ElementInfo;
     import gov.nasa.jpf.vm.ThreadInfo;
 
+    import gov.nasa.jpf.abstraction.PandaConfig;
     import gov.nasa.jpf.abstraction.PredicateAbstraction;
     import gov.nasa.jpf.abstraction.common.*;
     import gov.nasa.jpf.abstraction.common.impl.*;
@@ -94,8 +95,12 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
     | '(' ITE_TOKEN p=predicate q=predicate r=predicate ')' {
         $ctx.val = Disjunction.create(Conjunction.create($p.val, $q.val), Conjunction.create(Negation.create($p.val), $r.val));
     }
-    | '(' FORALL_TOKEN {PredicateContext.let.enterNested();} '(' ('(' '%' n=CONSTANT_TOKEN TYPE_TOKEN ')' {PredicateContext.let.put("%" + Integer.parseInt($n.text), DefaultRoot.create("%" + Integer.parseInt($n.text)));} )+ ')' '(' '!' p=predicate ':qid' 'itp' ')' ')' {
+    | '(' FORALL_TOKEN {PredicateContext.let.enterNested(); String vars = "";} '(' ('(' '%' n=CONSTANT_TOKEN TYPE_TOKEN ')' {vars += " %" + $n.text; PredicateContext.let.put("%" + Integer.parseInt($n.text), DefaultRoot.create("%" + Integer.parseInt($n.text)));} )+ ')' '(' '!' p=predicate ':qid' 'itp' ')' ')' {
         PredicateContext.let.exitNested();
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("[WARNING] Omitting quantifier in FOR ALL" + vars + ": " + $p.val);
+        }
 
         $ctx.val = $p.val;
     }
@@ -159,7 +164,7 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
 
                     if (r.getName().replaceAll(pattern2, "").equals(fw.getField().getName())) {
                         fallback = Equals.create(DefaultObjectFieldRead.create(fw.getObject(), fw.getField()), fw.getNewValue());
-                    } else {
+                    } else if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
                         System.out.println("[WARNING] Omitting equality interpolant " + Equals.create($a.val, $b.val) + " (refers to " + r + ")");
                     }
                 }
@@ -183,7 +188,7 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
 
                     if (r.getName().replaceAll(pattern2, "").equals(fw.getField().getName())) {
                         fallback = Equals.create(DefaultObjectFieldRead.create(fw.getObject(), fw.getField()), fw.getNewValue());
-                    } else {
+                    } else if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
                         System.out.println("[WARNING] Omitting equality interpolant " + Equals.create($a.val, $b.val) + " (refers to " + r + ")");
                     }
                 }
@@ -201,6 +206,10 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
 
         if (fail) {
             $ctx.val = fallback;
+
+            if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+                System.out.println("[WARNING] " + $a.val + " = " + $b.val + " re-interpreted as " + fallback);
+            }
         } else {
             $ctx.val = Equals.create($a.val, $b.val);
         }
@@ -327,6 +336,11 @@ path returns [DefaultAccessExpression val]
         } else {
             $ctx.val = DefaultArrayElementRead.create(ae, $e.val);
         }
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("[WARNING] LET ." + $id.text + " = " + ae);
+            System.out.println("[WARNING] \t\t(select ." + $id.text + " " + $e.text + ") re-interpreted as " + $ctx.val);
+        }
     }
     | '(' SELECT_TOKEN id=ID_TOKEN '!' n=CONSTANT_TOKEN e=expression ')' {
         AccessExpression ae = (AccessExpression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
@@ -340,9 +354,16 @@ path returns [DefaultAccessExpression val]
         } else {
             $ctx.val = DefaultArrayElementRead.create(ae, $e.val);
         }
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("[WARNING] LET " + $id.text + "!" + $n.text + " = " + ae);
+            System.out.println("[WARNING] \t\t(select " + $id.text + "!" + $n.text + " " + $e.text + ") re-interpreted as " + $ctx.val);
+        }
     }
     | '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' {
         $ctx.val = $p.val;
+
+        //System.out.println("[WARNING] (select arr " + $p.text + ") re-interpreted as " + $ctx.val);
     }
     | '(' SELECT_TOKEN f=ID_TOKEN p=path ')' {
         $ctx.val = DefaultObjectFieldRead.create($p.val, $f.text.replaceAll("field_ssa_[0-9]+_", ""));
@@ -357,21 +378,48 @@ path returns [DefaultAccessExpression val]
         } else {
             $ctx.val = DefaultArrayElementRead.create($p.val, $e.val);
         }
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("[WARNING] (select " + $p.text + " " + $e.text + ") re-interpreted as " + $ctx.val);
+        }
     }
     | '(' STORE_TOKEN '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' e1=expression e2=expression ')' {
+        // In interpretation of this term we add additional (store arr ... ...) around the expression
         $ctx.val = DefaultArrayElementWrite.create($p.val, $e1.val, $e2.val);
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("[WARNING] (store (select arr " + $p.text + ") " + $e1.text + " " + $e2.text + ") re-interpreted as " + $ctx.val);
+        }
     }
     | '(' STORE_TOKEN a=ARR_TOKEN p1=path p2=path ')' {
         $ctx.val = $p2.val;
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("[WARNING] (store arr " + $p1.text + " " + $p2.text + ") re-interpreted as the value being stored: " + $ctx.val);
+        }
     }
     | '(' STORE_TOKEN a=ARR_TOKEN p1=path '.' id=ID_TOKEN ')' {
         $ctx.val = (DefaultAccessExpression) PredicateContext.let.get($id.text);
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("[WARNING] LET ." + $id.text + " = " + $ctx.val);
+            System.out.println("[WARNING] \t\t(store arr " + $p1.val + " ." + $id.text + ") re-interpreted as " + $ctx.val);
+        }
     }
     | '(' STORE_TOKEN a=ARR_TOKEN p1=path id=ID_TOKEN '!' n=CONSTANT_TOKEN ')' {
         $ctx.val = (DefaultAccessExpression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("[WARNING] LET " + $id.text + "!" + $n.text + " = " + $ctx.val);
+            System.out.println("[WARNING] \t\t(store arr " + $p1.val + " " + $id.text + "!" + $n.text + ") re-interpreted as " + $ctx.val);
+        }
     }
     | '(' STORE_TOKEN f=ID_TOKEN p=path e=expression ')' {
         $ctx.val = DefaultObjectFieldWrite.create($p.val, $f.text.replaceAll("field_ssa_[0-9]+_", ""), $e.val);
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("[WARNING] (store " + $f.text + " " + $p.text + " " + $e.text + ") re-interpreted as " + $ctx.val);
+        }
     }
     ;
 
