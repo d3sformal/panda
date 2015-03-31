@@ -797,6 +797,16 @@ public class SMT {
                         }
 
                         if (config.enabledMethodGlobalRefinement()) {
+                            if (!(methodInterpolants[methodInterpolants.length - 1] instanceof Contradiction)) {
+                                if (m.get(m.size() - 1) >= interpolants.length) {
+                                    for (int i = 0; i < interpolants.length; ++i) {
+                                        interpolants[i] = Conjunction.create(interpolants[i], methodInterpolants[methodInterpolants.length - 1]);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (config.enabledMethodGlobalRefinement()) {
                             if (!(methodInterpolants[methodInterpolants.length - 1] instanceof Tautology) && config.enabledVerbose(this.getClass())) {
                                 System.out.println("\t... inserting interpolant `" + methodInterpolants[methodInterpolants.length - 1] + "` globally to the whole method");
                             }
