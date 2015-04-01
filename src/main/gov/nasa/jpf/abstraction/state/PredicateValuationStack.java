@@ -36,6 +36,15 @@ public class PredicateValuationStack implements Scopes, Iterable<MethodFramePred
     }
 
     @Override
+    public void replace(int i, Scope scope) {
+        if (scope instanceof MethodFramePredicateValuation) {
+            scopes.set(scopes.size() - i - 1, new Pair<String, MethodFramePredicateValuation>(scopes.get(scopes.size() - i - 1).getFirst(), (MethodFramePredicateValuation) scope));
+        } else {
+            throw new RuntimeException("Invalid scope type being replaced!");
+        }
+    }
+
+    @Override
     public int count() {
         return scopes.size();
     }

@@ -36,6 +36,15 @@ public class SymbolTableStack implements Scopes, Iterable<MethodFrameSymbolTable
     }
 
     @Override
+    public void replace(int i, Scope scope) {
+        if (scope instanceof MethodFrameSymbolTable) {
+            scopes.set(scopes.size() - i - 1, new Pair<String, MethodFrameSymbolTable>(scopes.get(scopes.size() - i - 1).getFirst(), (MethodFrameSymbolTable) scope));
+        } else {
+            throw new RuntimeException("Invalid scope type being replaced!");
+        }
+    }
+
+    @Override
     public int count() {
         return scopes.size();
     }

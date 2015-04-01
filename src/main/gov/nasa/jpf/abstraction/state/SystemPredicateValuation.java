@@ -1006,6 +1006,13 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
         return scopes.get(threadID).top(depth);
     }
 
+    public MethodFramePredicateValuation createThreadRunScope(ThreadInfo threadInfo) {
+        MethodInfo runMethod = threadInfo.getThreadObject().getClassInfo().getMethod("run()V", true);
+        MethodFramePredicateValuation bottomScope = createDefaultScope(threadInfo, runMethod);
+
+        return bottomScope;
+    }
+
     @Override
     public void addThread(ThreadInfo threadInfo) {
         MethodFramePredicateValuation startScope = null;
@@ -1018,9 +1025,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
         }
 
         PredicateValuationStack threadStack = new PredicateValuationStack();
-
-        MethodInfo runMethod = threadInfo.getThreadObject().getClassInfo().getMethod("run()V", true);
-        MethodFramePredicateValuation bottomScope = createDefaultScope(threadInfo, runMethod);
+        MethodFramePredicateValuation bottomScope = createThreadRunScope(threadInfo);
 
         threadStack.push("-- Dummy stop scope --", bottomScope);
         scopes.put(threadInfo.getId(), threadStack);

@@ -8,6 +8,7 @@ public interface Scopes extends Cloneable {
     public Scope top(int i);
     public void pop();
     public void push(String name, Scope scope);
+    public void replace(int i, Scope scope);
     public int count();
     public void print();
     public Scopes clone();

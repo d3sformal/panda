@@ -130,6 +130,7 @@ public class PredicateAbstraction extends Abstraction {
     private int refinements = 0;
     private RefinementHeuristic heuristic;
     private ChoiceHistory history;
+    private ThreadInfo mainThread;
 
     private static PredicateAbstraction instance = null;
     private static List<CounterexampleListener> listeners = new ArrayList<CounterexampleListener>();
@@ -681,6 +682,8 @@ public class PredicateAbstraction extends Abstraction {
 
     @Override
     public void start(ThreadInfo mainThread) {
+        this.mainThread = mainThread;
+
         Map<Integer, SymbolTableStack> symbols = new HashMap<Integer, SymbolTableStack>();
         Map<Integer, PredicateValuationStack> predicates = new HashMap<Integer, PredicateValuationStack>();
 
@@ -760,6 +763,38 @@ public class PredicateAbstraction extends Abstraction {
     @Override
     public void backtrack(MethodInfo method) {
         trace.pop();
+
+        /**
+         * There is a dummy predicate scope on the bottom of the stack of the main thread
+         * That scope does not get refined (we always backtrack only to the state that is created after main thread is initialized)
+         *
+         * therefore we need to refine the scope manually
+         */
+        Map<Integer, PredicateValuationStack> predStacks = trace.top().predicateValuationStacks;
+
+        if (predStacks.containsKey(mainThread.getId())) {
+            /**
+             * Get main thread (Single process VM)
+             */
+            PredicateValuationStack predStack = predStacks.get(mainThread.getId());
+
+            /**
+             * We detect the need to refine this scope when the above mentioned state is reached
+             *
+             * Because we first create an EMPTY STATE in our representation of the trace, the length of the trace has to be 2 to indicate that we backtracked to the first state
+             */
+            if (trace.size() == 2) {
+                MethodFramePredicateValuation bottomScopeOrig = predStack.top(1);
+                MethodFramePredicateValuation bottomScope = predicateValuation.createThreadRunScope(mainThread); // This creates the refined scope
+
+                // Inherit valuations of predicates already present in the previous state of the scope
+                for (Predicate p : bottomScopeOrig.getPredicates()) {
+                    bottomScope.put(p, bottomScopeOrig.get(p));
+                }
+
+                predStack.replace(1, bottomScope);
+            }
+        }
 
         symbolTable.restore(trace.top().symbolTableStacks);
         symbolTable.scheduleThread(trace.top().currentThread);
