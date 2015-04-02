@@ -27,6 +27,7 @@ import gov.nasa.jpf.abstraction.common.BytecodeUnlimitedRange;
 import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
+import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.LessThan;
@@ -340,6 +341,10 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
     @Override
     public void put(Predicate predicate, TruthValue value) {
+        if (predicate instanceof Tautology || predicate instanceof Contradiction) {
+            return;
+        }
+
         // Change of the set of predicates -> need to recompute determinant sets
         if (!containsKey(predicate)) {
             // Least effort

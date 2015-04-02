@@ -9,6 +9,9 @@ import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 
+import gov.nasa.jpf.abstraction.common.Contradiction;
+import gov.nasa.jpf.abstraction.common.Tautology;
+
 public class PredicateValuationMap extends HashMap<Predicate, TruthValue> {
     public static final long serialVersionUID = 1L;
 
@@ -48,13 +51,28 @@ public class PredicateValuationMap extends HashMap<Predicate, TruthValue> {
         return value;
     }
 
+    private TruthValue putDirectly(Predicate p, TruthValue v) {
+        /*
+        // This is the correct place to intercept additions of new predicates/valuations
+        if (p instanceof Tautology) {
+            new Exception().printStackTrace();
+            System.exit(0);
+        }
+        if (p instanceof Contradiction) {
+            new Exception().printStackTrace();
+            System.exit(0);
+        }
+        */
+        return super.put(p, v);
+    }
+
     private TruthValue overwrite(Predicate o, Predicate n, TruthValue v) {
         BytecodeRange scope = o.getScope();
         BytecodeRange newScope = scope.merge(n.getScope());
 
         o.setScope(newScope);
 
-        TruthValue ret = super.put(n, v);
+        TruthValue ret = putDirectly(n, v);
 
         if (scope.equals(newScope)) {
             return ret;
@@ -81,7 +99,7 @@ public class PredicateValuationMap extends HashMap<Predicate, TruthValue> {
                 }
             }
 
-            return super.put(e, canonicalValue);
+            return putDirectly(e, canonicalValue);
         } else {
             for (Predicate p : keySet()) {
                 if (p.equals(canonical)) {
@@ -89,7 +107,7 @@ public class PredicateValuationMap extends HashMap<Predicate, TruthValue> {
                 }
             }
 
-            return super.put(canonical, canonicalValue);
+            return putDirectly(canonical, canonicalValue);
         }
     }
 
