@@ -3,9 +3,11 @@ grammar Interpolants;
 @header {
     import java.util.AbstractMap;
     import java.util.HashMap;
+    import java.util.HashSet;
     import java.util.List;
     import java.util.LinkedList;
     import java.util.Map;
+    import java.util.Set;
     import java.util.SortedSet;
     import java.util.TreeSet;
 
@@ -21,6 +23,95 @@ grammar Interpolants;
     import gov.nasa.jpf.abstraction.concrete.*;
     import gov.nasa.jpf.abstraction.state.universe.*;
     import gov.nasa.jpf.abstraction.util.*;
+}
+
+@members{
+    public static class Helper {
+        public static void collectQuantifiedVarValues(Predicate p, Map<Root, Set<Expression>> values) {
+            // Recurse on compound formula
+            if (p instanceof Formula) {
+                Formula f = (Formula) p;
+
+                collectQuantifiedVarValues(f.a, values);
+                collectQuantifiedVarValues(f.b, values);
+            }
+            // Recurse over negation
+            if (p instanceof Negation) {
+                Negation n = (Negation) p;
+
+                collectQuantifiedVarValues(n.predicate, values);
+            }
+            // Place related values into Eq options
+            if (p instanceof Comparison) {
+                Comparison c = (Comparison) p;
+
+                Expression a = c.a;
+                Expression b = c.b;
+
+                // Detect quantified variables
+                boolean aQuant = false;
+                boolean bQuant = false;
+
+                if (a instanceof Root) {
+                    Root r = (Root) a;
+
+                    if (r.getName().startsWith("%")) {
+                        aQuant = true;
+                    }
+                }
+
+                if (b instanceof Root) {
+                    Root r = (Root) b;
+
+                    if (r.getName().startsWith("%")) {
+                        bQuant = true;
+                    }
+                }
+
+                Root r = null;
+                Expression opt = null;
+
+                if (aQuant && !bQuant) {
+                    r = (Root) a;
+                    opt = b;
+                }
+
+                if (bQuant && !aQuant) {
+                    r = (Root) b;
+                    opt = a;
+                }
+
+                // Add possible equality
+                if (r != null) {
+                    if (!values.containsKey(r)) {
+                        values.put(r, new HashSet<Expression>());
+                    }
+
+                    values.get(r).add(opt);
+                }
+            }
+        }
+
+        public static Predicate expandQuantifiedVars(Predicate p, Map<Root, Set<Expression>> values) {
+            Predicate ret = p;
+
+            for (Root var : values.keySet()) {
+                Predicate instantiated = Contradiction.create();
+
+                for (Expression e : values.get(var)) {
+                    Predicate instance = ret.replace(var, e);
+
+                    if (!(instance instanceof Tautology)) { // True would consume the rest of the interpolant (in disjunction via absorption law)
+                        instantiated = Disjunction.create(instantiated, instance);
+                    }
+                }
+
+                ret = instantiated;
+            }
+
+            return ret;
+        }
+    }
 }
 
 predicates returns [Predicate[] val]
@@ -102,7 +193,19 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
             System.out.println("[WARNING] Omitting quantifier in FOR ALL" + vars + ": " + $p.val);
         }
 
-        $ctx.val = $p.val;
+        // Collect values that the quantified variables may possess
+        Map<Root, Set<Expression>> eqOptions = new HashMap<Root, Set<Expression>>();
+
+        Helper.collectQuantifiedVarValues($p.val, eqOptions);
+
+        Predicate p = Helper.expandQuantifiedVars($p.val, eqOptions);
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("[WARNING] Expanding quantified formula FOR ALL" + vars + " using " + eqOptions + ": ");
+            System.out.println("[WARNING] \t\t" + p);
+        }
+
+        $ctx.val = p;
     }
     | '(=>' p=predicate q=predicate ')' {
         $ctx.val = Disjunction.create(Negation.create($p.val), $q.val);
