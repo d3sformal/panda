@@ -121,6 +121,19 @@ grammar Interpolants;
                 return e;
             }
             if (e instanceof AccessExpression) {
+                if (e instanceof ArrayLengthRead) {
+                    ArrayLengthRead r = (ArrayLengthRead) e;
+
+                    AccessExpression a = (AccessExpression) extractHighLevelConstructs(r.getArray());
+
+                    ArrayLengthRead newR = DefaultArrayLengthRead.create(a);
+
+                    if (newR.equals(r)) {
+                        return r;
+                    }
+
+                    return newR;
+                }
                 if (e instanceof Select) {
                     Select s = (Select) e;
 
@@ -143,11 +156,20 @@ grammar Interpolants;
                         }
                     }
 
+                    // (select (select ... ...) ...)
                     if (from instanceof Select) {
                         Select fromS = (Select) from;
 
+                        // (select (select arr ...) ...)
                         if (fromS.isRoot()) {
                             return DefaultArrayElementRead.create((AccessExpression) fromS.getIndex(), s.getIndex());
+                        }
+
+                        // (select (select (awrite ... ... ... ...) ...) ...)
+                        if (fromS.getFrom() instanceof ArrayElementWrite) {
+                            ArrayElementWrite w = (ArrayElementWrite) fromS.getFrom();
+
+                            return DefaultArrayElementRead.create((AccessExpression) fromS.getIndex(), w, s.getIndex());
                         }
                     }
 
@@ -302,6 +324,13 @@ grammar Interpolants;
                             e1 = DefaultArrayElementRead.create(w.getArray(), w.getIndex());
                             e2 = w.getNewValue();
                         }
+
+                        // (select arr A) = (select (store ... ... ...) A)
+                        if (s2.getFrom() instanceof Store) {
+                            Store s2fromS = (Store) s2.getFrom();
+
+                            return eq(Select.create(s2fromS.getTo(), s2fromS.getIndex()), s2fromS.getValue());
+                        }
                     }
                 }
             }
@@ -325,6 +354,31 @@ grammar Interpolants;
                         if (s2toS.isRoot()) {
 
                             // (select arr A) = (store (select arr A) ... ...)
+                            if (s1.getIndex().equals(s2toS.getIndex())) {
+                                e1 = DefaultArrayElementRead.create((AccessExpression) s1.getIndex(), s2.getIndex());
+                                e2 = s2.getValue();
+                            }
+                        }
+                    }
+                }
+
+                // (select (awrite ... ... ... ...) ...) = (store ... ... ...)
+                if (s1.getFrom() instanceof ArrayElementWrite) {
+                    ArrayElementWrite w = (ArrayElementWrite) s1.getFrom();
+
+                    // (select (awrite A ... ... ...) B) = (store ... ... ...)
+                    // Track aliasing between A and B
+                    // It may affect the select-over-store semantics in this example
+                    ret = Conjunction.create(ret, Equals.create(w.getArray(), s1.getIndex()));
+
+                    // (select (awrite ... ... ... ...) ...) = (store (select ... ...) ... ...)
+                    if (s2.getTo() instanceof Select) {
+                        Select s2toS = (Select) s2.getTo();
+
+                        // (select (awrite ... ... ... ...) ...) = (store (select arr ...) ... ...)
+                        if (s2toS.isRoot()) {
+
+                            // (select (awrite ... ... ... ...) A) = (store (select arr A) ... ...)
                             if (s1.getIndex().equals(s2toS.getIndex())) {
                                 e1 = DefaultArrayElementRead.create((AccessExpression) s1.getIndex(), s2.getIndex());
                                 e2 = s2.getValue();
