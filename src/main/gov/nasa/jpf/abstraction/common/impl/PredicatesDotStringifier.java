@@ -10,6 +10,8 @@ import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.impl.Select;
+import gov.nasa.jpf.abstraction.common.access.impl.Store;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
@@ -153,4 +155,31 @@ public class PredicatesDotStringifier extends PredicatesStringifier {
     public void visit(DefaultArrays meta) {
     }
 
+    @Override
+    public void visit(Select select) {
+        ret.append("select(");
+        if (select.isRoot()) {
+            ret.append("arr");
+        } else {
+            select.getFrom().accept(this);
+        }
+        ret.append(", ");
+        select.getIndex().accept(this);
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(Store store) {
+        ret.append("store(");
+        if (store.isRoot()) {
+            ret.append("arr");
+        } else {
+            store.getTo().accept(this);
+        }
+        ret.append(", ");
+        store.getIndex().accept(this);
+        ret.append(", ");
+        store.getValue().accept(this);
+        ret.append(")");
+    }
 }

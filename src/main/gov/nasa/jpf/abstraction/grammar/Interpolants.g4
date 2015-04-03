@@ -115,6 +115,266 @@ grammar Interpolants;
         public static void println(String s) {
             System.out.println(s.replaceAll("\\s+", " "));
         }
+
+        private static Expression extractHighLevelConstructs(Expression e) {
+            if (e instanceof Constant) {
+                return e;
+            }
+            if (e instanceof AccessExpression) {
+                if (e instanceof Select) {
+                    Select s = (Select) e;
+
+                    AccessExpression from = s.getFrom();
+                    Expression index = s.getIndex();
+
+                    index = extractHighLevelConstructs(index);
+
+                    if (!s.isRoot()) {
+                        from = (AccessExpression) extractHighLevelConstructs(from);
+
+                        if (from instanceof Root) {
+                            Root r = (Root) from;
+
+                            if (r.getName().startsWith("field_ssa_")) {
+                                String f = r.getName().replaceAll("field_ssa_[0-9]*_", "");
+
+                                return DefaultObjectFieldRead.create((AccessExpression) index, f);
+                            }
+                        }
+                    }
+
+                    if (from instanceof Select) {
+                        Select fromS = (Select) from;
+
+                        if (fromS.isRoot()) {
+                            return DefaultArrayElementRead.create((AccessExpression) fromS.getIndex(), s.getIndex());
+                        }
+                    }
+
+                    Select newSelect = Select.create(from, index);
+
+                    if (newSelect.equals(s)) {
+                        return s;
+                    }
+
+                    return newSelect;
+                }
+                if (e instanceof Store) {
+                    Store s = (Store) e;
+
+                    AccessExpression to = s.getTo();
+                    Expression index = s.getIndex();
+                    Expression value = s.getValue();
+
+                    if (!s.isRoot()) {
+                        to = (AccessExpression) extractHighLevelConstructs(to);
+                    }
+
+                    index = extractHighLevelConstructs(index);
+                    value = extractHighLevelConstructs(value);
+
+                    // (store arr ... ...)
+                    if (s.isRoot()) {
+
+                        // (store arr ... (store ... ... ...))
+                        if (value instanceof Store) {
+                            Store valueS = (Store) value;
+
+                            // (store arr ... (store (select ... ...) ... ...))
+                            if (valueS.getTo() instanceof Select) {
+                                Select valueSToS = (Select) valueS.getTo();
+
+                                // (store arr ... (store (select arr ...) ... ...))
+                                if (valueSToS.isRoot()) {
+
+                                    // (store arr A (store (select arr A) ... ...)
+                                    if (s.getIndex().equals(valueSToS.getIndex())) {
+                                        return DefaultArrayElementWrite.create((AccessExpression) s.getIndex(), valueS.getIndex(), valueS.getValue());
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Store newStore = Store.create(to, index, value);
+
+                    if (newStore.equals(s)) {
+                        return s;
+                    }
+
+                    return newStore;
+                }
+                return e;
+            }
+            if (e instanceof Operation) {
+                if (e instanceof Add) {
+                    Add a = (Add) e;
+
+                    Expression newAdd = Add.create(extractHighLevelConstructs(a.a), extractHighLevelConstructs(a.b));
+
+                    if (newAdd.equals(a)) {
+                        return a;
+                    }
+
+                    return newAdd;
+                }
+                if (e instanceof Subtract) {
+                    Subtract s = (Subtract) e;
+
+                    Expression newSubtract = Subtract.create(extractHighLevelConstructs(s.a), extractHighLevelConstructs(s.b));
+
+                    if (newSubtract.equals(s)) {
+                        return s;
+                    }
+
+                    return newSubtract;
+                }
+                if (e instanceof Multiply) {
+                    Multiply m = (Multiply) e;
+
+                    Expression newMultiply = Multiply.create(extractHighLevelConstructs(m.a), extractHighLevelConstructs(m.b));
+
+                    if (newMultiply.equals(m)) {
+                        return m;
+                    }
+
+                    return newMultiply;
+                }
+                if (e instanceof Divide) {
+                    Divide d = (Divide) e;
+
+                    Expression newDivide = Divide.create(extractHighLevelConstructs(d.a), extractHighLevelConstructs(d.b));
+
+                    if (newDivide.equals(d)) {
+                        return d;
+                    }
+
+                    return newDivide;
+                }
+                if (e instanceof Modulo) {
+                    Modulo m = (Modulo) e;
+
+                    Expression newModulo = Modulo.create(extractHighLevelConstructs(m.a), extractHighLevelConstructs(m.b));
+
+                    if (newModulo.equals(m)) {
+                        return m;
+                    }
+
+                    return newModulo;
+                }
+                return e;
+            }
+
+            return null;
+        }
+
+        public static Predicate eq(Expression e1, Expression e2) {
+            e1 = extractHighLevelConstructs(e1);
+            e2 = extractHighLevelConstructs(e2);
+
+            Predicate ret = Tautology.create();
+
+            // Heuristic
+            if (e1 instanceof Select && e2 instanceof Select) {
+                Select s1 = (Select) e1;
+                Select s2 = (Select) e2;
+
+                if (s1.isRoot() && s2.isRoot()) {
+                    e1 = s1.getIndex();
+                    e2 = s2.getIndex();
+                }
+                if (s2.isRoot() && !s1.isRoot()) {
+                    Select s = s1;
+                    s1 = s2;
+                    s2 = s;
+                }
+
+                // (select arr ...) = (select ... ...)
+                if (s1.isRoot() && !s2.isRoot()) {
+
+                    // (select arr A) = (select ... A)
+                    if (s1.getIndex().equals(s2.getIndex())) {
+
+                        // (select arr A) = (select (awrite ... ... ... ...) A)
+                        if (s2.getFrom() instanceof ArrayElementWrite) {
+                            ArrayElementWrite w = (ArrayElementWrite) s2.getFrom();
+
+                            e1 = DefaultArrayElementRead.create(w.getArray(), w.getIndex());
+                            e2 = w.getNewValue();
+                        }
+                    }
+                }
+            }
+            if (e1 instanceof Store && e2 instanceof Select) {
+                Expression e = e1;
+                e1 = e2;
+                e2 = e;
+            }
+            if (e1 instanceof Select && e2 instanceof Store) {
+                Select s1 = (Select) e1;
+                Store s2 = (Store) e2;
+
+                // (select arr ...) = (store ... ... ...)
+                if (s1.isRoot()) {
+
+                    // (select arr ...) = (store (select ... ...) ... ...)
+                    if (s2.getTo() instanceof Select) {
+                        Select s2toS = (Select) s2.getTo();
+
+                        // (select arr ...) = (store (select arr ...) ... ...)
+                        if (s2toS.isRoot()) {
+
+                            // (select arr A) = (store (select arr A) ... ...)
+                            if (s1.getIndex().equals(s2toS.getIndex())) {
+                                e1 = DefaultArrayElementRead.create((AccessExpression) s1.getIndex(), s2.getIndex());
+                                e2 = s2.getValue();
+                            }
+                        }
+                    }
+                }
+            }
+            if (e1 instanceof Store && e2 instanceof Root) {
+                Expression e = e1;
+                e1 = e2;
+                e2 = e;
+            }
+            if (e1 instanceof Root && e2 instanceof Store) {
+                Root r1 = (Root) e1;
+                Store s = (Store) e2;
+
+                // field = (store ... ...)
+                if (r1.getName().startsWith("field_ssa_")) {
+                    String name1 = r1.getName().replaceAll("field_ssa_[0-9]*_", "");
+
+                    if (s.getTo() instanceof Root) {
+                        Root r2 = (Root) s.getTo();
+                        String name2 = r2.getName().replaceAll("field_ssa_[0-9]*_", "");
+
+                        // field = (store field ...)
+                        if (name2.equals(name1)) {
+                            e1 = DefaultObjectFieldRead.create((AccessExpression) s.getIndex(), name1);
+                            e2 = s.getValue();
+                        }
+                    }
+                }
+            }
+
+            ret = Conjunction.create(ret, Equals.create(e1, e2));
+
+            return ret;
+        }
+
+        public static Predicate lt(Expression e1, Expression e2) {
+            e1 = extractHighLevelConstructs(e1);
+            e2 = extractHighLevelConstructs(e2);
+
+            Predicate ret = Tautology.create();
+
+            // Heuristic
+            ret = Conjunction.create(ret, LessThan.create(e1, e2));
+
+            return ret;
+        }
     }
 }
 
@@ -230,7 +490,7 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
             Expression a = (Expression) o1;
             Expression b = (Expression) o2;
 
-            $ctx.val = Equals.create(a, b);
+            $ctx.val = Helper.eq(a, b);
         }
     }
     | '(=' id1=ID_TOKEN '!' n1=CONSTANT_TOKEN id2=ID_TOKEN '!' n2=CONSTANT_TOKEN ')' {
@@ -248,100 +508,38 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
             Expression a = (Expression) o1;
             Expression b = (Expression) o2;
 
-            $ctx.val = Equals.create(a, b);
+            $ctx.val = Helper.eq(a, b);
         }
     }
     | '(=' p=predicate q=predicate ')' {
         $ctx.val = Disjunction.create(Conjunction.create($p.val, $q.val), Conjunction.create(Negation.create($p.val), Negation.create($q.val)));
     }
     | '(' DISTINCT_TOKEN a=expression b=expression ')' {
-        $ctx.val = Negation.create(Equals.create($a.val, $b.val));
+        $ctx.val = Negation.create(Helper.eq($a.val, $b.val));
     }
     | '(=' a=expression b=expression ')' {
-        Predicate fallback = Tautology.create();
-        String pattern1 = "field_ssa_[0-9]+_[a-zA-Z_$][a-zA-Z0-9_$]*";
-        String pattern2 = "field_ssa_[0-9]+_";
-        boolean fail = false;
-
-        if ($a.val instanceof Root) {
-            Root r = (Root) $a.val;
-
-            if (r.getName().matches(pattern1)) {
-                if ($b.val instanceof ObjectFieldWrite) {
-                    ObjectFieldWrite fw = (ObjectFieldWrite) $b.val;
-
-                    if (r.getName().replaceAll(pattern2, "").equals(fw.getField().getName())) {
-                        fallback = Equals.create(DefaultObjectFieldRead.create(fw.getObject(), fw.getField()), fw.getNewValue());
-                    } else if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-                        Helper.println("[WARNING] Omitting equality interpolant " + Equals.create($a.val, $b.val) + " (refers to " + r + ")");
-                    }
-                }
-
-                fail = true;
-            } else if ($b.val instanceof ArrayElementWrite) {
-                ArrayElementWrite aw = (ArrayElementWrite) $b.val;
-
-                if (aw.getArray().equals($a.val)) {
-                    fallback = Equals.create(DefaultArrayElementRead.create(aw.getArray(), aw.getIndex()), aw.getNewValue());
-                    fail = true;
-                }
-            }
-        }
-        if ($b.val instanceof Root) {
-            Root r = (Root) $b.val;
-
-            if (r.getName().matches(pattern1)) {
-                if ($a.val instanceof ObjectFieldWrite) {
-                    ObjectFieldWrite fw = (ObjectFieldWrite) $a.val;
-
-                    if (r.getName().replaceAll(pattern2, "").equals(fw.getField().getName())) {
-                        fallback = Equals.create(DefaultObjectFieldRead.create(fw.getObject(), fw.getField()), fw.getNewValue());
-                    } else if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-                        Helper.println("[WARNING] Omitting equality interpolant " + Equals.create($a.val, $b.val) + " (refers to " + r + ")");
-                    }
-                }
-
-                fail = true;
-            } else if ($a.val instanceof ArrayElementWrite) {
-                ArrayElementWrite aw = (ArrayElementWrite) $a.val;
-
-                if (aw.getArray().equals($b.val)) {
-                    fallback = Equals.create(DefaultArrayElementRead.create(aw.getArray(), aw.getIndex()), aw.getNewValue());
-                    fail = true;
-                }
-            }
-        }
-
-        if (fail) {
-            $ctx.val = fallback;
-
-            if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-                Helper.println("[WARNING] " + $a.val + " = " + $b.val + " re-interpreted as " + fallback);
-            }
-        } else {
-            $ctx.val = Equals.create($a.val, $b.val);
-        }
+        $ctx.val = Helper.eq($a.val, $b.val);
     }
     | '(=' a=expression NULL_TOKEN ')' {
-        $ctx.val = Equals.create($a.val, NullExpression.create());
+        $ctx.val = Helper.eq($a.val, NullExpression.create());
     }
     | '(=' NULL_TOKEN b=expression ')' {
-        $ctx.val = Equals.create(NullExpression.create(), $b.val);
+        $ctx.val = Helper.eq(NullExpression.create(), $b.val);
     }
     | NULL_TOKEN '=' NULL_TOKEN {
-        $ctx.val = Equals.create(NullExpression.create(), NullExpression.create());
+        $ctx.val = Tautology.create();
     }
     | '(<' a=expression b=expression ')' {
-        $ctx.val = LessThan.create($a.val, $b.val);
+        $ctx.val = Helper.lt($a.val, $b.val);
     }
     | '(>' a=expression b=expression ')' {
-        $ctx.val = LessThan.create($b.val, $a.val);
+        $ctx.val = Helper.lt($b.val, $a.val);
     }
     | '(<=' a=expression b=expression ')' {
-        $ctx.val = Negation.create(LessThan.create($b.val, $a.val));
+        $ctx.val = Helper.lt($b.val, $a.val);
     }
     | '(>=' a=expression b=expression ')' {
-        $ctx.val = Negation.create(LessThan.create($a.val, $b.val));
+        $ctx.val = Helper.lt($a.val, $b.val);
     }
     | '(=' ARRLEN_TOKEN ARRLEN_TOKEN ')' {
         $ctx.val = Tautology.create();
@@ -435,103 +633,37 @@ path returns [DefaultAccessExpression val]
     | '(' SELECT_TOKEN '.' id=ID_TOKEN e=expression ')' {
         AccessExpression ae = (AccessExpression) PredicateContext.let.get($id.text);
 
-        if (ae instanceof ArrayElementWrite) {
-            // Losing precision (there is no way to express (select (store arr b (...)) b) - query for a possibly modified array)
-            // .. we can only query elements with aread: (select (select (store arr b (...)) b) index)
-            ArrayElementWrite aew = (ArrayElementWrite) ae;
-
-            $ctx.val = DefaultArrayElementRead.create(aew.getArray(), $e.val);
-        } else {
-            $ctx.val = DefaultArrayElementRead.create(ae, $e.val);
-        }
-
-        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-            Helper.println("[WARNING] LET ." + $id.text + " = " + ae);
-            System.out.print("[WARNING] \t\t");
-            Helper.println("(select ." + $id.text + " " + $e.text + ") re-interpreted as " + $ctx.val);
-        }
+        $ctx.val = Select.create(ae, $e.val);
     }
     | '(' SELECT_TOKEN id=ID_TOKEN '!' n=CONSTANT_TOKEN e=expression ')' {
         AccessExpression ae = (AccessExpression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
 
-        if (ae instanceof ArrayElementWrite) {
-            // Losing precision (there is no way to express (select (store arr b (...)) b) - query for a possibly modified array)
-            // .. we can only query elements with aread: (select (select (store arr b (...)) b) index)
-            ArrayElementWrite aew = (ArrayElementWrite) ae;
-
-            $ctx.val = DefaultArrayElementRead.create(aew.getArray(), $e.val);
-        } else {
-            $ctx.val = DefaultArrayElementRead.create(ae, $e.val);
-        }
-
-        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-            Helper.println("[WARNING] LET " + $id.text + "!" + $n.text + " = " + ae);
-            System.out.print("[WARNING] \t\t");
-            Helper.println("(select " + $id.text + "!" + $n.text + " " + $e.text + ") re-interpreted as " + $ctx.val);
-        }
+        $ctx.val = Select.create(ae, $e.val);
     }
     | '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' {
-        $ctx.val = $p.val;
-
-        //Helper.println("[WARNING] (select arr " + $p.text + ") re-interpreted as " + $ctx.val);
-    }
-    | '(' SELECT_TOKEN f=ID_TOKEN p=path ')' {
-        $ctx.val = DefaultObjectFieldRead.create($p.val, $f.text.replaceAll("field_ssa_[0-9]+_", ""));
+        $ctx.val = Select.create($p.val);
     }
     | '(' SELECT_TOKEN p=path e=expression ')' {
-        if ($p.val instanceof DefaultArrayElementWrite) {
-            // Losing precision (there is no way to express (select (store arr b (...)) b) - query for a possibly modified array)
-            // .. we can only query elements with aread: (select (select (store arr b (...)) b) index)
-            ArrayElementWrite aew = (ArrayElementWrite) $p.val;
-
-            $ctx.val = DefaultArrayElementRead.create(aew.getArray(), $e.val);
-        } else {
-            $ctx.val = DefaultArrayElementRead.create($p.val, $e.val);
-        }
-
-        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-            Helper.println("[WARNING] (select " + $p.text + " " + $e.text + ") re-interpreted as " + $ctx.val);
-        }
+        $ctx.val = Select.create($p.val, $e.val);
     }
-    | '(' STORE_TOKEN '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' e1=expression e2=expression ')' {
-        // In interpretation of this term we add additional (store arr ... ...) around the expression
-        $ctx.val = DefaultArrayElementWrite.create($p.val, $e1.val, $e2.val);
-
-        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-            Helper.println("[WARNING] (store (select arr " + $p.text + ") " + $e1.text + " " + $e2.text + ") re-interpreted as " + $ctx.val);
-        }
+    | '(' STORE_TOKEN p=path e1=expression e2=expression ')' {
+        $ctx.val = Store.create($p.val, $e1.val, $e2.val);
     }
     | '(' STORE_TOKEN a=ARR_TOKEN p1=path p2=path ')' {
-        $ctx.val = $p2.val;
-
-        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-            Helper.println("[WARNING] (store arr " + $p1.text + " " + $p2.text + ") re-interpreted as the value being stored: " + $ctx.val);
-        }
+        $ctx.val = Store.create($p1.val, $p2.val);
     }
     | '(' STORE_TOKEN a=ARR_TOKEN p1=path '.' id=ID_TOKEN ')' {
-        $ctx.val = (DefaultAccessExpression) PredicateContext.let.get($id.text);
+        AccessExpression e = (DefaultAccessExpression) PredicateContext.let.get($id.text);
 
-        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-            Helper.println("[WARNING] LET ." + $id.text + " = " + $ctx.val);
-            System.out.print("[WARNING] \t\t");
-            Helper.println("(store arr " + $p1.val + " ." + $id.text + ") re-interpreted as " + $ctx.val);
-        }
+        $ctx.val = Store.create($p1.val, e);
     }
     | '(' STORE_TOKEN a=ARR_TOKEN p1=path id=ID_TOKEN '!' n=CONSTANT_TOKEN ')' {
-        $ctx.val = (DefaultAccessExpression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
+        AccessExpression e = (DefaultAccessExpression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
 
-        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-            Helper.println("[WARNING] LET " + $id.text + "!" + $n.text + " = " + $ctx.val);
-            System.out.print("[WARNING] \t\t");
-            Helper.println("(store arr " + $p1.val + " " + $id.text + "!" + $n.text + ") re-interpreted as " + $ctx.val);
-        }
+        $ctx.val = Store.create($p1.val, e);
     }
     | '(' STORE_TOKEN f=ID_TOKEN p=path e=expression ')' {
         $ctx.val = DefaultObjectFieldWrite.create($p.val, $f.text.replaceAll("field_ssa_[0-9]+_", ""), $e.val);
-
-        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
-            Helper.println("[WARNING] (store " + $f.text + " " + $p.text + " " + $e.text + ") re-interpreted as " + $ctx.val);
-        }
     }
     ;
 
@@ -541,6 +673,7 @@ ARRLEN_TOKEN   : 'arrlen';
 CLASS_TOKEN    : 'class_'[a-zA-Z0-9_$]+;
 DISTINCT_TOKEN : 'distinct';
 FALSE_TOKEN    : 'false';
+//FIELD_TOKEN    : 'field_ssa_'[0-9]+'_'[a-zA-Z$_][a-zA-Z0-9$_]*; // FIELD_TOKEN could appear in equalities and we don't have the machinery for that
 FORALL_TOKEN   : 'forall';
 FRESH_TOKEN    : 'fresh_'[0-9]+;
 INIT_TOKEN     : '<init>';

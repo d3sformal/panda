@@ -11,6 +11,8 @@ import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
+import gov.nasa.jpf.abstraction.common.access.impl.Select;
+import gov.nasa.jpf.abstraction.common.access.impl.Store;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
@@ -82,4 +84,6 @@ public interface PredicatesComponentVisitor {
     public void visit(AnonymousObject expression);
     public void visit(AnonymousArray expression);
     public void visit(Undefined expression);
+    public void visit(Select select);
+    public void visit(Store store);
 }

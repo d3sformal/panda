@@ -55,6 +55,8 @@ import gov.nasa.jpf.abstraction.common.access.Root;
 import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
+import gov.nasa.jpf.abstraction.common.access.impl.Select;
+import gov.nasa.jpf.abstraction.common.access.impl.Store;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
@@ -467,4 +469,13 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
     public void visit(Method expression) {
     }
 
+    @Override
+    public void visit(Select select) {
+        throw new RuntimeException("unsupported term in SMT input");
+    }
+
+    @Override
+    public void visit(Store store) {
+        throw new RuntimeException("unsupported term in SMT input");
+    }
 }

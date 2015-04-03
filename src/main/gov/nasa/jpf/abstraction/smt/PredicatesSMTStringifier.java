@@ -26,6 +26,8 @@ import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.PackageAndClass;
 import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.impl.Select;
+import gov.nasa.jpf.abstraction.common.access.impl.Store;
 import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
@@ -506,4 +508,13 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
         ret.append("class_" + packageAndClass.getName().replace("_", "__").replace('.', '_'));
     }
 
+    @Override
+    public void visit(Select select) {
+        throw new RuntimeException("unsupported term in SMT input");
+    }
+
+    @Override
+    public void visit(Store store) {
+        throw new RuntimeException("unsupported term in SMT input");
+    }
 }

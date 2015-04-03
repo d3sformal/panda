@@ -538,5 +538,4 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
     public void visit(SpecialVariable expression) {
         ret.append(expression.getName());
     }
-
 }
