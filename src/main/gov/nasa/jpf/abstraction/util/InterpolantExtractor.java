@@ -420,6 +420,45 @@ public class InterpolantExtractor {
                 }
             }
         }
+        if (e2 instanceof Select) {
+            Expression e = e1;
+            e1 = e2;
+            e2 = e;
+        }
+        if (e1 instanceof Select) {
+            Select s1 = (Select) e1;
+
+            // (select (store ... ... ...) ...) = ...
+            if (s1.getFrom() instanceof Store) {
+                Store s1fromS = (Store) s1.getFrom();
+
+                // (select (store (select ... ...) ... ...) ...) = ...
+                if (s1fromS.getTo() instanceof Select) {
+                    Select s1fromStoS = (Select) s1fromS.getTo();
+
+                    // (select (store (select arr ...) ... ...) ...) = ...
+                    if (s1fromStoS.isRoot()) {
+                        // (select (store (select arr A) I X) J) = Y
+                        AccessExpression a = (AccessExpression) s1fromStoS.getIndex();
+                        Expression i = s1fromS.getIndex();
+                        Expression x = s1fromS.getValue();
+                        Expression j = s1.getIndex();
+                        Expression y = e2;
+
+                        // add
+                        //
+                        // I = J
+                        // aread(arr, A, I) = X
+                        // aread(arr, A, J) = Y
+                        ret = Conjunction.create(ret, Equals.create(i, j));
+                        ret = Conjunction.create(ret, Equals.create(DefaultArrayElementRead.create(a, i), x));
+
+                        e1 = DefaultArrayElementRead.create(a, j);
+                        e2 = y;
+                    }
+                }
+            }
+        }
         if (e1 instanceof Store && e2 instanceof Root) {
             Expression e = e1;
             e1 = e2;
