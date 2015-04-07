@@ -14,6 +14,7 @@ import gov.nasa.jpf.abstraction.common.access.Root;
 public class Select extends DefaultAccessExpression implements Root {
     private AccessExpression from;
     private Expression index;
+    private Integer hashCode;
 
     protected Select(AccessExpression from, Expression index) {
         super(from == null ? 1 : from.getLength());
@@ -164,5 +165,14 @@ public class Select extends DefaultAccessExpression implements Root {
     @Override
     public String getName() {
         return "select";
+    }
+
+    @Override
+    public int hashCode() {
+        if (hashCode == null) {
+            hashCode = toString().hashCode();
+        }
+
+        return hashCode;
     }
 }

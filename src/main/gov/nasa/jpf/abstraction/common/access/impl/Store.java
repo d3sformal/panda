@@ -14,6 +14,7 @@ public class Store extends DefaultAccessExpression implements Root {
     private AccessExpression to;
     private Expression index;
     private Expression value;
+    private Integer hashCode;
 
     protected Store(AccessExpression to, Expression index, Expression value) {
         super(to == null ? 1 : to.getLength());
@@ -165,5 +166,14 @@ public class Store extends DefaultAccessExpression implements Root {
     @Override
     public String getName() {
         return "store";
+    }
+
+    @Override
+    public int hashCode() {
+        if (hashCode == null) {
+            hashCode = toString().hashCode();
+        }
+
+        return hashCode;
     }
 }
