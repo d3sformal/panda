@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.common.Add;
 import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Conjunction;
@@ -127,6 +128,8 @@ public class InterpolantExtractor {
     }
 
     private static Expression extractHighLevelConstructs(Expression e) {
+        PandaConfig config = PandaConfig.getInstance();
+
         if (e instanceof Constant) {
             return e;
         }
@@ -177,7 +180,13 @@ public class InterpolantExtractor {
                         if (r.getName().startsWith("field_ssa_")) {
                             String f = r.getName().replaceAll("field_ssa_[0-9]*_", "");
 
-                            return DefaultObjectFieldRead.create((AccessExpression) index, f);
+                            Expression ret = DefaultObjectFieldRead.create((AccessExpression) index, f);
+
+                            if (config.enabledVerbose(InterpolantExtractor.class)) {
+                                System.out.println("[WARNING] Re-interpreting: " + e + " as " + ret);
+                            }
+
+                            return ret;
                         }
                     }
                 }
@@ -188,14 +197,26 @@ public class InterpolantExtractor {
 
                     // (select (select arr ...) ...)
                     if (fromS.isRoot()) {
-                        return DefaultArrayElementRead.create((AccessExpression) fromS.getIndex(), s.getIndex());
+                        Expression ret = DefaultArrayElementRead.create((AccessExpression) fromS.getIndex(), s.getIndex());
+
+                        if (config.enabledVerbose(InterpolantExtractor.class)) {
+                            System.out.println("[WARNING] Re-interpreting: " + e + " as " + ret);
+                        }
+
+                        return ret;
                     }
 
                     // (select (select (awrite ... ... ... ...) ...) ...)
                     if (fromS.getFrom() instanceof ArrayElementWrite) {
                         ArrayElementWrite w = (ArrayElementWrite) fromS.getFrom();
 
-                        return DefaultArrayElementRead.create((AccessExpression) fromS.getIndex(), w, s.getIndex());
+                        Expression ret = DefaultArrayElementRead.create((AccessExpression) fromS.getIndex(), w, s.getIndex());
+
+                        if (config.enabledVerbose(InterpolantExtractor.class)) {
+                            System.out.println("[WARNING] Re-interpreting: " + e + " as " + ret);
+                        }
+
+                        return ret;
                     }
                 }
 
@@ -203,6 +224,10 @@ public class InterpolantExtractor {
 
                 if (newSelect.equals(s)) {
                     return s;
+                }
+
+                if (config.enabledVerbose(InterpolantExtractor.class)) {
+                    System.out.println("[WARNING] Re-interpreting: " + e + " as " + newSelect);
                 }
 
                 return newSelect;
@@ -237,7 +262,13 @@ public class InterpolantExtractor {
 
                                 // (store arr A (store (select arr A) ... ...)
                                 if (s.getIndex().equals(valueSToS.getIndex())) {
-                                    return DefaultArrayElementWrite.create((AccessExpression) index, valueS.getIndex(), valueS.getValue());
+                                    Expression ret = DefaultArrayElementWrite.create((AccessExpression) index, valueS.getIndex(), valueS.getValue());
+
+                                    if (config.enabledVerbose(InterpolantExtractor.class)) {
+                                        System.out.println("[WARNING] Re-interpreting: " + e + " as " + ret);
+                                    }
+
+                                    return ret;
                                 }
                             }
                         }
@@ -248,13 +279,23 @@ public class InterpolantExtractor {
                 if (to instanceof ObjectFieldWrite) {
                     ObjectFieldWrite w = (ObjectFieldWrite) to;
 
-                    return DefaultObjectFieldWrite.create((AccessExpression) index, w.getField(), value);
+                    Expression ret = DefaultObjectFieldWrite.create((AccessExpression) index, w, value);
+
+                    if (config.enabledVerbose(InterpolantExtractor.class)) {
+                        System.out.println("[WARNING] Re-interpreting: " + e + " as " + ret);
+                    }
+
+                    return ret;
                 }
 
                 Store newStore = Store.create(to, index, value);
 
                 if (newStore.equals(s)) {
                     return s;
+                }
+
+                if (config.enabledVerbose(InterpolantExtractor.class)) {
+                    System.out.println("[WARNING] Re-interpreting: " + e + " as " + newStore);
                 }
 
                 return newStore;
@@ -271,6 +312,10 @@ public class InterpolantExtractor {
                     return a;
                 }
 
+                if (config.enabledVerbose(InterpolantExtractor.class)) {
+                    System.out.println("[WARNING] Re-interpreting: " + e + " as " + newAdd);
+                }
+
                 return newAdd;
             }
             if (e instanceof Subtract) {
@@ -280,6 +325,10 @@ public class InterpolantExtractor {
 
                 if (newSubtract.equals(s)) {
                     return s;
+                }
+
+                if (config.enabledVerbose(InterpolantExtractor.class)) {
+                    System.out.println("[WARNING] Re-interpreting: " + e + " as " + newSubtract);
                 }
 
                 return newSubtract;
@@ -293,6 +342,10 @@ public class InterpolantExtractor {
                     return m;
                 }
 
+                if (config.enabledVerbose(InterpolantExtractor.class)) {
+                    System.out.println("[WARNING] Re-interpreting: " + e + " as " + newMultiply);
+                }
+
                 return newMultiply;
             }
             if (e instanceof Divide) {
@@ -302,6 +355,10 @@ public class InterpolantExtractor {
 
                 if (newDivide.equals(d)) {
                     return d;
+                }
+
+                if (config.enabledVerbose(InterpolantExtractor.class)) {
+                    System.out.println("[WARNING] Re-interpreting: " + e + " as " + newDivide);
                 }
 
                 return newDivide;
@@ -315,6 +372,10 @@ public class InterpolantExtractor {
                     return m;
                 }
 
+                if (config.enabledVerbose(InterpolantExtractor.class)) {
+                    System.out.println("[WARNING] Re-interpreting: " + e + " as " + newModulo);
+                }
+
                 return newModulo;
             }
             return e;
@@ -324,6 +385,11 @@ public class InterpolantExtractor {
     }
 
     public static Predicate eq(Expression e1, Expression e2) {
+        PandaConfig config = PandaConfig.getInstance();
+
+        Expression oldE1 = e1;
+        Expression oldE2 = e2;
+
         e1 = extractHighLevelConstructs(e1);
         e2 = extractHighLevelConstructs(e2);
 
@@ -404,6 +470,10 @@ public class InterpolantExtractor {
                 // It may affect the select-over-store semantics in this example
                 ret = Conjunction.create(ret, Equals.create(w.getArray(), s1.getIndex()));
 
+                if (config.enabledVerbose(InterpolantExtractor.class)) {
+                    System.out.println("[WARNING] Adding: " + w.getArray() + " = " + s1.getIndex());
+                }
+
                 // (select (awrite ... ... ... ...) ...) = (store (select ... ...) ... ...)
                 if (s2.getTo() instanceof Select) {
                     Select s2toS = (Select) s2.getTo();
@@ -453,6 +523,11 @@ public class InterpolantExtractor {
                         ret = Conjunction.create(ret, Equals.create(i, j));
                         ret = Conjunction.create(ret, Equals.create(DefaultArrayElementRead.create(a, i), x));
 
+                        if (config.enabledVerbose(InterpolantExtractor.class)) {
+                            System.out.println("[WARNING] Adding: " + i + " = " + j);
+                            System.out.println("[WARNING] Adding: " + DefaultArrayElementRead.create(a, i) + " = " + x);
+                        }
+
                         e1 = DefaultArrayElementRead.create(a, j);
                         e2 = y;
                     }
@@ -484,8 +559,34 @@ public class InterpolantExtractor {
                 }
             }
         }
+        if (e1 instanceof ArrayElementWrite) {
+            ArrayElementWrite w = (ArrayElementWrite) e1;
+
+            ret = Conjunction.create(ret, Equals.create(DefaultArrayElementRead.create(w.getArray(), w.getIndex()), w.getNewValue()));
+
+            if (config.enabledVerbose(InterpolantExtractor.class)) {
+                System.out.println("[WARNING] Adding: " + DefaultArrayElementRead.create(w.getArray(), w.getIndex()) + " = " + w.getNewValue());
+            }
+        }
+        if (e2 instanceof ArrayElementWrite) {
+            ArrayElementWrite w = (ArrayElementWrite) e2;
+
+            ret = Conjunction.create(ret, Equals.create(DefaultArrayElementRead.create(w.getArray(), w.getIndex()), w.getNewValue()));
+
+            if (config.enabledVerbose(InterpolantExtractor.class)) {
+                System.out.println("[WARNING] Adding: " + DefaultArrayElementRead.create(w.getArray(), w.getIndex()) + " = " + w.getNewValue());
+            }
+        }
 
         ret = Conjunction.create(ret, Equals.create(e1, e2));
+
+        if (config.enabledVerbose(InterpolantExtractor.class)) {
+            if (e1 != oldE1 && e2 != oldE2) {
+                System.out.println("[WARNING] Adding: " + e1 + " = " + e2);
+                System.out.println("[WARNING] Removing: " + oldE1 + " = " + oldE2);
+            }
+        }
+
 
         return ret;
     }
