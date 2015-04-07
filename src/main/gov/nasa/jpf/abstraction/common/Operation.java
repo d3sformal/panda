@@ -33,4 +33,15 @@ public abstract class Operation extends DefaultPrimitiveExpression {
     public Predicate getPreconditionForBeingFresh() {
         return Disjunction.create(a.getPreconditionForBeingFresh(), b.getPreconditionForBeingFresh());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (getClass().equals(o.getClass())) {
+            Operation op = (Operation) o;
+
+            return a.equals(op.a) && b.equals(op.b);
+        }
+
+        return false;
+    }
 }
