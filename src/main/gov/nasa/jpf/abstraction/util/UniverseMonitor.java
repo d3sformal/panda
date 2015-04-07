@@ -72,11 +72,11 @@ public class UniverseMonitor extends ListenerAdapter {
     private void inspectLocal(Abstraction abs) {
         PredicateAbstraction predicate = (PredicateAbstraction) abs;
         Universe universe = predicate.getSymbolTable().getUniverse();
-        Set<StructuredValueIdentifier> values = universe.getStructuredValues();
 
         System.out.println("--UNIVERSE " + universe.hashCode() +  "--");
 
         Set<UniverseIdentifier> reachable = new HashSet<UniverseIdentifier>();
+        Set<StructuredValueIdentifier> values = new HashSet<StructuredValueIdentifier>();
 
         ThreadInfo ti = ThreadInfo.getCurrentThread();
         StackFrame sf = ti.getTopFrame();
@@ -86,11 +86,11 @@ public class UniverseMonitor extends ListenerAdapter {
                 LocalVarInfo var = sf.getLocalVarInfo(i);
 
                 if (var != null) {
-                    values.add(new Reference(ti.getElementInfo(sf.getLocalVariable(var.getSlotIndex()))));
+                    reachable.add(new Reference(ti.getElementInfo(sf.getLocalVariable(var.getSlotIndex()))));
                 }
             }
 
-            reachable = universe.computeReachable(values);
+            reachable = universe.computeReachable(reachable);
 
             for (UniverseIdentifier id : reachable) {
                 if (id instanceof StructuredValueIdentifier) {

@@ -24,13 +24,21 @@ public class StackConcreteValueMonitor extends ListenerAdapter {
         //NOT HANDLING LONGS...
         System.out.println("--CONCRETE VALUES --");
         for (int i = 0; i <= (sf.getTopPos() - sf.getLocalVariableCount()); ++i) {
-            System.out.print(i + ": " + sf.peek(i));
+            System.out.print(i + ": ");
             if (sf.isReferenceSlot(i)) {
                 ElementInfo ei = ti.getElementInfo(sf.peek(i));
 
-                if (ei != null && ei.isStringObject()) {
-                    System.out.print(" -> \"" + ei.asString() + "\"");
+                if (ei == null) {
+                    System.out.print("null");
+                } else {
+                    System.out.print(sf.peek(i));
+
+                    if (ei.isStringObject()) {
+                        System.out.print(" -> \"" + ei.asString() + "\"");
+                    }
                 }
+            } else {
+                System.out.print(sf.peek(i));
             }
             System.out.println();
         }
