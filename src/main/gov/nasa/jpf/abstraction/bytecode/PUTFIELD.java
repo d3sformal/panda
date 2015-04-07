@@ -8,10 +8,12 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.Types;
 
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 
 public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
 
@@ -50,6 +52,10 @@ public class PUTFIELD extends gov.nasa.jpf.jvm.bytecode.PUTFIELD {
                 break;
 
             default:
+        }
+
+        if (ei == null) {
+            PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Equals.create(to, NullExpression.create()), sf.getMethodInfo(), getPosition());
         }
 
         AccessExpression field = DefaultObjectFieldRead.create(to, getFieldName());

@@ -1,13 +1,17 @@
 package gov.nasa.jpf.abstraction.bytecode;
 
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MJIEnv;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 
 /**
  * Loads a value of a field of an object (identified by objRef) onto the stack
@@ -26,6 +30,10 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
         AccessExpression path = DefaultObjectFieldRead.create(from, getFieldName());
 
         Instruction expectedNextInsn = JPFInstructionAdaptor.getStandardNextInstruction(this, ti);
+
+        if (sf.peek() == MJIEnv.NULL) {
+            PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Equals.create(from, NullExpression.create()), sf.getMethodInfo(), getPosition());
+        }
 
         Instruction actualNextInsn = super.execute(ti);
 
