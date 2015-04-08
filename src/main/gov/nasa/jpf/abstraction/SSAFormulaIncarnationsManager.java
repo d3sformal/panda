@@ -6,9 +6,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import gov.nasa.jpf.abstraction.common.Add;
+import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.Modulo;
+import gov.nasa.jpf.abstraction.common.Operation;
+import gov.nasa.jpf.abstraction.common.Multiply;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Subtract;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
@@ -157,6 +163,63 @@ public class SSAFormulaIncarnationsManager {
         }
 
         return null;
+    }
+
+    public Expression clear(Expression expr) {
+        if (expr instanceof AccessExpression) {
+            return clear((AccessExpression) expr);
+        }
+        if (expr instanceof Operation) {
+            return clear((Operation) expr);
+        }
+        return expr;
+    }
+
+    public AccessExpression clear(AccessExpression expr) {
+        if (expr instanceof Root) {
+            Root r = (Root) expr;
+
+            return DefaultRoot.create(r.getName().replaceAll("ssa_[0-9]*_frame_[0-9]*_", ""));
+        }
+        if (expr instanceof ObjectFieldRead) {
+            ObjectFieldRead fr = (ObjectFieldRead) expr;
+
+            return DefaultObjectFieldRead.create(clear(fr.getObject()), clear(fr.getField()));
+        }
+        if (expr instanceof ArrayElementRead) {
+            ArrayElementRead ar = (ArrayElementRead) expr;
+
+            return DefaultArrayElementRead.create(clear(ar.getArray()), clear(ar.getIndex()));
+        }
+        return expr;
+    }
+
+    public Field clear(Field f) {
+        if (f instanceof DefaultField) {
+            return DefaultField.create(f.getName().replaceAll("ssa_[0-9]*_", ""));
+        }
+
+        return f;
+    }
+
+    public Expression clear(Operation expr) {
+        if (expr instanceof Add) {
+            return Add.create(clear(expr.a), clear(expr.b));
+        }
+        if (expr instanceof Subtract) {
+            return Subtract.create(clear(expr.a), clear(expr.b));
+        }
+        if (expr instanceof Multiply) {
+            return Multiply.create(clear(expr.a), clear(expr.b));
+        }
+        if (expr instanceof Divide) {
+            return Divide.create(clear(expr.a), clear(expr.b));
+        }
+        if (expr instanceof Modulo) {
+            return Modulo.create(clear(expr.a), clear(expr.b));
+        }
+
+        return expr;
     }
 
     @Override
