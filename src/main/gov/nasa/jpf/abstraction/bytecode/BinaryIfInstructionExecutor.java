@@ -121,49 +121,49 @@ public class BinaryIfInstructionExecutor {
 
             if (cg instanceof AbstractChoiceGenerator) {
                 conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
-
-                if (expr1 != null && expr2 != null) {
-                    Predicate predicate = br.createPredicate(expr1, expr2);
-                    PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)), br.getSelf().getMethodInfo(), br.getTarget(ti, conditionValue ? 1 : 0).getPosition());
-
-                    if (PandaConfig.getInstance().trackExactValueForLoopControlVariable() && !conditionValue) {
-                        Instruction bJumpCandidate = br.getSelf();
-                        Instruction cmpStart = br.getSelf();
-
-                        /*
-                        // find the first instruction of the comparison operands load (based on the structured of the compared expressions)
-                        cmpStart = unwindExprLoad(cmpStart, expr1);
-                        cmpStart = unwindExprLoad(cmpStart, expr2);
-                        */
-
-                        int start = cmpStart.getPosition();
-                        int end = start;
-
-                        while (bJumpCandidate != null) {
-                            if (bJumpCandidate instanceof gov.nasa.jpf.jvm.bytecode.GOTO) {
-                                gov.nasa.jpf.jvm.bytecode.GOTO gt = (gov.nasa.jpf.jvm.bytecode.GOTO) bJumpCandidate;
-
-                                //if (gt.getTarget() == cmpStart) { // find a matching backjump
-                                if (gt.getTarget().getPosition() < cmpStart.getPosition()) { // find the first jump to a location before comparison
-                                    end = gt.getPosition();
-                                    break;
-                                }
-                            }
-
-                            bJumpCandidate = bJumpCandidate.getNext();
-                        }
-
-                        Predicate eq = Equals.create(expr1, Constant.create(v1));
-
-                        eq.setScope(new BytecodeInterval(start, end));
-
-                        PredicateAbstraction.getInstance().getPredicateValuation().force(eq, TruthValue.UNKNOWN);
-                    }
-                }
             } else if (cg instanceof IntChoiceFromList) {
                 conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
             } else {
                 throw new RuntimeException("expected AbstractChoiceGenerator, got: " + cg);
+            }
+
+            if (expr1 != null && expr2 != null) {
+                Predicate predicate = br.createPredicate(expr1, expr2);
+                PredicateAbstraction.getInstance().informAboutBranchingDecision(new BranchingConditionValuation(predicate, TruthValue.create(conditionValue)), br.getSelf().getMethodInfo(), br.getTarget(ti, conditionValue ? 1 : 0).getPosition());
+
+                if (PandaConfig.getInstance().trackExactValueForLoopControlVariable() && !conditionValue) {
+                    Instruction bJumpCandidate = br.getSelf();
+                    Instruction cmpStart = br.getSelf();
+
+                    /*
+                    // find the first instruction of the comparison operands load (based on the structured of the compared expressions)
+                    cmpStart = unwindExprLoad(cmpStart, expr1);
+                    cmpStart = unwindExprLoad(cmpStart, expr2);
+                    */
+
+                    int start = cmpStart.getPosition();
+                    int end = start;
+
+                    while (bJumpCandidate != null) {
+                        if (bJumpCandidate instanceof gov.nasa.jpf.jvm.bytecode.GOTO) {
+                            gov.nasa.jpf.jvm.bytecode.GOTO gt = (gov.nasa.jpf.jvm.bytecode.GOTO) bJumpCandidate;
+
+                            //if (gt.getTarget() == cmpStart) { // find a matching backjump
+                            if (gt.getTarget().getPosition() < cmpStart.getPosition()) { // find the first jump to a location before comparison
+                                end = gt.getPosition();
+                                break;
+                            }
+                        }
+
+                        bJumpCandidate = bJumpCandidate.getNext();
+                    }
+
+                    Predicate eq = Equals.create(expr1, Constant.create(v1));
+
+                    eq.setScope(new BytecodeInterval(start, end));
+
+                    PredicateAbstraction.getInstance().getPredicateValuation().force(eq, TruthValue.UNKNOWN);
+                }
             }
         }
 
