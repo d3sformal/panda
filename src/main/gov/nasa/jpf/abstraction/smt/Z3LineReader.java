@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.common.PredicatesFactory;
 
 public class Z3LineReader implements Closeable {
@@ -39,6 +40,11 @@ public class Z3LineReader implements Closeable {
     private String out() {
         String s = new String(buf, 0, len - 1);
         len = 0;
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            System.out.println("Z3: " + s);
+        }
+
         return s;
     }
 
@@ -79,9 +85,9 @@ public class Z3LineReader implements Closeable {
 
     public static void main(String[] args) throws Exception {
         Z3LineReader r = new Z3LineReader(new java.io.FileReader(args[0]));
-        
+
         String line;
-        
+
         while ((line = r.readLine()) != null) {
             System.out.println("Z3: " + line);
             if (!line.equals("unsat")) {

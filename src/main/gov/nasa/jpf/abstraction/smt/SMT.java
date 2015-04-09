@@ -819,6 +819,14 @@ public class SMT {
 
             notifyInterpolateExecuted(interpolants);
 
+            if (config.enabledVerbose(this.getClass())) {
+                System.out.println("Interpolants: ");
+
+                for (int i = 0; i < interpolants.length; ++i) {
+                    System.out.println("\t" + interpolants[i]);
+                }
+            }
+
             return interpolants;
         } catch (IOException e) {
             System.err.println("SMT refuses to provide output.");
