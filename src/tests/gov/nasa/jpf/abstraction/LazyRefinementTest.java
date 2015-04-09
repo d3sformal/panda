@@ -8,9 +8,8 @@ import static gov.nasa.jpf.abstraction.statematch.StateMatchingTest.assertVisite
 public class LazyRefinementTest extends BaseTest {
     public LazyRefinementTest() {
         config.add("+panda.refinement=true");
-        config.add("+panda.branch.prune_infeasible=true");
-        config.add("+panda.branch.nondet_force_feasible=true");
-        config.add("+search.multiple_errors=true");
+        config.add("+panda.refinement.method_global=false"); // Needs to be disabled to minimize the risk of backtracking past the choice generator in `createChoices`
+        config.add("+search.multiple_errors=true"); // Needs to be enabled for the asserts to work
     }
 
     private final static int choices = 1000;
