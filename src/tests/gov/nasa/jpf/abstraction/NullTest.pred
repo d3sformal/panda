@@ -1,8 +1,12 @@
 [method gov.nasa.jpf.abstraction.NullTest.test1]
 alength(arrlen, array) > 1
+alength(arrlen, array) > i
+i >= 0
 
 [method gov.nasa.jpf.abstraction.NullTest.test2]
 alength(arrlen, array) > 1
+alength(arrlen, array) > i
+i >= 0
 
 [method gov.nasa.jpf.abstraction.NullTest.test3]
 alength(arrlen, array) > 1
