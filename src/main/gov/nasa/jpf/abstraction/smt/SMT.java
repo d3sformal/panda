@@ -747,6 +747,12 @@ public class SMT {
 
                             if (!satisfiable) {
                                 methodInterpolants = PredicatesFactory.createInterpolantsFromString(output);
+
+                                for (int i = 0; i < methodInterpolants.length; ++i) {
+                                    if (!(methodInterpolants[i] instanceof Tautology) && config.enabledVerbose(this.getClass())) {
+                                        System.out.println("\t... inserting interpolant `" + methodInterpolants[i] + "` to " + (m.get(i) + 1));
+                                    }
+                                }
                             }
                             break;
                         case Z3:
@@ -759,6 +765,10 @@ public class SMT {
                                     output = interpol.out.readLine();
 
                                     methodInterpolants[i] = PredicatesFactory.createInterpolantFromString(output);
+
+                                    if (!(methodInterpolants[i] instanceof Tautology) && config.enabledVerbose(this.getClass())) {
+                                        System.out.println("\t... inserting interpolant `" + methodInterpolants[i] + "` to " + (m.get(i) + 1));
+                                    }
                                 }
                             }
                             break;
@@ -767,10 +777,6 @@ public class SMT {
                     if (!satisfiable) {
                         for (int i = 0; i < m.size(); ++i) {
                             if (m.get(i) < interpolants.length) {
-                                if (!(methodInterpolants[i] instanceof Tautology) && config.enabledVerbose(this.getClass())) {
-                                    System.out.println("\t... inserting interpolant `" + methodInterpolants[i] + "` to " + (m.get(i) + 1));
-                                }
-
                                 Predicate p = interpolants[m.get(i)];
 
                                 p = Conjunction.create(p, methodInterpolants[i]);
