@@ -52,6 +52,7 @@ public class PandaConfig {
     private Boolean trackExactValueForLoopControlVariable;
     private Boolean monitorEntireUniverse;
     private FreshnessEncoding freshnessEncoding;
+    private Boolean extendPredicatesOverAnonymousToDestinations;
 
     public enum FreshnessEncoding {
         ASSIGN_REFERENCE,
@@ -434,5 +435,13 @@ public class PandaConfig {
         }
 
         return freshnessEncoding;
+    }
+
+    public boolean extendPredicatesOverAnonymousToDestinations() {
+        if (extendPredicatesOverAnonymousToDestinations == null) {
+            extendPredicatesOverAnonymousToDestinations = getUnderlyingConfig().getBoolean("panda.refinement.extend_predicates_over_anonymous_to_destinations");
+        }
+
+        return extendPredicatesOverAnonymousToDestinations;
     }
 }

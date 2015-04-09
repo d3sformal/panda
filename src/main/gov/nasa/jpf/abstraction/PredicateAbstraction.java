@@ -891,6 +891,58 @@ public class PredicateAbstraction extends Abstraction {
 
                 List<MethodInfo> refinedMethods = new ArrayList<MethodInfo>();
 
+                if (config.extendPredicatesOverAnonymousToDestinations()) {
+                    Map<AccessExpression, Expression> anonDest = new HashMap<AccessExpression, Expression>();
+
+                    // Collect destinations where the anonymous objects were stored
+                    // create copies over anonymous objects, only using the destinations
+                    for (Step s : traceFormula) {
+                        if (s.getPredicate() instanceof VariableAssign) {
+                            VariableAssign a = (VariableAssign) s.getPredicate();
+
+                            if (a.expression instanceof AnonymousObject) {
+                                AnonymousObject anon = (AnonymousObject) a.expression;
+
+                                anonDest.put(anon, ssa.clear(a.variable));
+                            }
+                        }
+                        if (s.getPredicate() instanceof FieldAssign) {
+                            FieldAssign a = (FieldAssign) s.getPredicate();
+
+                            if (a.newField instanceof ObjectFieldWrite) {
+                                ObjectFieldWrite fw = (ObjectFieldWrite) a.newField;
+
+                                if (fw.getNewValue() instanceof AnonymousObject) {
+                                    AnonymousObject anon = (AnonymousObject) fw.getNewValue();
+
+                                    anonDest.put(anon, DefaultObjectFieldRead.create(ssa.clear(fw.getObject()), ssa.clear(fw.getField())));
+                                }
+                            }
+                        }
+                        if (s.getPredicate() instanceof ArraysAssign) {
+                            ArraysAssign a = (ArraysAssign) s.getPredicate();
+
+                            if (a.newArrays instanceof ArrayElementWrite) {
+                                ArrayElementWrite aw = (ArrayElementWrite) a.newArrays;
+
+                                if (aw.getNewValue() instanceof AnonymousObject) {
+                                    AnonymousObject anon = (AnonymousObject) aw.getNewValue();
+
+                                    anonDest.put(anon, DefaultArrayElementRead.create(ssa.clear(aw.getArray()), ssa.clear(aw.getIndex())));
+                                }
+                            }
+                        }
+                    }
+
+                    for (int i = 0; i < interpolants.length; ++i) {
+                        Predicate interpolant = interpolants[i].replace(anonDest);
+
+                        if (interpolant != interpolants[i] && !(interpolant instanceof Contradiction)) {
+                            interpolants[i] = Conjunction.create(interpolants[i], interpolant);
+                        }
+                    }
+                }
+
                 for (int i = 0; i < interpolants.length; ++i) {
                     Predicate interpolant = interpolants[i];
 
