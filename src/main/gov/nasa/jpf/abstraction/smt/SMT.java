@@ -380,6 +380,9 @@ public class SMT {
             "(declare-fun shl (Int Int) Int)" + separator +
             "(declare-fun shr (Int Int) Int)" + separator +
 
+            // Fresh symbol discriminator
+            "(declare-fun ref (Int) Int)" + separator +
+
             separator
         );
 

@@ -26,6 +26,7 @@ import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrayLengths;
 import gov.nasa.jpf.abstraction.common.impl.ArraysAssign;
 import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
+import gov.nasa.jpf.abstraction.common.impl.New;
 import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.EmptyExpression;
 
@@ -397,6 +398,16 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
         ret.append(" = ");
 
         predicate.newArrays.accept(this);
+    }
+
+    @Override
+    public void visit(New predicate) {
+        ret.append("ref(");
+        predicate.object.accept(this);
+
+        ret.append(") = ");
+
+        ret.append(predicate.object.getReference().getReferenceNumber());
     }
 
     @Override

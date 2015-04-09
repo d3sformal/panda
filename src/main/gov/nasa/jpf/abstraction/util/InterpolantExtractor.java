@@ -36,6 +36,7 @@ import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldWrite;
 import gov.nasa.jpf.abstraction.common.access.impl.Select;
 import gov.nasa.jpf.abstraction.common.access.impl.Store;
+import gov.nasa.jpf.abstraction.common.access.meta.Arrays;
 
 public class InterpolantExtractor {
     public static void collectQuantifiedVarValues(Predicate p, Map<Root, Set<Expression>> values) {
@@ -382,6 +383,33 @@ public class InterpolantExtractor {
         }
 
         return null;
+    }
+
+    public static Predicate eq(Arrays a, Expression e) {
+        // arr = (awrite ... ... ... ...)
+        if (e instanceof ArrayElementWrite) {
+            ArrayElementWrite w = (ArrayElementWrite) e;
+
+            Predicate ret = eq(DefaultArrayElementRead.create(w.getArray(), w.getIndex()), w.getNewValue());
+
+            System.out.println("[WARNING] Removing: " + a + " = " + e);
+
+            return ret;
+        }
+        // arr = (store ... ... ...)
+        if (e instanceof Store) {
+            Store s = (Store) e;
+
+            if (s.isRoot()) {
+                Predicate ret = eq(Select.create((AccessExpression) s.getIndex()), s.getValue());
+
+                System.out.println("[WARNING] Removing: " + a + " = " + e);
+
+                return ret;
+            }
+        }
+
+        throw new RuntimeException("No idea what to do with: " + a + " = " + e);
     }
 
     public static Predicate eq(Expression e1, Expression e2) {

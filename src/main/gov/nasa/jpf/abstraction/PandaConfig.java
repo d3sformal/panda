@@ -51,6 +51,12 @@ public class PandaConfig {
     private String refinementDumpAbstractionPredicatesTo;
     private Boolean trackExactValueForLoopControlVariable;
     private Boolean monitorEntireUniverse;
+    private FreshnessEncoding freshnessEncoding;
+
+    public enum FreshnessEncoding {
+        ASSIGN_REFERENCE,
+        DIFFERENCE
+    }
 
     protected PandaConfig() {
     }
@@ -420,5 +426,13 @@ public class PandaConfig {
         }
 
         return monitorEntireUniverse;
+    }
+
+    public FreshnessEncoding getFreshnessEncoding() {
+        if (freshnessEncoding == null) {
+            freshnessEncoding = getUnderlyingConfig().getEnum("panda.refinement.trace.freshness_encoding", FreshnessEncoding.class.getEnumConstants(), FreshnessEncoding.ASSIGN_REFERENCE);
+        }
+
+        return freshnessEncoding;
     }
 }

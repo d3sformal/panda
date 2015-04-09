@@ -33,6 +33,7 @@ import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.common.impl.ArraysAssign;
 import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
+import gov.nasa.jpf.abstraction.common.impl.New;
 import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
@@ -223,6 +224,19 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
         ret.append(" ");
 
         predicate.newArrays.accept(this);
+
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(New predicate) {
+        ret.append("(= (ref ");
+
+        predicate.object.accept(this);
+
+        ret.append(") ");
+
+        ret.append(predicate.object.getReference().getReferenceNumber());
 
         ret.append(")");
     }

@@ -68,6 +68,7 @@ import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.common.impl.ArraysAssign;
 import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
+import gov.nasa.jpf.abstraction.common.impl.New;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
@@ -546,10 +547,18 @@ public class PredicateAbstraction extends Abstraction {
 
         Predicate fresh = Tautology.create();
 
-        for (AccessExpression ae : exprs) {
-            if (!(ae instanceof ObjectFieldWrite) && !(ae instanceof ArrayElementWrite) && !(ae instanceof ArrayLengthWrite)) {
-                fresh = Conjunction.create(fresh, Negation.create(Equals.create(ae, object)));
-            }
+        switch (PandaConfig.getInstance().getFreshnessEncoding()) {
+            case ASSIGN_REFERENCE:
+                fresh = New.create(object);
+                break;
+
+            case DIFFERENCE:
+                for (AccessExpression ae : exprs) {
+                    if (!(ae instanceof ObjectFieldWrite) && !(ae instanceof ArrayElementWrite) && !(ae instanceof ArrayLengthWrite)) {
+                        fresh = Conjunction.create(fresh, Negation.create(Equals.create(ae, object)));
+                    }
+                }
+                break;
         }
 
         Predicate constraint = Tautology.create();

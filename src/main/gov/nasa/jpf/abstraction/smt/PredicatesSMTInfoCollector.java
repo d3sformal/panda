@@ -62,6 +62,7 @@ import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultArrays;
 import gov.nasa.jpf.abstraction.common.access.meta.impl.DefaultField;
 import gov.nasa.jpf.abstraction.common.impl.ArraysAssign;
 import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
+import gov.nasa.jpf.abstraction.common.impl.New;
 import gov.nasa.jpf.abstraction.common.impl.NullExpression;
 import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
 import gov.nasa.jpf.abstraction.concrete.AnonymousArray;
@@ -209,6 +210,11 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
     public void visit(ArraysAssign predicate) {
         predicate.arrays.accept(this);
         predicate.newArrays.accept(this);
+    }
+
+    @Override
+    public void visit(New predicate) {
+        predicate.object.accept(this);
     }
 
     @Override

@@ -20,6 +20,8 @@ grammar Interpolants;
     import gov.nasa.jpf.abstraction.common.impl.*;
     import gov.nasa.jpf.abstraction.common.access.*;
     import gov.nasa.jpf.abstraction.common.access.impl.*;
+    import gov.nasa.jpf.abstraction.common.access.meta.*;
+    import gov.nasa.jpf.abstraction.common.access.meta.impl.*;
     import gov.nasa.jpf.abstraction.concrete.*;
     import gov.nasa.jpf.abstraction.state.universe.*;
     import gov.nasa.jpf.abstraction.util.*;
@@ -122,6 +124,28 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
 
         $ctx.val = p;
     }
+    | '(' EXISTS_TOKEN {PredicateContext.let.enterNested(); String vars = "";} '(' ('(' '%' n=CONSTANT_TOKEN TYPE_TOKEN ')' {vars += " %" + $n.text; PredicateContext.let.put("%" + Integer.parseInt($n.text), DefaultRoot.create("%" + Integer.parseInt($n.text)));} )+ ')' '(' '!' p=predicate ':qid' 'itp' ')' ')' {
+        PredicateContext.let.exitNested();
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            InterpolantExtractor.println("[WARNING] Omitting quantifier in EXISTS " + vars + ": " + $p.val);
+        }
+
+        // Collect values that the quantified variables may possess
+        Map<Root, Set<Expression>> eqOptions = new HashMap<Root, Set<Expression>>();
+
+        InterpolantExtractor.collectQuantifiedVarValues($p.val, eqOptions);
+
+        Predicate p = InterpolantExtractor.expandQuantifiedVars($p.val, eqOptions);
+
+        if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
+            InterpolantExtractor.println("[WARNING] Expanding quantified formula EXISTS" + vars + " using " + eqOptions + ": ");
+            System.out.print("[WARNING] \t\t");
+            InterpolantExtractor.println(p.toString());
+        }
+
+        $ctx.val = p;
+    }
     | '(=>' p=predicate q=predicate ')' {
         $ctx.val = Disjunction.create(Negation.create($p.val), $q.val);
     }
@@ -169,6 +193,12 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
     }
     | '(=' a=expression b=expression ')' {
         $ctx.val = InterpolantExtractor.eq($a.val, $b.val);
+    }
+    | '(=' arr=ARR_TOKEN b=expression ')' {
+        $ctx.val = InterpolantExtractor.eq(DefaultArrays.create(), $b.val);
+    }
+    | '(=' a=expression arr=ARR_TOKEN ')' {
+        $ctx.val = InterpolantExtractor.eq(DefaultArrays.create(), $a.val);
     }
     | '(=' a=expression NULL_TOKEN ')' {
         $ctx.val = InterpolantExtractor.eq($a.val, NullExpression.create());
@@ -236,8 +266,22 @@ factor returns [Expression val]
     | '(' SELECT_TOKEN ARRLEN_TOKEN p=path ')' {
         $ctx.val = DefaultArrayLengthRead.create($p.val);
     }
+    | '(' SELECT_TOKEN ARRLEN_TOKEN '%' n=CONSTANT_TOKEN ')' {
+        AccessExpression ae = (AccessExpression) PredicateContext.let.get("%" + Integer.parseInt($n.text));
+
+        $ctx.val = DefaultArrayLengthRead.create(ae);
+    }
     | p=path {
         $ctx.val = $p.val;
+    }
+    | '(' REF_TOKEN p=path ')' {
+        if ($p.val instanceof AnonymousObject) {
+            AnonymousObject ao = (AnonymousObject) $p.val;
+
+            $ctx.val = Constant.create(ao.getReference().getReferenceNumber());
+        } else {
+            $ctx.val = $p.val;
+        }
     }
     | '(' e=expression ')' {
         $ctx.val = $e.val;
@@ -290,8 +334,23 @@ path returns [DefaultAccessExpression val]
 
         $ctx.val = Select.create(ae, $e.val);
     }
+    | '(' SELECT_TOKEN a=ARR_TOKEN id=ID_TOKEN '!' n=CONSTANT_TOKEN ')' {
+        AccessExpression ae = (AccessExpression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
+
+        $ctx.val = Select.create(ae);
+    }
+    | '(' SELECT_TOKEN a=ARR_TOKEN '.' id=ID_TOKEN ')' {
+        AccessExpression ae = (AccessExpression) PredicateContext.let.get($id.text);
+
+        $ctx.val = Select.create(ae);
+    }
     | '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' {
         $ctx.val = Select.create($p.val);
+    }
+    | '(' SELECT_TOKEN a=ARR_TOKEN '%' n=CONSTANT_TOKEN ')' {
+        AccessExpression ae = (AccessExpression) PredicateContext.let.get("%" + Integer.parseInt($n.text));
+
+        $ctx.val = Select.create(ae);
     }
     | '(' SELECT_TOKEN p=path e=expression ')' {
         $ctx.val = Select.create($p.val, $e.val);
@@ -322,6 +381,7 @@ ARR_TOKEN      : 'ssa_'[0-9]+'_arr';
 ARRLEN_TOKEN   : 'arrlen';
 CLASS_TOKEN    : 'class_'[a-zA-Z0-9_$]+;
 DISTINCT_TOKEN : 'distinct';
+EXISTS_TOKEN   : 'exists';
 FALSE_TOKEN    : 'false';
 //FIELD_TOKEN    : 'field_ssa_'[0-9]+'_'[a-zA-Z$_][a-zA-Z0-9$_]*; // FIELD_TOKEN could appear in equalities and we don't have the machinery for that
 FORALL_TOKEN   : 'forall';
@@ -332,6 +392,7 @@ LET_TOKEN      : 'let';
 NOT_TOKEN      : 'not';
 NULL_TOKEN     : 'null';
 OR_TOKEN       : 'or';
+REF_TOKEN      : 'ref';
 RETURN_TOKEN   : 'var_ssa_'[0-9]+'_frame_'[0-9]+'_return'('_pc'[0-9]+)?;
 SELECT_TOKEN   : 'select';
 STORE_TOKEN    : 'store';
