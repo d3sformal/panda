@@ -13,6 +13,8 @@ pos = 8
 pos = 9
 pos = 10
 
+pos < alength(arrlen, data)
+
 j = 0
 j = 1
 j = 2
