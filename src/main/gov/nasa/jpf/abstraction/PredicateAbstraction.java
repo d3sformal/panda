@@ -558,6 +558,27 @@ public class PredicateAbstraction extends Abstraction {
                         fresh = Conjunction.create(fresh, Negation.create(Equals.create(ae, object)));
                     }
                 }
+
+                /**
+                 * Create a virtual scope for NEW
+                 * This allows cutting out the global comparison which introduces out-of-scope symbols
+                 *
+                 * We might want to add constraint:
+                 *
+                 *   fresh_1 != frame_1_x and fresh_1 != frame_2_y
+                 *
+                 * where only frame_2_y is in the scope, while frame_1_x is here only to say that fresh_1 is really fresh
+                 *
+                 * By creating a new scope (for the same method and the precise PC) we allow adding the interpolants at the PC
+                 * but treat the statement separatelly from the rest of the method (thus not pulling in all the symbols).
+                 */
+                traceFormula.markCallInvoked(m);
+                traceFormula.markCallStarted();
+                extendTraceFormulaWith(fresh, m, pc, false);
+                traceFormula.markReturn();
+                traceFormula.markReturned();
+                fresh = Tautology.create();
+
                 break;
         }
 
