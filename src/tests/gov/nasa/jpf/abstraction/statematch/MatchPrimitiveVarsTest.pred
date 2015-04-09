@@ -6,6 +6,7 @@
 n = 0
 n = 1
 c = 0
+alength(arrlen, array) = 0..1
 
 [method gov.nasa.jpf.abstraction.statematch.MatchPrimitiveVarsTest.test2]
 n = 0
