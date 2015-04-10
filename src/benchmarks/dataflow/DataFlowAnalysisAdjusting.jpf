@@ -8,6 +8,7 @@ sourcepath=${jpf-abstraction}/src/benchmarks
 #panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/dataflow/DataFlowAnalysis.pred
 panda.abstract_domain=PREDICATES
 panda.refinement=true
+panda.refinement.extend_predicates_over_anonymous_to_destinations=true
 panda.refinement.heuristic=gov.nasa.jpf.abstraction.heuristic.MethodGlobalRefinementHeuristic
 panda.refinement.trace.initialize_array_elements=false
 

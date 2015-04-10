@@ -9,7 +9,8 @@ sourcepath=${jpf-abstraction}/src/benchmarks
 panda.abstract_domain=PREDICATES
 panda.refinement=true
 
-#listener+=,gov.nasa.jpf.abstraction.util.ExecTracker
-#listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker
-#listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor
-#listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener
+# Without precise tracking of loop variables any loop may be re-entered abstractly
+# Image contains a loop allocating objects
+# The iterations do not match due to the different heaps
+# To avoid infinite exploration we enable this option
+panda.branch.track_exact_value_for_loop_control_variable=true
