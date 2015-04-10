@@ -27,6 +27,7 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.PandaConfig;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.Step;
 import gov.nasa.jpf.abstraction.TraceFormula;
 import gov.nasa.jpf.abstraction.common.Conjunction;
@@ -49,6 +50,7 @@ import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultFresh;
 import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
 import gov.nasa.jpf.abstraction.state.TruthValue;
+import gov.nasa.jpf.abstraction.state.universe.Universe;
 import gov.nasa.jpf.abstraction.util.Pair;
 
 /**
@@ -1053,22 +1055,31 @@ public class SMT {
     private void appendFreshConstraints(Set<Integer> fresh, Set<AccessExpression> objects, StringBuilder input, String separator) {
         Set<String> freshConstraints = new HashSet<String>();
 
+        PredicateAbstraction abs = PredicateAbstraction.getInstance();
+        Universe universe = abs.getSymbolTable().get(0).getUniverse();
+        AnonymousObject anon = AnonymousObject.create(universe.getFresh());
+
+        fresh.add(anon.getReference().getReferenceNumber());
+
         for (int id : fresh) {
             input.append("(declare-fun fresh_" + id + " () Int)" + separator);
         }
 
-        for (AccessExpression object : objects) {
-            Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh()), Negation.create(Equals.createUnminimized(DefaultFresh.create(), object)));
-
-            freshConstraints.add("(assert " + convertToString(distinction) + ")" + separator);
+        // All fresh symbols are different
+        if (fresh.size() > 1) {
+            input.append("(assert (distinct");
+            for (int id : fresh) {
+                input.append(" fresh_");
+                input.append(id);
+            }
+            input.append("))");
+            input.append(separator);
         }
 
-        for (int id1 : fresh) {
-            for (int id2 : fresh) {
-                if (id1 > id2) {
-                    freshConstraints.add("(assert (not (= fresh_" + id1 + " fresh_" + id2 + ")))" + separator);
-                }
-            }
+        for (AccessExpression object : objects) {
+            Predicate distinction = Implication.create(Negation.create(object.getPreconditionForBeingFresh().replace(DefaultFresh.create(), anon)), Negation.create(Equals.createUnminimized(anon, object)));
+
+            freshConstraints.add("(assert " + convertToString(distinction) + ")" + separator);
         }
 
         for (String constraint : freshConstraints) {
@@ -1240,7 +1251,9 @@ public class SMT {
         appendArraysDeclarations(arrays, input, separator);
 
         if (!fresh.isEmpty()) {
-            appendFreshConstraints(fresh, objects, input, separator);
+            Set<AccessExpression> nonFreshObjects = Collections.emptySet();
+
+            appendFreshConstraints(fresh, nonFreshObjects, input, separator);
         }
 
         input.append("(assert "); input.append(state); input.append(")"); input.append(separator);

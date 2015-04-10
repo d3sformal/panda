@@ -27,6 +27,7 @@ public class Universe {
 
     private Map<StructuredValueIdentifier, StructuredValue> currentStructuredRealization = new HashMap<StructuredValueIdentifier, StructuredValue>();
     private Map<PrimitiveValueIdentifier, PrimitiveValue> currentPrimitiveRealization = new HashMap<PrimitiveValueIdentifier, PrimitiveValue>();
+    private Reference fresh = nullReference;
 
     public Universe() {
         currentStructuredRealization.put(nullReference, new UniverseNull());
@@ -70,6 +71,10 @@ public class Universe {
 
     public PrimitiveValue get(PrimitiveValueIdentifier id) {
         return currentPrimitiveRealization.get(id);
+    }
+
+    public Reference getFresh() {
+        return fresh;
     }
 
     public void put(UniverseIdentifier id, UniverseValue value) {
@@ -142,6 +147,10 @@ public class Universe {
 
         if (contains(identifier)) {
             return identifier;
+        }
+
+        if (identifier instanceof Reference) {
+            fresh = (Reference) identifier;
         }
 
         if (elementInfo.isArray()) {
@@ -267,6 +276,7 @@ public class Universe {
 
         universe.currentStructuredRealization.putAll(currentStructuredRealization);
         universe.currentPrimitiveRealization.putAll(currentPrimitiveRealization);
+        universe.fresh = fresh;
 
         for (StructuredValue value : currentStructuredRealization.values()) {
             value.freeze();
