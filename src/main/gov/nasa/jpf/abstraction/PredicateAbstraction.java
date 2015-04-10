@@ -29,6 +29,7 @@ import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.Abstraction;
+import gov.nasa.jpf.abstraction.assertions.AssertStateMatchingContext;
 import gov.nasa.jpf.abstraction.common.BranchingCondition;
 import gov.nasa.jpf.abstraction.common.BranchingConditionInfo;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
@@ -160,6 +161,7 @@ public class PredicateAbstraction extends Abstraction {
     public PredicateAbstraction(Predicates predicateSet) {
         PandaConfig.reset();
         SMT.reset();
+        AssertStateMatchingContext.reset();
 
         symbolTable = new SystemSymbolTable(this);
         predicateValuation = new SystemPredicateValuation(this, predicateSet);

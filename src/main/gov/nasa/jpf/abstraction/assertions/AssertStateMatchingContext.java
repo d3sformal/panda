@@ -40,4 +40,8 @@ public class AssertStateMatchingContext {
     public static LocationAssertion get(Instruction insn) {
         return assertions.get(insn);
     }
+
+    public static void reset() {
+        assertions.clear();
+    }
 }
