@@ -715,7 +715,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                     // Write predicates over return through (this is useful when called from processMethodReturn)
                     if (PredicateUtil.isPredicateOverReturn(predicate)) {
                         calleeReturns.put(predicate.replace(returnValue, returnValueSpecific), value);
-                    } else {
+                    } else if (value != TruthValue.UNKNOWN) {
                         relevant.put(predicate, value);
                     }
                 } catch (PredicateNotCloneableException e) {
@@ -777,7 +777,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
 
                 if (canBeAffected) {
                     toBeUpdated.add(predicate);
-                } else {
+                } else if (callerScope.get(predicate) != TruthValue.UNKNOWN) {
                     relevant.put(predicate, callerScope.get(predicate));
                 }
             }
