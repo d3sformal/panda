@@ -102,30 +102,6 @@ public class Equals extends Comparison {
 
     @Override
     public Predicate update(AccessExpression expression, Expression newExpression) {
-        /**
-         * a := new Object
-         * a = b ... false
-         */
-        if (a instanceof AccessExpression) {
-            AccessExpression ae = (AccessExpression) a;
-
-            if (expression.equals(ae) && newExpression instanceof AnonymousExpression && !a.equals(b)) {
-                return Contradiction.create();
-            }
-        }
-
-        /**
-         * a := new Object
-         * b = a ... false
-         */
-        if (b instanceof AccessExpression) {
-            AccessExpression be = (AccessExpression) b;
-
-            if (expression.equals(be) && newExpression instanceof AnonymousExpression && !a.equals(b)) {
-                return Contradiction.create();
-            }
-        }
-
         Expression newA = a.update(expression, newExpression);
         Expression newB = b.update(expression, newExpression);
 
