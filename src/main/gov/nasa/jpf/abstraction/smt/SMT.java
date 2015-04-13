@@ -584,45 +584,51 @@ public class SMT {
 
         String separator = InputType.DEBUG.getSeparator();
 
-        StringBuilder input = new StringBuilder();
+        StringBuilder head = new StringBuilder();
 
-        input.append("(push 1)"); input.append(separator);
-
-        appendClassDeclarations(classes, input, separator);
-        appendVariableDeclarations(variables, input, separator);
-        appendFieldDeclarations(fields, input, separator);
-        appendArraysDeclarations(arrays, input, separator);
+        appendClassDeclarations(classes, head, separator);
+        appendVariableDeclarations(variables, head, separator);
+        appendFieldDeclarations(fields, head, separator);
+        appendArraysDeclarations(arrays, head, separator);
 
         if (!fresh.isEmpty()) {
             for (int id : fresh) {
-                input.append("(declare-fun fresh_" + id + " () Int)" + separator);
+                head.append("(declare-fun fresh_" + id + " () Int)" + separator);
             }
         }
 
         int interpolationGroup = 0;
 
-        input.append("(assert (! true :named g0))"); input.append(separator);
+        head.append("(assert (! true :named g0))"); head.append(separator);
         for (Step s : traceFormula) {
-            input.append("(assert (! "); input.append(convertToString(s.getPredicate())); input.append(" :named g"); input.append(++interpolationGroup); input.append("))"); input.append(separator);
+            head.append("(assert (! "); head.append(convertToString(s.getPredicate())); head.append(" :named g"); head.append(++interpolationGroup); head.append("))"); head.append(separator);
         }
 
-        input.append("(check-sat)"); input.append(separator);
+        head.append("(check-sat)"); head.append(separator);
 
         // Overall (Global) interpolants (No notion of method scopes)
         if (config.enabledGlobalRefinement()) {
             switch (type) {
                 case SMTInterpol:
-                    input.append("(get-interpolants");
+                    head.append("(get-interpolants");
                     break;
                 case Z3:
-                    input.append("(get-interpolant");
+                    head.append("(get-interpolant");
                     break;
             }
             for (int i = 1; i <= interpolationGroup; ++i) {
-                input.append(" g"); input.append(i);
+                head.append(" g"); head.append(i);
             }
-            input.append(")"); input.append(separator);
+            head.append(")"); head.append(separator);
         }
+
+        StringBuilder input = new StringBuilder();
+        int batchMaxSize = 1;
+        int batchSize = 0;
+        int batchNum = 0;
+        int batches = (traceFormula.getMethods().size() + batchMaxSize - 1) / batchMaxSize; // ceil
+
+        String[] batch = new String[batches];
 
         // Method scopes intepolants
         for (Pair<MethodInfo, List<Integer>> mp : traceFormula.getMethods()) {
@@ -652,14 +658,28 @@ public class SMT {
 
                 input.append(")"); input.append(separator);
             }
+
+            ++batchSize;
+
+            if (batchSize == batchMaxSize) {
+                batch[batchNum++] = input.toString();
+                input.setLength(0);
+                batchSize = 0;
+            }
         }
 
-        input.append("(pop 1)"); input.append(separator);
+        if (batchSize != 0) {
+            batch[batchNum++] = input.toString();
+            input.setLength(0);
+            batchSize = 0;
+        }
 
         notifyInterpolateInputGenerated(input.toString());
 
         try {
-            interpol.in.write(input.toString());
+            interpol.in.write("(push 1)");
+            interpol.in.write(separator);
+            interpol.in.write(head.toString());
             interpol.in.flush();
         } catch (IOException e) {
             System.err.println("SMT refuses input.");
@@ -667,16 +687,26 @@ public class SMT {
             throw new SMTException(e);
         }
 
+        String output;
+        boolean satisfiable = true;
+
         try {
-            String output = interpol.out.readLine();
+            output = interpol.out.readLine();
 
             if (output == null || !output.matches("^(un)?sat$")) {
                 throw new SMTException("SMT replied with '" + output + "'");
             }
 
-            boolean satisfiable = output.matches("^sat$");
-            Predicate[] interpolants = null;
+            satisfiable = output.matches("^sat$");
+        } catch (IOException e) {
+            System.err.println("SMT refuses to provide output.");
 
+            throw new SMTException(e);
+        }
+
+        Predicate[] interpolants = null;
+
+        try {
             if (config.enabledGlobalRefinement()) {
                 switch (type) {
                     case SMTInterpol:
@@ -709,9 +739,25 @@ public class SMT {
                     }
                 }
             }
+        } catch (IOException e) {
+            System.err.println("SMT refuses to provide output.");
+
+            throw new SMTException(e);
+        }
+
+        for (int k = 0; k < batches; ++k) {
+            try {
+                interpol.in.write(batch[k]);
+                interpol.in.flush();
+            } catch (IOException e) {
+                System.err.println("SMT refuses input.");
+
+                throw new SMTException(e);
+            }
 
             // Inject method-scoped interpolants
-            for (Pair<MethodInfo, List<Integer>> mp : traceFormula.getMethods()) {
+            for (int l = 0; l < Math.min(traceFormula.getMethods().size() - k * batchMaxSize, batchMaxSize); ++l) {
+                Pair<MethodInfo, List<Integer>> mp = traceFormula.getMethods().get(k * batchMaxSize + l);
                 List<Integer> m = mp.getSecond();
 
                 if (config.enabledVerbose(this.getClass())) {
@@ -748,7 +794,13 @@ public class SMT {
 
                     switch (type) {
                         case SMTInterpol:
-                            output = interpol.out.readLine();
+                            try {
+                                output = interpol.out.readLine();
+                            } catch (IOException e) {
+                                System.err.println("SMT refuses to provide output.");
+
+                                throw new SMTException(e);
+                            }
 
                             if (!satisfiable) {
                                 methodInterpolants = PredicatesFactory.createInterpolantsFromString(output);
@@ -762,12 +814,24 @@ public class SMT {
                             break;
                         case Z3:
                             if (satisfiable) {
-                                output = interpol.out.readLine();
+                                try {
+                                    output = interpol.out.readLine();
+                                } catch (IOException e) {
+                                    System.err.println("SMT refuses to provide output.");
+
+                                    throw new SMTException(e);
+                                }
                             } else {
                                 methodInterpolants = new Predicate[m.size()];
 
                                 for (int i = 0; i < methodInterpolants.length; ++i) {
-                                    output = interpol.out.readLine();
+                                    try {
+                                        output = interpol.out.readLine();
+                                    } catch (IOException e) {
+                                        System.err.println("SMT refuses to provide output.");
+
+                                        throw new SMTException(e);
+                                    }
 
                                     methodInterpolants[i] = PredicatesFactory.createInterpolantFromString(output);
 
@@ -825,22 +889,25 @@ public class SMT {
                     }
                 }
             }
+        }
 
-            interpol.close();
+        notifyInterpolateExecuted(interpolants);
 
-            notifyInterpolateExecuted(interpolants);
+        if (config.enabledVerbose(this.getClass())) {
+            System.out.println("Interpolants: ");
 
-            if (config.enabledVerbose(this.getClass())) {
-                System.out.println("Interpolants: ");
-
-                for (int i = 0; i < interpolants.length; ++i) {
-                    System.out.println("\t" + interpolants[i]);
-                }
+            for (int i = 0; i < interpolants.length; ++i) {
+                System.out.println("\t" + interpolants[i]);
             }
+        }
 
-            return interpolants;
+        try {
+            interpol.in.write("(pop 1)");
+            interpol.in.write(separator);
+            interpol.in.flush();
+            interpol.close();
         } catch (IOException e) {
-            System.err.println("SMT refuses to provide output.");
+            System.err.println("SMT refuses input.");
 
             throw new SMTException(e);
         } finally {
@@ -848,6 +915,8 @@ public class SMT {
 
             elapsed += endTime.getTime() - startTime.getTime();
         }
+
+        return interpolants;
     }
 
     /**
