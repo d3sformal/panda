@@ -237,6 +237,9 @@ public class Universe {
             if (read instanceof ObjectFieldRead) {
                 if (parentObject instanceof UniverseNull) continue;
                 Associative object = (Associative) parentObject;
+                UniverseSlot field = object.getField(fName);
+
+                if (field == null) continue;
 
                 outValues.addAll(object.getField(fName).getPossibleValues());
             } else if (read instanceof ArrayElementRead) {
