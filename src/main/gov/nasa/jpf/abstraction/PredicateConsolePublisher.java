@@ -217,7 +217,7 @@ public class PredicateConsolePublisher extends ConsolePublisher {
                 MethodPredicateContext mctx = (MethodPredicateContext) ctx;
                 Method m = mctx.getMethod();
 
-                for (Predicate p : ctx.predicates.keySet()) {
+                for (Predicate p : ctx.getPredicates()) {
                     if (!method2pred.containsKey(m)) {
                         method2pred.put(m, new HashSet<Predicate>());
                     }
@@ -244,7 +244,7 @@ public class PredicateConsolePublisher extends ConsolePublisher {
                     if (m.getPackageAndClass().equals(pc)) {
                         added = true;
 
-                        for (Predicate p : octx.predicates.keySet()) {
+                        for (Predicate p : octx.getPredicates()) {
                             if (method2pred.get(m).contains(p)) {
                                 for (Predicate q : method2pred.get(m)) {
                                     if (p.equals(q)) {
@@ -263,7 +263,7 @@ public class PredicateConsolePublisher extends ConsolePublisher {
                     Method m = DefaultMethod.create(pc, "<init>");
 
                     method2pred.put(m, new HashSet<Predicate>());
-                    method2pred.get(m).addAll(octx.predicates.keySet());
+                    method2pred.get(m).addAll(octx.getPredicates());
                 }
             }
         }
@@ -276,7 +276,7 @@ public class PredicateConsolePublisher extends ConsolePublisher {
                 }
 
                 for (Method m : method2pred.keySet()) {
-                    for (Predicate p : sctx.predicates.keySet()) {
+                    for (Predicate p : sctx.getPredicates()) {
                         if (method2pred.get(m).contains(p)) {
                             for (Predicate q : method2pred.get(m)) {
                                 if (p.equals(q)) {
@@ -354,7 +354,7 @@ public class PredicateConsolePublisher extends ConsolePublisher {
         }
 
         for (PredicateContext ctx : preds.contexts) {
-            for (Predicate p : ctx.predicates.keySet()) {
+            for (Predicate p : ctx.getPredicates()) {
                 ++total;
             }
         }

@@ -86,7 +86,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
         for (PredicateContext context : predicateSet.contexts) {
             if (context instanceof AssumePredicateContext) continue;
 
-            for (Predicate p : context.predicates.keySet()) {
+            for (Predicate p : context.getPredicates()) {
                 p.addAccessExpressionsToSet(paths);
 
                 boolean special = false;
@@ -119,11 +119,11 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 for (PredicateContext context : predicateSet.contexts) {
                     if (context instanceof AssumePredicateContext) continue;
 
-                    for (Predicate predicate : context.predicates.keySet()) {
+                    for (Predicate predicate : context.getPredicates()) {
                         if (predicates.contains(predicate)) {
-                            context.predicates.put(predicate, initialValuation.get(predicate));
+                            context.put(predicate, initialValuation.get(predicate));
                         } else {
-                            context.predicates.put(predicate, TruthValue.UNKNOWN);
+                            context.put(predicate, TruthValue.UNKNOWN);
                         }
                     }
                 }
@@ -172,8 +172,16 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                 }
             }
 
-            for (Predicate predicate : context.predicates.keySet()) {
-                valuation.put(predicate, context.predicates.get(predicate));
+            for (Predicate predicate : context.getPredicates()) {
+                BytecodeRange scope = predicate.getScope();
+
+                // A copy has to be created to avoid setting scope to the original predicate (stored in the PredicateContext and reused in future)
+                // putting the same predicate twice with different scopes will cause the scopes to be merged and only one of the predicates will be tracked
+                // therefore if applied to the original predicate (without making the copy) it may change the content of PredicateContext
+                predicate = predicate.clone();
+                predicate.setScope(scope);
+
+                valuation.put(predicate, context.get(predicate));
             }
         }
 
@@ -191,6 +199,9 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
     }
 
     public boolean refineStatic(Predicate interpolant) {
+        interpolant = interpolant.clone();
+        interpolant.setScope(BytecodeUnlimitedRange.getInstance());
+
         boolean refined = false;
 
         StaticPredicateContext ctx = null;
@@ -208,12 +219,10 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             ctx = new StaticPredicateContext(predicates);
             predicateSet.contexts.add(ctx);
         } else {
-            boolean present = false;
-
-            if (ctx.predicates.containsKey(interpolant)) {
-                refined = ctx.predicates.put(interpolant, ctx.predicates.get(interpolant)) == null;
+            if (ctx.contains(interpolant)) {
+                refined = ctx.put(interpolant, ctx.get(interpolant)) == null;
             } else {
-                refined = ctx.predicates.put(interpolant, TruthValue.UNKNOWN) == null;
+                refined = ctx.put(interpolant, TruthValue.UNKNOWN) == null;
             }
         }
 
@@ -255,12 +264,10 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             ctx = new MethodPredicateContext(DefaultMethod.create(DefaultPackageAndClass.create(m.getClassInfo().getName()), m.getName()), predicates);
             predicateSet.contexts.add(ctx);
         } else {
-            boolean present = false;
-
-            if (ctx.predicates.containsKey(interpolant)) {
-                refined = ctx.predicates.put(interpolant, ctx.predicates.get(interpolant)) == null;
+            if (ctx.contains(interpolant)) {
+                refined = ctx.put(interpolant, ctx.get(interpolant)) == null;
             } else {
-                refined = ctx.predicates.put(interpolant, TruthValue.UNKNOWN) == null;
+                refined = ctx.put(interpolant, TruthValue.UNKNOWN) == null;
             }
         }
 
@@ -314,7 +321,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                     continue;
                 }
 
-                for (Predicate predicate : context.predicates.keySet()) {
+                for (Predicate predicate : context.getPredicates()) {
                     Set<Predicate> inconsistent = valuation.getPredicatesInconsistentWith(predicate, TruthValue.TRUE);
 
                     if (!inconsistent.isEmpty()) {

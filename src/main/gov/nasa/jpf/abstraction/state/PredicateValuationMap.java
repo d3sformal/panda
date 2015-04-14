@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import gov.nasa.jpf.abstraction.common.BytecodeRange;
+import gov.nasa.jpf.abstraction.common.BytecodeUnlimitedRange;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
@@ -72,7 +73,7 @@ public class PredicateValuationMap extends HashMap<Predicate, TruthValue> {
 
         o.setScope(newScope);
 
-        TruthValue ret = putDirectly(n, v);
+        TruthValue ret = putDirectly(o, v);
 
         if (scope.equals(newScope)) {
             return ret;

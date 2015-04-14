@@ -106,35 +106,35 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 
     @Override
     public void visit(ObjectPredicateContext context) {
-        for (Predicate predicate : context.predicates.keySet()) {
+        for (Predicate predicate : context.getPredicates()) {
             predicate.accept(this);
         }
     }
 
     @Override
     public void visit(MethodPredicateContext context) {
-        for (Predicate predicate : context.predicates.keySet()) {
+        for (Predicate predicate : context.getPredicates()) {
             predicate.accept(this);
         }
     }
 
     @Override
     public void visit(MethodAssumePrePredicateContext context) {
-        for (Predicate predicate : context.predicates.keySet()) {
+        for (Predicate predicate : context.getPredicates()) {
             predicate.accept(this);
         }
     }
 
     @Override
     public void visit(MethodAssumePostPredicateContext context) {
-        for (Predicate predicate : context.predicates.keySet()) {
+        for (Predicate predicate : context.getPredicates()) {
             predicate.accept(this);
         }
     }
 
     @Override
     public void visit(StaticPredicateContext context) {
-        for (Predicate predicate : context.predicates.keySet()) {
+        for (Predicate predicate : context.getPredicates()) {
             predicate.accept(this);
         }
     }

@@ -30,13 +30,13 @@ public class RangeAbstractionBuilder extends PredicateAbstractionBuilder {
             PredicateContext predContext = exprContext.getPredicateContextOfProperType();
 
             for (Expression expr : exprContext.expressions) {
-                predContext.predicates.put(LessThan.create(expr, Constant.create(min)), TruthValue.UNKNOWN);
+                predContext.put(LessThan.create(expr, Constant.create(min)), TruthValue.UNKNOWN);
 
                 for (int i = min; i < max + 1; ++i) {
-                    predContext.predicates.put(Equals.create(expr, Constant.create(i)), TruthValue.UNKNOWN);
+                    predContext.put(Equals.create(expr, Constant.create(i)), TruthValue.UNKNOWN);
                 }
 
-                predContext.predicates.put(LessThan.create(Constant.create(max), expr), TruthValue.UNKNOWN);
+                predContext.put(LessThan.create(Constant.create(max), expr), TruthValue.UNKNOWN);
             }
 
             predicates.contexts.add(predContext);

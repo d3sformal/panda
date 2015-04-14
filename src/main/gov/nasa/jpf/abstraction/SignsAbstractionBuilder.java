@@ -19,8 +19,8 @@ public class SignsAbstractionBuilder extends PredicateAbstractionBuilder {
             PredicateContext predContext = exprContext.getPredicateContextOfProperType();
 
             for (Expression expr : exprContext.expressions) {
-                predContext.predicates.put(LessThan.create(expr, Constant.create(0)), TruthValue.UNKNOWN);
-                predContext.predicates.put(LessThan.create(Constant.create(0), expr), TruthValue.UNKNOWN);
+                predContext.put(LessThan.create(expr, Constant.create(0)), TruthValue.UNKNOWN);
+                predContext.put(LessThan.create(Constant.create(0), expr), TruthValue.UNKNOWN);
 
                 // This predicate is not necessary and may slow the evaluation process
                 //
@@ -31,7 +31,7 @@ public class SignsAbstractionBuilder extends PredicateAbstractionBuilder {
                 // e > 0: false      false         true           unknown (otherwise e < 0 could not be unknown)
                 // e > 0: unknown  inconsist      unknown         unknown (otherwise e < 0 could not be unknown)
                 //
-                predContext.predicates.put(Equals.create(expr, Constant.create(0)), TruthValue.UNKNOWN);
+                predContext.put(Equals.create(expr, Constant.create(0)), TruthValue.UNKNOWN);
             }
 
             predicates.contexts.add(predContext);

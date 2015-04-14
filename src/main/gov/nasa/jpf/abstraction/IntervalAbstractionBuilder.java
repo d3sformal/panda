@@ -29,8 +29,8 @@ public class IntervalAbstractionBuilder extends PredicateAbstractionBuilder {
             PredicateContext predContext = exprContext.getPredicateContextOfProperType();
 
             for (Expression expr : exprContext.expressions) {
-                predContext.predicates.put(LessThan.create(expr, Constant.create(min)), TruthValue.UNKNOWN);
-                predContext.predicates.put(LessThan.create(Constant.create(max), expr), TruthValue.UNKNOWN);
+                predContext.put(LessThan.create(expr, Constant.create(min)), TruthValue.UNKNOWN);
+                predContext.put(LessThan.create(Constant.create(max), expr), TruthValue.UNKNOWN);
             }
 
             predicates.contexts.add(predContext);

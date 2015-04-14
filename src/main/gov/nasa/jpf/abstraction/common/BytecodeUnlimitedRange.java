@@ -50,4 +50,9 @@ public class BytecodeUnlimitedRange extends BytecodeRange {
     public String toString() {
         return "*";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof BytecodeUnlimitedRange;
+    }
 }

@@ -1,7 +1,9 @@
 package gov.nasa.jpf.abstraction.common;
 
 import java.util.List;
+import java.util.Set;
 
+import gov.nasa.jpf.abstraction.common.BytecodeRange;
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitable;
 import gov.nasa.jpf.abstraction.state.PredicateValuationMap;
 import gov.nasa.jpf.abstraction.state.TruthValue;
@@ -14,11 +16,11 @@ import gov.nasa.jpf.abstraction.state.TruthValue;
  * @see gov.nasa.jpf.abstraction.common.MethodPredicateContext for a container of predicates over static fields, instance fields, local variables (including method parameters)
  */
 public abstract class PredicateContext implements PredicatesComponentVisitable {
-    public PredicateValuationMap predicates = new PredicateValuationMap();
+    protected PredicateValuationMap predicates = new PredicateValuationMap();
 
     public PredicateContext(List<Predicate> predicates) {
         for (Predicate p : predicates) {
-            this.predicates.put(p, TruthValue.UNKNOWN);
+            put(p, TruthValue.UNKNOWN);
         }
     }
 
@@ -31,5 +33,21 @@ public abstract class PredicateContext implements PredicatesComponentVisitable {
         }
 
         return ret;
+    }
+
+    public Set<Predicate> getPredicates() {
+        return predicates.keySet();
+    }
+
+    public TruthValue get(Predicate p) {
+        return predicates.get(p);
+    }
+
+    public TruthValue put(Predicate p, TruthValue v) {
+        return predicates.put(p, v);
+    }
+
+    public boolean contains(Predicate p) {
+        return predicates.containsKey(p);
     }
 }

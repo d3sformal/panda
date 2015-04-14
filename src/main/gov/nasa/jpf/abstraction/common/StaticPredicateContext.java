@@ -3,6 +3,7 @@ package gov.nasa.jpf.abstraction.common;
 import java.util.List;
 
 import gov.nasa.jpf.abstraction.common.PredicatesComponentVisitor;
+import gov.nasa.jpf.abstraction.state.TruthValue;
 
 /**
  * Corresponds to one static section in the input file
@@ -25,5 +26,14 @@ public class StaticPredicateContext extends PredicateContext {
     @Override
     public void accept(PredicatesComponentVisitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public TruthValue put(Predicate p, TruthValue v) {
+        if (!(p.getScope() instanceof BytecodeUnlimitedRange)) {
+            throw new RuntimeException("Static predicates should not have a specific scope set");
+        }
+
+        return super.put(p, v);
     }
 }
