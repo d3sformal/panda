@@ -360,7 +360,7 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 
     @Override
     public void visit(Fresh expression) {
-        ret.append("fresh");
+        throw new RuntimeException("unsupported term in SMT input");
     }
 
     @Override

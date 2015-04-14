@@ -366,7 +366,6 @@ public class SMT {
         in.write(
             // Memory model symbols
             "(declare-fun arrlen () (Array Int Int))" + separator +
-            "(declare-fun fresh () Int)" + separator + // new object
 
             // Language symbols
             "(declare-fun null () Int)" + separator +  // java null

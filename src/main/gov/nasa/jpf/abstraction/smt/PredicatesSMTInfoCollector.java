@@ -357,7 +357,7 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
 
     @Override
     public void visit(Fresh expression) {
-        hasFresh = true;
+        throw new RuntimeException("unsupported term in SMT input");
     }
 
     @Override
