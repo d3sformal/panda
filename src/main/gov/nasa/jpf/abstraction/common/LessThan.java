@@ -69,6 +69,14 @@ public class LessThan extends Comparison {
             if (c.value.intValue() == 0) {
                 return new LessThan(s.b, s.a);
             }
+
+            if (s.a instanceof Constant) {
+                Constant e = (Constant) s.a;
+
+                if (e.value.intValue() == 0) {
+                    return new LessThan(s.b, Constant.create(-c.value.intValue()));
+                }
+            }
         }
 
         if (a instanceof Subtract && b instanceof Constant) {
@@ -77,6 +85,14 @@ public class LessThan extends Comparison {
 
             if (d.value.intValue() == 0) {
                 return new LessThan(s.a, s.b);
+            }
+
+            if (s.a instanceof Constant) {
+                Constant e = (Constant) s.a;
+
+                if (e.value.intValue() == 0) {
+                    return new LessThan(Constant.create(-d.value.intValue()), s.b);
+                }
             }
         }
 
