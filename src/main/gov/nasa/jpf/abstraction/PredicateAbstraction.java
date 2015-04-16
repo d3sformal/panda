@@ -439,12 +439,16 @@ public class PredicateAbstraction extends Abstraction {
 
             if (before.getMethodInfo().getReturnSize() > 0) {
                 extendTraceFormulaWithAssignment(returnSymbolCallee, returnValue, callee, before.getPC().getPosition() + before.getPC().getLength(), 0);
+            } else {
+                throw new RuntimeException("Incorrectly called handler for a void method");
             }
 
             traceFormula.markReturn();
 
             if (before.getMethodInfo().getReturnSize() > 0) {
-                extendTraceFormulaWithAssignment(returnSymbolCaller, returnSymbolCallee, caller, after.getPC().getPosition(), -1);
+                extendTraceFormulaWithAssignment(returnSymbolCaller, returnSymbolCallee, caller, after.getPC().getPosition() + after.getPC().getLength(), -1);
+            } else {
+                throw new RuntimeException("Incorrectly called handler for a void method");
             }
 
             ssa.changeDepth(-1);
@@ -463,7 +467,9 @@ public class PredicateAbstraction extends Abstraction {
         if (RunDetector.isRunning()) {
             ssa.changeDepth(-1);
 
+            //extendTraceFormulaWithConstraint(Tautology.create(), before.getMethodInfo(), before.getPC().getPosition() + before.getPC().getLength(), true);
             traceFormula.markReturn();
+            extendTraceFormulaWithConstraint(Tautology.create(), after.getMethodInfo(), after.getPC().getPosition() + after.getPC().getLength(), true);
             traceFormula.markReturned();
         }
     }

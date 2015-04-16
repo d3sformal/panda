@@ -643,13 +643,35 @@ public class SMT {
                         input.append("(get-interpolant");
                         break;
                 }
-                for (int i : m) {
-                    input.append(" g"); input.append(i + 1);
+
+                int nestedMethodSteps = 0;
+
+                for (int i = m.get(0); i <= m.get(m.size() - 1); ++i) {
+                    if (m.contains(i)) {
+                        if (nestedMethodSteps == 1) {
+                            input.append(" true");
+                        }
+                        if (nestedMethodSteps > 0) {
+                            input.append(")");
+
+                            nestedMethodSteps = 0;
+                        }
+
+                        input.append(" g"); input.append(i + 1);
+                    } else {
+                        ++nestedMethodSteps;
+
+                        if (nestedMethodSteps == 1) {
+                            input.append(" (and");
+                        }
+
+                        input.append(" g"); input.append(i + 1);
+                    }
                 }
 
                 input.append(" (and g0 g0"); // Make sure the operation is at least binary
                 for (int i = 0; i < traceFormula.size(); ++i) {
-                    if (!m.contains(i)) {
+                    if (i < m.get(0) || m.get(m.size() - 1) < i) {
                         input.append(" g"); input.append(i + 1);
                     }
                 }
@@ -823,7 +845,30 @@ public class SMT {
                             } else {
                                 methodInterpolants = new Predicate[m.size()];
 
-                                for (int i = 0; i < methodInterpolants.length; ++i) {
+                                int lastStep = 0;
+                                for (int i = 0; i < m.size(); ++i) {
+                                    if (i > 0) {
+                                        if (lastStep != m.get(i) - 1) {
+                                            try {
+                                                output = interpol.out.readLine();
+                                            } catch (IOException e) {
+                                                System.err.println("SMT refuses to provide output.");
+
+                                                throw new SMTException(e);
+                                            }
+
+                                            Predicate nested = PredicatesFactory.createInterpolantFromString(output);
+
+                                            if (!(nested instanceof Contradiction)) {
+                                                methodInterpolants[i - 1] = Conjunction.create(methodInterpolants[i - 1], nested);
+
+                                                if (!(nested instanceof Tautology) && config.enabledVerbose(this.getClass())) {
+                                                    System.out.println("\t... inserting nested interpolant `" + nested + "` to " + (m.get(i - 1) + 1));
+                                                }
+                                            }
+                                        }
+                                    }
+
                                     try {
                                         output = interpol.out.readLine();
                                     } catch (IOException e) {
@@ -837,6 +882,8 @@ public class SMT {
                                     if (!(methodInterpolants[i] instanceof Tautology) && config.enabledVerbose(this.getClass())) {
                                         System.out.println("\t... inserting interpolant `" + methodInterpolants[i] + "` to " + (m.get(i) + 1));
                                     }
+
+                                    lastStep = m.get(i);
                                 }
                             }
                             break;
