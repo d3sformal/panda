@@ -262,7 +262,7 @@ public class InterpolantExtractor {
                             if (valueSToS.isRoot()) {
 
                                 // (store arr A (store (select arr A) ... ...)
-                                if (s.getIndex().equals(valueSToS.getIndex())) {
+                                if (index.equals(valueSToS.getIndex())) {
                                     Expression ret = DefaultArrayElementWrite.create((AccessExpression) index, valueS.getIndex(), valueS.getValue());
 
                                     if (config.enabledVerbose(InterpolantExtractor.class)) {

@@ -894,7 +894,9 @@ public class SMT {
                             if (m.get(i) < interpolants.length) {
                                 Predicate p = interpolants[m.get(i)];
 
-                                p = Conjunction.create(p, methodInterpolants[i]);
+                                if (!(methodInterpolants[i] instanceof Contradiction)) {
+                                    p = Conjunction.create(p, methodInterpolants[i]);
+                                }
 
                                 if (config.enabledMethodGlobalRefinement()) {
                                     if (!(methodInterpolants[methodInterpolants.length - 1] instanceof Contradiction)) {
