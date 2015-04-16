@@ -625,6 +625,63 @@ public class InterpolantExtractor {
 
         Predicate ret = Tautology.create();
 
+        boolean flipped = false;
+
+        if (e1 instanceof Constant && e2 instanceof Operation) {
+            Expression e = e1;
+            e1 = e2;
+            e2 = e;
+
+            flipped = !flipped;
+        }
+
+        // ... [+-*/%] ... = C
+        if (e1 instanceof Operation && e2 instanceof Constant) {
+            Operation o = (Operation) e1;
+            Constant c = (Constant) e2;
+
+            // (alength arrlen ...) [+-*/%] ... = C
+            if (o.a instanceof ArrayLengthRead) {
+                // Suppose the other operand is the neutral element w.r.t. the operation
+                // this clears the interpolants that contain additions/subtractions of terms that are known to valuate to 0 (or 1 in case of multiplication ...)
+                if (flipped) {
+                    ret = Conjunction.create(ret, LessThan.create(c, o.a));
+                } else {
+                    ret = Conjunction.create(ret, LessThan.create(o.a, c));
+                }
+            }
+
+            boolean localFlipped = flipped;
+
+            if (o instanceof Subtract) {
+                c = Constant.create(-c.value.intValue());
+
+                localFlipped = !localFlipped;
+            }
+            if (o instanceof Divide) {
+                c = Constant.create(0);
+
+                localFlipped = !localFlipped;
+            }
+
+            // ... [+-*/%] (alength arrlen ...) = C
+            if (o.b instanceof ArrayLengthRead) {
+                // Suppose the other operand is the neutral element w.r.t. the operation
+                // this clears the interpolants that contain additions/subtractions of terms that are known to valuate to 0 (or 1 in case of multiplication ...)
+                if (localFlipped) {
+                    ret = Conjunction.create(ret, LessThan.create(c, o.b));
+                } else {
+                    ret = Conjunction.create(ret, LessThan.create(o.b, c));
+                }
+            }
+        }
+
+        if (flipped) {
+            Expression e = e1;
+            e1 = e2;
+            e2 = e;
+        }
+
         // Heuristic
         ret = Conjunction.create(ret, LessThan.create(e1, e2));
 
