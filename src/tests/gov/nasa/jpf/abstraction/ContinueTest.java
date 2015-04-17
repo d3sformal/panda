@@ -4,7 +4,6 @@ package gov.nasa.jpf.abstraction;
 public class ContinueTest extends BaseTest {
     public ContinueTest() {
         config.add("+panda.refinement=true");
-        config.add("+panda.refinement.method_global=true");
     }
 
     @Test
