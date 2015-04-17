@@ -262,6 +262,7 @@ public class SMT {
     }
 
     private static SupportedSMT defaultSMT = PandaConfig.getInstance().getSMT();
+    private SupportedSMT type;
 
     /**
      * Starts a process of a supported SMT solver
@@ -405,6 +406,7 @@ public class SMT {
      * Attach to an SMT solver process
      */
     public SMT(SupportedSMT smt) throws SMTException {
+        type = smt;
         try {
             prepareSMTProcess(smt);
 
@@ -549,6 +551,321 @@ public class SMT {
         }
     }
 
+    private static final int PLAIN = 0;
+    private static final int PREFIX_IN_FRONT = 1 << 0;
+    private static final int NESTED_IN_PLACE = 1 << 1;
+
+    private class InterpolationEntry {
+        int method;
+        int format;
+        String input;
+
+        InterpolationEntry(int method, int format, String input) {
+            this.method = method;
+            this.format = format;
+            this.input = input;
+        }
+    }
+
+    private void prepareInterpolationForMethod(SupportedSMT type, int method, TraceFormula traceFormula, List<InterpolationEntry> queries, String separator) {
+        Pair<MethodInfo, List<Integer>> mp = traceFormula.getMethods().get(method);
+        List<Integer> m = mp.getSecond();
+        StringBuilder input = new StringBuilder();
+
+        if (m.get(0) > 0) {
+            input.append("; Method "); input.append(mp.getFirst().getFullName()); input.append(separator);
+        }
+
+        // Encode as:
+
+        // (and prefix) g1 g2 (and nested1) ... gN (and rest)
+        prepareInterpolationForMethod(type, method, traceFormula, input, separator, PREFIX_IN_FRONT | NESTED_IN_PLACE);
+
+        queries.add(new InterpolationEntry(method, PREFIX_IN_FRONT | NESTED_IN_PLACE, input.toString()));
+        input.setLength(0);
+
+        // g1 g2 (and nested1) ... gN (and rest)
+        prepareInterpolationForMethod(type, method, traceFormula, input, separator, NESTED_IN_PLACE);
+
+        queries.add(new InterpolationEntry(method, NESTED_IN_PLACE, input.toString()));
+        input.setLength(0);
+
+        // g1 g2 ... gN (and rest)
+        prepareInterpolationForMethod(type, method, traceFormula, input, separator, PLAIN);
+
+        queries.add(new InterpolationEntry(method, PLAIN, input.toString()));
+        input.setLength(0);
+    }
+
+    /**
+     * For a method: step0 ... stepN
+     * Interpolate the following sequence
+     *
+     * (and prefix step0) step1 ... (nestedStep0 ... nestedStepM) ... stepN (and rest)
+     *
+     * where
+     *   prefix contains all methods that have exited before this one (none of its local symbols is referenced later)
+     *   rest contains the enveloping methods (caller and its caller ...) and all methods called after this one exits
+     */
+    private void prepareInterpolationForMethod(SupportedSMT type, int method, TraceFormula traceFormula, StringBuilder input, String separator, int format) {
+        Pair<MethodInfo, List<Integer>> mp = traceFormula.getMethods().get(method);
+        List<Integer> m = mp.getSecond();
+
+        if (m.get(0) > 0) {
+            switch (type) {
+                case SMTInterpol:
+                    input.append("(get-interpolants");
+                    break;
+                case Z3:
+                    input.append("(get-interpolant");
+                    break;
+            }
+
+            int nestedMethodSteps = 0;
+
+            Set<Integer> steps = new HashSet<Integer>();
+
+            input.append(" (and g0 g0"); // Make sure the operation is at least binary
+
+            if ((format & PREFIX_IN_FRONT) != 0) {
+                for (Pair<MethodInfo, List<Integer>> mp2 : traceFormula.getMethods()) {
+                    List<Integer> m2 = mp2.getSecond();
+
+                    int start = m2.get(0);
+                    int end = m2.get(m2.size() - 1);
+
+                    if (end < m.get(0)) {
+                        for (int i = start; i <= end; ++i) {
+                            input.append(" g"); input.append(i + 1);
+                            steps.add(i);
+                        }
+                    }
+                }
+            }
+
+            input.append(")");
+
+            for (int i = m.get(0); i <= m.get(m.size() - 1); ++i) {
+                if (m.contains(i)) {
+                    if (nestedMethodSteps == 1) {
+                        input.append(" true");
+                    }
+                    if (nestedMethodSteps > 0) {
+                        input.append(")");
+
+                        nestedMethodSteps = 0;
+                    }
+
+                    input.append(" g"); input.append(i + 1);
+                    steps.add(i);
+                } else if ((format & NESTED_IN_PLACE) != 0) {
+                    ++nestedMethodSteps;
+
+                    if (nestedMethodSteps == 1) {
+                        input.append(" (and");
+                    }
+
+                    input.append(" g"); input.append(i + 1);
+                    steps.add(i);
+                }
+            }
+
+            input.append(" (and g0 g0"); // Make sure the operation is at least binary
+            for (int i = 0; i < traceFormula.size(); ++i) {
+                if (!steps.contains(i)) {
+                    input.append(" g"); input.append(i + 1);
+                }
+            }
+            input.append(")");
+
+            input.append(")"); input.append(separator);
+        }
+    }
+
+    private void interpolateMethod(SMT interpol, boolean satisfiable, int method, TraceFormula traceFormula, Map<Integer, Set<Predicate>> interpolants, int format) {
+        ++itp;
+
+        PandaConfig config = PandaConfig.getInstance();
+
+        List<Integer> m = traceFormula.getMethods().get(method).getSecond();
+
+        if (config.enabledVerbose(this.getClass())) {
+            Step start = traceFormula.get(m.get(0));
+            Step end = traceFormula.get(m.get(m.size() - 1));
+            System.out.println("Method [" + start.getMethod().getName() + ":" + start.getPC() + ".." + end.getMethod().getName() + ":" + end.getPC() + "]");
+
+            for (int i : m) {
+                {
+                    int j = i - 1;
+
+                    if (j > m.get(0) && !m.contains(j)) {
+                        Step ps = traceFormula.get(j);
+                        System.out.println("\t" + (j + 1) + ": " +  ps.getMethod().getName() + ":" + ps.getPC() + " return");
+                    }
+                }
+
+                Step s = traceFormula.get(i);
+                System.out.println("\t" + (i + 1) + ": " +  s.getMethod().getName() + ":" + s.getPC());
+
+                {
+                    int j = i + 1;
+
+                    if (j < m.get(m.size() - 1) && !m.contains(j)) {
+                        Step ns = traceFormula.get(j);
+                        System.out.println("\t" + (j + 1) + ": " +  ns.getMethod().getName() + ":" + ns.getPC() + " call");
+                    }
+                }
+            }
+        }
+
+        String output;
+
+        if (m.get(0) > 0) {
+            Map<Integer, Set<Predicate>> methodInterpolants = new HashMap<Integer, Set<Predicate>>();
+
+            for (int i = 0; i < m.size(); ++i) {
+                methodInterpolants.put(i, new HashSet<Predicate>());
+            }
+
+            switch (interpol.type) {
+                case SMTInterpol:
+                    try {
+                        output = interpol.out.readLine();
+                    } catch (IOException e) {
+                        System.err.println("SMT refuses to provide output.");
+
+                        throw new SMTException(e);
+                    }
+
+                    if (!satisfiable) {
+                        Predicate[] itps = PredicatesFactory.createInterpolantsFromString(output);
+
+                        int j = 0;
+
+                        methodInterpolants.get(0).add(itps[j++]);
+
+                        int lastStep = 0;
+                        for (int i = 0; i < m.size(); ++i) {
+                            if (i > 0) {
+                                if ((format & NESTED_IN_PLACE) != 0 && lastStep != m.get(i) - 1) {
+                                    Predicate nested = itps[j++];
+
+                                    methodInterpolants.get(i - 1).add(nested);
+
+                                    if (!(nested instanceof Tautology) && config.enabledVerbose(this.getClass())) {
+                                        System.out.println("\t... inserting nested interpolant `" + nested + "` to " + (m.get(i - 1) + 1));
+                                    }
+                                }
+                            }
+
+                            Predicate itp = itps[j++];
+
+                            methodInterpolants.get(i).add(itp);
+
+                            if (!(itp instanceof Tautology) && config.enabledVerbose(this.getClass())) {
+                                System.out.println("\t... inserting interpolant `" + itp + "` to " + (m.get(i) + 1));
+                            }
+
+                            lastStep = m.get(i);
+                        }
+                    }
+                    break;
+                case Z3:
+                    if (satisfiable) {
+                        try {
+                            output = interpol.out.readLine();
+                        } catch (IOException e) {
+                            System.err.println("SMT refuses to provide output.");
+
+                            throw new SMTException(e);
+                        }
+                    } else {
+                        try {
+                            output = interpol.out.readLine();
+                        } catch (IOException e) {
+                            System.err.println("SMT refuses to provide output.");
+
+                            throw new SMTException(e);
+                        }
+
+                        methodInterpolants.get(0).add(PredicatesFactory.createInterpolantFromString(output));
+
+                        int lastStep = 0;
+                        for (int i = 0; i < m.size(); ++i) {
+                            if (i > 0) {
+                                if ((format & NESTED_IN_PLACE) != 0 && lastStep != m.get(i) - 1) {
+                                    try {
+                                        output = interpol.out.readLine();
+                                    } catch (IOException e) {
+                                        System.err.println("SMT refuses to provide output.");
+
+                                        throw new SMTException(e);
+                                    }
+
+                                    Predicate nested = PredicatesFactory.createInterpolantFromString(output);
+
+                                    methodInterpolants.get(i - 1).add(nested);
+
+                                    if (!(nested instanceof Tautology) && config.enabledVerbose(this.getClass())) {
+                                        System.out.println("\t... inserting nested interpolant `" + nested + "` to " + (m.get(i - 1) + 1));
+                                    }
+                                }
+                            }
+
+                            try {
+                                output = interpol.out.readLine();
+                            } catch (IOException e) {
+                                System.err.println("SMT refuses to provide output.");
+
+                                throw new SMTException(e);
+                            }
+
+                            Predicate itp = PredicatesFactory.createInterpolantFromString(output);
+
+                            methodInterpolants.get(i).add(itp);
+
+                            if (!(itp instanceof Tautology) && config.enabledVerbose(this.getClass())) {
+                                System.out.println("\t... inserting interpolant `" + itp + "` to " + (m.get(i) + 1));
+                            }
+
+                            lastStep = m.get(i);
+                        }
+                    }
+                    break;
+            }
+
+            if (!satisfiable) {
+                for (int i = 0; i < m.size(); ++i) {
+                    if (m.get(i) < traceFormula.size() - 1) {
+                        interpolants.get(m.get(i)).addAll(methodInterpolants.get(i));
+
+                        if (config.enabledMethodGlobalRefinement()) {
+                            interpolants.get(m.get(i)).addAll(methodInterpolants.get(m.size() - 1)); // The last interpolant overapproximates the whole method and may be necessary (not globally but what can you do :))
+                            // Also check if there was not a return location where we might also want to track the predicate
+                            int j = m.get(i) - 1;
+
+                            if (j > m.get(0) && !m.contains(j)) {
+                                interpolants.get(j).addAll(methodInterpolants.get(m.size() - 1));
+                            }
+
+                        }
+                    }
+                }
+
+                if (config.enabledMethodGlobalRefinement()) {
+                    if (m.get(m.size() - 1) >= traceFormula.size() - 1) {
+                        for (int i : interpolants.keySet()) {
+                            interpolants.get(i).addAll(methodInterpolants.get(m.size() - 1));
+                        }
+                    }
+                    if (!methodInterpolants.get(m.size() - 1).isEmpty() && config.enabledVerbose(this.getClass())) {
+                        System.out.println("\t... inserting interpolant `" + methodInterpolants.get(m.size() - 1) + "` globally to the whole method");
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Given a Trace Formula (basically expressing a conjunction of constraints that model an execution run of the program-to-be-verified)
      * produces interpolants in all program locations (after each step - assignment, branching, ...)
@@ -558,7 +875,6 @@ public class SMT {
     public Predicate[] interpolate(TraceFormula traceFormula) throws SMTException {
         notifyInterpolateInvoked(traceFormula);
 
-        ++itp;
         Date startTime = new Date();
         SupportedSMT type = PandaConfig.getInstance().getInterpolationSMT();
 
@@ -623,76 +939,47 @@ public class SMT {
 
         StringBuilder input = new StringBuilder();
         int batchMaxSize = 1;
-        int batchSize = 0;
-        int batchNum = 0;
-        int batches = (traceFormula.getMethods().size() + batchMaxSize - 1) / batchMaxSize; // ceil
 
-        String[] batch = new String[batches];
+        List<InterpolationEntry> batch = new LinkedList<InterpolationEntry>();
+        List<List<InterpolationEntry>> batches = new LinkedList<List<InterpolationEntry>>();
 
         // Method scopes intepolants
-        for (Pair<MethodInfo, List<Integer>> mp : traceFormula.getMethods()) {
-            List<Integer> m = mp.getSecond();
+        for (int i = 0; i < traceFormula.getMethods().size(); ++i) {
+            prepareInterpolationForMethod(type, i, traceFormula, batch, separator);
 
-            if (m.get(0) > 0) {
-                input.append("; Method "); input.append(mp.getFirst().getFullName()); input.append(separator);
-                switch (type) {
-                    case SMTInterpol:
-                        input.append("(get-interpolants");
-                        break;
-                    case Z3:
-                        input.append("(get-interpolant");
-                        break;
+            if (batch.size() > batchMaxSize) {
+                List<InterpolationEntry> newBatch = new LinkedList<InterpolationEntry>();
+
+                int k = 0;
+                Iterator<InterpolationEntry> it = batch.iterator();
+
+                while (k < batchMaxSize) {
+                    newBatch.add(it.next());
+                    it.remove();
+                    ++k;
                 }
 
-                int nestedMethodSteps = 0;
-
-                for (int i = m.get(0); i <= m.get(m.size() - 1); ++i) {
-                    if (m.contains(i)) {
-                        if (nestedMethodSteps == 1) {
-                            input.append(" true");
-                        }
-                        if (nestedMethodSteps > 0) {
-                            input.append(")");
-
-                            nestedMethodSteps = 0;
-                        }
-
-                        input.append(" g"); input.append(i + 1);
-                    } else {
-                        ++nestedMethodSteps;
-
-                        if (nestedMethodSteps == 1) {
-                            input.append(" (and");
-                        }
-
-                        input.append(" g"); input.append(i + 1);
-                    }
-                }
-
-                input.append(" (and g0 g0"); // Make sure the operation is at least binary
-                for (int i = 0; i < traceFormula.size(); ++i) {
-                    if (i < m.get(0) || m.get(m.size() - 1) < i) {
-                        input.append(" g"); input.append(i + 1);
-                    }
-                }
-                input.append(")");
-
-                input.append(")"); input.append(separator);
-            }
-
-            ++batchSize;
-
-            if (batchSize == batchMaxSize) {
-                batch[batchNum++] = input.toString();
-                input.setLength(0);
-                batchSize = 0;
+                batches.add(newBatch);
             }
         }
 
-        if (batchSize != 0) {
-            batch[batchNum++] = input.toString();
-            input.setLength(0);
-            batchSize = 0;
+        if (!batch.isEmpty()) {
+            while (batch.size() > batchMaxSize) {
+                List<InterpolationEntry> newBatch = new LinkedList<InterpolationEntry>();
+
+                int i = 0;
+                Iterator<InterpolationEntry> it = batch.iterator();
+
+                while (i < batchMaxSize) {
+                    newBatch.add(it.next());
+                    it.remove();
+                    ++i;
+                }
+
+                batches.add(newBatch);
+            }
+
+            batches.add(batch);
         }
 
         notifyInterpolateInputGenerated(input.toString());
@@ -725,39 +1012,39 @@ public class SMT {
             throw new SMTException(e);
         }
 
-        Predicate[] interpolants = null;
+        Map<Integer, Set<Predicate>> interpolants = new HashMap<Integer, Set<Predicate>>();
+
+        for (int i = 0; i < traceFormula.size() - 1; ++i) {
+            interpolants.put(i, new HashSet<Predicate>());
+        }
 
         try {
             if (config.enabledGlobalRefinement()) {
+                ++itp;
+
                 switch (type) {
                     case SMTInterpol:
                         output = interpol.out.readLine();
 
                         if (!satisfiable) {
-                            interpolants = PredicatesFactory.createInterpolantsFromString(output);
+                            Predicate[] global = PredicatesFactory.createInterpolantsFromString(output);
+
+                            for (int i = 0; i < global.length; ++i) {
+                                interpolants.get(i).add(global[i]);
+                            }
                         }
                         break;
                     case Z3:
                         if (satisfiable) {
                             output = interpol.out.readLine();
                         } else {
-                            interpolants = new Predicate[traceFormula.size() - 1];
-
-                            for (int i = 0; i < interpolants.length; ++i) {
+                            for (int i = 0; i < traceFormula.size() - 1; ++i) {
                                 output = interpol.out.readLine();
 
-                                interpolants[i] = PredicatesFactory.createInterpolantFromString(output);
+                                interpolants.get(i).add(PredicatesFactory.createInterpolantFromString(output));
                             }
                         }
                         break;
-                }
-            } else {
-                if (!satisfiable) {
-                    interpolants = new Predicate[traceFormula.size() - 1];
-
-                    for (int i = 0; i < interpolants.length; ++i) {
-                        interpolants[i] = Tautology.create();
-                    }
                 }
             }
         } catch (IOException e) {
@@ -766,9 +1053,15 @@ public class SMT {
             throw new SMTException(e);
         }
 
-        for (int k = 0; k < batches; ++k) {
+        Iterator<List<InterpolationEntry>> it = batches.iterator();
+
+        while (it.hasNext()) {
+            batch = it.next();
+
             try {
-                interpol.in.write(batch[k]);
+                for (InterpolationEntry entry : batch) {
+                    interpol.in.write(entry.input);
+                }
                 interpol.in.flush();
             } catch (IOException e) {
                 System.err.println("SMT refuses input.");
@@ -777,175 +1070,33 @@ public class SMT {
             }
 
             // Inject method-scoped interpolants
-            for (int l = 0; l < Math.min(traceFormula.getMethods().size() - k * batchMaxSize, batchMaxSize); ++l) {
-                Pair<MethodInfo, List<Integer>> mp = traceFormula.getMethods().get(k * batchMaxSize + l);
+            for (InterpolationEntry entry : batch) {
+                Pair<MethodInfo, List<Integer>> mp = traceFormula.getMethods().get(entry.method);
                 List<Integer> m = mp.getSecond();
 
-                if (config.enabledVerbose(this.getClass())) {
-                    Step start = traceFormula.get(m.get(0));
-                    Step end = traceFormula.get(m.get(m.size() - 1));
-                    System.out.println("Method [" + start.getMethod().getName() + ":" + start.getPC() + ".." + end.getMethod().getName() + ":" + end.getPC() + "]");
+                interpolateMethod(interpol, satisfiable, entry.method, traceFormula, interpolants, entry.format);
+            }
+        }
 
-                    for (int i : m) {
-                        {
-                            int j = i - 1;
+        Predicate[] ret = new Predicate[traceFormula.size() - 1];
 
-                            if (j > m.get(0) && !m.contains(j)) {
-                                Step ps = traceFormula.get(j);
-                                System.out.println("\t" + (j + 1) + ": " +  ps.getMethod().getName() + ":" + ps.getPC() + " return");
-                            }
-                        }
+        for (int step : interpolants.keySet()) {
+            ret[step] = Tautology.create();
 
-                        Step s = traceFormula.get(i);
-                        System.out.println("\t" + (i + 1) + ": " +  s.getMethod().getName() + ":" + s.getPC());
-
-                        {
-                            int j = i + 1;
-
-                            if (j < m.get(m.size() - 1) && !m.contains(j)) {
-                                Step ns = traceFormula.get(j);
-                                System.out.println("\t" + (j + 1) + ": " +  ns.getMethod().getName() + ":" + ns.getPC() + " call");
-                            }
-                        }
-                    }
-                }
-
-                if (m.get(0) > 0) {
-                    Predicate[] methodInterpolants = null;
-
-                    switch (type) {
-                        case SMTInterpol:
-                            try {
-                                output = interpol.out.readLine();
-                            } catch (IOException e) {
-                                System.err.println("SMT refuses to provide output.");
-
-                                throw new SMTException(e);
-                            }
-
-                            if (!satisfiable) {
-                                methodInterpolants = PredicatesFactory.createInterpolantsFromString(output);
-
-                                for (int i = 0; i < methodInterpolants.length; ++i) {
-                                    if (!(methodInterpolants[i] instanceof Tautology) && config.enabledVerbose(this.getClass())) {
-                                        System.out.println("\t... inserting interpolant `" + methodInterpolants[i] + "` to " + (m.get(i) + 1));
-                                    }
-                                }
-                            }
-                            break;
-                        case Z3:
-                            if (satisfiable) {
-                                try {
-                                    output = interpol.out.readLine();
-                                } catch (IOException e) {
-                                    System.err.println("SMT refuses to provide output.");
-
-                                    throw new SMTException(e);
-                                }
-                            } else {
-                                methodInterpolants = new Predicate[m.size()];
-
-                                int lastStep = 0;
-                                for (int i = 0; i < m.size(); ++i) {
-                                    if (i > 0) {
-                                        if (lastStep != m.get(i) - 1) {
-                                            try {
-                                                output = interpol.out.readLine();
-                                            } catch (IOException e) {
-                                                System.err.println("SMT refuses to provide output.");
-
-                                                throw new SMTException(e);
-                                            }
-
-                                            Predicate nested = PredicatesFactory.createInterpolantFromString(output);
-
-                                            if (!(nested instanceof Contradiction)) {
-                                                methodInterpolants[i - 1] = Conjunction.create(methodInterpolants[i - 1], nested);
-
-                                                if (!(nested instanceof Tautology) && config.enabledVerbose(this.getClass())) {
-                                                    System.out.println("\t... inserting nested interpolant `" + nested + "` to " + (m.get(i - 1) + 1));
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    try {
-                                        output = interpol.out.readLine();
-                                    } catch (IOException e) {
-                                        System.err.println("SMT refuses to provide output.");
-
-                                        throw new SMTException(e);
-                                    }
-
-                                    methodInterpolants[i] = PredicatesFactory.createInterpolantFromString(output);
-
-                                    if (!(methodInterpolants[i] instanceof Tautology) && config.enabledVerbose(this.getClass())) {
-                                        System.out.println("\t... inserting interpolant `" + methodInterpolants[i] + "` to " + (m.get(i) + 1));
-                                    }
-
-                                    lastStep = m.get(i);
-                                }
-                            }
-                            break;
-                    }
-
-                    if (!satisfiable) {
-                        for (int i = 0; i < m.size(); ++i) {
-                            if (m.get(i) < interpolants.length) {
-                                Predicate p = interpolants[m.get(i)];
-
-                                if (!(methodInterpolants[i] instanceof Contradiction)) {
-                                    p = Conjunction.create(p, methodInterpolants[i]);
-                                }
-
-                                if (config.enabledMethodGlobalRefinement()) {
-                                    if (!(methodInterpolants[methodInterpolants.length - 1] instanceof Contradiction)) {
-                                        p = Conjunction.create(p, methodInterpolants[methodInterpolants.length - 1]); // The last interpolant overapproximates the whole method and may be necessary (not globally but what can you do :))
-                                        // Also check if there was not a return location where we might also want to track the predicate
-                                        int j = m.get(i) - 1;
-
-                                        if (j > m.get(0) && !m.contains(j)) {
-                                            Predicate q = interpolants[m.get(i) - 1];
-
-                                            q = Conjunction.create(q, methodInterpolants[methodInterpolants.length - 1]);
-
-                                            interpolants[m.get(i) - 1] = q;
-                                        }
-                                    }
-
-                                }
-
-                                interpolants[m.get(i)] = p;
-                            }
-                        }
-
-                        if (config.enabledMethodGlobalRefinement()) {
-                            if (!(methodInterpolants[methodInterpolants.length - 1] instanceof Contradiction)) {
-                                if (m.get(m.size() - 1) >= interpolants.length) {
-                                    for (int i = 0; i < interpolants.length; ++i) {
-                                        interpolants[i] = Conjunction.create(interpolants[i], methodInterpolants[methodInterpolants.length - 1]);
-                                    }
-                                }
-                            }
-                        }
-
-                        if (config.enabledMethodGlobalRefinement()) {
-                            if (!(methodInterpolants[methodInterpolants.length - 1] instanceof Tautology) && config.enabledVerbose(this.getClass())) {
-                                System.out.println("\t... inserting interpolant `" + methodInterpolants[methodInterpolants.length - 1] + "` globally to the whole method");
-                            }
-                        }
-                    }
+            for (Predicate itp : interpolants.get(step)) {
+                if (!(itp instanceof Contradiction)) {
+                    ret[step] = Conjunction.create(ret[step], itp);
                 }
             }
         }
 
-        notifyInterpolateExecuted(interpolants);
+        notifyInterpolateExecuted(ret);
 
         if (config.enabledVerbose(this.getClass())) {
             System.out.println("Interpolants: ");
 
-            for (int i = 0; i < interpolants.length; ++i) {
-                System.out.println("\t" + interpolants[i]);
+            for (int i = 0; i < ret.length; ++i) {
+                System.out.println("\t" + ret[i]);
             }
         }
 
@@ -964,7 +1115,11 @@ public class SMT {
             elapsed += endTime.getTime() - startTime.getTime();
         }
 
-        return interpolants;
+        if (satisfiable) {
+            return null;
+        } else {
+            return ret;
+        }
     }
 
     /**
