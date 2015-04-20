@@ -583,25 +583,87 @@ public class SMT {
             input.append(separator);
         }
 
+        int voidFeatures = PLAIN; // Do not generate duplicate query if it is going to look the same due to missing features
+
+        /**
+         * Trace:
+         *
+         * (m1) (m2 (m3) (m4)) (m5 (m6)) (m7 (m8) (m9 (m10)))
+         *
+         * Features:
+         *
+         * 1) PREFIX IN FRONT + NESTED IN PLACE
+         *
+         * query(m5) = (and m1 m2 m3 m4) (m5 (m6)) (and m7 m8 m9 m10)
+         *
+         * 2) NESTED IN PLACE
+         *
+         * query(m5) = (m5 (m6)) (and m1 m2 m3 m4 m7 m8 m9 m10)
+         *
+         * 3) PLAIN
+         *
+         * query(m5) = (m5) (and m1 m2 m3 m4 m6 m7 m8 m9 m10)
+         *
+         *
+         *
+         * Example of missing features:
+         *
+         * 1) PREFIX IN FRONT + NESTED IN PLACE
+         *
+         * query(m1) = (m1) (and ...)
+         *
+         * 2) NESTED IN PLACE
+         *
+         * query(m1) = (m1) (and ...)
+         *
+         * 3) PLAIN
+         *
+         * query(m1) = (m1) (and ...)
+         *
+         * ... The three queries are identical
+         *
+         *
+         *
+         * Another example:
+         *
+         * 1) PREFIX IN FRONT + NESTED IN PLACE
+         *
+         * query(m4) = (and m1 m2 m3) (m4) (and m5 m6 m7 m8 m9 m10)
+         * 
+         * 2) NESTED IN PLACE
+         *
+         * query(m4) = (m4) (and m1 m2 m3 m5 m6 m7 m8 m9 m10)
+         *
+         * 3) PLAIN
+         *
+         * query(m4) = (m4) (and m1 m2 m3 m5 m6 m7 m8 m9 m10)
+         *
+         * ... The last two queries are identical
+         */
+
         // Encode as:
 
         // (and prefix) g1 g2 (and nested1) ... gN (and rest)
-        prepareInterpolationForMethod(type, method, traceFormula, input, separator, PREFIX_IN_FRONT | NESTED_IN_PLACE);
+        voidFeatures = prepareInterpolationForMethod(type, method, traceFormula, input, separator, PREFIX_IN_FRONT | NESTED_IN_PLACE);
 
         queries.add(new InterpolationEntry(method, PREFIX_IN_FRONT | NESTED_IN_PLACE, input.toString()));
         input.setLength(0);
 
         // g1 g2 (and nested1) ... gN (and rest)
-        prepareInterpolationForMethod(type, method, traceFormula, input, separator, NESTED_IN_PLACE);
+        if ((voidFeatures & PREFIX_IN_FRONT) != PREFIX_IN_FRONT) { // Only if the previous query does not cover this one
+            voidFeatures = prepareInterpolationForMethod(type, method, traceFormula, input, separator, NESTED_IN_PLACE);
 
-        queries.add(new InterpolationEntry(method, NESTED_IN_PLACE, input.toString()));
-        input.setLength(0);
+            queries.add(new InterpolationEntry(method, NESTED_IN_PLACE, input.toString()));
+            input.setLength(0);
+        }
 
         // g1 g2 ... gN (and rest)
-        prepareInterpolationForMethod(type, method, traceFormula, input, separator, PLAIN);
+        if ((voidFeatures & NESTED_IN_PLACE) != NESTED_IN_PLACE) { // Only if the previous query does not cover this one
+            voidFeatures = prepareInterpolationForMethod(type, method, traceFormula, input, separator, PLAIN);
 
-        queries.add(new InterpolationEntry(method, PLAIN, input.toString()));
-        input.setLength(0);
+            queries.add(new InterpolationEntry(method, PLAIN, input.toString()));
+            input.setLength(0);
+        }
     }
 
     /**
@@ -613,10 +675,15 @@ public class SMT {
      * where
      *   prefix contains all methods that have exited before this one (none of its local symbols is referenced later)
      *   rest contains the enveloping methods (caller and its caller ...) and all methods called after this one exits
+     *
+     * The return value specifies which features of the trace were empty.
+     * When some of the features (prefix, nested methods) are empty, the query is essentially the same as a query formatted in a simpler way.
      */
-    private void prepareInterpolationForMethod(SupportedSMT type, int method, TraceFormula traceFormula, StringBuilder input, String separator, int format) {
+    private int prepareInterpolationForMethod(SupportedSMT type, int method, TraceFormula traceFormula, StringBuilder input, String separator, int format) {
         Pair<MethodInfo, List<Integer>> mp = traceFormula.getMethods().get(method);
         List<Integer> m = mp.getSecond();
+
+        int ret = PREFIX_IN_FRONT | NESTED_IN_PLACE;
 
         if (m.get(0) > 0) {
             switch (type) {
@@ -640,6 +707,8 @@ public class SMT {
                 for (int i = 0; i < startM; ++i) {
                     input.append(" g"); input.append(i + 1);
                     steps.add(i);
+
+                    ret &= ~PREFIX_IN_FRONT;
                 }
 
                 for (Pair<MethodInfo, List<Integer>> mp2 : traceFormula.getMethods()) {
@@ -664,7 +733,7 @@ public class SMT {
             for (int i = m.get(0); i <= m.get(m.size() - 1); ++i) {
                 if (m.contains(i)) {
                     if (nestedMethodSteps == 1) {
-                        input.append(" true");
+                        input.append(" g0");
                     }
                     if (nestedMethodSteps > 0) {
                         input.append(")");
@@ -683,6 +752,8 @@ public class SMT {
 
                     input.append(" g"); input.append(i + 1);
                     steps.add(i);
+
+                    ret &= ~NESTED_IN_PLACE;
                 }
             }
 
@@ -696,6 +767,8 @@ public class SMT {
 
             input.append(")"); input.append(separator);
         }
+
+        return ret;
     }
 
     private void interpolateMethod(SMT interpol, boolean satisfiable, int method, TraceFormula traceFormula, Map<Integer, Set<Predicate>> interpolants, int format) {
@@ -930,7 +1003,7 @@ public class SMT {
 
         int interpolationGroup = 0;
 
-        head.append("(assert (! true :named g0))"); head.append(separator);
+        head.append("(assert (! true :named g0))"); head.append(separator); // SMTInterpol requires all nodes in the interpolation query to be named (not constant true)
         for (Step s : traceFormula) {
             head.append("(assert (! "); head.append(convertToString(s.getPredicate())); head.append(" :named g"); head.append(++interpolationGroup); head.append("))"); head.append(separator);
         }
