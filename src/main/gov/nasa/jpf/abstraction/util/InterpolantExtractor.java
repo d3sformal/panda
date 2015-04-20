@@ -386,13 +386,17 @@ public class InterpolantExtractor {
     }
 
     public static Predicate eq(Arrays a, Expression e) {
+        PandaConfig config = PandaConfig.getInstance();
+
         // arr = (awrite ... ... ... ...)
         if (e instanceof ArrayElementWrite) {
             ArrayElementWrite w = (ArrayElementWrite) e;
 
             Predicate ret = eq(DefaultArrayElementRead.create(w.getArray(), w.getIndex()), w.getNewValue());
 
-            System.out.println("[WARNING] Removing: " + a + " = " + e);
+            if (config.enabledVerbose(InterpolantExtractor.class)) {
+                System.out.println("[WARNING] Removing: " + a + " = " + e);
+            }
 
             return ret;
         }
@@ -403,7 +407,9 @@ public class InterpolantExtractor {
             if (s.isRoot()) {
                 Predicate ret = eq(Select.create((AccessExpression) s.getIndex()), s.getValue());
 
-                System.out.println("[WARNING] Removing: " + a + " = " + e);
+                if (config.enabledVerbose(InterpolantExtractor.class)) {
+                    System.out.println("[WARNING] Removing: " + a + " = " + e);
+                }
 
                 return ret;
             }
