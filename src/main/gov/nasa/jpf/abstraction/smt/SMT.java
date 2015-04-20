@@ -573,7 +573,14 @@ public class SMT {
         StringBuilder input = new StringBuilder();
 
         if (m.get(0) > 0) {
-            input.append("; Method "); input.append(mp.getFirst().getFullName()); input.append(separator);
+            input.append("; Method "); input.append(mp.getFirst().getFullName());
+
+            for (int i : m) {
+                input.append(" g");
+                input.append(i + 1);
+            }
+
+            input.append(separator);
         }
 
         // Encode as:
@@ -636,8 +643,10 @@ public class SMT {
 
                     if (end < m.get(0)) {
                         for (int i = start; i <= end; ++i) {
-                            input.append(" g"); input.append(i + 1);
-                            steps.add(i);
+                            if (!steps.contains(i)) {
+                                input.append(" g"); input.append(i + 1);
+                                steps.add(i);
+                            }
                         }
                     }
                 }
