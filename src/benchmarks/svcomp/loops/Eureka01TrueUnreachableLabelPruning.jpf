@@ -8,3 +8,4 @@ sourcepath=${jpf-abstraction}/src/benchmarks/
 panda.refinement=true
 panda.branch.adjust_concrete_values=false
 panda.branch.prune_infeasible=true
+panda.branch.track_exact_value_for_loop_control_variable=true
