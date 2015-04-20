@@ -635,14 +635,21 @@ public class SMT {
             input.append(" (and g0 g0"); // Make sure the operation is at least binary
 
             if ((format & PREFIX_IN_FRONT) != 0) {
+                int startM = m.get(0);
+
+                for (int i = 0; i < startM; ++i) {
+                    input.append(" g"); input.append(i + 1);
+                    steps.add(i);
+                }
+
                 for (Pair<MethodInfo, List<Integer>> mp2 : traceFormula.getMethods()) {
                     List<Integer> m2 = mp2.getSecond();
 
                     int start = m2.get(0);
                     int end = m2.get(m2.size() - 1);
 
-                    if (end < m.get(0)) {
-                        for (int i = start; i <= end; ++i) {
+                    if (start < startM && startM < end) { // Method started before this one (m) but not finished yet (it is a caller)
+                        for (int i : m2) { // Add code of the method (including parts that are after the call to this one (m))
                             if (!steps.contains(i)) {
                                 input.append(" g"); input.append(i + 1);
                                 steps.add(i);
