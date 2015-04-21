@@ -7,9 +7,12 @@ import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import gov.nasa.jpf.JPF;
 
@@ -83,7 +86,18 @@ public class BaseTest {
         List<String[]> targetConfig = new LinkedList<String[]>();
         List<Boolean> targetShouldPass = new LinkedList<Boolean>();
 
+        SortedSet<Method> methods = new TreeSet<Method>(new Comparator<Method>() {
+            @Override
+            public int compare(Method m1, Method m2) {
+                return m1.getName().compareTo(m2.getName());
+            }
+        });
+
         for (Method m : cls.getDeclaredMethods()) {
+            methods.add(m);
+        }
+
+        for (Method m : methods) {
             Annotation t = m.getAnnotation(gov.nasa.jpf.abstraction.Test.class);
             boolean pass = true;
 
