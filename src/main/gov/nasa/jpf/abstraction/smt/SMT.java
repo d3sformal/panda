@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.VM;
 
+import gov.nasa.jpf.abstraction.Method;
 import gov.nasa.jpf.abstraction.PandaConfig;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.Step;
@@ -568,12 +569,11 @@ public class SMT {
     }
 
     private void prepareInterpolationForMethod(SupportedSMT type, int method, TraceFormula traceFormula, List<InterpolationEntry> queries, String separator) {
-        Pair<MethodInfo, List<Integer>> mp = traceFormula.getMethods().get(method);
-        List<Integer> m = mp.getSecond();
+        Method m = traceFormula.getMethods().get(method);
         StringBuilder input = new StringBuilder();
 
         if (m.get(0) > 0) {
-            input.append("; Method "); input.append(mp.getFirst().getFullName());
+            input.append("; Method "); input.append(m.getInfo().getFullName());
 
             for (int i : m) {
                 input.append(" g");
@@ -680,8 +680,7 @@ public class SMT {
      * When some of the features (prefix, nested methods) are empty, the query is essentially the same as a query formatted in a simpler way.
      */
     private int prepareInterpolationForMethod(SupportedSMT type, int method, TraceFormula traceFormula, StringBuilder input, String separator, int format) {
-        Pair<MethodInfo, List<Integer>> mp = traceFormula.getMethods().get(method);
-        List<Integer> m = mp.getSecond();
+        Method m = traceFormula.getMethods().get(method);
 
         int ret = PREFIX_IN_FRONT | NESTED_IN_PLACE;
 
@@ -711,9 +710,7 @@ public class SMT {
                     ret &= ~PREFIX_IN_FRONT;
                 }
 
-                for (Pair<MethodInfo, List<Integer>> mp2 : traceFormula.getMethods()) {
-                    List<Integer> m2 = mp2.getSecond();
-
+                for (Method m2 : traceFormula.getMethods()) {
                     int start = m2.get(0);
                     int end = m2.get(m2.size() - 1);
 
@@ -776,11 +773,11 @@ public class SMT {
 
         PandaConfig config = PandaConfig.getInstance();
 
-        List<Integer> m = traceFormula.getMethods().get(method).getSecond();
+        Method m = traceFormula.getMethods().get(method);
 
         if (config.enabledVerbose(this.getClass())) {
-            Step start = traceFormula.get(m.get(0));
-            Step end = traceFormula.get(m.get(m.size() - 1));
+            Step start = m.getStep(0);
+            Step end = m.getStep(m.size() - 1);
             System.out.println("Method [" + start.getMethod().getName() + ":" + start.getPC() + ".." + end.getMethod().getName() + ":" + end.getPC() + "]");
 
             for (int i : m) {
@@ -1160,9 +1157,6 @@ public class SMT {
 
             // Inject method-scoped interpolants
             for (InterpolationEntry entry : batch) {
-                Pair<MethodInfo, List<Integer>> mp = traceFormula.getMethods().get(entry.method);
-                List<Integer> m = mp.getSecond();
-
                 interpolateMethod(interpol, satisfiable, entry.method, traceFormula, interpolants, entry.format);
             }
         }

@@ -144,20 +144,21 @@ public class TraceFormula implements Iterable<Step> {
     /**
      * @returns list of step indices constituting individual methods (excluding nested calls)
      */
-    public List<Pair<MethodInfo, List<Integer>>> getMethods() {
-        List<Pair<MethodInfo, List<Integer>>> methods = new ArrayList<Pair<MethodInfo, List<Integer>>>();
+    public List<Method> getMethods() {
+        List<Method> methods = new ArrayList<Method>();
 
         while (!unmatchedCalls.isEmpty()) {
             markReturn();
         }
 
         for (int i = methodBoundaries.size() - 1; i >= 0; --i) {
+            int p = methodBoundaries.get(i).mCallInvoked; // Preparation
             int c = methodBoundaries.get(i).mCallStarted; // First step of the method
             int r = methodBoundaries.get(i).mReturn; // Last step of the method
 
             int s = c; // Step index
 
-            List<Integer> method = new ArrayList<Integer>();
+            Method method = new Method(methodBoundaries.get(i).m, this, p);
 
             // Until you reach end of the method
             while (s < r) {
@@ -178,7 +179,7 @@ public class TraceFormula implements Iterable<Step> {
             }
 
             if (!method.isEmpty()) {
-                methods.add(new Pair<MethodInfo, List<Integer>>(methodBoundaries.get(i).m, method));
+                methods.add(method);
             }
         }
 
