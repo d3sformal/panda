@@ -5,7 +5,7 @@ package gov.nasa.jpf.abstraction;
  */
 public class Verifier {
     native public static int unknownInt();
-    native public static int unknownPositiveInt();
+    native public static int unknownNonNegativeInt();
     native public static char unknownChar();
     native public static boolean unknownBool();
 }
