@@ -4,7 +4,7 @@ import gov.nasa.jpf.abstraction.Verifier;
 
 public class InsertionSortFalseUnreachableLabel {
     public static void main(String[] args) {
-        int SIZE = Verifier.unknownPositiveInt();
+        int SIZE = Verifier.unknownNonNegativeInt();
         int[] v = new int[SIZE];
 
         for (int j = 1; j < SIZE; j++) {

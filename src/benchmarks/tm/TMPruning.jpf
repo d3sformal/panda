@@ -1,0 +1,11 @@
+@using=jpf-abstraction
+
+target=tm.TM
+target.args=src/benchmarks/tm/t1
+
+classpath=${jpf-abstraction}/build/benchmarks
+sourcepath=${jpf-abstraction}/src/benchmarks
+
+panda.refinement=true
+panda.branch.adjust_concrete_values=false
+panda.branch.prune_infeasible=true

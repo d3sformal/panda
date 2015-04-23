@@ -1,0 +1,13 @@
+@using=jpf-abstraction
+
+target=pc.SerialProducerConsumer
+
+classpath=${jpf-abstraction}/build/benchmarks
+sourcepath=${jpf-abstraction}/src/benchmarks
+
+panda.refinement=true
+
+listener+=,gov.nasa.jpf.abstraction.util.ExecTracker
+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker
+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor
+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener
