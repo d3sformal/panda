@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -1006,6 +1007,9 @@ public class PredicateAbstraction extends Abstraction {
                     }
 
                     String filename = config.refinementDumpAbstractionPredicatesTo();
+                    File file = new File(filename);
+
+                    file.getParentFile().mkdir();
 
                     try (PrintWriter w = new PrintWriter(new FileOutputStream(filename))) {
                        w.println(predicateSet.toString());
