@@ -21,6 +21,7 @@ import gov.nasa.jpf.abstraction.parser.PredicatesParser;
  * A factory used to produce predicate abstraction instances from definition in an input file whose name is the first element of the @param args parameter
  */
 public class PredicateAbstractionFactory extends AbstractionFactory {
+    public static Predicates systemPredicates = null;
 
     private static String systemPredicatesFilename = "systemlibs.pred";
     private static Map<String, PredicateAbstractionBuilder> builders = new HashMap<String, PredicateAbstractionBuilder>();
@@ -40,6 +41,7 @@ public class PredicateAbstractionFactory extends AbstractionFactory {
     public PredicateAbstraction create(Config config, String[]... args) {
         Predicates predicates = new Predicates();
 
+        systemPredicates = createPredicates("predicates", systemPredicatesFilename); // Store a copy of the initial predicates
         predicates.contexts.addAll(createPredicates("predicates", systemPredicatesFilename).contexts);
 
         for (String[] arguments : args) {

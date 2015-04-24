@@ -37,4 +37,16 @@ public class ObjectPredicateContext extends PredicateContext {
     public void accept(PredicatesComponentVisitor visitor) {
         visitor.visit(this);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o.getClass().equals(getClass())) {
+            ObjectPredicateContext ctx = (ObjectPredicateContext) o;
+
+            return packageAndClass.equals(ctx.packageAndClass);
+        }
+
+        return false;
+    }
+
 }

@@ -39,6 +39,17 @@ public class DefaultMethod implements Method {
         return packageAndClass.toString() + "." + getName();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof DefaultMethod) {
+            DefaultMethod m = (DefaultMethod) o;
+
+            return packageAndClass.equals(m.packageAndClass) && name.equals(m.name);
+        }
+
+        return false;
+    }
+
     public static DefaultMethod create(PackageAndClass packageAndClass, String name) {
         if (packageAndClass == null || name == null) {
             return null;

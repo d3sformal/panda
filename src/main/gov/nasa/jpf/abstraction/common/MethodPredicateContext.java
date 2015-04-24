@@ -30,4 +30,15 @@ public class MethodPredicateContext extends AbstractMethodPredicateContext {
         visitor.visit(this);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o.getClass().equals(getClass())) {
+            MethodPredicateContext ctx = (MethodPredicateContext) o;
+
+            return getMethod().equals(ctx.getMethod());
+        }
+
+        return false;
+    }
+
 }

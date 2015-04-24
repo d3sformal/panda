@@ -213,38 +213,75 @@ public class PredicateConsolePublisher extends ConsolePublisher {
         int total = 0;
 
         for (PredicateContext ctx : preds.contexts) {
-            if (ctx instanceof MethodPredicateContext) {
-                MethodPredicateContext mctx = (MethodPredicateContext) ctx;
-                Method m = mctx.getMethod();
+            if (!PredicateAbstractionFactory.systemPredicates.contexts.contains(ctx)) {
+                if (ctx instanceof MethodPredicateContext) {
+                    MethodPredicateContext mctx = (MethodPredicateContext) ctx;
+                    Method m = mctx.getMethod();
 
-                for (Predicate p : ctx.getPredicates()) {
-                    if (!method2pred.containsKey(m)) {
-                        method2pred.put(m, new HashSet<Predicate>());
-                    }
-                    if (method2pred.get(m).contains(p)) {
-                        for (Predicate q : method2pred.get(m)) {
-                            if (p.equals(q)) {
-                                q.setScope(q.getScope().merge(p.getScope()));
-                                break;
-                            }
+                    for (Predicate p : ctx.getPredicates()) {
+                        if (!method2pred.containsKey(m)) {
+                            method2pred.put(m, new HashSet<Predicate>());
                         }
-                    } else {
-                        method2pred.get(m).add(p);
+                        if (method2pred.get(m).contains(p)) {
+                            for (Predicate q : method2pred.get(m)) {
+                                if (p.equals(q)) {
+                                    q.setScope(q.getScope().merge(p.getScope()));
+                                    break;
+                                }
+                            }
+                        } else {
+                            method2pred.get(m).add(p);
+                        }
                     }
                 }
             }
         }
         for (PredicateContext ctx : preds.contexts) {
-            if (ctx instanceof ObjectPredicateContext) {
-                ObjectPredicateContext octx = (ObjectPredicateContext) ctx;
-                PackageAndClass pc = octx.getPackageAndClass();
-                boolean added = false;
+            if (!PredicateAbstractionFactory.systemPredicates.contexts.contains(ctx)) {
+                if (ctx instanceof ObjectPredicateContext) {
+                    ObjectPredicateContext octx = (ObjectPredicateContext) ctx;
+                    PackageAndClass pc = octx.getPackageAndClass();
+                    boolean added = false;
 
-                for (Method m : method2pred.keySet()) {
-                    if (m.getPackageAndClass().equals(pc)) {
-                        added = true;
+                    for (Method m : method2pred.keySet()) {
+                        if (m.getPackageAndClass().equals(pc)) {
+                            added = true;
 
-                        for (Predicate p : octx.getPredicates()) {
+                            for (Predicate p : octx.getPredicates()) {
+                                if (method2pred.get(m).contains(p)) {
+                                    for (Predicate q : method2pred.get(m)) {
+                                        if (p.equals(q)) {
+                                            q.setScope(q.getScope().merge(p.getScope()));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    method2pred.get(m).add(p);
+                                }
+                            }
+                        }
+                    }
+
+                    if (!added) {
+                        Method m = DefaultMethod.create(pc, "<init>");
+
+                        method2pred.put(m, new HashSet<Predicate>());
+                        method2pred.get(m).addAll(octx.getPredicates());
+                    }
+                }
+            }
+        }
+        for (PredicateContext ctx : preds.contexts) {
+            if (!PredicateAbstractionFactory.systemPredicates.contexts.contains(ctx)) {
+                if (ctx instanceof StaticPredicateContext) {
+                    StaticPredicateContext sctx = (StaticPredicateContext) ctx;
+
+                    if (method2pred.isEmpty()) {
+                        method2pred.put(DefaultMethod.create(DefaultPackageAndClass.create(""), ""), new HashSet<Predicate>());
+                    }
+
+                    for (Method m : method2pred.keySet()) {
+                        for (Predicate p : sctx.getPredicates()) {
                             if (method2pred.get(m).contains(p)) {
                                 for (Predicate q : method2pred.get(m)) {
                                     if (p.equals(q)) {
@@ -255,37 +292,6 @@ public class PredicateConsolePublisher extends ConsolePublisher {
                             } else {
                                 method2pred.get(m).add(p);
                             }
-                        }
-                    }
-                }
-
-                if (!added) {
-                    Method m = DefaultMethod.create(pc, "<init>");
-
-                    method2pred.put(m, new HashSet<Predicate>());
-                    method2pred.get(m).addAll(octx.getPredicates());
-                }
-            }
-        }
-        for (PredicateContext ctx : preds.contexts) {
-            if (ctx instanceof StaticPredicateContext) {
-                StaticPredicateContext sctx = (StaticPredicateContext) ctx;
-
-                if (method2pred.isEmpty()) {
-                    method2pred.put(DefaultMethod.create(DefaultPackageAndClass.create(""), ""), new HashSet<Predicate>());
-                }
-
-                for (Method m : method2pred.keySet()) {
-                    for (Predicate p : sctx.getPredicates()) {
-                        if (method2pred.get(m).contains(p)) {
-                            for (Predicate q : method2pred.get(m)) {
-                                if (p.equals(q)) {
-                                    q.setScope(q.getScope().merge(p.getScope()));
-                                    break;
-                                }
-                            }
-                        } else {
-                            method2pred.get(m).add(p);
                         }
                     }
                 }
@@ -354,8 +360,10 @@ public class PredicateConsolePublisher extends ConsolePublisher {
         }
 
         for (PredicateContext ctx : preds.contexts) {
-            for (Predicate p : ctx.getPredicates()) {
-                ++total;
+            if (!PredicateAbstractionFactory.systemPredicates.contexts.contains(ctx)) {
+                for (Predicate p : ctx.getPredicates()) {
+                    ++total;
+                }
             }
         }
 

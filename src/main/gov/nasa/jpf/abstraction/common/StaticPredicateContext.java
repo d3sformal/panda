@@ -36,4 +36,10 @@ public class StaticPredicateContext extends PredicateContext {
 
         return super.put(p, v);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof StaticPredicateContext;
+    }
+
 }
