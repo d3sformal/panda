@@ -31,7 +31,7 @@ public class CopyTest extends BaseTest {
         copy2();
     }
 
-    //@Test
+    @Test
     @Config(items = {
         "+panda.branch.adjust_concrete_values=false",
         "+panda.branch.prune_infeasible=true"
