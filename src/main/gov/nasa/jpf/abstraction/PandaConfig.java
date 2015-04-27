@@ -36,6 +36,8 @@ public class PandaConfig {
     private Boolean branchReevaluatePredicates;
     private Boolean refinement;
     private PredicateAbstraction.Initialization refinementInitialization;
+    private Boolean refinementNested;
+    private Boolean refinementCustom;
     private Boolean refinementGlobal;
     private Boolean refinementMethodGlobal;
     private Boolean refinementKeepUnrefinedPrefix;
@@ -279,6 +281,22 @@ public class PandaConfig {
         }
 
         return refinementGlobal;
+    }
+
+    public boolean enabledNestedRefinement() {
+        if (refinementNested == null) {
+            refinementNested = getUnderlyingConfig().getBoolean("panda.refinement.nested");
+        }
+
+        return refinementNested;
+    }
+
+    public boolean enabledCustomRefinement() {
+        if (refinementCustom == null) {
+            refinementCustom = getUnderlyingConfig().getBoolean("panda.refinement.custom");
+        }
+
+        return refinementCustom;
     }
 
     public boolean enabledMethodGlobalRefinement() {

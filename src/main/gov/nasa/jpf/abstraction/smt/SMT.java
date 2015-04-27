@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -959,6 +960,30 @@ public class SMT {
      * @returns null if the Trace Formula is satisfiable. Otherwise an array of !FORMULAS! (non-atomic predicates) is returned (the length of the array corresponds to the length of the Trace Formula)
      */
     public Predicate[] interpolate(TraceFormula traceFormula) throws SMTException {
+        PandaConfig config = PandaConfig.getInstance();
+        Predicate[] ret = new Predicate[traceFormula.size() - 1];
+
+        for (int i = 0; i < ret.length; ++i) {
+            ret[i] = Tautology.create();
+        }
+
+        boolean satisfiable = true;
+
+        if (config.enabledCustomRefinement()) {
+            satisfiable &= interpolateCustom(traceFormula, ret);
+        }
+        if (config.enabledNestedRefinement()) {
+            satisfiable &= interpolateNested(traceFormula, ret);
+        }
+
+        if (satisfiable) {
+            return null;
+        }
+
+        return ret;
+    }
+
+    public boolean interpolateCustom(TraceFormula traceFormula, Predicate[] ret) throws SMTException {
         notifyInterpolateInvoked(traceFormula);
 
         Date startTime = new Date();
@@ -1161,11 +1186,7 @@ public class SMT {
             }
         }
 
-        Predicate[] ret = new Predicate[traceFormula.size() - 1];
-
         for (int step : interpolants.keySet()) {
-            ret[step] = Tautology.create();
-
             for (Predicate itp : interpolants.get(step)) {
                 if (!(itp instanceof Contradiction)) {
                     ret[step] = Conjunction.create(ret[step], itp);
@@ -1198,11 +1219,295 @@ public class SMT {
             elapsed += endTime.getTime() - startTime.getTime();
         }
 
-        if (satisfiable) {
-            return null;
-        } else {
-            return ret;
+        return satisfiable;
+    }
+
+    private boolean interpolateNested(TraceFormula traceFormula, Predicate[] interpolants) {
+        ++itp;
+
+        notifyInterpolateInvoked(traceFormula);
+
+        Date startTime = new Date();
+        SupportedSMT type = PandaConfig.getInstance().getInterpolationSMT();
+
+        SMT interpol = new SMT(type);
+        PandaConfig config = PandaConfig.getInstance();
+
+        PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
+
+        // Treat all steps separately
+        // False-conjunct may turn the conjunction into False
+        // Not having any symbols
+        for (Step s : traceFormula) {
+            collector.collect(s.getPredicate());
         }
+
+        Set<String> classes = collector.getClasses();
+        Set<String> variables = collector.getVars();
+        Set<String> fields = collector.getFields();
+        Set<String> arrays = collector.getArrays();
+        Set<AccessExpression> objects = collector.getObjects();
+        Set<Integer> fresh = collector.getFresh();
+
+        String separator = InputType.DEBUG.getSeparator();
+
+        StringBuilder head = new StringBuilder();
+
+        appendClassDeclarations(classes, head, separator);
+        appendVariableDeclarations(variables, head, separator);
+        appendFieldDeclarations(fields, head, separator);
+        appendArraysDeclarations(arrays, head, separator);
+
+        if (!fresh.isEmpty()) {
+            for (int id : fresh) {
+                head.append("(declare-fun fresh_" + id + " () Int)" + separator);
+            }
+        }
+
+        try {
+            interpol.in.write(head.toString());
+            interpol.in.flush();
+        } catch (IOException e) {
+            System.err.println("SMT refuses input.");
+
+            throw new SMTException(e);
+        }
+
+        head.setLength(0);
+        head.append("(push 1)"); head.append(separator);
+
+        int interpolationGroup = 0;
+
+        head.append("(assert (! true :named g0))"); head.append(separator); // SMTInterpol requires all nodes in the interpolation query to be named (not constant true)
+        for (Step s : traceFormula) {
+            head.append("(assert (! "); head.append(convertToString(s.getPredicate())); head.append(" :named g"); head.append(++interpolationGroup); head.append("))"); head.append(separator);
+        }
+        head.append("(check-sat)"); head.append(separator);
+        head.append("; Interpolants"); head.append(separator);
+
+        // Overall (Global) interpolants (No notion of method scopes)
+        if (config.enabledGlobalRefinement()) {
+            switch (type) {
+                case SMTInterpol:
+                    head.append("(get-interpolants");
+                    break;
+                case Z3:
+                    head.append("(get-interpolant");
+                    break;
+            }
+            for (int i = 1; i <= interpolationGroup; ++i) {
+                head.append(" g"); head.append(i);
+            }
+            head.append(")"); head.append(separator);
+        }
+
+        String output;
+        boolean satisfiable = true;
+
+        List<Method> methods2 = traceFormula.getMethods();
+        List<Method> methods1 = new ArrayList<Method>();
+
+        methods1.addAll(methods2);
+
+        Collections.sort(methods1, new Comparator<Method>() {
+            @Override
+            public int compare(Method m1, Method m2) {
+                return m1.getCall() - m2.getCall();
+            }
+        });
+
+        // Ordered by call, maps calls to returns
+        int k = 0;
+        int[] calls1 = new int[methods1.size()];
+        Integer[] returns1 = new Integer[methods1.size()];
+
+        for (Method m : methods1) {
+            calls1[k] = m.getCall();
+
+            if (m.getReturn() < traceFormula.size()) {
+                returns1[k] = m.getReturn();
+            } else {
+                returns1[k] = null;
+            }
+
+            ++k;
+        }
+
+        // Ordered by return, maps returns to calls
+        int l = 0;
+        int[] calls2 = new int[methods2.size()];
+        Integer[] returns2 = new Integer[methods2.size()];
+
+        for (Method m : methods2) {
+            calls2[l] = m.getCall();
+
+            if (m.getReturn() < traceFormula.size()) {
+                returns2[l] = m.getReturn();
+            } else {
+                returns2[l] = null;
+            }
+
+            ++l;
+        }
+
+        int n = traceFormula.size();
+        int rawItp = ++interpolationGroup;
+        Predicate[] itps = new Predicate[n + 1];
+        Predicate[] ret = new Predicate[n - 1];
+
+        itps[0] = Tautology.create();
+
+        StringBuilder input = new StringBuilder();
+
+        // Closest calls/returns to the current step
+        k = 0;
+        l = returns2.length - 1;
+
+        head.append("(assert (! true :named g"); head.append(interpolationGroup); head.append("))"); head.append(separator);
+        for (int i = 0; i < n; ++i) {
+            notifyInterpolateInputGenerated(head.toString());
+
+            try {
+                interpol.in.write(head.toString());
+                interpol.in.flush();
+            } catch (IOException e) {
+                System.err.println("SMT refuses input.");
+
+                throw new SMTException(e);
+            }
+
+            try {
+                interpol.in.write(input.toString());
+                interpol.in.flush();
+            } catch (IOException e) {
+                System.err.println("SMT refuses input.");
+
+                throw new SMTException(e);
+            }
+
+            input.setLength(0);
+
+            try {
+                output = interpol.out.readLine();
+
+                if (output == null || !output.matches("^(un)?sat$")) {
+                    throw new SMTException("SMT replied with '" + output + "'");
+                }
+
+                satisfiable = output.matches("^sat$");
+            } catch (IOException e) {
+                System.err.println("SMT refuses to provide output.");
+
+                throw new SMTException(e);
+            }
+
+            if (calls1[k] == i) {
+                input.append("; call "); input.append(methods1.get(k).getInfo().getFullName()); input.append(separator);
+            }
+            if (returns2[l] != null && returns2[l] == i) {
+                input.append("; return from "); input.append(methods2.get(l).getInfo().getFullName()); input.append(separator);
+            }
+            input.append("(compute-interpolant ");
+
+            // psi-
+            input.append("(and g0 g0");
+
+            if (calls1[k] != i && (returns2[l] == null || returns2[l] != i)) { // Internal
+                input.append(" g"); input.append(rawItp + i); input.append(" g"); input.append(i + 1);
+            } else if (calls1[k] == i) { // Call
+                if (returns1[k] == null) { // Parent
+                    input.append(" g"); input.append(rawItp + i); input.append(" g"); input.append(i + 1);
+                }
+                // else append true
+            } else if (returns2[l] == i) { // Return
+                input.append(" g"); input.append(rawItp + i); input.append(" g"); input.append(i + 1);
+                input.append(" g"); input.append(rawItp + calls2[l]); input.append(" g"); input.append(calls2[l] + 1);
+            }
+            input.append(")");
+
+            // Find the closest call/return to next step
+            while (k < calls1.length - 1 && calls1[k] < i + 1) {
+                ++k;
+            }
+            while (l > 0 && returns2[l] != null && returns2[l] < i) {
+                --l;
+            }
+
+            // psi+
+            input.append(" (and g0 g0");
+            for (int j = i + 1; j < n; ++j) {
+                input.append(" g"); input.append(j + 1);
+            }
+            for (int j = 0; j <= k; ++j) {
+                if (returns1[j] != null && returns1[j] > i) { // Pending calls
+                    input.append(" g"); input.append(rawItp + j); input.append(" g"); input.append(calls1[j] + 1);
+                }
+            }
+            input.append(")");
+
+            input.append(")");
+            input.append(separator);
+
+            input.append("(pop 1)"); input.append(separator);
+
+            // Query
+            try {
+                notifyInterpolateInputGenerated(input.toString());
+
+                interpol.in.write(input.toString());
+                interpol.in.flush();
+
+                input.setLength(0);
+            } catch (IOException e) {
+                System.err.println("SMT refuses input.");
+
+                throw new SMTException(e);
+            }
+
+            try {
+                output = interpol.out.readLine();
+
+                boolean stepSatisfiable = output.matches("^sat$");
+
+                String newRawItp;
+
+                if (stepSatisfiable) {
+                    newRawItp = "true";
+                    itps[i + 1] = Tautology.create();
+                } else {
+                    output = interpol.out.readLine();
+
+                    newRawItp = output.replaceAll("\\s+", " ");
+                    itps[i + 1] = PredicatesFactory.createInterpolantFromString(newRawItp);
+                }
+
+                head.append("(assert (! "); head.append(newRawItp); head.append(" :named g"); head.append(++interpolationGroup); head.append("))"); head.append(separator);
+            } catch (IOException e) {
+                System.err.println("SMT refuses to provide output.");
+
+                throw new SMTException(e);
+            }
+
+            if (i < n - 1) {
+                interpolants[i] = Conjunction.create(interpolants[i], itps[i + 1]);
+            }
+        }
+
+        notifyInterpolateExecuted(ret);
+
+        if (config.enabledVerbose(this.getClass())) {
+            System.out.println("Interpolants: ");
+
+            for (int i = 0; i < ret.length; ++i) {
+                System.out.println("\t" + ret[i]);
+            }
+        }
+
+        Date endTime = new Date();
+
+        elapsed += endTime.getTime() - startTime.getTime();
+
+        return satisfiable;
     }
 
     /**
