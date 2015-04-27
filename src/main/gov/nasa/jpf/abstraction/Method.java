@@ -8,12 +8,12 @@ public class Method extends ArrayList<Integer> {
     private static final long serialVersionUID = 0L;
     private MethodInfo info;
     private TraceFormula trace;
-    private int init;
+    private TraceFormula.MethodBoundaries boundaries;
 
-    public Method(MethodInfo info, TraceFormula trace, Integer init) {
+    public Method(MethodInfo info, TraceFormula trace, TraceFormula.MethodBoundaries b) {
         this.info = info;
         this.trace = trace;
-        this.init = init;
+        this.boundaries = b;
     }
 
     public MethodInfo getInfo() {
@@ -29,7 +29,19 @@ public class Method extends ArrayList<Integer> {
     }
 
     public int getInit() {
-        return init;
+        return boundaries.mCallInvoked;
+    }
+
+    public int getCall() {
+        return boundaries.mCallStarted;
+    }
+
+    public int getReturn() {
+        return boundaries.mReturn;
+    }
+
+    public int getFinish() {
+        return boundaries.mReturned;
     }
 
     public Step getInitStep() {
@@ -40,7 +52,7 @@ public class Method extends ArrayList<Integer> {
         if (o instanceof Method) {
             Method m = (Method) o;
 
-            return info.equals(m.info) && init == m.init && trace == m.trace && super.equals(o);
+            return info.equals(m.info) && boundaries == m.boundaries && trace == m.trace && super.equals(o);
         }
 
         return false;

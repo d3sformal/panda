@@ -407,7 +407,7 @@ public class PredicateAbstraction extends Abstraction {
 
             traceFormula.markCallInvoked(method);
 
-            extendTraceFormulaWith(assignment, method, 0, false);
+            extendTraceFormulaWith(assignment, method, 0, true);
 
             traceFormula.markCallStarted();
         }
@@ -468,7 +468,7 @@ public class PredicateAbstraction extends Abstraction {
         if (RunDetector.isRunning()) {
             ssa.changeDepth(-1);
 
-            //extendTraceFormulaWithConstraint(Tautology.create(), before.getMethodInfo(), before.getPC().getPosition() + before.getPC().getLength(), true);
+            extendTraceFormulaWithConstraint(Tautology.create(), before.getMethodInfo(), before.getPC().getPosition() + before.getPC().getLength(), true);
             traceFormula.markReturn();
             extendTraceFormulaWithConstraint(Tautology.create(), after.getMethodInfo(), after.getPC().getPosition() + after.getPC().getLength(), true);
             traceFormula.markReturned();

@@ -276,7 +276,7 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             System.out.println(gov.nasa.jpf.abstraction.common.Notation.convertToString(ctx));
         }
 
-        if (m.getName().equals("<clinit>")) {
+        if (m.getName().equals("<clinit>") || m.getName().equals("[<clinit>]")) {
             refined |= refineStatic(interpolant);
         }
 

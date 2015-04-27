@@ -37,7 +37,7 @@ public class TraceFormula implements Iterable<Step> {
     // position of the call on current trace
     private Stack<MethodCall> unmatchedCalls = new Stack<MethodCall>();
 
-    private class MethodBoundaries {
+    public class MethodBoundaries {
         MethodInfo m;
         int mCallInvoked;
         int mCallStarted;
@@ -54,6 +54,18 @@ public class TraceFormula implements Iterable<Step> {
 
         MethodBoundaries(MethodCall mCall, int mReturn, int mReturned) {
             this(mCall.m, mCall.mCallInvoked, mCall.mCallStarted, mReturn, mReturned);
+        }
+
+        public boolean equals(Object o) {
+            if (this == o) return true;
+
+            if (o instanceof MethodBoundaries) {
+                MethodBoundaries b = (MethodBoundaries) o;
+
+                return mCallInvoked == b.mCallInvoked && mCallStarted == b.mCallStarted && mReturn == b.mReturn && mReturned == b.mReturned;
+            }
+
+            return false;
         }
     }
 
@@ -108,7 +120,13 @@ public class TraceFormula implements Iterable<Step> {
     }
 
     public void append(Predicate p, MethodInfo m, int pc) {
-        push(new Step(p, m, pc, depth));
+        if (size() > 0 && methodBoundaries.isEmpty() && unmatchedCalls.isEmpty()) { // Merge steps in the prefix of the trace (system startup)
+            Step s = steps.pop();
+
+            push(new Step(Conjunction.create(s.getPredicate(), p), m, pc, depth));
+        } else {
+            push(new Step(p, m, pc, depth));
+        }
     }
 
     @Override
@@ -149,16 +167,16 @@ public class TraceFormula implements Iterable<Step> {
 
         while (!unmatchedCalls.isEmpty()) {
             markReturn();
+            markReturned();
         }
 
         for (int i = methodBoundaries.size() - 1; i >= 0; --i) {
-            int p = methodBoundaries.get(i).mCallInvoked; // Preparation
             int c = methodBoundaries.get(i).mCallStarted; // First step of the method
             int r = methodBoundaries.get(i).mReturn; // Last step of the method
 
             int s = c; // Step index
 
-            Method method = new Method(methodBoundaries.get(i).m, this, p);
+            Method method = new Method(methodBoundaries.get(i).m, this, methodBoundaries.get(i));
 
             // Until you reach end of the method
             while (s < r) {
