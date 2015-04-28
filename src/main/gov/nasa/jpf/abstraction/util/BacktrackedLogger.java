@@ -18,6 +18,12 @@ import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import static java.nio.file.StandardCopyOption.*;
 
 public class BacktrackedLogger extends ListenerAdapter {
+    private static PrintStream originalStdOut = System.out;
+
+    public static PrintStream getOriginalStdOut() {
+        return originalStdOut;
+    }
+
     private Stack<Long> positions = new Stack<Long>();
     private FileOutputStream fos;
     private FileChannel fc;
