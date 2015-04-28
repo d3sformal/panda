@@ -1409,19 +1409,36 @@ public class SMT {
             }
             input.append("(compute-interpolant ");
 
+            String stepClass = null;
+
             // psi-
             input.append("(and g0 g0");
 
             if (calls1[k] != i && (returns2[l] == null || returns2[l] != i)) { // Internal
                 input.append(" g"); input.append(rawItp + i); input.append(" g"); input.append(i + 1);
+
+                stepClass = "internal";
             } else if (calls1[k] == i) { // Call
-                if (returns1[k] == null) { // Parent
+                //if (k > 0 && returns1[k - 1] == null) { // Parent
                     input.append(" g"); input.append(rawItp + i); input.append(" g"); input.append(i + 1);
-                }
-                // else append true
+                //}
+                /**
+                 * According to Nested Interpolants (POPL 2010), the above rule is only applied for "parent" calls
+                 * Error traces like in the test gov.nasa.jpf.abstraction.NestedInterpolantsTest will not produces sufficient itps
+                 *
+                 * A() {this.a = new int[42]}
+                 *
+                 * a = new A(); m1(); m2(a); m3(); assert a.a.length == 42;
+                 *
+                 * when interpolating call to m1 it is necessary that phi- is not just true
+                 */
+
+                stepClass = "call " + methods1.get(k).getInfo().getName();
             } else if (returns2[l] == i) { // Return
                 input.append(" g"); input.append(rawItp + i); input.append(" g"); input.append(i + 1);
                 input.append(" g"); input.append(rawItp + calls2[l]); input.append(" g"); input.append(calls2[l] + 1);
+
+                stepClass = "return " + methods2.get(l).getInfo().getName();
             }
             input.append(")");
 
@@ -1472,6 +1489,8 @@ public class SMT {
                 String newRawItp;
 
                 if (stepSatisfiable) {
+                    System.out.println("[WARNING] Invalid interpolation step.");
+
                     newRawItp = "true";
                     itps[i + 1] = Tautology.create();
                 } else {
@@ -1481,7 +1500,7 @@ public class SMT {
                     itps[i + 1] = PredicatesFactory.createInterpolantFromString(newRawItp);
                 }
 
-                head.append("(assert (! "); head.append(newRawItp); head.append(" :named g"); head.append(++interpolationGroup); head.append("))"); head.append(separator);
+                head.append("(assert (! "); head.append(newRawItp); head.append(" :named g"); head.append(++interpolationGroup); head.append(")) ; computed at step "); head.append(i + 1); head.append(" as "); head.append(stepClass); head.append(separator);
             } catch (IOException e) {
                 System.err.println("SMT refuses to provide output.");
 
