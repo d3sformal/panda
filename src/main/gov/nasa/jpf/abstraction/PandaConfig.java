@@ -1,5 +1,8 @@
 package gov.nasa.jpf.abstraction;
 
+import java.io.FileReader;
+import java.io.IOException;
+
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPFConfigException;
 import gov.nasa.jpf.vm.JenkinsStateSet;
@@ -78,7 +81,15 @@ public class PandaConfig {
 
     private Config getUnderlyingConfig() {
         if (config == null) {
-            config = VM.getVM().getJPF().getConfig();
+            if (VM.getVM() == null || VM.getVM().getJPF() == null || VM.getVM().getJPF().getConfig() == null) {
+                try {
+                    config = new Config(new FileReader("jpf.properties"));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                config = VM.getVM().getJPF().getConfig();
+            }
         }
 
         return config;
