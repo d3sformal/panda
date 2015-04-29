@@ -1,3 +1,7 @@
+// An auxiliary scopes that make all standard java library scopes (and similar system scopes) disappear from the statistics
+[object java]
+[object sun]
+
 // Callsite of ThreadGroup.add
 // Track these to allow precise exception handling
 [assume post method java.lang.Class.desiredAssertionStatus]

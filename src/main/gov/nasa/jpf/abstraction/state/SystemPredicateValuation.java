@@ -48,6 +48,7 @@ import gov.nasa.jpf.abstraction.common.StaticPredicateContext;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
+import gov.nasa.jpf.abstraction.common.access.Method;
 import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
 import gov.nasa.jpf.abstraction.common.access.ReturnValue;
 import gov.nasa.jpf.abstraction.common.access.Root;
@@ -144,7 +145,13 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
      */
     @Override
     public MethodFramePredicateValuation createDefaultScope(ThreadInfo threadInfo, MethodInfo method) {
-        MethodFramePredicateValuation valuation = new MethodFramePredicateValuation(abstraction.smt);
+        Method m = null;
+
+        if (method != null) {
+            m = DefaultMethod.create(DefaultPackageAndClass.create(method.getClassName()), method.getName());
+        }
+
+        MethodFramePredicateValuation valuation = new MethodFramePredicateValuation(abstraction.smt, m);
 
         if (method == null) return valuation;
 
@@ -171,6 +178,8 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
                     continue;
                 }
             }
+
+            if (context.getPredicates().isEmpty()) continue;
 
             for (Predicate predicate : context.getPredicates()) {
                 BytecodeRange scope = predicate.getScope();

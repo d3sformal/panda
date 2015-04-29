@@ -8,4 +8,6 @@ package gov.nasa.jpf.abstraction.common.access;
 public interface PackageAndClass extends Root {
     @Override
     public PackageAndClass createShallowCopy();
+
+    public boolean contains(PackageAndClass pc);
 }

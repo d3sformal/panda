@@ -31,15 +31,19 @@ import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.LessThan;
+import gov.nasa.jpf.abstraction.common.MethodPredicateContext;
 import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Notation;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.PredicateContext;
 import gov.nasa.jpf.abstraction.common.PredicateUtil;
+import gov.nasa.jpf.abstraction.common.Predicates;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
 import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.UpdatedPredicate;
 import gov.nasa.jpf.abstraction.common.access.AccessExpression;
 import gov.nasa.jpf.abstraction.common.access.ArrayLengthRead;
+import gov.nasa.jpf.abstraction.common.access.Method;
 import gov.nasa.jpf.abstraction.common.access.SpecialVariable;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
@@ -55,13 +59,21 @@ import gov.nasa.jpf.abstraction.util.Pair;
  * A predicate valuation for a single scope
  */
 public class MethodFramePredicateValuation implements PredicateValuation, Scope {
+    private static Predicates cumulativePredicateSet = new Predicates();
+
+    public static Predicates getCumulativePredicateSet() {
+        return cumulativePredicateSet;
+    }
+
     private PredicateValuationMap valuations = new PredicateValuationMap();
     private HashMap<Predicate, Set<Predicate>> sharedSymbolCache = new HashMap<Predicate, Set<Predicate>>();
     private SMT smt;
     private int lastPC = -1;
+    private Method method;
 
-    public MethodFramePredicateValuation(SMT smt) {
+    public MethodFramePredicateValuation(SMT smt, Method method) {
         this.smt = smt;
+        this.method = method;
     }
 
     // not used right now (might be useful for multi-dimensional arrays)
@@ -121,7 +133,7 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
     @Override
     public MethodFramePredicateValuation clone() {
-        MethodFramePredicateValuation clone = new MethodFramePredicateValuation(smt);
+        MethodFramePredicateValuation clone = new MethodFramePredicateValuation(smt, method);
 
         clone.valuations = valuations.clone();
         clone.lastPC = lastPC;
@@ -380,9 +392,9 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
             }
         }
 
-        if (valuations.containsKey(predicate)) {
-            BytecodeRange scopeNew = predicate.getScope();
+        BytecodeRange scopeNew = predicate.getScope();
 
+        if (valuations.containsKey(predicate)) {
             for (Predicate p : valuations.keySet()) {
                 if (p.equals(predicate)) {
                     BytecodeRange scopeOld = p.getScope();
@@ -395,6 +407,48 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
 
                     break;
                 }
+            }
+        }
+
+        // Record added predicates for statistical purposes (omit scopes that are only auxiliary (method == null))
+        if (method != null) {
+            // Find cumulative context to record the predicate to
+            PredicateContext ctx = null;
+
+            for (PredicateContext ctxCandidate : cumulativePredicateSet.contexts) {
+                if (ctxCandidate instanceof MethodPredicateContext) {
+                    MethodPredicateContext mCtx = (MethodPredicateContext) ctxCandidate;
+                    Method m = mCtx.getMethod();
+
+                    if (m.equals(method)) {
+                        ctx = mCtx;
+                    }
+                }
+            }
+
+            if (ctx == null) {
+                List<Predicate> preds = Collections.emptyList();
+                ctx = new MethodPredicateContext(method, preds);
+                cumulativePredicateSet.contexts.add(ctx);
+            }
+
+            // Record the predicate
+            if (ctx.contains(predicate)) {
+                for (Predicate p : ctx.getPredicates()) {
+                    if (p.equals(predicate)) {
+                        BytecodeRange scopeOld = p.getScope();
+
+                        if (scopeOld instanceof BytecodeUnlimitedRange) {
+                            p.setScope(scopeNew);
+                        } else if (!(scopeNew instanceof BytecodeUnlimitedRange)) {
+                            p.setScope(scopeOld.merge(scopeNew));
+                        }
+
+                        break;
+                    }
+                }
+            } else {
+                ctx.put(predicate, TruthValue.UNKNOWN);
             }
         }
 

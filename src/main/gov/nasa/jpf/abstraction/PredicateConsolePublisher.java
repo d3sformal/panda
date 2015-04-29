@@ -206,18 +206,28 @@ public class PredicateConsolePublisher extends ConsolePublisher {
 
         PredicateAbstraction abs = PredicateAbstraction.getInstance();
 
-        Predicates preds = abs.getPredicateValuation().getPredicateSet();
+        Predicates preds = MethodFramePredicateValuation.getCumulativePredicateSet();
         Map<Method, Set<Predicate>> method2pred = new HashMap<Method, Set<Predicate>>();
         int method = 0;
         int location = 0;
         int total = 0;
 
         for (PredicateContext ctx : preds.contexts) {
-            if (!PredicateAbstractionFactory.systemPredicates.contexts.contains(ctx)) {
-                if (ctx instanceof MethodPredicateContext) {
-                    MethodPredicateContext mctx = (MethodPredicateContext) ctx;
-                    Method m = mctx.getMethod();
+            if (ctx instanceof MethodPredicateContext) {
+                MethodPredicateContext mctx = (MethodPredicateContext) ctx;
+                Method m = mctx.getMethod();
 
+                boolean contains = PredicateAbstractionFactory.systemPredicates.contexts.contains(ctx);
+
+                for (PredicateContext pkgCtxCandidate : PredicateAbstractionFactory.systemPredicates.contexts) {
+                    if (pkgCtxCandidate instanceof ObjectPredicateContext) {
+                        ObjectPredicateContext pkgCtx = (ObjectPredicateContext) pkgCtxCandidate;
+
+                        contains |= pkgCtx.getPackageAndClass().contains(m.getPackageAndClass());
+                    }
+                }
+
+                if (!contains) {
                     for (Predicate p : ctx.getPredicates()) {
                         if (!method2pred.containsKey(m)) {
                             method2pred.put(m, new HashSet<Predicate>());
@@ -237,10 +247,21 @@ public class PredicateConsolePublisher extends ConsolePublisher {
             }
         }
         for (PredicateContext ctx : preds.contexts) {
-            if (!PredicateAbstractionFactory.systemPredicates.contexts.contains(ctx)) {
-                if (ctx instanceof ObjectPredicateContext) {
-                    ObjectPredicateContext octx = (ObjectPredicateContext) ctx;
-                    PackageAndClass pc = octx.getPackageAndClass();
+            if (ctx instanceof ObjectPredicateContext) {
+                ObjectPredicateContext octx = (ObjectPredicateContext) ctx;
+                PackageAndClass pc = octx.getPackageAndClass();
+
+                boolean contains = PredicateAbstractionFactory.systemPredicates.contexts.contains(ctx);
+
+                for (PredicateContext pkgCtxCandidate : PredicateAbstractionFactory.systemPredicates.contexts) {
+                    if (pkgCtxCandidate instanceof ObjectPredicateContext) {
+                        ObjectPredicateContext pkgCtx = (ObjectPredicateContext) pkgCtxCandidate;
+
+                        contains |= pkgCtx.getPackageAndClass().contains(pc);
+                    }
+                }
+
+                if (!contains) {
                     boolean added = false;
 
                     for (Method m : method2pred.keySet()) {

@@ -69,6 +69,22 @@ public class DefaultPackageAndClass extends DefaultRoot implements PackageAndCla
         return this;
     }
 
+    @Override
+    public boolean contains(PackageAndClass pc) {
+        String[] pkg1 = getName().split("\\.");
+        String[] pkg2 = pc.getName().split("\\.");
+
+        if (pkg1.length > pkg2.length) return false;
+
+        int i = 0;
+
+        while (i < pkg1.length && pkg1[i].equals(pkg2[i])) {
+            ++i;
+        }
+
+        return i >= pkg1.length;
+    }
+
     public static DefaultPackageAndClass create(List<String> name) {
         if (name == null || name.size() == 0) {
             return null;
