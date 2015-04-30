@@ -1,5 +1,6 @@
 package gov.nasa.jpf.abstraction.common.impl;
 
+import gov.nasa.jpf.abstraction.common.IfThenElse;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
@@ -144,6 +145,17 @@ public class PredicatesFunctionStringifier extends PredicatesStringifier {
     @Override
     public void visit(AnonymousArray expression) {
         ret.append("array(" + expression.getReference() + ")");
+    }
+
+    @Override
+    public void visit(IfThenElse expression) {
+        ret.append("ite(");
+        expression.cond.accept(this);
+        ret.append(", ");
+        expression.a.accept(this);
+        ret.append(", ");
+        expression.b.accept(this);
+        ret.append(")");
     }
 
     @Override

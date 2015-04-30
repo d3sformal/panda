@@ -17,6 +17,7 @@ import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expressions;
+import gov.nasa.jpf.abstraction.common.IfThenElse;
 import gov.nasa.jpf.abstraction.common.Implication;
 import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.MethodAssumePostPredicateContext;
@@ -419,6 +420,13 @@ public class PredicatesSMTInfoCollector implements PredicatesComponentVisitor {
         expression.getArray().accept(this);
         expression.getArrayLengths().accept(this);
         expression.getNewValue().accept(this);
+    }
+
+    @Override
+    public void visit(IfThenElse expression) {
+        expression.cond.accept(this);
+        expression.a.accept(this);
+        expression.b.accept(this);
     }
 
     @Override

@@ -72,6 +72,10 @@ standalonepredicate returns [Predicate val]
     }
     ;
 
+qvar returns [String val]
+    : '%' {$ctx.val = "%";} n=CONSTANT_TOKEN {$ctx.val += $n.text;} ( '!' {$ctx.val += "!";} m=CONSTANT_TOKEN {$ctx.val += $m.text;} )*
+    ;
+
 predicate returns [Predicate val] locals [static ScopedDefineMap let = new ScopedDefineMap(); Predicate acc;]
     : '.' id=ID_TOKEN {
         $ctx.val = (Predicate) PredicateContext.let.get($id.text);
@@ -90,10 +94,10 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
     | FALSE_TOKEN {
         $ctx.val = Contradiction.create();
     }
-    | '(' AND_TOKEN p=predicate {$ctx.acc = $p.val;} (q=predicate {$ctx.acc = Conjunction.create($ctx.acc, $q.val);})+ ')' {
+    | '(' AND_TOKEN ((p=predicate {$ctx.acc = $p.val;}) | (qv=qvar {$ctx.acc = (Predicate) PredicateContext.let.get($qv.val);})) ((q=predicate {$ctx.acc = Conjunction.create($ctx.acc, $q.val);}) | ( qv=qvar {$ctx.acc = Conjunction.create($ctx.acc, (Predicate) PredicateContext.let.get($qvar.val));} ))+ ')' {
         $ctx.val = $ctx.acc;
     }
-    | '(' OR_TOKEN p=predicate {$ctx.acc = $p.val;} (q=predicate {$ctx.acc = Disjunction.create($ctx.acc, $q.val);})+ ')' {
+    | '(' OR_TOKEN ((p=predicate {$ctx.acc = $p.val;}) | (qv=qvar {$ctx.acc = (Predicate) PredicateContext.let.get($qv.val);})) ((q=predicate {$ctx.acc = Disjunction.create($ctx.acc, $q.val);}) | ( qv=qvar {$ctx.acc = Disjunction.create($ctx.acc, (Predicate) PredicateContext.let.get($qvar.val));} ))+ ')' {
         $ctx.val = $ctx.acc;
     }
     | '(' NOT_TOKEN p=predicate ')' {
@@ -102,7 +106,7 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
     | '(' ITE_TOKEN p=predicate q=predicate r=predicate ')' {
         $ctx.val = Disjunction.create(Conjunction.create($p.val, $q.val), Conjunction.create(Negation.create($p.val), $r.val));
     }
-    | '(' FORALL_TOKEN {PredicateContext.let.enterNested(); String vars = "";} '(' ('(' '%' n=CONSTANT_TOKEN TYPE_TOKEN ')' {vars += " %" + $n.text; PredicateContext.let.put("%" + Integer.parseInt($n.text), DefaultRoot.create("%" + Integer.parseInt($n.text)));} )+ ')' '(' '!' p=predicate (':pattern' '(' expression+ ')')? ':qid' 'itp' ')' ')' {
+    | '(' FORALL_TOKEN {PredicateContext.let.enterNested(); String vars = "";} '(' ( '(' qv=qvar TYPE_TOKEN ')' {vars += " " + $qvar.val; PredicateContext.let.put($qvar.val, DefaultRoot.create($qvar.val));} )+ ')' '(' '!' p=predicate ( ':pattern' '(' expression+ ')' )? ':qid' 'itp' ')' ')' {
         PredicateContext.let.exitNested();
 
         if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
@@ -124,7 +128,7 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
 
         $ctx.val = p;
     }
-    | '(' EXISTS_TOKEN {PredicateContext.let.enterNested(); String vars = "";} '(' ('(' '%' n=CONSTANT_TOKEN TYPE_TOKEN ')' {vars += " %" + $n.text; PredicateContext.let.put("%" + Integer.parseInt($n.text), DefaultRoot.create("%" + Integer.parseInt($n.text)));} )+ ')' '(' '!' p=predicate ':qid' 'itp' ')' ')' {
+    | '(' EXISTS_TOKEN {PredicateContext.let.enterNested(); String vars = "";} '(' ( '(' qv=qvar TYPE_TOKEN ')' {vars += " " + $qvar.val; PredicateContext.let.put($qvar.val, DefaultRoot.create($qvar.val));} )+ ')' '(' '!' p=predicate ( ':pattern' '(' expression+ ')' )? ':qid' 'itp' ')' ')' {
         PredicateContext.let.exitNested();
 
         if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
@@ -257,8 +261,8 @@ factor returns [Expression val]
     | id=ID_TOKEN '!' n=CONSTANT_TOKEN {
         $ctx.val = (Expression) PredicateContext.let.get($id.text + '!' + Integer.parseInt($n.text));
     }
-    | '%' n=CONSTANT_TOKEN {
-        $ctx.val = (Expression) PredicateContext.let.get("%" + Integer.parseInt($n.text));
+    | qv=qvar {
+        $ctx.val = (Expression) PredicateContext.let.get($qvar.val);
     }
     | CONSTANT_TOKEN {
         $ctx.val = Constant.create(Integer.parseInt($CONSTANT_TOKEN.text));
@@ -266,13 +270,19 @@ factor returns [Expression val]
     | '(' SELECT_TOKEN ARRLEN_TOKEN p=path ')' {
         $ctx.val = DefaultArrayLengthRead.create($p.val);
     }
-    | '(' SELECT_TOKEN ARRLEN_TOKEN '%' n=CONSTANT_TOKEN ')' {
-        AccessExpression ae = (AccessExpression) PredicateContext.let.get("%" + Integer.parseInt($n.text));
+    | '(' SELECT_TOKEN ARRLEN_TOKEN qv=qvar ')' {
+        AccessExpression ae = (AccessExpression) PredicateContext.let.get($qvar.val);
 
         $ctx.val = DefaultArrayLengthRead.create(ae);
     }
     | p=path {
         $ctx.val = $p.val;
+    }
+    | '(' ITE_TOKEN pCond=predicate e1=expression e2=expression ')' {
+        $ctx.val = IfThenElse.create($pCond.val, $e1.val, $e2.val);
+    }
+    | '(' ITE_TOKEN eCond=expression e1=expression e2=expression ')' {
+        $ctx.val = IfThenElse.create($eCond.val, $e1.val, $e2.val);
     }
     | '(' REF_TOKEN p=path ')' {
         if ($p.val instanceof AnonymousObject) {
@@ -347,8 +357,8 @@ path returns [DefaultAccessExpression val]
     | '(' SELECT_TOKEN a=ARR_TOKEN p=path ')' {
         $ctx.val = Select.create($p.val);
     }
-    | '(' SELECT_TOKEN a=ARR_TOKEN '%' n=CONSTANT_TOKEN ')' {
-        AccessExpression ae = (AccessExpression) PredicateContext.let.get("%" + Integer.parseInt($n.text));
+    | '(' SELECT_TOKEN a=ARR_TOKEN qv=qvar ')' {
+        AccessExpression ae = (AccessExpression) PredicateContext.let.get($qvar.val);
 
         $ctx.val = Select.create(ae);
     }

@@ -6,6 +6,7 @@ import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Equals;
+import gov.nasa.jpf.abstraction.common.IfThenElse;
 import gov.nasa.jpf.abstraction.common.Implication;
 import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Modulo;
@@ -504,6 +505,17 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
 
         expression.getNewValue().accept(this);
 
+        ret.append(")");
+    }
+
+    @Override
+    public void visit(IfThenElse expression) {
+        ret.append("(ite ");
+        expression.cond.accept(this);
+        ret.append(" ");
+        expression.a.accept(this);
+        ret.append(" ");
+        expression.b.accept(this);
         ret.append(")");
     }
 

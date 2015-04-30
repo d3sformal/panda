@@ -15,6 +15,7 @@ import gov.nasa.jpf.abstraction.common.Divide;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.Formula;
+import gov.nasa.jpf.abstraction.common.IfThenElse;
 import gov.nasa.jpf.abstraction.common.LessThan;
 import gov.nasa.jpf.abstraction.common.Modulo;
 import gov.nasa.jpf.abstraction.common.Multiply;
@@ -381,6 +382,27 @@ public class InterpolantExtractor {
             }
             return e;
         }
+        if (e instanceof IfThenElse) {
+            IfThenElse ite = (IfThenElse) e;
+
+            Expression a = extractHighLevelConstructs(ite.a);
+            Expression b = extractHighLevelConstructs(ite.b);
+
+            Expression newIte = IfThenElse.create(ite.cond, a, b);
+
+            if (newIte.equals(ite)) {
+                return ite;
+            }
+
+            if (config.enabledVerbose(InterpolantExtractor.class)) {
+                System.out.println("[WARNING] Re-interpreting: " + e + " as " + newIte);
+            }
+
+            return newIte;
+        }
+
+        System.err.println("Failed to extract interpolant expression from: " + e);
+        new Exception().printStackTrace();
 
         return null;
     }
