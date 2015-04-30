@@ -9,7 +9,7 @@ panda.refinement=true
 #panda.refinement.heuristic=gov.nasa.jpf.abstraction.heuristic.VariableLifespanRefinementHeuristic
 panda.refinement.heuristic=gov.nasa.jpf.abstraction.heuristic.MethodGlobalRefinementHeuristic
 
-listener+=,gov.nasa.jpf.abstraction.util.ExecTracker
-listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker
-listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor
-listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener
+#listener+=,gov.nasa.jpf.abstraction.util.ExecTracker
+#listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker
+#listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor
+#listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener
