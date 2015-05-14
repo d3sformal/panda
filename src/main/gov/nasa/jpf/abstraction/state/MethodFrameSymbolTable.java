@@ -809,6 +809,14 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
             if (slot.isFrozen()) {
                 slot = slot.createShallowCopy();
 
+                slot.clear();
+
+                if (slot instanceof StructuredValueSlot) {
+                    ((StructuredValueSlot) slot).addPossibleStructuredValue((StructuredValueIdentifier) singleValue);
+                } else {
+                    ((PrimitiveValueSlot) slot).addPossiblePrimitiveValue((PrimitiveValueIdentifier) singleValue);
+                }
+
                 parent.removeSlot(eIndex);
                 parent.addSlot(eIndex, slot);
             }

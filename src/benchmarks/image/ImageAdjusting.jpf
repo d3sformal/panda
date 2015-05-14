@@ -8,6 +8,8 @@ sourcepath=${jpf-abstraction}/src/benchmarks
 #panda.abstract_domain=PREDICATES ${jpf-abstraction}/src/benchmarks/image/Image.pred
 panda.abstract_domain=PREDICATES
 panda.refinement=true
+panda.refinement.nested=true
+panda.log_smt=true
 
 # Without precise tracking of loop variables any loop may be re-entered abstractly
 # Image contains a loop allocating objects

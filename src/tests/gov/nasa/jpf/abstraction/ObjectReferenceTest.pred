@@ -1,0 +1,5 @@
+[method gov.nasa.jpf.abstraction.ObjectReferenceTest.test3]
+unknownIndex >= 0
+unknownIndex < 2
+alength(arrlen, a) = 2
+alength(arrlen, b) = 2

@@ -49,15 +49,15 @@ echo
 bin/run.sh $CONFIG src/benchmarks/scheduler/SchedulerAdjusting.jpf 2>&1 | tee output/scheduler-adjusting
 echo
 bin/run.sh $CONFIG src/benchmarks/scheduler/SchedulerPruning.jpf 2>&1 | tee output/scheduler-pruning
-echo
-
-echo UNSAFE
-
-bin/run.sh $CONFIG src/benchmarks/svcomp/loops/ArrayFalseUnreachableLabelAdjusting.jpf 2>&1 | tee output/array-error-adjusting
-echo
-bin/run.sh $CONFIG src/benchmarks/svcomp/loops/ArrayFalseUnreachableLabelPruning.jpf 2>&1 | tee output/array-error-pruning
-echo
-bin/run.sh $CONFIG src/benchmarks/svcomp/loops/Eureka01FalseUnreachableLabelAdjusting.jpf 2>&1 | tee output/eureka-error-adjusting
-echo
-bin/run.sh $CONFIG src/benchmarks/svcomp/loops/Eureka01FalseUnreachableLabelPruning.jpf 2>&1 | tee output/eureka-error-pruning
-echo
+#echo
+#
+#echo UNSAFE
+#
+#bin/run.sh $CONFIG src/benchmarks/svcomp/loops/ArrayFalseUnreachableLabelAdjusting.jpf 2>&1 | tee output/array-error-adjusting
+#echo
+#bin/run.sh $CONFIG src/benchmarks/svcomp/loops/ArrayFalseUnreachableLabelPruning.jpf 2>&1 | tee output/array-error-pruning
+#echo
+#bin/run.sh $CONFIG src/benchmarks/svcomp/loops/Eureka01FalseUnreachableLabelAdjusting.jpf 2>&1 | tee output/eureka-error-adjusting
+#echo
+#bin/run.sh $CONFIG src/benchmarks/svcomp/loops/Eureka01FalseUnreachableLabelPruning.jpf 2>&1 | tee output/eureka-error-pruning
+#echo

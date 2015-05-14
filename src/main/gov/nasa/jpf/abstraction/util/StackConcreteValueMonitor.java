@@ -29,7 +29,7 @@ public class StackConcreteValueMonitor extends ListenerAdapter {
                 ElementInfo ei = ti.getElementInfo(sf.peek(i));
 
                 if (ei == null) {
-                    System.out.print("null");
+                    System.out.print(sf.peek(i) + " (null)");
                 } else {
                     System.out.print(sf.peek(i));
 
