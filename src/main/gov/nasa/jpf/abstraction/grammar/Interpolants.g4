@@ -106,7 +106,7 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
     | '(' ITE_TOKEN p=predicate q=predicate r=predicate ')' {
         $ctx.val = Disjunction.create(Conjunction.create($p.val, $q.val), Conjunction.create(Negation.create($p.val), $r.val));
     }
-    | '(' FORALL_TOKEN {PredicateContext.let.enterNested(); String vars = "";} '(' ( '(' qv=qvar TYPE_TOKEN ')' {vars += " " + $qvar.val; PredicateContext.let.put($qvar.val, DefaultRoot.create($qvar.val));} )+ ')' '(' '!' p=predicate ( ':pattern' '(' expression+ ')' )? ':qid' 'itp' ')' ')' {
+    | '(' FORALL_TOKEN {PredicateContext.let.enterNested(); String vars = "";} '(' ( '(' qv=qvar TYPE_TOKEN ')' {vars += " " + $qvar.val; PredicateContext.let.put($qvar.val, DefaultRoot.create($qvar.val));} )+ ')' '(' '!' p=predicate ( ':pattern' '(' expression+ ')' )* ':qid' 'itp' ')' ')' {
         PredicateContext.let.exitNested();
 
         if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
@@ -128,7 +128,7 @@ predicate returns [Predicate val] locals [static ScopedDefineMap let = new Scope
 
         $ctx.val = p;
     }
-    | '(' EXISTS_TOKEN {PredicateContext.let.enterNested(); String vars = "";} '(' ( '(' qv=qvar TYPE_TOKEN ')' {vars += " " + $qvar.val; PredicateContext.let.put($qvar.val, DefaultRoot.create($qvar.val));} )+ ')' '(' '!' p=predicate ( ':pattern' '(' expression+ ')' )? ':qid' 'itp' ')' ')' {
+    | '(' EXISTS_TOKEN {PredicateContext.let.enterNested(); String vars = "";} '(' ( '(' qv=qvar TYPE_TOKEN ')' {vars += " " + $qvar.val; PredicateContext.let.put($qvar.val, DefaultRoot.create($qvar.val));} )+ ')' '(' '!' p=predicate ( ':pattern' '(' expression+ ')' )* ':qid' 'itp' ')' ')' {
         PredicateContext.let.exitNested();
 
         if (PandaConfig.getInstance().enabledVerbose(this.getClass())) {
