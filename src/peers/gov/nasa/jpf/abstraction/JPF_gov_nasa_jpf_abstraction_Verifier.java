@@ -33,14 +33,16 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
     public static int unknownNonNegativeInt____I(MJIEnv env, int clsObjRef) {
         int ret = unknown(env, clsObjRef);
 
-        StackFrame before = env.getCallerStackFrame();
-        MethodInfo caller = before.getMethodInfo();
-        int pc = before.getPC().getPosition() + before.getPC().getLength();
+        if (!env.isInvocationRepeated() && !env.getSystemState().isIgnored()) {
+            StackFrame before = env.getCallerStackFrame();
+            MethodInfo caller = before.getMethodInfo();
+            int pc = before.getPC().getPosition() + before.getPC().getLength();
 
-        Predicate constraint = LessThan.create(Constant.create(-1), ExpressionUtil.getExpression(env.getReturnAttribute()));
+            Predicate constraint = LessThan.create(Constant.create(-1), ExpressionUtil.getExpression(env.getReturnAttribute()));
 
-        PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(constraint, caller, pc); // Make sure refinement (trace feasibility check, interpolation) is aware of this constraint
-        PredicateAbstraction.getInstance().getPredicateValuation().force(constraint, TruthValue.TRUE); // Make sure that pre-existing predicates about unknown are propagated
+            PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(constraint, caller, pc); // Make sure refinement (trace feasibility check, interpolation) is aware of this constraint
+            PredicateAbstraction.getInstance().getPredicateValuation().force(constraint, TruthValue.TRUE); // Make sure that pre-existing predicates about unknown are propagated
+        }
 
         return ret < 0 ? -ret : ret;
     }
