@@ -150,6 +150,14 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
         return classes.keySet();
     }
 
+    public void inheritClassesFrom(MethodFrameSymbolTable sym) {
+        for (PackageAndClass pkgcls : sym.classes.keySet()) {
+            if (!classes.containsKey(pkgcls)) {
+                classes.put(pkgcls, sym.classes.get(pkgcls));
+            }
+        }
+    }
+
     public LocalVariable getLocal(Root l) {
         return locals.get(l);
     }

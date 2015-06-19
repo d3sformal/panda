@@ -227,7 +227,11 @@ public class SystemSymbolTable implements SymbolTable, Scoped {
         /**
          * Drop callee scope
          */
+        MethodFrameSymbolTable top = scopes.get(currentThreadID).top();
         scopes.get(currentThreadID).pop();
+        MethodFrameSymbolTable bot = scopes.get(currentThreadID).top();
+
+        bot.inheritClassesFrom(top);
     }
 
     @Override
