@@ -1,6 +1,6 @@
 @using=jpf-abstraction
 
-target=pc.SerialProducerConsumer
+target=prodcons.SerialProducerConsumer
 
 classpath=${jpf-abstraction}/build/benchmarks
 sourcepath=${jpf-abstraction}/src/benchmarks

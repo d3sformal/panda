@@ -1,4 +1,4 @@
-package ac;
+package alarmclock;
 
 import static gov.nasa.jpf.abstraction.Verifier.unknownNonNegativeInt;
 
@@ -46,7 +46,12 @@ public class SerialAlarmClock {
         if (!clockDone || !clDone) {
             assert !clockDone || clReady; // Deadlock
 
-            int i = unknownNonNegativeInt() % ((clockReady ? 1 : 0) + cl.length);
+            int i = unknownNonNegativeInt();
+            int mod = (clockReady ? 1 : 0) + cl.length;
+
+            while (i >= mod) {
+                i = i - mod;
+            }
 
             if (clockReady && clReady) {
                 if (i == 0) {
@@ -76,7 +81,11 @@ public class SerialAlarmClock {
         while (cl[i].isDone() || cl[i].isWaiting()) {
             assert count++ < cl.length;
 
-            i = (i + 1) % cl.length;
+            i = i + 1;
+
+            while (i >= cl.length) {
+                i = i - cl.length;
+            }
         }
 
         cl[i].step();
@@ -144,7 +153,13 @@ public class SerialAlarmClock {
 
             switch (phase) {
                 case INIT:
-                    monitor.wakeme(this, unknownNonNegativeInt() % 5);
+                    int t = unknownNonNegativeInt();
+
+                    while (t >= 5) {
+                        t = t - 5;
+                    }
+
+                    monitor.wakeme(this, t);
                     phase = Phase.TERM;
                     break;
 

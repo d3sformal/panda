@@ -1,4 +1,4 @@
-package pc;
+package prodcons;
 
 import static gov.nasa.jpf.abstraction.Verifier.unknownNonNegativeInt;
 

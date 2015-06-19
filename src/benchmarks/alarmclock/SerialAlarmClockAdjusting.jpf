@@ -1,0 +1,15 @@
+@using=jpf-abstraction
+
+target=alarmclock.SerialAlarmClock
+
+classpath=${jpf-abstraction}/build/benchmarks
+sourcepath=${jpf-abstraction}/src/benchmarks
+
+panda.refinement=true
+panda.refinement.method_global=true
+panda.log_smt=true
+
+listener+=,gov.nasa.jpf.abstraction.util.ExecTracker
+listener+=,gov.nasa.jpf.abstraction.util.InstructionTracker
+listener+=,gov.nasa.jpf.abstraction.util.PredicateValuationMonitor
+listener+=,gov.nasa.jpf.abstraction.util.CounterexampleListener
