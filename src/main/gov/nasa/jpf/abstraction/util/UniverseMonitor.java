@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import gov.nasa.jpf.ListenerAdapter;
+import gov.nasa.jpf.jvm.bytecode.StaticFieldInstruction;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
@@ -82,6 +83,25 @@ public class UniverseMonitor extends ListenerAdapter {
         StackFrame sf = ti.getTopFrame();
 
         if (sf != null) {
+            for (Instruction i : sf.getMethodInfo().getInstructions()) {
+                // Monitor those statics that are referred to from the current method and are already in Universe
+                // Warning: directly querying the class info of the instruction would cause the class to be loaded and put into universe (which we do not want happening as the VM would not load the class otherwise)
+                if (i instanceof StaticFieldInstruction) {
+                    StaticFieldInstruction sfi = (StaticFieldInstruction) i;
+                    String className = sfi.getClassName();
+
+                    for (StructuredValueIdentifier id : universe.getStructuredValues()) {
+                        if (id instanceof ClassName) {
+                            ClassName cls = (ClassName) id;
+
+                            if (cls.getClassName().equals(className)) {
+                                reachable.add(id);
+                            }
+                        }
+                    }
+                }
+            }
+
             for (int i = 0; i < sf.getLocalVariableCount(); ++i) {
                 LocalVarInfo var = sf.getLocalVarInfo(i);
 
