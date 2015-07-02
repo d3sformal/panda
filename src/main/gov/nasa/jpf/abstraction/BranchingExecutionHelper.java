@@ -49,6 +49,16 @@ import gov.nasa.jpf.abstraction.state.universe.ClassName;
 import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 
 public class BranchingExecutionHelper {
+    private static boolean pruned;
+
+    public static void setPruned(boolean b) {
+        pruned = b;
+    }
+
+    public static boolean isPruned() {
+        return pruned;
+    }
+
     public static Instruction synchronizeConcreteAndAbstractExecutions(ThreadInfo ti, Predicate branchCondition, boolean concreteJump, boolean abstractJump, Instruction target, Instruction self) {
         StackFrame sf = ti.getModifiableTopFrame();
         SystemState ss = ti.getVM().getSystemState();
@@ -289,6 +299,8 @@ public class BranchingExecutionHelper {
                         }
                     }
                 }
+
+                setPruned(true);
 
                 return self;
             } else if (config.adjustConcreteValues()) {

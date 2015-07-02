@@ -19,6 +19,7 @@ import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 
+import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
 import gov.nasa.jpf.abstraction.util.RunDetector;
 
 /**
@@ -104,7 +105,11 @@ public class ExecTracker extends ListenerAdapter {
     if (search.isNewState()) {
       out.print(" new");
     } else if (search.isIgnoredState()) {
-      out.print(" ignored");
+        if (BranchingExecutionHelper.isPruned()) {
+            out.print(" pruned branch");
+        } else {
+            out.print(" ignored (maybe spurious data choice value)");
+        }
     } else {
       out.print(" visited");
     }
