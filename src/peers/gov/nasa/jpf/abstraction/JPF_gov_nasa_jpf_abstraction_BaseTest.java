@@ -59,4 +59,22 @@ public class JPF_gov_nasa_jpf_abstraction_BaseTest extends NativePeer {
         /** Should never be reached */
         throw new RuntimeException("Should never be reached!");
     }
+
+    @MJI
+    public void addMethodAbstractionPredicate__Ljava_lang_String_2__V(MJIEnv env, int objRef, int argRef) {
+        /** Should never be reached */
+        throw new RuntimeException("Should never be reached!");
+    }
+
+    @MJI
+    public void addObjectAbstractionPredicate__Ljava_lang_String_2__V(MJIEnv env, int objRef, int argRef) {
+        /** Should never be reached */
+        throw new RuntimeException("Should never be reached!");
+    }
+
+    @MJI
+    public void addStaticAbstractionPredicate__Ljava_lang_String_2__V(MJIEnv env, int objRef, int argRef) {
+        /** Should never be reached */
+        throw new RuntimeException("Should never be reached!");
+    }
 }

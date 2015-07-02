@@ -49,6 +49,7 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
 public class AbstractListener extends PropertyListenerAdapter {
     private Map<String, ExecuteInstructionHandler> debugMethods = new HashMap<String, ExecuteInstructionHandler>();
     private Map<String, ExecuteInstructionHandler> testMethods = new HashMap<String, ExecuteInstructionHandler>();
+    private Map<String, ExecuteInstructionHandler> utilMethods = new HashMap<String, ExecuteInstructionHandler>();
 
     private static String DebugClass = "gov.nasa.jpf.abstraction.Debug";
     private static String BaseTestClass = "gov.nasa.jpf.abstraction.BaseTest";
@@ -98,6 +99,11 @@ public class AbstractListener extends PropertyListenerAdapter {
 
         // Aliasing
         testMethods.put(StateMatchingTestClass + ".assertSameAliasingOnEveryVisit([Ljava/lang/String;)V", new AssertSameAliasingOnEveryVisitHandler());
+
+        // Adding predicates
+        utilMethods.put(BaseTestClass + ".addMethodAbstractionPredicate(Ljava/lang/String;)V", new AddMethodAbstractionPredicateHandler());
+        utilMethods.put(BaseTestClass + ".addObjectAbstractionPredicate(Ljava/lang/String;)V", new AddObjectAbstractionPredicateHandler());
+        utilMethods.put(BaseTestClass + ".addStaticAbstractionPredicate(Ljava/lang/String;)V", new AddStaticAbstractionPredicateHandler());
     }
 
     @Override
@@ -122,6 +128,8 @@ public class AbstractListener extends PropertyListenerAdapter {
 
     @Override
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
+        BranchingExecutionHelper.setPruned(false);
+
         // Create a state at the beginning of the trace
         // so that we can backtrack there on refinement
         if (!firstInsn) {
@@ -138,6 +146,12 @@ public class AbstractListener extends PropertyListenerAdapter {
             if (method != null) {
                 if (debugMethods.containsKey(method.getFullName())) {
                     ExecuteInstructionHandler handler = debugMethods.get(method.getFullName());
+
+                    handler.executeInstruction(vm, curTh, nextInsn);
+
+                    curTh.skipInstruction(curTh.getPC().getNext());
+                } else if (utilMethods.containsKey(method.getFullName())) {
+                    ExecuteInstructionHandler handler = utilMethods.get(method.getFullName());
 
                     handler.executeInstruction(vm, curTh, nextInsn);
 

@@ -37,6 +37,10 @@ public class BaseTest {
 
     native public static void assertNumberOfPossibleValues(String expression, int expectedNumber);
 
+    native public static void addMethodAbstractionPredicate(String p);
+    native public static void addObjectAbstractionPredicate(String p);
+    native public static void addStaticAbstractionPredicate(String p);
+
     protected List<String> config = new LinkedList<String>();
 
     public BaseTest() {
