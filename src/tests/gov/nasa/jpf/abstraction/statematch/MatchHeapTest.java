@@ -29,7 +29,7 @@ public class MatchHeapTest extends StateMatchingTest {
     }
 
     private static boolean getZ() {
-        return false; // UNTRACKED RETURN
+        return true; // UNTRACKED RETURN
     }
 
     @Test

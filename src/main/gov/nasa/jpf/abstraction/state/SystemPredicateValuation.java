@@ -32,6 +32,7 @@ import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Disjunction;
+import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
 import gov.nasa.jpf.abstraction.common.ExpressionUtil;
 import gov.nasa.jpf.abstraction.common.MethodAssumePostPredicateContext;
@@ -468,11 +469,11 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
         scopes.get(currentThreadID).push(method.getFullName(), calleeScope);
     }
 
+    private Expression expr;
+
     @Override
     public void processMethodReturn(ThreadInfo threadInfo, StackFrame before, StackFrame after) {
         RunDetector.detectRunning(VM.getVM(), after.getPC(), before.getPC());
-
-        Expression expr;
 
         if (before.getMethodInfo().getReturnSize() == 2) {
             expr = ExpressionUtil.getExpression(after.getLongResultAttr());
@@ -801,6 +802,11 @@ public class SystemPredicateValuation implements PredicateValuation, Scoped {
             // Use predicates over return to evaluate predicates over return_pcXYZ that are already present (interpolation, return from method in loop)
             for (Predicate predicate : calleeReturns.keySet()) {
                 relevant.put(predicate, calleeReturns.get(predicate));
+            }
+
+            // By adding this here we avoid poluting the caller scope with a new predicate which may not be desired
+            if (method.getReturnSize() > 0) {
+                relevant.put(Equals.create(returnValueSpecific, expr), TruthValue.TRUE);
             }
 
             // Use the relevant predicates to valuate predicates that need to be updated
