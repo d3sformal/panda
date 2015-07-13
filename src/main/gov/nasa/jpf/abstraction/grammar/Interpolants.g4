@@ -246,8 +246,8 @@ term returns [Expression val]
     : f=factor {
         $ctx.val = $f.val;
     }
-    | '(*' a=factor b=factor ')' {
-        $ctx.val = Multiply.create($a.val, $b.val);
+    | '(*' a=factor {Expression e = $a.val;} (b=factor {e = Multiply.create(e, $b.val);})+ ')' {
+        $ctx.val = e;
     }
     | '(/' a=factor b=factor ')' {
         $ctx.val = Divide.create($a.val, $b.val);
