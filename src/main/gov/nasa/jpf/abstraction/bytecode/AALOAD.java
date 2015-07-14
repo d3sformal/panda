@@ -63,6 +63,11 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD implements ArrayLoa
     }
 
     @Override
+    public void setAttribute(StackFrame sf, Expression e) {
+        sf.setOperandAttr(e);
+    }
+
+    @Override
     public ArrayElementInstruction getSelf() {
         return this;
     }

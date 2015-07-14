@@ -59,6 +59,11 @@ public class DALOAD extends gov.nasa.jpf.jvm.bytecode.DALOAD implements ArrayLoa
     }
 
     @Override
+    public void setAttribute(StackFrame sf, Expression e) {
+        sf.setLongOperandAttr(e);
+    }
+
+    @Override
     public ArrayElementInstruction getSelf() {
         return this;
     }

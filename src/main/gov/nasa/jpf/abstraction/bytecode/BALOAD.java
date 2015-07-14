@@ -59,6 +59,11 @@ public class BALOAD extends gov.nasa.jpf.jvm.bytecode.BALOAD implements ArrayLoa
     }
 
     @Override
+    public void setAttribute(StackFrame sf, Expression e) {
+        sf.setOperandAttr(e);
+    }
+
+    @Override
     public ArrayElementInstruction getSelf() {
         return this;
     }

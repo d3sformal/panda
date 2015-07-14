@@ -267,7 +267,7 @@ public class ArrayLoadExecutor {
             return actualNextInsn;
         }
 
-        sf.setOperandAttr(path);
+        load.setAttribute(sf, path);
 
         return load.getSelf().getNext();
     }
