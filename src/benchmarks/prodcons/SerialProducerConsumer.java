@@ -15,11 +15,11 @@ public class SerialProducerConsumer {
         Buffer b = new Buffer(5);
 
         // Allocate some producers
-        for (int i = 0; i < PRODS; ++i) {
+        for (int i = 0; i < PRODS; i = i + 1) {
             prods[i] = new Producer(b);
         }
         // Allocate some consumers
-        for (int i = 0; i < CONS; ++i) {
+        for (int i = 0; i < CONS; i = i + 1) {
             cons[i] = new Consumer(b);
         }
 
@@ -36,13 +36,13 @@ public class SerialProducerConsumer {
         boolean consDone = true;
 
         // Check whether there is any live producer
-        for (int k = 0; k < prods.length; ++k) {
+        for (int k = 0; k < prods.length; k = k + 1) {
             if (!prods[k].isDone()) {
                 prodsDone = false;
             }
         }
         // Check whether there is any live consumer
-        for (int k = 0; k < cons.length; ++k) {
+        for (int k = 0; k < cons.length; k = k + 1) {
             if (!cons[k].isDone()) {
                 consDone = false;
             }
@@ -63,7 +63,9 @@ public class SerialProducerConsumer {
             if (!b.isEmpty() && !b.isFull() && !prodsDone && !consDone) {
                 int all = prods.length + cons.length;
 
-                i %= all;
+                while (i >= all) {
+                    i = i - all;
+                }
 
                 if (i < prods.length) {
                     wake(prods, i);
@@ -71,11 +73,15 @@ public class SerialProducerConsumer {
                     wake(cons, i - prods.length);
                 }
             } else if (!b.isEmpty() && !consDone) { // Only consumers can work
-                i %= cons.length;
+                while (i >= cons.length) {
+                    i = i - cons.length;
+                }
 
                 wake(cons, i);
             } else if (!b.isFull() && !prodsDone) { // Only producers can work
-                i %= prods.length;
+                while (i >= prods.length) {
+                    i = i - prods.length;
+                }
 
                 wake(prods, i);
             }
@@ -90,9 +96,15 @@ public class SerialProducerConsumer {
         int count = 0;
 
         while (prods[i].isDone()) {
-            assert count++ < prods.length;
+            assert count < prods.length;
 
-            i = (i + 1) % prods.length;
+            count = count + 1;
+
+            i = i + 1;
+
+            while (i >= prods.length) {
+                i = i - prods.length;
+            }
         }
 
         prods[i].step();
@@ -102,9 +114,15 @@ public class SerialProducerConsumer {
         int count = 0;
 
         while (cons[i].isDone()) {
-            assert count++ < cons.length;
+            assert count < cons.length;
 
-            i = (i + 1) % cons.length;
+            count = count + 1;
+
+            i = i + 1;
+
+            while (i >= cons.length) {
+                i = i - cons.length;
+            }
         }
 
         cons[i].step();
@@ -127,8 +145,13 @@ public class SerialProducerConsumer {
 
             array[putPtr] = x;
 
-            putPtr = (putPtr + 1) % size;
-            ++usedSlots;
+            putPtr = putPtr + 1;
+
+            while (putPtr >= size) {
+                putPtr = putPtr - size;
+            }
+
+            usedSlots = usedSlots + 1;
         }
 
         public Object get() {
@@ -137,8 +160,13 @@ public class SerialProducerConsumer {
             Object x = array[getPtr];
             array[getPtr] = null;
 
-            getPtr = (getPtr + 1) % size;
-            --usedSlots;
+            getPtr = getPtr + 1;
+
+            while (getPtr >= size) {
+                getPtr = getPtr - size;
+            }
+
+            usedSlots = usedSlots - 1;
 
             return x;
         }
@@ -166,9 +194,13 @@ public class SerialProducerConsumer {
         public void step() {
             assert !done;
 
-            if (count++ < PRODS_COUNT) {
-                buffer.put((Integer)(++payload));
+            if (count < PRODS_COUNT) {
+                payload = payload + 1;
+
+                buffer.put((Integer)(payload));
             }
+
+            count = count + 1;
 
             if (count >= PRODS_COUNT) {
                 done = true;
@@ -196,15 +228,17 @@ public class SerialProducerConsumer {
         public void step() {
             assert !done;
 
-            if (count++ < CONS_COUNT) {
+            if (count < CONS_COUNT) {
                 Object received = buffer.get();
 
                 if (received == null) {
                     done = true;
                 }
 
-                ++total;
+                total = total + 1;
             }
+
+            count = count + 1;
 
             if (count >= CONS_COUNT) {
                 done = true;
