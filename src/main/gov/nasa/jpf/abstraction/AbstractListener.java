@@ -210,6 +210,10 @@ public class AbstractListener extends PropertyListenerAdapter {
     @Override
     public void choiceGeneratorRegistered(VM vm, ChoiceGenerator<?> nextCG, ThreadInfo currentThread, Instruction executedInstruction) {
         if (!finished) {
+            if (PandaConfig.getInstance().pruneInfeasibleBranches()) {
+                vm.forceState();
+            }
+
             PredicateAbstraction.getInstance().collectGarbage(vm, currentThread);
 
             PredicateAbstraction.getInstance().rememberChoiceGenerator(nextCG);
