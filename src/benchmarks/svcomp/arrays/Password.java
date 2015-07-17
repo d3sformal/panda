@@ -1,5 +1,7 @@
 package svcomp.arrays;
 
+import static gov.nasa.jpf.abstraction.Verifier.unknownInt;
+
 // Taken from SVCOMP (ETAPS 2014)
 
 public class Password {
@@ -8,6 +10,11 @@ public class Password {
     public static void test() {
         int[] password = new int[SIZE];
         int[] guess = new int[SIZE];
+
+        for (int i = 0; i < SIZE; ++i) {
+            password[i] = unknownInt();
+            guess[i] = unknownInt();
+        }
 
         boolean result = true;
 

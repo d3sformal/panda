@@ -1,5 +1,7 @@
 package svcomp.arrays;
 
+import static gov.nasa.jpf.abstraction.Verifier.unknownInt;
+
 // Taken from SVCOMP
 
 public class ReverseArray {
@@ -8,6 +10,10 @@ public class ReverseArray {
     public static void test() {
         int[] a = new int[N];
         int[] b = new int[N];
+
+        for (int i = 0; i < N; ++i) {
+            a[i] = unknownInt();
+        }
 
         for (int i = 0; i < N; ++i) {
             b[i] = a[N - i - 1];

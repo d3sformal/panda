@@ -1,5 +1,7 @@
 package svcomp.arrays;
 
+import static gov.nasa.jpf.abstraction.Verifier.unknownInt;
+
 // Taken from SVCOMP
 
 public class TwoIndices {
@@ -8,6 +10,10 @@ public class TwoIndices {
     public static void test() {
         int[] a = new int[SIZE];
         int[] b = new int[SIZE];
+
+        for (int i = 0; i < SIZE; ++i) {
+            b[i] = unknownInt();
+        }
 
         int i = 1;
         int j = 0;
