@@ -26,7 +26,7 @@ public class SerialAlarmClock {
         boolean clDone = true;
         boolean clReady = false;
 
-        for (int k = 0; k < cl.length; ++k) {
+        for (int k = 0; k < cl.length; k = k + 1) {
             if (!cl[k].isDone()) {
                 clDone = false;
 
@@ -79,7 +79,9 @@ public class SerialAlarmClock {
         int count = 0;
 
         while (cl[i].isDone() || cl[i].isWaiting()) {
-            assert count++ < cl.length;
+            assert count < cl.length;
+
+            count = count + 1;
 
             i = i + 1;
 
@@ -111,14 +113,14 @@ public class SerialAlarmClock {
             if (monitor.getTime() < max) {
                 monitor.tick();
 
-                sleep += 3;
+                sleep = sleep + 3;
             } else {
                 done = true;
             }
         }
 
         public void timeQuantumElapsed() {
-            --sleep;
+            sleep = sleep - 1;
         }
 
         public boolean isDone() {
@@ -198,7 +200,7 @@ public class SerialAlarmClock {
         }
 
         public void tick() {
-            ++now;
+            now = now + 1;
 
             if (!waitList.isEmpty()) {
                 if (waitList.getFirstWakeTime() == now) {
@@ -277,6 +279,7 @@ public class SerialAlarmClock {
                         p = p.getNext();
                     }
 
+                    n.setNext(p.getNext());
                     p.setNext(n);
                 }
             }
