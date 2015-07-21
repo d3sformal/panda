@@ -43,8 +43,8 @@ public class SerialAlarmClock {
             (cl[1].isWaiting() ? "W" : (cl[1].isDone() ? "D" : "1")));
         */
 
-        if (!clockDone || !clDone) {
-            assert !clockDone || clReady; // Deadlock
+        if (!clDone) {
+            //assert !clockDone || clReady; // Deadlock
 
             int i = unknownNonNegativeInt();
             int mod = (clockReady ? 1 : 0) + cl.length;

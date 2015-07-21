@@ -309,7 +309,7 @@ static int schedule(monitor_t* m, alarmclock_t* c, client_t** cl, int n) {
         }
     }
 
-    if (!c_done || !cl_done) {
+    if (!cl_done) {
         //assert(!c_done || cl_ready);
 
         int i = unknown();

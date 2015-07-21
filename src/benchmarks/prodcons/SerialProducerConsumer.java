@@ -4,8 +4,8 @@ import static gov.nasa.jpf.abstraction.Verifier.unknownNonNegativeInt;
 
 public class SerialProducerConsumer {
     public static final int PRODS = 2;
-    public static final int CONS = 3;
-    public static final int PRODS_COUNT = 3;
+    public static final int CONS = 2;
+    public static final int PRODS_COUNT = 2;
     public static final int CONS_COUNT = 2;
     public static int total = 0;
 

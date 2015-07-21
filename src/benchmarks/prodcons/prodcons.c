@@ -3,7 +3,7 @@
 #define assert(c) {if(!(c)) __VERIFIER_error();}
 
 #define PRODS 2
-#define CONS 3
+#define CONS 2
 #define TOTAL (PRODS * CONS)
 #define PRODS_ITEMS (TOTAL / PRODS)
 #define CONS_ITEMS (TOTAL / CONS)
