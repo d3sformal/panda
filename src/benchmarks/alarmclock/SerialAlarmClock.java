@@ -9,7 +9,7 @@ public class SerialAlarmClock {
         Clock c = new Clock(m, maxTime);
 
         Client[] cl = new Client[2];
-        cl[0] = new Client(2, m);
+        cl[0] = new Client(1, m);
         cl[1] = new Client(2, m);
 
         while (schedule(m, c, cl)) {
