@@ -227,12 +227,16 @@ static int schedule(buffer_t* b, producer_t** prods, consumer_t** cons) {
     for (k = 0; k < PRODS; k = k + 1) {
         if (!producer_done(prods[k])) {
             prods_done = false;
+
+            break;
         }
     }
 
     for (k = 0; k < CONS; k = k + 1) {
         if (!consumer_done(cons[k])) {
             cons_done = false;
+
+            break;
         }
     }
 

@@ -305,6 +305,8 @@ static int schedule(monitor_t* m, alarmclock_t* c, client_t** cl, int n) {
 
             if (!client_waiting(cl[k])) {
                 cl_ready = true;
+
+                break;
             }
         }
     }

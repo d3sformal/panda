@@ -39,12 +39,16 @@ public class SerialProducerConsumer {
         for (int k = 0; k < prods.length; k = k + 1) {
             if (!prods[k].isDone()) {
                 prodsDone = false;
+
+                break;
             }
         }
         // Check whether there is any live consumer
         for (int k = 0; k < cons.length; k = k + 1) {
             if (!cons[k].isDone()) {
                 consDone = false;
+
+                break;
             }
         }
 

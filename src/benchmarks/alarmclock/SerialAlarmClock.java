@@ -32,6 +32,8 @@ public class SerialAlarmClock {
 
                 if (!cl[k].isWaiting()) {
                     clReady = true;
+
+                    break;
                 }
             }
         }
