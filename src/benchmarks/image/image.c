@@ -133,4 +133,6 @@ int main() {
     // Static method invocation
     //_img_load(img);
     //_img_render(img);
+
+    return 0;
 }
