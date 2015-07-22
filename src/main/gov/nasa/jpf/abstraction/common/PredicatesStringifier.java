@@ -301,11 +301,27 @@ public abstract class PredicatesStringifier implements PredicatesComponentVisito
         if (predicate.getClass().equals(Conjunction.class)) {
             Conjunction c = (Conjunction) predicate;
 
-            inlineConjunction(c.a);
+            if (c.a.getClass().equals(Conjunction.class) && (c.b instanceof Comparison || c.b instanceof Assign)) {
+                while (c.a.getClass().equals(Conjunction.class) && (c.b instanceof Comparison || c.b instanceof Assign)) {
+                    c.b.accept(this);
+                    ret.append(" and ");
+                    c = (Conjunction) c.a;
+                }
+                c.accept(this);
+            } else if (c.b.getClass().equals(Conjunction.class) && (c.a instanceof Comparison || c.a instanceof Assign)) {
+                while (c.b.getClass().equals(Conjunction.class) && (c.a instanceof Comparison || c.a instanceof Assign)) {
+                    c.a.accept(this);
+                    ret.append(" and ");
+                    c = (Conjunction) c.b;
+                }
+                c.accept(this);
+            } else {
+                inlineConjunction(c.a);
 
-            ret.append(" and ");
+                ret.append(" and ");
 
-            inlineConjunction(c.b);
+                inlineConjunction(c.b);
+            }
         } else {
             predicate.accept(this);
         }

@@ -1,6 +1,8 @@
 package gov.nasa.jpf.abstraction.smt;
 
 import gov.nasa.jpf.abstraction.common.Add;
+import gov.nasa.jpf.abstraction.common.Assign;
+import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Disjunction;
@@ -57,11 +59,27 @@ public class PredicatesSMTStringifier extends PredicatesStringifier {
         if (predicate.getClass().equals(Conjunction.class)) {
             Conjunction c = (Conjunction) predicate;
 
-            inlineConjunction(c.a);
+            if (c.a.getClass().equals(Conjunction.class) && (c.b instanceof Comparison || c.b instanceof Assign)) {
+                while (c.a.getClass().equals(Conjunction.class) && (c.b instanceof Comparison || c.b instanceof Assign)) {
+                    c.b.accept(this);
+                    ret.append(" ");
+                    c = (Conjunction) c.a;
+                }
+                c.accept(this);
+            } else if (c.b.getClass().equals(Conjunction.class) && (c.a instanceof Comparison || c.a instanceof Assign)) {
+                while (c.b.getClass().equals(Conjunction.class) && (c.a instanceof Comparison || c.a instanceof Assign)) {
+                    c.a.accept(this);
+                    ret.append(" ");
+                    c = (Conjunction) c.b;
+                }
+                c.accept(this);
+            } else {
+                inlineConjunction(c.a);
 
-            ret.append(" ");
+                ret.append(" ");
 
-            inlineConjunction(c.b);
+                inlineConjunction(c.b);
+            }
         } else {
             predicate.accept(this);
         }
