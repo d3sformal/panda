@@ -204,14 +204,12 @@ public class SerialAlarmClock {
         public void tick() {
             now = now + 1;
 
-            if (!waitList.isEmpty()) {
-                if (waitList.getFirstWakeTime() == now) {
-                    Client wakeup = waitList.getFirstElement();
+            while (!waitList.isEmpty() && waitList.getFirstWakeTime() <= now) {
+                Client wakeup = waitList.getFirstElement();
 
-                    waitList.removeFirstElement();
+                waitList.removeFirstElement();
 
-                    wakeup.wakeup();
-                }
+                wakeup.wakeup();
             }
         }
 

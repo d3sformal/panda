@@ -138,12 +138,10 @@ static void client_wakeup(client_t* c) {
 static void monitor_tick(monitor_t* m) {
     m->now = m->now + 1;
 
-    if (!list_empty(m->wait)) {
-        if (list_first_wake_time(m->wait) == m->now) {
-            client_t* wakeup = list_first(m->wait);
-            m->wait = list_remove_first(m->wait);
-            client_wakeup(wakeup);
-        }
+    while (!list_empty(m->wait) && list_first_wake_time(m->wait) <= m->now) {
+        client_t* wakeup = list_first(m->wait);
+        m->wait = list_remove_first(m->wait);
+        client_wakeup(wakeup);
     }
 }
 
