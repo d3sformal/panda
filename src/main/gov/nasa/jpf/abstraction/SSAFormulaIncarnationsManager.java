@@ -113,7 +113,7 @@ public class SSAFormulaIncarnationsManager {
         return DefaultArrays.create("ssa_" + getArraysIncarnationNumber(arrays) + "_arr");
     }
 
-    private int getFrame(int depth) {
+    public int getFrame(int depth) {
         return frameIncarnations.get(frameIncarnations.size() - depth - 1);
     }
 

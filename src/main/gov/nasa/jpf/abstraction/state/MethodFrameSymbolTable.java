@@ -363,7 +363,7 @@ public class MethodFrameSymbolTable implements SymbolTable, Scope {
     /**
      * Find all paths (up to a certain length) that can describe the given value (primitive/object)
      */
-    private void valueToAccessExpressions(UniverseIdentifier id, int maxLength, Set<AccessExpression> outAccessExpressions) {
+    public void valueToAccessExpressions(UniverseIdentifier id, int maxLength, Set<AccessExpression> outAccessExpressions) {
         if (maxLength == 0) {
             return;
         }

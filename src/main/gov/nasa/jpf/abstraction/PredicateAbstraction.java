@@ -203,7 +203,10 @@ public class PredicateAbstraction extends Abstraction {
     }
 
     public void registerUnknown(Unknown unknown) {
-        unknowns.put(((Root) ssa.getSymbolIncarnation(unknown, 0)).getName(), unknown);
+        String name = ((Root) ssa.getSymbolIncarnation(unknown, 0)).getName();
+
+        unknowns.put(name, unknown);
+        traceFormula.registerUnknown(name);
     }
 
     public SortedMap<String, Unknown> getUnknowns() {
@@ -407,6 +410,7 @@ public class PredicateAbstraction extends Abstraction {
 
             traceFormula.markCallInvoked(method);
 
+            System.out.println("Assignment: " + assignment + " ... " + assignment.getClass().getSimpleName());
             extendTraceFormulaWith(assignment, method, 0, true);
 
             traceFormula.markCallStarted();
@@ -426,6 +430,8 @@ public class PredicateAbstraction extends Abstraction {
         symbolTable.processMethodReturn(threadInfo, before, after);
 
         if (RunDetector.isRunning()) {
+            int frame = ssa.getFrame(0);
+
             MethodInfo callee = before.getMethodInfo();
             MethodInfo caller = after.getMethodInfo();
             AccessExpression returnSymbolCallee = DefaultReturnValue.create();
@@ -455,6 +461,8 @@ public class PredicateAbstraction extends Abstraction {
             ssa.changeDepth(-1);
 
             traceFormula.markReturned();
+
+            traceFormula.dropInfluencesFromFrame(frame);
         }
 
         predicateValuation.processMethodReturn(threadInfo, before, after);
@@ -466,12 +474,16 @@ public class PredicateAbstraction extends Abstraction {
         predicateValuation.processVoidMethodReturn(threadInfo, before, after);
 
         if (RunDetector.isRunning()) {
+            int frame = ssa.getFrame(0);
+
             ssa.changeDepth(-1);
 
             extendTraceFormulaWithConstraint(Tautology.create(), before.getMethodInfo(), before.getPC().getPosition() + before.getPC().getLength(), true);
             traceFormula.markReturn();
             extendTraceFormulaWithConstraint(Tautology.create(), after.getMethodInfo(), after.getPC().getPosition() + after.getPC().getLength(), true);
             traceFormula.markReturned();
+
+            traceFormula.dropInfluencesFromFrame(frame);
         }
     }
 

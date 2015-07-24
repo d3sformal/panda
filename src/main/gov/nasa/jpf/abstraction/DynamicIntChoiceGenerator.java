@@ -19,6 +19,10 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
         super(name, values);
     }
 
+    public Integer getCurrentChoice() {
+        return super.getNextChoice();
+    }
+
     @Override
     public Integer getNextChoice() {
         Integer ret = super.getNextChoice();

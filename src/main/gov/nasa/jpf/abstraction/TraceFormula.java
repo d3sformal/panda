@@ -1,15 +1,37 @@
 package gov.nasa.jpf.abstraction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import gov.nasa.jpf.vm.MethodInfo;
 
 import gov.nasa.jpf.abstraction.common.Conjunction;
+import gov.nasa.jpf.abstraction.common.Disjunction;
+import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.Predicate;
 import gov.nasa.jpf.abstraction.common.Tautology;
+import gov.nasa.jpf.abstraction.common.impl.ArraysAssign;
+import gov.nasa.jpf.abstraction.common.impl.FieldAssign;
+import gov.nasa.jpf.abstraction.common.impl.VariableAssign;
+import gov.nasa.jpf.abstraction.common.access.AccessExpression;
+import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldRead;
+import gov.nasa.jpf.abstraction.common.access.ObjectFieldWrite;
+import gov.nasa.jpf.abstraction.common.access.Root;
+import gov.nasa.jpf.abstraction.common.access.Unknown;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultArrayElementRead;
+import gov.nasa.jpf.abstraction.common.access.impl.DefaultObjectFieldRead;
+import gov.nasa.jpf.abstraction.state.MethodFrameSymbolTable;
+import gov.nasa.jpf.abstraction.state.SystemSymbolTable;
+import gov.nasa.jpf.abstraction.state.universe.Reference;
+import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
 import gov.nasa.jpf.abstraction.util.Pair;
 
 public class TraceFormula implements Iterable<Step> {
@@ -96,6 +118,209 @@ public class TraceFormula implements Iterable<Step> {
 
     private void push(Step s) {
         steps.push(s);
+
+        computeUnknownInfluence(s.getPredicate());
+    }
+
+    Map<String, Set<AccessExpression>> unknownInfluence = new HashMap<String, Set<AccessExpression>>();
+
+    public void registerUnknown(String name) {
+        unknownInfluence.put(name, new HashSet<AccessExpression>());
+    }
+
+    public void computeUnknownInfluence(Predicate p) {
+        computeUnknownInfluenceRecursive(p);
+        //System.out.println(unknownInfluence.get("ssa_0_frame_10_unknown_pc0"));
+    }
+
+    private void computeUnknownInfluenceRecursive(Predicate p) {
+        if (p instanceof Negation) {
+            Negation n = (Negation) p;
+
+            computeUnknownInfluence(n.predicate);
+        } else if (p instanceof Conjunction) {
+            Conjunction c = (Conjunction) p;
+
+            computeUnknownInfluence(c.a);
+            computeUnknownInfluence(c.b);
+        } else if (p instanceof Disjunction) {
+            Disjunction d = (Disjunction) p;
+
+            computeUnknownInfluence(d.a);
+            computeUnknownInfluence(d.b);
+        } else if (p instanceof VariableAssign) {
+            Set<AccessExpression> exprs = new HashSet<AccessExpression>();
+
+            VariableAssign va = (VariableAssign) p;
+
+            va.expression.addAccessExpressionsToSet(exprs);
+
+            computeUnknownInfluence(va.variable, exprs);
+        } else if (p instanceof FieldAssign) {
+            FieldAssign fa = (FieldAssign) p;
+
+            if (fa.newField instanceof ObjectFieldWrite) {
+                Set<AccessExpression> exprs = new HashSet<AccessExpression>();
+
+                ObjectFieldWrite fw = (ObjectFieldWrite) fa.newField;
+                ObjectFieldRead fr = DefaultObjectFieldRead.create(fw.getObject(), fa.field);
+
+                fw.getNewValue().addAccessExpressionsToSet(exprs);
+
+                computeUnknownInfluence(fr, exprs);
+            }
+        } else if (p instanceof ArraysAssign) {
+            ArraysAssign aa = (ArraysAssign) p;
+
+            if (aa.newArrays instanceof ArrayElementWrite) {
+                Set<AccessExpression> exprs = new HashSet<AccessExpression>();
+
+                ArrayElementWrite aw = (ArrayElementWrite) aa.newArrays;
+                ArrayElementRead ar = DefaultArrayElementRead.create(aw.getArray(), aa.arrays, aw.getIndex());
+
+                aw.getIndex().addAccessExpressionsToSet(exprs);
+                aw.getNewValue().addAccessExpressionsToSet(exprs);
+
+                computeUnknownInfluence(ar, exprs);
+            }
+        /*
+        } else if (p instanceof Equals) {
+            p.addAccessExpressionsToSet(exprs);
+
+            computeUnknownInfluence(exprs, exprs);
+        } else if (p instanceof LessThan) {
+            p.addAccessExpressionsToSet(exprs);
+
+            computeUnknownInfluence(exprs);
+        */
+        }
+    }
+
+    public Set<Unknown> getInfluentialUnknowns(AccessExpression ae) {
+        Set<Unknown> ret = new HashSet<Unknown>();
+
+        addInfluentialUnknownsToSet(ae, ret);
+
+        return ret;
+    }
+
+    public Set<Unknown> getInfluentialUnknowns(Set<AccessExpression> exprs) {
+        Set<Unknown> ret = new HashSet<Unknown>();
+
+        for (AccessExpression ae : exprs) {
+            addInfluentialUnknownsToSet(ae, ret);
+        }
+
+        return ret;
+    }
+
+    public void dropInfluencesFromFrame(int frame) {
+        Set<AccessExpression> toBeRemoved = new HashSet<AccessExpression>();
+        Set<AccessExpression> expr = new HashSet<AccessExpression>();
+
+        for (String u : unknownInfluence.keySet()) {
+            for (AccessExpression ae : unknownInfluence.get(u)) {
+                ae.addAccessExpressionsToSet(expr);
+
+                for (AccessExpression ae2 : expr) {
+                    Root r = ae2.getRoot();
+
+                    if (r.getName().matches("^ssa_[0-9]\\+_frame_" + frame)) {
+                        toBeRemoved.add(ae);
+
+                        break;
+                    }
+                }
+
+                expr.clear();
+            }
+
+            unknownInfluence.get(u).removeAll(toBeRemoved);
+
+            toBeRemoved.clear();
+        }
+    }
+
+    protected void addInfluentialUnknownsToSet(AccessExpression ae, Set<Unknown> ret) {
+        PredicateAbstraction abs = PredicateAbstraction.getInstance();
+        SSAFormulaIncarnationsManager ssa = abs.getSSAManager();
+        AccessExpression ssaExpr = ssa.getSymbolIncarnation(ae, 0);
+        Map<String, Unknown> unknowns = abs.getUnknowns();
+
+        for (String u : unknownInfluence.keySet()) {
+            Set<AccessExpression> influenced = unknownInfluence.get(u);
+
+            for (AccessExpression i : influenced) {
+                if (i.isPrefixOf(ssaExpr)) {
+                    ret.add(unknowns.get(u));
+                }
+            }
+        }
+    }
+
+    private void computeUnknownInfluence(AccessExpression expr, Set<AccessExpression> dep) {
+        for (String u : unknownInfluence.keySet()) {
+            Set<AccessExpression> influenced = unknownInfluence.get(u);
+
+            for (AccessExpression ae : dep) {
+                boolean isUnknown = false;
+
+                if (ae instanceof Root) {
+                    Root r = (Root) ae;
+
+                    if (r.getName().equals(u)) {
+                        isUnknown = true;
+                    }
+                }
+
+                boolean isInfluenced = false;
+
+                for (AccessExpression i : influenced) {
+                    if (i.isPrefixOf(ae) || ae.isPrefixOf(i)) {
+                        isInfluenced = true;
+
+                        break;
+                    }
+                }
+
+                if (isUnknown || isInfluenced) {
+                    addInfluence(influenced, expr);
+
+                    return;
+                }
+            }
+        }
+    }
+
+    private void addInfluence(Set<AccessExpression> influenced, AccessExpression ae) {
+        PredicateAbstraction abs = PredicateAbstraction.getInstance();
+        SystemSymbolTable sys = abs.getSymbolTable();
+        MethodFrameSymbolTable top = sys.get(0);
+        Set<UniverseIdentifier> ids = new HashSet<UniverseIdentifier>();
+        Set<AccessExpression> alias = new HashSet<AccessExpression>();
+        SSAFormulaIncarnationsManager ssa = abs.getSSAManager();
+        AccessExpression ae1 = ssa.clear(ae);
+
+        top.lookupValues(ae1, ids);
+
+        System.out.println("Adding influence to: " + ae + " (" + ae1 + ") = " + ids);
+
+
+        for (UniverseIdentifier id : ids) {
+            //System.out.println(" \tParents: " + top.getUniverse().get(id).getParentSlots());
+            for (int i = 0; i < sys.depth(); ++i) {
+                MethodFrameSymbolTable sym = sys.get(i);
+
+                sym.valueToAccessExpressions(id, ae.getLength() + 1, alias); // TODO: length = ae.length + maxParamLength of current frame's actual param to the nested frame
+                System.out.println("\tAliases of length " + ae.getLength() + " at depth " + i + ": " + alias);
+
+                for (AccessExpression ae2 : alias) {
+                    influenced.add(ssa.getSymbolIncarnation(ae2, i));
+                }
+            }
+        }
+
+        influenced.add(ae);
     }
 
     private void pop() {
@@ -226,6 +451,14 @@ public class TraceFormula implements Iterable<Step> {
         c.depth = depth;
         c.unmatchedCalls.addAll(unmatchedCalls);
         c.methodBoundaries.addAll(methodBoundaries);
+
+        for (String u : unknownInfluence.keySet()) {
+            Set<AccessExpression> influenced = new HashSet<AccessExpression>();
+
+            influenced.addAll(unknownInfluence.get(u));
+
+            c.unknownInfluence.put(u, influenced);
+        }
 
         return c;
     }
