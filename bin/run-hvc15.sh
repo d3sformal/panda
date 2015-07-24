@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CONFIG="+listener+=,gov.nasa.jpf.abstraction.util.TimeConstrainedJPF +jpf.time_limit=3600"
+CONFIG="+listener+=,gov.nasa.jpf.abstraction.util.TimeConstrainedJPF +jpf.time_limit=7200"
 
 mkdir -p output
 
