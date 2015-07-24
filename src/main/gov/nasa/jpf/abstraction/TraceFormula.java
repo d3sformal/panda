@@ -196,16 +196,24 @@ public class TraceFormula implements Iterable<Step> {
         }
     }
 
-    public Set<Unknown> getInfluentialUnknowns(AccessExpression ae) {
-        Set<Unknown> ret = new HashSet<Unknown>();
+    public Set<String> getInfluentialUnknowns(AccessExpression ae) {
+        if (unknownInfluence.isEmpty()) {
+            return java.util.Collections.emptySet();
+        }
+
+        Set<String> ret = new HashSet<String>();
 
         addInfluentialUnknownsToSet(ae, ret);
 
         return ret;
     }
 
-    public Set<Unknown> getInfluentialUnknowns(Set<AccessExpression> exprs) {
-        Set<Unknown> ret = new HashSet<Unknown>();
+    public Set<String> getInfluentialUnknowns(Set<AccessExpression> exprs) {
+        if (unknownInfluence.isEmpty()) {
+            return java.util.Collections.emptySet();
+        }
+
+        Set<String> ret = new HashSet<String>();
 
         for (AccessExpression ae : exprs) {
             addInfluentialUnknownsToSet(ae, ret);
@@ -241,18 +249,17 @@ public class TraceFormula implements Iterable<Step> {
         }
     }
 
-    protected void addInfluentialUnknownsToSet(AccessExpression ae, Set<Unknown> ret) {
+    protected void addInfluentialUnknownsToSet(AccessExpression ae, Set<String> ret) {
         PredicateAbstraction abs = PredicateAbstraction.getInstance();
         SSAFormulaIncarnationsManager ssa = abs.getSSAManager();
         AccessExpression ssaExpr = ssa.getSymbolIncarnation(ae, 0);
-        Map<String, Unknown> unknowns = abs.getUnknowns();
 
         for (String u : unknownInfluence.keySet()) {
             Set<AccessExpression> influenced = unknownInfluence.get(u);
 
             for (AccessExpression i : influenced) {
                 if (i.isPrefixOf(ssaExpr)) {
-                    ret.add(unknowns.get(u));
+                    ret.add(u);
                 }
             }
         }
@@ -289,7 +296,12 @@ public class TraceFormula implements Iterable<Step> {
                     return;
                 }
             }
+
+            removeInfluence(influenced, expr);
         }
+    }
+
+    private void removeInfluence(Set<AccessExpression> influenced, AccessExpression ae) {
     }
 
     private void addInfluence(Set<AccessExpression> influenced, AccessExpression ae) {
@@ -305,6 +317,7 @@ public class TraceFormula implements Iterable<Step> {
 
         System.out.println("Adding influence to: " + ae + " (" + ae1 + ") = " + ids);
 
+        // TODO: Store without ssa_[0-9]\+ part
 
         for (UniverseIdentifier id : ids) {
             //System.out.println(" \tParents: " + top.getUniverse().get(id).getParentSlots());
@@ -452,6 +465,8 @@ public class TraceFormula implements Iterable<Step> {
         c.unmatchedCalls.addAll(unmatchedCalls);
         c.methodBoundaries.addAll(methodBoundaries);
 
+        // This is path-sensitive
+        /*
         for (String u : unknownInfluence.keySet()) {
             Set<AccessExpression> influenced = new HashSet<AccessExpression>();
 
@@ -459,6 +474,11 @@ public class TraceFormula implements Iterable<Step> {
 
             c.unknownInfluence.put(u, influenced);
         }
+        */
+
+        // This is path-insensitive (still safe, just less strict about how loose the model constraint should be)
+        // Saves a lot of memory
+        c.unknownInfluence = unknownInfluence;
 
         return c;
     }

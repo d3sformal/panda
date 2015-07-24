@@ -123,7 +123,7 @@ public class BranchingExecutionHelper {
 
                     branchCondition.addAccessExpressionsToSet(exprs);
 
-                    Set<Unknown> influentialUnknowns = trace.getInfluentialUnknowns(exprs);
+                    Set<String> influentialUnknowns = trace.getInfluentialUnknowns(exprs);
 
                     exprs.clear();
 
@@ -191,7 +191,9 @@ public class BranchingExecutionHelper {
                             reuse = Disjunction.create(reuse, binding);
                         }
 
-                        if (!influentialUnknowns.contains(unknown)) {
+                        System.out.println(influentialUnknowns + ".contains(" + name + ") = " + influentialUnknowns.contains(name));
+
+                        if (!influentialUnknowns.contains(name)) {
                             least = Conjunction.create(least, Equals.create(exprArray[j], Constant.create(currentChoice)));
                             reuses = Conjunction.create(reuses, reuse);
                         }
