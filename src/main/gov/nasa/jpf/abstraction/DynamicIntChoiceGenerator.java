@@ -19,9 +19,13 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
         super(name, values);
     }
 
+    public Integer getCurrentChoice() {
+        return super.getNextChoice();
+    }
+
     @Override
     public Integer getNextChoice() {
-        Integer ret = super.getNextChoice();
+        Integer ret = getCurrentChoice();
 
         if (count > 0) {
             PredicateAbstraction.getInstance().forceStatesAlongTrace(targetBranchings.get(count - 1));

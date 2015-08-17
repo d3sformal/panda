@@ -137,62 +137,82 @@ public class BranchingExecutionHelper {
 
                     AccessExpression[] exprArray = unknownExprs.toArray(new AccessExpression[unknownExprs.size()]);
 
-                    /**
-                     * Blocking clauses may not be necessary (the trace itself (extended with appropriate branch condition) is enough to demand a new value of unknown)
-                     * On contrary they may cause divergence
-                     * But they are there currently to avoid returning to previously picked choices:
-                     *   i = *
-                     *   if (i = 1) {
-                     *   }
-                     *
-                     *   Starts with 0
-                     *   Generates 1
-                     *   Goes back to 0
-                     *   Goes back to 1
-                     *   Goes back to 0
-                     *   ...
-                     */
-                    // Add blocking clause for unknown models
-                    //   (u1 != v11 & u1 != v12 & ... u1 != v1n) | (u2 != ...) | ... (un != ...)
+                    // Try changing some unknowns to drive the execution into the branch that is not currently enabled
+                    int[] models = null;
 
-                    Predicate reuses = Tautology.create();
-                    Predicate blockings = Contradiction.create();
+                    for (int j = 0; j < exprArray.length && models == null; ++j) {
+                        Predicate singleChangeModelFormula = Tautology.create();
 
-                    for (int j = 0; j < exprArray.length; ++j) {
-                        Predicate reuse = Contradiction.create();
-                        Predicate blocking = Tautology.create();
-                        DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
-                        Integer[] choices = cg.getProcessedChoices();
-                        List<TraceFormula> traces = cg.getTraces();
+                        for (int k = 0; k < exprArray.length; ++k) {
+                            if (k != j) {
+                                DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
 
-                        for (int k = 0; k < choices.length; ++k) {
-                            int model = choices[k];
-                            Predicate binding = Equals.create(exprArray[j], Constant.create(model));
-
-                            // Block only those models that were created for the same trace (other choices applied in other branches of the state space may easily be reused here)
-                            // Actually it would be wrong to omit models that might easily enable this branch but happen to be used elsewhere first (That would destroy soundness)
-                            if (k == 0 || traces.get(k - 1).equals(PredicateAbstraction.getInstance().getTraceFormula())) {
-                                blocking = Conjunction.create(blocking, Negation.create(binding));
+                                singleChangeModelFormula = Conjunction.create(singleChangeModelFormula, Equals.create(exprArray[k], Constant.create(cg.getCurrentChoice())));
                             }
-
-                            // In contrast to blocking:
-                            // Force using one of the old models of the given unknown
-                            reuse = Disjunction.create(reuse, binding);
                         }
 
-                        reuses = Conjunction.create(reuses, reuse);
-                        blockings = Disjunction.create(blockings, blocking);
+                        models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(singleChangeModelFormula, exprArray);
                     }
 
-                    Predicate oldModelFormula = Conjunction.create(traceFormula, reuses);
-                    Predicate newModelFormula = Conjunction.create(traceFormula, blockings);
-
-                    // First, try using a combination of old (already generated) models for the unknowns
-                    int[] models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(oldModelFormula, exprArray);
-
-                    // Only if none exists, generate a possibly completely different model (may change all the values to something new, if used unwisely may cause divergence - too many different model combinations)
+                    // If changing one unknown was not enough
                     if (models == null) {
-                        models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(newModelFormula, exprArray);
+                        /**
+                         * Blocking clauses may not be necessary (the trace itself (extended with appropriate branch condition) is enough to demand a new value of unknown)
+                         * On contrary they may cause divergence
+                         * But they are there currently to avoid returning to previously picked choices:
+                         *   i = *
+                         *   if (i = 1) {
+                         *   }
+                         *
+                         *   Starts with 0
+                         *   Generates 1
+                         *   Goes back to 0
+                         *   Goes back to 1
+                         *   Goes back to 0
+                         *   ...
+                         */
+                        // Add blocking clause for unknown models
+                        //   (u1 != v11 & u1 != v12 & ... u1 != v1n) | (u2 != ...) | ... (un != ...)
+
+                        Predicate reuses = Tautology.create();
+                        Predicate blockings = Contradiction.create();
+
+                        for (int j = 0; j < exprArray.length; ++j) {
+                            Predicate reuse = Contradiction.create();
+                            Predicate blocking = Tautology.create();
+                            DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
+                            Integer[] choices = cg.getProcessedChoices();
+                            List<TraceFormula> traces = cg.getTraces();
+
+                            for (int k = 0; k < choices.length; ++k) {
+                                int model = choices[k];
+                                Predicate binding = Equals.create(exprArray[j], Constant.create(model));
+
+                                // Block only those models that were created for the same trace (other choices applied in other branches of the state space may easily be reused here)
+                                // Actually it would be wrong to omit models that might easily enable this branch but happen to be used elsewhere first (That would destroy soundness)
+                                if (k == 0 || traces.get(k - 1).equals(PredicateAbstraction.getInstance().getTraceFormula())) {
+                                    blocking = Conjunction.create(blocking, Negation.create(binding));
+                                }
+
+                                // In contrast to blocking:
+                                // Force using one of the old models of the given unknown
+                                reuse = Disjunction.create(reuse, binding);
+                            }
+
+                            reuses = Conjunction.create(reuses, reuse);
+                            blockings = Disjunction.create(blockings, blocking);
+                        }
+
+                        Predicate oldModelFormula = Conjunction.create(traceFormula, reuses);
+                        Predicate newModelFormula = Conjunction.create(traceFormula, blockings);
+
+                        // First, try using a combination of old (already generated) models for the unknowns
+                        models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(oldModelFormula, exprArray);
+
+                        // Only if none exists, generate a possibly completely different model (may change all the values to something new, if used unwisely may cause divergence - too many different model combinations)
+                        if (models == null) {
+                            models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(newModelFormula, exprArray);
+                        }
                     }
 
                     if (models == null || models.length == 0) {
