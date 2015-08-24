@@ -63,6 +63,8 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
         if (!ti.isFirstStepInsn()) { // first time around
             DynamicIntChoiceGenerator cg = new DynamicIntChoiceGenerator("unknownInt()", new int[] { 0 }); // Fixed default value
 
+            cg.setInsn(env.getInstruction());
+
             // During PRUNING (with FORCE_FEASIBLE)
             // at some point we reach a feasible branch which is not enabled under current concrete execution
             // we generate a model of all unknown values
@@ -104,7 +106,7 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
             // Check condition and break the transition if it does not hold
             if (!icg.isNextChoiceEnabled()) {
                 String message = "The model of this unknown has not been explicitely enabled under the current combination of all the preceding unknowns";
-                cg = new BreakGenerator(message, ThreadInfo.getCurrentThread(), false);
+                //cg = new BreakGenerator(message, ThreadInfo.getCurrentThread(), false);
 
                 if (PandaConfig.getInstance().enabledVerbose(JPF_gov_nasa_jpf_abstraction_Verifier.class)) {
                     System.out.println();
