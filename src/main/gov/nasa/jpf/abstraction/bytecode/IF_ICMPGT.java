@@ -13,9 +13,10 @@ import gov.nasa.jpf.abstraction.state.TruthValue;
  * Branch if int comparison succeeds
  * ..., value1, value2 => ...
  */
-public class IF_ICMPGT extends gov.nasa.jpf.jvm.bytecode.IF_ICMPGT implements AbstractBranching {
+public class IF_ICMPGT extends gov.nasa.jpf.jvm.bytecode.IF_ICMPGT implements BinaryAbstractBranching {
 
     BinaryIfInstructionExecutor executor = new BinaryIfInstructionExecutor();
+    Predicate last;
 
     public IF_ICMPGT(int targetPc) {
         super(targetPc);
@@ -43,7 +44,13 @@ public class IF_ICMPGT extends gov.nasa.jpf.jvm.bytecode.IF_ICMPGT implements Ab
 
     @Override
     public Predicate createPredicate(Expression expr1, Expression expr2) {
-        return LessThan.create(expr2, expr1);
+        last = LessThan.create(expr2, expr1);
+        return last;
+    }
+
+    @Override
+    public Predicate getLastPredicate() {
+        return last;
     }
 
     @Override

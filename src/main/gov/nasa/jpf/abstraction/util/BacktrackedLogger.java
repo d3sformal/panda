@@ -9,13 +9,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Stack;
 
+import static java.nio.file.StandardCopyOption.*;
+
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.ListenerAdapter;
 import gov.nasa.jpf.search.Search;
 
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
-
-import static java.nio.file.StandardCopyOption.*;
 
 public class BacktrackedLogger extends ListenerAdapter {
     private static PrintStream originalStdOut = System.out;

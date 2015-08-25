@@ -14,12 +14,19 @@ import gov.nasa.jpf.abstraction.state.TruthValue;
  * Branch if int comparison with zero succeeds
  * ..., value => ...
  */
-public class IFGT extends gov.nasa.jpf.jvm.bytecode.IFGT implements AbstractBranching {
+public class IFGT extends gov.nasa.jpf.jvm.bytecode.IFGT implements UnaryAbstractBranching {
 
-    UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor(Constant.create(0));
+    Constant secondOperand = Constant.create(0);
+    UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor(secondOperand);
+    Predicate last;
 
     public IFGT(int targetPc) {
         super(targetPc);
+    }
+
+    @Override
+    public Expression getSecondOperand() {
+        return secondOperand;
     }
 
     @Override
@@ -44,7 +51,13 @@ public class IFGT extends gov.nasa.jpf.jvm.bytecode.IFGT implements AbstractBran
 
     @Override
     public Predicate createPredicate(Expression expr1, Expression expr2) {
-        return LessThan.create(expr2, expr1);
+        last = LessThan.create(expr2, expr1);
+        return last;
+    }
+
+    @Override
+    public Predicate getLastPredicate() {
+        return last;
     }
 
     @Override

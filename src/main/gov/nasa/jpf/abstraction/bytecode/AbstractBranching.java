@@ -23,4 +23,5 @@ public interface AbstractBranching {
     public Instruction getNext(ThreadInfo ti);
     public Instruction getTarget(ThreadInfo ti, int num);
 
+    public Predicate getLastPredicate();
 }

@@ -139,6 +139,8 @@ public class PredicateAbstraction extends Abstraction {
     private static List<CounterexampleListener> listeners = new ArrayList<CounterexampleListener>();
     private static Set<String> ignoredStaticFields = new HashSet<String>();
 
+    public Map<Integer, Integer> stateVer = new HashMap<Integer, Integer>();
+
     static {
         ignoredStaticFields.add("serialVersionUID");
     }
@@ -772,12 +774,22 @@ public class PredicateAbstraction extends Abstraction {
     @SuppressWarnings("unchecked")
     @Override
     public void forward(MethodInfo method) {
+        VM vm = VM.getVM();
+
+        int stateId = vm.getSystemState().getId();
+
+        if (!stateVer.containsKey(stateId)) {
+            stateVer.put(stateId, -1);
+        }
+
+        stateVer.put(stateId, stateVer.get(stateId) + 1);
+
         Set<MethodInfo> visitedMethods = new HashSet<MethodInfo>();
 
         visitedMethods.addAll(this.visitedMethods);
 
         State state = new State(
-            VM.getVM().getCurrentThread().getId(),
+            vm.getCurrentThread().getId(),
             symbolTable.memorize(),
             predicateValuation.memorize(),
             traceFormula.clone(),
@@ -791,7 +803,7 @@ public class PredicateAbstraction extends Abstraction {
 
         if (forcedTrace != null) {
             if (traceFormula.isPrefixOf(forcedTrace)) {
-                VM.getVM().forceState();
+                vm.forceState();
             } else {
                 forcedTrace = null;
             }

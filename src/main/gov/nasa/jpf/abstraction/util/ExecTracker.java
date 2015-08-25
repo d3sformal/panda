@@ -14,10 +14,10 @@ import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
 
 import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
 import gov.nasa.jpf.abstraction.util.RunDetector;
@@ -295,4 +295,3 @@ public class ExecTracker extends ListenerAdapter {
     }
   }
 }
-

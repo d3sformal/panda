@@ -9,6 +9,7 @@ import gov.nasa.jpf.vm.ThreadInfo;
 
 import gov.nasa.jpf.abstraction.Abstraction;
 import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.common.Constant;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.Expression;
@@ -26,12 +27,19 @@ import gov.nasa.jpf.abstraction.state.universe.UniverseIdentifier;
  * Branch if int comparison with NULL value succeeds
  * ..., value => ...
  */
-public class IFNULL extends gov.nasa.jpf.jvm.bytecode.IFNULL implements AbstractBranching {
+public class IFNULL extends gov.nasa.jpf.jvm.bytecode.IFNULL implements UnaryAbstractBranching {
 
-    UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor(NullExpression.create());
+    Constant secondOperand = NullExpression.create();
+    UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor(secondOperand);
+    Predicate last;
 
     public IFNULL(int targetPc) {
         super(targetPc);
+    }
+
+    @Override
+    public Expression getSecondOperand() {
+        return secondOperand;
     }
 
     @Override
@@ -56,6 +64,11 @@ public class IFNULL extends gov.nasa.jpf.jvm.bytecode.IFNULL implements Abstract
 
     @Override
     public Predicate createPredicate(Expression expr1, Expression expr2) {
+        last = createPredicateHelper(expr1, expr2);
+        return last;
+    }
+
+    public Predicate createPredicateHelper(Expression expr1, Expression expr2) {
         if (expr1 instanceof NullExpression) {
             return Tautology.create();
         } else if (expr1 instanceof AnonymousExpression) {
@@ -79,6 +92,11 @@ public class IFNULL extends gov.nasa.jpf.jvm.bytecode.IFNULL implements Abstract
         }
 
         return Equals.create(expr1, expr2);
+    }
+
+    @Override
+    public Predicate getLastPredicate() {
+        return last;
     }
 
     @Override

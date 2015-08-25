@@ -7,11 +7,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 
 import gov.nasa.jpf.abstraction.common.access.Unknown;
 
 public class DynamicIntChoiceGenerator extends IntChoiceFromList {
+    public class Introduction {
+        public int stateId;
+        public int stateVer;
+
+        public Introduction(int id, int ver) {
+            stateId = id;
+            stateVer = ver;
+        }
+    }
+
+    private List<Introduction> introducedInState = new ArrayList<Introduction>();
     private List<TraceFormula> targetBranchings = new ArrayList<TraceFormula>();
     private List<Map<String, Integer>> otherUnknownsConditions = new ArrayList<Map<String, Integer>>();
 
@@ -98,6 +110,11 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
         targetBranchings.add(trace);
         otherUnknownsConditions.add(otherUnknownsCondition);
 
+        int stateId = VM.getVM().getSystemState().getId();
+        int stateVer = PredicateAbstraction.getInstance().stateVer.get(stateId);
+
+        introducedInState.add(new Introduction(stateId, stateVer));
+
         isDone = false;
     }
 
@@ -123,5 +140,21 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
 
     public List<Map<String, Integer>> getConditions() {
         return otherUnknownsConditions;
+    }
+
+    public int getIntroductionStateId() {
+        if (count > 0) {
+            return introducedInState.get(count - 1).stateId;
+        }
+
+        return 0;
+    }
+
+    public int getIntroductionStateVer() {
+        if (count > 0) {
+            return introducedInState.get(count - 1).stateVer;
+        }
+
+        return 0;
     }
 }

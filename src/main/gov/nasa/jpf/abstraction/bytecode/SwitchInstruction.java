@@ -10,8 +10,8 @@ import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.choice.IntChoiceFromList;
 
 import gov.nasa.jpf.abstraction.Abstraction;
-import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.BranchingExecutionHelper;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
 import gov.nasa.jpf.abstraction.common.BranchingConditionValuation;
 import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Constant;
@@ -29,6 +29,8 @@ import gov.nasa.jpf.abstraction.util.RunDetector;
 ThreadInfo ti,  *
  */
 public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.SwitchInstruction implements AbstractBranching {
+
+    Predicate last;
 
     protected SwitchInstruction(int defaultTarget, int numberOfTargets) {
         super(defaultTarget, numberOfTargets);
@@ -144,7 +146,13 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
 
     @Override
     public Predicate createPredicate(Expression expr1, Expression expr2) {
-        return Equals.create(expr1, expr2);
+        last = Equals.create(expr1, expr2);
+        return last;
+    }
+
+    @Override
+    public Predicate getLastPredicate() {
+        return last;
     }
 
     @Override

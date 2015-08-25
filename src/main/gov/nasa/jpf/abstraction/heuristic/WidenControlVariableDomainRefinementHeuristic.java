@@ -6,9 +6,9 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MethodInfo;
 
 import gov.nasa.jpf.abstraction.bytecode.VariableLoadInstruction;
-import gov.nasa.jpf.abstraction.common.BytecodeRange;
 import gov.nasa.jpf.abstraction.common.BytecodeInterval;
 import gov.nasa.jpf.abstraction.common.BytecodeIntervals;
+import gov.nasa.jpf.abstraction.common.BytecodeRange;
 import gov.nasa.jpf.abstraction.common.BytecodeUnlimitedRange;
 import gov.nasa.jpf.abstraction.common.Comparison;
 import gov.nasa.jpf.abstraction.common.Constant;

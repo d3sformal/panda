@@ -15,12 +15,19 @@ import gov.nasa.jpf.abstraction.state.TruthValue;
  * Branch if int comparison with zero succeeds
  * ..., value => ...
  */
-public class IFLE extends gov.nasa.jpf.jvm.bytecode.IFLE implements AbstractBranching {
+public class IFLE extends gov.nasa.jpf.jvm.bytecode.IFLE implements UnaryAbstractBranching {
 
-    UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor(Constant.create(0));
+    Constant secondOperand = Constant.create(0);
+    UnaryIfInstructionExecutor executor = new UnaryIfInstructionExecutor(secondOperand);
+    Predicate last;
 
     public IFLE(int targetPc) {
         super(targetPc);
+    }
+
+    @Override
+    public Expression getSecondOperand() {
+        return secondOperand;
     }
 
     @Override
@@ -45,7 +52,13 @@ public class IFLE extends gov.nasa.jpf.jvm.bytecode.IFLE implements AbstractBran
 
     @Override
     public Predicate createPredicate(Expression expr1, Expression expr2) {
-        return Negation.create(LessThan.create(expr2, expr1));
+        last = Negation.create(LessThan.create(expr2, expr1));
+        return last;
+    }
+
+    @Override
+    public Predicate getLastPredicate() {
+        return last;
     }
 
     @Override

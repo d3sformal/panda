@@ -1,6 +1,10 @@
 package gov.nasa.jpf.abstraction.common.impl;
 
+import gov.nasa.jpf.abstraction.common.Comparison;
+import gov.nasa.jpf.abstraction.common.Equals;
 import gov.nasa.jpf.abstraction.common.IfThenElse;
+import gov.nasa.jpf.abstraction.common.LessThan;
+import gov.nasa.jpf.abstraction.common.Negation;
 import gov.nasa.jpf.abstraction.common.PredicatesStringifier;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementRead;
 import gov.nasa.jpf.abstraction.common.access.ArrayElementWrite;
@@ -24,6 +28,25 @@ import gov.nasa.jpf.abstraction.concrete.AnonymousObject;
  * @see gov.nasa.jpf.abstraction.common.Notation
  */
 public class PredicatesDotStringifier extends PredicatesStringifier {
+
+    @Override
+    public void visit(Negation predicate) {
+        if (predicate.predicate instanceof Comparison) {
+            Comparison c = (Comparison) predicate.predicate;
+
+            c.a.accept(this);
+
+            if (c instanceof Equals) {
+                ret.append(" != ");
+            } else if (c instanceof LessThan) {
+                ret.append(" >= ");
+            }
+
+            c.b.accept(this);
+        } else {
+            super.visit(predicate);
+        }
+    }
 
     @Override
     public void visit(Root expression) {

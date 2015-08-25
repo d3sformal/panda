@@ -32,6 +32,10 @@ public class ElementSelector extends IndexSelector {
     private Integer selectedElementRef = null;
     private static final String ELEMENT_VALUE_CHOICE_ID = "abstractArrayElementLoadChooseElement";
 
+    public static boolean isElementChoice(ChoiceGenerator<?> cg) {
+        return cg.getId().equals(ELEMENT_VALUE_CHOICE_ID);
+    }
+
     @Override
     public boolean makeChoices(ThreadInfo ti, SystemState ss, PredicateAbstraction abs, MethodFrameSymbolTable sym, AccessExpression array, Expression index) {
         return selectElementRef(ti, ss, abs, sym, array, index);

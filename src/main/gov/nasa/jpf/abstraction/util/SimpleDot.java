@@ -1,23 +1,16 @@
-//
-// Copyright (C) 2010 United States Government as represented by the
-// Administrator of the National Aeronautics and Space Administration
-// (NASA).  All Rights Reserved.
-//
-// This software is distributed under the NASA Open Source Agreement
-// (NOSA), version 1.3.  The NOSA has been approved by the Open Source
-// Initiative.  See the file NOSA-1.3-JPF at the top of the distribution
-// directory tree for the complete NOSA document.
-//
-// THE SUBJECT SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY OF ANY
-// KIND, EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT
-// LIMITED TO, ANY WARRANTY THAT THE SUBJECT SOFTWARE WILL CONFORM TO
-// SPECIFICATIONS, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
-// A PARTICULAR PURPOSE, OR FREEDOM FROM INFRINGEMENT, ANY WARRANTY THAT
-// THE SUBJECT SOFTWARE WILL BE ERROR FREE, OR ANY WARRANTY THAT
-// DOCUMENTATION, IF PROVIDED, WILL CONFORM TO THE SUBJECT SOFTWARE.
-//
-
 package gov.nasa.jpf.abstraction.util;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.Error;
@@ -45,20 +38,29 @@ import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ExceptionInfo;
 import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.IntChoiceGenerator;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.NoUncaughtExceptionsProperty;
 import gov.nasa.jpf.vm.NotDeadlockedProperty;
+import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.choice.BreakGenerator;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Stack;
+import gov.nasa.jpf.abstraction.AbstractChoiceGenerator;
+import gov.nasa.jpf.abstraction.DynamicIntChoiceGenerator;
+import gov.nasa.jpf.abstraction.PredicateAbstraction;
+import gov.nasa.jpf.abstraction.bytecode.AbstractBranching;
+import gov.nasa.jpf.abstraction.bytecode.ArrayLoadInstruction;
+import gov.nasa.jpf.abstraction.bytecode.ArrayStoreInstruction;
+import gov.nasa.jpf.abstraction.bytecode.ElementSelector;
+import gov.nasa.jpf.abstraction.bytecode.IndexSelector;
+import gov.nasa.jpf.abstraction.bytecode.UnaryAbstractBranching;
+import gov.nasa.jpf.abstraction.common.Expression;
+import gov.nasa.jpf.abstraction.common.ExpressionUtil;
+import gov.nasa.jpf.abstraction.common.Negation;
+import gov.nasa.jpf.abstraction.common.Notation;
+import gov.nasa.jpf.abstraction.common.Predicate;
 
 /**
  * an alternative  Graphviz dot-file generator for simple,educational state graphs
@@ -167,8 +169,6 @@ public class SimpleDot extends ListenerAdapter {
   
   class StateCopies {
       int versions = 0;
-      Map<Integer, Integer> pred = new HashMap<Integer, Integer>();
-      Map<Integer, Integer> predVer = new HashMap<Integer, Integer>();
   }
 
   class Pair<T1,T2> {
@@ -181,40 +181,40 @@ public class SimpleDot extends ListenerAdapter {
       }
   }
 
-  static Map<Integer, StateCopies> states;
   static Stack<Pair<Integer, Integer>> stack;
+  static List<Set<Pair<Integer, Integer>>> contours;
 
   @Override
   public void searchStarted(Search search){
-    states = new HashMap<Integer, StateCopies>();
+    Pair<Integer, Integer> init = new Pair<Integer, Integer>(-1, 0);
+
     stack = new Stack<Pair<Integer, Integer>>();
-    stack.push(new Pair<Integer, Integer>(-1, 0));
+    stack.push(init);
+
+    contours = new ArrayList<Set<Pair<Integer, Integer>>>();
+    contours.add(new HashSet<Pair<Integer,Integer>>());
+    contours.get(0).add(init);
 
     vm = search.getVM();
-    
+
     initialize(vm);
-    
+
     printHeader();
     printStartState("S");
   }
 
   @Override
   public void stateAdvanced(Search search){
-    if (lastId != stack.peek().a || lastVer != stack.peek().b) {
-        throw new RuntimeException("WTF?");
-    }
-
     int id = search.getStateId();
-
-    if (!states.containsKey(id)) {
-        states.put(id, new StateCopies());
-    }
-
-    int ver = states.get(id).versions++;
+    int ver = PredicateAbstraction.getInstance().stateVer.get(id);
 
     stack.push(new Pair<Integer, Integer>(id, ver));
-    states.get(id).pred.put(ver, lastId);
-    states.get(id).predVer.put(ver, lastVer);
+
+    if (stack.size() > contours.size()) {
+        contours.add(new HashSet<Pair<Integer, Integer>>());
+    }
+
+    contours.get(stack.size() - 1).add(new Pair<Integer, Integer>(id, ver));
 
     long edgeId = ((long)lastId << 32) | id;
 
@@ -239,37 +239,34 @@ public class SimpleDot extends ListenerAdapter {
       } else {
         printTransition(getStateId(lastId, lastVer), getStateId(id, ver), getLastChoice(), getNextCG());
       }
-
     } else { // already visited state
       printTransition(getStateId(lastId, lastVer), getStateId(id, ver), getLastChoice(), null);
+    }
+
+    ChoiceGenerator<?> cg = vm.getChoiceGenerator();
+
+    if (cg instanceof DynamicIntChoiceGenerator) {
+      DynamicIntChoiceGenerator d = (DynamicIntChoiceGenerator) cg;
+
+      int introId = d.getIntroductionStateId();
+      int introVer = d.getIntroductionStateVer();
+
+      if (introId > 0) {
+        printUnknownDependency(getStateId(introId, introVer), getStateId(id, ver));
+      }
     }
 
     seenEdges.add(edgeId);
     lastId = id;
     lastVer = ver;
-
-    if (lastId != stack.peek().a || lastVer != stack.peek().b) {
-        throw new RuntimeException("WTF?");
-    }
   }
 
   @Override
   public void stateBacktracked(Search search){
-    if (lastId != stack.peek().a || lastVer != stack.peek().b) {
-        throw new RuntimeException("WTF?");
-    }
-
     stack.pop();
 
     int id = stack.peek().a;
     int ver = stack.peek().b;
-
-    int id2 = states.get(lastId).pred.get(lastVer);
-    int ver2 = states.get(lastId).predVer.get(lastVer);
-
-    if (id != id2 || ver != ver2) {
-        throw new RuntimeException("WTF?");
-    }
 
     long edgeId = ((long)lastId << 32) | id;
 
@@ -284,16 +281,12 @@ public class SimpleDot extends ListenerAdapter {
     }
     lastId = id;
     lastVer = ver;
-
-    if (lastId != stack.peek().a || lastVer != stack.peek().b) {
-        throw new RuntimeException("WTF?");
-    }
   }
   
   @Override
   public void stateRestored(Search search) {
     int id = search.getStateId();
-    int ver = states.get(id).versions - 1;
+    int ver = PredicateAbstraction.getInstance().stateVer.get(id); // Doesnt make sense to restore states
     long edgeId = ((long)lastId << 32) | id;
 
     if (!seenEdges.contains(edgeId)) {
@@ -306,6 +299,17 @@ public class SimpleDot extends ListenerAdapter {
 
   @Override
   public void searchFinished (Search search){
+    for (Set<Pair<Integer, Integer>> contour : contours) {
+        pw.print("{rank=same ");
+        for (Pair<Integer, Integer> s : contour) {
+            pw.print("; ");
+            pw.print('"');
+            pw.print(getStateId(s.a, s.b));
+            pw.print('"');
+        }
+        pw.println('}');
+    }
+
     pw.println("}");
     pw.close();
   }
@@ -345,12 +349,40 @@ public class SimpleDot extends ListenerAdapter {
     ChoiceGenerator<?> cg = vm.getChoiceGenerator();
     Object choice = cg.getNextChoice();
 
+    Instruction insn = cg.getInsn();
+
     if (choice instanceof ThreadInfo){
       int idx = ((ThreadInfo)choice).getId();
       return "T"+idx;
-    } else {
-      return choice.toString(); // we probably want more here
+    } else if (IndexSelector.isIndexChoice(cg)) {
+      return "idx: " + choice;
+    } else if (ElementSelector.isElementChoice(cg)) {
+      return "elem: " + choice;
+    } else if (insn instanceof AbstractBranching) {
+      Predicate p = ((AbstractBranching)insn).getLastPredicate();
+
+      if (cg instanceof IntChoiceGenerator) {
+          if ((Integer) cg.getNextChoice() == 0) {
+              return Negation.create(p).toString(Notation.DOT_NOTATION);
+          } else {
+              return p.toString(Notation.DOT_NOTATION);
+          }
+      }
+
+      if (cg instanceof BreakGenerator) {
+          return "break";
+      }
+    } else if (insn instanceof ArrayStoreInstruction || insn instanceof ArrayLoadInstruction) {
+        if (cg instanceof AbstractChoiceGenerator) {
+            if ((Integer) cg.getNextChoice() == 0) {
+                return "outOfBounds";
+            } else {
+                return "inBounds";
+            }
+        }
     }
+
+    return choice.toString(); // we probably want more here
   }
 
   // this is the only method that's more tricky - we have to find a balance
@@ -424,7 +456,7 @@ public class SimpleDot extends ListenerAdapter {
       }
     }
 
-    String varId = Misc.stripToLastDot(((FieldInstruction) insn).getVariableId());
+    String varId = Misc.stripToLastDot(insn.getVariableId());
     s = s + ' ' + varId;
 
     return s;
@@ -518,13 +550,21 @@ public class SimpleDot extends ListenerAdapter {
     pw.print('"');
     if (cgCause != null){
       pw.print(NEW_EDGE_ATTRS);
-      pw.print(",headlabel=\"");
+      pw.print(",weight=100,headlabel=\"");
       pw.print(cgCause);
       pw.print('"');
     } else {
       pw.print(VISITED_EDGE_ATTRS);
     }
     pw.println(']');
+  }
+
+  protected void printUnknownDependency(String intro, String dep) {
+      pw.println();
+      pw.print(intro);
+      pw.print(" -> ");
+      pw.print(dep);
+      pw.println(" [color=green,weight=0] // Introduction of a new Unknown value");
   }
 
   protected void printBacktrack (String fromState, String toState){

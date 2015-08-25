@@ -8,8 +8,8 @@ import gov.nasa.jpf.abstraction.common.Conjunction;
 import gov.nasa.jpf.abstraction.common.Contradiction;
 import gov.nasa.jpf.abstraction.common.Disjunction;
 import gov.nasa.jpf.abstraction.common.Negation;
-import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.common.Predicate;
+import gov.nasa.jpf.abstraction.common.Tautology;
 import gov.nasa.jpf.abstraction.state.SystemPredicateValuation;
 
 public class RefinementHeuristic {
