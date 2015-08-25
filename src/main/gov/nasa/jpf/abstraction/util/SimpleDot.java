@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.Error;
@@ -171,13 +172,22 @@ public class SimpleDot extends ListenerAdapter {
       int versions = 0;
   }
 
-  class Pair<T1,T2> {
+  class Pair<T1 extends Comparable<T1>, T2 extends Comparable<T2>> implements Comparable<Pair<T1, T2>> {
       T1 a;
       T2 b;
 
       Pair(T1 a, T2 b) {
           this.a = a;
           this.b = b;
+      }
+
+      @Override
+      public int compareTo(Pair<T1, T2> p) {
+          int c = a.compareTo(p.a);
+
+          if (c != 0) return c;
+
+          return b.compareTo(p.b);
       }
   }
 
@@ -192,7 +202,7 @@ public class SimpleDot extends ListenerAdapter {
     stack.push(init);
 
     contours = new ArrayList<Set<Pair<Integer, Integer>>>();
-    contours.add(new HashSet<Pair<Integer,Integer>>());
+    contours.add(new TreeSet<Pair<Integer,Integer>>());
     contours.get(0).add(init);
 
     vm = search.getVM();
@@ -211,7 +221,7 @@ public class SimpleDot extends ListenerAdapter {
     stack.push(new Pair<Integer, Integer>(id, ver));
 
     if (stack.size() > contours.size()) {
-        contours.add(new HashSet<Pair<Integer, Integer>>());
+        contours.add(new TreeSet<Pair<Integer, Integer>>());
     }
 
     contours.get(stack.size() - 1).add(new Pair<Integer, Integer>(id, ver));
@@ -223,7 +233,6 @@ public class SimpleDot extends ListenerAdapter {
       return; // skip the root state and property violations (reported separately)
     }
     */
-
 
     if (search.isErrorState()) {
       String eid = "e" + search.getNumberOfErrors();
@@ -298,7 +307,8 @@ public class SimpleDot extends ListenerAdapter {
   }
 
   @Override
-  public void searchFinished (Search search){
+  public void searchFinished (Search search) {
+    /*
     for (Set<Pair<Integer, Integer>> contour : contours) {
         pw.print("{rank=same ");
         for (Pair<Integer, Integer> s : contour) {
@@ -309,7 +319,7 @@ public class SimpleDot extends ListenerAdapter {
         }
         pw.println('}');
     }
-
+    */
     pw.println("}");
     pw.close();
   }
@@ -351,7 +361,9 @@ public class SimpleDot extends ListenerAdapter {
 
     Instruction insn = cg.getInsn();
 
-    if (choice instanceof ThreadInfo){
+    if (cg instanceof BreakGenerator){
+      return "break";
+    } else if (choice instanceof ThreadInfo){
       int idx = ((ThreadInfo)choice).getId();
       return "T"+idx;
     } else if (IndexSelector.isIndexChoice(cg)) {
@@ -367,10 +379,6 @@ public class SimpleDot extends ListenerAdapter {
           } else {
               return p.toString(Notation.DOT_NOTATION);
           }
-      }
-
-      if (cg instanceof BreakGenerator) {
-          return "break";
       }
     } else if (insn instanceof ArrayStoreInstruction || insn instanceof ArrayLoadInstruction) {
         if (cg instanceof AbstractChoiceGenerator) {
@@ -549,8 +557,9 @@ public class SimpleDot extends ListenerAdapter {
     pw.print(choiceVal);
     pw.print('"');
     if (cgCause != null){
+      pw.print(',');
       pw.print(NEW_EDGE_ATTRS);
-      pw.print(",weight=100,headlabel=\"");
+      pw.print(",headlabel=\"");
       pw.print(cgCause);
       pw.print('"');
     } else {
@@ -564,7 +573,7 @@ public class SimpleDot extends ListenerAdapter {
       pw.print(intro);
       pw.print(" -> ");
       pw.print(dep);
-      pw.println(" [color=green,weight=0] // Introduction of a new Unknown value");
+      pw.println(" [color=green,constraint=false] // Introduction of a new Unknown value");
   }
 
   protected void printBacktrack (String fromState, String toState){
