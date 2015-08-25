@@ -78,6 +78,11 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
             //   value(u1) = v1
             //   value(u2) = u2
             //   ...
+
+            /*
+             * Turned off because this eager approach may generate values for unknowns that do not have to be explored actually
+             */
+            /*
             List<Map<String, Integer>> prevConditions = null;
 
             if (unknowns.containsKey(name)) {
@@ -89,6 +94,7 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
             for (int i = 1; i < prevValues.length; ++i) {
                 cg.add(prevValues[i], prevTraces.get(i - 1), prevConditions.get(i - 1));
             }
+            */
 
             if (env.setNextChoiceGenerator(cg)) {
                 env.getSystemState().setForced(true);
