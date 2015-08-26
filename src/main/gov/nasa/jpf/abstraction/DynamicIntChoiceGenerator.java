@@ -25,6 +25,9 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
 
     private List<Introduction> introducedInState = new ArrayList<Introduction>();
     private List<TraceFormula> targetBranchings = new ArrayList<TraceFormula>();
+
+    // Enable individual choices only when other unknowns have specific values
+    // The map gives these constraints on other unknowns
     private List<Map<String, Integer>> otherUnknownsConditions = new ArrayList<Map<String, Integer>>();
 
     public DynamicIntChoiceGenerator(String name, int... values) {

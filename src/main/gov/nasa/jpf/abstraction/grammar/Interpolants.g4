@@ -23,6 +23,7 @@ grammar Interpolants;
     import gov.nasa.jpf.abstraction.common.access.meta.*;
     import gov.nasa.jpf.abstraction.common.access.meta.impl.*;
     import gov.nasa.jpf.abstraction.concrete.*;
+    import gov.nasa.jpf.abstraction.smt.*;
     import gov.nasa.jpf.abstraction.state.universe.*;
     import gov.nasa.jpf.abstraction.util.*;
 }

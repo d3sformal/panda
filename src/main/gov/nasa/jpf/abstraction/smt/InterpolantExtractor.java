@@ -1,4 +1,4 @@
-package gov.nasa.jpf.abstraction.util;
+package gov.nasa.jpf.abstraction.smt;
 
 import java.util.HashSet;
 import java.util.Map;

@@ -124,7 +124,7 @@ public class AbstractListener extends PropertyListenerAdapter {
         RunDetector.backtrack();
     }
 
-    boolean firstInsn = false;
+    boolean firstInsnEncountered = false;
 
     @Override
     public void executeInstruction(VM vm, ThreadInfo curTh, Instruction nextInsn) {
@@ -132,11 +132,11 @@ public class AbstractListener extends PropertyListenerAdapter {
 
         // Create a state at the beginning of the trace
         // so that we can backtrack there on refinement
-        if (!firstInsn) {
+        if (!firstInsnEncountered) {
             vm.getSystemState().setForced(true);
             curTh.breakTransition("Start of Panda");
 
-            firstInsn = true;
+            firstInsnEncountered = true;
         }
 
         if (nextInsn instanceof InvokeInstruction) {
