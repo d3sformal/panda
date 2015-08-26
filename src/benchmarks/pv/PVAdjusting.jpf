@@ -1,9 +1,0 @@
-@using=jpf-abstraction
-
-target=pv.PV
-target.args=src/benchmarks/pv/PV1
-
-classpath=${jpf-abstraction}/build/benchmarks
-sourcepath=${jpf-abstraction}/src/benchmarks
-
-panda.refinement=true

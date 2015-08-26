@@ -1,7 +1,7 @@
 @using=jpf-abstraction
 
-target=tm.TM
-target.args=src/benchmarks/tm/t1
+target=turingmachine.TM
+target.args=src/benchmarks/turingmachine/t1
 
 classpath=${jpf-abstraction}/build/benchmarks
 sourcepath=${jpf-abstraction}/src/benchmarks

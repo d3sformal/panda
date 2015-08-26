@@ -1,4 +1,4 @@
-package tm;
+package turingmachine;
 
 import java.io.*;
 import java.util.*;

@@ -1,4 +1,4 @@
-package pv;
+package propositionalvalidity;
 
 import java.io.*;
 import java.util.*;

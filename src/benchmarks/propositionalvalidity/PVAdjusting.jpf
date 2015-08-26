@@ -1,11 +1,9 @@
 @using=jpf-abstraction
 
-target=pv.PV
-target.args=src/benchmarks/pv/p1
+target=propositionalvalidity.PV
+target.args=src/benchmarks/propositionalvalidity/PV1
 
 classpath=${jpf-abstraction}/build/benchmarks
 sourcepath=${jpf-abstraction}/src/benchmarks
 
 panda.refinement=true
-panda.branch.adjust_concrete_values=false
-panda.branch.prune_infeasible=true
