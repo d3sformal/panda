@@ -141,17 +141,18 @@ public class BranchingExecutionHelper {
                     int[] models = null;
 
                     for (int j = 0; j < exprArray.length && models == null; ++j) {
-                        Predicate singleChangeModelFormula = Tautology.create();
+                        Predicate singleChangeModelCube = Tautology.create();
 
                         for (int k = 0; k < exprArray.length; ++k) {
                             if (k != j) {
                                 DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
 
-                                singleChangeModelFormula = Conjunction.create(singleChangeModelFormula, Equals.create(exprArray[k], Constant.create(cg.getCurrentChoice())));
+                                singleChangeModelCube = Conjunction.create(singleChangeModelCube, Equals.create(exprArray[k], Constant.create(cg.getCurrentChoice())));
                             }
                         }
 
-                        models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(singleChangeModelFormula, exprArray);
+                        //models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(singleChangeModelCube, exprArray, false);
+                        models = PredicateAbstraction.getInstance().traceSMT.getModels(singleChangeModelCube, exprArray, false);
                     }
 
                     // If changing one unknown was not enough
@@ -203,15 +204,17 @@ public class BranchingExecutionHelper {
                             blockings = Disjunction.create(blockings, blocking);
                         }
 
-                        Predicate oldModelFormula = Conjunction.create(traceFormula, reuses);
-                        Predicate newModelFormula = Conjunction.create(traceFormula, blockings);
+                        //Predicate oldModelFormula = Conjunction.create(traceFormula, reuses);
+                        //Predicate newModelFormula = Conjunction.create(traceFormula, blockings);
 
                         // First, try using a combination of old (already generated) models for the unknowns
-                        models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(oldModelFormula, exprArray);
+                        //models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(oldModelFormula, exprArray);
+                        models = PredicateAbstraction.getInstance().traceSMT.getModels(reuses, exprArray, false);
 
                         // Only if none exists, generate a possibly completely different model (may change all the values to something new, if used unwisely may cause divergence - too many different model combinations)
                         if (models == null) {
-                            models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(newModelFormula, exprArray);
+                            //models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(newModelFormula, exprArray);
+                            models = PredicateAbstraction.getInstance().traceSMT.getModels(blockings, exprArray, false);
                         }
                     }
 

@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1695,35 +1696,55 @@ public class SMT {
 
     private void appendClassDeclarations(Set<String> classes, StringBuilder input, String separator) {
         for (String c : classes) {
-            input.append("(declare-fun class_"); input.append(c.replace("_", "__").replace('.', '_')); input.append(" () Int)"); input.append(separator);
+            if (!isDefined(c)) {
+                input.append("(declare-fun class_"); input.append(c.replace("_", "__").replace('.', '_')); input.append(" () Int)"); input.append(separator);
+
+                define(c);
+            }
         }
         input.append(separator);
     }
 
     private void appendVariableDeclarations(Set<String> vars, StringBuilder input, String separator) {
         for (String var : vars) {
-            input.append("(declare-fun var_"); input.append(var); input.append(" () Int)"); input.append(separator);
+            if (!isDefined(var)) {
+                input.append("(declare-fun var_"); input.append(var); input.append(" () Int)"); input.append(separator);
+
+                define(var);
+            }
         }
         input.append(separator);
     }
 
     private void appendSpecialDeclarations(Set<String> specials, StringBuilder input, String separator) {
         for (String special : specials) {
-            input.append("(declare-fun "); input.append(special); input.append(" () Int)"); input.append(separator);
+            if (!isDefined(special)) {
+                input.append("(declare-fun "); input.append(special); input.append(" () Int)"); input.append(separator);
+
+                define(special);
+            }
         }
         input.append(separator);
     }
 
     private void appendFieldDeclarations(Set<String> fields, StringBuilder input, String separator) {
         for (String field : fields) {
-            input.append("(declare-fun field_"); input.append(field); input.append(" () (Array Int Int))"); input.append(separator);
+            if (!isDefined(field)) {
+                input.append("(declare-fun field_"); input.append(field); input.append(" () (Array Int Int))"); input.append(separator);
+
+                define(field);
+            }
         }
         input.append(separator);
     }
 
     private void appendArraysDeclarations(Set<String> arraysSets, StringBuilder input, String separator) {
         for (String arrays : arraysSets) {
-            input.append("(declare-fun "); input.append(arrays); input.append(" () (Array Int (Array Int Int)))"); input.append(separator);
+            if (!isDefined(arrays)) {
+                input.append("(declare-fun "); input.append(arrays); input.append(" () (Array Int (Array Int Int)))"); input.append(separator);
+
+                define(arrays);
+            }
         }
         input.append(separator);
     }
@@ -1870,6 +1891,10 @@ public class SMT {
      * Retrieves any arbitrary models of variables/fields/... based on constraints imposed by the state
      */
     public int[] getModels(Predicate stateFormula, AccessExpression[] expressions) {
+        return getModels(stateFormula, expressions, true);
+    }
+
+    public int[] getModels(Predicate stateFormula, AccessExpression[] expressions, boolean useCache) {
         notifyGetModelsInvoked(stateFormula, expressions);
 
         String separator = InputType.NORMAL.getSeparator();
@@ -1881,7 +1906,7 @@ public class SMT {
         boolean[] cached = null;
         String[] queries = null;
 
-        if (USE_MODELS_CACHE) {
+        if (USE_MODELS_CACHE && useCache) {
             cached = new boolean[expressions.length];
             queries = new String[expressions.length];
         }
@@ -2134,6 +2159,95 @@ public class SMT {
         smt.close();
 
         return ret;
+    }
+
+    private Stack<Set<String>> definedSymbols = null;
+
+    public void assertStep(Step s) {
+        Predicate p = s.getPredicate();
+
+        PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
+
+        collector.collect(s.getPredicate());
+
+        Set<String> classes = collector.getClasses();
+        Set<String> variables = collector.getVars();
+        Set<String> fields = collector.getFields();
+        Set<String> arrays = collector.getArrays();
+        Set<AccessExpression> objects = collector.getObjects();
+        Set<Integer> fresh = collector.getFresh();
+
+        String separator = InputType.DEBUG.getSeparator();
+
+        StringBuilder input = new StringBuilder();
+
+        appendClassDeclarations(classes, input, separator);
+        appendVariableDeclarations(variables, input, separator);
+        appendFieldDeclarations(fields, input, separator);
+        appendArraysDeclarations(arrays, input, separator);
+
+        if (!fresh.isEmpty()) {
+            for (int id : fresh) {
+                if (!isDefined("fresh_" + id)) {
+                    input.append("(declare-fun fresh_" + id + " () Int)" + separator);
+
+                    define("fresh_" + id);
+                }
+            }
+        }
+
+        input.append("(assert " + convertToString(p) + ")" + separator);
+
+        try {
+            in.write(input.toString());
+            in.flush();
+        } catch (Exception e) {
+            throw new SMTException("SMT failed:\n" + e.getMessage());
+        }
+    }
+
+    public boolean isDefined(String s) {
+        if (definedSymbols != null) {
+            for (Set<String> set : definedSymbols) {
+                if (set.contains(s)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public void define(String s) {
+        if (definedSymbols != null) {
+            definedSymbols.peek().add(s);
+        }
+    }
+
+    public void push() {
+        if (definedSymbols == null) {
+            definedSymbols = new Stack<Set<String>>();
+        }
+
+        definedSymbols.push(new HashSet<String>());
+
+        try {
+            in.write("(push 1)\n");
+            in.flush();
+        } catch (Exception e) {
+            throw new SMTException("SMT failed:\n" + e.getMessage());
+        }
+    }
+
+    public void pop() {
+        definedSymbols.pop();
+
+        try {
+            in.write("(pop 1)\n");
+            in.flush();
+        } catch (Exception e) {
+            throw new SMTException("SMT failed:\n" + e.getMessage());
+        }
     }
 
     /**

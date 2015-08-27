@@ -80,7 +80,11 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
             //   ...
 
             /*
-             * Turned off because this eager approach may generate values for unknowns that do not have to be explored actually
+             * Still dont know why this cannot be turned off.
+             *   This was supposed to be an optimization ONLY
+             *   All values introduced here would eventually be discovered anyway if needed (but this is violated, for some reason)
+             *
+             * (Turned off because this eager approach may generate values for unknowns that do not have to be explored actually)
              */
             List<Map<String, Integer>> prevConditions = null;
 

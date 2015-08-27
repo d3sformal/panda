@@ -128,6 +128,7 @@ public class PredicateAbstraction extends Abstraction {
     private Set<MethodInfo> visitedMethods = new HashSet<MethodInfo>();
 
     public SMT smt = new SMT();
+    public SMT traceSMT = new SMT();
     private Stack<Pair<MethodInfo, Integer>> traceProgramLocations = new Stack<Pair<MethodInfo, Integer>>();
     private Predicates predicateSet;
     private int refinements = 0;
@@ -317,6 +318,7 @@ public class PredicateAbstraction extends Abstraction {
     private void extendTraceFormulaWith(Predicate p, MethodInfo m, int nextPC, boolean forceConstraint) {
         if (forceConstraint || !(p instanceof Tautology)) {
             traceFormula.append(p, m, nextPC);
+            traceSMT.assertStep(traceFormula.get(traceFormula.size() - 1));
         }
     }
 
@@ -774,6 +776,7 @@ public class PredicateAbstraction extends Abstraction {
     @SuppressWarnings("unchecked")
     @Override
     public void forward(MethodInfo method) {
+        traceSMT.push();
         VM vm = VM.getVM();
 
         int stateId = vm.getSystemState().getId();
@@ -852,6 +855,8 @@ public class PredicateAbstraction extends Abstraction {
         predicateValuation.restore(trace.top().predicateValuationStacks);
         predicateValuation.scheduleThread(trace.top().currentThread);
 
+        traceSMT.pop();
+
         traceFormula = trace.top().traceFormula.clone();
         ssa = trace.top().ssa.clone();
         visitedMethods.clear();
@@ -864,6 +869,7 @@ public class PredicateAbstraction extends Abstraction {
 
         if (trace.isEmpty()) {
             smt.close();
+            traceSMT.close();
         }
     }
 

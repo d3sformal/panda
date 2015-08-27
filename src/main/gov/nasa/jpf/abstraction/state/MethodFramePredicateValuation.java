@@ -1004,6 +1004,10 @@ public class MethodFramePredicateValuation implements PredicateValuation, Scope 
     }
 
     public int[] getModels(Predicate state, AccessExpression[] exprArray) {
-        return smt.getModels(state, exprArray);
+        return smt.getModels(state, exprArray, true);
+    }
+
+    public int[] getModels(Predicate state, AccessExpression[] exprArray, boolean useCache) {
+        return smt.getModels(state, exprArray, false);
     }
 }

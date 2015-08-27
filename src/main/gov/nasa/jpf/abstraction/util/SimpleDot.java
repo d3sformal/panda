@@ -550,18 +550,23 @@ public class SimpleDot extends ListenerAdapter {
 
   protected void printTransition(String fromState, String toState, String choiceVal, String cgCause){
     pw.println();
+    if (cgCause != null) {
+        pw.print(toState);
+        pw.print("[label=\"");
+        pw.print(toState);
+        pw.print("\\n");
+        pw.print(cgCause);
+        pw.println("\"]");
+    }
     pw.print(fromState);
     pw.print(" -> ");
-    pw.print( toState);
+    pw.print(toState);
     pw.print(" [label=\"");
     pw.print(choiceVal);
     pw.print('"');
     if (cgCause != null){
       pw.print(',');
       pw.print(NEW_EDGE_ATTRS);
-      pw.print(",headlabel=\"");
-      pw.print(cgCause);
-      pw.print('"');
     } else {
       pw.print(VISITED_EDGE_ATTRS);
     }
