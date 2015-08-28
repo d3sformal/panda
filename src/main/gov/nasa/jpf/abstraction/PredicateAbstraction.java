@@ -318,7 +318,7 @@ public class PredicateAbstraction extends Abstraction {
     private void extendTraceFormulaWith(Predicate p, MethodInfo m, int nextPC, boolean forceConstraint) {
         if (forceConstraint || !(p instanceof Tautology)) {
             traceFormula.append(p, m, nextPC);
-            traceSMT.assertStep(traceFormula.get(traceFormula.size() - 1));
+            traceSMT.assertStep(p);
         }
     }
 
@@ -743,6 +743,7 @@ public class PredicateAbstraction extends Abstraction {
 
         trace.push(state);
         traceFormula.markState();
+        traceSMT.push(-1);
 
         /**
          * Register the main thread as it is not explicitely created elsewhere
@@ -776,10 +777,11 @@ public class PredicateAbstraction extends Abstraction {
     @SuppressWarnings("unchecked")
     @Override
     public void forward(MethodInfo method) {
-        traceSMT.push();
         VM vm = VM.getVM();
 
         int stateId = vm.getSystemState().getId();
+
+        traceSMT.push(stateId);
 
         if (!stateVer.containsKey(stateId)) {
             stateVer.put(stateId, -1);
@@ -816,6 +818,10 @@ public class PredicateAbstraction extends Abstraction {
     @SuppressWarnings("unchecked")
     @Override
     public void backtrack(MethodInfo method) {
+        VM vm = VM.getVM();
+
+        int stateId = vm.getSystemState().getId();
+
         trace.pop();
 
         /**
@@ -856,6 +862,8 @@ public class PredicateAbstraction extends Abstraction {
         predicateValuation.scheduleThread(trace.top().currentThread);
 
         traceSMT.pop();
+        traceSMT.pop();
+        traceSMT.push(stateId);
 
         traceFormula = trace.top().traceFormula.clone();
         ssa = trace.top().ssa.clone();

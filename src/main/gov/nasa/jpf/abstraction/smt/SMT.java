@@ -2163,12 +2163,10 @@ public class SMT {
 
     private Stack<Set<String>> definedSymbols = null;
 
-    public void assertStep(Step s) {
-        Predicate p = s.getPredicate();
-
+    public void assertStep(Predicate p) {
         PredicatesSMTInfoCollector collector = new PredicatesSMTInfoCollector();
 
-        collector.collect(s.getPredicate());
+        collector.collect(p);
 
         Set<String> classes = collector.getClasses();
         Set<String> variables = collector.getVars();
@@ -2224,7 +2222,7 @@ public class SMT {
         }
     }
 
-    public void push() {
+    public void push(int stateId) {
         if (definedSymbols == null) {
             definedSymbols = new Stack<Set<String>>();
         }
@@ -2232,6 +2230,7 @@ public class SMT {
         definedSymbols.push(new HashSet<String>());
 
         try {
+            in.write("; State " + stateId + "\n");
             in.write("(push 1)\n");
             in.flush();
         } catch (Exception e) {

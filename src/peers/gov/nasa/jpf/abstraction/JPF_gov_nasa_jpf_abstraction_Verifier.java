@@ -80,12 +80,26 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
             //   ...
 
             /*
-             * Still dont know why this cannot be turned off.
-             *   This was supposed to be an optimization ONLY
-             *   All values introduced here would eventually be discovered anyway if needed (but this is violated, for some reason)
+             * Eagerly reuse already discovered values of a specific unknown from different subtrees.
+             * This helps save a lot of computational effort when a tuple of values is found together for several unknowns:
+             *   (u1=1, u2=7, u3=8)
+             * once we backtrack past u1 all the generators are actually forgotten and we need to continue to
              *
-             * (Turned off because this eager approach may generate values for unknowns that do not have to be explored actually)
+             *   (u1=1, u2=0, u3=0)
+             *
+             * before introducing values (u2=7, u3=8); after backtrack we again continue to
+             *
+             *   (u1=1, u2=7, u3=0)
+             *
+             * where we finally introduce u3=8.
+             *
+             * But if we copied the old choices of u2 and u3 whenever we encounter them in a new subtree of the state space, we can avoid the need to search for the values.
+             * However, because we copy the whole domain of u2 and u3 they again contain the initial value 0 and re-explore the subtree anyway, even though by finding the values 7, 8 we gain nothing as the values are already included (copied).
+             * We may actually copy a lot more than we need to, making Panda explore many more subtrees.
+             *
+             * Furthermore, if Panda does not produce tuples of values, this does not help at all.
              */
+            /*
             List<Map<String, Integer>> prevConditions = null;
 
             if (unknowns.containsKey(name)) {
@@ -97,6 +111,7 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
             for (int i = 1; i < prevValues.length; ++i) {
                 cg.add(prevValues[i], prevTraces.get(i - 1), prevConditions.get(i - 1));
             }
+            */
 
             if (env.setNextChoiceGenerator(cg)) {
                 env.getSystemState().setForced(true);

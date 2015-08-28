@@ -1,11 +1,14 @@
 package gov.nasa.jpf.abstraction;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import gov.nasa.jpf.vm.ArrayFields;
 import gov.nasa.jpf.vm.ByteArrayFields;
@@ -57,6 +60,168 @@ public class BranchingExecutionHelper {
 
     public static boolean isPruned() {
         return pruned;
+    }
+
+    protected static class ModelIterator implements Iterator<Predicate> {
+        private AccessExpression[] exprs;
+        private DynamicIntChoiceGenerator[] cgs;
+        private int subset = 1;
+        private boolean reusesTried = false;
+        private boolean blockingsTried = false;
+        private Iterator<Predicate> it;
+
+        public ModelIterator(AccessExpression[] exprs, DynamicIntChoiceGenerator[] cgs) {
+            this.exprs = exprs;
+            this.cgs = cgs;
+        }
+
+        @Override
+        public boolean hasNext() {
+            // If we are about to try changing all the unknowns
+            if (subset == exprs.length) {
+                return !reusesTried || !blockingsTried;
+            }
+
+            // Until we try to change all subsets we need to keep going
+            return exprs.length > 0;
+        }
+
+        @Override
+        public Predicate next() {
+            if (subset == exprs.length) {
+                if (!reusesTried) {
+                    Predicate reuses = Tautology.create();
+
+                    for (int j = 0; j < exprs.length; ++j) {
+                        Predicate reuse = Contradiction.create();
+                        DynamicIntChoiceGenerator cg = cgs[j];
+                        Integer[] choices = cg.getProcessedChoices();
+                        List<TraceFormula> traces = cg.getTraces();
+
+                        for (int k = 0; k < choices.length; ++k) {
+                            int model = choices[k];
+                            Predicate binding = Equals.create(exprs[j], Constant.create(model));
+
+                            // In contrast to blocking:
+                            // Force using one of the old models of the given unknown
+                            reuse = Disjunction.create(reuse, binding);
+                        }
+
+                        reuses = Conjunction.create(reuses, reuse);
+                    }
+
+                    reusesTried = true;
+
+                    return reuses;
+                } else if (!blockingsTried) {
+                    Predicate blockings = Contradiction.create();
+
+                    for (int j = 0; j < exprs.length; ++j) {
+                        Predicate blocking = Tautology.create();
+                        DynamicIntChoiceGenerator cg = cgs[j];
+                        Integer[] choices = cg.getProcessedChoices();
+                        List<TraceFormula> traces = cg.getTraces();
+
+                        for (int k = 0; k < choices.length; ++k) {
+                            int model = choices[k];
+                            Predicate binding = Equals.create(exprs[j], Constant.create(model));
+
+                            // Block only those models that were created for the same trace (other choices applied in other branches of the state space may easily be reused here)
+                            // Actually it would be wrong to omit models that might easily enable this branch but happen to be used elsewhere first (That would destroy soundness)
+                            if (k == 0 || traces.get(k - 1).equals(PredicateAbstraction.getInstance().getTraceFormula())) {
+                                blocking = Conjunction.create(blocking, Negation.create(binding));
+                            }
+                        }
+
+                        blockings = Disjunction.create(blockings, blocking);
+                    }
+
+                    blockingsTried = true;
+
+                    return blockings;
+                }
+
+                return null;
+            } else {
+                if (it == null) {
+                    List<Predicate> combinations = new ArrayList<Predicate>();
+                    Stack<Integer> idx = new Stack<Integer>();
+
+                    generate(combinations, idx, 0, subset);
+
+                    it = combinations.iterator();
+                }
+
+                Predicate p = it.next();
+
+                if (!it.hasNext()) {
+                    ++subset;
+
+                    // TODO: bound the size of subset, when it reaches a certain empirically determined threshold (2) it stops (configurable).
+
+                    it = null;
+                }
+
+                return p;
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new RuntimeException("Not supported");
+        }
+
+        // TODO: rewrite so that:
+        //
+        // Make sure the models are generated so that for a sequence of unknowns (u1, u2, u3, u4, u5) the models are probed to change
+        //
+        //          u5
+        //       u4
+        //       u4 u5
+        //    u3
+        //    u3    u5
+        //    u3 u4
+        //    u3 u4 u5
+        // u2
+        // u2       u5
+        // u2    u4
+        // u2    u4 u5
+        // u2 u3
+        // u2 u3    u5
+        // u2 u3 u4
+        // u2 u3 u4 u5
+        // ...
+        protected void generate(List<Predicate> out, Stack<Integer> idx, int i, int subset) {
+            if (i == exprs.length) {
+                if (idx.size() + subset == exprs.length) {
+                    Predicate p = Tautology.create();
+
+                    for (int k : idx) {
+                        p = Conjunction.create(p, Equals.create(exprs[k], Constant.create(cgs[k].getCurrentChoice())));
+                    }
+
+                    out.add(p);
+                }
+            } else {
+                if (i - idx.size() < subset) {
+                    generate(out, idx, i + 1, subset);
+                }
+                if (i < exprs.length - subset) {
+                    idx.push(i);
+                    generate(out, idx, i + 1, subset);
+                    idx.pop();
+                }
+            }
+        }
+    }
+
+    protected static final Iterable<Predicate> generateModelConstraints(final AccessExpression[] exprs, final DynamicIntChoiceGenerator[] cgs) {
+        return new Iterable<Predicate>() {
+            @Override
+            public Iterator<Predicate> iterator() {
+                return new ModelIterator(exprs, cgs);
+            }
+        };
     }
 
     public static Instruction synchronizeConcreteAndAbstractExecutions(ThreadInfo ti, Predicate branchCondition, boolean concreteJump, boolean abstractJump, Instruction target, Instruction self) {
@@ -137,85 +302,46 @@ public class BranchingExecutionHelper {
 
                     AccessExpression[] exprArray = unknownExprs.toArray(new AccessExpression[unknownExprs.size()]);
 
-                    // Try changing some unknowns to drive the execution into the branch that is not currently enabled
-                    int[] models = null;
+                    Set<AccessExpression> stepExprs = new HashSet<AccessExpression>();
+                    int ord = 0;
+                    Integer[] order = new Integer[exprArray.length];
 
-                    for (int j = 0; j < exprArray.length && models == null; ++j) {
-                        Predicate singleChangeModelCube = Tautology.create();
-
-                        for (int k = 0; k < exprArray.length; ++k) {
-                            if (k != j) {
-                                DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
-
-                                singleChangeModelCube = Conjunction.create(singleChangeModelCube, Equals.create(exprArray[k], Constant.create(cg.getCurrentChoice())));
-                            }
-                        }
-
-                        //models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(singleChangeModelCube, exprArray, false);
-                        models = PredicateAbstraction.getInstance().traceSMT.getModels(singleChangeModelCube, exprArray, false);
-                    }
-
-                    // If changing one unknown was not enough
-                    if (models == null) {
-                        /**
-                         * Blocking clauses may not be necessary (the trace itself (extended with appropriate branch condition) is enough to demand a new value of unknown)
-                         * On contrary they may cause divergence
-                         * But they are there currently to avoid returning to previously picked choices:
-                         *   i = *
-                         *   if (i = 1) {
-                         *   }
-                         *
-                         *   Starts with 0
-                         *   Generates 1
-                         *   Goes back to 0
-                         *   Goes back to 1
-                         *   Goes back to 0
-                         *   ...
-                         */
-                        // Add blocking clause for unknown models
-                        //   (u1 != v11 & u1 != v12 & ... u1 != v1n) | (u2 != ...) | ... (un != ...)
-
-                        Predicate reuses = Tautology.create();
-                        Predicate blockings = Contradiction.create();
+                    // Order the unknown expressions as they appear in the trace
+                    //   walk through the trace from the beginning
+                    //   assign a number to an expression found on the trace
+                    //   increase the counter
+                    for (Step s : PredicateAbstraction.getInstance().getTraceFormula()) {
+                        stepExprs.clear();
+                        s.getPredicate().addAccessExpressionsToSet(stepExprs);
 
                         for (int j = 0; j < exprArray.length; ++j) {
-                            Predicate reuse = Contradiction.create();
-                            Predicate blocking = Tautology.create();
-                            DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
-                            Integer[] choices = cg.getProcessedChoices();
-                            List<TraceFormula> traces = cg.getTraces();
-
-                            for (int k = 0; k < choices.length; ++k) {
-                                int model = choices[k];
-                                Predicate binding = Equals.create(exprArray[j], Constant.create(model));
-
-                                // Block only those models that were created for the same trace (other choices applied in other branches of the state space may easily be reused here)
-                                // Actually it would be wrong to omit models that might easily enable this branch but happen to be used elsewhere first (That would destroy soundness)
-                                if (k == 0 || traces.get(k - 1).equals(PredicateAbstraction.getInstance().getTraceFormula())) {
-                                    blocking = Conjunction.create(blocking, Negation.create(binding));
-                                }
-
-                                // In contrast to blocking:
-                                // Force using one of the old models of the given unknown
-                                reuse = Disjunction.create(reuse, binding);
+                            if (order[j] == null && stepExprs.contains(exprArray[j])) {
+                                order[j] = ord++;
                             }
-
-                            reuses = Conjunction.create(reuses, reuse);
-                            blockings = Disjunction.create(blockings, blocking);
                         }
+                    }
 
-                        //Predicate oldModelFormula = Conjunction.create(traceFormula, reuses);
-                        //Predicate newModelFormula = Conjunction.create(traceFormula, blockings);
+                    // Reorder the unknown expressions according to the order imposed above
+                    AccessExpression[] ordExprArray = new AccessExpression[exprArray.length];
+                    DynamicIntChoiceGenerator[] ordExprCGArray = new DynamicIntChoiceGenerator[exprArray.length];
 
-                        // First, try using a combination of old (already generated) models for the unknowns
-                        //models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(oldModelFormula, exprArray);
-                        models = PredicateAbstraction.getInstance().traceSMT.getModels(reuses, exprArray, false);
+                    for (int j = 0; j < ord; ++j) {
+                        ordExprArray[order[j]] = exprArray[j];
+                        ordExprCGArray[order[j]] = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
+                    }
 
-                        // Only if none exists, generate a possibly completely different model (may change all the values to something new, if used unwisely may cause divergence - too many different model combinations)
-                        if (models == null) {
-                            //models = PredicateAbstraction.getInstance().getPredicateValuation().get(0).getModels(newModelFormula, exprArray);
-                            models = PredicateAbstraction.getInstance().traceSMT.getModels(blockings, exprArray, false);
+                    // Try changing some unknowns to drive the execution into the branch that is not currently enabled
+                    int[] models = null;
+                    int[] fallbackModels = PredicateAbstraction.getInstance().traceSMT.getModels(Tautology.create(), ordExprArray, false);
+
+                    // Try to find nice models only if there are some (if there is no fallback then there is no nice model either)
+                    if (fallbackModels != null) {
+                        for (Predicate mc : generateModelConstraints(ordExprArray, ordExprCGArray)) {
+                            models = PredicateAbstraction.getInstance().traceSMT.getModels(mc, ordExprArray, false);
                         }
+                    }
+                    if (models == null) {
+                        models = fallbackModels;
                     }
 
                     if (models == null || models.length == 0) {
@@ -260,34 +386,6 @@ public class BranchingExecutionHelper {
                                 }
                             }
 
-                            Set<AccessExpression> stepExprs = new HashSet<AccessExpression>();
-                            int ord = 0;
-                            Integer[] order = new Integer[exprArray.length];
-
-                            // Order the unknown expressions as they appear in the trace
-                            //   walk through the trace from the beginning
-                            //   assign a number to an expression found on the trace
-                            //   increase the counter
-                            for (Step s : PredicateAbstraction.getInstance().getTraceFormula()) {
-                                stepExprs.clear();
-                                s.getPredicate().addAccessExpressionsToSet(stepExprs);
-
-                                for (int j = 0; j < exprArray.length; ++j) {
-                                    if (order[j] == null && stepExprs.contains(exprArray[j])) {
-                                        order[j] = ord++;
-                                    }
-                                }
-                            }
-
-                            // Reorder the unknown expressions according to the order imposed above
-                            AccessExpression[] ordExprArray = new AccessExpression[exprArray.length];
-                            int[] ordModels = new int[models.length];
-
-                            for (int j = 0; j < ord; ++j) {
-                                ordExprArray[order[j]] = exprArray[j];
-                                ordModels[order[j]] = models[j];
-                            }
-
                             Map<String, Integer> prevUnknowns = new HashMap<String, Integer>();
 
                             // Enable the newly generated value for each of the unknowns
@@ -300,6 +398,7 @@ public class BranchingExecutionHelper {
                             //     values(u3) += {v3 as long as value(u1) = v1, value(u2) = u2}
                             //     values(u4) += {v4 as long as value(u1) = v1, value(u2) = u2, value(u3) = v3}
                             //     ...
+                            /*
                             for (int j = 0; j < ordModels.length; ++j) {
                                 Map<String, Integer> prevUnknownsCopy = new HashMap<String, Integer>();
                                 AccessExpression cur = ordExprArray[j];
@@ -318,6 +417,28 @@ public class BranchingExecutionHelper {
                                 }
 
                                 prevUnknowns.put(name, ordModels[j]);
+                            }
+                            */
+
+                            // Change the first UNKNOWN that has to be changed and don't bother with the rest.
+                            // If some value was already explored, then the whole subtree must have been explored and thus its nothing new
+                            // If the value is already planned, wait for it to be explored
+                            for (int j = 0; j < models.length; ++j) {
+                                Map<String, Integer> prevUnknownsCopy = new HashMap<String, Integer>();
+                                AccessExpression cur = ordExprArray[j];
+                                String name = ((DefaultRoot) cur).getName();
+
+                                DynamicIntChoiceGenerator cg = unknowns.get(name).getChoiceGenerator();
+
+                                if (!cg.hasProcessed(models[j]) && !cg.has(models[j])) {
+                                    cg.add(models[j], prevUnknownsCopy);
+
+                                    if (config.enabledVerbose(BranchingExecutionHelper.class)) {
+                                        System.out.println("\t" + ordExprArray[j] + ": " + models[j]);
+                                    }
+
+                                    break;
+                                }
                             }
                         }
                     }

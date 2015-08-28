@@ -104,14 +104,16 @@ public class UnaryIfInstructionExecutor {
                     cg = new IntChoiceFromList("Ensure that state matching is used in case there was an infinite loop", 1);
                     ss.setNextChoiceGenerator(cg);
 
-                    PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(predicate, br.getSelf().getMethodInfo(), br.getDefaultTarget().getPosition());
+                    // This happens after reinvoking the instruction
+                    //PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(predicate, br.getSelf().getMethodInfo(), br.getDefaultTarget().getPosition());
 
                     return br.getSelf();
                 case FALSE:
                     cg = new IntChoiceFromList("Ensure that state matching is used in case there was an infinite loop", 0);
                     ss.setNextChoiceGenerator(cg);
 
-                    PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Negation.create(predicate), br.getSelf().getMethodInfo(), br.getNext(ti).getPosition());
+                    // This happens after reinvoking the instruction
+                    //PredicateAbstraction.getInstance().extendTraceFormulaWithConstraint(Negation.create(predicate), br.getSelf().getMethodInfo(), br.getNext(ti).getPosition());
 
                     return br.getSelf();
                 case UNKNOWN:
