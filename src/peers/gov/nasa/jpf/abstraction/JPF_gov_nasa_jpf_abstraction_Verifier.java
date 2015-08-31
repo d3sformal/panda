@@ -69,15 +69,11 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
             // at some point we reach a feasible branch which is not enabled under current concrete execution
             // we generate a model of all unknown values
             // we backtrack and try different choices
+
             String name = ((Root) PredicateAbstraction.getInstance().getSSAManager().getSymbolIncarnation(Unknown.create(ti.getPC(), cg), 0)).getName();
             Map<String, Unknown> unknowns = PredicateAbstraction.getInstance().getUnknowns();
             Integer[] prevValues = new Integer[0];
             List<TraceFormula> prevTraces = null;
-
-            // Check that exact values (the current values during execution) of previous unknowns match the enabling constraints (the values discovered together with this model)
-            //   value(u1) = v1
-            //   value(u2) = u2
-            //   ...
 
             /*
              * Eagerly reuse already discovered values of a specific unknown from different subtrees.
@@ -99,7 +95,6 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
              *
              * Furthermore, if Panda does not produce tuples of values, this does not help at all.
              */
-            /*
             List<Map<String, Integer>> prevConditions = null;
 
             if (unknowns.containsKey(name)) {
@@ -108,10 +103,9 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
                 prevConditions = unknowns.get(name).getChoiceGenerator().getConditions();
             }
 
-            for (int i = 1; i < prevValues.length; ++i) {
+            for (int i = unknowns.get(name).getChoiceGenerator().getProcessedNumberOfChoices(); i < prevValues.length; ++i) {
                 cg.add(prevValues[i], prevTraces.get(i - 1), prevConditions.get(i - 1));
             }
-            */
 
             if (env.setNextChoiceGenerator(cg)) {
                 env.getSystemState().setForced(true);

@@ -50,6 +50,11 @@ public class DynamicIntChoiceGenerator extends IntChoiceFromList {
     }
 
     public boolean isNextChoiceEnabled() {
+        // Check that exact values (the current values during execution) of previous unknowns match the enabling constraints (the values discovered together with this model)
+        //   value(u1) = v1
+        //   value(u2) = u2
+        //   ...
+
         boolean ret = true;
 
         if (count > 0) {

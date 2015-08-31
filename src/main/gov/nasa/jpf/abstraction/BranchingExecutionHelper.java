@@ -65,7 +65,7 @@ public class BranchingExecutionHelper {
     protected static class ModelIterator implements Iterator<Predicate> {
         private AccessExpression[] exprs;
         private DynamicIntChoiceGenerator[] cgs;
-        private int subset = 1;
+        private int subsetSize = 1;
         private boolean reusesTried = false;
         private boolean blockingsTried = false;
         private Iterator<Predicate> it;
@@ -78,7 +78,7 @@ public class BranchingExecutionHelper {
         @Override
         public boolean hasNext() {
             // If we are about to try changing all the unknowns
-            if (subset == exprs.length) {
+            if (subsetSize == exprs.length) {
                 return !reusesTried || !blockingsTried;
             }
 
@@ -88,8 +88,9 @@ public class BranchingExecutionHelper {
 
         @Override
         public Predicate next() {
-            if (subset == exprs.length) {
+            if (subsetSize == exprs.length) {
                 if (!reusesTried) {
+                    // picks some combination of previously discovered values
                     Predicate reuses = Tautology.create();
 
                     for (int j = 0; j < exprs.length; ++j) {
@@ -114,6 +115,7 @@ public class BranchingExecutionHelper {
 
                     return reuses;
                 } else if (!blockingsTried) {
+                    // at least one unknown will get a completely fresh value (previously unseen)
                     Predicate blockings = Contradiction.create();
 
                     for (int j = 0; j < exprs.length; ++j) {
@@ -143,11 +145,13 @@ public class BranchingExecutionHelper {
 
                 return null;
             } else {
+                // at least one unknown gets a new value (different from "reuses" above)
+                // but note that the "new" value may be the same as some previously seen (different from "blockings" above)
                 if (it == null) {
                     List<Predicate> combinations = new ArrayList<Predicate>();
-                    Stack<Integer> idx = new Stack<Integer>();
+                    Stack<Integer> selectedIdx = new Stack<Integer>();
 
-                    generate(combinations, idx, 0, subset);
+                    generate(combinations, selectedIdx, 0, subsetSize);
 
                     it = combinations.iterator();
                 }
@@ -155,9 +159,10 @@ public class BranchingExecutionHelper {
                 Predicate p = it.next();
 
                 if (!it.hasNext()) {
-                    ++subset;
+                    ++subsetSize;
 
-                    // TODO: bound the size of subset, when it reaches a certain empirically determined threshold (2) it stops (configurable).
+                    // TODO: bound the size of subset, when it reaches a certain empirically determined threshold (2 or 3) it stops (configurable).
+                        // when it reaches a threshold produce the whole set (so that all unknowns are changed if pairs or tuples are not sufficient to force target branch)
 
                     it = null;
                 }
@@ -171,6 +176,8 @@ public class BranchingExecutionHelper {
             throw new RuntimeException("Not supported");
         }
 
+        // Generate constraint that fixes values of all the unknowns except those in the `subset`
+        //   `selectedIdx` is an auxiliary set of selected indices of unknowns to be fixed (modified only in recursive calls, initially empty)
         // TODO: rewrite so that:
         //
         // Make sure the models are generated so that for a sequence of unknowns (u1, u2, u3, u4, u5) the models are probed to change
@@ -191,25 +198,30 @@ public class BranchingExecutionHelper {
         // u2 u3 u4
         // u2 u3 u4 u5
         // ...
-        protected void generate(List<Predicate> out, Stack<Integer> idx, int i, int subset) {
-            if (i == exprs.length) {
-                if (idx.size() + subset == exprs.length) {
+        protected void generate(List<Predicate> out, Stack<Integer> selectedIdx, int i, int subsetSize) {
+            if (i == exprs.length) { // The entire set of unknowns
+                if (selectedIdx.size() + subsetSize == exprs.length) {
                     Predicate p = Tautology.create();
 
-                    for (int k : idx) {
+                    // Fix values for the selected unknowns
+                    for (int k : selectedIdx) {
                         p = Conjunction.create(p, Equals.create(exprs[k], Constant.create(cgs[k].getCurrentChoice())));
                     }
 
+                    // Add the constraint in the set of all possibilities
                     out.add(p);
                 }
             } else {
-                if (i - idx.size() < subset) {
-                    generate(out, idx, i + 1, subset);
+                // We left out too few unknowns from the constraint
+                if (i - selectedIdx.size() < subsetSize) { // It still makes sense to try leaving out an unknown from the constraint
+                    generate(out, selectedIdx, i + 1, subsetSize);
                 }
-                if (i < exprs.length - subset) {
-                    idx.push(i);
-                    generate(out, idx, i + 1, subset);
-                    idx.pop();
+
+                // We included too few unknowns in the constraint
+                if (i < exprs.length - subsetSize) { // It still makes sense to try including an unknown in the constraint
+                    selectedIdx.push(i);
+                    generate(out, selectedIdx, i + 1, subsetSize);
+                    selectedIdx.pop();
                 }
             }
         }
@@ -325,13 +337,16 @@ public class BranchingExecutionHelper {
                     AccessExpression[] ordExprArray = new AccessExpression[exprArray.length];
                     DynamicIntChoiceGenerator[] ordExprCGArray = new DynamicIntChoiceGenerator[exprArray.length];
 
-                    for (int j = 0; j < ord; ++j) {
+                    for (int j = 0; j < exprArray.length; ++j) {
                         ordExprArray[order[j]] = exprArray[j];
                         ordExprCGArray[order[j]] = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
                     }
 
                     // Try changing some unknowns to drive the execution into the branch that is not currently enabled
+
                     int[] models = null;
+                    // This query does not constrain any of the unknowns to take any specific value, thus if any model exists it will be found here
+                    // (but it may introduce new values where unnecessary)
                     int[] fallbackModels = PredicateAbstraction.getInstance().traceSMT.getModels(Tautology.create(), ordExprArray, false);
 
                     // Try to find nice models only if there are some (if there is no fallback then there is no nice model either)
@@ -398,6 +413,15 @@ public class BranchingExecutionHelper {
                             //     values(u3) += {v3 as long as value(u1) = v1, value(u2) = u2}
                             //     values(u4) += {v4 as long as value(u1) = v1, value(u2) = u2, value(u3) = v3}
                             //     ...
+                            //
+                            // The commented-out code below represents the EAGER APPROACH
+                            //   When introducing a tuple of new unknown values, we still need to backtrack to the first of the unknowns
+                            //   This destroys all the choice generators on the suffix of the trace and thus we would need to copy the newly discovered values for those cgs
+                            //
+                            // We disabled this because now we use the LAZY APPROACH
+                            //   The values may get discovered in future anyway and thus all this eager work is redundant
+                            //   If we lazily wait for the values to get discovered when needed, we may save ourselves the trouble of bookkeeping for the new values
+                            //
                             /*
                             for (int j = 0; j < ordModels.length; ++j) {
                                 Map<String, Integer> prevUnknownsCopy = new HashMap<String, Integer>();
@@ -424,14 +448,13 @@ public class BranchingExecutionHelper {
                             // If some value was already explored, then the whole subtree must have been explored and thus its nothing new
                             // If the value is already planned, wait for it to be explored
                             for (int j = 0; j < models.length; ++j) {
-                                Map<String, Integer> prevUnknownsCopy = new HashMap<String, Integer>();
                                 AccessExpression cur = ordExprArray[j];
                                 String name = ((DefaultRoot) cur).getName();
 
                                 DynamicIntChoiceGenerator cg = unknowns.get(name).getChoiceGenerator();
 
                                 if (!cg.hasProcessed(models[j]) && !cg.has(models[j])) {
-                                    cg.add(models[j], prevUnknownsCopy);
+                                    cg.add(models[j]);
 
                                     if (config.enabledVerbose(BranchingExecutionHelper.class)) {
                                         System.out.println("\t" + ordExprArray[j] + ": " + models[j]);

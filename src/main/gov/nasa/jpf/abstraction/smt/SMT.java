@@ -1969,7 +1969,7 @@ public class SMT {
 
             String query = convertToString(valueConstraint);
 
-            if (USE_MODELS_CACHE && cache.getQueries().contains(query)) {
+            if (USE_MODELS_CACHE && cache.getQueries().contains(query) && useCache) {
                 ret[i] = cache.get(query).getModel();
                 ++cachedCount;
                 cached[i] = true;
@@ -1990,7 +1990,7 @@ public class SMT {
         QueryResponse[] responses = isSatisfiable(expressions.length - cachedCount, input.toString(), true);
 
         for (int i = 0, j = 0; i < responses.length; ++i, ++j) {
-            if (USE_MODELS_CACHE) {
+            if (USE_MODELS_CACHE && useCache) {
                 // Cache responses
                 cache.put(state + queries[i], responses[i]);
 
