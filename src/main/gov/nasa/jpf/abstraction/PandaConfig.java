@@ -58,6 +58,7 @@ public class PandaConfig {
     private Boolean monitorEntireUniverse;
     private FreshnessEncoding freshnessEncoding;
     private Boolean extendPredicatesOverAnonymousToDestinations;
+    private Integer unknownsSubsetSizeThreshold;
 
     public enum FreshnessEncoding {
         ASSIGN_REFERENCE,
@@ -472,5 +473,13 @@ public class PandaConfig {
         }
 
         return extendPredicatesOverAnonymousToDestinations;
+    }
+
+    public int getUnknownsSubsetSizeThreshold() {
+        if (unknownsSubsetSizeThreshold == null) {
+            unknownsSubsetSizeThreshold = getUnderlyingConfig().getInt("panda.unknowns.subset_size_threshold");
+        }
+        
+        return unknownsSubsetSizeThreshold;
     }
 }

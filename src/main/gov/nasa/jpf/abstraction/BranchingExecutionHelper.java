@@ -65,30 +65,36 @@ public class BranchingExecutionHelper {
     protected static class ModelIterator implements Iterator<Predicate> {
         private AccessExpression[] exprs;
         private DynamicIntChoiceGenerator[] cgs;
-        private int subsetSize = 1;
         private boolean reusesTried = false;
         private boolean blockingsTried = false;
+        private int threshold;
         private Iterator<Predicate> it;
 
         public ModelIterator(AccessExpression[] exprs, DynamicIntChoiceGenerator[] cgs) {
             this.exprs = exprs;
             this.cgs = cgs;
+            
+            threshold = PandaConfig.getInstance().getUnknownsSubsetSizeThreshold();
+            
+            List<Predicate> combinations = generateCombinations();
+
+            it = combinations.iterator();
         }
 
         @Override
         public boolean hasNext() {
-            // If we are about to try changing all the unknowns
-            if (subsetSize == exprs.length) {
+            // If we already tried to change all the unknowns (all the combinations)
+            if (!it.hasNext()) {
                 return !reusesTried || !blockingsTried;
             }
 
             // Until we try to change all subsets we need to keep going
-            return exprs.length > 0;
+            return true; // it.hasNext() == true
         }
 
         @Override
         public Predicate next() {
-            if (subsetSize == exprs.length) {
+            if (!it.hasNext()) {
                 if (!reusesTried) {
                     // picks some combination of previously discovered values
                     Predicate reuses = Tautology.create();
@@ -114,7 +120,9 @@ public class BranchingExecutionHelper {
                     reusesTried = true;
 
                     return reuses;
-                } else if (!blockingsTried) {
+                } 
+                
+                if (!blockingsTried) {
                     // at least one unknown will get a completely fresh value (previously unseen)
                     Predicate blockings = Contradiction.create();
 
@@ -144,31 +152,14 @@ public class BranchingExecutionHelper {
                 }
 
                 return null;
-            } else {
-                // at least one unknown gets a new value (different from "reuses" above)
-                // but note that the "new" value may be the same as some previously seen (different from "blockings" above)
-                if (it == null) {
-                    List<Predicate> combinations = new ArrayList<Predicate>();
-                    Stack<Integer> selectedIdx = new Stack<Integer>();
-
-                    generate(combinations, selectedIdx, 0, subsetSize);
-
-                    it = combinations.iterator();
-                }
-
-                Predicate p = it.next();
-
-                if (!it.hasNext()) {
-                    ++subsetSize;
-
-                    // TODO: bound the size of subset, when it reaches a certain empirically determined threshold (2 or 3) it stops (configurable).
-                        // when it reaches a threshold produce the whole set (so that all unknowns are changed if pairs or tuples are not sufficient to force target branch)
-
-                    it = null;
-                }
-
-                return p;
             }
+            
+            // in this case, at least one unknown gets a new value (different from "reuses" above)
+            // but note that the "new" value may be the same as some previously seen (different from "blockings" above)
+
+            Predicate p = it.next();
+
+            return p;
         }
 
         @Override
@@ -178,10 +169,9 @@ public class BranchingExecutionHelper {
 
         // Generate constraint that fixes values of all the unknowns except those in the `subset`
         //   `selectedIdx` is an auxiliary set of selected indices of unknowns to be fixed (modified only in recursive calls, initially empty)
-        // TODO: rewrite so that:
         //
         // Make sure the models are generated so that for a sequence of unknowns (u1, u2, u3, u4, u5) the models are probed to change
-        //
+        // Combinations are generated in this order (each line corresponding to a bit mask):
         //          u5
         //       u4
         //       u4 u5
@@ -198,32 +188,52 @@ public class BranchingExecutionHelper {
         // u2 u3 u4
         // u2 u3 u4 u5
         // ...
-        protected void generate(List<Predicate> out, Stack<Integer> selectedIdx, int i, int subsetSize) {
-            if (i == exprs.length) { // The entire set of unknowns
-                if (selectedIdx.size() + subsetSize == exprs.length) {
-                    Predicate p = Tautology.create();
+		//
+        // We use an empirically determined threshold that bounds the number of changed unknowns (i.e., the number of unknowns left out from a particular constraint)
+        //     when the number of unknowns left out from a constraint exceeds the threshold value, our procedure omits the corresponding combination from the produced list
+        //     motivation: all unknowns should be changed if pairs or small tuples are not sufficient to force exploration of the target branch
+        //
+        protected List<Predicate> generateCombinations() {
+            List<Predicate> combinations = new ArrayList<Predicate>();
 
-                    // Fix values for the selected unknowns
-                    for (int k : selectedIdx) {
-                        p = Conjunction.create(p, Equals.create(exprs[k], Constant.create(cgs[k].getCurrentChoice())));
-                    }
+            // 2 * exprs.length - 1
+            int fullMask = 1 << exprs.length;
+            fullMask--;
 
-                    // Add the constraint in the set of all possibilities
-                    out.add(p);
-                }
-            } else {
-                // We left out too few unknowns from the constraint
-                if (i - selectedIdx.size() < subsetSize) { // It still makes sense to try leaving out an unknown from the constraint
-                    generate(out, selectedIdx, i + 1, subsetSize);
+            int curMask = 1;
+            while (curMask <= fullMask) {
+                List<Integer> selectedIdx = new ArrayList<Integer>();
+
+                for (int i = 0; i < exprs.length; i++) {
+                    // if the bit at the position `i` is set then we must leave the corresponding unknown from the constraint
+                    // otherwise we must include the corresponding unknown (to be fixed in this combination)				  
+                    int b = 1 << i;
+                    if ((curMask & b) == 0) selectedIdx.add(i);
                 }
 
-                // We included too few unknowns in the constraint
-                if (i < exprs.length - subsetSize) { // It still makes sense to try including an unknown in the constraint
-                    selectedIdx.push(i);
-                    generate(out, selectedIdx, i + 1, subsetSize);
-                    selectedIdx.pop();
+                // check threshold, and skip the combination if needed
+                if (selectedIdx.size() > threshold)
+                {
+                    curMask++;
+                    continue;
                 }
+
+                // create the actual combination for the current bit mask
+
+                Predicate p = Tautology.create();
+
+                // Fix values for the selected unknowns
+                for (int k : selectedIdx) {
+                    p = Conjunction.create(p, Equals.create(exprs[k], Constant.create(cgs[k].getCurrentChoice())));
+                }
+
+                // Add the constraint in the set of all possibilities (combinations)
+                combinations.add(p);
+
+                curMask++;
             }
+
+            return combinations;
         }
     }
 
