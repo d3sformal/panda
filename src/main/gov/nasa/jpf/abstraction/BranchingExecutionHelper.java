@@ -205,10 +205,11 @@ public class BranchingExecutionHelper {
                 List<Integer> selectedIdx = new ArrayList<Integer>();
 
                 for (int i = 0; i < exprs.length; i++) {
-                    // if the bit at the position `i` is set then we must leave the corresponding unknown from the constraint
-                    // otherwise we must include the corresponding unknown (to be fixed in this combination)				  
+                    // if the bit at the position `exprs.length - i` is set then we must leave the corresponding unknown from the constraint
+                    // otherwise we must include the corresponding unknown (to be fixed in this combination)
+                    // note that we take unknowns from the end (rear) of the array to match the order defined above
                     int b = 1 << i;
-                    if ((curMask & b) == 0) selectedIdx.add(i);
+                    if ((curMask & b) == 0) selectedIdx.add(exprs.length - i - 1);
                 }
 
                 // check threshold, and skip the combination if needed
