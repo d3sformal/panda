@@ -75,6 +75,7 @@ public class BranchingExecutionHelper {
             this.cgs = cgs;
             
             threshold = PandaConfig.getInstance().getUnknownsSubsetSizeThreshold();
+            if (threshold == -1) threshold = exprs.length; // default is "no bound"
             
             List<Predicate> combinations = generateCombinations();
 

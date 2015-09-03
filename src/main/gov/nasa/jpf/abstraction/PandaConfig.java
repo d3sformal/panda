@@ -477,7 +477,7 @@ public class PandaConfig {
 
     public int getUnknownsSubsetSizeThreshold() {
         if (unknownsSubsetSizeThreshold == null) {
-            unknownsSubsetSizeThreshold = getUnderlyingConfig().getInt("panda.unknowns.subset_size_threshold");
+            unknownsSubsetSizeThreshold = getUnderlyingConfig().getInt("panda.unknowns.subset_size_threshold", -1);
         }
         
         return unknownsSubsetSizeThreshold;
