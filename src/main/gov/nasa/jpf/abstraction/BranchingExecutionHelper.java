@@ -365,6 +365,7 @@ public class BranchingExecutionHelper {
                     if (fallbackModels != null) {
                         for (Predicate mc : generateModelConstraints(ordExprArray, ordExprCGArray)) {
                             models = PredicateAbstraction.getInstance().traceSMT.getModels(mc, ordExprArray, false);
+                            if (models != null) break; // we have found some model
                         }
                     }
                     if (models == null) {

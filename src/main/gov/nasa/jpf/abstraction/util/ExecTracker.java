@@ -1,6 +1,7 @@
 package gov.nasa.jpf.abstraction.util;
 
 import java.io.PrintWriter;
+import java.util.Date;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.ListenerAdapter;
@@ -53,6 +54,8 @@ public class ExecTracker extends ListenerAdapter {
   boolean skip;
   MethodInfo miMain; // just to make init skipping more efficient
 
+  long startMS;
+  
   public ExecTracker (Config config) {
     /** @jpfoption et.print_insn : boolean - print executed bytecode instructions (default=true). */
     printInsn = config.getBoolean("et.print_insn", true);
@@ -73,6 +76,9 @@ public class ExecTracker extends ListenerAdapter {
     }
 
     out = new PrintWriter(System.out, true);
+
+    Date startTime = new Date();
+    startMS = startTime.getTime();
   }
 
   /******************************************* SearchListener interface *****/
@@ -120,6 +126,8 @@ public class ExecTracker extends ListenerAdapter {
 
     out.println();
 
+    out.println("\t\t time: " + printCurrentTimeDiff());
+
     lastLine = null; // in case we report by source line
     lastMi = null;
     linePrefix = null;
@@ -141,6 +149,8 @@ public class ExecTracker extends ListenerAdapter {
 
     out.println("----------------------------------- [" +
                        search.getDepth() + "] backtrack: " + id);
+
+    out.println("\t\t time: " + printCurrentTimeDiff());
   }
 
   @Override
@@ -293,5 +303,17 @@ public class ExecTracker extends ListenerAdapter {
         }
       }
     }
+  }
+
+  String printCurrentTimeDiff()
+  {
+    Date now = new Date();
+    long nowMS = now.getTime();
+
+    long diffMS = nowMS - startMS;
+    
+    long diffSeconds = (diffMS / 1000);
+    
+    return String.valueOf(diffSeconds);
   }
 }

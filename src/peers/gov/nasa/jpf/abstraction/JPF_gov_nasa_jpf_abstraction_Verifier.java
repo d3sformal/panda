@@ -103,7 +103,10 @@ public class JPF_gov_nasa_jpf_abstraction_Verifier extends NativePeer {
                 prevConditions = unknowns.get(name).getChoiceGenerator().getConditions();
             }
 
-            for (int i = unknowns.get(name).getChoiceGenerator().getProcessedNumberOfChoices(); i < prevValues.length; ++i) {
+            int numProcessedChoices = 0;
+            if (unknowns.containsKey(name)) numProcessedChoices = unknowns.get(name).getChoiceGenerator().getProcessedNumberOfChoices();
+
+            for (int i = numProcessedChoices; i < prevValues.length; ++i) {
                 cg.add(prevValues[i], prevTraces.get(i - 1), prevConditions.get(i - 1));
             }
 
