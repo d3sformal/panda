@@ -214,7 +214,8 @@ public class BranchingExecutionHelper {
                 }
 
                 // check threshold, and skip the combination if needed
-                if (selectedIdx.size() > threshold)
+                // threshold applies to the number of unknowns that are NOT constrained in a particular combination
+                if ((exprs.length - selectedIdx.size()) > threshold)
                 {
                     curMask++;
                     continue;
@@ -291,7 +292,29 @@ public class BranchingExecutionHelper {
                 ss.setForced(false);
                 ss.setIgnored(true);
 
-                if (forceFeasible) {
+                StateSet stateSet = VM.getVM().getStateSet();
+                ResetableStateSet rStateSet = null;
+
+                if (stateSet instanceof ResetableStateSet) {
+                    rStateSet = (ResetableStateSet) stateSet;
+                }
+
+                // We must check uniqueness of the current state to avoid divergence:
+                //   one concrete path allows only one branch -> second trace is explored to cover the other branch
+                //   the second concrete path does not allow the first branch -> third trace is explored to cover the first branch
+                //   ...
+                //
+                // Assume this is the case:
+                //   We revisit this branch (the other branch has already been visited - it created a state after passing the check)
+                // Then:
+                //   Try to create a state (but not store it) if the state matches then dont add the choices
+                //     - We cannot store it now because:
+                //       - If this is the first visit -> first enable of a disabled branch -> we WOULD CREATE STATE in the branch -> when we get here with the correct concrete model we would match and not continue exploring
+                //
+
+                // we moved the check for unique state here to avoid expensive computation of models for unknowns when they are not used 
+                    // more specifically, when they are not added to the respective choice generators and the branch is not explored again with the new values (to avoid divergence)
+                if (forceFeasible && (!forceFeasibleOnce || rStateSet == null || rStateSet.isCurrentUnique())) {
                     if (config.enabledVerbose(BranchingExecutionHelper.class)) {
                         System.out.println("[WARNING] Deciding feasibility of the following trace (prefix matching current trace + " + branchCondition + ")");
 
@@ -357,6 +380,7 @@ public class BranchingExecutionHelper {
                     // Try changing some unknowns to drive the execution into the branch that is not currently enabled
 
                     int[] models = null;
+                    
                     // This query does not constrain any of the unknowns to take any specific value, thus if any model exists it will be found here
                     // (but it may introduce new values where unnecessary)
                     int[] fallbackModels = PredicateAbstraction.getInstance().traceSMT.getModels(Tautology.create(), ordExprArray, false);
@@ -377,104 +401,82 @@ public class BranchingExecutionHelper {
                             System.out.println("[WARNING] No feasible trace found");
                         }
                     } else {
-                        // To avoid divergence:
-                        //   one concrete path allows only one branch -> second trace is explored to cover the other branch
-                        //   the second concrete path does not allow the first branch -> third trace is explored to cover the first branch
-                        //   ...
-                        //
-                        // Assume this is the case:
-                        //   We revisit this branch (the other branch has already been visited - it created a state after passing the check)
-                        // Then:
-                        //   Try to create a state (but not store it) if the state matches then dont add the choices
-                        //     - We cannot store it now because:
-                        //       - If this is the first visit -> first enable of a disabled branch -> we WOULD CREATE STATE in the branch -> when we get here with the correct concrete model we would match and not continue exploring
-                        //
-
-                        StateSet stateSet = VM.getVM().getStateSet();
-                        ResetableStateSet rStateSet = null;
-
-                        if (stateSet instanceof ResetableStateSet) {
-                            rStateSet = (ResetableStateSet) stateSet;
+                        if (config.enabledVerbose(BranchingExecutionHelper.class)) {
+                            System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
                         }
 
-                        if (rStateSet == null || rStateSet.isCurrentUnique() || !forceFeasibleOnce) {
-                            if (config.enabledVerbose(BranchingExecutionHelper.class)) {
-                                System.out.println("[WARNING] Feasible trace found for unknown values: " + Arrays.toString(models));
+                        // Make sure we do not enable one tuple of values multiple times (that could cause divergence)
+                        // At least one value for one of the unknowns needs to be new
+                        boolean isNewCombination = false;
+
+                        for (int j = 0; j < models.length; ++j) {
+                            DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
+
+                            if (!cg.has(models[j])) {
+                                isNewCombination = true;
                             }
+                        }
 
-                            // Make sure we do not enable one tuple of values multiple times (that could cause divergence)
-                            // At least one value for one of the unknowns needs to be new
-                            boolean isNewCombination = false;
+                        Map<String, Integer> prevUnknowns = new HashMap<String, Integer>();
 
-                            for (int j = 0; j < models.length; ++j) {
-                                DynamicIntChoiceGenerator cg = unknowns.get(((DefaultRoot) exprArray[j]).getName()).getChoiceGenerator();
+                        // Enable the newly generated value for each of the unknowns
+                        //   always require that all the previous unknowns have the values dictated by the newly discovered tuple
+                        //
+                        //   the domain of the first unknown is extended unconditionally
+                        //     values(u1) += {v1}
+                        //
+                        //     values(u2) += {v2 as long as value(u1) = v1}
+                        //     values(u3) += {v3 as long as value(u1) = v1, value(u2) = u2}
+                        //     values(u4) += {v4 as long as value(u1) = v1, value(u2) = u2, value(u3) = v3}
+                        //     ...
+                        //
+                        // The commented-out code below represents the EAGER APPROACH
+                        //   When introducing a tuple of new unknown values, we still need to backtrack to the first of the unknowns
+                        //   This destroys all the choice generators on the suffix of the trace and thus we would need to copy the newly discovered values for those cgs
+                        //
+                        // We disabled this because now we use the LAZY APPROACH
+                        //   The values may get discovered in future anyway and thus all this eager work is redundant
+                        //   If we lazily wait for the values to get discovered when needed, we may save ourselves the trouble of bookkeeping for the new values
+                        //
+                        /*
+                        for (int j = 0; j < ordModels.length; ++j) {
+                            Map<String, Integer> prevUnknownsCopy = new HashMap<String, Integer>();
+                            AccessExpression cur = ordExprArray[j];
+                            String name = ((DefaultRoot) cur).getName();
 
-                                if (!cg.has(models[j])) {
-                                    isNewCombination = true;
+                            prevUnknownsCopy.putAll(prevUnknowns);
+
+                            DynamicIntChoiceGenerator cg = unknowns.get(name).getChoiceGenerator();
+
+                            if ((cg.hasProcessed(ordModels[j]) && isNewCombination) || !cg.has(ordModels[j])) {
+                                cg.add(ordModels[j], prevUnknownsCopy);
+
+                                if (config.enabledVerbose(BranchingExecutionHelper.class)) {
+                                    System.out.println("\t" + ordExprArray[j] + ": " + ordModels[j]);
                                 }
                             }
 
-                            Map<String, Integer> prevUnknowns = new HashMap<String, Integer>();
+                            prevUnknowns.put(name, ordModels[j]);
+                        }
+                        */
 
-                            // Enable the newly generated value for each of the unknowns
-                            //   always require that all the previous unknowns have the values dictated by the newly discovered tuple
-                            //
-                            //   the domain of the first unknown is extended unconditionally
-                            //     values(u1) += {v1}
-                            //
-                            //     values(u2) += {v2 as long as value(u1) = v1}
-                            //     values(u3) += {v3 as long as value(u1) = v1, value(u2) = u2}
-                            //     values(u4) += {v4 as long as value(u1) = v1, value(u2) = u2, value(u3) = v3}
-                            //     ...
-                            //
-                            // The commented-out code below represents the EAGER APPROACH
-                            //   When introducing a tuple of new unknown values, we still need to backtrack to the first of the unknowns
-                            //   This destroys all the choice generators on the suffix of the trace and thus we would need to copy the newly discovered values for those cgs
-                            //
-                            // We disabled this because now we use the LAZY APPROACH
-                            //   The values may get discovered in future anyway and thus all this eager work is redundant
-                            //   If we lazily wait for the values to get discovered when needed, we may save ourselves the trouble of bookkeeping for the new values
-                            //
-                            /*
-                            for (int j = 0; j < ordModels.length; ++j) {
-                                Map<String, Integer> prevUnknownsCopy = new HashMap<String, Integer>();
-                                AccessExpression cur = ordExprArray[j];
-                                String name = ((DefaultRoot) cur).getName();
+                        // Change the first UNKNOWN that has to be changed and don't bother with the rest.
+                        // If some value was already explored, then the whole subtree must have been explored and thus its nothing new
+                        // If the value is already planned, wait for it to be explored
+                        for (int j = 0; j < models.length; ++j) {
+                            AccessExpression cur = ordExprArray[j];
+                            String name = ((DefaultRoot) cur).getName();
 
-                                prevUnknownsCopy.putAll(prevUnknowns);
+                            DynamicIntChoiceGenerator cg = unknowns.get(name).getChoiceGenerator();
 
-                                DynamicIntChoiceGenerator cg = unknowns.get(name).getChoiceGenerator();
+                            if (!cg.hasProcessed(models[j]) && !cg.has(models[j])) {
+                                cg.add(models[j]);
 
-                                if ((cg.hasProcessed(ordModels[j]) && isNewCombination) || !cg.has(ordModels[j])) {
-                                    cg.add(ordModels[j], prevUnknownsCopy);
-
-                                    if (config.enabledVerbose(BranchingExecutionHelper.class)) {
-                                        System.out.println("\t" + ordExprArray[j] + ": " + ordModels[j]);
-                                    }
+                                if (config.enabledVerbose(BranchingExecutionHelper.class)) {
+                                    System.out.println("\t" + ordExprArray[j] + ": " + models[j]);
                                 }
 
-                                prevUnknowns.put(name, ordModels[j]);
-                            }
-                            */
-
-                            // Change the first UNKNOWN that has to be changed and don't bother with the rest.
-                            // If some value was already explored, then the whole subtree must have been explored and thus its nothing new
-                            // If the value is already planned, wait for it to be explored
-                            for (int j = 0; j < models.length; ++j) {
-                                AccessExpression cur = ordExprArray[j];
-                                String name = ((DefaultRoot) cur).getName();
-
-                                DynamicIntChoiceGenerator cg = unknowns.get(name).getChoiceGenerator();
-
-                                if (!cg.hasProcessed(models[j]) && !cg.has(models[j])) {
-                                    cg.add(models[j]);
-
-                                    if (config.enabledVerbose(BranchingExecutionHelper.class)) {
-                                        System.out.println("\t" + ordExprArray[j] + ": " + models[j]);
-                                    }
-
-                                    break;
-                                }
+                                break;
                             }
                         }
                     }
