@@ -1,4 +1,8 @@
 /*
+ * Copyright (C) 2010, United States Government as represented by the
+ * Administrator of the National Aeronautics and Space Administration
+ * (NASA). All rights reserved.
+ *
  * Copyright (C) 2015, Charles University in Prague.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
